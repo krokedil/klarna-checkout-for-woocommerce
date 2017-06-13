@@ -1,2 +1,1 @@
-# klarna-checkout-for-woocommerce
-Klarna Checkout for WooCommerce plugin
+# Klarna Checkout for WooCommerce plugin
