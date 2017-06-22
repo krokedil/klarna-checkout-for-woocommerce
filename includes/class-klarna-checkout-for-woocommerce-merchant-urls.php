@@ -16,15 +16,15 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 */
 	public static function get_urls() {
 		$merchant_urls = array(
-			'terms'                  => self::get_terms_url(),        // Required.
-			'checkout'               => self::get_checkout_url(),     // Required.
-			'confirmation'           => self::get_confirmation_url(), // Required.
-			'push'                   => self::get_push_url(),         // Required.
-			'validation'             => self::get_validation_url(),
-			'shipping_option_update' => self::get_shipping_option_update_url(),
-			'address_update'         => self::get_address_update_url(),
+			'terms'                  => self::get_terms_url(),                  // Required.
+			'checkout'               => self::get_checkout_url(),               // Required.
+			'confirmation'           => self::get_confirmation_url(),           // Required.
+			'push'                   => self::get_push_url(),                   // Required.
+			'validation'             => self::get_validation_url(),             // HTTPS.
+			'shipping_option_update' => self::get_shipping_option_update_url(), // HTTPS.
+			'address_update'         => self::get_address_update_url(),         // HTTPS.
 			'notification'           => self::get_notification_url(),
-			'country_change'         => self::get_country_change_url(),
+			'country_change'         => self::get_country_change_url(),         // HTTPS.
 		);
 
 		return $merchant_urls;

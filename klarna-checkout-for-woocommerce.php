@@ -166,6 +166,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-gateway.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api.php' );
+			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-ajax.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines.php' );
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
