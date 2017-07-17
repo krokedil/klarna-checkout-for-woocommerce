@@ -12,13 +12,21 @@ jQuery( function( $ ) {
 
 			// Check if switching to of from Klarna Checkout.
 			if ('klarna_checkout_for_woocommerce' === $('input[name="payment_method"]:checked').val() || 'klarna_checkout_for_woocommerce' === this.selectedGateway) {
-				// $('body').trigger('update_checkout');
+				$('body').trigger('update_checkout');
 				this.selectedGateway = $('input[name="payment_method"]:checked').val();
 				window.location.reload();
 			}
 		},
-		update_from_klarna_checkout: function() {
+		update_from_klarna_checkout: function(e) {
 			console.log('updating checkout');
+
+			e.preventDefault();
+
+			$.ajax({
+				type: 'POST',
+				url: '/checkout/?wc-ajax=kco_ajax_event',
+				success: function (data) {}
+			});
 
 			this.selectedGateway = false;
 			window.location.reload();
