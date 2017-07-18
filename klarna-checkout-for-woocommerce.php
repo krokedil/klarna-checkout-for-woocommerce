@@ -102,6 +102,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		protected function __construct() {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
+			add_action( 'init', array( $this, 'add_kco_endpoint' ) );
 		}
 
 		/**
@@ -168,6 +169,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-ajax.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines.php' );
+			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-endpoints.php' );
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
@@ -176,7 +178,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		/**
 		 * Add the gateways to WooCommerce
 		 *
-		 * @since 1.0.0
+		 * @param  array $methods Payment methods.
+		 * @return array $methods Payment methods.
+		 * @since  1.0.0
 		 */
 		public function add_gateways( $methods ) {
 			$methods[] = 'Klarna_Checkout_For_WooCommerce_Gateway';
@@ -193,6 +197,13 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				self::$log = new WC_Logger();
 			}
 			self::$log->add( 'klarna-checkout-for-woocommerce', $message );
+		}
+
+		/**
+		 * Adds KCO page endpoint.
+		 */
+		public function add_kco_endpoint() {
+			add_rewrite_endpoint( 'special-page', EP_ROOT | EP_PAGES );
 		}
 
 	}

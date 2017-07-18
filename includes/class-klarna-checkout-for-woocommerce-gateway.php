@@ -1,7 +1,9 @@
 <?php
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
 /**
  * Klarna_Checkout_For_WooCommerce_Gateway class.
  *
@@ -16,7 +18,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->id                   = 'klarna_checkout_for_woocommerce';
 		$this->method_title         = __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' );
 		$this->method_description   = __( 'Klarna Checkout replaces standard WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' );
-		$this->has_fields           = true;
+		$this->has_fields           = false;
 		$this->supports             = apply_filters( 'klarna_checkout_for_woocommerce_supports', array( 'products' ) );
 
 		// Load the form fields.
@@ -26,17 +28,17 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->init_settings();
 
 		// Get setting values.
-		$this->title         = $this->get_option( 'title' );
-		$this->description   = $this->get_option( 'description', '' );
-		$this->enabled       = $this->get_option( 'enabled' );
-		$this->testmode      = 'yes' === $this->get_option( 'testmode' );
-		$this->merchant_id   = $this->testmode ? $this->get_option( 'test_merchant_id_us' ) : $this->get_option( 'merchant_id_us', '' ); // @TODO: Test if live credentials are pulled when needed.
-		$this->shared_secret = $this->testmode ? $this->get_option( 'test_shared_secret_us' ) : $this->get_option( 'shared_secret_us', '' );
-		$this->logging       = 'yes' === $this->get_option( 'logging' );
+		$this->title            = $this->get_option( 'title' );
+		$this->description      = $this->get_option( 'description', '' );
+		$this->enabled          = $this->get_option( 'enabled' );
+		$this->default_checkout = 'yes' === $this->get_option( 'default_checkout' );
+		$this->testmode         = 'yes' === $this->get_option( 'testmode' );
+		$this->merchant_id      = $this->testmode ? $this->get_option( 'test_merchant_id_us' ) : $this->get_option( 'merchant_id_us', '' ); // @TODO: Test if live credentials are pulled when needed.
+		$this->shared_secret    = $this->testmode ? $this->get_option( 'test_shared_secret_us' ) : $this->get_option( 'shared_secret_us', '' );
+		$this->logging          = 'yes' === $this->get_option( 'logging' );
 
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
 	}
 
 	/**
@@ -64,6 +66,13 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 				'description' => __( 'Payment method description that the customer will see on your website.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => __( 'Pay with Klarna Checkout.', 'klarna-checkout-for-woocommerce' ),
 				'desc_tip'    => true,
+			),
+			'default_checkout' => array(
+				'title'       => __( 'Make Klarna Checkout default', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'If checked Klarna Checkout will take over WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => '',
+				'default'     => 'yes',
 			),
 			'test_merchant_id_us' => array(
 				'title'       => __( 'Test merchant ID (US)', 'klarna-checkout-for-woocommerce' ),
@@ -126,25 +135,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Override checkout form template if Klarna Checkout is the selected payment method.
-	 *
-	 * @param string $template      Template.
-	 * @param string $template_name Template name.
-	 * @param string $template_path Template path.
-	 *
-	 * @return string
-	 */
-	public function override_template( $template, $template_name, $template_path ) {
-		if ( WC()->session->get( 'chosen_payment_method' ) === $this->id ) {
-			if ( 'checkout/form-checkout.php' === $template_name ) {
-				$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/form-checkout.php';
-			}
-		}
-
-		return $template;
-	}
-
-	/**
 	 * Enqueue payment scripts.
 	 *
 	 * @hook wp_enqueue_scripts
@@ -164,4 +154,5 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		wp_enqueue_script( 'klarna_checkout_for_woocommerce' );
 	}
+
 }

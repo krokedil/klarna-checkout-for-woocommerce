@@ -46,6 +46,22 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		) );
 	}
 
+	/**
+	 * Change payment method to Klarna Checkout.
+	 */
+	public static function change_to_kco() {
+		// Set session payment method.
+		// Reload the page.
+	}
+
+	/**
+	 * Change payment method from Klarna Checkout.
+	 */
+	public static function change_from_kco() {
+		// Set session payment method.
+		// Reload the page.
+	}
+
 }
 
 Klarna_Checkout_For_WooCommerce_AJAX::init();
