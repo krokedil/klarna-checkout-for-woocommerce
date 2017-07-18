@@ -26,9 +26,6 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 
 		// Override template if Klarna Checkout page.
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
-
-		// Inserting your new tab/page into the My Account page.
-		add_action( 'woocommerce_account_' . self::$endpoint . '_endpoint', array( $this, 'endpoint_content' ) );
 	}
 
 	/**
