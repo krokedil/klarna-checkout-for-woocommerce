@@ -38,6 +38,12 @@ define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MIN_WC_VER', '2.5.0' );
 define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE', __FILE__ );
 define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 
+/**
+ * Endpoints
+ */
+define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CHECKOUT_EP', 'kco' );
+define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CONFIRM_EP', 'kco-confirm' );
+
 if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 	/**
 	 * Class Klarna_Checkout_For_WooCommerce

@@ -10,11 +10,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Klarna_Checkout_For_WooCommerce_Endpoints {
 
 	/**
-	 * Custom endpoint name.
+	 * Checkout endpoint name.
 	 *
 	 * @var string
 	 */
-	public static $endpoint = 'kco';
+	public static $checkout_endpoint = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CHECKOUT_EP;
+
+	/**
+	 * Confirm endpoint names.
+	 *
+	 * @var string
+	 */
+	public static $confirm_endpoint = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CONFIRM_EP;
 
 	/**
 	 * Plugin actions.
@@ -24,17 +31,21 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 		add_action( 'init', array( $this, 'add_endpoints' ) );
 		add_filter( 'query_vars', array( $this, 'add_query_vars' ), 0 );
 
+		// Change the checkout page title.
+		add_filter( 'the_title', array( $this, 'endpoint_title' ) );
+
 		// Override template if Klarna Checkout page.
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
 	}
 
 	/**
-	 * Register new endpoint to use inside My Account page.
+	 * Register new endpoints.
 	 *
 	 * @see https://developer.wordpress.org/reference/functions/add_rewrite_endpoint/
 	 */
 	public function add_endpoints() {
-		add_rewrite_endpoint( self::$endpoint, EP_PAGES );
+		add_rewrite_endpoint( self::$checkout_endpoint, EP_PAGES );
+		add_rewrite_endpoint( self::$confirm_endpoint, EP_PAGES );
 	}
 
 	/**
@@ -44,7 +55,8 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 	 * @return array
 	 */
 	public function add_query_vars( $vars ) {
-		$vars[] = self::$endpoint;
+		$vars[] = self::$checkout_endpoint;
+		$vars[] = self::$confirm_endpoint;
 
 		return $vars;
 	}
@@ -61,9 +73,16 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 	public function override_template( $template, $template_name, $template_path ) {
 		global $wp_query;
 
-		if ( is_checkout() && isset( $wp_query->query_vars[ self::$endpoint ] ) ) {
-			if ( 'checkout/form-checkout.php' === $template_name ) {
-				$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/form-checkout.php';
+		// Klarna Checkout.
+		if ( 'checkout/form-checkout.php' === $template_name ) {
+			// Klarna checkout page.
+			if ( is_checkout() && isset( $wp_query->query_vars[ self::$checkout_endpoint ] ) ) {
+				$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
+			}
+
+			// Klarna checkout confirmation page.
+			if ( is_checkout() && isset( $wp_query->query_vars[ self::$confirm_endpoint ] ) ) {
+				$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout-confirm.php';
 			}
 		}
 
@@ -76,6 +95,24 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 	 */
 	public static function install() {
 		flush_rewrite_rules();
+	}
+
+	/**
+	 * Change checkout page title, if Klarna Checkout.
+	 *
+	 * @param  string $title Page title.
+	 * @return string
+	 */
+	public function endpoint_title( $title ) {
+		global $wp_query;
+
+		$is_endpoint = isset( $wp_query->query_vars[ self::$checkout_endpoint ] );
+
+		if ( $is_endpoint && is_checkout() ) {
+			$title = __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' );
+		}
+
+		return $title;
 	}
 
 }

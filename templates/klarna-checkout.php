@@ -12,7 +12,7 @@ echo '<div style="overflow:hidden; padding-top:20px;">';
 	$decoded_response = json_decode( $response['body'] );
 	$klarna_order_id = $decoded_response->order_id;
 
-	$klarna_order = wp_remote_get(
+	$klarna_order = wp_safe_remote_get(
 		'https://api-na.playground.klarna.com/checkout/v3/orders/' . $klarna_order_id,
 		array(
 			'headers' => array(
@@ -27,3 +27,7 @@ echo '<div style="overflow:hidden; padding-top:20px;">';
 	echo '</div>';
 
 echo '</div>';
+
+echo '<pre style="font-size:12px">';
+print_r( $klarna_order );
+echo '</pre>';
