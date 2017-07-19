@@ -2,7 +2,6 @@
 jQuery( function( $ ) {
 
 	var klarna_checkout_for_woocommerce = {
-		selectedGateway: $('input[name="payment_method"]:checked').val(),
 		init: function() {
 			$('body').on( 'change', 'input[name="payment_method"]', function() {
 				klarna_checkout_for_woocommerce.update_to_klarna_checkout();
@@ -13,9 +12,8 @@ jQuery( function( $ ) {
 			console.log('updating checkout', $('input[name="payment_method"]:checked').val());
 
 			// Check if switching to of from Klarna Checkout.
-			if ('klarna_checkout_for_woocommerce' === $('input[name="payment_method"]:checked').val() || 'klarna_checkout_for_woocommerce' === this.selectedGateway) {
-				this.selectedGateway = $('input[name="payment_method"]:checked').val();
-				$('body').trigger('update_checkout');
+			if ('klarna_checkout_for_woocommerce' === $('input[name="payment_method"]:checked').val()) {
+				// $('body').trigger('update_checkout');
 				window.location.href = '/checkout/kco';
 			}
 		},
@@ -30,8 +28,7 @@ jQuery( function( $ ) {
 			});
 			*/
 
-			this.selectedGateway = false;
-			window.location.reload();
+			window.location.href = '/checkout';
 			// $('body').trigger('update_checkout');
 		}
 

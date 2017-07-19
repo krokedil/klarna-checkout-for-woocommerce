@@ -36,6 +36,9 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 
 		// Override template if Klarna Checkout page.
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
+
+		// Change checkout URL if KCO is currently selected method.
+		add_filter('woocommerce_get_checkout_url', array( $this, 'maybe_filter_checkout_url' ) );
 	}
 
 	/**
@@ -113,6 +116,21 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 		}
 
 		return $title;
+	}
+
+	/**
+	 * Maybe filter checkout URL to go to KCO page.
+	 *
+	 * @param  string $url Checkout page URL.
+	 * @return mixed
+	 */
+	public function maybe_filter_checkout_url( $url ) {
+		// If KCO is chosen payment method.
+		if ( 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_payment_method' ) ) {
+			$url = wc_get_checkout_url() . '/kco';
+		}
+
+		return $url;
 	}
 
 }
