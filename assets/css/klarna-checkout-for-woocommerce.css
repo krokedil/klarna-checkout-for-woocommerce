@@ -1,0 +1,17 @@
+#kco-wrapper {
+    overflow: hidden;
+    padding: 20px 0;
+}
+
+#kco-order-review {
+    float: left;
+    width: 40%;
+    padding-right: 20px;
+    font-size: 0.9em;
+}
+
+#kco-iframe {
+    float: right;
+    width: 60%;
+    padding-left: 20px;
+}

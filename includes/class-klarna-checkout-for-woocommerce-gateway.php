@@ -152,7 +152,15 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			true
 		);
 
+		wp_register_style(
+			'klarna_checkout_for_woocommerce',
+			plugins_url( 'assets/css/klarna-checkout-for-woocommerce.css', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ),
+			array(),
+			KLARNA_CHECKOUT_FOR_WOOCOMMERCE_VERSION
+		);
+
 		wp_enqueue_script( 'klarna_checkout_for_woocommerce' );
+		wp_enqueue_style( 'klarna_checkout_for_woocommerce' );
 	}
 
 }

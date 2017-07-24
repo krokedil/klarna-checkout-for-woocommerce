@@ -38,7 +38,7 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
 
 		// Change checkout URL if KCO is currently selected method.
-		add_filter('woocommerce_get_checkout_url', array( $this, 'maybe_filter_checkout_url' ) );
+		// add_filter( 'woocommerce_get_checkout_url', array( $this, 'maybe_filter_checkout_url' ) );
 	}
 
 	/**
