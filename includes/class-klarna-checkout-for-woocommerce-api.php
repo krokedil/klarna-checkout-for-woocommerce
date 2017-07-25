@@ -29,22 +29,33 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * - Order Validation
 	 */
 
-	const API_BASE = 'https://api-na.playground.klarna.com';
+	/**
+	 * API base address
+	 *
+	 * @var $api_base
+	 */
+	private static $api_base = 'https://api-na.playground.klarna.com';
 
 	/**
 	 * Create checkout endpoint
+	 *
+	 * @var $create_checkout_endpoint
 	 */
-	const CREATE_CHECKOUT_ENDPOINT = '/checkout/v3/order';
+	private static $create_checkout_endpoint = '/checkout/v3/order';
 
 	/**
 	 * Fetch checkout endpoint
+	 *
+	 * @var $update_checkout_endpoint
 	 */
-	const FETCH_CHECKOUT_ENDPOINT = '/checkout/v3/orders/';
+	private static $fetch_checkout_endpoint = '/checkout/v3/orders/';
 
 	/**
 	 * Update checkout endpoint
+	 *
+	 * @var $update_checkout_endpoint
 	 */
-	const UPDATE_CHECKOUT_ENDPOINT = '/checkout/v3/orders/';
+	private static $update_checkout_endpoint = '/checkout/v3/orders/';
 
 	/**
 	 * Klarna Checkout merchant ID.

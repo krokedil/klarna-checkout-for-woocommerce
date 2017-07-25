@@ -61,6 +61,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		$this->process_shipping();
 		$this->process_sales_tax();
 		$this->process_coupons();
+
 		return array(
 			'order_lines' => $this->order_lines,
 			'order_amount' => $this->order_amount,
