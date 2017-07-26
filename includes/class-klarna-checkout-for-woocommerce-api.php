@@ -30,54 +30,39 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 */
 
 	/**
-	 * API base address
-	 *
-	 * @var $api_base
-	 */
-	private static $api_base = 'https://api-na.playground.klarna.com';
-
-	/**
-	 * Create checkout endpoint
-	 *
-	 * @var $create_checkout_endpoint
-	 */
-	private static $create_checkout_endpoint = '/checkout/v3/order';
-
-	/**
-	 * Fetch checkout endpoint
-	 *
-	 * @var $update_checkout_endpoint
-	 */
-	private static $fetch_checkout_endpoint = '/checkout/v3/orders/';
-
-	/**
-	 * Update checkout endpoint
-	 *
-	 * @var $update_checkout_endpoint
-	 */
-	private static $update_checkout_endpoint = '/checkout/v3/orders/';
-
-	/**
 	 * Klarna Checkout merchant ID.
 	 *
 	 * @var string
 	 */
-	private static $merchant_id = '';
+	private $merchant_id = '';
 
 	/**
 	 * Klarna Checkout shared secret.
 	 *
 	 * @var string
 	 */
-	private static $shared_secret = '';
+	private $shared_secret = '';
+
+	/**
+	 * Klarna_Checkout_For_WooCommerce_API constructor.
+	 *
+	 * @param string $merchant_id   Klarna merchant ID.
+	 * @param string $shared_secret Klarna shared secret.
+	 *
+	 * @TODO: Remove default values
+	 */
+	public function __construct( $merchant_id = 'N100033', $shared_secret = 'riz5Aith3bii%ch9' ) {
+		$this->set_merchant_id( $merchant_id );
+		$this->set_shared_secret( $shared_secret );
+	}
 
 	/**
 	 * Set Klarna Checkout merchant ID.
 	 *
 	 * @param string $merchant_id Klarna Checkout merchant ID.
 	 */
-	public static function set_merchant_id( $merchant_id ) {
-
+	public function set_merchant_id( $merchant_id ) {
+		$this->merchant_id = $merchant_id;
 	}
 
 	/**
@@ -85,112 +70,186 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 *
 	 * @param string $shared_secret Klarna Checkout shared secret.
 	 */
-	public static function set_shared_secret( $shared_secret ) {
-
+	public function set_shared_secret( $shared_secret ) {
+		$this->shared_secret = $shared_secret;
 	}
 
 	/**
-	 * Displays Klarna Checkout iframe.
+	 * Gets Klarna order from WC_Session
 	 *
-	 * Checks if there's an ongoing Klarna order, to update it, or creates a new one.
+	 * @return array|string
 	 */
-	public static function show_iframe() {
-		/**
-		 * Logic
-		 *
-		 * Check if there's an ongoing Klarna order ID in WC session
-		 * - YES
-		 *   Try to get order see if it's OK
-		 *   * YES
-		 *     Display the iframe
-		 *   * NO
-		 *     Create new Klarna order, display the iframe
-		 *
-		 * - NO
-		 *   Create new Klarna order, display the iframe
-		 *
-		 * @TODO: Continue here
-		 */
-
-		$klarna_order = self::get_order();
-		echo $klarna_order->html_snippet;
-
-
-
-
-		/*
-		$response = self::create_order();
-		$decoded_response = json_decode( $response['body'] );
-		$klarna_order_id = $decoded_response->order_id;
-
-		$klarna_order = wp_safe_remote_get(
-			API_BASE . FETCH_CHECKOUT_ENDPOINT . $klarna_order_id,
-			array(
-				'headers' => array(
-					'Authorization' => 'Basic ' . base64_encode( 'N100033:riz5Aith3bii%ch9' ),
-					'Content-Type'  => 'application/json',
-				),
-			)
-		);
-
-		$decoded_klarna_order = json_decode( $klarna_order['body'] );
-		echo $decoded_klarna_order->html_snippet;
-		*/
+	public function get_order_id_from_session() {
+		return WC()->session->get( 'klarna_order_id' );
 	}
 
 	/**
-	 * Gets Klarna order.
+	 * Saves Klarna order ID to WooCommerce session.
 	 *
-	 * Gets an ongoing or creates a new Klarna order and returns it.
+	 * @param string $order_id Klarna order ID.
 	 */
-	public static function get_order() {
-		WC()->session->__unset( 'klarna_checkout_order_id' );
+	public function save_order_id_to_session( $order_id ) {
+		WC()->session->set( 'klarna_order_id', $order_id );
+	}
 
-		if ( WC()->session->get( 'klarna_checkout_order_id' ) ) {
-			$klarna_order_id = WC()->session->get( 'klarna_checkout_order_id' );
-			$klarna_order = self::retrieve_order( $klarna_order_id );
+	/**
+	 * Gets Klarna Checkout order.
+	 *
+	 * If WC_Session value for Klarna order ID exists, attempt to retrieve that order.
+	 * If this fails, create a new one and retrieve it.
+	 * If WC_Session value for Klarna order ID does not exist, create a new order and retrieve it.
+	 */
+	public function get_order() {
+		$order_id = $this->get_order_id_from_session();
 
-			if ( is_wp_error( $klarna_order ) ) {
-				$klarna_order = self::create_order();
+		if ( $order_id ) {
+			$order = $this->retrieve_order( $order_id );
 
+			if ( ! $order ) {
+				$order = $this->create_order();
 			}
 		} else {
-			$klarna_order = self::create_order();
+			$order = $this->create_order();
 		}
 
-		return $klarna_order;
+		return $order;
 	}
 
 	/**
-	 * Create Klarna Checkout resource.
+	 * Gets KCO iframe snippet from KCO order.
+	 *
+	 * @param Klarna_Order $order Klarna Checkout order.
+	 *
+	 * @return mixed
 	 */
-	public static function create_order() {
-		$order_lines = self::get_order_lines();
-		$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders';
+	public function get_snippet( $order ) {
+		return $order->html_snippet;
+	}
+
+	/**
+	 * Gets Klarna merchant ID.
+	 *
+	 * @return string
+	 */
+	public function get_merchant_id() {
+		return $this->merchant_id;
+	}
+
+	/**
+	 * Gets Klarna shared secret.
+	 *
+	 * @return string
+	 */
+	public function get_shared_secret() {
+		return $this->shared_secret;
+	}
+
+	/**
+	 * Gets country for Klarna purchase.
+	 *
+	 * @return string
+	 */
+	public function get_purchase_country() {
+		return 'US';
+	}
+
+	/**
+	 * Gets currency for Klarna purchase.
+	 *
+	 * @return string
+	 */
+	public function get_purchase_currency() {
+		return 'USD';
+	}
+
+	/**
+	 * Gets locale for Klarna purchase.
+	 *
+	 * @return string
+	 */
+	public function get_locale() {
+		return 'en-US';
+	}
+
+	/**
+	 * Gets merchant URLs for Klarna purchase.
+	 *
+	 * @return array
+	 * @TODO: Add remaining URLs (validation, shipping_option_update, address_update, notification, country_change).
+	 */
+	public function get_merchant_urls() {
+		return array(
+			'terms'                  => 'http://krokedil.klarna.ngrok.io/terms.html',
+			'checkout'               => 'http://krokedil.klarna.ngrok.io/checkout/',
+			'confirmation'           => 'http://krokedil.klarna.ngrok.io/checkout/kco-confirm/',
+			'push'                   => 'http://krokedil.klarna.ngrok.io/api/push',
+		);
+	}
+
+	/**
+	 * Gets Klarna API request URL.
+	 *
+	 * @param string $request API request type (create, retrieve, update).
+	 *
+	 * @return string
+	 */
+	public function get_request_url( $request ) {
+		switch ( $request ) {
+			case 'create':
+				$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders';
+				break;
+			default:
+				$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders';
+		}
+
+		return $request_url;
+	}
+
+	/**
+	 * Gets Klarna API request headers.
+	 *
+	 * @return array
+	 */
+	public function get_request_headers() {
+		$request_headers = array(
+			'Authorization' => 'Basic ' . base64_encode( $this->get_merchant_id() . ':' . $this->get_shared_secret() ),
+			'Content-Type'  => 'application/json',
+		);
+
+		return $request_headers;
+	}
+
+	/**
+	 * Gets Klarna API request body.
+	 *
+	 * @return false|string
+	 */
+	public function get_request_body() {
+		$order_lines_processor = new Klarna_Checkout_For_WooCommerce_Order_Lines();
+
+		$request_body = wp_json_encode( array(
+			'purchase_country'  => $this->get_purchase_country(),
+			'purchase_currency' => $this->get_purchase_currency(),
+			'locale'            => $this->get_locale(),
+			'merchant_urls'     => $this->get_merchant_urls(),
+			'order_amount'      => $order_lines_processor->get_order_amount(),
+			'order_tax_amount'  => $order_lines_processor->get_order_tax_amount(),
+			'order_lines'       => $order_lines_processor->get_order_lines(),
+		) );
+
+		return $request_body;
+	}
+
+	/**
+	 * Creates Klarna Checkout order.
+	 *
+	 * @return array|mixed|object|WP_Error
+	 */
+	public function create_order() {
+		$request_url = $this->get_request_url( 'create' );
 		$request_args = array(
-			'headers' => array(
-				'Authorization' => 'Basic ' . base64_encode( 'N100033:riz5Aith3bii%ch9' ),
-				'Content-Type'  => 'application/json',
-			),
-			'body' => wp_json_encode( array(
-				'purchase_country'  => 'US',
-				'purchase_currency' => 'USD',
-				'locale'            => 'en-US',
-				'order_amount'      => $order_lines['order_amount'],
-				'order_tax_amount'  => $order_lines['order_tax_amount'],
-				'order_lines'       => $order_lines['order_lines'],
-				'merchant_urls'     => array(
-					'terms'                  => 'http://krokedil.klarna.ngrok.io/terms.html',
-					'checkout'               => 'http://krokedil.klarna.ngrok.io/checkout/',
-					'confirmation'           => 'http://krokedil.klarna.ngrok.io/checkout/kco-confirm/',
-					'push'                   => 'http://krokedil.klarna.ngrok.io/api/push',
-					// 'validation'             => 'https://krokedil.klarna.ngrok.io/api/validation',
-					// 'shipping_option_update' => 'https://krokedil.klarna.ngrok.io/api/shipment',
-					// 'address_update'         => 'https://krokedil.klarna.ngrok.io/api/address',
-					// 'notification'           => 'https://krokedil.klarna.ngrok.io/api/pending',
-					// 'country_change'         => 'https://krokedil.klarna.ngrok.io/api/country',
-				),
-			) ),
+			'headers' => $this->get_request_headers(),
+			'body'    => $this->get_request_body(),
 		);
 
 		$response = wp_safe_remote_post( $request_url, $request_args );
@@ -203,6 +262,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		} else {
 			return new WP_Error( 'Error creating Klarna order.' );
 		}
+
 	}
 
 	/**
@@ -211,7 +271,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @param  string $klarna_order_id Klarna order ID.
 	 * @return object $klarna_order    Klarna order.
 	 */
-	public static function retrieve_order( $klarna_order_id ) {
+	public function retrieve_order( $klarna_order_id ) {
 		$response = wp_safe_remote_get(
 			'https://api-na.playground.klarna.com/checkout/v3/orders/' . $klarna_order_id,
 			array(
@@ -233,20 +293,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 	/**
 	 * Update ongoing Klarna order.
 	 */
-	public static function update_order() {
+	public function update_order() {
 
-	}
-
-	/**
-	 * Gets WooCommerce order lines formatted for Klarna Rest API.
-	 *
-	 * @return array
-	 */
-	public static function get_order_lines() {
-		$order_lines_processor = new Klarna_Checkout_For_WooCommerce_Order_Lines();
-		$order_lines = $order_lines_processor->order_lines();
-
-		return $order_lines;
 	}
 
 }

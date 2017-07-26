@@ -49,25 +49,30 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( 'US' === $this->shop_country ) {
 			$this->separate_sales_tax = true;
 		}
+
+		// @TODO: Process fees
+		$this->process_cart();
+		$this->process_shipping();
+		$this->process_sales_tax();
+		$this->process_coupons();
 	}
 	/**
 	 * Gets formatted order lines from WooCommerce cart.
 	 *
 	 * @return array
 	 */
-	public function order_lines() {
-		// @TODO: Process fees
-		$this->process_cart();
-		$this->process_shipping();
-		$this->process_sales_tax();
-		$this->process_coupons();
-
-		return array(
-			'order_lines' => $this->order_lines,
-			'order_amount' => $this->order_amount,
-			'order_tax_amount' => $this->order_tax_amount,
-		);
+	public function get_order_lines() {
+		return $this->order_lines;
 	}
+
+	public function get_order_amount() {
+		return $this->order_amount;
+	}
+
+	public function get_order_tax_amount() {
+		return $this->order_tax_amount;
+	}
+
 	/**
 	 * Process WooCommerce cart to Klarna Payments order lines.
 	 */
