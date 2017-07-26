@@ -112,7 +112,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		 * @TODO: Continue here
 		 */
 
-		$klarna_order = self::order();
+		$klarna_order = self::get_order();
 		echo $klarna_order->html_snippet;
 
 
@@ -143,7 +143,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 *
 	 * Gets an ongoing or creates a new Klarna order and returns it.
 	 */
-	public static function order() {
+	public static function get_order() {
 		WC()->session->__unset( 'klarna_checkout_order_id' );
 
 		if ( WC()->session->get( 'klarna_checkout_order_id' ) ) {
