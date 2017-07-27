@@ -30,6 +30,13 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 */
 
 	/**
+	 * Klarna Checkout api URL.
+	 *
+	 * @var string
+	 */
+	private $api_url = '';
+
+	/**
 	 * Klarna Checkout merchant ID.
 	 *
 	 * @var string
@@ -52,8 +59,18 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @TODO: Remove default values
 	 */
 	public function __construct( $merchant_id = 'N100033', $shared_secret = 'riz5Aith3bii%ch9' ) {
+		$this->set_api_url( 'https://api-na.playground.klarna.com/checkout/v3/orders/' );
 		$this->set_merchant_id( $merchant_id );
 		$this->set_shared_secret( $shared_secret );
+	}
+
+	/**
+	 * Set Klarna Checkout API URL.
+	 *
+	 * @param string $api_url Klarna Checkout API URL.
+	 */
+	public function set_api_url( $api_url ) {
+		$this->api_url = $api_url;
 	}
 
 	/**
@@ -196,10 +213,16 @@ class Klarna_Checkout_For_WooCommerce_API {
 	public function get_request_url( $request ) {
 		switch ( $request ) {
 			case 'create':
-				$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders';
+				$request_url = $this->api_url;
+				break;
+			case 'retrieve':
+				$request_url = $this->api_url;
+				break;
+			case 'update':
+				$request_url = $this->api_url;
 				break;
 			default:
-				$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders';
+				$request_url = $this->api_url;
 		}
 
 		return $request_url;
@@ -262,7 +285,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 		} else {
 			return new WP_Error( 'Error creating Klarna order.' );
 		}
-
 	}
 
 	/**
@@ -272,15 +294,12 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return object $klarna_order    Klarna order.
 	 */
 	public function retrieve_order( $klarna_order_id ) {
-		$response = wp_safe_remote_get(
-			'https://api-na.playground.klarna.com/checkout/v3/orders/' . $klarna_order_id,
-			array(
-				'headers' => array(
-					'Authorization' => 'Basic ' . base64_encode( 'N100033:riz5Aith3bii%ch9' ),
-					'Content-Type'  => 'application/json',
-				),
-			)
+		$request_url = $this->get_request_url( 'retrieve' ) . $klarna_order_id;
+		$request_args = array(
+			'headers' => $this->get_request_headers(),
 		);
+
+		$response = wp_safe_remote_get( $request_url, $request_args );
 
 		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
 			$klarna_order = json_decode( $response['body'] );
@@ -292,8 +311,27 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 	/**
 	 * Update ongoing Klarna order.
+	 *
+	 * @param  string $klarna_order_id Klarna order ID.
+	 * @return object $klarna_order    Klarna order.
 	 */
-	public function update_order() {
+	public function update_order( $klarna_order_id ) {
+		$request_url = $this->get_request_url( 'update' ) . $klarna_order_id;
+		$request_args = array(
+			'headers' => $this->get_request_headers(),
+			'body'    => $this->get_request_body(),
+		);
+
+		$response = wp_safe_remote_post( $request_url, $request_args );
+
+		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
+			$klarna_order = json_decode( $response['body'] );
+			WC()->session->set( 'klarna_checkout_order_id', $klarna_order->order_id );
+
+			return $klarna_order;
+		} else {
+			return new WP_Error( 'Error creating Klarna order.' );
+		}
 
 	}
 

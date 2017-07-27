@@ -17,7 +17,7 @@
 	</div>
 
 	<div id="kco-iframe">
-		<?php Klarna_Checkout_For_WooCommerce_API::show_iframe(); ?>
+		<?php kco_wc_show_snippet(); ?>
 	</div>
 
 </div>
