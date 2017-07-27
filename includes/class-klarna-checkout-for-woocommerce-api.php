@@ -16,17 +16,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * - https://api.playground.klarna.com/
 	 * - https://api-na.playground.klarna.com/
 	 *
-	 * Authentication
-	 *
 	 * Checkout API
 	 * - Create checkout (order)
 	 * - Retrieve checkout
 	 * - Update checkout
-	 *
-	 * Checkout API Callbacks
-	 * - Address Update
-	 * - Shipping Option Update
-	 * - Order Validation
 	 */
 
 	/**
