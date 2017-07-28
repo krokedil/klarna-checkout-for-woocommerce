@@ -49,13 +49,19 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( 'US' === $this->shop_country ) {
 			$this->separate_sales_tax = true;
 		}
+	}
 
+	/**
+	 * Processes cart data
+	 */
+	public function process_data() {
 		// @TODO: Process fees
 		$this->process_cart();
 		$this->process_shipping();
 		$this->process_sales_tax();
 		$this->process_coupons();
 	}
+
 	/**
 	 * Gets formatted order lines from WooCommerce cart.
 	 *

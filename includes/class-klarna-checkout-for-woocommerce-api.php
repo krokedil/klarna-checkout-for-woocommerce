@@ -188,6 +188,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @TODO: Add remaining URLs (validation, shipping_option_update, address_update, notification, country_change).
 	 */
 	public function get_merchant_urls() {
+		return KCO_WC()->merchant_urls->get_urls();
+
 		return array(
 			'terms'                  => 'http://krokedil.klarna.ngrok.io/terms.html',
 			'checkout'               => 'http://krokedil.klarna.ngrok.io/checkout/',
@@ -241,16 +243,16 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return false|string
 	 */
 	public function get_request_body() {
-		$order_lines_processor = new Klarna_Checkout_For_WooCommerce_Order_Lines();
+		KCO_WC()->order_lines->process_data();
 
 		$request_body = wp_json_encode( array(
 			'purchase_country'  => $this->get_purchase_country(),
 			'purchase_currency' => $this->get_purchase_currency(),
 			'locale'            => $this->get_locale(),
 			'merchant_urls'     => $this->get_merchant_urls(),
-			'order_amount'      => $order_lines_processor->get_order_amount(),
-			'order_tax_amount'  => $order_lines_processor->get_order_tax_amount(),
-			'order_lines'       => $order_lines_processor->get_order_lines(),
+			'order_amount'      => KCO_WC()->order_lines->get_order_amount(),
+			'order_tax_amount'  => KCO_WC()->order_lines->get_order_tax_amount(),
+			'order_lines'       => KCO_WC()->order_lines->get_order_lines(),
 		) );
 
 		return $request_body;

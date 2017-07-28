@@ -10,6 +10,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Klarna_Checkout_For_WooCommerce_Endpoints {
 
 	/**
+	 * The reference the *Singleton* instance of this class.
+	 *
+	 * @var $instance
+	 */
+	protected static $instance;
+
+	/**
 	 * Checkout endpoint name.
 	 *
 	 * @var string
@@ -22,6 +29,18 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 	 * @var string
 	 */
 	public static $confirm_endpoint = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CONFIRM_EP;
+
+	/**
+	 * Returns the *Singleton* instance of this class.
+	 *
+	 * @return self::$instance The *Singleton* instance.
+	 */
+	public static function get_instance() {
+		if ( null === self::$instance ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
 
 	/**
 	 * Plugin actions.
@@ -134,6 +153,6 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 	}
 
 }
-new Klarna_Checkout_For_WooCommerce_Endpoints();
 
+Klarna_Checkout_For_WooCommerce_Endpoints::get_instance();
 register_activation_hook( __FILE__, array( 'Klarna_Checkout_For_WooCommerce_Endpoints', 'install' ) );
