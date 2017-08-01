@@ -2,13 +2,18 @@
 
 <p>Please wait while we process your order.</p>
 
+<?php
+	// Fetch Klarna order
+	// Get needed info from it
+?>
+
 <script>
 	// Public
 	var kco_slbd_test = function kco_slbd_test() {
 		jQuery.ajax({
 			type: 'POST',
 			url: '/checkout/?wc-ajax=checkout',
-			data: 'billing_first_name=Testperson-se&billing_last_name=Approved&billing_company=C&billing_country=SE&billing_address_1=St%C3%A5rgatan+1&billing_address_2=&billing_postcode=12343&billing_city=Ankeborg&billing_state=&billing_phone=0123456789&billing_email=slobodan%40krokedil.se&shipping_first_name=Testperson-se&shipping_last_name=Approved&shipping_company=C&shipping_country=SE&shipping_address_1=St%C3%A5rgatan+1&shipping_address_2=&shipping_postcode=12343&shipping_city=Ankeborg&shipping_state=&order_comments=&shipping_method%5B0%5D=flat_rate%3A1&payment_method=bacs&terms=on&terms-field=1&_wpnonce=<?php echo $nonce; ?>',
+			data: 'billing_first_name=Testperson-se&billing_last_name=Approved&billing_company=C&billing_country=SE&billing_address_1=St%C3%A5rgatan+1&billing_address_2=&billing_postcode=12343&billing_city=Ankeborg&billing_state=&billing_phone=0123456789&billing_email=slobodan%40krokedil.se&shipping_first_name=Testperson-se&shipping_last_name=Approved&shipping_company=C&shipping_country=SE&shipping_address_1=St%C3%A5rgatan+1&shipping_address_2=&shipping_postcode=12343&shipping_city=Ankeborg&shipping_state=&order_comments=&shipping_method%5B0%5D=flat_rate%3A1&payment_method=klarna_checkout_for_woocommerce&terms=on&terms-field=1&_wpnonce=<?php echo $nonce; ?>',
 			dataType: 'json',
 			success: function (result) {
 				try {
@@ -40,6 +45,7 @@
 						console.log(result.messages);
 						wc_checkout_form.submit_error(result.messages);
 					} else {
+						console.log(result);
 						wc_checkout_form.submit_error('<div class="woocommerce-error">' + wc_checkout_params.i18n_checkout_error + '</div>');
 					}
 				}

@@ -50,9 +50,6 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 		add_action( 'init', array( $this, 'add_endpoints' ) );
 		add_filter( 'query_vars', array( $this, 'add_query_vars' ), 0 );
 
-		// Change the checkout page title.
-		add_filter( 'the_title', array( $this, 'endpoint_title' ) );
-
 		// Override template if Klarna Checkout page.
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
 
@@ -117,24 +114,6 @@ class Klarna_Checkout_For_WooCommerce_Endpoints {
 	 */
 	public static function install() {
 		flush_rewrite_rules();
-	}
-
-	/**
-	 * Change checkout page title, if Klarna Checkout.
-	 *
-	 * @param  string $title Page title.
-	 * @return string
-	 */
-	public function endpoint_title( $title ) {
-		global $wp_query;
-
-		$is_endpoint = isset( $wp_query->query_vars[ self::$checkout_endpoint ] );
-
-		if ( $is_endpoint && is_checkout() ) {
-			$title = __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' );
-		}
-
-		return $title;
 	}
 
 	/**

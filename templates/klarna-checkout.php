@@ -9,6 +9,8 @@
 
 ?>
 
+<?php WC()->session->set( 'chosen_payment_method', 'klarna_checkout_for_woocommerce' ); ?>
+
 <a href="#" id="klarna-checkout-select-other">Select another payment method</a>
 
 <div id="kco-wrapper">

@@ -44,10 +44,24 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * Push callback function.
 	 */
 	public function push_cb() {
-		// 1. Handle POST request
-		// 2. Request the order from Klarna
-		// 3. Backup order creation
-		// 4. Acknowledge the order
+		/**
+		 * 1. Handle POST request
+		 * 2. Request the order from Klarna
+		 * 3. Backup order creation
+		 * 4. Acknowledge the order
+		 * 5. Send merchant_reference1
+		 */
+
+		$klarna_order_id = $_GET['klarna_order_id'];
+
+		KCO_WC()->api->acknowledge_order( $klarna_order_id );
+		KCO_WC()->api->set_merchant_reference(
+			$klarna_order_id,
+			array(
+				'merchant_reference1' => 'somethingrandom',
+				'merchant_reference2' => 'somethingelserandom',
+			)
+		);
 	}
 
 	/**
@@ -94,7 +108,13 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * @link https://developers.klarna.com/api/#checkout-api-callbacks-address-update
 	 */
 	public function address_update_cb() {
+		$post_body = file_get_contents( 'php://input' );
+		// Convert post body into native object.
+		$data = json_decode( $post_body, true );
 
+		// @TODO: Continue here
+
+		header( 'HTTP/1.0 200 OK' );
 	}
 
 }

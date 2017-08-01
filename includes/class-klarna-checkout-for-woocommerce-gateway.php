@@ -39,6 +39,28 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'show_thank_you_snippet' ) );
+	}
+
+	/**
+	 * Process the payment and return the result.
+	 *
+	 * @param  int $order_id WooCommerce order ID.
+	 * @return array
+	 */
+	public function process_payment( $order_id ) {
+		$order = wc_get_order( $order_id );
+
+		// Reduce stock levels.
+		wc_reduce_stock_levels( $order_id );
+
+		// Remove cart.
+		WC()->cart->empty_cart();
+
+		return array(
+			'result'   => 'success',
+			'redirect' => $this->get_return_url( $order ),
+		);
 	}
 
 	/**
@@ -161,6 +183,19 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		wp_enqueue_script( 'klarna_checkout_for_woocommerce' );
 		wp_enqueue_style( 'klarna_checkout_for_woocommerce' );
+	}
+
+	/**
+	 * Displays Klarna Checkout thank you iframe and clears Klarna order ID value from WC session.
+	 *
+	 * @param int $order_id WooCommerce order ID.
+	 */
+	public function show_thank_you_snippet( $order_id ) {
+		$klarna_order = KCO_WC()->api->get_order();
+		echo KCO_WC()->api->get_snippet( $klarna_order );
+
+		add_post_meta( $order_id, '_klarna_order_id', $klarna_order->order_id );
+		WC()->session->__unset( 'klarna_order_id' );
 	}
 
 }
