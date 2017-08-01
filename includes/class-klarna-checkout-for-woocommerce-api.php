@@ -58,6 +58,135 @@ class Klarna_Checkout_For_WooCommerce_API {
 	}
 
 	/**
+	 * Creates Klarna Checkout order.
+	 *
+	 * @return array|mixed|object|WP_Error
+	 */
+	public function request_pre_create_order() {
+		$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders';
+		$request_args = array(
+			'headers' => $this->get_request_headers(),
+			'body'    => $this->get_request_body(),
+		);
+
+		$response = wp_safe_remote_post( $request_url, $request_args );
+
+		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
+			$klarna_order = json_decode( $response['body'] );
+			$this->save_order_id_to_session( $klarna_order->order_id );
+
+			return $klarna_order;
+		} else {
+			return new WP_Error( 'Error creating Klarna order.' );
+		}
+	}
+
+	/**
+	 * Retrieve ongoing Klarna order.
+	 *
+	 * @param  string $klarna_order_id Klarna order ID.
+	 * @return object $klarna_order    Klarna order.
+	 */
+	public function request_pre_retrieve_order( $klarna_order_id ) {
+		$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders/' . $klarna_order_id;
+		$request_args = array(
+			'headers' => $this->get_request_headers(),
+		);
+
+		$response = wp_safe_remote_get( $request_url, $request_args );
+
+		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
+			$klarna_order = json_decode( $response['body'] );
+			return $klarna_order;
+		} else {
+			return new WP_Error( 'Error retrieving Klarna order.' );
+		}
+	}
+
+	/**
+	 * Update ongoing Klarna order.
+	 *
+	 * @param  string $klarna_order_id Klarna order ID.
+	 * @return object $klarna_order    Klarna order.
+	 */
+	public function request_pre_update_order( $klarna_order_id ) {
+		$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders/' . $klarna_order_id;
+		$request_args = array(
+			'headers' => $this->get_request_headers(),
+			'body'    => $this->get_request_body(),
+		);
+
+		$response = wp_safe_remote_post( $request_url, $request_args );
+
+		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
+			$klarna_order = json_decode( $response['body'] );
+
+			return $klarna_order;
+		} else {
+			return new WP_Error( 'Error creating Klarna order.' );
+		}
+
+	}
+
+
+	/**
+	 * Acknowledges Klarna Checkout order.
+	 *
+	 * @param  string $klarna_order_id Klarna order ID.
+	 *
+	 * @return WP_Error|array $response
+	 */
+	public function request_post_get_order( $klarna_order_id ) {
+		$request_url = 'https://api-na.playground.klarna.com/ordermanagement/v1/orders/' . $klarna_order_id;
+		$request_args = array(
+			'headers' => $this->get_request_headers(),
+		);
+
+		$response = wp_safe_remote_get( $request_url, $request_args );
+		return $response;
+	}
+
+	/**
+	 * Acknowledges Klarna Checkout order.
+	 *
+	 * @param  string $klarna_order_id Klarna order ID.
+	 *
+	 * @return WP_Error|array $response
+	 */
+	public function request_post_acknowledge_order( $klarna_order_id ) {
+		$request_url = 'https://api-na.playground.klarna.com/ordermanagement/v1/orders/' . $klarna_order_id . '/acknowledge';
+		$request_args = array(
+			'headers' => $this->get_request_headers(),
+		);
+
+		$response = wp_safe_remote_post( $request_url, $request_args );
+		return $response;
+	}
+
+	/**
+	 * Adds WooCommerce order ID to Klarna order as merchant_reference. And clear Klarna order ID value from WC session.
+	 *
+	 * @param  string $klarna_order_id     Klarna order ID.
+	 * @param  array  $merchant_references Array of merchant references.
+	 *
+	 * @return WP_Error|array $response
+	 */
+	public function request_post_set_merchant_reference( $klarna_order_id, $merchant_references ) {
+		$request_url = 'https://api-na.playground.klarna.com/ordermanagement/v1/orders/' . $klarna_order_id . '/merchant-references';
+		$request_args = array(
+			'headers' => $this->get_request_headers(),
+			'method' => 'PATCH',
+			'body' => wp_json_encode( array(
+				'merchant_reference1' => $merchant_references['merchant_reference1'],
+				'merchant_reference2' => $merchant_references['merchant_reference2'],
+			) ),
+		);
+
+		$response = wp_safe_remote_request( $request_url, $request_args );
+		return $response;
+	}
+
+	/**
 	 * Set Klarna Checkout API URL.
 	 *
 	 * @param string $api_url Klarna Checkout API URL.
@@ -113,16 +242,16 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$order_id = $this->get_order_id_from_session();
 
 		if ( $order_id ) {
-			$order = $this->retrieve_order( $order_id );
+			$order = $this->request_pre_retrieve_order( $order_id );
 
 			if ( ! $order ) {
-				$order = $this->create_order();
+				$order = $this->request_pre_create_order();
 			} elseif ( 'checkout_incomplete' === $order->status ) {
 				// Only update order if its status is incomplete.
-				$order = $this->update_order( $order_id );
+				$order = $this->request_pre_update_order( $order_id );
 			}
 		} else {
-			$order = $this->create_order();
+			$order = $this->request_pre_create_order();
 		}
 
 		return $order;
@@ -252,117 +381,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 		) );
 
 		return $request_body;
-	}
-
-	/**
-	 * Creates Klarna Checkout order.
-	 *
-	 * @return array|mixed|object|WP_Error
-	 */
-	public function create_order() {
-		$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders';
-		$request_args = array(
-			'headers' => $this->get_request_headers(),
-			'body'    => $this->get_request_body(),
-		);
-
-		$response = wp_safe_remote_post( $request_url, $request_args );
-
-		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
-			$klarna_order = json_decode( $response['body'] );
-			$this->save_order_id_to_session( $klarna_order->order_id );
-
-			return $klarna_order;
-		} else {
-			return new WP_Error( 'Error creating Klarna order.' );
-		}
-	}
-
-	/**
-	 * Retrieve ongoing Klarna order.
-	 *
-	 * @param  string $klarna_order_id Klarna order ID.
-	 * @return object $klarna_order    Klarna order.
-	 */
-	public function retrieve_order( $klarna_order_id ) {
-		$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders/' . $klarna_order_id;
-		$request_args = array(
-			'headers' => $this->get_request_headers(),
-		);
-
-		$response = wp_safe_remote_get( $request_url, $request_args );
-
-		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
-			$klarna_order = json_decode( $response['body'] );
-			return $klarna_order;
-		} else {
-			return new WP_Error( 'Error retrieving Klarna order.' );
-		}
-	}
-
-	/**
-	 * Update ongoing Klarna order.
-	 *
-	 * @param  string $klarna_order_id Klarna order ID.
-	 * @return object $klarna_order    Klarna order.
-	 */
-	public function update_order( $klarna_order_id ) {
-		$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders/' . $klarna_order_id;
-		$request_args = array(
-			'headers' => $this->get_request_headers(),
-			'body'    => $this->get_request_body(),
-		);
-
-		$response = wp_safe_remote_post( $request_url, $request_args );
-
-		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
-			$klarna_order = json_decode( $response['body'] );
-
-			return $klarna_order;
-		} else {
-			return new WP_Error( 'Error creating Klarna order.' );
-		}
-
-	}
-
-	/**
-	 * Acknowledges Klarna Checkout order.
-	 *
-	 * @param  string $klarna_order_id Klarna order ID.
-	 *
-	 * @return WP_Error|array $response
-	 */
-	public function acknowledge_order( $klarna_order_id ) {
-		$request_url = 'https://api-na.playground.klarna.com/ordermanagement/v1/orders/' . $klarna_order_id . '/acknowledge';
-		$request_args = array(
-			'headers' => $this->get_request_headers(),
-		);
-
-		$response = wp_safe_remote_post( $request_url, $request_args );
-		return $response;
-	}
-
-	/**
-	 * Adds WooCommerce order ID to Klarna order as merchant_reference. And clear Klarna order ID value from WC session.
-	 *
-	 * @param  string $klarna_order_id     Klarna order ID.
-	 * @param  array  $merchant_references Array of merchant references.
-	 *
-	 * @return WP_Error|array $response
-	 */
-	public function set_merchant_reference( $klarna_order_id, $merchant_references ) {
-		$request_url = 'https://api-na.playground.klarna.com/ordermanagement/v1/orders/' . $klarna_order_id . '/merchant-references';
-		$request_args = array(
-			'headers' => $this->get_request_headers(),
-			'method' => 'PATCH',
-			'body' => wp_json_encode( array(
-				'merchant_reference1' => $merchant_references['merchant_reference1'],
-				'merchant_reference2' => $merchant_references['merchant_reference2'],
-			) ),
-		);
-
-		$response = wp_safe_remote_request( $request_url, $request_args );
-		return $response;
 	}
 
 }
