@@ -2,6 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
 /**
  * Klarna_Checkout_For_WooCommerce_AJAX class.
  *
@@ -23,7 +24,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 */
 	public static function add_ajax_events() {
 		$ajax_events = array(
-			'kco_ajax_event' => true,
+			'kco_wc_update_quantity' => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -37,31 +38,22 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	}
 
 	/**
-	 * Test event.
+	 * Cart quantity update function
 	 */
-	public static function kco_ajax_event() {
-		WC()->session->__unset( 'chosen_payment_method' );
-		wp_send_json( array(
-			'test' => 'testvalue',
-		) );
-	}
+	public function kco_wc_update_quantity() {
+		$cart = $_POST['cart'];
 
-	/**
-	 * Change payment method to Klarna Checkout.
-	 */
-	public static function change_to_kco() {
-		// Set session payment method.
-		// Reload the page.
-	}
+		foreach ( $cart as $cart_key => $cart_value ) {
+			WC()->cart->set_quantity( $cart_key, $cart_value['qty'], false );
+			WC()->cart->calculate_shipping();
+			WC()->cart->calculate_fees();
+			WC()->cart->calculate_totals();
+			KCO_WC()->api->request_pre_update_order();
+		}
 
-	/**
-	 * Change payment method from Klarna Checkout.
-	 */
-	public static function change_from_kco() {
-		// Set session payment method.
-		// Reload the page.
+		exit;
 	}
-
+	
 }
 
 Klarna_Checkout_For_WooCommerce_AJAX::init();

@@ -1,0 +1,23 @@
+{
+  "name": "klarna-checkout-for-woocommerce",
+  "version": "1.0.0",
+  "description": "Klarna Checkout for WooCommerce",
+  "main": "gulpfile.js",
+  "repository": "https://github.com/krokedil/klarna-checkout-for-woocommerce.git",
+  "author": "Krokedil AB",
+  "license": "GPL-3.0+",
+  "devDependencies": {
+    "eslint": "^4.3.0",
+    "eslint-config-prettier": "^2.3.0",
+    "eslint-plugin-prettier": "^2.1.2",
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^3.7.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sort": "^2.0.0",
+    "gulp-uglify": "^3.0.0",
+    "gulp-watch": "^4.3.11",
+    "prettier": "^1.5.3",
+    "pump": "^1.0.2"
+  },
+  "dependencies": {}
+}

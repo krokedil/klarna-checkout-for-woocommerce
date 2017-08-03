@@ -109,7 +109,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @param  string $klarna_order_id Klarna order ID.
 	 * @return object $klarna_order    Klarna order.
 	 */
-	public function request_pre_update_order( $klarna_order_id ) {
+	public function request_pre_update_order() {
+		$klarna_order_id = $this->get_order_id_from_session();
 		$request_url = 'https://api-na.playground.klarna.com/checkout/v3/orders/' . $klarna_order_id;
 		$request_args = array(
 			'headers' => $this->get_request_headers(),
@@ -248,7 +249,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 				$order = $this->request_pre_create_order();
 			} elseif ( 'checkout_incomplete' === $order->status ) {
 				// Only update order if its status is incomplete.
-				$order = $this->request_pre_update_order( $order_id );
+				$order = $this->request_pre_update_order();
 			}
 		} else {
 			$order = $this->request_pre_create_order();

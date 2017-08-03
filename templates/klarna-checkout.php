@@ -15,7 +15,12 @@
 
 <div id="kco-wrapper">
 	<div id="kco-order-review">
-		<?php woocommerce_order_review(); ?>
+		<form class="checkout">
+		<?php
+			// echo do_shortcode( '[woocommerce_cart]' );
+			woocommerce_order_review();
+		?>
+		</form>
 	</div>
 
 	<div id="kco-iframe">
