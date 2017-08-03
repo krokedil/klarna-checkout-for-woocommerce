@@ -14,17 +14,17 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 *
 	 * @return array
 	 */
-	public static function get_urls() {
+	public function get_urls() {
 		$merchant_urls = array(
-			'terms'                  => self::get_terms_url(),                  // Required.
-			'checkout'               => self::get_checkout_url(),               // Required.
-			'confirmation'           => self::get_confirmation_url(),           // Required.
-			'push'                   => self::get_push_url(),                   // Required.
-			'validation'             => self::get_validation_url(),             // HTTPS.
-			'shipping_option_update' => self::get_shipping_option_update_url(), // HTTPS.
-			'address_update'         => self::get_address_update_url(),         // HTTPS.
-			'notification'           => self::get_notification_url(),
-			'country_change'         => self::get_country_change_url(),         // HTTPS.
+			'terms'                  => $this->get_terms_url(),                  // Required.
+			'checkout'               => $this->get_checkout_url(),               // Required.
+			'confirmation'           => $this->get_confirmation_url(),           // Required.
+			'push'                   => $this->get_push_url(),                   // Required.
+			'validation'             => $this->get_validation_url(),             // HTTPS.
+			'shipping_option_update' => $this->get_shipping_option_update_url(), // HTTPS.
+			// 'address_update'         => $this->get_address_update_url(),         // HTTPS.
+			'notification'           => $this->get_notification_url(),
+			'country_change'         => $this->get_country_change_url(),         // HTTPS.
 		);
 
 		return $merchant_urls;
@@ -37,7 +37,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 *
 	 * @return string
 	 */
-	private static function get_terms_url() {
+	private function get_terms_url() {
 		$terms_url = get_permalink( wc_get_page_id( 'terms' ) );
 		return $terms_url;
 	}
@@ -49,8 +49,8 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 *
 	 * @return string
 	 */
-	private static function get_checkout_url() {
-		$checkout_url = wc_get_checkout_url();
+	private function get_checkout_url() {
+		$checkout_url = wc_get_checkout_url() . KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CHECKOUT_EP . '/';
 		return $checkout_url;
 	}
 
@@ -61,8 +61,8 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 *
 	 * @return string
 	 */
-	private static function get_confirmation_url() {
-		$confirmation_url = '';
+	private function get_confirmation_url() {
+		$confirmation_url = wc_get_checkout_url() . KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CONFIRM_EP . '/';
 		return $confirmation_url;
 	}
 
@@ -73,8 +73,8 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 *
 	 * @return string
 	 */
-	private static function get_push_url() {
-		$push_url = '';
+	private function get_push_url() {
+		$push_url = get_home_url() . '/wc-api/KCO_WC_Push/?klarna_order_id={checkout.order.id}';
 		return $push_url;
 	}
 
@@ -85,9 +85,9 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 *
 	 * @return string
 	 */
-	private static function get_validation_url() {
-		$validation_url = '';
-		return $validation_url;
+	private function get_validation_url() {
+		$validation_url = get_home_url() . '/wc-api/KCO_WC_Validation/?klarna_order_id={checkout.order.id}';
+		return str_replace( 'http:', 'https:', $validation_url );
 	}
 
 	/**
@@ -97,9 +97,9 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 *
 	 * @return string
 	 */
-	private static function get_shipping_option_update_url() {
-		$shipping_option_update_url = '';
-		return $shipping_option_update_url;
+	private function get_shipping_option_update_url() {
+		$shipping_option_update_url = get_home_url() . '/wc-api/KCO_WC_Shipping_Option_Update/';
+		return str_replace( 'http:', 'https:', $shipping_option_update_url );
 	}
 
 	/**
@@ -109,9 +109,9 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 *
 	 * @return string
 	 */
-	private static function get_address_update_url() {
-		$address_update_url = '';
-		return $address_update_url;
+	private function get_address_update_url() {
+		$address_update_url = get_home_url() . '/wc-api/KCO_WC_Address_Update/?klarna_order_id={checkout.order.id}';
+		return str_replace( 'http:', 'https:', $address_update_url );
 	}
 
 	/**
@@ -121,8 +121,8 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 *
 	 * @return string
 	 */
-	private static function get_notification_url() {
-		$notification_url = '';
+	private function get_notification_url() {
+		$notification_url = get_home_url() . '/wc-api/KCO_WC_Notification/?klarna_order_id={checkout.order.id}';
 		return $notification_url;
 	}
 
@@ -133,9 +133,9 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 *
 	 * @return string
 	 */
-	private static function get_country_change_url() {
-		$country_change_url = '';
-		return $country_change_url;
+	private function get_country_change_url() {
+		$country_change_url = get_home_url() . '/wc-api/KCO_WC_Country_Change/?klarna_order_id={checkout.order.id}';
+		return str_replace( 'http:', 'https:', $country_change_url );
 	}
 
 }

@@ -9,4 +9,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Klarna_Checkout_For_WooCommerce_Credentials {
 
+	/**
+	 * Gets Klarna API credentials (merchant ID and shared secret) from user session.
+	 */
+	public static function get_credentials_from_session() {
+
+	}
+
+	/**
+	 * Gets Klarna API credentials (merchant ID and shared secret) from a completed WC order.
+	 */
+	public static function get_credentials_from_order() {
+
+	}
+
 }

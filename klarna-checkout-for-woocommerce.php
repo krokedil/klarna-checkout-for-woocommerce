@@ -55,14 +55,42 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 *
 		 * @var $instance
 		 */
-		private static $instance;
+		protected static $instance;
+
+		/**
+		 * Reference to API class.
+		 *
+		 * @var $api
+		 */
+		public $api;
+
+		/**
+		 * Reference to merchant URLs class.
+		 *
+		 * @var $merchant_urls
+		 */
+		public $merchant_urls;
+
+		/**
+		 * Reference to order lines class.
+		 *
+		 * @var $order_lines
+		 */
+		public $order_lines;
+
+		/**
+		 * Reference to credentials class.
+		 *
+		 * @var $credentials
+		 */
+		public $credentials;
 
 		/**
 		 * Reference to logging class.
 		 *
 		 * @var $log
 		 */
-		private static $log;
+		public $log;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -83,6 +111,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * @return void
 		 */
 		private function __clone() {
+			wc_doing_it_wrong( __FUNCTION__, __( 'Nope' ), '1.0' );
 		}
 
 		/**
@@ -92,6 +121,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * @return void
 		 */
 		private function __wakeup() {
+			wc_doing_it_wrong( __FUNCTION__, __( 'Nope' ), '1.0' );
 		}
 
 		/**
@@ -173,9 +203,18 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-gateway.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api.php' );
+			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api-callbacks.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-ajax.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-endpoints.php' );
+			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-merchant-urls.php' );
+			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-credentials.php' );
+			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php' );
+
+			$this->api           = new Klarna_Checkout_For_WooCommerce_API();
+			$this->merchant_urls = new Klarna_Checkout_For_WooCommerce_Merchant_URLs();
+			$this->order_lines   = new Klarna_Checkout_For_WooCommerce_Order_Lines();
+			$this->credentials   = new Klarna_Checkout_For_WooCommerce_Credentials();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
@@ -209,9 +248,20 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * Adds KCO page endpoint.
 		 */
 		public function add_kco_endpoint() {
-			add_rewrite_endpoint( 'special-page', EP_ROOT | EP_PAGES );
+			add_rewrite_endpoint( 'kco', EP_ROOT | EP_PAGES );
 		}
 
 	}
 	Klarna_Checkout_For_WooCommerce::get_instance();
+}
+
+/**
+ * Main instance Klarna_Checkout_For_WooCommerce WooCommerce.
+ *
+ * Returns the main instance of Klarna_Checkout_For_WooCommerce.
+ *
+ * @return Klarna_Checkout_For_WooCommerce
+ */
+function KCO_WC() {
+	return Klarna_Checkout_For_WooCommerce::get_instance();
 }
