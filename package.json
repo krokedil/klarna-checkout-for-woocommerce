@@ -7,9 +7,6 @@
   "author": "Krokedil AB",
   "license": "GPL-3.0+",
   "devDependencies": {
-    "eslint": "^4.3.0",
-    "eslint-config-prettier": "^2.3.0",
-    "eslint-plugin-prettier": "^2.1.2",
     "gulp": "^3.9.1",
     "gulp-clean-css": "^3.7.0",
     "gulp-rename": "^1.2.2",

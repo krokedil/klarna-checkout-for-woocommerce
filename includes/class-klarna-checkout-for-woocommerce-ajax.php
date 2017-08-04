@@ -24,7 +24,8 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 */
 	public static function add_ajax_events() {
 		$ajax_events = array(
-			'kco_wc_update_quantity' => true,
+			'kco_wc_update_cart' => true,
+			'kco_wc_update_order_notes' => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -38,10 +39,10 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	}
 
 	/**
-	 * Cart quantity update function
+	 * Cart quantity update function.
 	 */
-	public function kco_wc_update_quantity() {
-		$cart = $_POST['cart'];
+	public function kco_wc_update_cart() {
+		$cart = $_POST['checkout']['cart'];
 
 		foreach ( $cart as $cart_key => $cart_value ) {
 			WC()->cart->set_quantity( $cart_key, $cart_value['qty'], false );
@@ -51,9 +52,21 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			KCO_WC()->api->request_pre_update_order();
 		}
 
-		exit;
+		wp_die();
 	}
-	
-}
 
+	/**
+	 * Save order notes value to session and use it when creating the order.
+	 */
+	public function kco_wc_update_order_notes() {
+		$post = $_POST;
+
+		if ( '' !== $_POST['order_notes'] ) {
+			WC()->session->set( 'kco_wc_order_notes', wp_kses_post( $_POST['order_notes'] ) );
+		}
+
+		wp_die();
+	}
+
+}
 Klarna_Checkout_For_WooCommerce_AJAX::init();
