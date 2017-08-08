@@ -4,9 +4,10 @@
 
 <?php
 // Fetch Klarna order.
-$klarna_order_id = WC()->session->get( 'klarna_order_id' );
+$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 $response        = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 $klarna_order    = json_decode( $response['body'] );
+$order_notes     = WC()->session->get( 'kco_wc_order_notes' );
 
 // Get needed info from it.
 $checkout_data = array(
@@ -34,6 +35,7 @@ $checkout_data = array(
 	'payment_method'      => 'klarna_checkout_for_woocommerce',
 	'terms'               => 'on',
 	'terms-field'         => '1',
+	'order_comments'      => $order_notes,
 	'_wpnonce'            => $nonce,
 );
 

@@ -52,7 +52,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		 * 5. Send merchant_reference1
 		 */
 
-		$klarna_order_id = $_GET['klarna_order_id'];
+		$klarna_order_id = $_GET['kco_wc_order_id'];
 		$query_args = array(
 			'post_type' => wc_get_order_types(),
 			'post_status' => array_keys( wc_get_order_statuses() ),

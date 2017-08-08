@@ -174,10 +174,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		}
 
 		// Only load scripts in KCO version of checkout page.
-		global $wp_query;
-		if ( ! isset( $wp_query->query[ KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CHECKOUT_EP ] ) ) {
-			return;
-		}
+		// global $wp_query;
+		// if ( ! isset( $wp_query->query[ KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CHECKOUT_EP ] ) ) {
+			// return;
+		// }
 
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
@@ -210,7 +210,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		echo KCO_WC()->api->get_snippet( $klarna_order );
 
 		add_post_meta( $order_id, '_klarna_order_id', $klarna_order->order_id );
-		WC()->session->__unset( 'klarna_order_id' );
+		WC()->session->__unset( 'kco_wc_order_id' );
+		WC()->session->__unset( 'kco_wc_order_notes' );
 	}
 
 	/**

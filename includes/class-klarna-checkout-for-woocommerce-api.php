@@ -220,7 +220,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return array|string
 	 */
 	public function get_order_id_from_session() {
-		return WC()->session->get( 'klarna_order_id' );
+		return WC()->session->get( 'kco_wc_order_id' );
 	}
 
 	/**
@@ -229,7 +229,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @param string $order_id Klarna order ID.
 	 */
 	public function save_order_id_to_session( $order_id ) {
-		WC()->session->set( 'klarna_order_id', $order_id );
+		WC()->session->set( 'kco_wc_order_id', $order_id );
 	}
 
 	/**
