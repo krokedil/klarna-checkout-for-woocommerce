@@ -25,6 +25,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	public static function add_ajax_events() {
 		$ajax_events = array(
 			'kco_wc_update_cart' => true,
+			'kco_wc_update_shipping' => true,
 			'kco_wc_update_order_notes' => true,
 			'kco_wc_refresh_checkout_fragment' => true,
 		);
@@ -43,7 +44,9 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 * Cart quantity update function.
 	 */
 	public static function kco_wc_update_cart() {
-		$cart = $_POST['checkout']['cart'];
+		$cart_items = array();
+		parse_str( $_POST['checkout'], $values );
+		$cart = $values['cart'];
 
 		foreach ( $cart as $cart_key => $cart_value ) {
 			WC()->cart->set_quantity( $cart_key, $cart_value['qty'], false );
@@ -52,6 +55,30 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			WC()->cart->calculate_totals();
 			KCO_WC()->api->request_pre_update_order();
 		}
+
+		wp_die();
+	}
+
+	/**
+	 * Update shipping method function.
+	 */
+	public static function kco_wc_update_shipping() {
+		wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
+
+		$chosen_shipping_methods = WC()->session->get( 'chosen_shipping_methods' );
+
+		if ( isset( $_POST['shipping'] ) && is_array( $_POST['shipping'] ) ) {
+			foreach ( $_POST['shipping'] as $i => $value ) {
+				$chosen_shipping_methods[ $i ] = wc_clean( $value );
+			}
+		}
+
+		WC()->session->set( 'chosen_shipping_methods', $chosen_shipping_methods );
+
+		WC()->cart->calculate_shipping();
+		WC()->cart->calculate_fees();
+		WC()->cart->calculate_totals();
+		KCO_WC()->api->request_pre_update_order();
 
 		wp_die();
 	}
@@ -69,12 +96,13 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		wp_die();
 	}
 
+	/**
+	 * Refresh checkout fragment.
+	 */
 	public static function kco_wc_refresh_checkout_fragment() {
 		$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 
-		if ( 'true' === $_POST['kco'] ) {
-			WC()->session->set( 'chosen_payment_method', 'klarna_checkout_for_woocommerce' );
-		} else {
+		if ( 'false' === $_POST['kco'] ) {
 			// Set chosen payment method to first gateway that is not Klarna Checkout for WooCommerce.
 			$first_gateway = reset( $available_gateways );
 			if ( 'klarna_checkout_for_woocommerce' !== $first_gateway->id ) {
@@ -83,6 +111,8 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				$second_gateway = next( $available_gateways );
 				WC()->session->set( 'chosen_payment_method', $second_gateway->id );
 			}
+		} else {
+			WC()->session->set( 'chosen_payment_method', 'klarna_checkout_for_woocommerce' );
 		}
 
 		WC()->payment_gateways()->set_current_gateway( $available_gateways );

@@ -34,7 +34,7 @@ jQuery(function($) {
 			});
 		},
 
-		update: function () {
+		updateCart: function () {
 			kco_wc.kcoSuspend();
 			$('body').trigger('update_checkout');
 
@@ -42,6 +42,30 @@ jQuery(function($) {
 				type: 'POST',
 				url: '/checkout/?wc-ajax=kco_wc_update_cart',
 				data: { checkout: $('form.checkout').serialize() },
+				dataType: 'json',
+				success: function(data) {
+				},
+				error: function(data) {
+				},
+				complete: function(data) {
+					kco_wc.kcoResume();
+				}
+			});
+		},
+
+		updateShipping: function () {
+			kco_wc.kcoSuspend();
+			$('body').trigger('update_checkout');
+
+			var shipping_methods = {};
+			$( 'select.shipping_method, input[name^="shipping_method"][type="radio"]:checked, input[name^="shipping_method"][type="hidden"]' ).each( function() {
+				shipping_methods[ $( this ).data( 'index' ) ] = $( this ).val();
+			} );
+
+			$.ajax({
+				type: 'POST',
+				url: '/checkout/?wc-ajax=kco_wc_update_shipping',
+				data: { shipping: shipping_methods },
 				success: function(data) {
 				},
 				error: function(data) {
@@ -129,7 +153,8 @@ jQuery(function($) {
 			$(document).ready(kco_wc.documentReady);
 			// kco_wc.bodyEl.on('updated_checkout', kco_wc.documentReady);
 
-			kco_wc.bodyEl.on('change', 'input.qty, input.shipping_method', kco_wc.update);
+			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
+			kco_wc.bodyEl.on('change', 'input.shipping_method', kco_wc.updateShipping);
 			kco_wc.bodyEl.on('blur', kco_wc.orderNotesSelector, kco_wc.updateOrderNotes);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.refreshCheckoutFragmentKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.refreshCheckoutFragment);

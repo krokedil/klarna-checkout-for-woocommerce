@@ -9,15 +9,14 @@
 
 ?>
 
-<?php WC()->session->set( 'chosen_payment_method', 'klarna_checkout_for_woocommerce' ); ?>
-
-<form class="checkout">
+<form name="checkout" class="checkout woocommerce-checkout">
 <div id="kco-wrapper">
 		<p><a href="#" id="klarna-checkout-select-other">Select another payment method</a></p>
 
 		<div id="kco-order-review">
 			<?php woocommerce_order_review(); ?>
 			<?php kco_wc_show_order_notes(); ?>
+			<input name="payment_method" value="klarna_checkout_for_woocommerce" type="radio" checked style="display: none;" />
 		</div>
 
 		<div id="kco-iframe">
