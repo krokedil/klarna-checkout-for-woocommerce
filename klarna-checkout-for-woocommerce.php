@@ -39,9 +39,8 @@ define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE', __FILE__ );
 define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 
 /**
- * Endpoints
+ * Endpoint(s)
  */
-define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CHECKOUT_EP', 'kco' );
 define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CONFIRM_EP', 'kco-confirm' );
 
 if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
@@ -206,7 +205,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api-callbacks.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-ajax.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines.php' );
-			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-endpoints.php' );
+			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-templates.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-merchant-urls.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-credentials.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php' );

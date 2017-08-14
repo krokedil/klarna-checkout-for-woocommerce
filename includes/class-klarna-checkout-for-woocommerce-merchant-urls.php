@@ -50,7 +50,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_checkout_url() {
-		$checkout_url = wc_get_checkout_url() . KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CHECKOUT_EP . '/';
+		$checkout_url = wc_get_checkout_url();
 		return $checkout_url;
 	}
 

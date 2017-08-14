@@ -2,7 +2,7 @@ jQuery(function($) {
 	var kco_wc;
 	kco_wc = {
 		bodyEl: $('body'),
-		checkoutFormEl: $('form.checkout'),
+		checkoutFormSelector: 'form.checkout',
 
 		// Order notes
 		orderNotesValue: '',
@@ -20,7 +20,6 @@ jQuery(function($) {
 			} else {
 				kco_wc.paymentMethod = 'klarna_checkout_for_woocommerce';
 			}
-			console.log(kco_wc.paymentMethod);
 		},
 
 		kcoSuspend: function () {
@@ -54,9 +53,6 @@ jQuery(function($) {
 		},
 
 		updateOrderNotes: function() {
-			console.log(kco_wc.orderNotesEl.val());
-			console.log(kco_wc.orderNotesValue);
-
 			if (kco_wc.orderNotesEl.val() !== kco_wc.orderNotesValue) {
 				kco_wc.orderNotesValue = kco_wc.orderNotesEl.val();
 
@@ -76,7 +72,7 @@ jQuery(function($) {
 		refreshCheckoutFragment: function(e) {
 			e.preventDefault();
 
-			kco_wc.checkoutFormEl.block({
+			$(kco_wc.checkoutFormSelector).block({
 				message: null,
 				overlayCSS: {
 					background: '#fff',
@@ -87,15 +83,46 @@ jQuery(function($) {
 			$.ajax({
 				type: 'POST',
 				dataType: 'json',
+				data: { 'kco': false },
 				url: '/checkout/?wc-ajax=kco_wc_refresh_checkout_fragment',
 				success: function (data) {},
 				error: function (data) {},
 				complete: function (data) {
 					console.log(data.responseJSON);
-					kco_wc.checkoutFormEl.replaceWith(data.responseJSON.data.fragments.checkout);
-					kco_wc.checkoutFormEl.unblock();
+					$(kco_wc.checkoutFormSelector).replaceWith(data.responseJSON.data.fragments.checkout);
+					$(kco_wc.checkoutFormSelector).unblock();
 				}
 			});
+		},
+
+		refreshCheckoutFragmentKco: function(e) {
+			console.log($(this).val());
+
+			if ( 'klarna_checkout_for_woocommerce' === $(this).val() ) {
+				$('.woocommerce-info').remove();
+
+				$(kco_wc.checkoutFormSelector).block({
+					message: null,
+					overlayCSS: {
+						background: '#fff',
+						opacity: 0.6
+					}
+				});
+
+				$.ajax({
+					type: 'POST',
+					data: { 'kco': true },
+					dataType: 'json',
+					url: '/checkout/?wc-ajax=kco_wc_refresh_checkout_fragment',
+					success: function (data) {},
+					error: function (data) {},
+					complete: function (data) {
+						console.log(data.responseJSON);
+						$(kco_wc.checkoutFormSelector).replaceWith(data.responseJSON.data.fragments.checkout);
+						$(kco_wc.checkoutFormSelector).unblock();
+					}
+				});
+			}
 		},
 
 		init: function () {
@@ -104,7 +131,7 @@ jQuery(function($) {
 
 			kco_wc.bodyEl.on('change', 'input.qty, input.shipping_method', kco_wc.update);
 			kco_wc.bodyEl.on('blur', kco_wc.orderNotesSelector, kco_wc.updateOrderNotes);
-			// kco_wc.bodyEl.on('change', 'input.payment_method', kco_wc.refreshFragments);
+			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.refreshCheckoutFragmentKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.refreshCheckoutFragment);
 
 			/*

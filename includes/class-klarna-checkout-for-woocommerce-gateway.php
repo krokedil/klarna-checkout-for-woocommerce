@@ -31,7 +31,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->title            = $this->get_option( 'title' );
 		$this->description      = $this->get_option( 'description', '' );
 		$this->enabled          = $this->get_option( 'enabled' );
-		$this->default_checkout = 'yes' === $this->get_option( 'default_checkout' );
 		$this->testmode         = 'yes' === $this->get_option( 'testmode' );
 		$this->merchant_id      = $this->testmode ? $this->get_option( 'test_merchant_id_us' ) : $this->get_option( 'merchant_id_us', '' ); // @TODO: Test if live credentials are pulled when needed.
 		$this->shared_secret    = $this->testmode ? $this->get_option( 'test_shared_secret_us' ) : $this->get_option( 'shared_secret_us', '' );
@@ -95,13 +94,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 				'description' => __( 'Payment method description that the customer will see on your website.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => __( 'Pay with Klarna Checkout.', 'klarna-checkout-for-woocommerce' ),
 				'desc_tip'    => true,
-			),
-			'default_checkout'      => array(
-				'title'       => __( 'Make Klarna Checkout default', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'If checked Klarna Checkout will take over WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'checkbox',
-				'description' => '',
-				'default'     => 'yes',
 			),
 			'test_merchant_id_us'   => array(
 				'title'       => __( 'Test merchant ID (US)', 'klarna-checkout-for-woocommerce' ),
@@ -173,12 +165,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			return;
 		}
 
-		// Only load scripts in KCO version of checkout page.
-		// global $wp_query;
-		// if ( ! isset( $wp_query->query[ KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CHECKOUT_EP ] ) ) {
-			// return;
-		// }
-
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		wp_register_script(
@@ -224,12 +210,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * @return string $output
 	 */
 	public function add_quantity_field( $output, $cart_item, $cart_item_key ) {
-		global $wp_query;
-
-		if ( is_checkout() && isset( $wp_query->query[ KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CHECKOUT_EP ] ) ) {
+		if ( is_checkout() && 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_shipping_method' ) ) {
 			foreach ( WC()->cart->get_cart() as $cart_key => $cart_value ) {
 				if ( $cart_key === $cart_item_key ) {
-					$_product          = $cart_item['data'];
+					$_product = $cart_item['data'];
 
 					if ( $_product->is_sold_individually() ) {
 						$return_value = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1" />', $cart_key );
