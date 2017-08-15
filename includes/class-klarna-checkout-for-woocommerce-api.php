@@ -52,10 +52,19 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 *
 	 * @TODO: Remove default values
 	 */
-	public function __construct( $merchant_id = 'N100033', $shared_secret = 'riz5Aith3bii%ch9' ) {
+	public function __construct() {
+		add_action( 'woocommerce_init', array( $this, 'load_credentials' ) );
+	}
+
+	/**
+	 * Loads Klarna API credentials.
+	 */
+	public function load_credentials() {
+		$credentials = KCO_WC()->credentials->get_credentials_from_session();
+
 		$this->set_api_url( 'https://api-na.playground.klarna.com/checkout/v3/orders/' );
-		$this->set_merchant_id( $merchant_id );
-		$this->set_shared_secret( $shared_secret );
+		$this->set_merchant_id( $credentials['merchant_id'] );
+		$this->set_shared_secret( $credentials['shared_secret'] );
 	}
 
 	/**

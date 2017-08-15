@@ -31,7 +31,7 @@ class Klarna_Checkout_For_WooCommerce_Credentials {
 	public function get_credentials_from_session() {
 		$base_location = wc_get_base_location();
 
-		$country_string = 'US' === $base_location['country'] ? 'US' : 'EU';
+		$country_string = 'US' === $base_location['country'] ? 'us' : 'eu';
 		$test_string    = 'yes' === $this->settings['testmode'] ? 'test_' : '';
 
 		$credentials = array(
