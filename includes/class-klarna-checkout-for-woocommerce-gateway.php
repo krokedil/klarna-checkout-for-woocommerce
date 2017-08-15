@@ -28,13 +28,13 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->init_settings();
 
 		// Get setting values.
-		$this->title            = $this->get_option( 'title' );
-		$this->description      = $this->get_option( 'description', '' );
-		$this->enabled          = $this->get_option( 'enabled' );
-		$this->testmode         = 'yes' === $this->get_option( 'testmode' );
-		$this->merchant_id      = $this->testmode ? $this->get_option( 'test_merchant_id_us' ) : $this->get_option( 'merchant_id_us', '' ); // @TODO: Test if live credentials are pulled when needed.
-		$this->shared_secret    = $this->testmode ? $this->get_option( 'test_shared_secret_us' ) : $this->get_option( 'shared_secret_us', '' );
-		$this->logging          = 'yes' === $this->get_option( 'logging' );
+		$this->title         = $this->get_option( 'title' );
+		$this->description   = $this->get_option( 'description', '' );
+		$this->enabled       = $this->get_option( 'enabled' );
+		$this->testmode      = 'yes' === $this->get_option( 'testmode' );
+		$this->merchant_id   = $this->testmode ? $this->get_option( 'test_merchant_id_us' ) : $this->get_option( 'merchant_id_us', '' ); // @TODO: Test if live credentials are pulled when needed.
+		$this->shared_secret = $this->testmode ? $this->get_option( 'test_shared_secret_us' ) : $this->get_option( 'shared_secret_us', '' );
+		$this->logging       = 'yes' === $this->get_option( 'logging' );
 
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array(
 			$this,
@@ -123,6 +123,34 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 				'default'     => '',
 				'desc_tip'    => true,
 			),
+			'test_merchant_id_eu'   => array(
+				'title'       => __( 'Test merchant ID (EU)', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'text',
+				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => '',
+				'desc_tip'    => true,
+			),
+			'test_shared_secret_eu' => array(
+				'title'       => __( 'Test shared secret (EU)', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'text',
+				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => '',
+				'desc_tip'    => true,
+			),
+			'merchant_id_eu'        => array(
+				'title'       => __( 'Live merchant ID (EU)', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'text',
+				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => '',
+				'desc_tip'    => true,
+			),
+			'shared_secret_eu'      => array(
+				'title'       => __( 'Live shared secret (EU)', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'text',
+				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => '',
+				'desc_tip'    => true,
+			),
 			'testmode'              => array(
 				'title'       => __( 'Test mode', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Test Mode', 'klarna-checkout-for-woocommerce' ),
@@ -181,6 +209,18 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			array(),
 			KLARNA_CHECKOUT_FOR_WOOCOMMERCE_VERSION
 		);
+
+		$checkout_localize_params = array(
+			'update_cart_url'                 => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
+			'update_cart_nonce'               => wp_create_nonce( 'kco_wc_update_cart' ),
+			'update_shipping_url'             => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
+			'update_shipping_nonce'           => wp_create_nonce( 'kco_wc_update_shipping' ),
+			'update_order_notes_url'          => WC_AJAX::get_endpoint( 'kco_wc_update_order_notes' ),
+			'update_order_notes_nonce'        => wp_create_nonce( 'kco_wc_update_order_notes' ),
+			'refresh_checkout_fragment_url'   => WC_AJAX::get_endpoint( 'kco_wc_refresh_checkout_fragment' ),
+			'refresh_checkout_fragment_nonce' => wp_create_nonce( 'kco_wc_refresh_checkout_fragment' ),
+		);
+		wp_localize_script( 'klarna_checkout_for_woocommerce', 'klarna_checkout_for_woocommerce_params', $checkout_localize_params );
 
 		wp_enqueue_script( 'klarna_checkout_for_woocommerce' );
 		wp_enqueue_style( 'klarna_checkout_for_woocommerce' );

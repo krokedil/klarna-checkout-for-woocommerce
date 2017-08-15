@@ -1,6 +1,11 @@
+/* global klarna_checkout_for_woocommerce_params */
 jQuery(function($) {
-	var kco_wc;
-	kco_wc = {
+	// Check if we have params.
+	if ( typeof klarna_checkout_for_woocommerce_params === 'undefined' ) {
+		return false;
+	}
+
+	var kco_wc = {
 		bodyEl: $('body'),
 		checkoutFormSelector: 'form.checkout',
 
@@ -40,8 +45,11 @@ jQuery(function($) {
 
 			$.ajax({
 				type: 'POST',
-				url: '/checkout/?wc-ajax=kco_wc_update_cart',
-				data: { checkout: $('form.checkout').serialize() },
+				url: klarna_checkout_for_woocommerce_params.update_cart_url,
+				data: {
+					checkout: $('form.checkout').serialize(),
+					nonce: klarna_checkout_for_woocommerce_params.update_cart_nonce
+				},
 				dataType: 'json',
 				success: function(data) {
 				},
@@ -64,8 +72,11 @@ jQuery(function($) {
 
 			$.ajax({
 				type: 'POST',
-				url: '/checkout/?wc-ajax=kco_wc_update_shipping',
-				data: { shipping: shipping_methods },
+				url: klarna_checkout_for_woocommerce_params.update_shipping_url,
+				data: {
+					shipping: shipping_methods,
+					nonce: klarna_checkout_for_woocommerce_params.update_shipping_nonce
+				},
 				success: function(data) {
 				},
 				error: function(data) {
@@ -82,8 +93,11 @@ jQuery(function($) {
 
 				$.ajax({
 					type: 'POST',
-					url: '/checkout/?wc-ajax=kco_wc_update_order_notes',
-					data: { order_notes: kco_wc.orderNotesValue },
+					url: klarna_checkout_for_woocommerce_params.update_order_notes_url,
+					data: {
+						order_notes: kco_wc.orderNotesValue,
+						nonce: klarna_checkout_for_woocommerce_params.update_order_notes_nonce
+					},
 					success: function (data) {},
 					error: function (data) {},
 					complete: function (data) {
@@ -107,8 +121,11 @@ jQuery(function($) {
 			$.ajax({
 				type: 'POST',
 				dataType: 'json',
-				data: { 'kco': false },
-				url: '/checkout/?wc-ajax=kco_wc_refresh_checkout_fragment',
+				data: {
+					kco: false,
+					nonce: klarna_checkout_for_woocommerce_params.refresh_checkout_fragment_nonce
+				},
+				url: klarna_checkout_for_woocommerce_params.refresh_checkout_fragment_url,
 				success: function (data) {},
 				error: function (data) {},
 				complete: function (data) {
@@ -135,9 +152,12 @@ jQuery(function($) {
 
 				$.ajax({
 					type: 'POST',
-					data: { 'kco': true },
+					data: {
+						kco: true,
+						nonce: klarna_checkout_for_woocommerce_params.refresh_checkout_fragment_nonce
+					},
 					dataType: 'json',
-					url: '/checkout/?wc-ajax=kco_wc_refresh_checkout_fragment',
+					url: klarna_checkout_for_woocommerce_params.checkout_url + '?wc-ajax=kco_wc_refresh_checkout_fragment',
 					success: function (data) {},
 					error: function (data) {},
 					complete: function (data) {
@@ -172,5 +192,6 @@ jQuery(function($) {
 			*/
 		}
 	};
+
 	kco_wc.init();
 });

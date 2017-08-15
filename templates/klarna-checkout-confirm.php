@@ -9,6 +9,15 @@ $response        = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 $klarna_order    = json_decode( $response['body'] );
 $order_notes     = WC()->session->get( 'kco_wc_order_notes' );
 
+// Get shipping reference.
+$shipping = '';
+foreach ( $klarna_order->order_lines as $order_line ) {
+	if ( 'shipping_fee' === $order_line->type ) {
+		$shipping = $order_line->reference;
+		break;
+	}
+}
+
 // Get needed info from it.
 $checkout_data = array(
 	'billing_first_name'  => $klarna_order->billing_address->given_name,
@@ -30,8 +39,8 @@ $checkout_data = array(
 	'shipping_address_2'  => $klarna_order->shipping_address->street_address2,
 	'shipping_postcode'   => $klarna_order->shipping_address->postal_code,
 	'shipping_city'       => $klarna_order->shipping_address->city,
-	'order_comments'      => $klarna_order->shipping_address->region,
-	'shipping_method'     => 'flat_rate:1',
+	'shipping_state'      => $klarna_order->shipping_address->region,
+	'shipping_method'     => $shipping,
 	'payment_method'      => 'klarna_checkout_for_woocommerce',
 	'terms'               => 'on',
 	'terms-field'         => '1',
@@ -43,7 +52,7 @@ $query = http_build_query( $checkout_data, '', '&' );
 ?>
 
 <script>
-	var kco_slbd_test = function kco_slbd_test() {
+	var kco_wc_process_checkout = function kco_wc_process_checkout() {
 		jQuery.ajax({
 			type: 'POST',
 			url: '/checkout/?wc-ajax=checkout',
@@ -88,7 +97,7 @@ $query = http_build_query( $checkout_data, '', '&' );
 				wc_checkout_form.submit_error('<div class="woocommerce-error">' + errorThrown + '</div>');
 			}
 		});
-	}
+	};
 
-	kco_slbd_test();
+	kco_wc_process_checkout();
 </script>

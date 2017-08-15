@@ -91,8 +91,10 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 				}
 
 				// Klarna checkout confirmation page.
-				if ( isset( $wp_query->query_vars[ self::$confirm_endpoint ] ) ) {
-					$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout-confirm.php';
+				if ( isset( $wp_query->query_vars[ self::$confirm_endpoint ] ) && isset( $_GET['kco_wc_order_id'] ) ) {
+					if ( WC()->session->get( 'kco_wc_order_id' ) === $_GET['kco_wc_order_id'] ) {
+						$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout-confirm.php';
+					}
 				}
 			}
 		}

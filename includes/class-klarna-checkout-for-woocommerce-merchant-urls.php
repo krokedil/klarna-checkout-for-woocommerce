@@ -62,7 +62,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_confirmation_url() {
-		$confirmation_url = wc_get_checkout_url() . KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CONFIRM_EP . '/';
+		$confirmation_url = wc_get_checkout_url() . KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CONFIRM_EP . '/?kco_wc_order_id={checkout.order.id}';
 		return $confirmation_url;
 	}
 
@@ -74,7 +74,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_push_url() {
-		$push_url = get_home_url() . '/wc-api/KCO_WC_Push/?klarna_order_id={checkout.order.id}';
+		$push_url = get_home_url() . '/wc-api/KCO_WC_Push/?kco_wc_order_id={checkout.order.id}';
 		return $push_url;
 	}
 
@@ -86,7 +86,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_validation_url() {
-		$validation_url = get_home_url() . '/wc-api/KCO_WC_Validation/?klarna_order_id={checkout.order.id}';
+		$validation_url = get_home_url() . '/wc-api/KCO_WC_Validation/?kco_wc_order_id={checkout.order.id}';
 		return str_replace( 'http:', 'https:', $validation_url );
 	}
 
@@ -110,7 +110,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_address_update_url() {
-		$address_update_url = get_home_url() . '/wc-api/KCO_WC_Address_Update/?klarna_order_id={checkout.order.id}';
+		$address_update_url = get_home_url() . '/wc-api/KCO_WC_Address_Update/?kco_wc_order_id={checkout.order.id}';
 		return str_replace( 'http:', 'https:', $address_update_url );
 	}
 
@@ -122,7 +122,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_notification_url() {
-		$notification_url = get_home_url() . '/wc-api/KCO_WC_Notification/?klarna_order_id={checkout.order.id}';
+		$notification_url = get_home_url() . '/wc-api/KCO_WC_Notification/?kco_wc_order_id={checkout.order.id}';
 		return $notification_url;
 	}
 
@@ -134,7 +134,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_country_change_url() {
-		$country_change_url = get_home_url() . '/wc-api/KCO_WC_Country_Change/?klarna_order_id={checkout.order.id}';
+		$country_change_url = get_home_url() . '/wc-api/KCO_WC_Country_Change/?kco_wc_order_id={checkout.order.id}';
 		return str_replace( 'http:', 'https:', $country_change_url );
 	}
 

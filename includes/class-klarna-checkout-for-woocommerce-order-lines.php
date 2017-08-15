@@ -100,6 +100,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					'total_tax_amount'      => $this->get_item_tax_amount( $cart_item ),
 					'total_discount_amount' => $this->get_item_discount_amount( $cart_item ),
 				);
+
 				// Add images.
 				$klarna_payment_settings = get_option( 'woocommerce_klarna_payments_settings' );
 				if ( 'yes' === $klarna_payment_settings['send_product_urls'] ) {
@@ -108,6 +109,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 						$klarna_item['image_url'] = $this->get_item_image_url( $product );
 					}
 				}
+
 				$this->order_lines[] = $klarna_item;
 				$this->order_tax_amount += $this->get_item_tax_amount( $cart_item );
 				$this->order_amount += $this->get_item_quantity( $cart_item ) * $this->get_item_price( $cart_item ) - $this->get_item_discount_amount( $cart_item );

@@ -44,7 +44,12 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 * Cart quantity update function.
 	 */
 	public static function kco_wc_update_cart() {
-		$cart_items = array();
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_update_cart' ) ) {
+			wp_send_json_error( 'bad_nonce' );
+			exit;
+		}
+
+		$values = array();
 		parse_str( $_POST['checkout'], $values );
 		$cart = $values['cart'];
 
@@ -63,6 +68,11 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 * Update shipping method function.
 	 */
 	public static function kco_wc_update_shipping() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_update_shipping' ) ) {
+			wp_send_json_error( 'bad_nonce' );
+			exit;
+		}
+
 		wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
 
 		$chosen_shipping_methods = WC()->session->get( 'chosen_shipping_methods' );
@@ -87,6 +97,11 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 * Save order notes value to session and use it when creating the order.
 	 */
 	public static function kco_wc_update_order_notes() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_update_order_notes' ) ) {
+			wp_send_json_error( 'bad_nonce' );
+			exit;
+		}
+
 		$post = $_POST;
 
 		if ( '' !== $_POST['order_notes'] ) {
@@ -100,6 +115,11 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 * Refresh checkout fragment.
 	 */
 	public static function kco_wc_refresh_checkout_fragment() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_refresh_checkout_fragment' ) ) {
+			wp_send_json_error( 'bad_nonce' );
+			exit;
+		}
+
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_fees();
 		WC()->cart->calculate_totals();
