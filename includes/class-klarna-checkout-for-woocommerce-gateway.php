@@ -210,8 +210,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * @return string $output
 	 */
 	public function add_quantity_field( $output, $cart_item, $cart_item_key ) {
-		// if ( is_checkout() && 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_shipping_method' ) ) {
-		if ( is_checkout() ) {
+		if ( is_checkout() && 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_payment_method' ) ) {
 			foreach ( WC()->cart->get_cart() as $cart_key => $cart_value ) {
 				if ( $cart_key === $cart_item_key ) {
 					$_product = $cart_item['data'];

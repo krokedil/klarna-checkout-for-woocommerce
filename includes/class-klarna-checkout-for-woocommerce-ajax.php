@@ -100,6 +100,10 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 * Refresh checkout fragment.
 	 */
 	public static function kco_wc_refresh_checkout_fragment() {
+		WC()->cart->calculate_shipping();
+		WC()->cart->calculate_fees();
+		WC()->cart->calculate_totals();
+
 		$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 
 		if ( 'false' === $_POST['kco'] ) {
