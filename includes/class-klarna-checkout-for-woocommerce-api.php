@@ -116,6 +116,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 			return $klarna_order;
 		} else {
+			WC()->session->__unset( 'kco_wc_order_id' );
 			return new WP_Error( 'Error creating Klarna order.' );
 		}
 
@@ -301,7 +302,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_purchase_currency() {
-		return 'USD';
+		return 'GBP';
 	}
 
 	/**
