@@ -11,6 +11,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Klarna_Checkout_For_WooCommerce_API {
 
 	/**
+	 * Klarna Checkout for WooCommerce settings.
+	 *
+	 * @var array
+	 */
+	private $settings = array();
+
+	/**
 	 * Klarna Checkout api URL base.
 	 *
 	 * @var string
@@ -32,11 +39,21 @@ class Klarna_Checkout_For_WooCommerce_API {
 	private $shared_secret = '';
 
 	/**
+	 * Allow purchases from multiple countries.
+	 *
+	 * @var string
+	 */
+	private $allow_multiple_countries = false;
+
+	/**
 	 * Klarna_Checkout_For_WooCommerce_API constructor.
 	 */
 	public function __construct() {
+		$this->settings = get_option( 'woocommerce_klarna_checkout_for_woocommerce_settings' );
+
 		add_action( 'woocommerce_init', array( $this, 'load_credentials' ) );
 		add_action( 'woocommerce_init', array( $this, 'set_api_url_base' ) );
+		add_action( 'woocommerce_init', array( $this, 'set_multiple_countries' ) );
 	}
 
 	/**
@@ -46,6 +63,25 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$credentials = KCO_WC()->credentials->get_credentials_from_session();
 		$this->set_merchant_id( $credentials['merchant_id'] );
 		$this->set_shared_secret( $credentials['shared_secret'] );
+	}
+
+	/**
+	 * Set Klarna Checkout API URL base.
+	 */
+	public function set_api_url_base() {
+		$test_string = 'yes' === $this->settings['testmode'] ? '.playground' : '';
+
+		$base_location = wc_get_base_location();
+		$country_string = 'US' === $base_location['country'] ? '-na' : '';
+
+		$this->api_url_base = 'https://api' . $country_string . $test_string . '.klarna.com/';
+	}
+
+	/**
+	 * Set Klarna Checkout API URL base.
+	 */
+	public function set_multiple_countries() {
+		$this->allow_multiple_countries = 'yes' === $this->settings['allow_multiple_countries'];
 	}
 
 	/**
@@ -184,19 +220,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 	}
 
 	/**
-	 * Set Klarna Checkout API URL base.
-	 */
-	public function set_api_url_base() {
-		$this->settings = get_option( 'woocommerce_klarna_checkout_for_woocommerce_settings' );
-		$test_string    = 'yes' === $this->settings['testmode'] ? '.playground' : '';
-
-		$base_location = wc_get_base_location();
-		$country_string = 'US' === $base_location['country'] ? '-na' : '';
-
-		$this->api_url_base = 'https://api' . $country_string . $test_string . '.klarna.com/';
-	}
-
-	/**
 	 * Set Klarna Checkout merchant ID.
 	 *
 	 * @param string $merchant_id Klarna Checkout merchant ID.
@@ -245,7 +268,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( $order_id ) {
 			$order = $this->request_pre_retrieve_order( $order_id );
 
-			if ( ! $order ) {
+			if ( ! $order || is_wp_error( $order ) ) {
 				$order = $this->request_pre_create_order();
 			} elseif ( 'checkout_incomplete' === $order->status ) {
 				// Only update order if its status is incomplete.
@@ -293,7 +316,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_purchase_country() {
-		return 'US';
+		return WC()->checkout()->get_value( 'billing_country' );
 	}
 
 	/**
@@ -302,7 +325,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_purchase_currency() {
-		return 'GBP';
+		return get_woocommerce_currency();
 	}
 
 	/**
@@ -310,15 +333,14 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 *
 	 * @return string
 	 */
-	public function get_locale() {
-		return 'en-US';
+	public function get_purchase_locale() {
+		return str_replace( '_', '-', get_locale() );
 	}
 
 	/**
 	 * Gets merchant URLs for Klarna purchase.
 	 *
 	 * @return array
-	 * @TODO: Add remaining URLs (validation, shipping_option_update, address_update, notification, country_change).
 	 */
 	public function get_merchant_urls() {
 		return KCO_WC()->merchant_urls->get_urls();
@@ -351,7 +373,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$request_args = array(
 			'purchase_country'  => $this->get_purchase_country(),
 			'purchase_currency' => $this->get_purchase_currency(),
-			'locale'            => $this->get_locale(),
+			'locale'            => $this->get_purchase_locale(),
 			'merchant_urls'     => $this->get_merchant_urls(),
 			'order_amount'      => KCO_WC()->order_lines->get_order_amount(),
 			'order_tax_amount'  => KCO_WC()->order_lines->get_order_tax_amount(),
@@ -362,6 +384,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$request_args['billing_address'] = array(
 				'email'       => WC()->checkout()->get_value( 'billing_email' ),
 				'postal_code' => WC()->checkout()->get_value( 'billing_postcode' ),
+				'country'     => $this->get_purchase_country(),
 			);
 		}
 

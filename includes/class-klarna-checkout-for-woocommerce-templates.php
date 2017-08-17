@@ -86,8 +86,19 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 			// Klarna Checkout.
 			if ( 'checkout/form-checkout.php' === $template_name ) {
 				// Klarna checkout page.
-				if ( array_key_exists( 'klarna_checkout_for_woocommerce', $available_gateways ) && 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_payment_method' ) ) {
-					$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
+				if ( array_key_exists( 'klarna_checkout_for_woocommerce', $available_gateways ) ) {
+					// If chosen payment method exists.
+					if ( 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_payment_method' ) ) {
+						$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
+					}
+
+					// If chosen payment method does not exist and KCO is the first gateway.
+					if ( null === WC()->session->get( 'chosen_payment_method' ) ) {
+						reset( $available_gateways );
+						if ( 'klarna_checkout_for_woocommerce' === key( $available_gateways ) ) {
+							$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
+						}
+					}
 				}
 
 				// Klarna checkout confirmation page.
