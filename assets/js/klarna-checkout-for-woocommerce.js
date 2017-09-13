@@ -135,7 +135,7 @@ jQuery(function($) {
 			});
 		},
 
-		refreshCheckoutFragmentKco: function(e) {
+		refreshCheckoutFragmentKco: function() {
 			console.log($(this).val());
 
 			if ( 'klarna_checkout_for_woocommerce' === $(this).val() ) {

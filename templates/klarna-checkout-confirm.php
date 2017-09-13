@@ -55,7 +55,7 @@ $query = http_build_query( $checkout_data, '', '&' );
 	var kco_wc_process_checkout = function kco_wc_process_checkout() {
 		jQuery.ajax({
 			type: 'POST',
-			url: '/checkout/?wc-ajax=checkout',
+			url: '<?php echo WC_AJAX::get_endpoint( 'checkout' ); ?>',
 			data: '<?php echo $query; ?>',
 			dataType: 'json',
 			success: function (result) {

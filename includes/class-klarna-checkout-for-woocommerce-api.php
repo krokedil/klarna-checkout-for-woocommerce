@@ -291,7 +291,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return mixed
 	 */
 	public function get_snippet( $order ) {
-		return $order->html_snippet;
+		if ( ! is_wp_error( $order ) ) {
+			return $order->html_snippet;
+		}
 	}
 
 	/**
@@ -369,7 +371,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 *
 	 * @return false|string
 	 */
-	public function get_request_body( $request_type = '' ) {
+	public function get_request_body( $request_type = null ) {
 		KCO_WC()->order_lines->process_data();
 
 		$request_args = array(
@@ -386,7 +388,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$request_args['billing_address'] = array(
 				'email'       => WC()->checkout()->get_value( 'billing_email' ),
 				'postal_code' => WC()->checkout()->get_value( 'billing_postcode' ),
-				'country'     => $this->get_purchase_country(),
+				'country'     => $this->get_purchase_country()
 			);
 		}
 
