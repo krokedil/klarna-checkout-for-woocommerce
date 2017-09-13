@@ -69,10 +69,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * Set Klarna Checkout API URL base.
 	 */
 	public function set_api_url_base() {
-		$test_string = 'yes' === $this->settings['testmode'] ? '.playground' : '';
-
 		$base_location = wc_get_base_location();
 		$country_string = 'US' === $base_location['country'] ? '-na' : '';
+
+		$test_string = 'yes' === $this->settings['testmode'] ? '.playground' : '';
 
 		$this->api_url_base = 'https://api' . $country_string . $test_string . '.klarna.com/';
 	}
@@ -81,7 +81,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * Set Klarna Checkout API URL base.
 	 */
 	public function set_multiple_countries() {
-		$this->allow_multiple_countries = 'yes' === $this->settings['allow_multiple_countries'];
+		if ( isset( $this->settings['allow_multiple_countries'] ) ) {
+			$this->allow_multiple_countries = 'yes' === $this->settings['allow_multiple_countries'];
+		}
 	}
 
 	/**

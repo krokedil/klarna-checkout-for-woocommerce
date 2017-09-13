@@ -9,6 +9,12 @@
 
 ?>
 
+<?php
+WC()->cart->calculate_fees();
+WC()->cart->calculate_shipping();
+WC()->cart->calculate_totals();
+?>
+
 <form name="checkout" class="checkout woocommerce-checkout">
 <div id="kco-wrapper">
 		<p><a href="#" id="klarna-checkout-select-other">Select another payment method</a></p>

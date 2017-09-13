@@ -137,21 +137,9 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 		WC()->payment_gateways()->set_current_gateway( $available_gateways );
 
-		// @TODO: Check why template filter is not working inside an AJAX request.
-		ob_start();
-		if ( 'klarna_checkout_for_woocommerce' !== WC()->session->get( 'chosen_payment_method' ) ) {
-			wc_get_template( 'checkout/form-checkout.php', array(
-				'checkout' => WC()->checkout(),
-			) );
-		} else {
-			include( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php' );
-		}
-		$checkout_output = ob_get_clean();
-
+		$redirect = wc_get_checkout_url();
 		$data = array(
-			'fragments' => array(
-				'checkout' => $checkout_output,
-			),
+			'redirect' => $redirect,
 		);
 
 		wp_send_json_success( $data );

@@ -2,6 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
 /**
  * Klarna_Checkout_For_WooCommerce_Order_Lines class.
  *
@@ -15,30 +16,21 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @var $order_lines
 	 */
 	public $order_lines = array();
-	/**
-	 * Formatted order lines.
-	 *
-	 * @var $order_lines
-	 */
-	public $order_amount = 0;
-	/**
-	 * Formatted order lines.
-	 *
-	 * @var $order_lines
-	 */
-	public $order_tax_amount = 0;
+
 	/**
 	 * Shop country.
 	 *
 	 * @var string
 	 */
 	public $shop_country;
+
 	/**
 	 * Send sales tax as separate item (US merchants).
 	 *
 	 * @var bool
 	 */
 	public $separate_sales_tax = false;
+
 	/**
 	 * WC_Klarna_Payments_Order_Lines constructor.
 	 *
@@ -71,12 +63,22 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		return $this->order_lines;
 	}
 
+	/**
+	 * Gets order amount for Klarna API.
+	 *
+	 * @return int
+	 */
 	public function get_order_amount() {
-		return $this->order_amount;
+		return round( WC()->cart->total * 100 );
 	}
 
+	/**
+	 * Gets order tax amount for Klarna API.
+	 *
+	 * @return int
+	 */
 	public function get_order_tax_amount() {
-		return $this->order_tax_amount;
+		return round( ( WC()->cart->tax_total + WC()->cart->shipping_tax_total ) * 100 );
 	}
 
 	/**
@@ -111,17 +113,16 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				}
 
 				$this->order_lines[] = $klarna_item;
-				$this->order_tax_amount += $this->get_item_tax_amount( $cart_item );
-				$this->order_amount += $this->get_item_quantity( $cart_item ) * $this->get_item_price( $cart_item ) - $this->get_item_discount_amount( $cart_item );
 			}
 		}
 	}
+
 	/**
 	 * Process WooCommerce shipping to Klarna Payments order lines.
 	 */
 	public function process_shipping() {
 		if ( WC()->shipping->get_packages() && WC()->session->get( 'chosen_shipping_methods' ) ) {
-			$shipping = array(
+			$shipping            = array(
 				'type'             => 'shipping_fee',
 				'reference'        => $this->get_shipping_reference(),
 				'name'             => $this->get_shipping_name(),
@@ -132,10 +133,9 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				'total_tax_amount' => $this->get_shipping_tax_amount(),
 			);
 			$this->order_lines[] = $shipping;
-			$this->order_tax_amount += $this->get_shipping_tax_amount();
-			$this->order_amount += $this->get_shipping_amount();
 		}
 	}
+
 	/**
 	 * Process sales tax for US.
 	 */
@@ -143,7 +143,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( $this->separate_sales_tax ) {
 			$sales_tax_amount = round( ( WC()->cart->tax_total + WC()->cart->shipping_tax_total ) * 100 );
 			// Add sales tax line item.
-			$sales_tax = array(
+			$sales_tax           = array(
 				'type'                  => 'sales_tax',
 				'reference'             => __( 'Sales Tax', 'klarna-payments-for-woocommerce' ),
 				'name'                  => __( 'Sales Tax', 'klarna-payments-for-woocommerce' ),
@@ -154,25 +154,24 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				'total_discount_amount' => 0,
 				'total_tax_amount'      => 0,
 			);
-			$this->order_lines[]    = $sales_tax;
-			$this->order_tax_amount = $sales_tax_amount;
-			$this->order_amount    += $sales_tax_amount;
+			$this->order_lines[] = $sales_tax;
 		}
 	}
+
 	/**
 	 * Process smart coupons.
 	 */
 	public function process_coupons() {
 		if ( ! empty( WC()->cart->get_coupons() ) ) {
 			foreach ( WC()->cart->get_coupons() as $coupon_key => $coupon ) {
-				$coupon_reference = '';
-				$coupon_amount = 0;
+				$coupon_reference  = '';
+				$coupon_amount     = 0;
 				$coupon_tax_amount = '';
 				// Smart coupons are processed as real line items, cart and product discounts sent for reference only.
 				if ( 'smart_coupon' === $coupon->get_discount_type() ) {
-					$coupon_amount = - WC()->cart->get_coupon_discount_amount( $coupon_key ) * 100;
+					$coupon_amount     = - WC()->cart->get_coupon_discount_amount( $coupon_key ) * 100;
 					$coupon_tax_amount = - WC()->cart->get_coupon_discount_tax_amount( $coupon_key ) * 100;
-					$coupon_reference = 'Discount';
+					$coupon_reference  = 'Discount';
 				} else {
 					if ( 'US' === $this->shop_country ) {
 						$coupon_amount     = 0;
@@ -189,7 +188,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				}
 				// Add separate discount line item, but only if it's a smart coupon or country is US.
 				if ( 'smart_coupon' === $coupon->get_discount_type() || 'US' === $this->shop_country ) {
-					$discount = array(
+					$discount            = array(
 						'type'                  => 'discount',
 						'reference'             => $coupon_reference,
 						'name'                  => $coupon_key,
@@ -200,14 +199,13 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 						'total_discount_amount' => 0,
 						'total_tax_amount'      => $coupon_tax_amount,
 					);
-					$this->order_lines[]    = $discount;
-					$this->order_tax_amount += $coupon_tax_amount;
-					$this->order_amount     += $coupon_amount;
+					$this->order_lines[] = $discount;
 				}
 			} // End foreach().
 		} // End if().
 	}
 	// Helpers.
+
 	/**
 	 * Get cart item name.
 	 *
@@ -228,8 +226,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( '' !== $item_variations ) {
 			$item_name .= ' [' . $item_variations . ']';
 		}
+
 		return (string) strip_tags( $item_name );
 	}
+
 	/**
 	 * Calculate item tax percentage.
 	 *
@@ -246,8 +246,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		} else {
 			$item_tax_amount = $cart_item['line_tax'] * 100;
 		}
+
 		return (int) $item_tax_amount;
 	}
+
 	/**
 	 * Calculate item tax percentage.
 	 *
@@ -260,19 +262,27 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @return integer $item_tax_rate Item tax percentage formatted for Klarna.
 	 */
 	public function get_item_tax_rate( $cart_item, $product ) {
-		// We manually calculate the tax percentage here.
 		if ( $product->is_taxable() && $cart_item['line_subtotal_tax'] > 0 ) {
 			// Calculate tax rate.
 			if ( $this->separate_sales_tax ) {
 				$item_tax_rate = 0;
 			} else {
-				$item_tax_rate = round( $cart_item['line_subtotal_tax'] / $cart_item['line_subtotal'] * 100 * 100 );
+				$_tax      = new WC_Tax();
+				$tmp_rates = $_tax->get_rates( $product->get_tax_class() );
+				$vat       = array_shift( $tmp_rates );
+				if ( isset( $vat['rate'] ) ) {
+					$item_tax_rate = round( $vat['rate'] * 100 );
+				} else {
+					$item_tax_rate = 0;
+				}
 			}
 		} else {
 			$item_tax_rate = 0;
 		}
-		return (int) $item_tax_rate;
+
+		return round( $item_tax_rate );
 	}
+
 	/**
 	 * Get cart item price.
 	 *
@@ -290,8 +300,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$item_subtotal = $cart_item['line_subtotal'] + $cart_item['line_subtotal_tax'];
 		}
 		$item_price = $item_subtotal * 100 / $cart_item['quantity'];
+
 		return (int) $item_price;
 	}
+
 	/**
 	 * Get cart item quantity.
 	 *
@@ -305,6 +317,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	public function get_item_quantity( $cart_item ) {
 		return (int) $cart_item['quantity'];
 	}
+
 	/**
 	 * Get cart item reference.
 	 *
@@ -323,8 +336,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		} else {
 			$item_reference = $product->get_id();
 		}
+
 		return substr( strval( $item_reference ), 0, 64 );
 	}
+
 	/**
 	 * Get cart item discount.
 	 *
@@ -346,8 +361,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		} else {
 			$item_discount_amount = 0;
 		}
+
 		return (int) $item_discount_amount;
 	}
+
 	/**
 	 * Get cart item product URL.
 	 *
@@ -361,6 +378,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	public function get_item_product_url( $product ) {
 		return $product->get_permalink();
 	}
+
 	/**
 	 * Get cart item product image URL.
 	 *
@@ -374,11 +392,13 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	public function get_item_image_url( $product ) {
 		$image_url = false;
 		if ( $product->get_image_id() > 0 ) {
-			$image_id = $product->get_image_id();
+			$image_id  = $product->get_image_id();
 			$image_url = wp_get_attachment_image_url( $image_id, 'shop_thumbnail', false );
 		}
+
 		return $image_url;
 	}
+
 	/**
 	 * Get cart item discount rate.
 	 *
@@ -391,8 +411,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 */
 	public function get_item_discount_rate( $cart_item ) {
 		$item_discount_rate = ( 1 - ( $cart_item['line_total'] / $cart_item['line_subtotal'] ) ) * 100 * 100;
+
 		return (int) $item_discount_rate;
 	}
+
 	/**
 	 * Get cart item total amount.
 	 *
@@ -409,8 +431,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		} else {
 			$item_total_amount = ( ( $cart_item['line_total'] + $cart_item['line_tax'] ) * 100 );
 		}
+
 		return (int) $item_total_amount;
 	}
+
 	/**
 	 * Get shipping method name.
 	 *
@@ -435,8 +459,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( ! isset( $shipping_name ) ) {
 			$shipping_name = __( 'Shipping', 'woocommerce-gateway-klarna' );
 		}
+
 		return (string) $shipping_name;
 	}
+
 	/**
 	 * Get shipping reference.
 	 *
@@ -461,8 +487,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( ! isset( $shipping_reference ) ) {
 			$shipping_reference = __( 'Shipping', 'woocommerce-gateway-klarna' );
 		}
+
 		return (string) $shipping_reference;
 	}
+
 	/**
 	 * Get shipping method amount.
 	 *
@@ -477,8 +505,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		} else {
 			$shipping_amount = (int) number_format( ( WC()->cart->shipping_total + WC()->cart->shipping_tax_total ) * 100, 0, '', '' );
 		}
+
 		return (int) $shipping_amount;
 	}
+
 	/**
 	 * Get shipping method tax rate.
 	 *
@@ -493,8 +523,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		} else {
 			$shipping_tax_rate = 0;
 		}
+
 		return (int) $shipping_tax_rate;
 	}
+
 	/**
 	 * Get shipping method tax amount.
 	 *
@@ -509,6 +541,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		} else {
 			$shipping_tax_amount = WC()->cart->shipping_tax_total * 100;
 		}
+
 		return (int) $shipping_tax_amount;
 	}
 

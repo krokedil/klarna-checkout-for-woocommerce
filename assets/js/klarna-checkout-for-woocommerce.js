@@ -130,8 +130,7 @@ jQuery(function($) {
 				error: function (data) {},
 				complete: function (data) {
 					console.log(data.responseJSON);
-					$(kco_wc.checkoutFormSelector).replaceWith(data.responseJSON.data.fragments.checkout);
-					$(kco_wc.checkoutFormSelector).unblock();
+					window.location.href = data.responseJSON.data.redirect;
 				}
 			});
 		},
@@ -162,8 +161,7 @@ jQuery(function($) {
 					error: function (data) {},
 					complete: function (data) {
 						console.log(data.responseJSON);
-						$(kco_wc.checkoutFormSelector).replaceWith(data.responseJSON.data.fragments.checkout);
-						$(kco_wc.checkoutFormSelector).unblock();
+						window.location.href = data.responseJSON.data.redirect;
 					}
 				});
 			}

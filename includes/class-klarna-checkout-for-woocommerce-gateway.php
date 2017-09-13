@@ -151,6 +151,13 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 				'default'     => '',
 				'desc_tip'    => true,
 			),
+			'allow_multiple_countries' => array(
+				'title'       => __( 'Allow Klarna Checkout across multiple countries', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'label' => __( 'If this option is checked Klarna credentials for customer\'s billing country will be used, if available. If those credentials are not available, then Klarna credentials for shop base location country will be used. If the option is unchecked only Klarna credentials for shop base location country will be used.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
 			'testmode'              => array(
 				'title'       => __( 'Test mode', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Test Mode', 'klarna-checkout-for-woocommerce' ),
@@ -235,7 +242,18 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$klarna_order = KCO_WC()->api->get_order();
 		echo KCO_WC()->api->get_snippet( $klarna_order );
 
-		add_post_meta( $order_id, '_klarna_order_id', $klarna_order->order_id );
+		add_post_meta( $order_id, '_wc_klarna_order_id', $klarna_order->order_id );
+
+		if ( $this->testmode ) {
+			$environment = 'test';
+		} else {
+			$environment = 'live';
+		}
+		update_post_meta( $order_id, '_wc_klarna_environment', $environment );
+
+		$klarna_country = WC()->checkout()->get_value( 'billing_country' );
+		update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
+
 		WC()->session->__unset( 'kco_wc_order_id' );
 		WC()->session->__unset( 'kco_wc_order_notes' );
 	}

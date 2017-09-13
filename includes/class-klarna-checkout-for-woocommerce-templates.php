@@ -45,6 +45,19 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 
 		// Override template if Klarna Checkout page.
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
+
+		// add_action( 'woocommerce_checkout_init', array( $this, 'remove_form_fields' ) );
+	}
+
+	function remove_form_fields() {
+		remove_all_actions( 'woocommerce_checkout_before_customer_details' );
+		remove_all_actions( 'woocommerce_checkout_billing' );
+		remove_all_actions( 'woocommerce_checkout_shipping' );
+		remove_all_actions( 'woocommerce_checkout_after_customer_details' );
+		remove_all_actions( 'woocommerce_checkout_before_order_review' );
+		remove_all_actions( 'woocommerce_checkout_order_review' );
+		remove_all_actions( 'woocommerce_checkout_after_order_review' );
+		remove_all_actions( 'woocommerce_after_checkout_form' );
 	}
 
 	/**

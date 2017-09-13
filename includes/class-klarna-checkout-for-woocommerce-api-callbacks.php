@@ -57,7 +57,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$query_args = array(
 			'post_type' => wc_get_order_types(),
 			'post_status' => array_keys( wc_get_order_statuses() ),
-			'meta_key' => '_klarna_order_id',
+			'meta_key' => '_wc_klarna_order_id',
 			'meta_value' => $klarna_order_id,
 		);
 
