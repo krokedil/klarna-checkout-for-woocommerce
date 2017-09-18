@@ -89,7 +89,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 *
 		 * @var $log
 		 */
-		public $log;
+		public $logger;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -207,12 +207,14 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-merchant-urls.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-credentials.php' );
+			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-logging.php' );
 			include_once( KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php' );
 
 			$this->api           = new Klarna_Checkout_For_WooCommerce_API();
 			$this->merchant_urls = new Klarna_Checkout_For_WooCommerce_Merchant_URLs();
 			$this->order_lines   = new Klarna_Checkout_For_WooCommerce_Order_Lines();
 			$this->credentials   = new Klarna_Checkout_For_WooCommerce_Credentials();
+			$this->logger        = new Klarna_Checkout_For_WooCommerce_Logging();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
@@ -228,18 +230,6 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		public function add_gateways( $methods ) {
 			$methods[] = 'Klarna_Checkout_For_WooCommerce_Gateway';
 			return $methods;
-		}
-
-		/**
-		 * Instantiate WC_Logger class.
-		 *
-		 * @param string $message Log message.
-		 */
-		public static function log( $message ) {
-			if ( empty( self::$log ) ) {
-				self::$log = new WC_Logger();
-			}
-			self::$log->add( 'klarna-checkout-for-woocommerce', $message );
 		}
 
 		/**

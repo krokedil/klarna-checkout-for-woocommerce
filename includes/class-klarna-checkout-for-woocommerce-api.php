@@ -68,7 +68,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 			return $klarna_order;
 		} else {
-			return new WP_Error( 'Error creating Klarna order.' );
+			$error = $this->extract_error_messages( $response );
+
+			return $error;
 		}
 	}
 
@@ -92,7 +94,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 			return $klarna_order;
 		} else {
-			return new WP_Error( 'Error retrieving Klarna order.' );
+			$error = $this->extract_error_messages( $response );
+
+			return $error;
 		}
 	}
 
@@ -117,7 +121,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 			return $klarna_order;
 		} else {
 			WC()->session->__unset( 'kco_wc_order_id' );
-			return new WP_Error( 'Error creating Klarna order.' );
+			$error = $this->extract_error_messages( $response );
+
+			return $error;
 		}
 
 	}
@@ -277,6 +283,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( ! is_wp_error( $order ) ) {
 			return $order->html_snippet;
 		}
+
+		return $order->get_error_message();
 	}
 
 	/**
@@ -378,6 +386,26 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$request_body = wp_json_encode( $request_args );
 
 		return $request_body;
+	}
+
+	/**
+	 * @param $response
+	 *
+	 * @return mixed
+	 */
+	private function extract_error_messages( $response ) {
+		$response_body = json_decode( $response['body'] );
+		$error = new WP_Error();
+
+		if ( ! empty( $response_body->error_messages ) && is_array( $response_body->error_messages ) ) {
+			KCO_WC()->logger->log( var_export( $response_body, true ) );
+
+			foreach ( $response_body->error_messages as $error_message ) {
+				$error->add( 'kco', $error_message );
+			}
+		}
+
+		return $error;
 	}
 
 }
