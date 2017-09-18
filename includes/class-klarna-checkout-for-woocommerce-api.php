@@ -39,13 +39,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 	private $shared_secret = '';
 
 	/**
-	 * Allow purchases from multiple countries.
-	 *
-	 * @var string
-	 */
-	private $allow_multiple_countries = false;
-
-	/**
 	 * Klarna_Checkout_For_WooCommerce_API constructor.
 	 */
 	public function __construct() {
@@ -53,37 +46,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		add_action( 'woocommerce_init', array( $this, 'load_credentials' ) );
 		add_action( 'woocommerce_init', array( $this, 'set_api_url_base' ) );
-		add_action( 'woocommerce_init', array( $this, 'set_multiple_countries' ) );
-	}
-
-	/**
-	 * Loads Klarna API credentials.
-	 */
-	public function load_credentials() {
-		$credentials = KCO_WC()->credentials->get_credentials_from_session();
-		$this->set_merchant_id( $credentials['merchant_id'] );
-		$this->set_shared_secret( $credentials['shared_secret'] );
-	}
-
-	/**
-	 * Set Klarna Checkout API URL base.
-	 */
-	public function set_api_url_base() {
-		$base_location = wc_get_base_location();
-		$country_string = 'US' === $base_location['country'] ? '-na' : '';
-
-		$test_string = 'yes' === $this->settings['testmode'] ? '.playground' : '';
-
-		$this->api_url_base = 'https://api' . $country_string . $test_string . '.klarna.com/';
-	}
-
-	/**
-	 * Set Klarna Checkout API URL base.
-	 */
-	public function set_multiple_countries() {
-		if ( isset( $this->settings['allow_multiple_countries'] ) ) {
-			$this->allow_multiple_countries = 'yes' === $this->settings['allow_multiple_countries'];
-		}
 	}
 
 	/**
@@ -219,6 +181,27 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$response = wp_safe_remote_request( $request_url, $request_args );
 
 		return $response;
+	}
+
+	/**
+	 * Loads Klarna API credentials.
+	 */
+	public function load_credentials() {
+		$credentials = KCO_WC()->credentials->get_credentials_from_session();
+		$this->set_merchant_id( $credentials['merchant_id'] );
+		$this->set_shared_secret( $credentials['shared_secret'] );
+	}
+
+	/**
+	 * Set Klarna Checkout API URL base.
+	 */
+	public function set_api_url_base() {
+		$base_location = wc_get_base_location();
+		$country_string = 'US' === $base_location['country'] ? '-na' : '';
+
+		$test_string = 'yes' === $this->settings['testmode'] ? '.playground' : '';
+
+		$this->api_url_base = 'https://api' . $country_string . $test_string . '.klarna.com/';
 	}
 
 	/**
