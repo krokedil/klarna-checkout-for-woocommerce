@@ -202,7 +202,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * Set Klarna Checkout API URL base.
 	 */
 	public function set_api_url_base() {
-		$base_location = wc_get_base_location();
+		$base_location  = wc_get_base_location();
 		$country_string = 'US' === $base_location['country'] ? '-na' : '';
 
 		$test_string = 'yes' === $this->settings['testmode'] ? '.playground' : '';
@@ -366,13 +366,14 @@ class Klarna_Checkout_For_WooCommerce_API {
 		KCO_WC()->order_lines->process_data();
 
 		$request_args = array(
-			'purchase_country'  => $this->get_purchase_country(),
-			'purchase_currency' => $this->get_purchase_currency(),
-			'locale'            => $this->get_purchase_locale(),
-			'merchant_urls'     => $this->get_merchant_urls(),
-			'order_amount'      => KCO_WC()->order_lines->get_order_amount(),
-			'order_tax_amount'  => KCO_WC()->order_lines->get_order_tax_amount(),
-			'order_lines'       => KCO_WC()->order_lines->get_order_lines(),
+			'purchase_country'   => $this->get_purchase_country(),
+			'purchase_currency'  => $this->get_purchase_currency(),
+			'locale'             => $this->get_purchase_locale(),
+			'merchant_urls'      => $this->get_merchant_urls(),
+			'order_amount'       => KCO_WC()->order_lines->get_order_amount(),
+			'order_tax_amount'   => KCO_WC()->order_lines->get_order_tax_amount(),
+			'order_lines'        => KCO_WC()->order_lines->get_order_lines(),
+			'shipping_countries' => $this->get_shipping_countries()
 		);
 
 		if ( 'create' === $request_type ) {
@@ -389,13 +390,24 @@ class Klarna_Checkout_For_WooCommerce_API {
 	}
 
 	/**
+	 * Gets shipping countries formatted for Klarna.
+	 *
+	 * @return array
+	 */
+	public function get_shipping_countries() {
+		$wc_countries = new WC_Countries();
+
+		return array_keys( $wc_countries->get_shipping_countries() );
+	}
+
+	/**
 	 * @param $response
 	 *
 	 * @return mixed
 	 */
 	private function extract_error_messages( $response ) {
 		$response_body = json_decode( $response['body'] );
-		$error = new WP_Error();
+		$error         = new WP_Error();
 
 		if ( ! empty( $response_body->error_messages ) && is_array( $response_body->error_messages ) ) {
 			KCO_WC()->logger->log( var_export( $response_body, true ) );

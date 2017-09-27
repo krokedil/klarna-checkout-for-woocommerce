@@ -94,7 +94,7 @@ $query = http_build_query( $checkout_data, '', '&' );
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				wc_checkout_form.submit_error('<div class="woocommerce-error">' + errorThrown + '</div>');
+				console.log(errorThrown);
 			}
 		});
 	};

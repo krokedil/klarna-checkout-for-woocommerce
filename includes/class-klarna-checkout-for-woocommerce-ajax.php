@@ -28,6 +28,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			'kco_wc_update_shipping' => true,
 			'kco_wc_update_order_notes' => true,
 			'kco_wc_refresh_checkout_fragment' => true,
+			'kco_wc_iframe_change' => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -143,6 +144,52 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		);
 
 		wp_send_json_success( $data );
+		wp_die();
+	}
+
+	/**
+	 * Cart quantity update function.
+	 */
+	public static function kco_wc_iframe_change() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_iframe_change' ) ) {
+			wp_send_json_error( 'bad_nonce' );
+			exit;
+		}
+
+		if ( isset( $_REQUEST['data'] ) && is_array( $_REQUEST['data'] ) ) {
+			$address = $_REQUEST['data'];
+		}
+
+		$countries = array(
+			'swe' => 'SE',
+			'gbr' => 'UK',
+			'fin' => 'FI',
+			'usa' => 'US',
+			'nld' => 'NL'
+		);
+
+		WC()->customer->set_billing_email( $address['email'] );
+		WC()->customer->set_billing_postcode( $address['postal_code'] );
+		WC()->customer->set_billing_country( $countries[ $address['country'] ] );
+		WC()->customer->set_billing_first_name( $address['given_name'] );
+		WC()->customer->set_billing_last_name( $address['family_name'] );
+
+		WC()->customer->set_shipping_postcode( $address['postal_code'] );
+		WC()->customer->set_shipping_country( $countries[ $address['country'] ] );
+		WC()->customer->set_shipping_first_name( $address['given_name'] );
+		WC()->customer->set_shipping_last_name( $address['family_name'] );
+
+		WC()->customer->save();
+		WC()->cart->calculate_shipping();
+		WC()->cart->calculate_totals();
+
+		KCO_WC()->api->request_pre_update_order();
+
+		ob_start();
+		woocommerce_order_review();
+		$html = ob_get_clean();
+
+		wp_send_json_success( array( 'html' => $html ) );
 		wp_die();
 	}
 

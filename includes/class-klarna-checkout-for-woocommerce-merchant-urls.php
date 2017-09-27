@@ -24,7 +24,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 			'shipping_option_update' => $this->get_shipping_option_update_url(), // HTTPS.
 			// 'address_update'         => $this->get_address_update_url(),         // HTTPS.
 			'notification'           => $this->get_notification_url(),
-			'country_change'         => $this->get_country_change_url(),         // HTTPS.
+			// 'country_change'         => $this->get_country_change_url(),         // HTTPS.
 		);
 
 		return $merchant_urls;
@@ -134,7 +134,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_country_change_url() {
-		$country_change_url = get_home_url() . '/wc-api/KCO_WC_Country_Change/?kco_wc_order_id={checkout.order.id}';
+		$country_change_url = get_home_url() . '/wp-json/kcowc/v1/address/{checkout.order.id}';
 		return str_replace( 'http:', 'https:', $country_change_url );
 	}
 

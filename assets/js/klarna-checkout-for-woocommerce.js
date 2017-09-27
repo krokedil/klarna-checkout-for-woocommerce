@@ -177,17 +177,59 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.refreshCheckoutFragmentKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.refreshCheckoutFragment);
 
-			/*
-			window._klarnaCheckout(function(api) {
-				api.on({
-					'change': function(data) {},
-					'shipping_address_change': function(data) {},
-					'order_total_change': function(data) {},
-					'shipping_option_change': function(data) {},
-					'can_not_complete_order': function(data) {}
+			if (typeof window._klarnaCheckout == 'function') {
+				window._klarnaCheckout(function (api) {
+					api.on({
+						'change': function(data) {
+							console.log('change', data);
+
+							$('table.woocommerce-checkout-review-order-table').block({
+								message: null,
+								overlayCSS: {
+									background: '#fff',
+									opacity: 0.6
+								}
+							});
+							kco_wc.kcoSuspend();
+
+							$.ajax(
+								{
+									url: klarna_checkout_for_woocommerce_params.iframe_change_url,
+									type: 'POST',
+									dataType: 'json',
+									data: {
+										data: data,
+										nonce: klarna_checkout_for_woocommerce_params.iframe_change_nonce
+									},
+									success: function (response) {
+										console.log(response.data.html);
+										$('table.woocommerce-checkout-review-order-table').replaceWith(response.data.html);
+									},
+									error: function (response) {
+										console.log(response);
+									},
+									complete: function() {
+										$('table.woocommerce-checkout-review-order-table').unblock();
+										kco_wc.kcoResume();
+									}
+								}
+							);
+						},
+						'shipping_address_change': function(data) {
+							console.log('shipping_address_change', data);
+						},
+						'order_total_change': function(data) {
+							console.log('order_total_change', data);
+						},
+						'shipping_option_change': function(data) {
+							console.log('shipping_option_change', data);
+						},
+						'can_not_complete_order': function(data) {
+							console.log('can_not_complete_order', data);
+						}
+					});
 				});
-			});
-			*/
+			}
 		}
 	};
 

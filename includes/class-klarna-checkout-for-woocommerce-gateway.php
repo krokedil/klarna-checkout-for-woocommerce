@@ -73,108 +73,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * Initialise settings fields.
 	 */
 	public function init_form_fields() {
-		$this->form_fields = apply_filters( 'klarna_checkout_for_woocommerce_gateway_settings', array(
-			'enabled'               => array(
-				'title'       => __( 'Enable/Disable', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Enable Klarna Checkout', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'checkbox',
-				'description' => '',
-				'default'     => 'no',
-			),
-			'title'                 => array(
-				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Payment method description that the customer will see on your checkout.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' ),
-				'desc_tip'    => true,
-			),
-			'description'           => array(
-				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'textarea',
-				'description' => __( 'Payment method description that the customer will see on your website.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => __( 'Pay with Klarna Checkout.', 'klarna-checkout-for-woocommerce' ),
-				'desc_tip'    => true,
-			),
-			'test_merchant_id_us'   => array(
-				'title'       => __( 'Test merchant ID (US)', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
-			'test_shared_secret_us' => array(
-				'title'       => __( 'Test shared secret (US)', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
-			'merchant_id_us'        => array(
-				'title'       => __( 'Live merchant ID (US)', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
-			'shared_secret_us'      => array(
-				'title'       => __( 'Live shared secret (US)', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
-			'test_merchant_id_eu'   => array(
-				'title'       => __( 'Test merchant ID (EU)', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
-			'test_shared_secret_eu' => array(
-				'title'       => __( 'Test shared secret (EU)', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
-			'merchant_id_eu'        => array(
-				'title'       => __( 'Live merchant ID (EU)', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
-			'shared_secret_eu'      => array(
-				'title'       => __( 'Live shared secret (EU)', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Get your API keys from your Klarna Payments merchant account.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
-			'allow_multiple_countries' => array(
-				'title'       => __( 'Allow Klarna Checkout across multiple countries', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'checkbox',
-				'label' => __( 'If this option is checked Klarna credentials for customer\'s billing country will be used, if available. If those credentials are not available, then Klarna credentials for shop base location country will be used. If the option is unchecked only Klarna credentials for shop base location country will be used.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'no',
-				'desc_tip'    => true,
-			),
-			'testmode'              => array(
-				'title'       => __( 'Test mode', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Enable Test Mode', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'checkbox',
-				'description' => __( 'Place the payment gateway in test mode using test API keys.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'yes',
-				'desc_tip'    => true,
-			),
-			'logging'               => array(
-				'title'       => __( 'Logging', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Log debug messages', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'checkbox',
-				'description' => __( 'Save debug messages to the WooCommerce System Status log.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'no',
-				'desc_tip'    => true,
-			),
-		) );
+		$this->form_fields = Klarna_Checkout_For_WooCommerce_Fields::fields();
 	}
 
 	/**
@@ -226,6 +125,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'update_order_notes_nonce'        => wp_create_nonce( 'kco_wc_update_order_notes' ),
 			'refresh_checkout_fragment_url'   => WC_AJAX::get_endpoint( 'kco_wc_refresh_checkout_fragment' ),
 			'refresh_checkout_fragment_nonce' => wp_create_nonce( 'kco_wc_refresh_checkout_fragment' ),
+			'iframe_change_url'               => WC_AJAX::get_endpoint( 'kco_wc_iframe_change' ),
+			'iframe_change_nonce'             => wp_create_nonce( 'kco_wc_iframe_change' ),
 		);
 		wp_localize_script( 'klarna_checkout_for_woocommerce', 'klarna_checkout_for_woocommerce_params', $checkout_localize_params );
 

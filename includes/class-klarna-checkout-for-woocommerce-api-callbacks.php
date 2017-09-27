@@ -2,6 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
 /**
  * Klarna_Checkout_For_WooCommerce_API_Callbacks class.
  *
@@ -25,6 +26,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		if ( null === self::$instance ) {
 			self::$instance = new self();
 		}
+
 		return self::$instance;
 	}
 
@@ -34,10 +36,85 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	public function __construct() {
 		add_action( 'woocommerce_api_kco_wc_push', array( $this, 'push_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_notification', array( $this, 'notification_cb' ) );
-		add_action( 'woocommerce_api_kco_wc_country_change', array( $this, 'country_change_cb' ) );
+		// add_action( 'woocommerce_api_kco_wc_country_change', array( $this, 'country_change_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_validation', array( $this, 'validation_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_shipping_option_update', array( $this, 'shipping_option_update_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
+
+		// Rest
+		add_action( 'rest_api_init', array( $this, 'rest_routes' ) );
+	}
+
+	/**
+	 * Registers REST API routes.
+	 */
+	public function rest_routes() {
+		register_rest_route( 'kcowc/v1', '/address/(?P<id>[a-zA-Z0-9-]+)', array(
+			'methods'  => 'POST',
+			'callback' => array( $this, 'rest_address_cb' ),
+		) );
+
+	}
+
+	public function rest_address_cb( $request ) {
+		$request_order_id = $request->get_param( 'id' );
+		$request_body     = json_decode( $request->get_body() );
+
+		$cart = WC()->cart;
+		$cart->add_to_cart( 70 );
+		$cart->calculate_shipping();
+		$cart->calculate_totals();
+
+		$response_body = array(
+			'purchase_currency' => 'GBP',
+			'order_amount'      => 7770,
+			'order_tax_amount'  => 693,
+			'order_lines'       => array(
+				array(
+					'reference'             => '70',
+					'name'                  => 'Flying Ninja',
+					'quantity'              => 3,
+					'unit_price'            => 1025,
+					'tax_rate'              => 0,
+					'total_amount'          => 3077,
+					'total_tax_amount'      => 0,
+					'total_discount_amount' => 0,
+					'product_url'           => 'http://krokedil.klarna.ngrok.io/product/flying-ninja/',
+					'image_url'             => 'http://krokedil.klarna.ngrok.io/wp-content/uploads/2013/06/poster_2_up-180x180.jpg'
+				),
+				array(
+					'type'             => 'shipping_fee',
+					'reference'        => 'flat_rate:3',
+					'name'             => 'Flat Rate',
+					'quantity'         => 1,
+					'unit_price'       => 4000,
+					'tax_rate'         => 0,
+					'total_amount'     => 4000,
+					'total_tax_amount' => 0
+				),
+				array(
+					'type'                  => 'sales_tax',
+					'reference'             => 'Sales Tax',
+					'name'                  => 'Sales Tax',
+					'quantity'              => 1,
+					'unit_price'            => 693,
+					'tax_rate'              => 0,
+					'total_amount'          => 693,
+					'total_discount_amount' => 0,
+					'total_tax_amount'      => 0
+				)
+			)
+		);
+
+		// header( 'HTTP/1.0 200 OK' );
+		// header('Content-Type: application/json');
+		// return json_encode( $response_body );
+
+		$response = new WP_REST_Response( $response_body );
+		$response->set_status( 200 );
+		$response->header( 'Content-Type', 'application/json' );
+
+		return $response;
 	}
 
 	/**
@@ -55,17 +132,17 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$klarna_order_id = $_GET['kco_wc_order_id'];
 
 		$query_args = array(
-			'post_type' => wc_get_order_types(),
+			'post_type'   => wc_get_order_types(),
 			'post_status' => array_keys( wc_get_order_statuses() ),
-			'meta_key' => '_wc_klarna_order_id',
-			'meta_value' => $klarna_order_id,
+			'meta_key'    => '_wc_klarna_order_id',
+			'meta_value'  => $klarna_order_id,
 		);
 
-		$orders = get_posts( $query_args );
+		$orders   = get_posts( $query_args );
 		$order_id = $orders[0]->ID;
-		$order = wc_get_order( $order_id );
+		$order    = wc_get_order( $order_id );
 
-		$response = KCO_WC()->api->request_post_get_order( $klarna_order_id );
+		$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 		$klarna_order = json_decode( $response['body'] );
 
 		if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
@@ -93,16 +170,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	}
 
 	/**
-	 * Country change callback function.
-	 * Used in KCO Global only.
-	 *
-	 * @link https://developers.klarna.com/en/us/kco-v3/checkout/additional-features/kco-global/callbacks
-	 */
-	public function country_change_cb() {
-
-	}
-
-	/**
 	 * Order validation callback function.
 	 * Response must be sent to Klarna API.
 	 *
@@ -110,9 +177,9 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 */
 	public function validation_cb() {
 		$post_body = file_get_contents( 'php://input' );
-		$data = json_decode( $post_body, true );
+		$data      = json_decode( $post_body, true );
 
-		$all_in_stock = true;
+		$all_in_stock    = true;
 		$shipping_chosen = false;
 
 		// Check stock for each item and shipping method.
