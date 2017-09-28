@@ -155,6 +155,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$klarna_country = WC()->checkout()->get_value( 'billing_country' );
 		update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
 
+		WC()->session->__unset( 'kco_wc_update_md5' );
 		WC()->session->__unset( 'kco_wc_order_id' );
 		WC()->session->__unset( 'kco_wc_order_notes' );
 	}

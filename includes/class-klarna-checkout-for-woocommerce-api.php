@@ -113,13 +113,21 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'body'    => $this->get_request_body(),
 		);
 
+		// No update if nothing changed in data being sent to Klarna.
+		if ( WC()->session->get( 'kco_wc_update_md5' ) && WC()->session->get( 'kco_wc_update_md5' ) === md5( serialize( $request_args ) ) ) {
+			return;
+		}
+
 		$response = wp_safe_remote_post( $request_url, $request_args );
 
 		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
+			WC()->session->set( 'kco_wc_update_md5', md5( serialize( $request_args ) ) );
+
 			$klarna_order = json_decode( $response['body'] );
 
 			return $klarna_order;
 		} else {
+			WC()->session->__unset( 'kco_wc_update_md5' );
 			WC()->session->__unset( 'kco_wc_order_id' );
 			$error = $this->extract_error_messages( $response );
 
@@ -263,7 +271,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 				$order = $this->request_pre_create_order();
 			} elseif ( 'checkout_incomplete' === $order->status ) {
 				// Only update order if its status is incomplete.
-				$order = $this->request_pre_update_order();
+				$this->request_pre_update_order();
 			}
 		} else {
 			$order = $this->request_pre_create_order();

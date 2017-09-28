@@ -162,7 +162,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 		$countries = array(
 			'swe' => 'SE',
-			'gbr' => 'UK',
+			'gbr' => 'GB',
 			'fin' => 'FI',
 			'usa' => 'US',
 			'nld' => 'NL'
@@ -180,6 +180,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		WC()->customer->set_shipping_last_name( $address['family_name'] );
 
 		WC()->customer->save();
+
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_totals();
 

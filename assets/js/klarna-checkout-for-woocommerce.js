@@ -202,7 +202,7 @@ jQuery(function($) {
 										nonce: klarna_checkout_for_woocommerce_params.iframe_change_nonce
 									},
 									success: function (response) {
-										console.log(response.data.html);
+										console.log(response);
 										$('table.woocommerce-checkout-review-order-table').replaceWith(response.data.html);
 									},
 									error: function (response) {
