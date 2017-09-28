@@ -62,7 +62,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_confirmation_url() {
-		$confirmation_url = wc_get_checkout_url() . KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CONFIRM_EP . '/?kco_wc_order_id={checkout.order.id}';
+		$confirmation_url = wc_get_checkout_url() . '?confirm=yes&kco_wc_order_id={checkout.order.id}';
 		return $confirmation_url;
 	}
 

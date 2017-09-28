@@ -17,13 +17,6 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	protected static $instance;
 
 	/**
-	 * Confirm endpoint names.
-	 *
-	 * @var string
-	 */
-	public static $confirm_endpoint = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_CONFIRM_EP;
-
-	/**
 	 * Returns the *Singleton* instance of this class.
 	 *
 	 * @return self::$instance The *Singleton* instance.
@@ -39,33 +32,11 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	 * Plugin actions.
 	 */
 	public function __construct() {
-		// Actions used to insert a new endpoint in the WordPress.
-		add_action( 'init', array( $this, 'add_endpoints' ) );
-		add_filter( 'query_vars', array( $this, 'add_query_vars' ), 0 );
-
 		// Override template if Klarna Checkout page.
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
-	}
 
-	/**
-	 * Register new endpoints.
-	 *
-	 * @see https://developer.wordpress.org/reference/functions/add_rewrite_endpoint/
-	 */
-	public function add_endpoints() {
-		add_rewrite_endpoint( self::$confirm_endpoint, EP_PAGES );
-	}
-
-	/**
-	 * Add new query var.
-	 *
-	 * @param  array $vars Array of query vars.
-	 * @return array
-	 */
-	public function add_query_vars( $vars ) {
-		$vars[] = self::$confirm_endpoint;
-
-		return $vars;
+		// Show loading indicator in KCO confirmation page.
+		add_action( 'wp_footer', array( $this, 'confirm_loading_indicator' ), 999 );
 	}
 
 	/**
@@ -78,8 +49,6 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	 * @return string
 	 */
 	public function override_template( $template, $template_name, $template_path ) {
-		global $wp_query;
-
 		$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 
 		if ( is_checkout() ) {
@@ -102,7 +71,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 				}
 
 				// Klarna checkout confirmation page.
-				if ( isset( $wp_query->query_vars[ self::$confirm_endpoint ] ) && isset( $_GET['kco_wc_order_id'] ) ) {
+				if ( isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] && isset( $_GET['kco_wc_order_id'] ) ) {
 					if ( WC()->session->get( 'kco_wc_order_id' ) === $_GET['kco_wc_order_id'] ) {
 						$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout-confirm.php';
 					}
@@ -113,15 +82,20 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 		return $template;
 	}
 
-	/**
-	 * Plugin install action.
-	 * Flush rewrite rules to make our custom endpoint available.
-	 */
-	public static function install() {
-		flush_rewrite_rules();
-	}
+	public function confirm_loading_indicator() { ?>
+		<script>
+			jQuery('#kco-confirm-loading')
+				.css('minHeight', '200px')
+				.block({
+					message: null,
+					overlayCSS: {
+						background: '#fff',
+						opacity: 0.6
+					}
+				});
+		</script>
+	<?php }
 
 }
 
 Klarna_Checkout_For_WooCommerce_Templates::get_instance();
-register_activation_hook( __FILE__, array( 'Klarna_Checkout_For_WooCommerce_Templates', 'install' ) );

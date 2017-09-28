@@ -1,6 +1,7 @@
 <?php $nonce = wp_create_nonce( 'woocommerce-process_checkout' ); ?>
 
 <p>Please wait while we process your order.</p>
+<div id="kco-confirm-loading"></div>
 
 <?php
 // Fetch Klarna order.
@@ -98,6 +99,5 @@ $query = http_build_query( $checkout_data, '', '&' );
 			}
 		});
 	};
-
 	kco_wc_process_checkout();
 </script>
