@@ -1,6 +1,5 @@
 <?php $nonce = wp_create_nonce( 'woocommerce-process_checkout' ); ?>
 
-<p>Please wait while we process your order.</p>
 <div id="kco-confirm-loading"></div>
 
 <?php

@@ -35,8 +35,23 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 		// Override template if Klarna Checkout page.
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
 
-		// Show loading indicator in KCO confirmation page.
-		add_action( 'wp_footer', array( $this, 'confirm_loading_indicator' ), 999 );
+		add_filter( 'the_title', array( $this, 'confirm_page_title' ) );
+	}
+
+	/**
+	 * Filter Checkout page title in confirmation page.
+	 *
+	 * @param $title
+	 *
+	 * @return string
+	 */
+	public function confirm_page_title( $title ) {
+		if ( ! is_admin() && is_main_query() && in_the_loop() && is_page() && is_checkout() && isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] ) {
+			$title = 'Please wait while we process your order.';
+			remove_filter( 'the_title', array( $this, 'confirm_page_title' ) );
+		}
+
+		return $title;
 	}
 
 	/**
@@ -81,20 +96,6 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 
 		return $template;
 	}
-
-	public function confirm_loading_indicator() { ?>
-		<script>
-			jQuery('#kco-confirm-loading')
-				.css('minHeight', '200px')
-				.block({
-					message: null,
-					overlayCSS: {
-						background: '#fff',
-						opacity: 0.6
-					}
-				});
-		</script>
-	<?php }
 
 }
 

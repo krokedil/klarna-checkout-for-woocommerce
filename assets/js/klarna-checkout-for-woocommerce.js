@@ -25,6 +25,8 @@ jQuery(function($) {
 			} else {
 				kco_wc.paymentMethod = 'klarna_checkout_for_woocommerce';
 			}
+
+			kco_wc.confirmLoading();
 		},
 
 		kcoSuspend: function () {
@@ -37,6 +39,18 @@ jQuery(function($) {
 			window._klarnaCheckout(function (api) {
 				api.resume();
 			});
+		},
+
+		confirmLoading: function () {
+			$('#kco-confirm-loading')
+				.css('minHeight', '300px')
+				.block({
+					message: null,
+					overlayCSS: {
+						background: '#fff',
+						opacity: 0.6
+					}
+				});
 		},
 
 		updateCart: function () {
