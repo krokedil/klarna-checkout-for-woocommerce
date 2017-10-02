@@ -57,12 +57,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	public function process_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		// Reduce stock levels.
-		wc_reduce_stock_levels( $order_id );
-
-		// Remove cart.
-		WC()->cart->empty_cart();
-
 		return array(
 			'result'   => 'success',
 			'redirect' => $this->get_return_url( $order ),

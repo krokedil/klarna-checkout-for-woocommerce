@@ -42,7 +42,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
 
 		// Rest
-		add_action( 'rest_api_init', array( $this, 'rest_routes' ) );
+		// add_action( 'rest_api_init', array( $this, 'rest_routes' ) );
 	}
 
 	/**
@@ -129,6 +129,13 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		 * 5. Send merchant_reference1
 		 */
 
+		// Do nothing if there's no Klarna Checkout order ID.
+		if ( ! $_GET['kco_wc_order_id'] ) {
+			$this->backup_order_creation();
+
+			return;
+		}
+
 		$klarna_order_id = $_GET['kco_wc_order_id'];
 
 		$query_args = array(
@@ -138,28 +145,39 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			'meta_value'  => $klarna_order_id,
 		);
 
-		$orders   = get_posts( $query_args );
+		$orders = get_posts( $query_args );
+
+		if ( empty( $orders ) ) {
+			return;
+		}
+
 		$order_id = $orders[0]->ID;
 		$order    = wc_get_order( $order_id );
 
-		$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
-		$klarna_order = json_decode( $response['body'] );
+		if ( $order ) {
+			// If the order was already created, send merchant reference.
+			$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
+			$klarna_order = json_decode( $response['body'] );
 
-		if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
-			$order->payment_complete( $klarna_order_id );
-			$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . $klarna_order->order_id );
-		} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
-			$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
+			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
+				$order->payment_complete( $klarna_order_id );
+				$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . $klarna_order->order_id );
+			} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
+				$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
+			}
+
+			KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
+			KCO_WC()->api->request_post_set_merchant_reference(
+				$klarna_order_id,
+				array(
+					'merchant_reference1' => $order->get_order_number(),
+					'merchant_reference2' => $order->get_id(),
+				)
+			);
+		} else {
+			// Backup order creation.
+			$this->backup_order_creation();
 		}
-
-		KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
-		KCO_WC()->api->request_post_set_merchant_reference(
-			$klarna_order_id,
-			array(
-				'merchant_reference1' => $order->get_order_number(),
-				'merchant_reference2' => $order->get_id(),
-			)
-		);
 	}
 
 	/**
@@ -237,62 +255,213 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * @ref  https://github.com/mmartche/coach/blob/30022c266089fc7499c54e149883e951c288dc9f/catalog/controller/extension/payment/klarna_checkout.php#L509
 	 */
 	public function address_update_cb() {
-		header( 'HTTP/1.0 200 OK' );
-		header( 'Content-Type: application/json' );
-		echo '{
-	    "order_amount": 5000,
-	    "order_tax_amount": 500,
-	    "order_lines": [
-	        {
-	            "type": "physical",
-	            "reference": "19-402-USA",
-	            "name": "Red T-Shirt",
-	            "quantity": 5,
-	            "quantity_unit": "pcs",
-	            "unit_price": 1000,
-	            "tax_rate": 1000,
-	            "total_amount": 5000,
-	            "total_discount_amount": 0,
-	            "total_tax_amount": 500,
-	            "merchant_data": "{\"marketplace_seller_info\":[{\"product_category\":\"Women\'s Fashion\",\"product_name\":\"Women Sweatshirt\"}]}",
-	            "product_url": "https://www.estore.com/products/f2a8d7e34",
-	            "image_url": "https://www.exampleobjects.com/logo.png"
-	        }
-	    ],
-	    "purchase_currency": "USD"
-		}';
+		// Currently disabled, because of how response body needs to be calculated in WooCommerce.
+	}
 
-		// $post_body = file_get_contents( 'php://input' );
-		// Convert post body into native object.
-		// $data = json_decode( $post_body, true );
-
-		// @TODO: Continue here
+	public function backup_order_creation() {
+		$klarna_order_id = '76c2db44-a927-7975-bdc9-c5a4634f406f';
+		$response        = KCO_WC()->api->request_post_get_order( $klarna_order_id );
+		$klarna_order    = json_decode( $response['body'] );
 
 		/*
-		header( 'HTTP/1.0 200 OK' );
-		echo '{
-	    "order_amount": 0,
-	    "order_tax_amount": 0,
-	    "order_lines": [
-	        {
-	            "type": "physical",
-	            "reference": "19-402-USA",
-	            "name": "Red T-Shirt",
-	            "quantity": 5,
-	            "quantity_unit": "pcs",
-	            "unit_price": 10000,
-	            "tax_rate": 1000,
-	            "total_amount": 50000,
-	            "total_discount_amount": 0,
-	            "total_tax_amount": 5000,
-	            "merchant_data": "{\"marketplace_seller_info\":[{\"product_category\":\"Women\'s Fashion\",\"product_name\":\"Women Sweatshirt\"}]}",
-	            "product_url": "https://www.estore.com/products/f2a8d7e34",
-	            "image_url": "https://www.exampleobjects.com/logo.png"
-	        }
-	    ],
-	    "purchase_currency": "USD"
-		}';
+		$data = array(
+			'terms' => 1,
+			'createaccount' => 0,
+			'payment_method' => 'klarna_checkout_for_woocommerce',
+			'shipping_method' => array(
+
+			),
+			'ship_to_different_address' => '', // Check if needed.
+			'woocommerce_checkout_update_totals' => '', // Check if needed.
+
+			'billing_first_name' => '',
+			'billing_last_name' => '',
+			'billing_company' => '',
+			'billing_country' => '',
+			'billing_address_1' => '',
+			'billing_address_2' => '',
+			'billing_city' => '',
+			'billing_state' => '',
+			'billing_postcode' => '',
+			'billing_phone' => '',
+			'billing_email' => '',
+
+			'order_comments' => '',
+
+			'shipping_first_name' => '',
+			'shipping_last_name' => '',
+			'shipping_company' => '',
+			'shipping_country' => '',
+			'shipping_address_1' => '',
+			'shipping_address_2' => '',
+			'shipping_city' => '',
+			'shipping_state' => '',
+			'shipping_postcode' => '',
+		);
 		*/
+
+		/*
+			Array
+			(
+				[terms] => 1
+				[createaccount] => 0
+				[payment_method] => klarna_checkout_for_woocommerce
+				[shipping_method] => Array
+				(
+					[0] => flat_rate:1
+				)
+				[ship_to_different_address] =>
+				[woocommerce_checkout_update_totals] =>
+
+				[billing_first_name] => fsd
+				[billing_last_name] => fsd
+				[billing_company] =>
+				[billing_country] => SE
+				[billing_address_1] => Neherkade
+				[billing_address_2] => fsd
+				[billing_city] => rewrew
+				[billing_state] =>
+				[billing_postcode] => 12345
+				[billing_phone] => + 358 41 432412412
+				[billing_email] => dasdasad@dsadas.net
+
+				[order_comments] =>
+
+				[shipping_first_name] => fsd
+				[shipping_last_name] => fsd
+				[shipping_company] =>
+				[shipping_country] => SE
+				[shipping_address_1] => Neherkade
+				[shipping_address_2] => fsd
+				[shipping_city] => rewrew
+				[shipping_state] =>
+				[shipping_postcode] => 12345
+			)
+		 */
+
+
+		// First name.
+		WC()->customer->set_billing_first_name( $klarna_order->billing_address->given_name );
+		WC()->customer->set_shipping_first_name( $klarna_order->shipping_address->given_name );
+
+		// Last name.
+		WC()->customer->set_billing_last_name( $klarna_order->billing_address->family_name );
+		WC()->customer->set_shipping_last_name( $klarna_order->shipping_address->family_name );
+
+		// Company.
+
+		// Country.
+		WC()->customer->set_billing_country( $klarna_order->billing_address->country );
+		WC()->customer->set_shipping_country( $klarna_order->shipping_address->country );
+
+		// Street address 1.
+		WC()->customer->set_billing_address_1( $klarna_order->billing_address->street_address );
+		WC()->customer->set_shipping_address_1( $klarna_order->shipping_address->street_address );
+
+		// Street address 2.
+		WC()->customer->set_billing_address_2( $klarna_order->billing_address->street_address2 );
+		WC()->customer->set_shipping_address_2( $klarna_order->shipping_address->street_address2 );
+
+		// City.
+		WC()->customer->set_billing_city( $klarna_order->billing_address->city );
+		WC()->customer->set_shipping_city( $klarna_order->shipping_address->city );
+
+		// County/State.
+		WC()->customer->set_billing_state( $klarna_order->billing_address->region );
+		WC()->customer->set_shipping_state( $klarna_order->shipping_address->region );
+
+		// Postcode.
+		WC()->customer->set_billing_postcode( $klarna_order->billing_address->postal_code );
+		WC()->customer->set_shipping_postcode( $klarna_order->shipping_address->postal_code );
+
+		// Phone.
+		WC()->customer->set_billing_phone( $klarna_order->billing_address->phone );
+
+		// Email.
+		WC()->customer->set_billing_email( $klarna_order->billing_address->email );
+
+		WC()->customer->save();
+
+
+
+
+
+		WC()->cart->add_to_cart( 99 );
+		WC()->cart->calculate_shipping();
+		WC()->cart->calculate_fees();
+		WC()->cart->calculate_totals();
+
+
+		if ( ! WC()->checkout()->check_cart_items() ) {
+			return;
+		}
+
+
+
+		$order = new WC_Order();
+
+		$order->set_billing_first_name( $klarna_order->billing_address->given_name );
+		$order->set_billing_last_name( $klarna_order->billing_address->family_name );
+		// $order->set_billing_company();
+		$order->set_billing_country( $klarna_order->billing_address->country );
+		$order->set_billing_address_1( $klarna_order->billing_address->street_address );
+		$order->set_billing_address_2( $klarna_order->billing_address->street_address2 );
+		$order->set_billing_city( $klarna_order->billing_address->city );
+		$order->set_billing_state($klarna_order->billing_address->region );
+		$order->set_billing_postcode( $klarna_order->billing_address->postal_code );
+		$order->set_billing_phone( $klarna_order->billing_address->phone );
+		$order->set_billing_email( $klarna_order->billing_address->email );
+
+		$order->set_shipping_first_name( $klarna_order->shipping_address->given_name );
+		$order->set_shipping_last_name( $klarna_order->shipping_address->family_name );
+		// $order->set_shipping_company();
+		$order->set_shipping_country( $klarna_order->shipping_address->country );
+		$order->set_shipping_address_1( $klarna_order->shipping_address->street_address );
+		$order->set_shipping_address_2( $klarna_order->shipping_address->street_address2 );
+		$order->set_shipping_city( $klarna_order->shipping_address->city );
+		$order->set_shipping_state($klarna_order->shipping_address->region );
+		$order->set_shipping_postcode( $klarna_order->shipping_address->postal_code );
+
+
+
+
+		$order->set_created_via( 'klarna_checkout_backup_order_creation' );
+		$order->set_currency( $klarna_order->purchase_currency );
+		$order->set_payment_method( 'klarna_checkout_for_woocommerce' );
+
+		$order->set_created_via( 'klarna_checkout_backup_order_creation' );
+		// $order->set_cart_hash( $cart_hash );
+		// $order->set_customer_id( apply_filters( 'woocommerce_checkout_customer_id', get_current_user_id() ) );
+		$order->set_currency( $klarna_order->purchase_currency );
+		$order->set_prices_include_tax( 'yes' === get_option( 'woocommerce_prices_include_tax' ) );
+		// $order->set_customer_ip_address( WC_Geolocation::get_ip_address() );
+		// $order->set_customer_user_agent( wc_get_user_agent() );
+		// $order->set_customer_note( isset( $data['order_comments'] ) ? $data['order_comments'] : '' );
+
+		$order->set_shipping_total( WC()->cart->get_shipping_total() );
+		$order->set_discount_total( WC()->cart->get_discount_total() );
+		$order->set_discount_tax( WC()->cart->get_discount_tax() );
+		$order->set_cart_tax( WC()->cart->get_cart_contents_tax() + WC()->cart->get_fee_tax() );
+		$order->set_shipping_tax( WC()->cart->get_shipping_tax() );
+		$order->set_total( WC()->cart->get_total( 'edit' ) );
+
+		WC()->checkout()->create_order_line_items( $order, WC()->cart );
+		WC()->checkout()->create_order_fee_lines( $order, WC()->cart );
+		WC()->checkout()->create_order_shipping_lines( $order, WC()->session->get( 'chosen_shipping_methods' ), WC()->shipping->get_packages() );
+		WC()->checkout()->create_order_tax_lines( $order, WC()->cart );
+		WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
+
+
+		$order->save();
+
+		if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
+			$order->payment_complete( $klarna_order_id );
+			$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . $klarna_order->order_id );
+		} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
+			$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
+		}
+
+
 	}
 
 }

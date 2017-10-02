@@ -98,5 +98,5 @@ $query = http_build_query( $checkout_data, '', '&' );
 			}
 		});
 	};
-	kco_wc_process_checkout();
+	// kco_wc_process_checkout();
 </script>
