@@ -263,82 +263,10 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$response        = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 		$klarna_order    = json_decode( $response['body'] );
 
-		/*
-		$data = array(
-			'terms' => 1,
-			'createaccount' => 0,
-			'payment_method' => 'klarna_checkout_for_woocommerce',
-			'shipping_method' => array(
 
-			),
-			'ship_to_different_address' => '', // Check if needed.
-			'woocommerce_checkout_update_totals' => '', // Check if needed.
-
-			'billing_first_name' => '',
-			'billing_last_name' => '',
-			'billing_company' => '',
-			'billing_country' => '',
-			'billing_address_1' => '',
-			'billing_address_2' => '',
-			'billing_city' => '',
-			'billing_state' => '',
-			'billing_postcode' => '',
-			'billing_phone' => '',
-			'billing_email' => '',
-
-			'order_comments' => '',
-
-			'shipping_first_name' => '',
-			'shipping_last_name' => '',
-			'shipping_company' => '',
-			'shipping_country' => '',
-			'shipping_address_1' => '',
-			'shipping_address_2' => '',
-			'shipping_city' => '',
-			'shipping_state' => '',
-			'shipping_postcode' => '',
-		);
-		*/
-
-		/*
-			Array
-			(
-				[terms] => 1
-				[createaccount] => 0
-				[payment_method] => klarna_checkout_for_woocommerce
-				[shipping_method] => Array
-				(
-					[0] => flat_rate:1
-				)
-				[ship_to_different_address] =>
-				[woocommerce_checkout_update_totals] =>
-
-				[billing_first_name] => fsd
-				[billing_last_name] => fsd
-				[billing_company] =>
-				[billing_country] => SE
-				[billing_address_1] => Neherkade
-				[billing_address_2] => fsd
-				[billing_city] => rewrew
-				[billing_state] =>
-				[billing_postcode] => 12345
-				[billing_phone] => + 358 41 432412412
-				[billing_email] => dasdasad@dsadas.net
-
-				[order_comments] =>
-
-				[shipping_first_name] => fsd
-				[shipping_last_name] => fsd
-				[shipping_company] =>
-				[shipping_country] => SE
-				[shipping_address_1] => Neherkade
-				[shipping_address_2] => fsd
-				[shipping_city] => rewrew
-				[shipping_state] =>
-				[shipping_postcode] => 12345
-			)
+		/**
+		 * Customer.
 		 */
-
 
 		// First name.
 		WC()->customer->set_billing_first_name( $klarna_order->billing_address->given_name );
@@ -347,8 +275,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		// Last name.
 		WC()->customer->set_billing_last_name( $klarna_order->billing_address->family_name );
 		WC()->customer->set_shipping_last_name( $klarna_order->shipping_address->family_name );
-
-		// Company.
 
 		// Country.
 		WC()->customer->set_billing_country( $klarna_order->billing_address->country );
@@ -383,17 +309,25 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		WC()->customer->save();
 
 
+		/**
+		 * Cart.
+		 */
+		WC()->cart->empty_cart();
 
+		foreach ( $klarna_order->order_lines as $cart_item ) {
+			if ( 'physical' === $cart_item->type ) {
+				WC()->cart->add_to_cart( (int) $cart_item->reference );
+			}
+		}
 
-
-		WC()->cart->add_to_cart( 99 );
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_fees();
 		WC()->cart->calculate_totals();
 
 
+		// Check cart items (quantity, coupon validity etc).
 		if ( ! WC()->checkout()->check_cart_items() ) {
-			return;
+			// return;
 		}
 
 
