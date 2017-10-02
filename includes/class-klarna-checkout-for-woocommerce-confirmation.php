@@ -55,13 +55,40 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		$klarna_order    = json_decode( $response['body'] );
 		$order_notes     = WC()->session->get( 'kco_wc_order_notes' );
 
+		$this->save_customer_data( $klarna_order );
+	}
+
+	public function maybe_submit_wc_checkout( $checkout ) {
+		if ( ! $this->is_kco_confirmation() ) {
+			return;
+		}
+
+		?>
+		<script>
+			jQuery(function($) {
+				$('input#terms').prop('checked', true);
+				$('form.woocommerce-checkout').submit();
+			});
+		</script>
+		<?php
+	}
+
+	private function is_kco_confirmation() {
+		if ( isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] && isset( $_GET['kco_wc_order_id'] ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private function save_customer_data( $klarna_order ) {
 		// First name.
 		WC()->customer->set_billing_first_name( $klarna_order->billing_address->given_name );
 		WC()->customer->set_shipping_first_name( $klarna_order->shipping_address->given_name );
 
 		// Last name.
-		WC()->customer->set_billing_first_name( $klarna_order->billing_address->given_name );
-		WC()->customer->set_shipping_first_name( $klarna_order->shipping_address->given_name );
+		WC()->customer->set_billing_last_name( $klarna_order->billing_address->family_name );
+		WC()->customer->set_shipping_last_name( $klarna_order->shipping_address->family_name );
 
 		// Company.
 
@@ -96,29 +123,6 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		WC()->customer->set_billing_email( $klarna_order->billing_address->email );
 
 		WC()->customer->save();
-	}
-
-	public function maybe_submit_wc_checkout( $checkout ) {
-		if ( ! $this->is_kco_confirmation() ) {
-			return;
-		}
-
-		?>
-		<script>
-			jQuery(function($) {
-				$('input#terms').prop('checked', true);
-				$('form.woocommerce-checkout').submit();
-			});
-		</script>
-		<?php
-	}
-
-	private function is_kco_confirmation() {
-		if ( isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] && isset( $_GET['kco_wc_order_id'] ) ) {
-			return true;
-		}
-
-		return false;
 	}
 
 }
