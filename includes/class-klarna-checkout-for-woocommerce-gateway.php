@@ -93,6 +93,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			return;
 		}
 
+		if ( is_order_received_page() ) {
+			return;
+		}
+
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		wp_register_script(
@@ -134,6 +138,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * @param int $order_id WooCommerce order ID.
 	 */
 	public function show_thank_you_snippet( $order_id ) {
+		if ( 0 === WC()->cart->get_cart_contents_count() ) {
+			return;
+		}
+
 		$klarna_order = KCO_WC()->api->get_order();
 		echo KCO_WC()->api->get_snippet( $klarna_order );
 

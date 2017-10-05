@@ -326,9 +326,11 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 
 		// Check cart items (quantity, coupon validity etc).
-		if ( ! WC()->checkout()->check_cart_items() ) {
-			// return;
+		if ( ! WC()->cart->check_cart_items() ) {
+			return;
 		}
+
+		WC()->cart->check_cart_coupons();
 
 
 
