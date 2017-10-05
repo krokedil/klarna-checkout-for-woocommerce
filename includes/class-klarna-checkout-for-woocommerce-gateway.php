@@ -138,7 +138,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * @param int $order_id WooCommerce order ID.
 	 */
 	public function show_thank_you_snippet( $order_id ) {
-		if ( 0 === WC()->cart->get_cart_contents_count() ) {
+		if ( ! WC()->session->get( 'kco_wc_order_id' ) ) {
 			return;
 		}
 
@@ -147,19 +147,11 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		add_post_meta( $order_id, '_wc_klarna_order_id', $klarna_order->order_id );
 
-		if ( $this->testmode ) {
-			$environment = 'test';
-		} else {
-			$environment = 'live';
-		}
+		$environment = $this->testmode ? 'test' : 'live';
 		update_post_meta( $order_id, '_wc_klarna_environment', $environment );
 
 		$klarna_country = WC()->checkout()->get_value( 'billing_country' );
 		update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
-
-		WC()->session->__unset( 'kco_wc_update_md5' );
-		WC()->session->__unset( 'kco_wc_order_id' );
-		WC()->session->__unset( 'kco_wc_order_notes' );
 	}
 
 	/**

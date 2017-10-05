@@ -289,10 +289,25 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 */
 	public function get_snippet( $order ) {
 		if ( ! is_wp_error( $order ) ) {
+			$this->maybe_clear_session_values( $order );
+
 			return $order->html_snippet;
 		}
 
 		return $order->get_error_message();
+	}
+
+	/**
+	 * Clear WooCommerce session values if Klarna Checkout order is completed.
+	 *
+	 * @param Klarna_Order $order Klarna Checkout order.
+	 */
+	public function maybe_clear_session_values( $order ) {
+		if ( 'checkout_complete' === $order->status ) {
+			WC()->session->__unset( 'kco_wc_update_md5' );
+			WC()->session->__unset( 'kco_wc_order_id' );
+			WC()->session->__unset( 'kco_wc_order_notes' );
+		}
 	}
 
 	/**
