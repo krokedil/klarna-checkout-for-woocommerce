@@ -88,15 +88,6 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 						}
 					}
 				}
-
-				// Klarna checkout confirmation page.
-				/*
-				if ( $this->is_kco_confirmation() ) {
-					if ( WC()->session->get( 'kco_wc_order_id' ) === $_GET['kco_wc_order_id'] ) {
-						$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout-confirm.php';
-					}
-				}
-				*/
 			}
 		}
 
