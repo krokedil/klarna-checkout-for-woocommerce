@@ -7,22 +7,22 @@ var rename = require('gulp-rename');
 var pump = require('pump');
 var cleanCSS = require('gulp-clean-css');
 
-var cssFile = 'assets/css/klarna-checkout-for-woocommerce.css';
-var jsFile = 'assets/js/klarna-checkout-for-woocommerce.js';
+var cssFiles = 'assets/css/klarna-checkout-for-woocommerce.css';
+var jsFiles = 'assets/js/klarna-checkout-for-woocommerce.js';
 
 gulp.task('CSS', function() {
     return gulp
-        .src(cssFile)
+        .src(cssFiles)
         .pipe(cleanCSS({ debug: true }))
         .pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest('assets/css'));
 });
 
 gulp.task('JS', function(cb) {
-    pump([gulp.src(jsFile), uglify(), rename({ suffix: '.min' }), gulp.dest('assets/js')], cb);
+    pump([gulp.src(jsFiles), uglify(), rename({ suffix: '.min' }), gulp.dest('assets/js')], cb);
 });
 
 gulp.task('watch', function() {
-    gulp.watch(cssFile, ['CSS']);
-    gulp.watch(jsFile, ['JS']);
+    gulp.watch(cssFiles, ['CSS']);
+    gulp.watch(jsFiles, ['JS']);
 });

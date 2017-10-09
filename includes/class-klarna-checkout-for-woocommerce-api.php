@@ -409,6 +409,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 				'postal_code' => WC()->checkout()->get_value( 'billing_postcode' ),
 				'country'     => $this->get_purchase_country()
 			);
+
+			if ( $this->get_iframe_colors() ) {
+				$request_args['options'] = $this->get_iframe_colors();
+			}
 		}
 
 		$request_body = wp_json_encode( $request_args );
@@ -425,6 +429,52 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$wc_countries = new WC_Countries();
 
 		return array_keys( $wc_countries->get_shipping_countries() );
+	}
+
+	private function get_iframe_colors() {
+		$color_settings = array();
+
+		if ( $this->check_option_field( 'color_button' ) ) {
+			$color_settings['color_button'] = $this->check_option_field( 'color_button' );
+		}
+
+		if ( $this->check_option_field( 'color_button_text' ) ) {
+			$color_settings['color_button_text'] = $this->check_option_field( 'color_button_text' );
+		}
+
+		if ( $this->check_option_field( 'color_checkbox' ) ) {
+			$color_settings['color_checkbox'] = $this->check_option_field( 'color_checkbox' );
+		}
+
+		if ( $this->check_option_field( 'color_checkbox_checkmark' ) ) {
+			$color_settings['color_checkbox_checkmark'] = $this->check_option_field( 'color_checkbox_checkmark' );
+		}
+
+		if ( $this->check_option_field( 'color_header' ) ) {
+			$color_settings['color_header'] = $this->check_option_field( 'color_header' );
+		}
+
+		if ( $this->check_option_field( 'color_link' ) ) {
+			$color_settings['color_link'] = $this->check_option_field( 'color_link' );
+		}
+
+		if ( $this->check_option_field( 'radius_border' ) ) {
+			$color_settings['radius_border'] = $this->check_option_field( 'radius_border' );
+		}
+
+		if ( count( $color_settings ) > 0 ) {
+			return $color_settings;
+		}
+
+		return false;
+	}
+
+	private function check_option_field( $field ) {
+		if ( array_key_exists( $field, $this->settings ) && '' !== $this->settings[ $field ] ) {
+			return $this->settings[ $field ];
+		}
+
+		return false;
 	}
 
 	/**

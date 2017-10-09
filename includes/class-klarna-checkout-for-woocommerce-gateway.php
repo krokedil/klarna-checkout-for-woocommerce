@@ -41,10 +41,14 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'process_admin_options',
 		) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'show_thank_you_snippet' ) );
 
 		// Add quantity button in woocommerce_order_review() function.
 		add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
+
+		// Remove WooCommerce footer text from our settings page.
+		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 999 );
 	}
 
 	/**
@@ -132,6 +136,29 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		wp_enqueue_style( 'klarna_checkout_for_woocommerce' );
 	}
 
+
+	/**
+	 * Enqueue admin scripts.
+	 *
+	 * @param string $hook Admin page hook.
+	 *
+	 * @hook admin_enqueue_scripts
+	 */
+	public function admin_enqueue_scripts( $hook ) {
+		if ( 'woocommerce_page_wc-settings' !== $hook ) {
+			return;
+		}
+
+		if ( ! isset( $_GET['section'] ) || 'klarna_checkout_for_woocommerce' !== $_GET['section'] ) {
+			return;
+		}
+
+		wp_enqueue_script(
+			'klarna_payments_admin',
+			plugins_url( 'assets/js/klarna-checkout-for-woocommerce-admin.js', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE )
+		);
+	}
+
 	/**
 	 * Displays Klarna Checkout thank you iframe and clears Klarna order ID value from WC session.
 	 *
@@ -186,6 +213,14 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		}
 
 		return $output;
+	}
+
+	public function admin_footer_text( $text ) {
+		if ( isset( $_GET['section'] ) && 'klarna_checkout_for_woocommerce' === $_GET['section'] ) {
+			$text = 'If you like Klarna Checkout for WooCommerce, please consider <strong><a href="#">assigning Krokedil as your integration partner</a></strong>.';
+		}
+
+		return $text;
 	}
 
 }
