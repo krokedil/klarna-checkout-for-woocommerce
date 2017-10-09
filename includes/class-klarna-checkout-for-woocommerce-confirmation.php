@@ -28,21 +28,29 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		return self::$instance;
 	}
 
+	/**
+	 * Klarna_Checkout_For_WooCommerce_Confirmation constructor.
+	 */
 	public function __construct() {
 		add_action( 'wp_head', array( $this, 'maybe_hide_checkout_form' ) );
 		add_action( 'woocommerce_before_checkout_form', array( $this, 'maybe_populate_wc_checkout' ) );
 		add_action( 'wp_footer', array( $this, 'maybe_submit_wc_checkout' ), 999 );
 	}
 
-
+	/**
+	 * Hides WooCommerce checkout form in KCO confirmation page.
+	 */
 	public function maybe_hide_checkout_form() {
 		if ( ! $this->is_kco_confirmation() ) {
 			return;
 		}
 
-		echo '<style>form.woocommerce-checkout,div.woocommerce-info{display:none}</style>';
+		echo '<style>form.woocommerce-checkout,div.woocommerce-info{display:none!important}</style>';
 	}
 
+	/**
+	 * Populates WooCommerce checkout form in KCO confirmation page.
+	 */
 	public function maybe_populate_wc_checkout( $checkout ) {
 		if ( ! $this->is_kco_confirmation() ) {
 			return;
@@ -58,6 +66,11 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		$this->save_customer_data( $klarna_order );
 	}
 
+	/**
+	 * Submits WooCommerce checkout form in KCO confirmation page.
+	 *
+	 * @param $checkout
+	 */
 	public function maybe_submit_wc_checkout( $checkout ) {
 		if ( ! $this->is_kco_confirmation() ) {
 			return;
@@ -67,12 +80,18 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		<script>
 			jQuery(function($) {
 				$('input#terms').prop('checked', true);
+				$('input#payment_method_klarna_checkout_for_woocommerce').prop('checked', true);
 				$('form.woocommerce-checkout').submit();
 			});
 		</script>
 		<?php
 	}
 
+	/**
+	 * Checks if in KCO confirmation page.
+	 *
+	 * @return bool
+	 */
 	private function is_kco_confirmation() {
 		if ( isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] && isset( $_GET['kco_wc_order_id'] ) ) {
 			return true;
@@ -81,6 +100,11 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		return false;
 	}
 
+	/**
+	 * Saves customer data from Klarna order into WC()->customer.
+	 *
+	 * @param $klarna_order
+	 */
 	private function save_customer_data( $klarna_order ) {
 		// First name.
 		WC()->customer->set_billing_first_name( $klarna_order->billing_address->given_name );

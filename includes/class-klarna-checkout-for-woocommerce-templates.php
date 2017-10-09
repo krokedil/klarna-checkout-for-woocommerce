@@ -34,7 +34,6 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	public function __construct() {
 		// Override template if Klarna Checkout page.
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
-
 		add_filter( 'the_title', array( $this, 'confirm_page_title' ) );
 	}
 
