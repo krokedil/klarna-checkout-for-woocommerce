@@ -63,11 +63,11 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	 * @return string
 	 */
 	public function override_template( $template, $template_name, $template_path ) {
-		$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
-
 		if ( is_checkout() ) {
 			// Klarna Checkout.
 			if ( 'checkout/form-checkout.php' === $template_name ) {
+				$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
+
 				// Klarna checkout page.
 				if ( array_key_exists( 'klarna_checkout_for_woocommerce', $available_gateways ) ) {
 					// If chosen payment method exists.

@@ -32,8 +32,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->description   = $this->get_option( 'description', '' );
 		$this->enabled       = $this->get_option( 'enabled' );
 		$this->testmode      = 'yes' === $this->get_option( 'testmode' );
-		$this->merchant_id   = $this->testmode ? $this->get_option( 'test_merchant_id_us' ) : $this->get_option( 'merchant_id_us', '' ); // @TODO: Test if live credentials are pulled when needed.
-		$this->shared_secret = $this->testmode ? $this->get_option( 'test_shared_secret_us' ) : $this->get_option( 'shared_secret_us', '' );
 		$this->logging       = 'yes' === $this->get_option( 'logging' );
 
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array(
@@ -81,6 +79,11 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 */
 	public function is_available() {
 		if ( 'yes' !== $this->enabled ) {
+			return false;
+		}
+
+		// If we can't retrieve a set of credentials, disable KCO.
+		if ( is_checkout() && ! KCO_WC()->credentials->get_credentials_from_session() ) {
 			return false;
 		}
 

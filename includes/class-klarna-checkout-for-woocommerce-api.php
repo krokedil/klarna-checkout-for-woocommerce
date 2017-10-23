@@ -44,8 +44,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 	public function __construct() {
 		$this->settings = get_option( 'woocommerce_klarna_checkout_for_woocommerce_settings' );
 
-		add_action( 'woocommerce_init', array( $this, 'load_credentials' ) );
-		add_action( 'woocommerce_init', array( $this, 'set_api_url_base' ) );
+		add_action( 'woocommerce_checkout_init', array( $this, 'load_credentials' ) );
+		add_action( 'woocommerce_checkout_init', array( $this, 'set_api_url_base' ) );
 	}
 
 	/**
@@ -338,7 +338,12 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_purchase_country() {
-		return WC()->checkout()->get_value( 'billing_country' );
+		if ( WC()->checkout()->get_value( 'billing_country' ) ) {
+			return WC()->checkout()->get_value( 'billing_country' );
+		} else {
+			$base_location = wc_get_base_location();
+			return $base_location['country'];
+		}
 	}
 
 	/**
@@ -356,7 +361,79 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_purchase_locale() {
-		return str_replace( '_', '-', get_locale() );
+		switch ( $this->get_purchase_country() ) {
+			case 'AT':
+				if ( $this->site_has_english_locale() ) {
+					$klarna_locale = 'en-at';
+				} else {
+					$klarna_locale = 'de-at';
+				}
+				break;
+			case 'DE':
+				if ( $this->site_has_english_locale() ) {
+					$klarna_locale = 'en-de';
+				} else {
+					$klarna_locale = 'de-de';
+				}
+				break;
+			case 'DK':
+				if ( $this->site_has_english_locale() ) {
+					$klarna_locale = 'en-dk';
+				} else {
+					$klarna_locale = 'da-dk';
+				}
+				break;
+			case 'FI':
+				if ( $this->site_has_english_locale() ) {
+					$klarna_locale = 'en-fi';
+				} else {
+					$klarna_locale = 'fi-fi';
+				}
+				break;
+			case 'NL':
+				if ( $this->site_has_english_locale() ) {
+					$klarna_locale = 'en-nl';
+				} else {
+					$klarna_locale = 'nl-nl';
+				}
+				break;
+			case 'NO':
+				if ( $this->site_has_english_locale() ) {
+					$klarna_locale = 'en-no';
+				} else {
+					$klarna_locale = 'nb-no';
+				}
+				break;
+			case 'SE':
+				if ( $this->site_has_english_locale() ) {
+					$klarna_locale = 'en-se';
+				} else {
+					$klarna_locale = 'sv-se';
+				}
+				break;
+			case 'GB':
+				$klarna_locale = 'en-gb';
+				break;
+			case 'US':
+				$klarna_locale = 'en-us';
+				break;
+			default:
+				$klarna_locale = 'en-us';
+		}
+
+		return $klarna_locale;
+	}
+
+	/**
+	 * Checks if site locale is english.
+	 *
+	 * @return bool
+	 */
+	public function site_has_english_locale() {
+		// @TODO: Clean this up, for now always do non-EN
+		return false;
+
+		return 'en_US' === get_locale() || 'en_GB' === get_locale();
 	}
 
 	/**
@@ -400,7 +477,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'order_amount'       => KCO_WC()->order_lines->get_order_amount(),
 			'order_tax_amount'   => KCO_WC()->order_lines->get_order_tax_amount(),
 			'order_lines'        => KCO_WC()->order_lines->get_order_lines(),
-			'shipping_countries' => $this->get_shipping_countries()
+			// 'shipping_countries' => $this->get_shipping_countries() // @TODO: Reenable this once Checkout Global is sorted out
 		);
 
 		if ( 'create' === $request_type ) {
@@ -483,6 +560,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return mixed
 	 */
 	private function extract_error_messages( $response ) {
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
 		$response_body = json_decode( $response['body'] );
 		$error         = new WP_Error();
 

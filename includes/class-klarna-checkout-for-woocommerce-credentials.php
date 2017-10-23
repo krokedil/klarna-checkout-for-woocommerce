@@ -30,18 +30,60 @@ class Klarna_Checkout_For_WooCommerce_Credentials {
 	 */
 	public function get_credentials_from_session() {
 		$base_location = wc_get_base_location();
+		$country_string = false;
 
 		if ( 'US' === $base_location['country'] ) {
 			$country_string = 'us';
 		} else {
-			if ( 'GBP' === get_woocommerce_currency() ) {
-				$country_string = 'uk';
+			// Use checkout billing country, if available, otherwise use store base location country for Klarna credentials.
+			if ( WC()->checkout()->get_value( 'billing_country' ) ) {
+				$checkout_country = WC()->checkout()->get_value( 'billing_country' );
 			} else {
-				$country_string = 'nl';
+				$checkout_country = $base_location['country'];
+			}
+
+			switch ( $checkout_country ) {
+				case 'AT':
+					$country_string = 'at';
+					break;
+				case 'DK':
+					$country_string = 'dk';
+					break;
+				case 'FI':
+					$country_string = 'fi';
+					break;
+				case 'DE':
+					$country_string = 'de';
+					break;
+				case 'NL':
+					$country_string = 'nl';
+					break;
+				case 'NO':
+					$country_string = 'no';
+					break;
+				case 'SE':
+					$country_string = 'se';
+					break;
+				case 'GB':
+					$country_string = 'gb';
+					break;
 			}
 		}
 
-		$test_string    = 'yes' === $this->settings['testmode'] ? 'test_' : '';
+		// No matching country found.
+		if ( ! $country_string ) {
+			return false;
+		}
+
+		$test_string = 'yes' === $this->settings['testmode'] ? 'test_' : '';
+
+		$merchant_id = $this->settings[ $test_string . 'merchant_id_' . $country_string ];
+		$shared_secret = $this->settings[ $test_string . 'shared_secret_' . $country_string ];
+
+		// Merchant id and/or shared secret not found for matching country.
+		if ( '' === $merchant_id || '' === $shared_secret ) {
+			return false;
+		}
 
 		$credentials = array(
 			'merchant_id'   => $this->settings[ $test_string . 'merchant_id_' . $country_string ],
