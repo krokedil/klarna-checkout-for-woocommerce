@@ -27,7 +27,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			'kco_wc_update_cart' => true,
 			'kco_wc_update_shipping' => true,
 			'kco_wc_update_order_notes' => true,
-			'kco_wc_refresh_checkout_fragment' => true,
+			'kco_wc_change_payment_method' => true,
 			'kco_wc_iframe_change' => true,
 		);
 
@@ -56,11 +56,12 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 		foreach ( $cart as $cart_key => $cart_value ) {
 			WC()->cart->set_quantity( $cart_key, $cart_value['qty'], false );
-			WC()->cart->calculate_shipping();
-			WC()->cart->calculate_fees();
-			WC()->cart->calculate_totals();
-			KCO_WC()->api->request_pre_update_order();
 		}
+
+		WC()->cart->calculate_shipping();
+		WC()->cart->calculate_fees();
+		WC()->cart->calculate_totals();
+		KCO_WC()->api->request_pre_update_order();
 
 		wp_die();
 	}
@@ -115,8 +116,8 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	/**
 	 * Refresh checkout fragment.
 	 */
-	public static function kco_wc_refresh_checkout_fragment() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_refresh_checkout_fragment' ) ) {
+	public static function kco_wc_change_payment_method() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_change_payment_method' ) ) {
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}

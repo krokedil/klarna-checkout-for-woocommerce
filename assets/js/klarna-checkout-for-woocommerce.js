@@ -20,6 +20,8 @@ jQuery(function($) {
 		selectAnotherSelector: '#klarna-checkout-select-other',
 
 		documentReady: function() {
+			console.log(klarna_checkout_for_woocommerce_params);
+
 			if (kco_wc.paymentMethodEl.length > 0) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter(':checked').val();
 			} else {
@@ -121,7 +123,8 @@ jQuery(function($) {
 			}
 		},
 
-		refreshCheckoutFragment: function(e) {
+		// When "Change to another payment method" is clicked.
+		changeFromKco: function(e) {
 			e.preventDefault();
 
 			$(kco_wc.checkoutFormSelector).block({
@@ -137,9 +140,9 @@ jQuery(function($) {
 				dataType: 'json',
 				data: {
 					kco: false,
-					nonce: klarna_checkout_for_woocommerce_params.refresh_checkout_fragment_nonce
+					nonce: klarna_checkout_for_woocommerce_params.change_payment_method_nonce
 				},
-				url: klarna_checkout_for_woocommerce_params.refresh_checkout_fragment_url,
+				url: klarna_checkout_for_woocommerce_params.change_payment_method_url,
 				success: function (data) {},
 				error: function (data) {},
 				complete: function (data) {
@@ -149,7 +152,8 @@ jQuery(function($) {
 			});
 		},
 
-		refreshCheckoutFragmentKco: function() {
+		// When payment method is changed to KCO in regular WC Checkout page.
+		maybeChangeToKco: function() {
 			console.log($(this).val());
 
 			if ( 'klarna_checkout_for_woocommerce' === $(this).val() ) {
@@ -167,10 +171,10 @@ jQuery(function($) {
 					type: 'POST',
 					data: {
 						kco: true,
-						nonce: klarna_checkout_for_woocommerce_params.refresh_checkout_fragment_nonce
+						nonce: klarna_checkout_for_woocommerce_params.change_payment_method_nonce
 					},
 					dataType: 'json',
-					url: klarna_checkout_for_woocommerce_params.checkout_url + '?wc-ajax=kco_wc_refresh_checkout_fragment',
+					url: klarna_checkout_for_woocommerce_params.change_payment_method_url,
 					success: function (data) {},
 					error: function (data) {},
 					complete: function (data) {
@@ -188,10 +192,10 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			kco_wc.bodyEl.on('change', 'input.shipping_method', kco_wc.updateShipping);
 			kco_wc.bodyEl.on('blur', kco_wc.orderNotesSelector, kco_wc.updateOrderNotes);
-			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.refreshCheckoutFragmentKco);
-			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.refreshCheckoutFragment);
+			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
+			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
 
-			if (typeof window._klarnaCheckout == 'function') {
+			if (typeof window._klarnaCheckout === 'function') {
 				window._klarnaCheckout(function (api) {
 					api.on({
 						'change': function(data) {

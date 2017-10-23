@@ -18,34 +18,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 	private $settings = array();
 
 	/**
-	 * Klarna Checkout api URL base.
-	 *
-	 * @var string
-	 */
-	private $api_url_base = '';
-
-	/**
-	 * Klarna Checkout merchant ID.
-	 *
-	 * @var string
-	 */
-	private $merchant_id = '';
-
-	/**
-	 * Klarna Checkout shared secret.
-	 *
-	 * @var string
-	 */
-	private $shared_secret = '';
-
-	/**
 	 * Klarna_Checkout_For_WooCommerce_API constructor.
 	 */
 	public function __construct() {
 		$this->settings = get_option( 'woocommerce_klarna_checkout_for_woocommerce_settings' );
-
-		add_action( 'woocommerce_checkout_init', array( $this, 'load_credentials' ) );
-		add_action( 'woocommerce_checkout_init', array( $this, 'set_api_url_base' ) );
 	}
 
 	/**
@@ -54,7 +30,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return array|mixed|object|WP_Error
 	 */
 	public function request_pre_create_order() {
-		$request_url  = $this->api_url_base . 'checkout/v3/orders';
+		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders';
 		$request_args = array(
 			'headers' => $this->get_request_headers(),
 			'body'    => $this->get_request_body( 'create' ),
@@ -86,7 +62,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return object $klarna_order    Klarna order.
 	 */
 	public function request_pre_retrieve_order( $klarna_order_id ) {
-		$request_url  = $this->api_url_base . 'checkout/v3/orders/' . $klarna_order_id;
+		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
 		$request_args = array(
 			'headers' => $this->get_request_headers(),
 		);
@@ -111,7 +87,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 */
 	public function request_pre_update_order() {
 		$klarna_order_id = $this->get_order_id_from_session();
-		$request_url     = $this->api_url_base . 'checkout/v3/orders/' . $klarna_order_id;
+		$request_url     = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
 		$request_args    = array(
 			'headers' => $this->get_request_headers(),
 			'body'    => $this->get_request_body(),
@@ -149,7 +125,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return WP_Error|array $response
 	 */
 	public function request_post_get_order( $klarna_order_id ) {
-		$request_url  = $this->api_url_base . 'ordermanagement/v1/orders/' . $klarna_order_id;
+		$request_url  = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id;
 		$request_args = array(
 			'headers' => $this->get_request_headers(),
 		);
@@ -167,7 +143,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return WP_Error|array $response
 	 */
 	public function request_post_acknowledge_order( $klarna_order_id ) {
-		$request_url  = $this->api_url_base . 'ordermanagement/v1/orders/' . $klarna_order_id . '/acknowledge';
+		$request_url  = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id . '/acknowledge';
 		$request_args = array(
 			'headers' => $this->get_request_headers(),
 		);
@@ -186,7 +162,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return WP_Error|array $response
 	 */
 	public function request_post_set_merchant_reference( $klarna_order_id, $merchant_references ) {
-		$request_url  = $this->api_url_base . 'ordermanagement/v1/orders/' . $klarna_order_id . '/merchant-references';
+		$request_url  = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id . '/merchant-references';
 		$request_args = array(
 			'headers' => $this->get_request_headers(),
 			'method'  => 'PATCH',
@@ -202,42 +178,14 @@ class Klarna_Checkout_For_WooCommerce_API {
 	}
 
 	/**
-	 * Loads Klarna API credentials.
+	 * Gets Klarna API URL base.
 	 */
-	public function load_credentials() {
-		$credentials = KCO_WC()->credentials->get_credentials_from_session();
-		$this->set_merchant_id( $credentials['merchant_id'] );
-		$this->set_shared_secret( $credentials['shared_secret'] );
-	}
-
-	/**
-	 * Set Klarna Checkout API URL base.
-	 */
-	public function set_api_url_base() {
+	public function get_api_url_base() {
 		$base_location  = wc_get_base_location();
 		$country_string = 'US' === $base_location['country'] ? '-na' : '';
-
 		$test_string = 'yes' === $this->settings['testmode'] ? '.playground' : '';
 
-		$this->api_url_base = 'https://api' . $country_string . $test_string . '.klarna.com/';
-	}
-
-	/**
-	 * Set Klarna Checkout merchant ID.
-	 *
-	 * @param string $merchant_id Klarna Checkout merchant ID.
-	 */
-	public function set_merchant_id( $merchant_id ) {
-		$this->merchant_id = $merchant_id;
-	}
-
-	/**
-	 * Set Klarna Checkout shared secret.
-	 *
-	 * @param string $shared_secret Klarna Checkout shared secret.
-	 */
-	public function set_shared_secret( $shared_secret ) {
-		$this->shared_secret = $shared_secret;
+		return 'https://api' . $country_string . $test_string . '.klarna.com/';
 	}
 
 	/**
@@ -320,7 +268,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_merchant_id() {
-		return $this->merchant_id;
+		$credentials = KCO_WC()->credentials->get_credentials_from_session();
+
+		return $credentials['merchant_id'];
 	}
 
 	/**
@@ -329,7 +279,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_shared_secret() {
-		return $this->shared_secret;
+		$credentials = KCO_WC()->credentials->get_credentials_from_session();
+
+		return $credentials['shared_secret'];
 	}
 
 	/**
@@ -338,10 +290,15 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_purchase_country() {
-		if ( WC()->checkout()->get_value( 'billing_country' ) ) {
+		$base_location = wc_get_base_location();
+
+		if ( 'US' === $base_location['country'] ) {
+			WC()->customer->set_billing_country( 'US' );
+			WC()->customer->save();
+			return 'US';
+		} else if ( WC()->checkout()->get_value( 'billing_country' ) ) {
 			return WC()->checkout()->get_value( 'billing_country' );
 		} else {
-			$base_location = wc_get_base_location();
 			return $base_location['country'];
 		}
 	}
