@@ -469,6 +469,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 			if ( $this->get_iframe_colors() ) {
 				$request_args['options'] = $this->get_iframe_colors();
 			}
+
+			if ( $this->get_shipping_details() ) {
+				$request_args['shipping_details'] = $this->get_shipping_details();
+			}
 		}
 
 		$request_body = wp_json_encode( $request_args );
@@ -487,10 +491,28 @@ class Klarna_Checkout_For_WooCommerce_API {
 		return array_keys( $wc_countries->get_shipping_countries() );
 	}
 
+	/**
+	 * Gets allowed separate shipping details option.
+	 *
+	 * @return bool
+	 */
 	public function get_allow_separate_shipping_address() {
 		$allow_separate_shipping = array_key_exists( 'allow_separate_shipping', $this->settings ) && 'yes' === $this->settings['allow_separate_shipping'];
 
 		return $allow_separate_shipping;
+	}
+
+	/**
+	 * Gets shipping details note.
+	 *
+	 * @return bool
+	 */
+	public function get_shipping_details() {
+		if ( array_key_exists( 'shipping_details', $this->settings ) ) {
+			return $this->settings['shipping_details'];
+		}
+
+		return false;
 	}
 
 	private function get_iframe_colors() {
