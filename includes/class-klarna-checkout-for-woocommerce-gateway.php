@@ -41,6 +41,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'show_thank_you_snippet' ) );
+		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'address_notice' ) );
 
 		// Add quantity button in woocommerce_order_review() function.
 		add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
@@ -225,5 +226,19 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		return $text;
 	}
+
+	/**
+	 * Adds can't edit address notice to KP EU orders.
+	 *
+	 * @param WC_Order $order WooCommerce order object.
+	 */
+	public function address_notice( $order ) {
+		if ( $this->id === $order->get_payment_method() ) {
+			if ( 'US' !== $order->get_billing_country() ) {
+				echo '<div style="margin: 10px 0; padding: 10px; border: 1px solid #B33A3A; font-size: 12px">Order address should not be changed and any changes you make will not be reflected in Klarna system.</div>';
+			}
+		}
+	}
+
 
 }
