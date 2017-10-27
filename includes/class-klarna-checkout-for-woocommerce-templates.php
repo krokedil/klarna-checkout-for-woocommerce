@@ -80,9 +80,23 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 					// If chosen payment method does not exist and KCO is the first gateway.
 					if ( null === WC()->session->get( 'chosen_payment_method' ) ) {
 						reset( $available_gateways );
+
 						if ( 'klarna_checkout_for_woocommerce' === key( $available_gateways ) ) {
 							if ( ! isset( $_GET['confirm'] ) ) {
 								$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
+							}
+						}
+					}
+
+					// If another gateway is saved in session, but has since become unavailable.
+					if ( WC()->session->get( 'chosen_payment_method' ) ) {
+						if ( ! array_key_exists( WC()->session->get( 'chosen_payment_method' ), $available_gateways ) ) {
+							reset( $available_gateways );
+
+							if ( 'klarna_checkout_for_woocommerce' === key( $available_gateways ) ) {
+								if ( ! isset( $_GET['confirm'] ) ) {
+									$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
+								}
 							}
 						}
 					}
