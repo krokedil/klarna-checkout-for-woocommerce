@@ -104,8 +104,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				);
 
 				// Add images.
-				$klarna_payment_settings = get_option( 'woocommerce_klarna_payments_settings' );
-				if ( 'yes' === $klarna_payment_settings['send_product_urls'] ) {
+				$klarna_checkout_settings = get_option( 'woocommerce_klarna_checkout_for_woocommerce_settings' );
+				if ( array_key_exists( 'send_product_urls', $klarna_checkout_settings ) && 'yes' === $klarna_checkout_settings['send_product_urls'] ) {
 					$klarna_item['product_url'] = $this->get_item_product_url( $product );
 					if ( $this->get_item_image_url( $product ) ) {
 						$klarna_item['image_url'] = $this->get_item_image_url( $product );
@@ -204,6 +204,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			} // End foreach().
 		} // End if().
 	}
+
 	// Helpers.
 
 	/**

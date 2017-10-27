@@ -44,6 +44,13 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
+			'send_product_urls'       => array(
+				'title'    => __( 'Product URLs', 'klarna-checkout-for-woocommerce' ),
+				'type'     => 'checkbox',
+				'label'    => __( 'Send product and product image URLs to Klarna', 'klarna-checkout-for-woocommerce' ),
+				'default'  => 'yes',
+				'desc_tip' => true,
+			),
 			'logging'                 => array(
 				'title'       => __( 'Logging', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Log debug messages', 'klarna-checkout-for-woocommerce' ),
