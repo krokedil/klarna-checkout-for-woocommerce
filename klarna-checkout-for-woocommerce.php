@@ -133,6 +133,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
 			add_action( 'init', array( $this, 'add_kco_endpoint' ) );
+			add_action( 'admin_notices', array( $this, 'order_management_check' ) );
 		}
 
 		/**
@@ -171,6 +172,22 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		public function get_setting_link() {
 			$section_slug = 'klarna_checkout_for_woocommerce';
 			return admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . $section_slug );
+		}
+
+		/**
+		 * Show admin notice if Order Management plugin is not active.
+		 */
+		public function order_management_check() {
+			if ( ! class_exists( 'WC_Klarna_Order_Management' ) ) {
+				$current_screen = get_current_screen();
+				if ( 'shop_order' === $current_screen->id || 'plugins' === $current_screen->id || 'woocommerce_page_wc-settings' === $current_screen->id ) {
+					?>
+					<div class="notice notice-warning">
+						<p><?php _e( 'Klarna Order Management is not active. Please activate it so you can capture, cancel, update and refund Klarna orders.', 'klarna-checkout-for-woocommerce' ); ?></p>
+					</div>
+					<?php
+				}
+			}
 		}
 
 		/**

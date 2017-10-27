@@ -45,6 +45,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
 			$klarna_order = json_decode( $response['body'] );
 			$this->save_order_id_to_session( $klarna_order->order_id );
+			$this->save_order_api_to_session( $klarna_order );
 
 			return $klarna_order;
 		} else {
@@ -207,6 +208,23 @@ class Klarna_Checkout_For_WooCommerce_API {
 	}
 
 	/**
+	 * Saves Klarna order API to WooCommerce session.
+	 *
+	 * 'na' or 'eu', used for order updates, to avoid trying to switch API when updating KCO Global orders.
+	 *
+	 * @param string $klarna_order Klarna order.
+	 */
+	public function save_order_api_to_session() {
+		if ( 'US' === $this->get_purchase_country() ) {
+			$api = 'US';
+		} else {
+			$api = 'EU';
+		}
+
+		WC()->session->set( 'kco_wc_order_api', $api );
+	}
+
+	/**
 	 * Gets Klarna Checkout order.
 	 *
 	 * If WC_Session value for Klarna order ID exists, attempt to retrieve that order.
@@ -259,6 +277,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 			WC()->session->__unset( 'kco_wc_update_md5' );
 			WC()->session->__unset( 'kco_wc_order_id' );
 			WC()->session->__unset( 'kco_wc_order_notes' );
+			WC()->session->__unset( 'kco_wc_order_api' );
+
 		}
 	}
 
@@ -295,6 +315,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( 'US' === $base_location['country'] ) {
 			WC()->customer->set_billing_country( 'US' );
 			WC()->customer->save();
+
 			return 'US';
 		} else if ( WC()->checkout()->get_value( 'billing_country' ) ) {
 			return WC()->checkout()->get_value( 'billing_country' );
@@ -434,7 +455,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'order_amount'       => KCO_WC()->order_lines->get_order_amount(),
 			'order_tax_amount'   => KCO_WC()->order_lines->get_order_tax_amount(),
 			'order_lines'        => KCO_WC()->order_lines->get_order_lines(),
-			// 'shipping_countries' => $this->get_shipping_countries() // @TODO: Reenable this once Checkout Global is sorted out
+			'shipping_countries' => $this->get_shipping_countries()
 		);
 
 		if ( 'create' === $request_type ) {
