@@ -184,7 +184,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	public function get_api_url_base() {
 		$base_location  = wc_get_base_location();
 		$country_string = 'US' === $base_location['country'] ? '-na' : '';
-		$test_string = 'yes' === $this->settings['testmode'] ? '.playground' : '';
+		$test_string    = 'yes' === $this->settings['testmode'] ? '.playground' : '';
 
 		return 'https://api' . $country_string . $test_string . '.klarna.com/';
 	}
@@ -448,14 +448,15 @@ class Klarna_Checkout_For_WooCommerce_API {
 		KCO_WC()->order_lines->process_data();
 
 		$request_args = array(
-			'purchase_country'   => $this->get_purchase_country(),
-			'purchase_currency'  => $this->get_purchase_currency(),
-			'locale'             => $this->get_purchase_locale(),
-			'merchant_urls'      => $this->get_merchant_urls(),
-			'order_amount'       => KCO_WC()->order_lines->get_order_amount(),
-			'order_tax_amount'   => KCO_WC()->order_lines->get_order_tax_amount(),
-			'order_lines'        => KCO_WC()->order_lines->get_order_lines(),
-			'shipping_countries' => $this->get_shipping_countries()
+			'purchase_country'                => $this->get_purchase_country(),
+			'purchase_currency'               => $this->get_purchase_currency(),
+			'locale'                          => $this->get_purchase_locale(),
+			'merchant_urls'                   => $this->get_merchant_urls(),
+			'order_amount'                    => KCO_WC()->order_lines->get_order_amount(),
+			'order_tax_amount'                => KCO_WC()->order_lines->get_order_tax_amount(),
+			'order_lines'                     => KCO_WC()->order_lines->get_order_lines(),
+			'shipping_countries'              => $this->get_shipping_countries(),
+			'allow_separate_shipping_address' => $this->get_allow_separate_shipping_address()
 		);
 
 		if ( 'create' === $request_type ) {
@@ -484,6 +485,12 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$wc_countries = new WC_Countries();
 
 		return array_keys( $wc_countries->get_shipping_countries() );
+	}
+
+	public function get_allow_separate_shipping_address() {
+		$allow_separate_shipping = array_key_exists( 'allow_separate_shipping', $this->settings ) && 'yes' === $this->settings['allow_separate_shipping'];
+
+		return $allow_separate_shipping;
 	}
 
 	private function get_iframe_colors() {

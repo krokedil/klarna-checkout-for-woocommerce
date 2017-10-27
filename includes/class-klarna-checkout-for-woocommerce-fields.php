@@ -15,28 +15,36 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 	 */
 	public static function fields() {
 		return apply_filters( 'klarna_checkout_for_woocommerce_gateway_settings', array(
-			'enabled'               => array(
+			'enabled'                 => array(
 				'title'       => __( 'Enable/Disable', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Klarna Checkout', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
 				'description' => '',
 				'default'     => 'no',
 			),
-			'title'                 => array(
+			'title'                   => array(
 				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Payment method description that the customer will see on your checkout.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' ),
 				'desc_tip'    => true,
 			),
-			'description'           => array(
+			'description'             => array(
 				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'textarea',
 				'description' => __( 'Payment method description that the customer will see on your website.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => __( 'Pay with Klarna Checkout.', 'klarna-checkout-for-woocommerce' ),
 				'desc_tip'    => true,
 			),
-			'logging'               => array(
+			'allow_separate_shipping' => array(
+				'title'       => __( 'Separate shipping address', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Allow separate shipping address', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If this option is checked, customers will be able to enter shipping address different than their billing address in checkout.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
+			'logging'                 => array(
 				'title'       => __( 'Logging', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Log debug messages', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
@@ -44,7 +52,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
-			'testmode'              => array(
+			'testmode'                => array(
 				'title'       => __( 'Test mode', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Test Mode', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
@@ -54,46 +62,46 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 			),
 
 			// EU.
-			'credentials_eu'        => array(
+			'credentials_eu'          => array(
 				'title' => '<img src="' . plugins_url( 'assets/img/flags/eu.svg', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ) . '" height="12" /> Europe',
 				'type'  => 'title',
 			),
-			'title_eu'              => array(
+			'title_eu'                => array(
 				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'If this option is used, default payment method title will be overridden for Europe purchases.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'description_eu'        => array(
+			'description_eu'          => array(
 				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'textarea',
 				'description' => __( 'If this option is used, default payment method description will be overridden for Europe purchases.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'merchant_id_eu'        => array(
+			'merchant_id_eu'          => array(
 				'title'       => __( 'Production Username', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'shared_secret_eu'      => array(
+			'shared_secret_eu'        => array(
 				'title'       => __( 'Production Password', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'test_merchant_id_eu'   => array(
+			'test_merchant_id_eu'     => array(
 				'title'       => __( 'Test Username', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'test_shared_secret_eu' => array(
+			'test_shared_secret_eu'   => array(
 				'title'       => __( 'Test Password', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
@@ -102,46 +110,46 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 			),
 
 			// US.
-			'credentials_us'        => array(
+			'credentials_us'          => array(
 				'title' => '<img src="' . plugins_url( 'assets/img/flags/us.svg', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ) . '" height="12" /> United States',
 				'type'  => 'title',
 			),
-			'title_us'              => array(
+			'title_us'                => array(
 				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'If this option is used, default payment method title will be overridden for US purchases.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'description_us'        => array(
+			'description_us'          => array(
 				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'textarea',
 				'description' => __( 'If this option is used, default payment method description will be overridden for US purchases.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'merchant_id_us'        => array(
+			'merchant_id_us'          => array(
 				'title'       => __( 'Production Username', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'shared_secret_us'      => array(
+			'shared_secret_us'        => array(
 				'title'       => __( 'Production Password', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'test_merchant_id_us'   => array(
+			'test_merchant_id_us'     => array(
 				'title'       => __( 'Test Username', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'test_shared_secret_us' => array(
+			'test_shared_secret_us'   => array(
 				'title'       => __( 'Test Password', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
