@@ -34,23 +34,6 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	public function __construct() {
 		// Override template if Klarna Checkout page.
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
-		add_filter( 'the_title', array( $this, 'confirm_page_title' ) );
-	}
-
-	/**
-	 * Filter Checkout page title in confirmation page.
-	 *
-	 * @param $title
-	 *
-	 * @return string
-	 */
-	public function confirm_page_title( $title ) {
-		if ( ! is_admin() && is_main_query() && in_the_loop() && is_page() && is_checkout() && isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] ) {
-			$title = 'Please wait while we process your order.';
-			remove_filter( 'the_title', array( $this, 'confirm_page_title' ) );
-		}
-
-		return $title;
 	}
 
 	/**
@@ -78,7 +61,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 					}
 
 					// If chosen payment method does not exist and KCO is the first gateway.
-					if ( null === WC()->session->get( 'chosen_payment_method' ) ) {
+					if ( null === WC()->session->get( 'chosen_payment_method' ) || '' === WC()->session->get( 'chosen_payment_method' ) ) {
 						reset( $available_gateways );
 
 						if ( 'klarna_checkout_for_woocommerce' === key( $available_gateways ) ) {

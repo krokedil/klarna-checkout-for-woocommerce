@@ -456,14 +456,14 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'order_tax_amount'                => KCO_WC()->order_lines->get_order_tax_amount(),
 			'order_lines'                     => KCO_WC()->order_lines->get_order_lines(),
 			'shipping_countries'              => $this->get_shipping_countries(),
-			'allow_separate_shipping_address' => $this->get_allow_separate_shipping_address()
+			'allow_separate_shipping_address' => $this->get_allow_separate_shipping_address(),
 		);
 
 		if ( 'create' === $request_type ) {
 			$request_args['billing_address'] = array(
 				'email'       => WC()->checkout()->get_value( 'billing_email' ),
 				'postal_code' => WC()->checkout()->get_value( 'billing_postcode' ),
-				'country'     => $this->get_purchase_country()
+				'country'     => $this->get_purchase_country(),
 			);
 
 			if ( $this->get_iframe_colors() ) {
@@ -471,8 +471,14 @@ class Klarna_Checkout_For_WooCommerce_API {
 			}
 
 			if ( $this->get_shipping_details() ) {
-				$request_args['shipping_details'] = $this->get_shipping_details();
+				$request_args['options']['shipping_details'] = $this->get_shipping_details();
 			}
+
+			$request_args['options']['additional_checkbox'] = array(
+				'text' => 'Create customer account',
+				'checked' => 'false',
+				'required' => 'false',
+			);
 		}
 
 		$request_body = wp_json_encode( $request_args );
@@ -515,6 +521,11 @@ class Klarna_Checkout_For_WooCommerce_API {
 		return false;
 	}
 
+	/**
+	 * Gets iframe color settings.
+	 *
+	 * @return array|bool
+	 */
 	private function get_iframe_colors() {
 		$color_settings = array();
 
@@ -562,7 +573,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 	}
 
 	/**
-	 * @param $response
+	 * Extracts error messages from Klarna's response.
+	 *
+	 * @param mixed $response Klarna API response.
 	 *
 	 * @return mixed
 	 */
