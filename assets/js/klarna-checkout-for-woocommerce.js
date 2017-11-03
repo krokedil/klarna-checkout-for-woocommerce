@@ -14,6 +14,10 @@ jQuery(function($) {
 		orderNotesSelector: 'textarea#order_comments',
 		orderNotesEl: $('textarea#order_comments'),
 
+		// Order notes
+		extraFieldsValues: klarna_checkout_for_woocommerce_params.extra_fields_values,
+		extraFieldsSelector: 'div#kco-extra-fields input, div#kco-extra-fields select, div#kco-extra-fields textarea',
+
 		// Payment method
 		paymentMethodEl: $('input[name="payment_method"]'),
 		paymentMethod: '',
@@ -99,6 +103,46 @@ jQuery(function($) {
 				},
 				complete: function(data) {
 					kco_wc.kcoResume();
+				}
+			});
+		},
+
+		updateExtraFields: function() {
+			var elementID = $(this).attr('id');
+			var updatedValue = $(this).val();
+
+			console.log(typeof kco_wc.extraFieldsValues);
+			console.log(kco_wc.extraFieldsValues);
+
+			if (null === kco_wc.extraFieldsValues && '' === updatedValue) {
+				return;
+			}
+
+			if (null !== kco_wc.extraFieldsValues && elementID in kco_wc.extraFieldsValues && updatedValue === kco_wc.extraFieldsValues) {
+				return;
+			}
+
+			if (null === kco_wc.extraFieldsValues) {
+				kco_wc.extraFieldsValues = {};
+			}
+
+			console.log('update');
+
+			kco_wc.extraFieldsValues[elementID] = updatedValue;
+
+			console.log(typeof kco_wc.extraFieldsValues);
+
+			$.ajax({
+				type: 'POST',
+				url: klarna_checkout_for_woocommerce_params.update_extra_fields_url,
+				data: {
+					extra_fields_values: kco_wc.extraFieldsValues,
+					nonce: klarna_checkout_for_woocommerce_params.update_extra_fields_nonce
+				},
+				success: function (data) {},
+				error: function (data) {},
+				complete: function (data) {
+					console.log('complete', data);
 				}
 			});
 		},
@@ -191,7 +235,8 @@ jQuery(function($) {
 
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			kco_wc.bodyEl.on('change', 'input.shipping_method', kco_wc.updateShipping);
-			kco_wc.bodyEl.on('blur', kco_wc.orderNotesSelector, kco_wc.updateOrderNotes);
+			// kco_wc.bodyEl.on('blur', kco_wc.orderNotesSelector, kco_wc.updateOrderNotes);
+			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelector, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
 

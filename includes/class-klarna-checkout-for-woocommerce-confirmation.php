@@ -92,13 +92,25 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		if ( ! $this->is_kco_confirmation() ) {
 			return;
 		}
-
 		?>
+
 		<script>
 			jQuery(function($) {
 				$('input#terms').prop('checked', true);
 				$('input#payment_method_klarna_checkout_for_woocommerce').prop('checked', true);
 				$('form.woocommerce-checkout').submit();
+
+				<?php
+				$extra_field_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
+
+				foreach ( $extra_field_values as $field_id => $field_value ) { ?>
+					var elemendID = '#' + <?php echo $field_id; ?>;
+					var elementValue = <?php echo $field_value; ?>;
+					if ($(elemendID).length) {
+						$(elementID).val(elementValue);
+					}
+				<?php }
+				?>
 			});
 		</script>
 		<?php
