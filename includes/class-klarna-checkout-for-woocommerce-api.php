@@ -278,7 +278,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			WC()->session->__unset( 'kco_wc_order_id' );
 			WC()->session->__unset( 'kco_wc_order_notes' );
 			WC()->session->__unset( 'kco_wc_order_api' );
-
+			WC()->session->__unset( 'kco_wc_extra_fields_values' );
 		}
 	}
 
@@ -473,12 +473,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 			if ( $this->get_shipping_details() ) {
 				$request_args['options']['shipping_details'] = $this->get_shipping_details();
 			}
-
-			$request_args['options']['additional_checkbox'] = array(
-				'text' => 'Create customer account',
-				'checked' => 'false',
-				'required' => 'false',
-			);
 		}
 
 		$request_body = wp_json_encode( $request_args );

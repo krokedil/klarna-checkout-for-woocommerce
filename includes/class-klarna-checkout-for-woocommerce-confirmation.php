@@ -2,6 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
 /**
  * Klarna_Checkout_For_WooCommerce_Confirmation class.
  *
@@ -25,6 +26,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		if ( null === self::$instance ) {
 			self::$instance = new self();
 		}
+
 		return self::$instance;
 	}
 
@@ -78,39 +80,57 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 		$response        = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 		$klarna_order    = json_decode( $response['body'] );
-		$order_notes     = WC()->session->get( 'kco_wc_order_notes' );
 
 		$this->save_customer_data( $klarna_order );
 	}
 
 	/**
 	 * Submits WooCommerce checkout form in KCO confirmation page.
-	 *
-	 * @param $checkout
 	 */
-	public function maybe_submit_wc_checkout( $checkout ) {
+	public function maybe_submit_wc_checkout() {
 		if ( ! $this->is_kco_confirmation() ) {
 			return;
 		}
 		?>
 
 		<script>
-			jQuery(function($) {
+			jQuery(function ($) {
 				$('input#terms').prop('checked', true);
 				$('input#payment_method_klarna_checkout_for_woocommerce').prop('checked', true);
-				$('form.woocommerce-checkout').submit();
 
 				<?php
 				$extra_field_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
 
-				foreach ( $extra_field_values as $field_id => $field_value ) { ?>
-					var elemendID = '#' + <?php echo $field_id; ?>;
-					var elementValue = <?php echo $field_value; ?>;
-					if ($(elemendID).length) {
-						$(elementID).val(elementValue);
+				foreach ( $extra_field_values as $field_name => $field_value ) { ?>
+
+					var elementName = "<?php echo $field_name; ?>";
+					var elementValue = "<?php echo $field_value; ?>";
+					var element = $('*[name="' + elementName + '"]');
+
+					console.log(elementName);
+					console.log(elementValue);
+					console.log(element);
+					console.log(element.type);
+
+					if (element.length) {
+						if (element.is('select')) { // Select.
+							var selectedOption = element.find('option[value="' + elementValue + '"]');
+							selectedOption.prop('selected', true);
+						} else if ('radio' === element.get(0).type) { // Radio.
+							var checkedRadio = $('*[name="' + elementName + '"][value="' + elementValue + '"]');
+							checkedRadio.prop('checked', true);
+						} else if ('checkbox' === element.get(0).type) { // Checkbox.
+							if (elementValue) {
+								element.prop('checked', true);
+							}
+						} else { // Text and textarea.
+							element.val(elementValue);
+						}
 					}
-				<?php }
-				?>
+
+				<?php } ?>
+
+				$('form.woocommerce-checkout').submit();
 			});
 		</script>
 		<?php

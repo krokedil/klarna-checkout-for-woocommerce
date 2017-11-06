@@ -16,7 +16,8 @@ jQuery(function($) {
 
 		// Order notes
 		extraFieldsValues: klarna_checkout_for_woocommerce_params.extra_fields_values,
-		extraFieldsSelector: 'div#kco-extra-fields input, div#kco-extra-fields select, div#kco-extra-fields textarea',
+		extraFieldsSelector: 'div#kco-extra-fields input, div#kco-extra-fields textarea',
+		extraFieldsSelectorSelect: 'div#kco-extra-fields select',
 
 		// Payment method
 		paymentMethodEl: $('input[name="payment_method"]'),
@@ -108,9 +109,13 @@ jQuery(function($) {
 		},
 
 		updateExtraFields: function() {
-			var elementID = $(this).attr('id');
+			var elementName = $(this).attr('name');
 			var updatedValue = $(this).val();
 
+			console.log('value');
+			console.log(updatedValue);
+			console.log('name');
+			console.log(elementName);
 			console.log(typeof kco_wc.extraFieldsValues);
 			console.log(kco_wc.extraFieldsValues);
 
@@ -118,7 +123,7 @@ jQuery(function($) {
 				return;
 			}
 
-			if (null !== kco_wc.extraFieldsValues && elementID in kco_wc.extraFieldsValues && updatedValue === kco_wc.extraFieldsValues) {
+			if (null !== kco_wc.extraFieldsValues && elementName in kco_wc.extraFieldsValues && updatedValue === kco_wc.extraFieldsValues) {
 				return;
 			}
 
@@ -128,7 +133,7 @@ jQuery(function($) {
 
 			console.log('update');
 
-			kco_wc.extraFieldsValues[elementID] = updatedValue;
+			kco_wc.extraFieldsValues[elementName] = updatedValue;
 
 			console.log(typeof kco_wc.extraFieldsValues);
 
@@ -237,6 +242,7 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('change', 'input.shipping_method', kco_wc.updateShipping);
 			// kco_wc.bodyEl.on('blur', kco_wc.orderNotesSelector, kco_wc.updateOrderNotes);
 			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelector, kco_wc.updateExtraFields);
+			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorSelect, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
 
