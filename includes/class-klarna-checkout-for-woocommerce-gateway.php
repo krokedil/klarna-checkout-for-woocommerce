@@ -129,14 +129,14 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'update_shipping_nonce'       => wp_create_nonce( 'kco_wc_update_shipping' ),
 			'update_extra_fields_url'     => WC_AJAX::get_endpoint( 'kco_wc_update_extra_fields' ),
 			'update_extra_fields_nonce'   => wp_create_nonce( 'kco_wc_update_extra_fields' ),
-			'extra_fields_values'         => WC()->session->get( 'kco_wc_extra_fields_values' ),
-			// 'update_order_notes_url'      => WC_AJAX::get_endpoint( 'kco_wc_update_order_notes' ),
-			// 'update_order_notes_nonce'    => wp_create_nonce( 'kco_wc_update_order_notes' ),
+			// 'extra_fields_values'         => WC()->session->get( 'kco_wc_extra_fields_values' ),
 			'change_payment_method_url'   => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
 			'change_payment_method_nonce' => wp_create_nonce( 'kco_wc_change_payment_method' ),
 			'iframe_change_url'           => WC_AJAX::get_endpoint( 'kco_wc_iframe_change' ),
 			'iframe_change_nonce'         => wp_create_nonce( 'kco_wc_iframe_change' ),
+			'logging'                     => $this->logging,
 		);
+
 		wp_localize_script( 'klarna_checkout_for_woocommerce', 'klarna_checkout_for_woocommerce_params', $checkout_localize_params );
 
 		wp_enqueue_script( 'klarna_checkout_for_woocommerce' );

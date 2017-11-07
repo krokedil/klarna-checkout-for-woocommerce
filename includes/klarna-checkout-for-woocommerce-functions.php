@@ -32,6 +32,9 @@ if ( ! function_exists( 'kco_wc_show_extra_fields' ) ) {
 	 * Shows extra fields in Klarna Checkout page.
 	 */
 	function kco_wc_show_extra_fields() {
+		// Clear extra fields session values on reload.
+		// WC()->session->__unset( 'kco_wc_extra_fields_values' );
+
 		echo '<div id="kco-extra-fields">';
 
 		$extra_fields_values          = WC()->session->get( 'kco_wc_extra_fields_values', array() );
@@ -52,19 +55,6 @@ if ( ! function_exists( 'kco_wc_show_extra_fields' ) ) {
 			$key_value = array_key_exists( $key, $extra_fields_values ) ? $extra_fields_values[ $key ] : '';
 			woocommerce_form_field( $key, $field, $key_value );
 		}
-
-		/*
-		if ( ! WC()->checkout()->is_registration_required() ) { ?>
-			<p class="form-row form-row-wide create-account">
-				<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
-					<input class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox"
-					       id="createaccount" <?php checked( ( true === WC()->checkout()->get_value( 'createaccount' ) || ( true === apply_filters( 'woocommerce_create_account_default_checked', false ) ) ), true ) ?>
-					       type="checkbox" name="createaccount" value="1"/>
-					<span><?php _e( 'Create an account?', 'woocommerce' ); ?></span>
-				</label>
-			</p>
-		<?php }
-		*/
 
 		// Shipping.
 		foreach ( $extra_fields['shipping'] as $key => $field ) {

@@ -26,7 +26,6 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		$ajax_events = array(
 			'kco_wc_update_cart' => true,
 			'kco_wc_update_shipping' => true,
-			// 'kco_wc_update_order_notes' => true,
 			'kco_wc_update_extra_fields' => true,
 			'kco_wc_change_payment_method' => true,
 			'kco_wc_iframe_change' => true,
@@ -92,24 +91,6 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		WC()->cart->calculate_fees();
 		WC()->cart->calculate_totals();
 		KCO_WC()->api->request_pre_update_order();
-
-		wp_die();
-	}
-
-	/**
-	 * Save order notes value to session and use it when creating the order.
-	 */
-	public static function kco_wc_update_order_notes() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_update_order_notes' ) ) {
-			wp_send_json_error( 'bad_nonce' );
-			exit;
-		}
-
-		$post = $_POST;
-
-		if ( '' !== $_POST['order_notes'] ) {
-			WC()->session->set( 'kco_wc_order_notes', wp_kses_post( $_POST['order_notes'] ) );
-		}
 
 		wp_die();
 	}

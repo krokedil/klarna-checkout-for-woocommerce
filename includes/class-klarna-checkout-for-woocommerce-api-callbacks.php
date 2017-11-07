@@ -41,81 +41,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		add_action( 'woocommerce_api_kco_wc_validation', array( $this, 'validation_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_shipping_option_update', array( $this, 'shipping_option_update_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
-
-		// Rest
-		// add_action( 'rest_api_init', array( $this, 'rest_routes' ) );
-	}
-
-	/**
-	 * Registers REST API routes.
-	 */
-	public function rest_routes() {
-		register_rest_route( 'kcowc/v1', '/address/(?P<id>[a-zA-Z0-9-]+)', array(
-			'methods'  => 'POST',
-			'callback' => array( $this, 'rest_address_cb' ),
-		) );
-
-	}
-
-	public function rest_address_cb( $request ) {
-		$request_order_id = $request->get_param( 'id' );
-		$request_body     = json_decode( $request->get_body() );
-
-		$cart = WC()->cart;
-		$cart->add_to_cart( 70 );
-		$cart->calculate_shipping();
-		$cart->calculate_totals();
-
-		$response_body = array(
-			'purchase_currency' => 'GBP',
-			'order_amount'      => 7770,
-			'order_tax_amount'  => 693,
-			'order_lines'       => array(
-				array(
-					'reference'             => '70',
-					'name'                  => 'Flying Ninja',
-					'quantity'              => 3,
-					'unit_price'            => 1025,
-					'tax_rate'              => 0,
-					'total_amount'          => 3077,
-					'total_tax_amount'      => 0,
-					'total_discount_amount' => 0,
-					'product_url'           => 'http://krokedil.klarna.ngrok.io/product/flying-ninja/',
-					'image_url'             => 'http://krokedil.klarna.ngrok.io/wp-content/uploads/2013/06/poster_2_up-180x180.jpg'
-				),
-				array(
-					'type'             => 'shipping_fee',
-					'reference'        => 'flat_rate:3',
-					'name'             => 'Flat Rate',
-					'quantity'         => 1,
-					'unit_price'       => 4000,
-					'tax_rate'         => 0,
-					'total_amount'     => 4000,
-					'total_tax_amount' => 0
-				),
-				array(
-					'type'                  => 'sales_tax',
-					'reference'             => 'Sales Tax',
-					'name'                  => 'Sales Tax',
-					'quantity'              => 1,
-					'unit_price'            => 693,
-					'tax_rate'              => 0,
-					'total_amount'          => 693,
-					'total_discount_amount' => 0,
-					'total_tax_amount'      => 0
-				)
-			)
-		);
-
-		// header( 'HTTP/1.0 200 OK' );
-		// header('Content-Type: application/json');
-		// return json_encode( $response_body );
-
-		$response = new WP_REST_Response( $response_body );
-		$response->set_status( 200 );
-		$response->header( 'Content-Type', 'application/json' );
-
-		return $response;
 	}
 
 	/**
@@ -132,8 +57,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		// Do nothing if there's no Klarna Checkout order ID.
 		if ( ! $_GET['kco_wc_order_id'] ) {
-			$this->backup_order_creation();
-
 			return;
 		}
 
@@ -148,6 +71,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		$orders = get_posts( $query_args );
 
+		// If zero matching orders were found, return.
 		if ( empty( $orders ) ) {
 			return;
 		}
@@ -259,16 +183,30 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		// Currently disabled, because of how response body needs to be calculated in WooCommerce.
 	}
 
+	/**
+	 * Backup order creation, in case checkout process failed.
+	 */
 	public function backup_order_creation() {
 		$klarna_order_id = '76c2db44-a927-7975-bdc9-c5a4634f406f';
 		$response        = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 		$klarna_order    = json_decode( $response['body'] );
 
+		// Process customer data.
+		$this->process_customer_data( $klarna_order );
 
-		/**
-		 * Customer.
-		 */
+		// Process cart.
+		$this->process_customer_data( $klarna_order );
 
+		// Process order.
+		$this->process_order( $klarna_order );
+	}
+
+	/**
+	 * Processes customer data on backup order creation.
+	 *
+	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
+	 */
+	private function process_customer_data( $klarna_order ) {
 		// First name.
 		WC()->customer->set_billing_first_name( $klarna_order->billing_address->given_name );
 		WC()->customer->set_shipping_first_name( $klarna_order->shipping_address->given_name );
@@ -308,11 +246,14 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		WC()->customer->set_billing_email( $klarna_order->billing_address->email );
 
 		WC()->customer->save();
+	}
 
-
-		/**
-		 * Cart.
-		 */
+	/**
+	 * Processes cart contents on backup order creation.
+	 *
+	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
+	 */
+	private function process_cart( $klarna_order ) {
 		WC()->cart->empty_cart();
 
 		foreach ( $klarna_order->order_lines as $cart_item ) {
@@ -332,31 +273,34 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		}
 
 		WC()->cart->check_cart_coupons();
+	}
 
-
-
+	/**
+	 * Processes WooCommerce order on backup order creation.
+	 *
+	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
+	 */
+	private function process_order( $klarna_order ) {
 		$order = new WC_Order();
 
 		$order->set_billing_first_name( $klarna_order->billing_address->given_name );
 		$order->set_billing_last_name( $klarna_order->billing_address->family_name );
-		// $order->set_billing_company();
 		$order->set_billing_country( $klarna_order->billing_address->country );
 		$order->set_billing_address_1( $klarna_order->billing_address->street_address );
 		$order->set_billing_address_2( $klarna_order->billing_address->street_address2 );
 		$order->set_billing_city( $klarna_order->billing_address->city );
-		$order->set_billing_state($klarna_order->billing_address->region );
+		$order->set_billing_state( $klarna_order->billing_address->region );
 		$order->set_billing_postcode( $klarna_order->billing_address->postal_code );
 		$order->set_billing_phone( $klarna_order->billing_address->phone );
 		$order->set_billing_email( $klarna_order->billing_address->email );
 
 		$order->set_shipping_first_name( $klarna_order->shipping_address->given_name );
 		$order->set_shipping_last_name( $klarna_order->shipping_address->family_name );
-		// $order->set_shipping_company();
 		$order->set_shipping_country( $klarna_order->shipping_address->country );
 		$order->set_shipping_address_1( $klarna_order->shipping_address->street_address );
 		$order->set_shipping_address_2( $klarna_order->shipping_address->street_address2 );
 		$order->set_shipping_city( $klarna_order->shipping_address->city );
-		$order->set_shipping_state($klarna_order->shipping_address->region );
+		$order->set_shipping_state( $klarna_order->shipping_address->region );
 		$order->set_shipping_postcode( $klarna_order->shipping_address->postal_code );
 
 
@@ -367,13 +311,9 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$order->set_payment_method( 'klarna_checkout_for_woocommerce' );
 
 		$order->set_created_via( 'klarna_checkout_backup_order_creation' );
-		// $order->set_cart_hash( $cart_hash );
 		// $order->set_customer_id( apply_filters( 'woocommerce_checkout_customer_id', get_current_user_id() ) );
 		$order->set_currency( $klarna_order->purchase_currency );
 		$order->set_prices_include_tax( 'yes' === get_option( 'woocommerce_prices_include_tax' ) );
-		// $order->set_customer_ip_address( WC_Geolocation::get_ip_address() );
-		// $order->set_customer_user_agent( wc_get_user_agent() );
-		// $order->set_customer_note( isset( $data['order_comments'] ) ? $data['order_comments'] : '' );
 
 		$order->set_shipping_total( WC()->cart->get_shipping_total() );
 		$order->set_discount_total( WC()->cart->get_discount_total() );
@@ -397,8 +337,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
 			$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
 		}
-
-
 	}
 
 }

@@ -15,9 +15,9 @@ jQuery(function($) {
 		orderNotesEl: $('textarea#order_comments'),
 
 		// Order notes
-		extraFieldsValues: klarna_checkout_for_woocommerce_params.extra_fields_values,
-		extraFieldsSelector: 'div#kco-extra-fields input, div#kco-extra-fields textarea',
-		extraFieldsSelectorSelect: 'div#kco-extra-fields select',
+		extraFieldsValues: {},
+		extraFieldsSelectorText: 'div#kco-extra-fields input[type="text"], div#kco-extra-fields input[type="password"], div#kco-extra-fields textarea',
+		extraFieldsSelectorNonText: 'div#kco-extra-fields select, div#kco-extra-fields input[type="radio"], div#kco-extra-fields input[type="checkbox"]',
 
 		// Payment method
 		paymentMethodEl: $('input[name="payment_method"]'),
@@ -25,7 +25,7 @@ jQuery(function($) {
 		selectAnotherSelector: '#klarna-checkout-select-other',
 
 		documentReady: function() {
-			console.log(klarna_checkout_for_woocommerce_params);
+			kco_wc.log(klarna_checkout_for_woocommerce_params);
 
 			if (kco_wc.paymentMethodEl.length > 0) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter(':checked').val();
@@ -112,12 +112,12 @@ jQuery(function($) {
 			var elementName = $(this).attr('name');
 			var updatedValue = $(this).val();
 
-			console.log('value');
-			console.log(updatedValue);
-			console.log('name');
-			console.log(elementName);
-			console.log(typeof kco_wc.extraFieldsValues);
-			console.log(kco_wc.extraFieldsValues);
+			kco_wc.log('value');
+			kco_wc.log(updatedValue);
+			kco_wc.log('name');
+			kco_wc.log(elementName);
+			kco_wc.log(typeof kco_wc.extraFieldsValues);
+			kco_wc.log(kco_wc.extraFieldsValues);
 
 			if (null === kco_wc.extraFieldsValues && '' === updatedValue) {
 				return;
@@ -131,11 +131,9 @@ jQuery(function($) {
 				kco_wc.extraFieldsValues = {};
 			}
 
-			console.log('update');
+			kco_wc.log('update');
 
 			kco_wc.extraFieldsValues[elementName] = updatedValue;
-
-			console.log(typeof kco_wc.extraFieldsValues);
 
 			$.ajax({
 				type: 'POST',
@@ -147,7 +145,7 @@ jQuery(function($) {
 				success: function (data) {},
 				error: function (data) {},
 				complete: function (data) {
-					console.log('complete', data);
+					kco_wc.log('complete', data);
 				}
 			});
 		},
@@ -166,7 +164,7 @@ jQuery(function($) {
 					success: function (data) {},
 					error: function (data) {},
 					complete: function (data) {
-						console.log('complete', data);
+						kco_wc.log('complete', data);
 					}
 				});
 			}
@@ -195,7 +193,7 @@ jQuery(function($) {
 				success: function (data) {},
 				error: function (data) {},
 				complete: function (data) {
-					console.log(data.responseJSON);
+					kco_wc.log(data.responseJSON);
 					window.location.href = data.responseJSON.data.redirect;
 				}
 			});
@@ -203,7 +201,7 @@ jQuery(function($) {
 
 		// When payment method is changed to KCO in regular WC Checkout page.
 		maybeChangeToKco: function() {
-			console.log($(this).val());
+			kco_wc.log($(this).val());
 
 			if ( 'klarna_checkout_for_woocommerce' === $(this).val() ) {
 				$('.woocommerce-info').remove();
@@ -227,22 +225,27 @@ jQuery(function($) {
 					success: function (data) {},
 					error: function (data) {},
 					complete: function (data) {
-						console.log(data.responseJSON);
+						kco_wc.log(data.responseJSON);
 						window.location.href = data.responseJSON.data.redirect;
 					}
 				});
 			}
 		},
 
+		log: function(message) {
+			console.log(klarna_checkout_for_woocommerce_params.logging);
+			if (klarna_checkout_for_woocommerce_params.logging) {
+				console.log(message);
+			}
+		},
+
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
-			// kco_wc.bodyEl.on('updated_checkout', kco_wc.documentReady);
 
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			kco_wc.bodyEl.on('change', 'input.shipping_method', kco_wc.updateShipping);
-			// kco_wc.bodyEl.on('blur', kco_wc.orderNotesSelector, kco_wc.updateOrderNotes);
-			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelector, kco_wc.updateExtraFields);
-			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorSelect, kco_wc.updateExtraFields);
+			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.updateExtraFields);
+			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
 
@@ -250,7 +253,7 @@ jQuery(function($) {
 				window._klarnaCheckout(function (api) {
 					api.on({
 						'change': function(data) {
-							console.log('change', data);
+							kco_wc.log('change', data);
 
 							$('table.woocommerce-checkout-review-order-table').block({
 								message: null,
@@ -271,11 +274,11 @@ jQuery(function($) {
 										nonce: klarna_checkout_for_woocommerce_params.iframe_change_nonce
 									},
 									success: function (response) {
-										console.log(response);
+										kco_wc.log(response);
 										$('table.woocommerce-checkout-review-order-table').replaceWith(response.data.html);
 									},
 									error: function (response) {
-										console.log(response);
+										kco_wc.log(response);
 									},
 									complete: function() {
 										$('table.woocommerce-checkout-review-order-table').unblock();
@@ -285,16 +288,16 @@ jQuery(function($) {
 							);
 						},
 						'shipping_address_change': function(data) {
-							console.log('shipping_address_change', data);
+							kco_wc.log('shipping_address_change', data);
 						},
 						'order_total_change': function(data) {
-							console.log('order_total_change', data);
+							kco_wc.log('order_total_change', data);
 						},
 						'shipping_option_change': function(data) {
-							console.log('shipping_option_change', data);
+							kco_wc.log('shipping_option_change', data);
 						},
 						'can_not_complete_order': function(data) {
-							console.log('can_not_complete_order', data);
+							kco_wc.log('can_not_complete_order', data);
 						}
 					});
 				});
