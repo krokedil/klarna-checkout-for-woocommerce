@@ -109,7 +109,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * Notification callback function, used for pending orders.
 	 */
 	public function notification_cb() {
-
+		do_action( 'wc_klarna_notification_listener' );
 	}
 
 	/**
