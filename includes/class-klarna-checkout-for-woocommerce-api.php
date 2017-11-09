@@ -230,6 +230,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * If WC_Session value for Klarna order ID exists, attempt to retrieve that order.
 	 * If this fails, create a new one and retrieve it.
 	 * If WC_Session value for Klarna order ID does not exist, create a new order and retrieve it.
+	 *
+	 * @return Klarna_Checkout_Order $order Klarna order.
 	 */
 	public function get_order() {
 		$order_id = $this->get_order_id_from_session();
@@ -244,6 +246,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 				$this->request_pre_update_order();
 			}
 		} else {
+			if ( is_order_received_page() ) {
+				return;
+			}
+
 			$order = $this->request_pre_create_order();
 		}
 
