@@ -22,20 +22,6 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'description' => '',
 				'default'     => 'no',
 			),
-			'title'                   => array(
-				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Payment method description that the customer will see on your checkout.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' ),
-				'desc_tip'    => true,
-			),
-			'description'             => array(
-				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'textarea',
-				'description' => __( 'Payment method description that the customer will see on your website.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => __( 'Pay with Klarna Checkout.', 'klarna-checkout-for-woocommerce' ),
-				'desc_tip'    => true,
-			),
 			'allow_separate_shipping' => array(
 				'title'       => __( 'Separate shipping address', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Allow separate shipping address', 'klarna-checkout-for-woocommerce' ),
@@ -81,20 +67,6 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'title' => '<img src="' . plugins_url( 'assets/img/flags/eu.svg', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ) . '" height="12" /> Europe',
 				'type'  => 'title',
 			),
-			'title_eu'                => array(
-				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'If this option is used, default payment method title will be overridden for Europe purchases.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
-			'description_eu'          => array(
-				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'textarea',
-				'description' => __( 'If this option is used, default payment method description will be overridden for Europe purchases.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
 			'merchant_id_eu'          => array(
 				'title'       => __( 'Production Username', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
@@ -128,20 +100,6 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 			'credentials_us'          => array(
 				'title' => '<img src="' . plugins_url( 'assets/img/flags/us.svg', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ) . '" height="12" /> United States',
 				'type'  => 'title',
-			),
-			'title_us'                => array(
-				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'If this option is used, default payment method title will be overridden for US purchases.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
-			'description_us'          => array(
-				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'textarea',
-				'description' => __( 'If this option is used, default payment method description will be overridden for US purchases.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
 			),
 			'merchant_id_us'          => array(
 				'title'       => __( 'Production Username', 'klarna-checkout-for-woocommerce' ),
