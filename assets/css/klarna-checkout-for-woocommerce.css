@@ -4,18 +4,24 @@
 }
 
 #kco-order-review {
-    float: left;
-    width: 40%;
-    padding-right: 20px;
-    font-size: 0.9em;
-}
-
-#kco-iframe {
-    float: right;
-    width: 60%;
-    padding-left: 20px;
+    margin-bottom: 50px;
 }
 
 .product-name .quantity {
 	display: inline-block;
+}
+
+@media only screen and (min-width : 769px) {
+	#kco-order-review {
+		float: left;
+		width: 40%;
+		padding-right: 20px;
+		font-size: 0.9em;
+	}
+
+	#kco-iframe {
+		float: right;
+		width: 60%;
+		padding-left: 20px;
+	}
 }

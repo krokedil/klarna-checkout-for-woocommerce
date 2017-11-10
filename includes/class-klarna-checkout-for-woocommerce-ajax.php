@@ -28,6 +28,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			'kco_wc_update_shipping' => true,
 			'kco_wc_update_extra_fields' => true,
 			'kco_wc_change_payment_method' => true,
+			'kco_wc_update_klarna_order' => true,
 			'kco_wc_iframe_change' => true,
 		);
 
@@ -148,7 +149,20 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	}
 
 	/**
-	 * Cart quantity update function.
+	 * Updates Klarna order.
+	 */
+	public static function kco_wc_update_klarna_order() {
+		WC()->cart->calculate_shipping();
+		WC()->cart->calculate_fees();
+		WC()->cart->calculate_totals();
+		KCO_WC()->api->request_pre_update_order();
+
+		wp_send_json_success();
+		wp_die();
+	}
+
+	/**
+	 * Iframe change callback function.
 	 */
 	public static function kco_wc_iframe_change() {
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_iframe_change' ) ) {

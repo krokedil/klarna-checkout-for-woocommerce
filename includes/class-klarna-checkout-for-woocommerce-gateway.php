@@ -132,6 +132,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			// 'extra_fields_values'         => WC()->session->get( 'kco_wc_extra_fields_values' ),
 			'change_payment_method_url'   => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
 			'change_payment_method_nonce' => wp_create_nonce( 'kco_wc_change_payment_method' ),
+			'update_klarna_order_url'     => WC_AJAX::get_endpoint( 'kco_wc_update_klarna_order' ),
+			'update_klarna_order_nonce'   => wp_create_nonce( 'kco_wc_update_klarna_order' ),
 			'iframe_change_url'           => WC_AJAX::get_endpoint( 'kco_wc_iframe_change' ),
 			'iframe_change_nonce'         => wp_create_nonce( 'kco_wc_iframe_change' ),
 			'logging'                     => $this->logging,
@@ -197,7 +199,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * Filters cart item quantity output.
 	 *
 	 * @param string $output HTML output.
-	 * @param array  $cart_item Cart item.
+	 * @param array $cart_item Cart item.
 	 * @param string $cart_item_key Cart item key.
 	 *
 	 * @return string $output

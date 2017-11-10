@@ -37,15 +37,19 @@ jQuery(function($) {
 		},
 
 		kcoSuspend: function () {
-			window._klarnaCheckout(function (api) {
-				api.suspend();
-			});
+			if (window._klarnaCheckout) {
+				window._klarnaCheckout(function (api) {
+					api.suspend();
+				});
+			}
 		},
 
 		kcoResume: function () {
-			window._klarnaCheckout(function (api) {
-				api.resume();
-			});
+			if (window._klarnaCheckout) {
+				window._klarnaCheckout(function (api) {
+					api.resume();
+				});
+			}
 		},
 
 		confirmLoading: function () {
@@ -58,54 +62,6 @@ jQuery(function($) {
 						opacity: 0.6
 					}
 				});
-		},
-
-		updateCart: function () {
-			kco_wc.kcoSuspend();
-			$('body').trigger('update_checkout');
-
-			$.ajax({
-				type: 'POST',
-				url: klarna_checkout_for_woocommerce_params.update_cart_url,
-				data: {
-					checkout: $('form.checkout').serialize(),
-					nonce: klarna_checkout_for_woocommerce_params.update_cart_nonce
-				},
-				dataType: 'json',
-				success: function(data) {
-				},
-				error: function(data) {
-				},
-				complete: function(data) {
-					kco_wc.kcoResume();
-				}
-			});
-		},
-
-		updateShipping: function () {
-			kco_wc.kcoSuspend();
-			$('body').trigger('update_checkout');
-
-			var shipping_methods = {};
-			$( 'select.shipping_method, input[name^="shipping_method"][type="radio"]:checked, input[name^="shipping_method"][type="hidden"]' ).each( function() {
-				shipping_methods[ $( this ).data( 'index' ) ] = $( this ).val();
-			} );
-
-			$.ajax({
-				type: 'POST',
-				url: klarna_checkout_for_woocommerce_params.update_shipping_url,
-				data: {
-					shipping: shipping_methods,
-					nonce: klarna_checkout_for_woocommerce_params.update_shipping_nonce
-				},
-				success: function(data) {
-				},
-				error: function(data) {
-				},
-				complete: function(data) {
-					kco_wc.kcoResume();
-				}
-			});
 		},
 
 		updateExtraFields: function() {
@@ -168,6 +124,25 @@ jQuery(function($) {
 					}
 				});
 			}
+		},
+
+		updateKlarnaOrder: function() {
+			$.ajax({
+				type: 'POST',
+				url: klarna_checkout_for_woocommerce_params.update_klarna_order_url,
+				data: {
+					nonce: klarna_checkout_for_woocommerce_params.update_klarna_order_nonce
+				},
+				dataType: 'json',
+				success: function(data) {
+				},
+				error: function(data) {
+				},
+				complete: function(data) {
+					kco_wc.kcoResume();
+				}
+			});
+
 		},
 
 		// When "Change to another payment method" is clicked.
@@ -242,8 +217,9 @@ jQuery(function($) {
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
 
-			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
-			kco_wc.bodyEl.on('change', 'input.shipping_method', kco_wc.updateShipping);
+			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend);
+			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
+
 			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
