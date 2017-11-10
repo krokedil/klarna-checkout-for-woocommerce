@@ -44,7 +44,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'address_notice' ) );
 
 		// Add quantity button in woocommerce_order_review() function.
-		add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
+		// add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
 
 		// Remove WooCommerce footer text from our settings page.
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 999 );
