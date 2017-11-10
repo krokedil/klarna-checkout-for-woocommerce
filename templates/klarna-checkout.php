@@ -17,7 +17,7 @@ $available_gateways = WC()->payment_gateways()->get_available_payment_gateways()
 <form name="checkout" class="checkout woocommerce-checkout">
 	<div id="kco-wrapper">
 		<?php if ( count( $available_gateways ) > 1 ) { ?>
-			<p><a href="#" id="klarna-checkout-select-other">Select another payment method</a></p>
+			<p><a class="checkout-button button alt" href="#" id="klarna-checkout-select-other">Select another payment method</a></p>
 		<?php } ?>
 
 		<div id="kco-order-review">
