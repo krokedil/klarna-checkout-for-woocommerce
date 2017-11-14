@@ -30,6 +30,25 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		// Get setting values.
 		$this->title       = $this->get_option( 'title' );
 		$this->description = $this->get_option( 'description', '' );
+
+		// Allow country based title and description to override general values.
+		$base_location = wc_get_base_location();
+		if ( 'US' === $base_location['country'] ) {
+			if ( '' !== $this->get_option( 'title_us' ) ) {
+				$this->title = $this->get_option( 'title_us' );
+			}
+			if ( '' !== $this->get_option( 'description_us' ) ) {
+				$this->description = $this->get_option( 'description_us' );
+			}
+		} else {
+			if ( '' !== $this->get_option( 'title_eu' ) ) {
+				$this->title = $this->get_option( 'title_eu' );
+			}
+			if ( '' !== $this->get_option( 'description_eu' ) ) {
+				$this->description = $this->get_option( 'description_eu' );
+			}
+		}
+
 		$this->enabled     = $this->get_option( 'enabled' );
 		$this->testmode    = 'yes' === $this->get_option( 'testmode' );
 		$this->logging     = 'yes' === $this->get_option( 'logging' );
