@@ -19,7 +19,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->method_title       = __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' );
 		$this->method_description = __( 'Klarna Checkout replaces standard WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' );
 		$this->has_fields         = false;
-		$this->supports           = apply_filters( 'klarna_checkout_for_woocommerce_supports', array( 'products' ) );
+		$this->supports           = apply_filters( 'klarna_checkout_for_woocommerce_supports', array( 'products', 'refunds' ) );
 
 		// Load the form fields.
 		$this->init_form_fields();
@@ -64,6 +64,20 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'result'   => 'success',
 			'redirect' => $this->get_return_url( $order ),
 		);
+	}
+
+	/**
+	 * This plugin doesn't handle order management, but it allows Klarna Order Management plugin to process refunds
+	 * and then return true or false.
+	 *
+	 * @param int      $order_id WooCommerce order ID.
+	 * @param null|int $amount Refund amount.
+	 * @param string   $reason Reason for refund.
+	 *
+	 * @return bool
+	 */
+	public function process_refund( $order_id, $amount = null, $reason = '' ) {
+		return apply_filters( 'wc_klarna_checkout_process_refund', false, $order_id, $amount, $reason );
 	}
 
 	/**
@@ -229,6 +243,15 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		return $output;
 	}
 
+	/**
+	 * Changes footer text in KCO settings page.
+	 *
+	 * @TODO: Get a URL to link to.
+	 *
+	 * @param string $text Footer text.
+	 *
+	 * @return string
+	 */
 	public function admin_footer_text( $text ) {
 		if ( isset( $_GET['section'] ) && 'klarna_checkout_for_woocommerce' === $_GET['section'] ) {
 			$text = 'If you like Klarna Checkout for WooCommerce, please consider <strong><a href="#">assigning Krokedil as your integration partner</a></strong>.';

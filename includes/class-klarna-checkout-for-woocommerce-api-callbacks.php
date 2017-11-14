@@ -41,6 +41,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		add_action( 'woocommerce_api_kco_wc_validation', array( $this, 'validation_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_shipping_option_update', array( $this, 'shipping_option_update_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
+		add_action( 'kco_wc_punted_notification', array( $this, 'kco_wc_punted_notification_cb' ), 10, 2 );
 	}
 
 	/**
@@ -101,7 +102,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			);
 		} else {
 			// Backup order creation.
-			$this->backup_order_creation();
+			$this->backup_order_creation( $klarna_order_id );
 		}
 	}
 
@@ -109,7 +110,54 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * Notification callback function, used for pending orders.
 	 */
 	public function notification_cb() {
-		do_action( 'wc_klarna_notification_listener' );
+		/**
+		 * Notification callback URL has Klarna Order ID (kco_wc_order_id) in it.
+		 *
+		 * 1. Get Klarna Order ID
+		 * 2. Try to find matching WooCommerce order, to see if it was created
+		 * 3. If WooCommerce order does not exist, that means regular creation failed AND confirmation callback
+		 *    either hasn't happened yet or failed. In this case, schedule a single event, 5 minutes from now
+		 *    and try to get WooCommerce order then.
+		 * 4. If WooCommerce order does exist, fire the hook.
+		 */
+
+
+		$order_id = '';
+
+		if ( $_GET['kco_wc_order_id']) { // KCO.
+			$klarna_order_id = $_GET['kco_wc_order_id'];
+			$query_args = array(
+				'post_type'   => wc_get_order_types(),
+				'post_status' => array_keys( wc_get_order_statuses() ),
+				'meta_key'    => '_wc_klarna_order_id',
+				'meta_value'  => $klarna_order_id,
+			);
+
+			$orders = get_posts( $query_args );
+
+			// If zero matching orders were found, return.
+			if ( ! empty( $orders ) ) {
+				$order_id = $orders[0]->ID;
+			}
+		}
+
+		if ( '' !== $order_id ) {
+			do_action( 'wc_klarna_notification_listener' );
+		} else {
+			$post_body = file_get_contents( 'php://input' );
+			$data = json_decode( $post_body, true );
+
+			wp_schedule_single_event( time() + 300, 'kco_wc_punted_notification', array( $klarna_order_id, $data ) );
+		}
+	}
+
+	/**
+	 * Punted notification callback.
+	 *
+	 * @param string $klarna_order_id Klarna order ID.
+	 */
+	public function kco_wc_punted_notification_cb( $klarna_order_id, $data ) {
+		do_action( 'wc_klarna_notification_listener', $klarna_order_id, $data );
 	}
 
 	/**
@@ -186,8 +234,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	/**
 	 * Backup order creation, in case checkout process failed.
 	 */
-	public function backup_order_creation() {
-		$klarna_order_id = '76c2db44-a927-7975-bdc9-c5a4634f406f';
+	public function backup_order_creation( $klarna_order_id ) {
 		$response        = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 		$klarna_order    = json_decode( $response['body'] );
 
