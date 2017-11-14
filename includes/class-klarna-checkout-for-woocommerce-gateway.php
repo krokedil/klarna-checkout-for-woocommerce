@@ -19,7 +19,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->method_title       = __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' );
 		$this->method_description = __( 'Klarna Checkout replaces standard WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' );
 		$this->has_fields         = false;
-		$this->supports           = apply_filters( 'klarna_checkout_for_woocommerce_supports', array( 'products', 'refunds' ) );
+		$this->supports           = apply_filters( 'klarna_checkout_for_woocommerce_supports', array(
+			'products',
+			'refunds',
+		) );
 
 		// Load the form fields.
 		$this->init_form_fields();
@@ -27,31 +30,19 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		// Load the settings.
 		$this->init_settings();
 
-		// Get setting values.
-		$this->title       = $this->get_option( 'title' );
-		$this->description = $this->get_option( 'description', '' );
-
-		// Allow country based title and description to override general values.
+		// API based title and description.
 		$base_location = wc_get_base_location();
 		if ( 'US' === $base_location['country'] ) {
-			if ( '' !== $this->get_option( 'title_us' ) ) {
-				$this->title = $this->get_option( 'title_us' );
-			}
-			if ( '' !== $this->get_option( 'description_us' ) ) {
-				$this->description = $this->get_option( 'description_us' );
-			}
+			$this->title       = $this->get_option( 'title_us' );
+			$this->description = $this->get_option( 'description_us' );
 		} else {
-			if ( '' !== $this->get_option( 'title_eu' ) ) {
-				$this->title = $this->get_option( 'title_eu' );
-			}
-			if ( '' !== $this->get_option( 'description_eu' ) ) {
-				$this->description = $this->get_option( 'description_eu' );
-			}
+			$this->title       = $this->get_option( 'title_eu' );
+			$this->description = $this->get_option( 'description_eu' );
 		}
 
-		$this->enabled     = $this->get_option( 'enabled' );
-		$this->testmode    = 'yes' === $this->get_option( 'testmode' );
-		$this->logging     = 'yes' === $this->get_option( 'logging' );
+		$this->enabled  = $this->get_option( 'enabled' );
+		$this->testmode = 'yes' === $this->get_option( 'testmode' );
+		$this->logging  = 'yes' === $this->get_option( 'logging' );
 
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array(
 			$this,
@@ -89,9 +80,9 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * This plugin doesn't handle order management, but it allows Klarna Order Management plugin to process refunds
 	 * and then return true or false.
 	 *
-	 * @param int      $order_id WooCommerce order ID.
+	 * @param int $order_id WooCommerce order ID.
 	 * @param null|int $amount Refund amount.
-	 * @param string   $reason Reason for refund.
+	 * @param string $reason Reason for refund.
 	 *
 	 * @return bool
 	 */

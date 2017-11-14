@@ -22,20 +22,6 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'description' => '',
 				'default'     => 'no',
 			),
-			'title'                   => array(
-				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Payment method description that the customer will see on your checkout.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' ),
-				'desc_tip'    => true,
-			),
-			'description'             => array(
-				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'textarea',
-				'description' => __( 'Payment method description that the customer will see on your website.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => __( 'Pay with Klarna Checkout.', 'klarna-checkout-for-woocommerce' ),
-				'desc_tip'    => true,
-			),
 			'allow_separate_shipping' => array(
 				'title'       => __( 'Separate shipping address', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Allow separate shipping address', 'klarna-checkout-for-woocommerce' ),
