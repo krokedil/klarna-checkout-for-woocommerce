@@ -14,7 +14,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 	 * Returns the fields.
 	 */
 	public static function fields() {
-		return apply_filters( 'klarna_checkout_for_woocommerce_gateway_settings', array(
+		return apply_filters( 'kco_wc_gateway_settings', array(
 			'enabled'                 => array(
 				'title'       => __( 'Enable/Disable', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Klarna Checkout', 'klarna-checkout-for-woocommerce' ),

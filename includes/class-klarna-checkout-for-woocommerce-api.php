@@ -481,7 +481,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			}
 		}
 
-		$request_body = wp_json_encode( $request_args );
+		$request_body = wp_json_encode( apply_filters( 'kco_wc_api_request_args', $request_args ) );
 
 		return $request_body;
 	}

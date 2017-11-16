@@ -166,8 +166,8 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		// Company.
 
 		// Country.
-		WC()->customer->set_billing_country( $klarna_order->billing_address->country );
-		WC()->customer->set_shipping_country( $klarna_order->shipping_address->country );
+		WC()->customer->set_billing_country( strtoupper( $klarna_order->billing_address->country ) );
+		WC()->customer->set_shipping_country( strtoupper( $klarna_order->shipping_address->country ) );
 
 		// Street address 1.
 		WC()->customer->set_billing_address_1( $klarna_order->billing_address->street_address );
