@@ -160,6 +160,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'update_klarna_order_nonce'   => wp_create_nonce( 'kco_wc_update_klarna_order' ),
 			'iframe_change_url'           => WC_AJAX::get_endpoint( 'kco_wc_iframe_change' ),
 			'iframe_change_nonce'         => wp_create_nonce( 'kco_wc_iframe_change' ),
+			'checkout_error_url'          => WC_AJAX::get_endpoint( 'kco_wc_checkout_error' ),
+			'checkout_error_nonce'        => wp_create_nonce( 'kco_wc_checkout_error' ),
 			'logging'                     => $this->logging,
 		);
 
@@ -197,7 +199,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 *
 	 * @param int $order_id WooCommerce order ID.
 	 */
-	public function show_thank_you_snippet( $order_id ) {
+	public function show_thank_you_snippet( $order_id = null ) {
 		if ( ! WC()->session->get( 'kco_wc_order_id' ) ) {
 			return;
 		}
@@ -205,18 +207,20 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$klarna_order = KCO_WC()->api->get_order();
 		echo KCO_WC()->api->get_snippet( $klarna_order );
 
-		add_post_meta( $order_id, '_wc_klarna_order_id', $klarna_order->order_id );
+		if ( $order_id ) {
+			// Set WC order transaction ID.
+			$order = wc_get_order( $order_id );
+			$order->set_transaction_id( $klarna_order->order_id );
+			$order->save();
 
-		// Set WC order transaction ID.
-		$order = wc_get_order( $order_id );
-		$order->set_transaction_id( $klarna_order->order_id );
-		$order->save();
+			add_post_meta( $order_id, '_wc_klarna_order_id', $klarna_order->order_id );
 
-		$environment = $this->testmode ? 'test' : 'live';
-		update_post_meta( $order_id, '_wc_klarna_environment', $environment );
+			$environment = $this->testmode ? 'test' : 'live';
+			update_post_meta( $order_id, '_wc_klarna_environment', $environment );
 
-		$klarna_country = WC()->checkout()->get_value( 'billing_country' );
-		update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
+			$klarna_country = WC()->checkout()->get_value( 'billing_country' );
+			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
+		}
 	}
 
 	/**

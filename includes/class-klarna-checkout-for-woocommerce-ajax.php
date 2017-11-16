@@ -30,6 +30,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			'kco_wc_change_payment_method' => true,
 			'kco_wc_update_klarna_order' => true,
 			'kco_wc_iframe_change' => true,
+			'kco_wc_checkout_error' => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -206,6 +207,22 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		$html = ob_get_clean();
 
 		wp_send_json_success( array( 'html' => $html ) );
+		wp_die();
+	}
+
+	/**
+	 * Handles WooCommerce checkout error, after Klarna order has already been created.
+	 */
+	public static function kco_wc_checkout_error() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_checkout_error' ) ) {
+			wp_send_json_error( 'bad_nonce' );
+			exit;
+		}
+
+		$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
+		$redirect_url = add_query_arg( 'kco_wc', 'true', $redirect_url );
+
+		wp_send_json_success( array( 'redirect' => $redirect_url ) );
 		wp_die();
 	}
 

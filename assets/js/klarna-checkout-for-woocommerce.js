@@ -207,6 +207,28 @@ jQuery(function($) {
 			}
 		},
 
+		checkoutError: function() {
+			if ('klarna_checkout_for_woocommerce' === kco_wc.paymentMethod) {
+				$.ajax({
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						kco: false,
+						nonce: klarna_checkout_for_woocommerce_params.checkout_error_nonce
+					},
+					url: klarna_checkout_for_woocommerce_params.checkout_error_url,
+					success: function (data) {
+					},
+					error: function (data) {
+					},
+					complete: function (data) {
+						kco_wc.log(data.responseJSON);
+						window.location.href = data.responseJSON.data.redirect;
+					}
+				});
+			}
+		},
+
 		log: function(message) {
 			console.log(klarna_checkout_for_woocommerce_params.logging);
 			if (klarna_checkout_for_woocommerce_params.logging) {
@@ -219,6 +241,7 @@ jQuery(function($) {
 
 			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
+			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
 
 			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.updateExtraFields);
