@@ -19,10 +19,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->method_title       = __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' );
 		$this->method_description = __( 'Klarna Checkout replaces standard WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' );
 		$this->has_fields         = false;
-		$this->supports           = apply_filters( 'kco_wc_supports', array(
-			'products',
-			'refunds',
-		) );
+		$this->supports           = apply_filters( 'kco_wc_supports', array( 'products' ) );
 
 		// Load the form fields.
 		$this->init_form_fields();
