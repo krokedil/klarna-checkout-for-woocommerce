@@ -178,16 +178,69 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * Show admin notice if Order Management plugin is not active.
 		 */
 		public function order_management_check() {
-			if ( ! class_exists( 'WC_Klarna_Order_Management' ) ) {
-				$current_screen = get_current_screen();
-				if ( 'shop_order' === $current_screen->id || 'plugins' === $current_screen->id || 'woocommerce_page_wc-settings' === $current_screen->id ) {
+			/**
+			 * Check if file exists
+			 *  - yes: check if activated
+			 *    - yes: all good
+			 *    - no: show activate button
+			 * - no: show install button
+			 */
+
+			$plugin_slug = 'collector-checkout-for-woocommerce'; // TEMPORARILY using this plugin, until OM is added to wp.org.
+
+			// If plugin file exists.
+			if ( file_exists(WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
+				// If plugin is not active show Activate button.
+				if ( ! is_plugin_active( $plugin_slug . '/' . $plugin_slug . '.php' ) && current_user_can( 'activate_plugins' ) ) {
+					include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+					$plugin = plugins_api( 'plugin_information', array(
+						'slug' => $plugin_slug,
+					) );
+					$plugin = (array) $plugin;
+					$status = install_plugin_install_status( $plugin );
+					$name = wp_kses( $plugin['name'], array() );
+					$url = add_query_arg( array(
+						'_wpnonce'    => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
+						'action'      => 'activate',
+						'plugin'      => $status['file'],
+					), network_admin_url( 'plugins.php' ) );
+					$description = $name . ' is not active. Please activate it so you can capture, cancel, update and refund Klarna orders.';
 					?>
 					<div class="notice notice-warning">
-						<p><?php _e( 'Klarna Order Management is not active. Please activate it so you can capture, cancel, update and refund Klarna orders.', 'klarna-checkout-for-woocommerce' ); ?></p>
+						<p>
+							<?php echo $description; ?>
+							<a class="install-now button" data-slug="<?php echo $plugin_slug; ?>" href="<?php echo $url; ?>"
+							   aria-label="Activate <?php echo $name; ?> now" data-name="<?php echo $name; ?>">Activate Now</a>
+						</p>
 					</div>
 					<?php
 				}
-			}
+			} else { // If plugin file does not exist, show Install button.
+				if ( current_user_can( 'install_plugins' ) ) {
+					include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+					$plugin = plugins_api( 'plugin_information', array(
+						'slug' => $plugin_slug,
+					) );
+					$plugin = (array) $plugin;
+					$status = install_plugin_install_status( $plugin );
+					if ( 'install' === $status['status'] && $status['url'] ) {
+						$name        = wp_kses( $plugin['name'], array() );
+						$url         = $status['url'];
+						$description = $name . ' is not installed. Please install and activate it so you can capture, cancel, update and refund Klarna orders.';
+						?>
+						<div class="notice notice-warning">
+							<p>
+								<?php echo $description; ?>
+								<a class="install-now button" data-slug="<?php echo $plugin_slug; ?>"
+								   href="<?php echo $url; ?>"
+								   aria-label="Install <?php echo $name; ?> now" data-name="<?php echo $name; ?>">Install
+									Now</a>
+							</p>
+						</div>
+						<?php
+					}
+				}
+			} // End if().
 		}
 
 		/**

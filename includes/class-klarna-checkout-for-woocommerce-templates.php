@@ -89,7 +89,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 
 		// Fallback Klarna Order Received, used when WooCommerce checkout form submission fails.
 		if ( 'checkout/thankyou.php' === $template_name ) {
-			if ( $_GET['kco_wc'] && 'true' === $_GET['kco_wc'] ) {
+			if ( isset( $_GET['kco_wc'] ) && 'true' === $_GET['kco_wc'] ) {
 				$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout-order-received.php';
 			}
 		}
