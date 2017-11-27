@@ -27,15 +27,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		// Load the settings.
 		$this->init_settings();
 
-		// API based title and description.
-		$base_location = wc_get_base_location();
-		if ( 'US' === $base_location['country'] ) {
-			$this->title       = $this->get_option( 'title_us' );
-			$this->description = $this->get_option( 'description_us' );
-		} else {
-			$this->title       = $this->get_option( 'title_eu' );
-			$this->description = $this->get_option( 'description_eu' );
-		}
+		$this->title       = $this->get_option( 'title' );
+		$this->description = $this->get_option( 'description' );
 
 		$this->enabled  = $this->get_option( 'enabled' );
 		$this->testmode = 'yes' === $this->get_option( 'testmode' );

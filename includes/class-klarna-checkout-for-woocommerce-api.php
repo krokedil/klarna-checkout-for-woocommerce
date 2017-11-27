@@ -158,7 +158,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * Adds WooCommerce order ID to Klarna order as merchant_reference. And clear Klarna order ID value from WC session.
 	 *
 	 * @param  string $klarna_order_id Klarna order ID.
-	 * @param  array  $merchant_references Array of merchant references.
+	 * @param  array $merchant_references Array of merchant references.
 	 *
 	 * @return WP_Error|array $response
 	 */
@@ -403,7 +403,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 				break;
 			default:
 				$klarna_locale = 'en-us';
-		}
+		} // End switch().
 
 		return $klarna_locale;
 	}
@@ -417,7 +417,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		// @TODO: Clean this up, for now always do non-EN
 		return false;
 
-		return 'en_US' === get_locale() || 'en_GB' === get_locale();
+		// return 'en_US' === get_locale() || 'en_GB' === get_locale();
 	}
 
 	/**
@@ -463,6 +463,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'order_lines'                     => KCO_WC()->order_lines->get_order_lines(),
 			'shipping_countries'              => $this->get_shipping_countries(),
 			'allow_separate_shipping_address' => $this->get_allow_separate_shipping_address(),
+			'dob_mandatory'                   => $this->get_dob_mandatory(),
+			'title_mandatory'                 => $this->get_title_mandatory(),
 		);
 
 		if ( 'create' === $request_type ) {
@@ -506,6 +508,28 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$allow_separate_shipping = array_key_exists( 'allow_separate_shipping', $this->settings ) && 'yes' === $this->settings['allow_separate_shipping'];
 
 		return $allow_separate_shipping;
+	}
+
+	/**
+	 * Gets date of birth mandatory option.
+	 *
+	 * @return bool
+	 */
+	public function get_dob_mandatory() {
+		$dob_mandatory = array_key_exists( 'dob_mandatory', $this->settings ) && 'yes' === $this->settings['dob_mandatory'];
+
+		return $dob_mandatory;
+	}
+
+	/**
+	 * Gets date of birth mandatory option.
+	 *
+	 * @return bool
+	 */
+	public function get_title_mandatory() {
+		$title_mandatory = array_key_exists( 'title_mandatory', $this->settings ) && 'yes' === $this->settings['title_mandatory'];
+
+		return $title_mandatory;
 	}
 
 	/**

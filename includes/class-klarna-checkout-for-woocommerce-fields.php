@@ -22,6 +22,20 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'description' => '',
 				'default'     => 'no',
 			),
+			'title'                => array(
+				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'text',
+				'description' => __( 'Payment method title.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'Klarna',
+				'desc_tip'    => true,
+			),
+			'description'          => array(
+				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'textarea',
+				'description' => __( 'Payment method description.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => '',
+				'desc_tip'    => true,
+			),
 			'allow_separate_shipping' => array(
 				'title'       => __( 'Separate shipping address', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Allow separate shipping address', 'klarna-checkout-for-woocommerce' ),
@@ -67,20 +81,6 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'title' => '<img src="' . plugins_url( 'assets/img/flags/eu.svg', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ) . '" height="12" /> Europe',
 				'type'  => 'title',
 			),
-			'title_eu'                => array(
-				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'If this option is used, default payment method title will be overridden for Europe purchases.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'Klarna',
-				'desc_tip'    => true,
-			),
-			'description_eu'          => array(
-				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'textarea',
-				'description' => __( 'If this option is used, default payment method description will be overridden for Europe purchases.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			),
 			'merchant_id_eu'          => array(
 				'title'       => __( 'Production Username', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
@@ -109,25 +109,27 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => '',
 				'desc_tip'    => true,
 			),
+			'dob_mandatory' => array(
+				'title'       => __( 'Date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Make customer date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If checked, the customer cannot skip date of birth. ', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
+			'title_mandatory' => array(
+				'title'       => __( 'Title mandatory (GB)', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Make customer title mandatory', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If unchecked, title becomes optional. Only available for orders for country GB.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'yes',
+				'desc_tip'    => true,
+			),
 
 			// US.
 			'credentials_us'          => array(
 				'title' => '<img src="' . plugins_url( 'assets/img/flags/us.svg', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ) . '" height="12" /> United States',
 				'type'  => 'title',
-			),
-			'title_us'                => array(
-				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'If this option is used, default payment method title will be overridden for US purchases.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'Klarna',
-				'desc_tip'    => true,
-			),
-			'description_us'          => array(
-				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'textarea',
-				'description' => __( 'If this option is used, default payment method description will be overridden for US purchases.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
 			),
 			'merchant_id_us'          => array(
 				'title'       => __( 'Production Username', 'klarna-checkout-for-woocommerce' ),
