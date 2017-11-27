@@ -71,7 +71,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'If this option is used, default payment method title will be overridden for Europe purchases.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
+				'default'     => 'Klarna',
 				'desc_tip'    => true,
 			),
 			'description_eu'          => array(
@@ -119,7 +119,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'If this option is used, default payment method title will be overridden for US purchases.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
+				'default'     => 'Klarna',
 				'desc_tip'    => true,
 			),
 			'description_us'          => array(
