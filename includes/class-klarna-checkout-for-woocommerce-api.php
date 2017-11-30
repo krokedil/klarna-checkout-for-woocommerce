@@ -32,8 +32,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 	public function request_pre_create_order() {
 		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders';
 		$request_args = array(
-			'headers' => $this->get_request_headers(),
-			'body'    => $this->get_request_body( 'create' ),
+			'headers'    => $this->get_request_headers(),
+			'user-agent' => $this->get_user_agent(),
+			'body'       => $this->get_request_body( 'create' ),
 		);
 
 		$response = wp_safe_remote_post( $request_url, $request_args );
@@ -65,7 +66,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 	public function request_pre_retrieve_order( $klarna_order_id ) {
 		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
 		$request_args = array(
-			'headers' => $this->get_request_headers(),
+			'headers'    => $this->get_request_headers(),
+			'user-agent' => $this->get_user_agent(),
 		);
 
 		$response = wp_safe_remote_get( $request_url, $request_args );
@@ -90,8 +92,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$klarna_order_id = $this->get_order_id_from_session();
 		$request_url     = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
 		$request_args    = array(
-			'headers' => $this->get_request_headers(),
-			'body'    => $this->get_request_body(),
+			'headers'    => $this->get_request_headers(),
+			'user-agent' => $this->get_user_agent(),
+			'body'       => $this->get_request_body(),
 		);
 
 		// No update if nothing changed in data being sent to Klarna.
@@ -128,7 +131,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 	public function request_post_get_order( $klarna_order_id ) {
 		$request_url  = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id;
 		$request_args = array(
-			'headers' => $this->get_request_headers(),
+			'headers'    => $this->get_request_headers(),
+			'user-agent' => $this->get_user_agent(),
 		);
 
 		$response = wp_safe_remote_get( $request_url, $request_args );
@@ -146,7 +150,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 	public function request_post_acknowledge_order( $klarna_order_id ) {
 		$request_url  = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id . '/acknowledge';
 		$request_args = array(
-			'headers' => $this->get_request_headers(),
+			'headers'    => $this->get_request_headers(),
+			'user-agent' => $this->get_user_agent(),
 		);
 
 		$response = wp_safe_remote_post( $request_url, $request_args );
@@ -165,9 +170,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 	public function request_post_set_merchant_reference( $klarna_order_id, $merchant_references ) {
 		$request_url  = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id . '/merchant-references';
 		$request_args = array(
-			'headers' => $this->get_request_headers(),
-			'method'  => 'PATCH',
-			'body'    => wp_json_encode( array(
+			'headers'    => $this->get_request_headers(),
+			'user-agent' => $this->get_user_agent(),
+			'method'     => 'PATCH',
+			'body'       => wp_json_encode( array(
 				'merchant_reference1' => $merchant_references['merchant_reference1'],
 				'merchant_reference2' => $merchant_references['merchant_reference2'],
 			) ),
@@ -441,6 +447,17 @@ class Klarna_Checkout_For_WooCommerce_API {
 		);
 
 		return $request_headers;
+	}
+
+	/**
+	 * Gets Klarna API request headers.
+	 *
+	 * @return string
+	 */
+	public function get_user_agent() {
+		$user_agent = apply_filters( 'http_headers_useragent', 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) ) . ' - KCO:' . KLARNA_CHECKOUT_FOR_WOOCOMMERCE_VERSION;
+
+		return $user_agent;
 	}
 
 	/**
