@@ -36,8 +36,14 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 *
 	 * @param bool|string $shop_country Shop country.
 	 */
-	public function __construct( $shop_country = 'US' ) {
+	public function __construct( $shop_country = null ) {
+		if ( ! $shop_country ) {
+			$base_location = wc_get_base_location();
+			$shop_country  = $base_location['country'];
+		}
+
 		$this->shop_country = $shop_country;
+
 		if ( 'US' === $this->shop_country ) {
 			$this->separate_sales_tax = true;
 		}
@@ -257,7 +263,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array  $cart_item Cart item.
+	 * @param  array $cart_item Cart item.
 	 * @param  object $product Product object.
 	 *
 	 * @return integer $item_tax_rate Item tax percentage formatted for Klarna.

@@ -27,7 +27,7 @@ class Klarna_Checkout_For_WooCommerce_Credentials {
 	/**
 	 * Gets Klarna API credentials (merchant ID and shared secret) from user session.
 	 *
-	 * @return array $credentials
+	 * @return bool|array $credentials
 	 */
 	public function get_credentials_from_session() {
 		$base_location = wc_get_base_location();
@@ -49,7 +49,7 @@ class Klarna_Checkout_For_WooCommerce_Credentials {
 
 		$credentials = array(
 			'merchant_id'   => $this->settings[ $test_string . 'merchant_id_' . $country_string ],
-			'shared_secret' => $this->settings[ $test_string . 'shared_secret_' . $country_string ],
+			'shared_secret' => htmlspecialchars_decode( $this->settings[ $test_string . 'shared_secret_' . $country_string ] ),
 		);
 
 		return $credentials;
