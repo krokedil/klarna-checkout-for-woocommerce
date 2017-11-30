@@ -22,14 +22,14 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'description' => '',
 				'default'     => 'no',
 			),
-			'title'                => array(
+			'title'                   => array(
 				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Payment method title.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'Klarna',
 				'desc_tip'    => true,
 			),
-			'description'          => array(
+			'description'             => array(
 				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'textarea',
 				'description' => __( 'Payment method description.', 'klarna-checkout-for-woocommerce' ),
@@ -44,7 +44,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
-			'shipping_details' => array(
+			'shipping_details'        => array(
 				'title'       => __( 'Shipping details', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Shipping details note shown to customer', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
@@ -73,6 +73,14 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'type'        => 'checkbox',
 				'description' => __( 'Place the payment gateway in test mode using test API keys.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'yes',
+				'desc_tip'    => true,
+			),
+			'dob_mandatory'           => array(
+				'title'       => __( 'Date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Make customer date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If checked, the customer cannot skip date of birth. ', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
 				'desc_tip'    => true,
 			),
 
@@ -109,15 +117,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'dob_mandatory' => array(
-				'title'       => __( 'Date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Make customer date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'checkbox',
-				'description' => __( 'If checked, the customer cannot skip date of birth. ', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'no',
-				'desc_tip'    => true,
-			),
-			'title_mandatory' => array(
+			'title_mandatory'         => array(
 				'title'       => __( 'Title mandatory (GB)', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Make customer title mandatory', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
