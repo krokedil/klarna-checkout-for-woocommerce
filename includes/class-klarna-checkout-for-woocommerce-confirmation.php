@@ -38,6 +38,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		add_action( 'woocommerce_before_checkout_form', array( $this, 'maybe_populate_wc_checkout' ) );
 		add_action( 'wp_footer', array( $this, 'maybe_submit_wc_checkout' ), 999 );
 		add_filter( 'the_title', array( $this, 'confirm_page_title' ) );
+		add_filter( 'woocommerce_checkout_fields', array( $this, 'unrequire_fields' ), 99 );
 	}
 
 	/**
@@ -196,6 +197,26 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		WC()->customer->set_billing_email( $klarna_order->billing_address->email );
 
 		WC()->customer->save();
+	}
+
+	/**
+	 * When checking out using KCO, we need to make sure none of the WooCommerce are required, in case Klarna
+	 * does not return info for some of them.
+	 *
+	 * @param array $fields WooCommerce checkout fields.
+	 *
+	 * @return mixed
+	 */
+	public function unrequire_fields( $fields ) {
+		if ( 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_payment_method' ) ) {
+			foreach ( $fields as $fieldset_key => $fieldset ) {
+				foreach ( $fieldset as $key => $field ) {
+					$fields[ $fieldset_key ][ $key ]['required'] = '';
+				}
+			}
+		}
+
+		return $fields;
 	}
 
 }
