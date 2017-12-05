@@ -39,6 +39,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		add_action( 'wp_footer', array( $this, 'maybe_submit_wc_checkout' ), 999 );
 		add_filter( 'the_title', array( $this, 'confirm_page_title' ) );
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'unrequire_fields' ), 99 );
+		add_filter( 'woocommerce_checkout_posted_data', array( $this, 'unrequire_posted_data' ), 99 );
 	}
 
 	/**
@@ -104,33 +105,34 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 
 				foreach ( $extra_field_values as $field_name => $field_value ) { ?>
 
-					var elementName = "<?php echo $field_name; ?>";
-					var elementValue = "<?php echo $field_value; ?>";
-					var element = $('*[name="' + elementName + '"]');
+				var elementName = "<?php echo $field_name; ?>";
+				var elementValue = "<?php echo $field_value; ?>";
+				var element = $('*[name="' + elementName + '"]');
 
-					console.log(elementName);
-					console.log(elementValue);
-					console.log(element);
-					console.log(element.type);
+				console.log(elementName);
+				console.log(elementValue);
+				console.log(element);
+				console.log(element.type);
 
-					if (element.length) {
-						if (element.is('select')) { // Select.
-							var selectedOption = element.find('option[value="' + elementValue + '"]');
-							selectedOption.prop('selected', true);
-						} else if ('radio' === element.get(0).type) { // Radio.
-							var checkedRadio = $('*[name="' + elementName + '"][value="' + elementValue + '"]');
-							checkedRadio.prop('checked', true);
-						} else if ('checkbox' === element.get(0).type) { // Checkbox.
-							if (elementValue) {
-								element.prop('checked', true);
-							}
-						} else { // Text and textarea.
-							element.val(elementValue);
+				if (element.length) {
+					if (element.is('select')) { // Select.
+						var selectedOption = element.find('option[value="' + elementValue + '"]');
+						selectedOption.prop('selected', true);
+					} else if ('radio' === element.get(0).type) { // Radio.
+						var checkedRadio = $('*[name="' + elementName + '"][value="' + elementValue + '"]');
+						checkedRadio.prop('checked', true);
+					} else if ('checkbox' === element.get(0).type) { // Checkbox.
+						if (elementValue) {
+							element.prop('checked', true);
 						}
+					} else { // Text and textarea.
+						element.val(elementValue);
 					}
+				}
 
 				<?php } ?>
 
+				$('.validate-required').removeClass('validate-required');
 				$('form.woocommerce-checkout').submit();
 			});
 		</script>
@@ -211,12 +213,32 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		if ( 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_payment_method' ) ) {
 			foreach ( $fields as $fieldset_key => $fieldset ) {
 				foreach ( $fieldset as $key => $field ) {
-					$fields[ $fieldset_key ][ $key ]['required'] = '';
+					$fields[ $fieldset_key ][ $key ]['required']        = '';
+					$fields[ $fieldset_key ][ $key ]['wooccm_required'] = '';
 				}
 			}
 		}
 
 		return $fields;
+	}
+
+	/**
+	 * Makes sure there's no empty data sent for validation.
+	 *
+	 * @param array $data Posted data.
+	 *
+	 * @return mixed
+	 */
+	public function unrequire_posted_data( $data ) {
+		if ( 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_payment_method' ) ) {
+			foreach ( $data as $key => $value ) {
+				if ( '' === $value ) {
+					unset( $data[ $key ] );
+				}
+			}
+		}
+
+		return $data;
 	}
 
 }

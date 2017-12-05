@@ -42,6 +42,7 @@ if ( ! function_exists( 'kco_wc_show_extra_fields' ) ) {
 		$extra_fields                 = $kco_wc_extra_checkout_fields->get_remaining_checkout_fields();
 
 		// Billing.
+		do_action( 'woocommerce_before_checkout_billing_form', WC()->checkout() );
 		foreach ( $extra_fields['billing'] as $key => $field ) {
 			if ( isset( $field['country_field'], $default_billing_fields[ $field['country_field'] ] ) ) {
 				$field['country'] = WC()->checkout()->get_value( $field['country_field'] );
@@ -49,6 +50,7 @@ if ( ! function_exists( 'kco_wc_show_extra_fields' ) ) {
 			$key_value = array_key_exists( $key, $extra_fields_values ) ? $extra_fields_values[ $key ] : '';
 			woocommerce_form_field( $key, $field, $key_value );
 		}
+		do_action( 'woocommerce_after_checkout_billing_form', WC()->checkout() );
 
 		if ( ! is_user_logged_in() && WC()->checkout()->is_registration_enabled() ) { ?>
 			<div class="woocommerce-account-fields">
@@ -78,6 +80,7 @@ if ( ! function_exists( 'kco_wc_show_extra_fields' ) ) {
 		<?php }
 
 		// Shipping.
+		do_action( 'woocommerce_before_checkout_shipping_form', WC()->checkout() );
 		foreach ( $extra_fields['shipping'] as $key => $field ) {
 			if ( isset( $field['country_field'], $default_shipping_fields[ $field['country_field'] ] ) ) {
 				$field['country'] = WC()->checkout()->get_value( $field['country_field'] );
@@ -85,12 +88,14 @@ if ( ! function_exists( 'kco_wc_show_extra_fields' ) ) {
 			$key_value = array_key_exists( $key, $extra_fields_values ) ? $extra_fields_values[ $key ] : '';
 			woocommerce_form_field( $key, $field, $key_value );
 		}
+		do_action( 'woocommerce_after_checkout_shipping_form', WC()->checkout() );
 
 		// Order.
 		foreach ( $extra_fields['order'] as $key => $field ) {
 			$key_value = array_key_exists( $key, $extra_fields_values ) ? $extra_fields_values[ $key ] : '';
 			woocommerce_form_field( $key, $field, $key_value );
 		}
+		do_action( 'woocommerce_after_order_notes', WC()->checkout() );
 
 		echo '</div>';
 	}

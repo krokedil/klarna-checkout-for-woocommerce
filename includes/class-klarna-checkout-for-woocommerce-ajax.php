@@ -181,7 +181,10 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			'fin' => 'FI',
 			'usa' => 'US',
 			'nld' => 'NL',
-			'nor' => 'NO'
+			'nor' => 'NO',
+			'aut' => 'AT',
+			'deu' => 'DE',
+			'dnk' => 'DK',
 		);
 
 		WC()->customer->set_billing_email( $address['email'] );
