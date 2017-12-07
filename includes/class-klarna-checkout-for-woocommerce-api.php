@@ -327,7 +327,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		 * This will allow local experience, where possible.
 		 */
 		$currency = $this->get_purchase_currency();
-		
+
 		switch ( $currency ) {
 			case 'USD':
 				$country = 'US';
@@ -531,13 +531,15 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'title_mandatory'                 => $this->get_title_mandatory(),
 		);
 
-		if ( 'create' === $request_type ) {
+		if ( 'DE' !== WC()->checkout()->get_value( 'billing_country' ) ) {
 			$request_args['billing_address'] = array(
 				'email'       => WC()->checkout()->get_value( 'billing_email' ),
 				'postal_code' => WC()->checkout()->get_value( 'billing_postcode' ),
-				'country'     => $this->get_purchase_country(),
+				'country'     => WC()->checkout()->get_value( 'billing_country' ),
 			);
+		}
 
+		if ( 'create' === $request_type ) {
 			if ( $this->get_iframe_colors() ) {
 				$request_args['options'] = $this->get_iframe_colors();
 			}

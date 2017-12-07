@@ -24,13 +24,13 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 */
 	public static function add_ajax_events() {
 		$ajax_events = array(
-			'kco_wc_update_cart' => true,
-			'kco_wc_update_shipping' => true,
-			'kco_wc_update_extra_fields' => true,
+			'kco_wc_update_cart'           => true,
+			'kco_wc_update_shipping'       => true,
+			'kco_wc_update_extra_fields'   => true,
 			'kco_wc_change_payment_method' => true,
-			'kco_wc_update_klarna_order' => true,
-			'kco_wc_iframe_change' => true,
-			'kco_wc_checkout_error' => true,
+			'kco_wc_update_klarna_order'   => true,
+			'kco_wc_iframe_change'         => true,
+			'kco_wc_checkout_error'        => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -141,7 +141,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		WC()->payment_gateways()->set_current_gateway( $available_gateways );
 
 		$redirect = wc_get_checkout_url();
-		$data = array(
+		$data     = array(
 			'redirect' => $redirect,
 		);
 
@@ -187,16 +187,33 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			'dnk' => 'DK',
 		);
 
-		WC()->customer->set_billing_email( $address['email'] );
-		WC()->customer->set_billing_postcode( $address['postal_code'] );
-		WC()->customer->set_billing_country( $countries[ $address['country'] ] );
-		WC()->customer->set_billing_first_name( $address['given_name'] );
-		WC()->customer->set_billing_last_name( $address['family_name'] );
+		$customer_data = array();
 
-		WC()->customer->set_shipping_postcode( $address['postal_code'] );
-		WC()->customer->set_shipping_country( $countries[ $address['country'] ] );
-		WC()->customer->set_shipping_first_name( $address['given_name'] );
-		WC()->customer->set_shipping_last_name( $address['family_name'] );
+		if ( isset( $address['email'] ) ) {
+			$customer_data['billing_email'] = $address['email'];
+		}
+
+		if ( isset( $address['postal_code'] ) ) {
+			$customer_data['billing_postal_code']  = $address['postal_code'];
+			$customer_data['shipping_postal_code'] = $address['postal_code'];
+		}
+
+		if ( isset( $address['given_name'] ) ) {
+			$customer_data['billing_first_name']  = $address['given_name'];
+			$customer_data['shipping_first_name'] = $address['given_name'];
+		}
+
+		if ( isset( $address['family_name'] ) ) {
+			$customer_data['billing_last_name']  = $address['family_name'];
+			$customer_data['shipping_last_name'] = $address['family_name'];
+		}
+
+		if ( isset( $address['country'] ) && array_key_exists( $address['country'], $countries ) ) {
+			$customer_data['billing_country']  = $countries[ $address['country'] ];
+			$customer_data['shipping_country'] = $countries[ $address['country'] ];
+		}
+
+		WC()->customer->set_props( $customer_data );
 
 		WC()->customer->save();
 
@@ -230,4 +247,5 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	}
 
 }
+
 Klarna_Checkout_For_WooCommerce_AJAX::init();
