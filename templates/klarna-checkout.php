@@ -30,6 +30,11 @@ $available_gateways = WC()->payment_gateways()->get_available_payment_gateways()
 		</div>
 
 		<div id="kco-iframe">
+			<?php
+			if ( ! kco_wc_prefill_allowed() && is_user_logged_in() ) {
+				kco_wc_prefill_consent();
+			}
+			?>
 			<?php do_action( 'kco_wc_before_snippet' ); ?>
 			<?php kco_wc_show_snippet(); ?>
 			<?php do_action( 'kco_wc_after_snippet' ); ?>

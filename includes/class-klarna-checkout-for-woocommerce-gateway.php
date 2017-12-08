@@ -42,6 +42,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'show_thank_you_snippet' ) );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'address_notice' ) );
+		add_action( 'woocommerce_checkout_init', array( $this, 'prefill_consent' ) );
 
 		// Add quantity button in woocommerce_order_review() function.
 		// add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
@@ -117,6 +118,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		if ( is_order_received_page() ) {
 			return;
+		}
+
+		if ( ! kco_wc_prefill_allowed() ) {
+			add_thickbox();
 		}
 
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
@@ -275,5 +280,15 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		}
 	}
 
+	/**
+	 * Adds prefill consent to WC session.
+	 */
+	public function prefill_consent() {
+		if ( isset( $_GET['prefill_consent'] ) ) { // Input var okay.
+			if ( 'yes' === sanitize_text_field( $_GET['prefill_consent'] ) ) {
+				WC()->session->set( 'kco_wc_prefill_consent', true );
+			}
+		}
+	}
 
 }

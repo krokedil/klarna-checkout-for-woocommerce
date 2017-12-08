@@ -95,6 +95,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			if ( null === self::$instance ) {
 				self::$instance = new self();
 			}
+
 			return self::$instance;
 		}
 
@@ -159,6 +160,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				'<a href="https://krokedil.se/">' . __( 'Docs', 'klarna-checkout-for-woocommerce' ) . '</a>',
 				'<a href="http://krokedil.se/">' . __( 'Support', 'klarna-checkout-for-woocommerce' ) . '</a>',
 			);
+
 			return array_merge( $plugin_links, $links );
 		}
 
@@ -171,6 +173,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 */
 		public function get_setting_link() {
 			$section_slug = 'kco';
+
 			return admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . $section_slug );
 		}
 
@@ -186,31 +189,33 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			 * - no: show install button
 			 */
 
-			$plugin_slug = 'collector-checkout-for-woocommerce'; // TEMPORARILY using this plugin, until OM is added to wp.org.
+			$plugin_slug = 'klarna-order-management-for-woocommerce'; // TEMPORARILY using this plugin, until OM is added to wp.org.
 
 			// If plugin file exists.
-			if ( file_exists(WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
+			if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
 				// If plugin is not active show Activate button.
 				if ( ! is_plugin_active( $plugin_slug . '/' . $plugin_slug . '.php' ) && current_user_can( 'activate_plugins' ) ) {
-					include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
-					$plugin = plugins_api( 'plugin_information', array(
+					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+					$plugin      = plugins_api( 'plugin_information', array(
 						'slug' => $plugin_slug,
 					) );
-					$plugin = (array) $plugin;
-					$status = install_plugin_install_status( $plugin );
-					$name = wp_kses( $plugin['name'], array() );
-					$url = add_query_arg( array(
-						'_wpnonce'    => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
-						'action'      => 'activate',
-						'plugin'      => $status['file'],
+					$plugin      = (array) $plugin;
+					$status      = install_plugin_install_status( $plugin );
+					$name        = wp_kses( $plugin['name'], array() );
+					$url         = add_query_arg( array(
+						'_wpnonce' => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
+						'action'   => 'activate',
+						'plugin'   => $status['file'],
 					), network_admin_url( 'plugins.php' ) );
 					$description = $name . ' is not active. Please activate it so you can capture, cancel, update and refund Klarna orders.';
 					?>
 					<div class="notice notice-warning">
 						<p>
 							<?php echo $description; ?>
-							<a class="install-now button" data-slug="<?php echo $plugin_slug; ?>" href="<?php echo $url; ?>"
-							   aria-label="Activate <?php echo $name; ?> now" data-name="<?php echo $name; ?>">Activate Now</a>
+							<a class="install-now button" data-slug="<?php echo $plugin_slug; ?>"
+							   href="<?php echo $url; ?>"
+							   aria-label="Activate <?php echo $name; ?> now" data-name="<?php echo $name; ?>">Activate
+								Now</a>
 						</p>
 					</div>
 					<?php
@@ -292,11 +297,13 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * Add the gateways to WooCommerce
 		 *
 		 * @param  array $methods Payment methods.
+		 *
 		 * @return array $methods Payment methods.
 		 * @since  1.0.0
 		 */
 		public function add_gateways( $methods ) {
 			$methods[] = 'Klarna_Checkout_For_WooCommerce_Gateway';
+
 			return $methods;
 		}
 
@@ -308,6 +315,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		}
 
 	}
+
 	Klarna_Checkout_For_WooCommerce::get_instance();
 }
 

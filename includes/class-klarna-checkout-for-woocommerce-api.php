@@ -291,6 +291,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			WC()->session->__unset( 'kco_wc_order_notes' );
 			WC()->session->__unset( 'kco_wc_order_api' );
 			WC()->session->__unset( 'kco_wc_extra_fields_values' );
+			WC()->session->__unset( 'kco_wc_prefill_consent' );
 		}
 	}
 
@@ -531,7 +532,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'title_mandatory'                 => $this->get_title_mandatory(),
 		);
 
-		if ( 'DE' !== WC()->checkout()->get_value( 'billing_country' ) ) {
+		if ( kco_wc_prefill_allowed() ) {
 			$request_args['billing_address'] = array(
 				'email'       => WC()->checkout()->get_value( 'billing_email' ),
 				'postal_code' => WC()->checkout()->get_value( 'billing_postcode' ),

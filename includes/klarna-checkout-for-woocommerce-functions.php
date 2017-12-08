@@ -19,7 +19,7 @@ if ( ! function_exists( 'kco_wc_show_order_notes' ) ) {
 	 */
 	function kco_wc_show_order_notes() {
 		$order_fields = WC()->checkout()->get_checkout_fields( 'order' );
-		$key = 'order_comments';
+		$key          = 'order_comments';
 		if ( array_key_exists( $key, $order_fields ) ) {
 			$order_notes_field = $order_fields[ $key ];
 			woocommerce_form_field( $key, $order_notes_field, WC()->checkout()->get_value( $key ) );
@@ -57,7 +57,10 @@ if ( ! function_exists( 'kco_wc_show_extra_fields' ) ) {
 				<?php if ( ! WC()->checkout()->is_registration_required() ) { ?>
 					<p class="form-row form-row-wide create-account">
 						<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
-							<input class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" id="createaccount" <?php checked( ( true === WC()->checkout()->get_value( 'createaccount' ) || ( true === apply_filters( 'woocommerce_create_account_default_checked', false ) ) ), true ) ?> type="checkbox" name="createaccount" value="1" /> <span><?php _e( 'Create an account?', 'woocommerce' ); ?></span>
+							<input class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox"
+							       id="createaccount" <?php checked( ( true === WC()->checkout()->get_value( 'createaccount' ) || ( true === apply_filters( 'woocommerce_create_account_default_checked', false ) ) ), true ) ?>
+							       type="checkbox" name="createaccount" value="1"/>
+							<span><?php _e( 'Create an account?', 'woocommerce' ); ?></span>
 						</label>
 					</p>
 				<?php } ?>
@@ -77,7 +80,8 @@ if ( ! function_exists( 'kco_wc_show_extra_fields' ) ) {
 
 				<?php do_action( 'woocommerce_after_checkout_registration_form', WC()->checkout() ); ?>
 			</div>
-		<?php }
+			<?php
+		}
 
 		// Shipping.
 		do_action( 'woocommerce_before_checkout_shipping_form', WC()->checkout() );
@@ -99,4 +103,53 @@ if ( ! function_exists( 'kco_wc_show_extra_fields' ) ) {
 
 		echo '</div>';
 	}
+}
+
+/**
+ * Is it OK to prefill customer data?
+ */
+function kco_wc_prefill_allowed() {
+	if ( 'DE' === WC()->checkout()->get_value( 'billing_country' ) ) {
+		if ( is_user_logged_in() && WC()->session->get( 'kco_wc_prefill_consent', false ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Shows prefill consent text.
+ */
+function kco_wc_prefill_consent() {
+	$consent_url = add_query_arg(
+		[ 'prefill_consent' => 'yes' ],
+		wc_get_checkout_url()
+	);
+
+	$credentials = KCO_WC()->credentials->get_credentials_from_session();
+	$merchant_id = $credentials['merchant_id'];
+
+	if ( 'de_DE' === get_locale() ) {
+		$button_text = 'Meine Adressdaten vorausfüllen';
+		$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
+		$popup_text  = 'In unserem Kassenbereich nutzen wir Klarna Checkout. Dazu werden Ihre Daten, wie E-Mail-Adresse, Vor- und
+			Nachname, Geburtsdatum, Adresse und Telefonnummer, soweit erforderlich, automatisch an Klarna AB übertragen,
+			sobald Sie in den Kassenbereich gelangen. Die Nutzungsbedingungen für Klarna Checkout finden Sie hier:
+			<a href="https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/de_de/checkout" target="_blank">https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/de_de/checkout</a>';
+	} else {
+		$button_text = 'Meine Adressdaten vorausfüllen';
+		$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
+		$popup_text  = 'We use Klarna Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Klarna AB, enabling the provision of Klarna Checkout. These User Terms apply for the use of Klarna Checkout is available here: 
+			<a target="_blank" href="https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/en_us/checkout">https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/en_us/checkout</a>';
+	}
+	?>
+	<p><a class="button" href="<?php echo $consent_url; ?>"><?php echo $button_text; ?></a></p>
+	<p><a href="#TB_inline?width=600&height=550&inlineId=consent-text" class="thickbox"><?php echo $link_text; ?></a></p>
+	<div id="consent-text" style="display:none;">
+		<p><?php echo $popup_text; ?></p>
+	</div>
+	<?php
 }

@@ -127,22 +127,23 @@ jQuery(function($) {
 		},
 
 		updateKlarnaOrder: function() {
-			$.ajax({
-				type: 'POST',
-				url: kco_params.update_klarna_order_url,
-				data: {
-					nonce: kco_params.update_klarna_order_nonce
-				},
-				dataType: 'json',
-				success: function(data) {
-				},
-				error: function(data) {
-				},
-				complete: function(data) {
-					kco_wc.kcoResume();
-				}
-			});
-
+			if ('kco' === kco_wc.paymentMethod) {
+				$.ajax({
+					type: 'POST',
+					url: kco_params.update_klarna_order_url,
+					data: {
+						nonce: kco_params.update_klarna_order_nonce
+					},
+					dataType: 'json',
+					success: function(data) {
+					},
+					error: function(data) {
+					},
+					complete: function(data) {
+						kco_wc.kcoResume();
+					}
+				});
+			}
 		},
 
 		// When "Change to another payment method" is clicked.
