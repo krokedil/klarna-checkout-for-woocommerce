@@ -135,6 +135,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
 			add_action( 'init', array( $this, 'add_kco_endpoint' ) );
 			add_action( 'admin_notices', array( $this, 'order_management_check' ) );
+
+			// Add quantity button in woocommerce_order_review() function.
+			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
 		}
 
 		/**
@@ -312,6 +315,40 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 */
 		public function add_kco_endpoint() {
 			add_rewrite_endpoint( 'kco', EP_ROOT | EP_PAGES );
+		}
+
+		/**
+		 * Filters cart item quantity output.
+		 *
+		 * @param string $output HTML output.
+		 * @param array $cart_item Cart item.
+		 * @param string $cart_item_key Cart item key.
+		 *
+		 * @return string $output
+		 */
+		public function add_quantity_field( $output, $cart_item, $cart_item_key ) {
+			if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
+				foreach ( WC()->cart->get_cart() as $cart_key => $cart_value ) {
+					if ( $cart_key === $cart_item_key ) {
+						$_product = $cart_item['data'];
+
+						if ( $_product->is_sold_individually() ) {
+							$return_value = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1" />', $cart_key );
+						} else {
+							$return_value = woocommerce_quantity_input( array(
+								'input_name'  => 'cart[' . $cart_key . '][qty]',
+								'input_value' => $cart_item['quantity'],
+								'max_value'   => $_product->backorders_allowed() ? '' : $_product->get_stock_quantity(),
+								'min_value'   => '1',
+							), $_product, false );
+						}
+
+						$output = $return_value;
+					}
+				}
+			}
+
+			return $output;
 		}
 
 	}
