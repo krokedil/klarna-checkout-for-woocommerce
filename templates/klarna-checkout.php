@@ -18,7 +18,7 @@ $available_gateways = WC()->payment_gateways()->get_available_payment_gateways()
 
 <form name="checkout" class="checkout woocommerce-checkout">
 	<?php /* Has to be here for WC_AJAX::update_order_review() */ ?>
-	<input style="display:none" type="radio" name="payment_method" value="klarna_checkout_for_woocommerce" />
+	<input style="display:none" type="radio" name="payment_method" value="kco" />
 
 	<div id="kco-wrapper">
 		<div id="kco-order-review">

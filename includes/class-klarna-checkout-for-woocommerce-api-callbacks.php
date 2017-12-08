@@ -355,7 +355,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		$order->set_created_via( 'klarna_checkout_backup_order_creation' );
 		$order->set_currency( $klarna_order->purchase_currency );
-		$order->set_payment_method( 'klarna_checkout_for_woocommerce' );
+		$order->set_payment_method( 'kco' );
 
 		$order->set_created_via( 'klarna_checkout_backup_order_creation' );
 		// $order->set_customer_id( apply_filters( 'woocommerce_checkout_customer_id', get_current_user_id() ) );

@@ -170,7 +170,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * @return string Setting link
 		 */
 		public function get_setting_link() {
-			$section_slug = 'klarna_checkout_for_woocommerce';
+			$section_slug = 'kco';
 			return admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . $section_slug );
 		}
 

@@ -128,14 +128,14 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		if ( 'false' === $_POST['kco'] ) {
 			// Set chosen payment method to first gateway that is not Klarna Checkout for WooCommerce.
 			$first_gateway = reset( $available_gateways );
-			if ( 'klarna_checkout_for_woocommerce' !== $first_gateway->id ) {
+			if ( 'kco' !== $first_gateway->id ) {
 				WC()->session->set( 'chosen_payment_method', $first_gateway->id );
 			} else {
 				$second_gateway = next( $available_gateways );
 				WC()->session->set( 'chosen_payment_method', $second_gateway->id );
 			}
 		} else {
-			WC()->session->set( 'chosen_payment_method', 'klarna_checkout_for_woocommerce' );
+			WC()->session->set( 'chosen_payment_method', 'kco' );
 		}
 
 		WC()->payment_gateways()->set_current_gateway( $available_gateways );

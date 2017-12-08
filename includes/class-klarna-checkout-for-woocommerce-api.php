@@ -21,7 +21,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * Klarna_Checkout_For_WooCommerce_API constructor.
 	 */
 	public function __construct() {
-		$this->settings = get_option( 'woocommerce_klarna_checkout_for_woocommerce_settings' );
+		$this->settings = get_option( 'woocommerce_kco_settings' );
 	}
 
 	/**

@@ -37,7 +37,7 @@ class Klarna_Checkout_For_WooCommerce_Logging {
 	 * @return bool
 	 */
 	private function log_enabled() {
-		$settings = get_option( 'woocommerce_klarna_checkout_for_woocommerce_settings' );
+		$settings = get_option( 'woocommerce_kco_settings' );
 
 		return ( null !== $settings['logging'] && 'yes' === $settings['logging'] );
 	}

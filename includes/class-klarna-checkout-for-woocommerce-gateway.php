@@ -15,7 +15,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * Klarna_Checkout_For_WooCommerce_Gateway constructor.
 	 */
 	public function __construct() {
-		$this->id                 = 'klarna_checkout_for_woocommerce';
+		$this->id                 = 'kco';
 		$this->method_title       = __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' );
 		$this->method_description = __( 'Klarna Checkout replaces standard WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' );
 		$this->has_fields         = false;
@@ -122,7 +122,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		wp_register_script(
-			'klarna_checkout_for_woocommerce',
+			'kco',
 			plugins_url( 'assets/js/klarna-checkout-for-woocommerce' . $suffix . '.js', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ),
 			array( 'jquery', 'wc-cart' ),
 			KLARNA_CHECKOUT_FOR_WOOCOMMERCE_VERSION,
@@ -130,7 +130,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		);
 
 		wp_register_style(
-			'klarna_checkout_for_woocommerce',
+			'kco',
 			plugins_url( 'assets/css/klarna-checkout-for-woocommerce' . $suffix . '.css', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ),
 			array(),
 			KLARNA_CHECKOUT_FOR_WOOCOMMERCE_VERSION
@@ -155,10 +155,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'logging'                     => $this->logging,
 		);
 
-		wp_localize_script( 'klarna_checkout_for_woocommerce', 'klarna_checkout_for_woocommerce_params', $checkout_localize_params );
+		wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );
 
-		wp_enqueue_script( 'klarna_checkout_for_woocommerce' );
-		wp_enqueue_style( 'klarna_checkout_for_woocommerce' );
+		wp_enqueue_script( 'kco' );
+		wp_enqueue_style( 'kco' );
 	}
 
 
@@ -174,7 +174,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			return;
 		}
 
-		if ( ! isset( $_GET['section'] ) || 'klarna_checkout_for_woocommerce' !== $_GET['section'] ) {
+		if ( ! isset( $_GET['section'] ) || 'kco' !== $_GET['section'] ) {
 			return;
 		}
 
@@ -223,7 +223,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * @return string $output
 	 */
 	public function add_quantity_field( $output, $cart_item, $cart_item_key ) {
-		if ( is_checkout() && 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_payment_method' ) ) {
+		if ( is_checkout() && 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
 			foreach ( WC()->cart->get_cart() as $cart_key => $cart_value ) {
 				if ( $cart_key === $cart_item_key ) {
 					$_product = $cart_item['data'];
@@ -257,7 +257,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * @return string
 	 */
 	public function admin_footer_text( $text ) {
-		if ( isset( $_GET['section'] ) && 'klarna_checkout_for_woocommerce' === $_GET['section'] ) {
+		if ( isset( $_GET['section'] ) && 'kco' === $_GET['section'] ) {
 			$text = 'If you like Klarna Checkout for WooCommerce, please consider <strong><a href="#">assigning Krokedil as your integration partner</a></strong>.';
 		}
 

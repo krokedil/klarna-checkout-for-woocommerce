@@ -110,7 +110,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				);
 
 				// Add images.
-				$klarna_checkout_settings = get_option( 'woocommerce_klarna_checkout_for_woocommerce_settings' );
+				$klarna_checkout_settings = get_option( 'woocommerce_kco_settings' );
 				if ( array_key_exists( 'send_product_urls', $klarna_checkout_settings ) && 'yes' === $klarna_checkout_settings['send_product_urls'] ) {
 					$klarna_item['product_url'] = $this->get_item_product_url( $product );
 					if ( $this->get_item_image_url( $product ) ) {

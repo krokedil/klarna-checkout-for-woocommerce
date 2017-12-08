@@ -1,7 +1,7 @@
-/* global klarna_checkout_for_woocommerce_params */
+/* global kco_params */
 jQuery(function($) {
 	// Check if we have params.
-	if ( typeof klarna_checkout_for_woocommerce_params === 'undefined' ) {
+	if ( typeof kco_params === 'undefined' ) {
 		return false;
 	}
 
@@ -25,12 +25,12 @@ jQuery(function($) {
 		selectAnotherSelector: '#klarna-checkout-select-other',
 
 		documentReady: function() {
-			kco_wc.log(klarna_checkout_for_woocommerce_params);
+			kco_wc.log(kco_params);
 
 			if (kco_wc.paymentMethodEl.length > 0) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter(':checked').val();
 			} else {
-				kco_wc.paymentMethod = 'klarna_checkout_for_woocommerce';
+				kco_wc.paymentMethod = 'kco';
 			}
 
 			kco_wc.confirmLoading();
@@ -93,10 +93,10 @@ jQuery(function($) {
 
 			$.ajax({
 				type: 'POST',
-				url: klarna_checkout_for_woocommerce_params.update_extra_fields_url,
+				url: kco_params.update_extra_fields_url,
 				data: {
 					extra_fields_values: kco_wc.extraFieldsValues,
-					nonce: klarna_checkout_for_woocommerce_params.update_extra_fields_nonce
+					nonce: kco_params.update_extra_fields_nonce
 				},
 				success: function (data) {},
 				error: function (data) {},
@@ -112,10 +112,10 @@ jQuery(function($) {
 
 				$.ajax({
 					type: 'POST',
-					url: klarna_checkout_for_woocommerce_params.update_order_notes_url,
+					url: kco_params.update_order_notes_url,
 					data: {
 						order_notes: kco_wc.orderNotesValue,
-						nonce: klarna_checkout_for_woocommerce_params.update_order_notes_nonce
+						nonce: kco_params.update_order_notes_nonce
 					},
 					success: function (data) {},
 					error: function (data) {},
@@ -129,9 +129,9 @@ jQuery(function($) {
 		updateKlarnaOrder: function() {
 			$.ajax({
 				type: 'POST',
-				url: klarna_checkout_for_woocommerce_params.update_klarna_order_url,
+				url: kco_params.update_klarna_order_url,
 				data: {
-					nonce: klarna_checkout_for_woocommerce_params.update_klarna_order_nonce
+					nonce: kco_params.update_klarna_order_nonce
 				},
 				dataType: 'json',
 				success: function(data) {
@@ -162,9 +162,9 @@ jQuery(function($) {
 				dataType: 'json',
 				data: {
 					kco: false,
-					nonce: klarna_checkout_for_woocommerce_params.change_payment_method_nonce
+					nonce: kco_params.change_payment_method_nonce
 				},
-				url: klarna_checkout_for_woocommerce_params.change_payment_method_url,
+				url: kco_params.change_payment_method_url,
 				success: function (data) {},
 				error: function (data) {},
 				complete: function (data) {
@@ -178,7 +178,7 @@ jQuery(function($) {
 		maybeChangeToKco: function() {
 			kco_wc.log($(this).val());
 
-			if ( 'klarna_checkout_for_woocommerce' === $(this).val() ) {
+			if ( 'kco' === $(this).val() ) {
 				$('.woocommerce-info').remove();
 
 				$(kco_wc.checkoutFormSelector).block({
@@ -193,10 +193,10 @@ jQuery(function($) {
 					type: 'POST',
 					data: {
 						kco: true,
-						nonce: klarna_checkout_for_woocommerce_params.change_payment_method_nonce
+						nonce: kco_params.change_payment_method_nonce
 					},
 					dataType: 'json',
-					url: klarna_checkout_for_woocommerce_params.change_payment_method_url,
+					url: kco_params.change_payment_method_url,
 					success: function (data) {},
 					error: function (data) {},
 					complete: function (data) {
@@ -208,15 +208,15 @@ jQuery(function($) {
 		},
 
 		checkoutError: function() {
-			if ('klarna_checkout_for_woocommerce' === kco_wc.paymentMethod) {
+			if ('kco' === kco_wc.paymentMethod) {
 				$.ajax({
 					type: 'POST',
 					dataType: 'json',
 					data: {
 						kco: false,
-						nonce: klarna_checkout_for_woocommerce_params.checkout_error_nonce
+						nonce: kco_params.checkout_error_nonce
 					},
-					url: klarna_checkout_for_woocommerce_params.checkout_error_url,
+					url: kco_params.checkout_error_url,
 					success: function (data) {
 					},
 					error: function (data) {
@@ -230,8 +230,8 @@ jQuery(function($) {
 		},
 
 		log: function(message) {
-			console.log(klarna_checkout_for_woocommerce_params.logging);
-			if (klarna_checkout_for_woocommerce_params.logging) {
+			console.log(kco_params.logging);
+			if (kco_params.logging) {
 				console.log(message);
 			}
 		},
@@ -265,12 +265,12 @@ jQuery(function($) {
 
 							$.ajax(
 								{
-									url: klarna_checkout_for_woocommerce_params.iframe_change_url,
+									url: kco_params.iframe_change_url,
 									type: 'POST',
 									dataType: 'json',
 									data: {
 										data: data,
-										nonce: klarna_checkout_for_woocommerce_params.iframe_change_nonce
+										nonce: kco_params.iframe_change_nonce
 									},
 									success: function (response) {
 										kco_wc.log(response);

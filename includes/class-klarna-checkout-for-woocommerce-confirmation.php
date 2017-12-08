@@ -98,7 +98,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		<script>
 			jQuery(function ($) {
 				$('input#terms').prop('checked', true);
-				$('input#payment_method_klarna_checkout_for_woocommerce').prop('checked', true);
+				$('input#payment_method_kco').prop('checked', true);
 
 				<?php
 				$extra_field_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
@@ -210,7 +210,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * @return mixed
 	 */
 	public function unrequire_fields( $fields ) {
-		if ( 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_payment_method' ) ) {
+		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
 			foreach ( $fields as $fieldset_key => $fieldset ) {
 				foreach ( $fieldset as $key => $field ) {
 					$fields[ $fieldset_key ][ $key ]['required']        = '';
@@ -230,7 +230,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * @return mixed
 	 */
 	public function unrequire_posted_data( $data ) {
-		if ( 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_payment_method' ) ) {
+		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
 			foreach ( $data as $key => $value ) {
 				if ( '' === $value ) {
 					unset( $data[ $key ] );

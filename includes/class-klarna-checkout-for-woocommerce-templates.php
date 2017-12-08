@@ -52,9 +52,9 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 				$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 
 				// Klarna checkout page.
-				if ( array_key_exists( 'klarna_checkout_for_woocommerce', $available_gateways ) ) {
+				if ( array_key_exists( 'kco', $available_gateways ) ) {
 					// If chosen payment method exists.
-					if ( 'klarna_checkout_for_woocommerce' === WC()->session->get( 'chosen_payment_method' ) ) {
+					if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
 						if ( ! isset( $_GET['confirm'] ) ) {
 							$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
 						}
@@ -64,7 +64,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 					if ( null === WC()->session->get( 'chosen_payment_method' ) || '' === WC()->session->get( 'chosen_payment_method' ) ) {
 						reset( $available_gateways );
 
-						if ( 'klarna_checkout_for_woocommerce' === key( $available_gateways ) ) {
+						if ( 'kco' === key( $available_gateways ) ) {
 							if ( ! isset( $_GET['confirm'] ) ) {
 								$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
 							}
@@ -76,7 +76,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 						if ( ! array_key_exists( WC()->session->get( 'chosen_payment_method' ), $available_gateways ) ) {
 							reset( $available_gateways );
 
-							if ( 'klarna_checkout_for_woocommerce' === key( $available_gateways ) ) {
+							if ( 'kco' === key( $available_gateways ) ) {
 								if ( ! isset( $_GET['confirm'] ) ) {
 									$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
 								}
