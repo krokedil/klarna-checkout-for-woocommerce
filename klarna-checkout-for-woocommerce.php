@@ -5,7 +5,7 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 0.1-alpha
+ * Version: 1.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
@@ -160,7 +160,6 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			$setting_link = $this->get_setting_link();
 			$plugin_links = array(
 				'<a href="' . $setting_link . '">' . __( 'Settings', 'klarna-checkout-for-woocommerce' ) . '</a>',
-				'<a href="https://krokedil.se/">' . __( 'Docs', 'klarna-checkout-for-woocommerce' ) . '</a>',
 				'<a href="http://krokedil.se/">' . __( 'Support', 'klarna-checkout-for-woocommerce' ) . '</a>',
 			);
 
@@ -192,7 +191,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			 * - no: show install button
 			 */
 
-			$plugin_slug = 'klarna-order-management-for-woocommerce'; // TEMPORARILY using this plugin, until OM is added to wp.org.
+			$plugin_slug = 'klarna-order-management-for-woocommerce';
 
 			// If plugin file exists.
 			if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
