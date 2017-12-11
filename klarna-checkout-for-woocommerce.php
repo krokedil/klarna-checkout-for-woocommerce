@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: Klarna Checkout for WooCommerce
- * Plugin URI: https://krokedil.com/
+ * Plugin URI: https://krokedil.com/klarna/
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
