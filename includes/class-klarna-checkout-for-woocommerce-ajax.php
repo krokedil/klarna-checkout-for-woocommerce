@@ -57,7 +57,8 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		$cart = $values['cart'];
 
 		foreach ( $cart as $cart_key => $cart_value ) {
-			WC()->cart->set_quantity( $cart_key, $cart_value['qty'], false );
+			$new_quantity = (int) $cart_value['qty'];
+			WC()->cart->set_quantity( $cart_key, $new_quantity, false );
 		}
 
 		WC()->cart->calculate_shipping();

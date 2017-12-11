@@ -159,44 +159,42 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 */
 	private function save_customer_data( $klarna_order ) {
 		// First name.
-		WC()->customer->set_billing_first_name( $klarna_order->billing_address->given_name );
-		WC()->customer->set_shipping_first_name( $klarna_order->shipping_address->given_name );
+		WC()->customer->set_billing_first_name( sanitize_text_field( $klarna_order->billing_address->given_name ) );
+		WC()->customer->set_shipping_first_name( sanitize_text_field( $klarna_order->shipping_address->given_name ) );
 
 		// Last name.
-		WC()->customer->set_billing_last_name( $klarna_order->billing_address->family_name );
-		WC()->customer->set_shipping_last_name( $klarna_order->shipping_address->family_name );
-
-		// Company.
-
+		WC()->customer->set_billing_last_name( sanitize_text_field( $klarna_order->billing_address->family_name ) );
+		WC()->customer->set_shipping_last_name( sanitize_text_field( $klarna_order->shipping_address->family_name ) );
+		
 		// Country.
-		WC()->customer->set_billing_country( strtoupper( $klarna_order->billing_address->country ) );
-		WC()->customer->set_shipping_country( strtoupper( $klarna_order->shipping_address->country ) );
+		WC()->customer->set_billing_country( strtoupper( sanitize_text_field( $klarna_order->billing_address->country ) ) );
+		WC()->customer->set_shipping_country( strtoupper( sanitize_text_field( $klarna_order->shipping_address->country ) ) );
 
 		// Street address 1.
-		WC()->customer->set_billing_address_1( $klarna_order->billing_address->street_address );
-		WC()->customer->set_shipping_address_1( $klarna_order->shipping_address->street_address );
+		WC()->customer->set_billing_address_1( sanitize_text_field( $klarna_order->billing_address->street_address ) );
+		WC()->customer->set_shipping_address_1( sanitize_text_field( $klarna_order->shipping_address->street_address ) );
 
 		// Street address 2.
-		WC()->customer->set_billing_address_2( $klarna_order->billing_address->street_address2 );
-		WC()->customer->set_shipping_address_2( $klarna_order->shipping_address->street_address2 );
+		WC()->customer->set_billing_address_2( sanitize_text_field( $klarna_order->billing_address->street_address2 ) );
+		WC()->customer->set_shipping_address_2( sanitize_text_field( $klarna_order->shipping_address->street_address2 ) );
 
 		// City.
-		WC()->customer->set_billing_city( $klarna_order->billing_address->city );
-		WC()->customer->set_shipping_city( $klarna_order->shipping_address->city );
+		WC()->customer->set_billing_city( sanitize_text_field( $klarna_order->billing_address->city ) );
+		WC()->customer->set_shipping_city( sanitize_text_field( $klarna_order->shipping_address->city ) );
 
 		// County/State.
-		WC()->customer->set_billing_state( $klarna_order->billing_address->region );
-		WC()->customer->set_shipping_state( $klarna_order->shipping_address->region );
+		WC()->customer->set_billing_state( sanitize_text_field( $klarna_order->billing_address->region ) );
+		WC()->customer->set_shipping_state( sanitize_text_field( $klarna_order->shipping_address->region ) );
 
 		// Postcode.
-		WC()->customer->set_billing_postcode( $klarna_order->billing_address->postal_code );
-		WC()->customer->set_shipping_postcode( $klarna_order->shipping_address->postal_code );
+		WC()->customer->set_billing_postcode( sanitize_text_field( $klarna_order->billing_address->postal_code ) );
+		WC()->customer->set_shipping_postcode( sanitize_text_field( $klarna_order->shipping_address->postal_code ) );
 
 		// Phone.
-		WC()->customer->set_billing_phone( $klarna_order->billing_address->phone );
+		WC()->customer->set_billing_phone( sanitize_text_field( $klarna_order->billing_address->phone ) );
 
 		// Email.
-		WC()->customer->set_billing_email( $klarna_order->billing_address->email );
+		WC()->customer->set_billing_email( sanitize_text_field( $klarna_order->billing_address->email ) );
 
 		WC()->customer->save();
 	}

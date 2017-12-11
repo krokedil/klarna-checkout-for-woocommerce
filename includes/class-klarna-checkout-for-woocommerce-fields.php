@@ -201,49 +201,49 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'type'        => 'color',
 				'description' => __( 'Checkout page button color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
-				'desc_tip'    => true
+				'desc_tip'    => true,
 			),
 			'color_button_text'        => array(
 				'title'       => __( 'Checkout button text color', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'color',
 				'description' => __( 'Checkout page button text color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
-				'desc_tip'    => true
+				'desc_tip'    => true,
 			),
 			'color_checkbox'           => array(
 				'title'       => __( 'Checkout checkbox color', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'color',
 				'description' => __( 'Checkout page checkbox color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
-				'desc_tip'    => true
+				'desc_tip'    => true,
 			),
 			'color_checkbox_checkmark' => array(
 				'title'       => __( 'Checkout checkbox checkmark color', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'color',
 				'description' => __( 'Checkout page checkbox checkmark color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
-				'desc_tip'    => true
+				'desc_tip'    => true,
 			),
 			'color_header'             => array(
 				'title'       => __( 'Checkout header color', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'color',
 				'description' => __( 'Checkout page header color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
-				'desc_tip'    => true
+				'desc_tip'    => true,
 			),
 			'color_link'               => array(
 				'title'       => __( 'Checkout link color', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'color',
 				'description' => __( 'Checkout page link color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
-				'desc_tip'    => true
+				'desc_tip'    => true,
 			),
 			'radius_border'            => array(
 				'title'       => __( 'Checkout radius border (px)', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'number',
 				'description' => __( 'Checkout page radius border in pixels', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
-				'desc_tip'    => true
+				'desc_tip'    => true,
 			),
 		) );
 	}

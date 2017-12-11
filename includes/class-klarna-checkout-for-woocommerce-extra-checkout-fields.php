@@ -64,7 +64,7 @@ class Klarna_Checkout_For_WooCommerce_Extra_Checkout_Fields {
 	 * Returns list of WooCommerce checkout fields that can NOT be populated using information from Klarna.
 	 */
 	public function get_remaining_checkout_fields() {
-		$all_fields = $this->get_all_checkout_fields();
+		$all_fields    = $this->get_all_checkout_fields();
 		$klarna_fields = $this->get_klarna_checkout_fields();
 
 		foreach ( $klarna_fields['billing'] as $field ) {
