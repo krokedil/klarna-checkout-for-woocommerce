@@ -226,7 +226,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 */
 	public function admin_footer_text( $text ) {
 		if ( isset( $_GET['section'] ) && 'kco' === $_GET['section'] ) {
-			$text = 'If you like Klarna Checkout for WooCommerce, please consider <strong><a href="#">assigning Krokedil as your integration partner</a></strong>.';
+			$text = 'If you like Klarna Checkout for WooCommerce, please consider <strong>assigning Krokedil as your integration partner.</strong>.';
 		}
 
 		return $text;

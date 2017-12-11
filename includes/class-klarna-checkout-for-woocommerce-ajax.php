@@ -107,7 +107,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		}
 
 		if ( is_array( $_POST['extra_fields_values'] ) ) {
-			$values = array_map( 'wp_kses_post', $_POST['extra_fields_values'] );
+			$values = array_map( 'sanitize_textarea_field', $_POST['extra_fields_values'] );
 			WC()->session->set( 'kco_wc_extra_fields_values', $values );
 		}
 
@@ -174,7 +174,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		}
 
 		if ( isset( $_REQUEST['data'] ) && is_array( $_REQUEST['data'] ) ) {
-			$address = $_REQUEST['data'];
+			$address = array_map( 'sanitize_text_field', $_REQUEST['data'] );
 		}
 
 		$countries = array(

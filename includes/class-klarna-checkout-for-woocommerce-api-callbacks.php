@@ -61,7 +61,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			return;
 		}
 
-		$klarna_order_id = $_GET['kco_wc_order_id'];
+		$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
 
 		$query_args = array(
 			'post_type'   => wc_get_order_types(),
@@ -125,7 +125,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$order_id = '';
 
 		if ( $_GET['kco_wc_order_id']) { // KCO.
-			$klarna_order_id = $_GET['kco_wc_order_id'];
+			$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
 			$query_args = array(
 				'post_type'   => wc_get_order_types(),
 				'post_status' => array_keys( wc_get_order_statuses() ),
