@@ -45,7 +45,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
 			$klarna_order = json_decode( $response['body'] );
-			$this->save_order_id_to_session( $klarna_order->order_id );
+			$this->save_order_id_to_session( sanitize_key( $klarna_order->order_id ) );
 			$this->save_order_api_to_session( $klarna_order );
 
 			return $klarna_order;

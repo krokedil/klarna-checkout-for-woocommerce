@@ -202,10 +202,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		if ( $order_id ) {
 			// Set WC order transaction ID.
 			$order = wc_get_order( $order_id );
-			$order->set_transaction_id( $klarna_order->order_id );
+			$order->set_transaction_id( sanitize_key( $klarna_order->order_id ) );
 			$order->save();
 
-			add_post_meta( $order_id, '_wc_klarna_order_id', $klarna_order->order_id );
+			add_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order->order_id ) );
 
 			$environment = $this->testmode ? 'test' : 'live';
 			update_post_meta( $order_id, '_wc_klarna_environment', $environment );

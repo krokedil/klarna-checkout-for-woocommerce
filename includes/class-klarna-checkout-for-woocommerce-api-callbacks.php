@@ -87,7 +87,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 				$order->payment_complete( $klarna_order_id );
-				$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . $klarna_order->order_id );
+				$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . sanitize_key( $klarna_order->order_id ) );
 			} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
 				$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
 			}
@@ -346,7 +346,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 			$order->payment_complete( $klarna_order_id );
-			$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . $klarna_order->order_id );
+			$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . sanitize_key( $klarna_order->order_id ) );
 		} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
 			$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
 		}
