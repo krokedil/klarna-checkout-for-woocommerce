@@ -532,9 +532,14 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		if ( kco_wc_prefill_allowed() ) {
 			$request_args['billing_address'] = array(
-				'email'       => WC()->checkout()->get_value( 'billing_email' ),
-				'postal_code' => WC()->checkout()->get_value( 'billing_postcode' ),
-				'country'     => WC()->checkout()->get_value( 'billing_country' ),
+				'email'          => WC()->checkout()->get_value( 'billing_email' ),
+				'postal_code'    => WC()->checkout()->get_value( 'billing_postcode' ),
+				'country'        => WC()->checkout()->get_value( 'billing_country' ),
+				'phone'          => WC()->checkout()->get_value( 'billing_phone' ),
+				'given_name'     => WC()->checkout()->get_value( 'billing_first_name' ),
+				'family_name'    => WC()->checkout()->get_value( 'billing_last_name' ),
+				'street_address' => WC()->checkout()->get_value( 'billing_address_1' ),
+				'city'           => WC()->checkout()->get_value( 'billing_city' ),
 			);
 		}
 
@@ -550,7 +555,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			}
 
 			$request_args['options']['date_of_birth_mandatory'] = $this->get_dob_mandatory();
-			$request_args['options']['title_mandatory'] = $this->get_title_mandatory();
+			$request_args['options']['title_mandatory']         = $this->get_title_mandatory();
 		}
 
 		$request_body = wp_json_encode( apply_filters( 'kco_wc_api_request_args', $request_args ) );
