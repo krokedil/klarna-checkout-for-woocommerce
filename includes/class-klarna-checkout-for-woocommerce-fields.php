@@ -125,6 +125,12 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'yes',
 				'desc_tip'    => true,
 			),
+			'prefill_consent'         => array(
+				'title'   => __( 'Show prefill consent notice', 'klarna-checkout-for-woocommerce' ),
+				'label'   => __( 'Only applicable for stores based in Germany and Austria', 'klarna-checkout-for-woocommerce' ),
+				'type'    => 'checkbox',
+				'default' => 'yes',
+			),
 			'offer_local_at'          => array(
 				'title'       => __( 'Offer local payment methods for AT customers', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Only valid when paying in EUR.', 'klarna-checkout-for-woocommerce' ),

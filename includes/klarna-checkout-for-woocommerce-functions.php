@@ -109,8 +109,13 @@ if ( ! function_exists( 'kco_wc_show_extra_fields' ) ) {
  * Is it OK to prefill customer data?
  */
 function kco_wc_prefill_allowed() {
-	if ( 'DE' === WC()->checkout()->get_value( 'billing_country' ) ) {
-		if ( is_user_logged_in() && WC()->session->get( 'kco_wc_prefill_consent', false ) ) {
+	$base_location = wc_get_base_location();
+
+	if ( 'DE' === $base_location['country'] || 'AT' === $base_location['country'] ) {
+		$settings                = get_option( 'woocommerce_kco_settings' );
+		$consent_setting_checked = ( isset( $settings['prefill_consent'] ) && 'yes' === $settings['prefill_consent'] );
+
+		if ( $consent_setting_checked && is_user_logged_in() && WC()->session->get( 'kco_wc_prefill_consent', false ) ) {
 			return true;
 		}
 
@@ -147,7 +152,8 @@ function kco_wc_prefill_consent() {
 	}
 	?>
 	<p><a class="button" href="<?php echo $consent_url; ?>"><?php echo $button_text; ?></a></p>
-	<p><a href="#TB_inline?width=600&height=550&inlineId=consent-text" class="thickbox"><?php echo $link_text; ?></a></p>
+	<p><a href="#TB_inline?width=600&height=550&inlineId=consent-text" class="thickbox"><?php echo $link_text; ?></a>
+	</p>
 	<div id="consent-text" style="display:none;">
 		<p><?php echo $popup_text; ?></p>
 	</div>

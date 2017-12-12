@@ -541,7 +541,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 				'street_address'  => WC()->checkout()->get_value( 'billing_address_1' ),
 				'street_address2' => WC()->checkout()->get_value( 'billing_address_2' ),
 				'city'            => WC()->checkout()->get_value( 'billing_city' ),
-				'region'          => WC()->checkout()->get_value( 'state' ),
+				'region'          => WC()->checkout()->get_value( 'billing_state' ),
 			);
 		}
 
