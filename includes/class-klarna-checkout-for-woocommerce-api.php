@@ -532,14 +532,16 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		if ( kco_wc_prefill_allowed() ) {
 			$request_args['billing_address'] = array(
-				'email'          => WC()->checkout()->get_value( 'billing_email' ),
-				'postal_code'    => WC()->checkout()->get_value( 'billing_postcode' ),
-				'country'        => WC()->checkout()->get_value( 'billing_country' ),
-				'phone'          => WC()->checkout()->get_value( 'billing_phone' ),
-				'given_name'     => WC()->checkout()->get_value( 'billing_first_name' ),
-				'family_name'    => WC()->checkout()->get_value( 'billing_last_name' ),
-				'street_address' => WC()->checkout()->get_value( 'billing_address_1' ),
-				'city'           => WC()->checkout()->get_value( 'billing_city' ),
+				'email'           => WC()->checkout()->get_value( 'billing_email' ),
+				'postal_code'     => WC()->checkout()->get_value( 'billing_postcode' ),
+				'country'         => WC()->checkout()->get_value( 'billing_country' ),
+				'phone'           => WC()->checkout()->get_value( 'billing_phone' ),
+				'given_name'      => WC()->checkout()->get_value( 'billing_first_name' ),
+				'family_name'     => WC()->checkout()->get_value( 'billing_last_name' ),
+				'street_address'  => WC()->checkout()->get_value( 'billing_address_1' ),
+				'street_address2' => WC()->checkout()->get_value( 'billing_address_2' ),
+				'city'            => WC()->checkout()->get_value( 'billing_city' ),
+				'region'          => WC()->checkout()->get_value( 'state' ),
 			);
 		}
 
