@@ -528,7 +528,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'order_lines'                     => KCO_WC()->order_lines->get_order_lines(),
 			'shipping_countries'              => $this->get_shipping_countries(),
 			'allow_separate_shipping_address' => $this->get_allow_separate_shipping_address(),
-			'dob_mandatory'                   => $this->get_dob_mandatory(),
 			'title_mandatory'                 => $this->get_title_mandatory(),
 		);
 
@@ -541,6 +540,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 		}
 
 		if ( 'create' === $request_type ) {
+			$request_args['options'] = array();
+
 			if ( $this->get_iframe_colors() ) {
 				$request_args['options'] = $this->get_iframe_colors();
 			}
@@ -548,6 +549,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 			if ( $this->get_shipping_details() ) {
 				$request_args['options']['shipping_details'] = $this->get_shipping_details();
 			}
+
+			$request_args['options']['date_of_birth_mandatory'] = $this->get_dob_mandatory();
 		}
 
 		$request_body = wp_json_encode( apply_filters( 'kco_wc_api_request_args', $request_args ) );

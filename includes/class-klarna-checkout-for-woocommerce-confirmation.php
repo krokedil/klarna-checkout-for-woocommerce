@@ -106,7 +106,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 				foreach ( $extra_field_values as $field_name => $field_value ) { ?>
 
 				var elementName = "<?php echo $field_name; ?>";
-				var elementValue = "<?php echo $field_value; ?>";
+				var elementValue = <?php echo wp_json_encode( $field_value ); ?>;
 				var element = $('*[name="' + elementName + '"]');
 
 				console.log(elementName);
@@ -165,7 +165,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		// Last name.
 		WC()->customer->set_billing_last_name( sanitize_text_field( $klarna_order->billing_address->family_name ) );
 		WC()->customer->set_shipping_last_name( sanitize_text_field( $klarna_order->shipping_address->family_name ) );
-		
+
 		// Country.
 		WC()->customer->set_billing_country( strtoupper( sanitize_text_field( $klarna_order->billing_address->country ) ) );
 		WC()->customer->set_shipping_country( strtoupper( sanitize_text_field( $klarna_order->shipping_address->country ) ) );
