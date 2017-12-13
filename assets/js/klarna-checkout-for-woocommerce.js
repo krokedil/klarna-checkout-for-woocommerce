@@ -66,7 +66,6 @@ jQuery(function($) {
 
 		updateCart: function () {
 			kco_wc.kcoSuspend();
-			$('body').trigger('update_checkout');
 
 			$.ajax({
 				type: 'POST',
@@ -81,6 +80,7 @@ jQuery(function($) {
 				error: function(data) {
 				},
 				complete: function(data) {
+					$('body').trigger('update_checkout');
 					kco_wc.kcoResume();
 				}
 			});
