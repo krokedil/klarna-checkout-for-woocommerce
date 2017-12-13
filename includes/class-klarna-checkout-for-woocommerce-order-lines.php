@@ -254,7 +254,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$item_tax_amount = $cart_item['line_tax'] * 100;
 		}
 
-		return (int) $item_tax_amount;
+		return round( $item_tax_amount );
 	}
 
 	/**
@@ -308,7 +308,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		}
 		$item_price = $item_subtotal * 100 / $cart_item['quantity'];
 
-		return (int) $item_price;
+		return round( $item_price );
 	}
 
 	/**
@@ -322,7 +322,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @return integer $item_quantity Cart item quantity.
 	 */
 	public function get_item_quantity( $cart_item ) {
-		return (int) $cart_item['quantity'];
+		return round( $cart_item['quantity'] );
 	}
 
 	/**
@@ -369,7 +369,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$item_discount_amount = 0;
 		}
 
-		return (int) $item_discount_amount;
+		return round( $item_discount_amount );
 	}
 
 	/**
@@ -419,7 +419,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	public function get_item_discount_rate( $cart_item ) {
 		$item_discount_rate = ( 1 - ( $cart_item['line_total'] / $cart_item['line_subtotal'] ) ) * 100 * 100;
 
-		return (int) $item_discount_rate;
+		return round( $item_discount_rate );
 	}
 
 	/**
@@ -439,7 +439,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$item_total_amount = ( ( $cart_item['line_total'] + $cart_item['line_tax'] ) * 100 );
 		}
 
-		return (int) $item_total_amount;
+		return round( $item_total_amount );
 	}
 
 	/**
@@ -513,7 +513,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$shipping_amount = (int) number_format( ( WC()->cart->shipping_total + WC()->cart->shipping_tax_total ) * 100, 0, '', '' );
 		}
 
-		return (int) $shipping_amount;
+		return $shipping_amount;
 	}
 
 	/**
@@ -531,7 +531,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$shipping_tax_rate = 0;
 		}
 
-		return (int) $shipping_tax_rate;
+		return round( $shipping_tax_rate );
 	}
 
 	/**
@@ -549,7 +549,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$shipping_tax_amount = WC()->cart->shipping_tax_total * 100;
 		}
 
-		return (int) $shipping_tax_amount;
+		return round( $shipping_tax_amount );
 	}
 
 }

@@ -519,15 +519,14 @@ class Klarna_Checkout_For_WooCommerce_API {
 		KCO_WC()->order_lines->process_data();
 
 		$request_args = array(
-			'purchase_country'                => $this->get_purchase_country(),
-			'purchase_currency'               => $this->get_purchase_currency(),
-			'locale'                          => $this->get_purchase_locale(),
-			'merchant_urls'                   => $this->get_merchant_urls(),
-			'order_amount'                    => KCO_WC()->order_lines->get_order_amount(),
-			'order_tax_amount'                => KCO_WC()->order_lines->get_order_tax_amount(),
-			'order_lines'                     => KCO_WC()->order_lines->get_order_lines(),
-			'shipping_countries'              => $this->get_shipping_countries(),
-			'allow_separate_shipping_address' => $this->get_allow_separate_shipping_address(),
+			'purchase_country'   => $this->get_purchase_country(),
+			'purchase_currency'  => $this->get_purchase_currency(),
+			'locale'             => $this->get_purchase_locale(),
+			'merchant_urls'      => $this->get_merchant_urls(),
+			'order_amount'       => KCO_WC()->order_lines->get_order_amount(),
+			'order_tax_amount'   => KCO_WC()->order_lines->get_order_tax_amount(),
+			'order_lines'        => KCO_WC()->order_lines->get_order_lines(),
+			'shipping_countries' => $this->get_shipping_countries(),
 		);
 
 		if ( kco_wc_prefill_allowed() ) {
@@ -545,19 +544,17 @@ class Klarna_Checkout_For_WooCommerce_API {
 			);
 		}
 
-		if ( 'create' === $request_type ) {
-			$request_args['options'] = array();
+		$request_args['options']                                    = array();
+		$request_args['options']['allow_separate_shipping_address'] = $this->get_allow_separate_shipping_address();
+		$request_args['options']['date_of_birth_mandatory']         = $this->get_dob_mandatory();
+		$request_args['options']['title_mandatory']                 = $this->get_title_mandatory();
 
-			if ( $this->get_iframe_colors() ) {
-				$request_args['options'] = $this->get_iframe_colors();
-			}
+		if ( $this->get_iframe_colors() ) {
+			$request_args['options'] = array_merge( $request_args['options'], $this->get_iframe_colors() );
+		}
 
-			if ( $this->get_shipping_details() ) {
-				$request_args['options']['shipping_details'] = $this->get_shipping_details();
-			}
-
-			$request_args['options']['date_of_birth_mandatory'] = $this->get_dob_mandatory();
-			$request_args['options']['title_mandatory']         = $this->get_title_mandatory();
+		if ( $this->get_shipping_details() ) {
+			$request_args['options']['shipping_details'] = $this->get_shipping_details();
 		}
 
 		$request_body = wp_json_encode( apply_filters( 'kco_wc_api_request_args', $request_args ) );

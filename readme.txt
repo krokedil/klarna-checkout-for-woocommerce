@@ -1,4 +1,4 @@
-=== Klarna Payments for WooCommerce ===
+=== Klarna Checkout for WooCommerce ===
 Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna
 Donate link: https://klarna.com
