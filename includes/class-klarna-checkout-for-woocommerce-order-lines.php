@@ -58,6 +58,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		$this->process_shipping();
 		$this->process_sales_tax();
 		$this->process_coupons();
+		$this->process_fees();
 	}
 
 	/**
@@ -207,6 +208,44 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					);
 					$this->order_lines[] = $discount;
 				}
+			} // End foreach().
+		} // End if().
+	}
+
+	/**
+	 * Process cart fees.
+	 */
+	public function process_fees() {
+		if ( ! empty( WC()->cart->get_fees() ) ) {
+			foreach ( WC()->cart->get_fees() as $fee_key => $fee ) {
+				if ( $this->separate_sales_tax ) {
+					$fee_tax_rate = 0;
+				} else {
+					$_tax      = new WC_Tax();
+					$tmp_rates = $_tax->get_rates( $fee->tax_class );
+					$vat       = array_shift( $tmp_rates );
+
+					if ( isset( $vat['rate'] ) ) {
+						$fee_tax_rate = round( $vat['rate'] * 100 );
+					} else {
+						$fee_tax_rate = 0;
+					}
+				}
+
+				// Add separate discount line item, but only if it's a smart coupon or country is US.
+				$fee_item = array(
+					'type'                  => 'shipping_fee',
+					'reference'             => $fee->id,
+					'name'                  => $fee->name,
+					'quantity'              => 1,
+					'unit_price'            => round( ( $fee->amount + $fee->tax ) * 100 ),
+					'tax_rate'              => $fee_tax_rate,
+					'total_amount'          => round( ( $fee->amount + $fee->tax ) * 100 ),
+					'total_discount_amount' => 0,
+					'total_tax_amount'      => round( $fee->tax * 100 ),
+				);
+
+				$this->order_lines[] = $fee_item;
 			} // End foreach().
 		} // End if().
 	}
