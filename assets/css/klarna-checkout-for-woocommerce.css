@@ -11,6 +11,10 @@
 	display: inline-block;
 }
 
+#kco-order-review table.woocommerce-checkout-review-order-table .product-name {
+	width: auto;
+}
+
 @media only screen and (min-width : 769px) {
 	#kco-order-review {
 		float: left;
