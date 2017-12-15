@@ -90,9 +90,11 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . sanitize_key( $klarna_order->order_id ) );
 			} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
 				$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
+			} elseif ( 'PENDING' === $klarna_order->fraud_status ) {
+				$order->update_status( 'on-hold', 'Klarna order is under review, order ID: ' . $klarna_order->order_id );
 			}
 
-			KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
+				KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
 			KCO_WC()->api->request_post_set_merchant_reference(
 				$klarna_order_id,
 				array(
@@ -233,6 +235,10 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 	/**
 	 * Backup order creation, in case checkout process failed.
+	 *
+	 * @param string $klarna_order_id Klarna order ID.
+	 *
+	 * @throws Exception WC_Data_Exception.
 	 */
 	public function backup_order_creation( $klarna_order_id ) {
 		$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
@@ -240,6 +246,9 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		// Process customer data.
 		$this->process_customer_data( $klarna_order );
+
+		// Process customer data.
+		$this->process_cart( $klarna_order );
 
 		// Process order.
 		$this->process_order( $klarna_order );
@@ -250,7 +259,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 *
 	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
 	 *
-	 * @throws Exception.
+	 * @throws Exception WC_Data_Exception.
 	 */
 	private function process_customer_data( $klarna_order ) {
 		// First name.
@@ -294,11 +303,41 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		WC()->customer->save();
 	}
 
+
+	/**
+	 * Processes cart contents on backup order creation.
+	 *
+	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
+	 *
+	 * @throws Exception WC_Data_Exception.
+	 */
+	private function process_cart( $klarna_order ) {
+		WC()->cart->empty_cart();
+
+		foreach ( $klarna_order->order_lines as $cart_item ) {
+			if ( 'physical' === $cart_item->type ) {
+				WC()->cart->add_to_cart( $cart_item->reference, $cart_item->quantity );
+			}
+		}
+
+		WC()->cart->calculate_shipping();
+		WC()->cart->calculate_fees();
+		WC()->cart->calculate_totals();
+
+		// Check cart items (quantity, coupon validity etc).
+		if ( ! WC()->cart->check_cart_items() ) {
+			return;
+		}
+
+		WC()->cart->check_cart_coupons();
+	}
+
 	/**
 	 * Processes WooCommerce order on backup order creation.
 	 *
 	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
- 	 * @throws Exception.
+	 *
+	 * @throws Exception WC_Data_Exception.
 	 */
 	private function process_order( $klarna_order ) {
 		$order = new WC_Order();
@@ -340,7 +379,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		WC()->checkout()->create_order_shipping_lines( $order, WC()->session->get( 'chosen_shipping_methods' ), WC()->shipping->get_packages() );
 		WC()->checkout()->create_order_tax_lines( $order, WC()->cart );
 		WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
-
 
 		$order->save();
 
