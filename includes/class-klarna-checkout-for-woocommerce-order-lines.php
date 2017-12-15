@@ -219,8 +219,13 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( ! empty( WC()->cart->get_fees() ) ) {
 			foreach ( WC()->cart->get_fees() as $fee_key => $fee ) {
 				if ( $this->separate_sales_tax ) {
-					$fee_tax_rate = 0;
+					$fee_tax_rate   = 0;
+					$fee_tax_amount = 0;
+					$fee_amount     = round( $fee->amount * 100 );
 				} else {
+					$fee_tax_amount = round( $fee->tax * 100 );
+					$fee_amount     = round( ( $fee->amount + $fee->tax ) * 100 );
+
 					$_tax      = new WC_Tax();
 					$tmp_rates = $_tax->get_rates( $fee->tax_class );
 					$vat       = array_shift( $tmp_rates );
@@ -238,11 +243,11 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					'reference'             => $fee->id,
 					'name'                  => $fee->name,
 					'quantity'              => 1,
-					'unit_price'            => round( ( $fee->amount + $fee->tax ) * 100 ),
+					'unit_price'            => $fee_amount,
 					'tax_rate'              => $fee_tax_rate,
-					'total_amount'          => round( ( $fee->amount + $fee->tax ) * 100 ),
+					'total_amount'          => $fee_amount,
 					'total_discount_amount' => 0,
-					'total_tax_amount'      => round( $fee->tax * 100 ),
+					'total_tax_amount'      => $fee_tax_amount,
 				);
 
 				$this->order_lines[] = $fee_item;
