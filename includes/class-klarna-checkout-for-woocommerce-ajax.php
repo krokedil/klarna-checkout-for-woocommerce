@@ -178,18 +178,6 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$address = array_map( 'sanitize_text_field', $_REQUEST['data'] );
 		}
 
-		$countries = array(
-			'swe' => 'SE',
-			'gbr' => 'GB',
-			'fin' => 'FI',
-			'usa' => 'US',
-			'nld' => 'NL',
-			'nor' => 'NO',
-			'aut' => 'AT',
-			'deu' => 'DE',
-			'dnk' => 'DK',
-		);
-
 		$customer_data = array();
 
 		if ( isset( $address['email'] ) ) {
@@ -211,9 +199,10 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$customer_data['shipping_last_name'] = $address['family_name'];
 		}
 
-		if ( isset( $address['country'] ) && array_key_exists( $address['country'], $countries ) ) {
-			$customer_data['billing_country']  = $countries[ $address['country'] ];
-			$customer_data['shipping_country'] = $countries[ $address['country'] ];
+		if ( isset( $address['country'] ) && kco_wc_country_code_converter( $address['country'] ) ) {
+			$country                           = kco_wc_country_code_converter( $address['country'] );
+			$customer_data['billing_country']  = $country;
+			$customer_data['shipping_country'] = $country;
 		}
 
 		WC()->customer->set_props( $customer_data );
