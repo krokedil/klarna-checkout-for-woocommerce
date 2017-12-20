@@ -21,11 +21,13 @@
 		width: 40%;
 		padding-right: 20px;
 		font-size: 0.9em;
+		box-sizing: border-box;
 	}
 
 	#kco-iframe {
 		float: right;
 		width: 60%;
 		padding-left: 20px;
+		box-sizing: border-box;
 	}
 }
