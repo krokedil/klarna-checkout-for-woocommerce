@@ -557,6 +557,11 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$request_args['options']['shipping_details'] = $this->get_shipping_details();
 		}
 
+		// Allow external payment method plugin to do its thing.
+		if ( 'create' === $request_type ) {
+			$request_args = apply_filters( 'kco_wc_create_order', $request_args );
+		}
+
 		$request_body = wp_json_encode( apply_filters( 'kco_wc_api_request_args', $request_args ) );
 
 		return $request_body;

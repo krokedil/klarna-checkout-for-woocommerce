@@ -81,7 +81,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 		$response        = KCO_WC()->api->request_post_get_order( $klarna_order_id );
-		$klarna_order    = json_decode( $response['body'] );
+		$klarna_order    = apply_filters( 'kco_wc_klarna_order_pre_submit', json_decode( $response['body'] ) );
 
 		$this->save_customer_data( $klarna_order );
 	}
@@ -130,7 +130,10 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					}
 				}
 
-				<?php } ?>
+				<?php
+				}
+				do_action( 'kco_wc_before_submit' );
+				?>
 
 				$('.validate-required').removeClass('validate-required');
 				$('form.woocommerce-checkout').submit();
@@ -175,8 +178,10 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		WC()->customer->set_shipping_address_1( sanitize_text_field( $klarna_order->shipping_address->street_address ) );
 
 		// Street address 2.
-		WC()->customer->set_billing_address_2( sanitize_text_field( $klarna_order->billing_address->street_address2 ) );
-		WC()->customer->set_shipping_address_2( sanitize_text_field( $klarna_order->shipping_address->street_address2 ) );
+		if ( isset( $klarna_order->billing_address->street_address2 ) ) {
+			WC()->customer->set_billing_address_2( sanitize_text_field( $klarna_order->billing_address->street_address2 ) );
+			WC()->customer->set_shipping_address_2( sanitize_text_field( $klarna_order->shipping_address->street_address2 ) );
+		}
 
 		// City.
 		WC()->customer->set_billing_city( sanitize_text_field( $klarna_order->billing_address->city ) );
