@@ -74,6 +74,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		// If zero matching orders were found, return.
 		if ( empty( $orders ) ) {
+			// Backup order creation.
+			$this->backup_order_creation( $klarna_order_id );
 			return;
 		}
 
@@ -94,7 +96,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				$order->update_status( 'on-hold', 'Klarna order is under review, order ID: ' . $klarna_order->order_id );
 			}
 
-				KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
+			KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
 			KCO_WC()->api->request_post_set_merchant_reference(
 				$klarna_order_id,
 				array(

@@ -17,7 +17,7 @@ jQuery(function($) {
 		// Order notes
 		extraFieldsValues: {},
 		extraFieldsSelectorText: 'div#kco-extra-fields input[type="text"], div#kco-extra-fields input[type="password"], div#kco-extra-fields textarea',
-		extraFieldsSelectorNonText: 'div#kco-extra-fields select, div#kco-extra-fields input[type="radio"], div#kco-extra-fields input[type="checkbox"]',
+		extraFieldsSelectorNonText: 'div#kco-extra-fields select, div#kco-extra-fields input[type="radio"], div#kco-extra-fields input[type="checkbox"], div#kco-extra-fields input.checkout-date-picker',
 
 		// Payment method
 		paymentMethodEl: $('input[name="payment_method"]'),
@@ -32,6 +32,12 @@ jQuery(function($) {
 			} else {
 				kco_wc.paymentMethod = 'kco';
 			}
+
+			/*
+			$( '.checkout-date-picker' ).datepicker( 'option', 'onSelect', function(ttt, obj) {
+				$(this).val(ttt);
+			});
+			*/
 
 			kco_wc.confirmLoading();
 		},
