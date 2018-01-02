@@ -390,6 +390,15 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
 			$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
 		}
+		
+		KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
+		KCO_WC()->api->request_post_set_merchant_reference(
+			$klarna_order_id,
+			array(
+				'merchant_reference1' => $order->get_order_number(),
+				'merchant_reference2' => $order->get_id(),
+			)
+		);
 	}
 
 }
