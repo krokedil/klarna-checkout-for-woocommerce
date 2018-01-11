@@ -17,11 +17,14 @@ Klarna Checkout is a full checkout experience embedded on your site. It lets you
 
 == Changelog ==
 = 2018.01.11  	- version 1.1.1 =
+* Tweak			- Makes datepicker extra field work in checkout.
 * Fix			- Acknowledge order & set merchant reference in Klarnas system during backup order creation (on push notification).
+* Fix			- Fixes storing WC_Customer postal code.
 
 = 2017.12.20  	- version 1.1 =
-* Tweak			- Makes datepicker extra field work.
-* Fix			- Fixes storing WC_Customer postal code.
+* Tweak			- Allows external payment method plugin to work.
+* Tweak			- Adds border-box to floated elements in KCO page.
+* Fix			- Adds 3-letter to 2-letter country code translation.
 
 = 1.0 =
 * Initial release.
