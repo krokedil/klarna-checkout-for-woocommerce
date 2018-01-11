@@ -1,11 +1,11 @@
 === Klarna Checkout for WooCommerce ===
 Contributors: klarna, krokedil, automattic
-Tags: woocommerce, klarna
+Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 4.8
+Tested up to: 4.9.1
 Requires PHP: 5.6
-Stable tag: 1.1
+Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -16,5 +16,12 @@ Klarna Checkout is a full checkout experience embedded on your site. It lets you
 2. Activate the plugin through the "Plugins" menu in WordPress.
 
 == Changelog ==
+= 2018.01.11  	- version 1.1.1 =
+* Fix			- Acknowledge order & set merchant reference in Klarnas system during backup order creation (on push notification).
+
+= 2017.12.20  	- version 1.1 =
+* Tweak			- Makes datepicker extra field work.
+* Fix			- Fixes storing WC_Customer postal code.
+
 = 1.0 =
 * Initial release.
