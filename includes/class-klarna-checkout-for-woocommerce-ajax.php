@@ -24,13 +24,13 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 */
 	public static function add_ajax_events() {
 		$ajax_events = array(
-			'kco_wc_update_cart'           => true,
-			'kco_wc_update_shipping'       => true,
-			'kco_wc_update_extra_fields'   => true,
-			'kco_wc_change_payment_method' => true,
-			'kco_wc_update_klarna_order'   => true,
-			'kco_wc_iframe_change'         => true,
-			'kco_wc_checkout_error'        => true,
+			'kco_wc_update_cart'                    => true,
+			'kco_wc_update_shipping'                => true,
+			'kco_wc_update_extra_fields'            => true,
+			'kco_wc_change_payment_method'          => true,
+			'kco_wc_update_klarna_order'            => true,
+			'kco_wc_iframe_shipping_address_change' => true,
+			'kco_wc_checkout_error'                 => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -168,8 +168,8 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	/**
 	 * Iframe change callback function.
 	 */
-	public static function kco_wc_iframe_change() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_iframe_change' ) ) {
+	public static function kco_wc_iframe_shipping_address_change() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_iframe_shipping_address_change' ) ) {
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}

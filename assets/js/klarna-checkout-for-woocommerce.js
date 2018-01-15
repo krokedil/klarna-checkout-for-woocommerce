@@ -294,12 +294,12 @@ jQuery(function($) {
 
 							$.ajax(
 								{
-									url: kco_params.iframe_change_url,
+									url: kco_params.iframe_shipping_address_change_url,
 									type: 'POST',
 									dataType: 'json',
 									data: {
 										data: data,
-										nonce: kco_params.iframe_change_nonce
+										nonce: kco_params.iframe_shipping_address_change_nonce
 									},
 									success: function (response) {
 										kco_wc.log(response);
