@@ -280,8 +280,8 @@ jQuery(function($) {
 			if (typeof window._klarnaCheckout === 'function') {
 				window._klarnaCheckout(function (api) {
 					api.on({
-						'change': function(data) {
-							kco_wc.log('change', data);
+						'shipping_address_change': function(data) {
+							kco_wc.log('shipping_address_change', data);
 
 							$('table.woocommerce-checkout-review-order-table').block({
 								message: null,
@@ -315,8 +315,8 @@ jQuery(function($) {
 								}
 							);
 						},
-						'shipping_address_change': function(data) {
-							kco_wc.log('shipping_address_change', data);
+						'change': function(data) {
+							kco_wc.log('change', data);
 						},
 						'order_total_change': function(data) {
 							kco_wc.log('order_total_change', data);

@@ -203,6 +203,12 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$customer_data['shipping_last_name'] = $address['family_name'];
 		}
 
+		if ( isset( $address['region'] ) ) {
+			$customer_data['state']          = $address['region'];
+			$customer_data['billing_state']  = $address['region'];
+			$customer_data['shipping_state'] = $address['region'];
+		}
+
 		if ( isset( $address['country'] ) && kco_wc_country_code_converter( $address['country'] ) ) {
 			$country                           = kco_wc_country_code_converter( $address['country'] );
 			$customer_data['country']          = $country;
@@ -211,7 +217,6 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		}
 
 		WC()->customer->set_props( $customer_data );
-
 		WC()->customer->save();
 
 		WC()->cart->calculate_shipping();
@@ -231,7 +236,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 * Handles WooCommerce checkout error, after Klarna order has already been created.
 	 */
 	public static function kco_wc_checkout_error() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_checkout_error' ) ) {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_checkout_error' ) ) { // Input var okay.
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
