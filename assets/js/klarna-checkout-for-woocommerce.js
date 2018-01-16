@@ -281,7 +281,8 @@ jQuery(function($) {
 				window._klarnaCheckout(function (api) {
 					api.on({
 						'shipping_address_change': function(data) {
-							kco_wc.log('shipping_address_change', data);
+							kco_wc.log('shipping_address_change');
+							kco_wc.log(data);
 
 							$('table.woocommerce-checkout-review-order-table').block({
 								message: null,
