@@ -33,12 +33,6 @@ jQuery(function($) {
 				kco_wc.paymentMethod = 'kco';
 			}
 
-			/*
-			$( '.checkout-date-picker' ).datepicker( 'option', 'onSelect', function(ttt, obj) {
-				$(this).val(ttt);
-			});
-			*/
-
 			kco_wc.confirmLoading();
 		},
 

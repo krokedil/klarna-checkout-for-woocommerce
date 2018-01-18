@@ -155,6 +155,13 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 */
 	public static function kco_wc_update_klarna_order() {
 		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
+			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
+			$klarna_order    = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id );
+
+			if ( 'checkout_incomplete' !== $klarna_order->status ) {
+				return;
+			}
+
 			WC()->cart->calculate_shipping();
 			WC()->cart->calculate_fees();
 			WC()->cart->calculate_totals();
