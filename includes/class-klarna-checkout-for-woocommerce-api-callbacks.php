@@ -342,63 +342,69 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * @throws Exception WC_Data_Exception.
 	 */
 	private function process_order( $klarna_order ) {
-		$order = new WC_Order();
+		try {
+			$order = new WC_Order();
 
-		$order->set_billing_first_name( sanitize_text_field( $klarna_order->billing_address->given_name ) );
-		$order->set_billing_last_name( sanitize_text_field( $klarna_order->billing_address->family_name ) );
-		$order->set_billing_country( sanitize_text_field( $klarna_order->billing_address->country ) );
-		$order->set_billing_address_1( sanitize_text_field( $klarna_order->billing_address->street_address ) );
-		$order->set_billing_address_2( sanitize_text_field( $klarna_order->billing_address->street_address2 ) );
-		$order->set_billing_city( sanitize_text_field( $klarna_order->billing_address->city ) );
-		$order->set_billing_state( sanitize_text_field( $klarna_order->billing_address->region ) );
-		$order->set_billing_postcode( sanitize_text_field( $klarna_order->billing_address->postal_code ) );
-		$order->set_billing_phone( sanitize_text_field( $klarna_order->billing_address->phone ) );
-		$order->set_billing_email( sanitize_text_field( $klarna_order->billing_address->email ) );
+			$order->set_billing_first_name( sanitize_text_field( $klarna_order->billing_address->given_name ) );
+			$order->set_billing_last_name( sanitize_text_field( $klarna_order->billing_address->family_name ) );
+			$order->set_billing_country( sanitize_text_field( $klarna_order->billing_address->country ) );
+			$order->set_billing_address_1( sanitize_text_field( $klarna_order->billing_address->street_address ) );
+			$order->set_billing_address_2( sanitize_text_field( $klarna_order->billing_address->street_address2 ) );
+			$order->set_billing_city( sanitize_text_field( $klarna_order->billing_address->city ) );
+			$order->set_billing_state( sanitize_text_field( $klarna_order->billing_address->region ) );
+			$order->set_billing_postcode( sanitize_text_field( $klarna_order->billing_address->postal_code ) );
+			$order->set_billing_phone( sanitize_text_field( $klarna_order->billing_address->phone ) );
+			$order->set_billing_email( sanitize_text_field( $klarna_order->billing_address->email ) );
 
-		$order->set_shipping_first_name( sanitize_text_field( $klarna_order->shipping_address->given_name ) );
-		$order->set_shipping_last_name( sanitize_text_field( $klarna_order->shipping_address->family_name ) );
-		$order->set_shipping_country( sanitize_text_field( $klarna_order->shipping_address->country ) );
-		$order->set_shipping_address_1( sanitize_text_field( $klarna_order->shipping_address->street_address ) );
-		$order->set_shipping_address_2( sanitize_text_field( $klarna_order->shipping_address->street_address2 ) );
-		$order->set_shipping_city( sanitize_text_field( $klarna_order->shipping_address->city ) );
-		$order->set_shipping_state( sanitize_text_field( $klarna_order->shipping_address->region ) );
-		$order->set_shipping_postcode( sanitize_text_field( $klarna_order->shipping_address->postal_code ) );
+			$order->set_shipping_first_name( sanitize_text_field( $klarna_order->shipping_address->given_name ) );
+			$order->set_shipping_last_name( sanitize_text_field( $klarna_order->shipping_address->family_name ) );
+			$order->set_shipping_country( sanitize_text_field( $klarna_order->shipping_address->country ) );
+			$order->set_shipping_address_1( sanitize_text_field( $klarna_order->shipping_address->street_address ) );
+			$order->set_shipping_address_2( sanitize_text_field( $klarna_order->shipping_address->street_address2 ) );
+			$order->set_shipping_city( sanitize_text_field( $klarna_order->shipping_address->city ) );
+			$order->set_shipping_state( sanitize_text_field( $klarna_order->shipping_address->region ) );
+			$order->set_shipping_postcode( sanitize_text_field( $klarna_order->shipping_address->postal_code ) );
 
-		$order->set_created_via( 'klarna_checkout_backup_order_creation' );
-		$order->set_currency( sanitize_text_field( $klarna_order->purchase_currency ) );
-		$order->set_prices_include_tax( 'yes' === get_option( 'woocommerce_prices_include_tax' ) );
-		$order->set_payment_method( 'kco' );
+			$order->set_created_via( 'klarna_checkout_backup_order_creation' );
+			$order->set_currency( sanitize_text_field( $klarna_order->purchase_currency ) );
+			$order->set_prices_include_tax( 'yes' === get_option( 'woocommerce_prices_include_tax' ) );
+			$order->set_payment_method( 'kco' );
 
-		$order->set_shipping_total( WC()->cart->get_shipping_total() );
-		$order->set_discount_total( WC()->cart->get_discount_total() );
-		$order->set_discount_tax( WC()->cart->get_discount_tax() );
-		$order->set_cart_tax( WC()->cart->get_cart_contents_tax() + WC()->cart->get_fee_tax() );
-		$order->set_shipping_tax( WC()->cart->get_shipping_tax() );
-		$order->set_total( WC()->cart->get_total( 'edit' ) );
+			$order->set_shipping_total( WC()->cart->get_shipping_total() );
+			$order->set_discount_total( WC()->cart->get_discount_total() );
+			$order->set_discount_tax( WC()->cart->get_discount_tax() );
+			$order->set_cart_tax( WC()->cart->get_cart_contents_tax() + WC()->cart->get_fee_tax() );
+			$order->set_shipping_tax( WC()->cart->get_shipping_tax() );
+			$order->set_total( WC()->cart->get_total( 'edit' ) );
 
-		WC()->checkout()->create_order_line_items( $order, WC()->cart );
-		WC()->checkout()->create_order_fee_lines( $order, WC()->cart );
-		WC()->checkout()->create_order_shipping_lines( $order, WC()->session->get( 'chosen_shipping_methods' ), WC()->shipping->get_packages() );
-		WC()->checkout()->create_order_tax_lines( $order, WC()->cart );
-		WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
+			WC()->checkout()->create_order_line_items( $order, WC()->cart );
+			WC()->checkout()->create_order_fee_lines( $order, WC()->cart );
+			WC()->checkout()->create_order_shipping_lines( $order, WC()->session->get( 'chosen_shipping_methods' ), WC()->shipping->get_packages() );
+			WC()->checkout()->create_order_tax_lines( $order, WC()->cart );
+			WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
 
-		$order->save();
+			$order->save();
 
-		if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
-			$order->payment_complete( $klarna_order->order_id );
-			$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . sanitize_key( $klarna_order->order_id ) );
-		} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
-			$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
+			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
+				$order->payment_complete( $klarna_order->order_id );
+				$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . sanitize_key( $klarna_order->order_id ) );
+			} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
+				$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
+			}
+
+			KCO_WC()->api->request_post_acknowledge_order( $klarna_order->order_id );
+			KCO_WC()->api->request_post_set_merchant_reference(
+				$klarna_order->order_id,
+				array(
+					'merchant_reference1' => $order->get_order_number(),
+					'merchant_reference2' => $order->get_id(),
+				)
+			);
+		} catch ( Exception $e ) {
+			$logger = new WC_Logger();
+			$logger->add( 'klarna', 'Backup order creation error: ' . $e->getMessage() );
+
 		}
-		
-		KCO_WC()->api->request_post_acknowledge_order( $klarna_order->order_id );
-		KCO_WC()->api->request_post_set_merchant_reference(
-			$klarna_order->order_id,
-			array(
-				'merchant_reference1' => $order->get_order_number(),
-				'merchant_reference2' => $order->get_id(),
-			)
-		);
 	}
 
 }

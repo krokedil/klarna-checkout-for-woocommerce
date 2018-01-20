@@ -329,63 +329,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_purchase_country() {
-		/**
-		 * Need to use currency as base for getting purchase_country.
-		 * This will allow local experience, where possible.
-		 */
-		$currency = $this->get_purchase_currency();
-
-		switch ( $currency ) {
-			case 'USD':
-				$country = 'US';
-				break;
-			case 'GBP':
-				$country = 'GB';
-				break;
-			case 'SEK':
-				$country = 'SE';
-				break;
-			case 'NOK':
-				$country = 'NO';
-				break;
-			case 'DKK':
-				$country = 'DK';
-				break;
-			case 'EUR':
-				$country = $this->get_purchase_country_euro();
-				break;
-			default:
-				$base_location = wc_get_base_location();
-				$country       = $base_location['country'];
-				break;
-		}
-
-		return $country;
-	}
-
-	/**
-	 * Gets purchase country when used currency is EURO
-	 */
-	public function get_purchase_country_euro() {
-		$base_location   = wc_get_base_location();
-		$billing_country = WC()->customer->get_billing_country();
-
-		switch ( $billing_country ) {
-			case 'AT':
-				$country = isset( $this->settings['offer_local_at'] ) && 'yes' === $this->settings['offer_local_at'] ? 'AT' : $base_location['country'];
-				break;
-			case 'DE':
-				$country = isset( $this->settings['offer_local_de'] ) && 'yes' === $this->settings['offer_local_de'] ? 'DE' : $base_location['country'];
-				break;
-			case 'FI':
-				$country = isset( $this->settings['offer_local_fi'] ) && 'yes' === $this->settings['offer_local_fi'] ? 'FI' : $base_location['country'];
-				break;
-			case 'NL':
-				$country = isset( $this->settings['offer_local_nl'] ) && 'yes' === $this->settings['offer_local_nl'] ? 'NL' : $base_location['country'];
-				break;
-			default:
-				$country = $base_location['country'];
-		}
+		$base_location = wc_get_base_location();
+		$country       = $base_location['country'];
 
 		return $country;
 	}

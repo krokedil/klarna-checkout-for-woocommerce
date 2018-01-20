@@ -139,22 +139,22 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		);
 
 		$checkout_localize_params = array(
-			'update_cart_url'             => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
-			'update_cart_nonce'           => wp_create_nonce( 'kco_wc_update_cart' ),
-			'update_shipping_url'         => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
-			'update_shipping_nonce'       => wp_create_nonce( 'kco_wc_update_shipping' ),
-			'update_extra_fields_url'     => WC_AJAX::get_endpoint( 'kco_wc_update_extra_fields' ),
-			'update_extra_fields_nonce'   => wp_create_nonce( 'kco_wc_update_extra_fields' ),
+			'update_cart_url'                      => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
+			'update_cart_nonce'                    => wp_create_nonce( 'kco_wc_update_cart' ),
+			'update_shipping_url'                  => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
+			'update_shipping_nonce'                => wp_create_nonce( 'kco_wc_update_shipping' ),
+			'update_extra_fields_url'              => WC_AJAX::get_endpoint( 'kco_wc_update_extra_fields' ),
+			'update_extra_fields_nonce'            => wp_create_nonce( 'kco_wc_update_extra_fields' ),
 			// 'extra_fields_values'         => WC()->session->get( 'kco_wc_extra_fields_values' ),
-			'change_payment_method_url'   => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
-			'change_payment_method_nonce' => wp_create_nonce( 'kco_wc_change_payment_method' ),
-			'update_klarna_order_url'     => WC_AJAX::get_endpoint( 'kco_wc_update_klarna_order' ),
-			'update_klarna_order_nonce'   => wp_create_nonce( 'kco_wc_update_klarna_order' ),
-			'iframe_change_url'           => WC_AJAX::get_endpoint( 'kco_wc_iframe_change' ),
-			'iframe_change_nonce'         => wp_create_nonce( 'kco_wc_iframe_change' ),
-			'checkout_error_url'          => WC_AJAX::get_endpoint( 'kco_wc_checkout_error' ),
-			'checkout_error_nonce'        => wp_create_nonce( 'kco_wc_checkout_error' ),
-			'logging'                     => $this->logging,
+			'change_payment_method_url'            => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
+			'change_payment_method_nonce'          => wp_create_nonce( 'kco_wc_change_payment_method' ),
+			'update_klarna_order_url'              => WC_AJAX::get_endpoint( 'kco_wc_update_klarna_order' ),
+			'update_klarna_order_nonce'            => wp_create_nonce( 'kco_wc_update_klarna_order' ),
+			'iframe_shipping_address_change_url'   => WC_AJAX::get_endpoint( 'kco_wc_iframe_shipping_address_change' ),
+			'iframe_shipping_address_change_nonce' => wp_create_nonce( 'kco_wc_iframe_shipping_address_change' ),
+			'checkout_error_url'                   => WC_AJAX::get_endpoint( 'kco_wc_checkout_error' ),
+			'checkout_error_nonce'                 => wp_create_nonce( 'kco_wc_checkout_error' ),
+			'logging'                              => $this->logging,
 		);
 
 		wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );
