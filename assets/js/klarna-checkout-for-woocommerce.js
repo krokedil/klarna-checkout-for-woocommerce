@@ -33,12 +33,6 @@ jQuery(function($) {
 				kco_wc.paymentMethod = 'kco';
 			}
 
-			/*
-			$( '.checkout-date-picker' ).datepicker( 'option', 'onSelect', function(ttt, obj) {
-				$(this).val(ttt);
-			});
-			*/
-
 			kco_wc.confirmLoading();
 		},
 
@@ -280,8 +274,9 @@ jQuery(function($) {
 			if (typeof window._klarnaCheckout === 'function') {
 				window._klarnaCheckout(function (api) {
 					api.on({
-						'change': function(data) {
-							kco_wc.log('change', data);
+						'shipping_address_change': function(data) {
+							kco_wc.log('shipping_address_change');
+							kco_wc.log(data);
 
 							$('table.woocommerce-checkout-review-order-table').block({
 								message: null,
@@ -294,12 +289,12 @@ jQuery(function($) {
 
 							$.ajax(
 								{
-									url: kco_params.iframe_change_url,
+									url: kco_params.iframe_shipping_address_change_url,
 									type: 'POST',
 									dataType: 'json',
 									data: {
 										data: data,
-										nonce: kco_params.iframe_change_nonce
+										nonce: kco_params.iframe_shipping_address_change_nonce
 									},
 									success: function (response) {
 										kco_wc.log(response);
@@ -315,8 +310,8 @@ jQuery(function($) {
 								}
 							);
 						},
-						'shipping_address_change': function(data) {
-							kco_wc.log('shipping_address_change', data);
+						'change': function(data) {
+							kco_wc.log('change', data);
 						},
 						'order_total_change': function(data) {
 							kco_wc.log('order_total_change', data);

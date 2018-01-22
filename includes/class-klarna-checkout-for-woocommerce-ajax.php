@@ -24,13 +24,13 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 */
 	public static function add_ajax_events() {
 		$ajax_events = array(
-			'kco_wc_update_cart'           => true,
-			'kco_wc_update_shipping'       => true,
-			'kco_wc_update_extra_fields'   => true,
-			'kco_wc_change_payment_method' => true,
-			'kco_wc_update_klarna_order'   => true,
-			'kco_wc_iframe_change'         => true,
-			'kco_wc_checkout_error'        => true,
+			'kco_wc_update_cart'                    => true,
+			'kco_wc_update_shipping'                => true,
+			'kco_wc_update_extra_fields'            => true,
+			'kco_wc_change_payment_method'          => true,
+			'kco_wc_update_klarna_order'            => true,
+			'kco_wc_iframe_shipping_address_change' => true,
+			'kco_wc_checkout_error'                 => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -155,6 +155,13 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 */
 	public static function kco_wc_update_klarna_order() {
 		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
+			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
+			$klarna_order    = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id );
+
+			if ( 'checkout_incomplete' !== $klarna_order->status ) {
+				return;
+			}
+
 			WC()->cart->calculate_shipping();
 			WC()->cart->calculate_fees();
 			WC()->cart->calculate_totals();
@@ -168,8 +175,8 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	/**
 	 * Iframe change callback function.
 	 */
-	public static function kco_wc_iframe_change() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_iframe_change' ) ) {
+	public static function kco_wc_iframe_shipping_address_change() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_iframe_shipping_address_change' ) ) {
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
@@ -203,6 +210,12 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$customer_data['shipping_last_name'] = $address['family_name'];
 		}
 
+		if ( isset( $address['region'] ) ) {
+			$customer_data['state']          = $address['region'];
+			$customer_data['billing_state']  = $address['region'];
+			$customer_data['shipping_state'] = $address['region'];
+		}
+
 		if ( isset( $address['country'] ) && kco_wc_country_code_converter( $address['country'] ) ) {
 			$country                           = kco_wc_country_code_converter( $address['country'] );
 			$customer_data['country']          = $country;
@@ -211,7 +224,6 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		}
 
 		WC()->customer->set_props( $customer_data );
-
 		WC()->customer->save();
 
 		WC()->cart->calculate_shipping();
@@ -231,7 +243,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 * Handles WooCommerce checkout error, after Klarna order has already been created.
 	 */
 	public static function kco_wc_checkout_error() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_checkout_error' ) ) {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_checkout_error' ) ) { // Input var okay.
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
