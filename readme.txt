@@ -16,6 +16,11 @@ Klarna Checkout is a full checkout experience embedded on your site. It lets you
 2. Activate the plugin through the "Plugins" menu in WordPress.
 
 == Changelog ==
+= 2018.01.22  	- version 1.2 =
+* Tweak         - Switches to using store base country as purchase country in all cases.
+* Tweak         - Switches from using 'change' to 'shipping_address_change' for storing customer data.
+* Fix			- Prevents Klarna Checkout order update after iframe has been submitted.
+
 = 2018.01.11  	- version 1.1.1 =
 * Tweak			- Makes datepicker extra field work in checkout.
 * Fix			- Acknowledge order & set merchant reference in Klarnas system during backup order creation (on push notification).
