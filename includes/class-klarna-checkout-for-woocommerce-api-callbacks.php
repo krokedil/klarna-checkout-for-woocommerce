@@ -64,6 +64,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
 
 		$query_args = array(
+			'fields'      => 'ids',
 			'post_type'   => wc_get_order_types(),
 			'post_status' => array_keys( wc_get_order_statuses() ),
 			'meta_key'    => '_wc_klarna_order_id',
@@ -79,7 +80,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			return;
 		}
 
-		$order_id = $orders[0]->ID;
+		$order_id = $orders[0];
 		$order    = wc_get_order( $order_id );
 
 		if ( $order ) {
@@ -131,6 +132,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		if ( $_GET['kco_wc_order_id'] ) { // KCO.
 			$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
 			$query_args      = array(
+				'fields'      => 'ids',
 				'post_type'   => wc_get_order_types(),
 				'post_status' => array_keys( wc_get_order_statuses() ),
 				'meta_key'    => '_wc_klarna_order_id',
@@ -141,7 +143,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 			// If zero matching orders were found, return.
 			if ( ! empty( $orders ) ) {
-				$order_id = $orders[0]->ID;
+				$order_id = $orders[0];
 			}
 		}
 
@@ -384,7 +386,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
 
 			$order->save();
-
 			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 				$order->payment_complete( $klarna_order->order_id );
 				$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . sanitize_key( $klarna_order->order_id ) );
