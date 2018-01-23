@@ -41,7 +41,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'unrequire_fields' ), 99 );
 		add_filter( 'woocommerce_checkout_posted_data', array( $this, 'unrequire_posted_data' ), 99 );
 		add_action( 'woocommerce_checkout_after_order_review', array( $this, 'add_kco_order_id_field' ) );
-		add_action( 'woocommerce_checkout_create_order', array( $this, 'save_kco_order_id_value' ), 10, 2 );
+		add_action( 'woocommerce_checkout_create_order', array( $this, 'save_kco_order_id_field' ), 10, 2 );
 	}
 
 	/**
@@ -100,6 +100,12 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		<script>
 			jQuery(function ($) {
 				$('input#terms').prop('checked', true);
+
+				// If order value = 0, payment method fields will not be in the page, so we need to
+				if (!$('input#payment_method_kco').length) {
+					$('#order_review').append('<input id="payment_method_kco" type="radio" class="input-radio" name="payment_method" value="kco" checked="checked" />');
+				}
+
 				$('input#payment_method_kco').prop('checked', true);
 
 				<?php
@@ -268,8 +274,9 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	public function save_kco_order_id_field( $order, $data ) {
 		if ( isset( $_POST['kco_order_id'] ) ) {
 			$kco_order_id = sanitize_text_field( $_POST['kco_order_id'] );
-			$order->set_transaction_id( $kco_order_id );
-			add_post_meta( $order->get_id(), '_wc_klarna_order_id', sanitize_key( $kco_order_id ) );
+
+			update_post_meta( $order->get_id(), '_wc_klarna_order_id', sanitize_key( $kco_order_id ) );
+			update_post_meta( $order->get_id(), '_transaction_id', sanitize_key( $kco_order_id ) );
 		}
 	}
 
