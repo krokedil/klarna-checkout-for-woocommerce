@@ -178,6 +178,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		$all_in_stock    = true;
 		$shipping_chosen = false;
+		$email_exists    = false;
 
 		// Check stock for each item and shipping method.
 		$cart_items = $data['order_lines'];
@@ -201,7 +202,14 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			}
 		}
 
-		if ( $all_in_stock && $shipping_chosen ) {
+		// If guest checkout is disabled, user is not logged in and the email already exists, force login.
+		if ( ! is_user_logged_in() && WC()->checkout()->is_registration_required() ) {
+			if ( email_exists( $data['billing_address']['email'] ) ) {
+				$email_exists = true;
+			}
+		}
+
+		if ( $all_in_stock && $shipping_chosen && ! $email_exists ) {
 			header( 'HTTP/1.0 200 OK' );
 		} else {
 			header( 'HTTP/1.0 303 See Other' );
@@ -212,6 +220,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				header( 'Location: ' . wc_get_cart_url() . '?stock_validate_failed' );
 			} elseif ( ! $shipping_chosen ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?no_shipping' );
+			} elseif ( $email_exists ) {
+				header( 'Location: ' . wc_get_checkout_url() . '?login_required=yes' );
 			}
 		}
 	}

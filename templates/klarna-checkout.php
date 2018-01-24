@@ -14,6 +14,7 @@ WC()->cart->calculate_totals();
 $available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 ?>
 
+<?php woocommerce_checkout_login_form(); ?>
 <?php woocommerce_checkout_coupon_form(); ?>
 
 <form name="checkout" class="checkout woocommerce-checkout">

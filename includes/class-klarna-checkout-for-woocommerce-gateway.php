@@ -43,6 +43,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'show_thank_you_snippet' ) );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'address_notice' ) );
 		add_action( 'woocommerce_checkout_init', array( $this, 'prefill_consent' ) );
+		add_action( 'woocommerce_checkout_init', array( $this, 'show_log_in_notice' ) );
 
 		// Remove WooCommerce footer text from our settings page.
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 999 );
@@ -239,6 +240,12 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	public function address_notice( $order ) {
 		if ( $this->id === $order->get_payment_method() ) {
 			echo '<div style="margin: 10px 0; padding: 10px; border: 1px solid #B33A3A; font-size: 12px">Order address should not be changed and any changes you make will not be reflected in Klarna system.</div>';
+		}
+	}
+
+	public function show_log_in_notice() {
+		if ( isset( $_GET['login_required'] ) && 'yes' === $_GET['login_required'] ) {
+			wc_add_notice( 'An account is already registered with your email address. Please log in.', 'error' );
 		}
 	}
 
