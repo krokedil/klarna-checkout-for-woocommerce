@@ -158,18 +158,16 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
 			$klarna_order    = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id );
 
-			if ( 'checkout_incomplete' !== $klarna_order->status ) {
-				return;
+			if ( 'checkout_incomplete' === $klarna_order->status ) {
+				WC()->cart->calculate_shipping();
+				WC()->cart->calculate_fees();
+				WC()->cart->calculate_totals();
+				KCO_WC()->api->request_pre_update_order();
 			}
-
-			WC()->cart->calculate_shipping();
-			WC()->cart->calculate_fees();
-			WC()->cart->calculate_totals();
-			KCO_WC()->api->request_pre_update_order();
-
-			wp_send_json_success();
-			wp_die();
 		}
+
+		wp_send_json_success();
+		wp_die();
 	}
 
 	/**
