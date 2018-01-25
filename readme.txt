@@ -44,6 +44,12 @@ __Klarna Payments__ removes the headaches of payments, for both consumers and me
 4. Read more about the configuration process in the [plugin documentation](http://docs.krokedil.com/documentation/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2018.01.25  	- version 1.2.1 =
+* Tweak         - Saves KCO as payment method for orders with total equals zero.
+* Tweak         - Checks if email already exists when guest checkout is disabled and forces users to log in before checking out.
+* Fix			- Fixes empty JSON AJAX response.
+* Enhancement   - Improves order query to only retrieve IDs.
+
 = 2018.01.22  	- version 1.2 =
 * Tweak         - Switches to using store base country as purchase country in all cases.
 * Tweak         - Switches from using 'change' to 'shipping_address_change' for storing customer data.
