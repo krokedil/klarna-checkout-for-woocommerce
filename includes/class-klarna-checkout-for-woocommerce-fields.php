@@ -44,6 +44,13 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
+			'select_another_method_text' => array(
+				'title'       => __( 'Other payment method button text', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'text',
+				'description' => __( 'Customize the <em>Select another payment method</em> button text that is displayed in checkout if using other payment methods than Klarna Checkout. Leave blank to use the default (and translatable) text.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => '',
+				'desc_tip'    => true,
+			),
 			'shipping_details'         => array(
 				'title'       => __( 'Shipping details', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Shipping details note shown to customer', 'klarna-checkout-for-woocommerce' ),
