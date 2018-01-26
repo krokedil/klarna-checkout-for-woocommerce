@@ -44,6 +44,10 @@ __Klarna Payments__ removes the headaches of payments, for both consumers and me
 4. Read more about the configuration process in the [plugin documentation](http://docs.krokedil.com/documentation/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2018.01.26  	- version 1.2.2 =
+* Fix			- Removes email check on validation CB.
+* Enhancement   - Cleans up template files.
+
 = 2018.01.25  	- version 1.2.1 =
 * Tweak         - Saves KCO as payment method for orders with total equals zero.
 * Tweak         - Checks if email already exists when guest checkout is disabled and forces users to log in before checking out.

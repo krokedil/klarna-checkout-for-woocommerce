@@ -34,6 +34,15 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	public function __construct() {
 		// Override template if Klarna Checkout page.
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
+
+		// Template hooks.
+		add_filter( 'kco_wc_before_checkout_form', 'kco_wc_calculate_totals', 1 );
+		add_filter( 'kco_wc_before_checkout_form', 'woocommerce_checkout_login_form', 10 );
+		add_filter( 'kco_wc_before_checkout_form', 'woocommerce_checkout_coupon_form', 20 );
+		add_filter( 'kco_wc_after_order_review', 'kco_wc_show_extra_fields', 10 );
+		add_filter( 'kco_wc_after_order_review', 'kco_wc_show_another_gateway_button', 20 );
+		add_filter( 'kco_wc_before_snippet', 'kco_wc_prefill_consent', 10 );
+		add_filter( 'kco_wc_after_snippet', 'kco_wc_show_payment_method_field', 10 );
 	}
 
 	/**

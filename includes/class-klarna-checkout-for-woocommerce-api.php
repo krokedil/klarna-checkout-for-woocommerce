@@ -36,9 +36,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 			'body'       => $this->get_request_body( 'create' ),
 		);
-		
+
 		KCO_WC()->logger->log( 'Create Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
-		
+
 		$response = wp_safe_remote_post( $request_url, $request_args );
 
 		if ( is_wp_error( $response ) ) {
@@ -71,9 +71,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 		);
-		
+
 		KCO_WC()->logger->log( 'Retrieve ongoing Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
-		
+
 		$response = wp_safe_remote_get( $request_url, $request_args );
 
 		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
@@ -105,9 +105,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( WC()->session->get( 'kco_wc_update_md5' ) && WC()->session->get( 'kco_wc_update_md5' ) === md5( serialize( $request_args ) ) ) {
 			return;
 		}
-		
+
 		KCO_WC()->logger->log( 'Update ongoing Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
-		
+
 		$response = wp_safe_remote_post( $request_url, $request_args );
 
 		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
