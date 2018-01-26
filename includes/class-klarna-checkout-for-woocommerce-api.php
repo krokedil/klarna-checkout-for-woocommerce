@@ -510,6 +510,33 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		// Allow external payment method plugin to do its thing.
 		if ( 'create' === $request_type ) {
+			if ( in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) ) {
+				if ( isset( $this->settings['allowed_customer_types'] ) ) {
+					$customer_types_setting = $this->settings['allowed_customer_types'];
+
+					switch ( $customer_types_setting ) {
+						case 'B2B':
+							$allowed_customer_types = array( 'organization' );
+							$customer_type          = 'organization';
+							break;
+						case 'B2BC':
+							$allowed_customer_types = array( 'person', 'organization' );
+							$customer_type          = 'organization';
+							break;
+						case 'B2CB':
+							$allowed_customer_types = array( 'person', 'organization' );
+							$customer_type          = 'person';
+							break;
+						default:
+							$allowed_customer_types = array( 'person' );
+							$customer_type          = 'person';
+					}
+
+					$request_args['options']['allowed_customer_types'] = $allowed_customer_types;
+					$request_args['customer']['type']                  = $customer_type;
+				}
+			}
+
 			$request_args = apply_filters( 'kco_wc_create_order', $request_args );
 		}
 
