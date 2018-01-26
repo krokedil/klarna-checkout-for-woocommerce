@@ -178,7 +178,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		$all_in_stock    = true;
 		$shipping_chosen = false;
-		$email_exists    = false;
 
 		// Check stock for each item and shipping method.
 		$cart_items = $data['order_lines'];
@@ -202,14 +201,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			}
 		}
 
-		// If guest checkout is disabled, user is not logged in and the email already exists, force login.
-		if ( ! is_user_logged_in() && WC()->checkout()->is_registration_required() ) {
-			if ( email_exists( $data['billing_address']['email'] ) ) {
-				$email_exists = true;
-			}
-		}
-
-		if ( $all_in_stock && $shipping_chosen && ! $email_exists ) {
+		if ( $all_in_stock && $shipping_chosen ) {
 			header( 'HTTP/1.0 200 OK' );
 		} else {
 			header( 'HTTP/1.0 303 See Other' );

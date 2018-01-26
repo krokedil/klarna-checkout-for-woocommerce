@@ -107,7 +107,11 @@ function kco_wc_show_another_gateway_button() {
 
 	if ( count( $available_gateways ) > 1 ) {
 		?>
-		<p style="margin-top:30px"><a class="checkout-button button" href="#" id="klarna-checkout-select-other">Select another payment method</a></p>
+		<p style="margin-top:30px">
+			<a class="checkout-button button" href="#" id="klarna-checkout-select-other">
+				<?php _e( 'Select another payment method', 'klarna-checkout-for-woocommerce' ); ?>
+			</a>
+		</p>
 		<?php
 	}
 }
