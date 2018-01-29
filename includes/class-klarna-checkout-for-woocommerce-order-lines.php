@@ -152,8 +152,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			// Add sales tax line item.
 			$sales_tax           = array(
 				'type'                  => 'sales_tax',
-				'reference'             => __( 'Sales Tax', 'klarna-payments-for-woocommerce' ),
-				'name'                  => __( 'Sales Tax', 'klarna-payments-for-woocommerce' ),
+				'reference'             => __( 'Sales Tax', 'klarna-checkout-for-woocommerce' ),
+				'name'                  => __( 'Sales Tax', 'klarna-checkout-for-woocommerce' ),
 				'quantity'              => 1,
 				'unit_price'            => $sales_tax_amount,
 				'tax_rate'              => 0,
