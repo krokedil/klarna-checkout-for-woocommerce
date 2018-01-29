@@ -512,7 +512,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			}
 		}
 		if ( ! isset( $shipping_name ) ) {
-			$shipping_name = __( 'Shipping', 'woocommerce-gateway-klarna' );
+			$shipping_name = __( 'Shipping', 'klarna-checkout-for-woocommerce' );
 		}
 
 		return (string) $shipping_name;
@@ -540,7 +540,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			}
 		}
 		if ( ! isset( $shipping_reference ) ) {
-			$shipping_reference = __( 'Shipping', 'woocommerce-gateway-klarna' );
+			$shipping_reference = __( 'Shipping', 'klarna-checkout-for-woocommerce' );
 		}
 
 		return (string) $shipping_reference;
