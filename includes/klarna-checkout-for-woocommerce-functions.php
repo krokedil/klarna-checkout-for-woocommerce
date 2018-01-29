@@ -90,9 +90,12 @@ function kco_wc_show_extra_fields() {
 	do_action( 'woocommerce_after_checkout_shipping_form', WC()->checkout() );
 
 	// Order.
-	foreach ( $extra_fields['order'] as $key => $field ) {
-		$key_value = array_key_exists( $key, $extra_fields_values ) ? $extra_fields_values[ $key ] : '';
-		woocommerce_form_field( $key, $field, $key_value );
+	do_action( 'woocommerce_before_order_notes', WC()->checkout() );
+	if ( apply_filters( 'woocommerce_enable_order_notes_field', true ) ) {
+		foreach ( $extra_fields['order'] as $key => $field ) {
+			$key_value = array_key_exists( $key, $extra_fields_values ) ? $extra_fields_values[ $key ] : '';
+			woocommerce_form_field( $key, $field, $key_value );
+		}
 	}
 	do_action( 'woocommerce_after_order_notes', WC()->checkout() );
 
@@ -150,7 +153,7 @@ function kco_wc_calculate_totals() {
 
 function kco_wc_show_payment_method_field() {
 	?>
-	<input style="display:none" type="radio" name="payment_method" value="kco" />
+	<input style="display:none" type="radio" name="payment_method" value="kco"/>
 	<?php
 }
 
