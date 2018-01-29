@@ -152,8 +152,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			// Add sales tax line item.
 			$sales_tax           = array(
 				'type'                  => 'sales_tax',
-				'reference'             => __( 'Sales Tax', 'klarna-payments-for-woocommerce' ),
-				'name'                  => __( 'Sales Tax', 'klarna-payments-for-woocommerce' ),
+				'reference'             => __( 'Sales Tax', 'klarna-checkout-for-woocommerce' ),
+				'name'                  => __( 'Sales Tax', 'klarna-checkout-for-woocommerce' ),
 				'quantity'              => 1,
 				'unit_price'            => $sales_tax_amount,
 				'tax_rate'              => 0,
@@ -512,7 +512,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			}
 		}
 		if ( ! isset( $shipping_name ) ) {
-			$shipping_name = __( 'Shipping', 'woocommerce-gateway-klarna' );
+			$shipping_name = __( 'Shipping', 'klarna-checkout-for-woocommerce' );
 		}
 
 		return (string) $shipping_name;
@@ -540,7 +540,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			}
 		}
 		if ( ! isset( $shipping_reference ) ) {
-			$shipping_reference = __( 'Shipping', 'woocommerce-gateway-klarna' );
+			$shipping_reference = __( 'Shipping', 'klarna-checkout-for-woocommerce' );
 		}
 
 		return (string) $shipping_reference;
