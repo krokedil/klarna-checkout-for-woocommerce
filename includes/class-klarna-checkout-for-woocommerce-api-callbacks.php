@@ -208,7 +208,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 			if ( ! $all_in_stock ) {
 				$logger = new WC_Logger();
-				$logger->add( 'klarna', 'Stock validation failed for SKU ' . $cart_item['reference'] );
+				$logger->add( 'klarna-checkout-for-woocommerce', 'Stock validation failed for SKU ' . $cart_item['reference'] );
 				header( 'Location: ' . wc_get_cart_url() . '?stock_validate_failed' );
 			} elseif ( ! $shipping_chosen ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?no_shipping' );
@@ -322,7 +322,18 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		foreach ( $klarna_order->order_lines as $cart_item ) {
 			if ( 'physical' === $cart_item->type ) {
-				WC()->cart->add_to_cart( $cart_item->reference, $cart_item->quantity );
+				if ( wc_get_product_id_by_sku( $cart_item->reference ) ) {
+					$id = wc_get_product_id_by_sku( $cart_item->reference );
+				} else {
+					$id = $cart_item->reference;
+				}
+
+				try {
+					WC()->cart->add_to_cart( $id, $cart_item->quantity );
+				} catch ( Exception $e ) {
+					$logger = new WC_Logger();
+					$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error add to cart error: ' . $e->getMessage() );
+				}
 			}
 		}
 
@@ -405,8 +416,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			);
 		} catch ( Exception $e ) {
 			$logger = new WC_Logger();
-			$logger->add( 'klarna', 'Backup order creation error: ' . $e->getMessage() );
-
+			$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error: ' . $e->getMessage() );
 		}
 	}
 
