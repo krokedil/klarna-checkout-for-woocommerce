@@ -48,7 +48,7 @@ __Klarna Payments__ removes the headaches of payments, for both consumers and me
 * Fix			- Fixes backup order creation process to check for product SKU.
 * Enhancement   - Adds admin notice if Terms URL is not set in WooCommerce settings.
 
-= 2018.01.26  	- version 1.2.3 =
+= 2018.01.29  	- version 1.2.3 =
 * Fix			- Cleans up translation strings.
 * Enhancement   - Adds woocommerce_enable_order_notes_field to KCO checkout template.
 
