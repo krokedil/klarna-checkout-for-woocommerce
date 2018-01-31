@@ -392,7 +392,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$item_reference = $product->get_id();
 		}
 
-		return substr( strval( $item_reference ), 0, 64 );
+		return substr( (string) $item_reference, 0, 64 );
 	}
 
 	/**
