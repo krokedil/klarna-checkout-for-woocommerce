@@ -44,6 +44,9 @@ __Klarna Payments__ removes the headaches of payments, for both consumers and me
 4. Read more about the configuration process in the [plugin documentation](http://docs.krokedil.com/documentation/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2018.01.21  	- version 1.2.4 =
+* Fix			- Fixes backup order creation process to check for product SKU.
+
 = 2018.01.26  	- version 1.2.3 =
 * Fix			- Cleans up translation strings.
 * Enhancement   - Adds woocommerce_enable_order_notes_field to KCO checkout template.
