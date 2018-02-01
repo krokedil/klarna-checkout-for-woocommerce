@@ -60,12 +60,18 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 			if ( 'checkout/form-checkout.php' === $template_name ) {
 				$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 
+				if ( locate_template( 'woocommerce/klarna-checkout.php' ) ) {
+					$klarna_checkout_template = locate_template( 'woocommerce/klarna-checkout.php' );
+				} else {
+					$klarna_checkout_template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
+				}
+
 				// Klarna checkout page.
 				if ( array_key_exists( 'kco', $available_gateways ) ) {
 					// If chosen payment method exists.
 					if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
 						if ( ! isset( $_GET['confirm'] ) ) {
-							$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
+							$template = $klarna_checkout_template;
 						}
 					}
 
@@ -75,7 +81,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 
 						if ( 'kco' === key( $available_gateways ) ) {
 							if ( ! isset( $_GET['confirm'] ) ) {
-								$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
+								$template = $klarna_checkout_template;
 							}
 						}
 					}
@@ -87,7 +93,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 
 							if ( 'kco' === key( $available_gateways ) ) {
 								if ( ! isset( $_GET['confirm'] ) ) {
-									$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
+									$template =  $klarna_checkout_template;
 								}
 							}
 						}
@@ -99,7 +105,13 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 		// Fallback Klarna Order Received, used when WooCommerce checkout form submission fails.
 		if ( 'checkout/thankyou.php' === $template_name ) {
 			if ( isset( $_GET['kco_wc'] ) && 'true' === $_GET['kco_wc'] ) {
-				$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout-order-received.php';
+				if ( locate_template( 'woocommerce/klarna-checkout-order-received.php' ) ) {
+					$klarna_checkout_order_received_template = locate_template( 'woocommerce/klarna-checkout-order-received.php' );
+				} else {
+					$klarna_checkout_order_received_template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout-order-received.php';
+				}
+
+				$template = $klarna_checkout_order_received_template;
 			}
 		}
 

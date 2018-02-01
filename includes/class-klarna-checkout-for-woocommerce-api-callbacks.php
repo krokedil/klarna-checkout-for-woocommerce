@@ -399,11 +399,16 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
 
 			$order->save();
+
 			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 				$order->payment_complete( $klarna_order->order_id );
 				$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . sanitize_key( $klarna_order->order_id ) );
 			} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
 				$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
+			}
+
+			if ( (int) round( $order->get_total() * 100 ) !== (int) $klarna_order->order_amount ) {
+				$order->update_status( 'on-hold', __( 'Order needs manual review, WooCommerce total and Klarna total do not match.', 'klarna-checkout-for-woocommerce' ) );
 			}
 
 			KCO_WC()->api->request_post_acknowledge_order( $klarna_order->order_id );
