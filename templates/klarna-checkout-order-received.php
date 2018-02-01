@@ -11,7 +11,5 @@ if ( ! WC()->session->get( 'kco_wc_order_id' ) ) {
 	return;
 }
 
-WC()->cart->empty_cart( true );
-
-$klarna_order = KCO_WC()->api->get_order();
-echo KCO_WC()->api->get_snippet( $klarna_order );
+wc_empty_cart();
+kco_wc_show_snippet();
