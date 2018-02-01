@@ -9,6 +9,9 @@
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
+ * WC requires at least: 3.0
+ * WC tested up to: 3.3
+ *
  * Copyright (c) 2017-2018 Krokedil
  *
  * This program is free software: you can redistribute it and/or modify
