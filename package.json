@@ -13,8 +13,8 @@
     "gulp-sort": "^2.0.0",
     "gulp-uglify": "^3.0.0",
     "gulp-watch": "^4.3.11",
+    "gulp-wp-pot": "^2.0.7",
     "prettier": "^1.5.3",
     "pump": "^1.0.2"
-  },
-  "dependencies": {}
+  }
 }

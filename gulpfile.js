@@ -6,9 +6,25 @@ var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var pump = require('pump');
 var cleanCSS = require('gulp-clean-css');
+var wpPot = require('gulp-wp-pot');
 
 var cssFiles = 'assets/css/klarna-checkout-for-woocommerce.css';
 var jsFiles = 'assets/js/klarna-checkout-for-woocommerce.js';
+var translateFiles = '**/*.php';
+
+gulp.task('makePOT', function () {
+	return gulp.src('**/*.php')
+		.pipe(sort())
+		.pipe(wpPot({
+			domain: 'klarna-checkout-for-woocommerce',
+			destFile: 'languages/klarna-checkout-for-woocommerce.pot',
+			package: 'klarna-checkout-for-woocommerce',
+			bugReport: 'http://krokedil.se',
+			lastTranslator: 'Krokedil <info@krokedil.se>',
+			team: 'Krokedil <info@krokedil.se>'
+		}))
+		.pipe(gulp.dest('languages/klarna-checkout-for-woocommerce.pot'));
+});
 
 gulp.task('CSS', function() {
     return gulp
@@ -25,4 +41,5 @@ gulp.task('JS', function(cb) {
 gulp.task('watch', function() {
     gulp.watch(cssFiles, ['CSS']);
     gulp.watch(jsFiles, ['JS']);
+    gulp.watch(translateFiles, ['makePOT']);
 });
