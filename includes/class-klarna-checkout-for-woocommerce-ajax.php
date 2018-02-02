@@ -108,8 +108,15 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		}
 
 		if ( is_array( $_POST['extra_fields_values'] ) ) {
-			$values = array_map( 'sanitize_textarea_field', $_POST['extra_fields_values'] );
-			WC()->session->set( 'kco_wc_extra_fields_values', $values );
+			$update_values  = array_map( 'sanitize_textarea_field', $_POST['extra_fields_values'] );
+			$session_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
+
+			// Update session array, instead of overwriting it.
+			foreach ( $update_values as $update_key => $update_value ) {
+				$session_values[ $update_key ] = $update_value;
+			}
+
+			WC()->session->set( 'kco_wc_extra_fields_values', $session_values );
 		}
 
 		wp_die();
