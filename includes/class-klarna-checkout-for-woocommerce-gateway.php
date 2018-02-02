@@ -126,17 +126,17 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		wp_register_script(
 			'kco',
-			plugins_url( 'assets/js/klarna-checkout-for-woocommerce' . $suffix . '.js', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ),
+			plugins_url( 'assets/js/klarna-checkout-for-woocommerce' . $suffix . '.js', KCO_WC_MAIN_FILE ),
 			array( 'jquery', 'wc-cart' ),
-			KLARNA_CHECKOUT_FOR_WOOCOMMERCE_VERSION,
+			KCO_WC_VERSION,
 			true
 		);
 
 		wp_register_style(
 			'kco',
-			plugins_url( 'assets/css/klarna-checkout-for-woocommerce' . $suffix . '.css', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ),
+			plugins_url( 'assets/css/klarna-checkout-for-woocommerce' . $suffix . '.css', KCO_WC_MAIN_FILE ),
 			array(),
-			KLARNA_CHECKOUT_FOR_WOOCOMMERCE_VERSION
+			KCO_WC_VERSION
 		);
 
 		$checkout_localize_params = array(
@@ -183,7 +183,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		wp_enqueue_script(
 			'klarna_payments_admin',
-			plugins_url( 'assets/js/klarna-checkout-for-woocommerce-admin.js', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE )
+			plugins_url( 'assets/js/klarna-checkout-for-woocommerce-admin.js', KCO_WC_MAIN_FILE )
 		);
 	}
 

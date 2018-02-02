@@ -73,7 +73,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 		// Terms page.
 		if ( ! wc_get_page_id( 'terms' ) || wc_get_page_id( 'terms' ) < 0 ) {
 			echo '<div class="notice notice-error">';
-			echo '<p>' . __( 'You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout.', 'klarna-checkout-for-woocommerce' ) . '</p>';
+			echo '<p>' . esc_html( __( 'You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout.', 'klarna-checkout-for-woocommerce' ) ) . '</p>';
 			echo '</div>';
 		}
 	}

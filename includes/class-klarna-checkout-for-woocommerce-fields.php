@@ -105,7 +105,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 			),
 			// EU.
 			'credentials_eu'             => array(
-				'title' => '<img src="' . plugins_url( 'assets/img/flags/eu.svg', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ) . '" height="12" /> Europe',
+				'title' => '<img src="' . plugins_url( 'assets/img/flags/eu.svg', KCO_WC_MAIN_FILE ) . '" height="12" /> Europe',
 				'type'  => 'title',
 			),
 			'merchant_id_eu'             => array(
@@ -152,7 +152,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 			),
 			// US.
 			'credentials_us'             => array(
-				'title' => '<img src="' . plugins_url( 'assets/img/flags/us.svg', KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE ) . '" height="12" /> United States',
+				'title' => '<img src="' . plugins_url( 'assets/img/flags/us.svg', KCO_WC_MAIN_FILE ) . '" height="12" /> United States',
 				'type'  => 'title',
 			),
 			'merchant_id_us'             => array(

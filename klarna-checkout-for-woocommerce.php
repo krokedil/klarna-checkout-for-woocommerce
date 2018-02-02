@@ -35,11 +35,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_VERSION', '1.2.4' );
-define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MIN_PHP_VER', '5.3.0' );
-define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MIN_WC_VER', '2.5.0' );
-define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_MAIN_FILE', __FILE__ );
-define( 'KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
+define( 'KCO_WC_VERSION', '1.2.4' );
+define( 'KCO_WC_MIN_PHP_VER', '5.3.0' );
+define( 'KCO_WC_MIN_WC_VER', '2.5.0' );
+define( 'KCO_WC_MAIN_FILE', __FILE__ );
+define( 'KCO_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 
 if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 	/**
@@ -136,7 +136,6 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		protected function __construct() {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
-			add_action( 'init', array( $this, 'add_kco_endpoint' ) );
 			add_action( 'admin_notices', array( $this, 'order_management_check' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
@@ -216,18 +215,17 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 					?>
 					<div class="notice notice-warning">
 						<p>
-							<?php echo $description; ?>
-							<a class="install-now button" data-slug="<?php echo $plugin_slug; ?>"
-							   href="<?php echo $url; ?>"
-							   aria-label="Activate <?php echo $name; ?> now" data-name="<?php echo $name; ?>">Activate
-								Now</a>
+							<?php echo esc_html( $description ); ?>
+							<a class="install-now button" data-slug="<?php esc_attr_e( $plugin_slug ); ?>"
+							   href="<?php echo esc_url( $url ); ?>"
+							   aria-label="Activate <?php esc_attr_e( $name ); ?> now" data-name="<?php esc_attr_e( $name ); ?>"><?php _e( 'Activate Now', 'klarna-checkout-for-woocommerce' ); ?></a>
 						</p>
 					</div>
 					<?php
 				}
 			} else { // If plugin file does not exist, show Install button.
 				if ( current_user_can( 'install_plugins' ) ) {
-					include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 					$plugin = plugins_api( 'plugin_information', array(
 						'slug' => $plugin_slug,
 					) );
@@ -240,11 +238,10 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 						?>
 						<div class="notice notice-warning">
 							<p>
-								<?php echo $description; ?>
-								<a class="install-now button" data-slug="<?php echo $plugin_slug; ?>"
-								   href="<?php echo $url; ?>"
-								   aria-label="Install <?php echo $name; ?> now" data-name="<?php echo $name; ?>">Install
-									Now</a>
+								<?php echo esc_html( $description ); ?>
+								<a class="install-now button" data-slug="<?php esc_attr_e( $plugin_slug ); ?>"
+								   href="<?php echo esc_url( $url ); ?>"
+								   aria-label="Install <?php esc_attr_e( $name ); ?> now" data-name="<?php esc_attr_e( $name ); ?>"><?php _e( 'Install	Now', 'klarna-checkout-for-woocommerce' ); ?></a>
 							</p>
 						</div>
 						<?php
@@ -274,22 +271,22 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				return;
 			}
 
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-gateway.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api-callbacks.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-templates.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-ajax.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-merchant-urls.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-credentials.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-logging.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-fields.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-confirmation.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-extra-checkout-fields.php';
-			include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-gateway.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api-callbacks.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-templates.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-ajax.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-merchant-urls.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-credentials.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-logging.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-confirmation.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-extra-checkout-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php';
 
 			if ( is_admin() ) {
-				include_once KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-admin-notices.php';
+				include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-admin-notices.php';
 			}
 
 			$this->api           = new Klarna_Checkout_For_WooCommerce_API();
@@ -317,17 +314,10 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		}
 
 		/**
-		 * Adds KCO page endpoint.
-		 */
-		public function add_kco_endpoint() {
-			add_rewrite_endpoint( 'kco', EP_ROOT | EP_PAGES );
-		}
-
-		/**
 		 * Filters cart item quantity output.
 		 *
-		 * @param string $output HTML output.
-		 * @param array $cart_item Cart item.
+		 * @param string $output        HTML output.
+		 * @param array  $cart_item     Cart item.
 		 * @param string $cart_item_key Cart item key.
 		 *
 		 * @return string $output

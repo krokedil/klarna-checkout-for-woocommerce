@@ -4,8 +4,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 /**
  * Klarna_Checkout_For_WooCommerce_Templates class.
- *
- * Class that registers custom checkout endpoints.
  */
 class Klarna_Checkout_For_WooCommerce_Templates {
 
@@ -63,7 +61,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 				if ( locate_template( 'woocommerce/klarna-checkout.php' ) ) {
 					$klarna_checkout_template = locate_template( 'woocommerce/klarna-checkout.php' );
 				} else {
-					$klarna_checkout_template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout.php';
+					$klarna_checkout_template = KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout.php';
 				}
 
 				// Klarna checkout page.
@@ -105,7 +103,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 		// Fallback Klarna Order Received, used when WooCommerce checkout form submission fails.
 		if ( 'checkout/thankyou.php' === $template_name ) {
 			if ( isset( $_GET['kco_wc'] ) && 'true' === $_GET['kco_wc'] ) {
-				$template = KLARNA_CHECKOUT_FOR_WOOCOMMERCE_PLUGIN_PATH . '/templates/klarna-checkout-order-received.php';
+				$template = KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout-order-received.php';
 			}
 		}
 

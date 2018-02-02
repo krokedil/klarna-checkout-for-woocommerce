@@ -451,7 +451,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_user_agent() {
-		$user_agent = apply_filters( 'http_headers_useragent', 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) ) . ' - KCO:' . KLARNA_CHECKOUT_FOR_WOOCOMMERCE_VERSION;
+		$user_agent = apply_filters( 'http_headers_useragent', 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) ) . ' - KCO:' . KCO_WC_VERSION;
 
 		return $user_agent;
 	}
