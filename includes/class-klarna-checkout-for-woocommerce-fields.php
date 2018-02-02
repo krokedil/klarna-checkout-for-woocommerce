@@ -66,7 +66,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 					'B2C'  => __( 'B2C only', 'klarna-checkout-for-woocommerce' ),
 					'B2B'  => __( 'B2B only', 'klarna-checkout-for-woocommerce' ),
 					'B2CB' => __( 'B2C & B2B (defaults to B2C)', 'klarna-checkout-for-woocommerce' ),
-					'B2BC' => __( 'B2B & B2C (defaults to B2B)', 'klarna-checkout-for-woocommerce' )
+					'B2BC' => __( 'B2B & B2C (defaults to B2B)', 'klarna-checkout-for-woocommerce' ),
 				),
 				'description' => sprintf( __( 'Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO and FI). Learn more and <a href="%s" target="_blank">sign up for Klarna Checkout B2B here</a>.', 'klarna-checkout-for-woocommerce' ), 'https://www.klarna.com/se/foretag/klarna-checkout/klarna-checkout-foretag-form' ),
 				'default'     => 'B2C',

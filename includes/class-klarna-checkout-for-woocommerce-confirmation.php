@@ -53,7 +53,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 */
 	public function confirm_page_title( $title ) {
 		if ( ! is_admin() && is_main_query() && in_the_loop() && is_page() && is_checkout() && isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] ) {
-			$title = 'Please wait while we process your order.';
+			$title = __( 'Please wait while we process your order.', 'klarna-checkout-for-woocommerce' );
 			remove_filter( 'the_title', array( $this, 'confirm_page_title' ) );
 		}
 
@@ -259,7 +259,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	public function add_kco_order_id_field() {
 		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) && isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] ) {
 			if ( isset( $_GET['kco_wc_order_id'] ) ) { // Input var okay.
-				$klarna_order_id = sanitize_text_field( $_GET['kco_wc_order_id'] );
+				$klarna_order_id = esc_attr( sanitize_text_field( $_GET['kco_wc_order_id'] ) );
 				echo '<input type="hidden" id="kco_order_id" name="kco_order_id" value="' . $klarna_order_id . '" />';
 			}
 		}

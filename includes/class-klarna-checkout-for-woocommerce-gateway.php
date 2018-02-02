@@ -146,7 +146,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'update_shipping_nonce'                => wp_create_nonce( 'kco_wc_update_shipping' ),
 			'update_extra_fields_url'              => WC_AJAX::get_endpoint( 'kco_wc_update_extra_fields' ),
 			'update_extra_fields_nonce'            => wp_create_nonce( 'kco_wc_update_extra_fields' ),
-			// 'extra_fields_values'         => WC()->session->get( 'kco_wc_extra_fields_values' ),
 			'change_payment_method_url'            => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
 			'change_payment_method_nonce'          => wp_create_nonce( 'kco_wc_change_payment_method' ),
 			'update_klarna_order_url'              => WC_AJAX::get_endpoint( 'kco_wc_update_klarna_order' ),
@@ -239,13 +238,24 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 */
 	public function address_notice( $order ) {
 		if ( $this->id === $order->get_payment_method() ) {
-			echo '<div style="margin: 10px 0; padding: 10px; border: 1px solid #B33A3A; font-size: 12px">Order address should not be changed and any changes you make will not be reflected in Klarna system.</div>';
+			echo '<div style="margin: 10px 0; padding: 10px; border: 1px solid #B33A3A; font-size: 12px">';
+			esc_html_e( 'Order address should not be changed and any changes you make will not be reflected in Klarna system.', 'klarna-checkout-for-woocommerce' );
+			echo '</div>';
 		}
 	}
 
+	/**
+	 * Show notice that tells customers they need to log in.
+	 */
 	public function show_log_in_notice() {
 		if ( isset( $_GET['login_required'] ) && 'yes' === $_GET['login_required'] ) {
-			wc_add_notice( 'An account is already registered with your email address. Please log in.', 'error' );
+			wc_add_notice(
+				sanitize_textarea_field( __(
+					'An account is already registered with your email address. Please log in.',
+					'klarna-checkout-for-woocommerce'
+				) ),
+				'error'
+			);
 		}
 	}
 

@@ -194,7 +194,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					}
 				}
 				// Add separate discount line item, but only if it's a smart coupon or country is US.
-				if ( 'smart_coupon' === $coupon->get_discount_type() || 'US' === $this->shop_country ) {
+				if ( 'US' === $this->shop_country || 'smart_coupon' === $coupon->get_discount_type() ) {
 					$discount            = array(
 						'type'                  => 'discount',
 						'reference'             => $coupon_reference,
@@ -311,8 +311,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array $cart_item Cart item.
-	 * @param  object $product Product object.
+	 * @param  array  $cart_item Cart item.
+	 * @param  object $product   Product object.
 	 *
 	 * @return integer $item_tax_rate Item tax percentage formatted for Klarna.
 	 */

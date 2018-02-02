@@ -55,7 +55,7 @@ function kco_wc_show_extra_fields() {
 						<input class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox"
 						       id="createaccount" <?php checked( ( true === WC()->checkout()->get_value( 'createaccount' ) || ( true === apply_filters( 'woocommerce_create_account_default_checked', false ) ) ), true ) ?>
 						       type="checkbox" name="createaccount" value="1"/>
-						<span><?php _e( 'Create an account?', 'woocommerce' ); ?></span>
+						<span><?php _e( 'Create an account?', 'klarna-checkout-for-woocommerce' ); ?></span>
 					</label>
 				</p>
 			<?php } ?>

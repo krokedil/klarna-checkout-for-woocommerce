@@ -90,11 +90,15 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 				$order->payment_complete( $klarna_order_id );
-				$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . sanitize_key( $klarna_order->order_id ) );
+				// translators: Klarna order ID.
+				$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+				$order->add_order_note( $note );
 			} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
-				$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
+				$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
 			} elseif ( 'PENDING' === $klarna_order->fraud_status ) {
-				$order->update_status( 'on-hold', 'Klarna order is under review, order ID: ' . $klarna_order->order_id );
+				// translators: Klarna order ID.
+				$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+				$order->update_status( 'on-hold', $note );
 			}
 
 			KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
@@ -402,9 +406,11 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 				$order->payment_complete( $klarna_order->order_id );
-				$order->add_order_note( 'Payment via Klarna Checkout, order ID: ' . sanitize_key( $klarna_order->order_id ) );
+				// translators: Klarna Order ID.
+				$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+				$order->add_order_note( $note );
 			} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
-				$order->update_status( 'on-hold', 'Klarna Checkout order was rejected.' );
+				$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
 			}
 
 			if ( (int) round( $order->get_total() * 100 ) !== (int) $klarna_order->order_amount ) {
