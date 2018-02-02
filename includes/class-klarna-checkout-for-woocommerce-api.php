@@ -419,10 +419,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return bool
 	 */
 	public function site_has_english_locale() {
-		// @TODO: Clean this up, for now always do non-EN
-		return false;
-
-		// return 'en_US' === get_locale() || 'en_GB' === get_locale();
+		return 0 === stripos( get_locale(), 'en' );
 	}
 
 	/**
