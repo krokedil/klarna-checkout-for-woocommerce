@@ -459,6 +459,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 	/**
 	 * Gets Klarna API request body.
 	 *
+	 * @TODO: Clean this up by using maybe_add functions.
+	 *
 	 * @param  string $request_type Type of request.
 	 *
 	 * @return false|string
@@ -506,6 +508,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		}
 
 		// Allow external payment method plugin to do its thing.
+		// @TODO: Extract this into a hooked function.
 		if ( 'create' === $request_type ) {
 			if ( in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) ) {
 				if ( isset( $this->settings['allowed_customer_types'] ) ) {
