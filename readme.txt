@@ -44,6 +44,14 @@ __Klarna Payments__ removes the headaches of payments, for both consumers and me
 4. Read more about the configuration process in the [plugin documentation](http://docs.krokedil.com/documentation/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2018.02.26  	- version 1.2.5 =
+* Feature       - Allows Klarna Checkout to be overwritten from the theme.
+* Fix           - Keeps extra checkout fields values on checkout page reload.
+* Enhancement   - Cleans up template files.
+* Enhancement   - Adds WC required and tested up to data to main plugin file.
+* Enhancement   - Allows English locale for non-english countries.
+* Dev           - Adds Gulp task for .pot file processing.
+
 = 2018.01.31  	- version 1.2.4 =
 * Fix			- Fixes backup order creation process to check for product SKU.
 * Enhancement   - Adds admin notice if Terms URL is not set in WooCommerce settings.
