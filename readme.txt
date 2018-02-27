@@ -13,17 +13,19 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 *A full checkout experience embedded on your site with Pay Now, Pay Later and Slice It. No credit card numbers, no passwords, no worries.*
 
+https://www.youtube.com/watch?v=XayUzOUkyDQ
+
 Our complete checkout is a seamless and mobile optimized solution that delivers a best-in-class user experience that comes with all our payment methods. It also identifies the customer and enables one-click repeat purchases across Klarna’s merchant network, resulting in increased average order value, conversions, and loyalty.
 
 This official Klarna extension also makes it easy for you to handle orders in WooCommerce after a purchase is complete. With a single click of a button, you can activate, update, refund and cancel orders directly from WooCommerce without logging into the Klarna administration.
 
-=== Pay Now ===
+=== Pay Now (direct payments) ===
 Customers who want to pay in full at checkout can do it quickly and securely with a credit/debit card. Friction-free direct purchases while maximising the value for your business thanks to guaranteed payments. If they have a Klarna account they can save their details and enjoy one-click purchases from then on.
 
-=== Pay later ===
+=== Pay later (invoice) ===
 Try it first, pay it later. Delayed payments for customers who like low friction purchases and to pay after delivery.
 
-=== Slice it ===
+=== Slice it (installments) ===
 Installment, revolving and other flexible financing plans let customers pay when they can and when they want.
 
 === How to Get Started ===
@@ -41,7 +43,21 @@ __Klarna Payments__ removes the headaches of payments, for both consumers and me
 1. Upload plugin folder to to the "/wp-content/plugins/" directory.
 2. Activate the plugin through the "Plugins" menu in WordPress.
 3. Go WooCommerce Settings –> Payment Gateways and configure your Klarna Checkout settings.
-4. Read more about the configuration process in the [plugin documentation](http://docs.krokedil.com/documentation/klarna-checkout-for-woocommerce/).
+4. Read more about the configuration process in the [plugin documentation](https://docs.woocommerce.com/document/klarna-checkout/).
+
+
+== Frequently Asked Questions ==
+= Which countries does this payment gateway support? =
+Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria, the Netherlands, UK and United States.
+
+= Where can I find Klarna Checkout for WooCommerce documentation? =
+For help setting up and configuring Klarna Payments for WooCommerce please refer to our [documentation](https://docs.woocommerce.com/document/klarna-checkout/).
+
+= Are there any specific requirements? =
+* WooCommerce 3.0 or newer is required.
+* PHP 5.6 or higher is required.
+* A SSL Certificate is required.
+* This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
 = 2018.02.26  	- version 1.2.5 =
