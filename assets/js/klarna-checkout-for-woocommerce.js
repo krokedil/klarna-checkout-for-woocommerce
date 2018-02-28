@@ -278,7 +278,7 @@ jQuery(function($) {
 							kco_wc.log('shipping_address_change');
 							kco_wc.log(data);
 
-							$('table.woocommerce-checkout-review-order-table').block({
+							$('.woocommerce-checkout-review-order-table').block({
 								message: null,
 								overlayCSS: {
 									background: '#fff',
@@ -298,13 +298,13 @@ jQuery(function($) {
 									},
 									success: function (response) {
 										kco_wc.log(response);
-										$('table.woocommerce-checkout-review-order-table').replaceWith(response.data.html);
+										$('.woocommerce-checkout-review-order-table').replaceWith(response.data.html);
 									},
 									error: function (response) {
 										kco_wc.log(response);
 									},
 									complete: function() {
-										$('table.woocommerce-checkout-review-order-table').unblock();
+										$('.woocommerce-checkout-review-order-table').unblock();
 										kco_wc.kcoResume();
 									}
 								}
