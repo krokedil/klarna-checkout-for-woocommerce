@@ -269,18 +269,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 */
 	public function get_item_name( $cart_item ) {
 		$cart_item_data = $cart_item['data'];
-		$item_name      = $cart_item_data->get_title();
-		// Get variations as a string and remove line breaks.
-		if ( function_exists( 'wc_get_formatted_cart_item_data' ) ) { // WC 3.3+.
-			$item_variations = rtrim( wc_get_formatted_cart_item_data( $cart_item, true ) ); // Removes new line at the end.
-		} else {
-			$item_variations = rtrim( WC()->cart->get_item_data( $cart_item, true ) ); // Removes new line at the end.
-		}
-		$item_variations = str_replace( "\n", ', ', $item_variations ); // Replaces all other line breaks with commas.
-		// Add variations to name.
-		if ( '' !== $item_variations ) {
-			$item_name .= ' [' . $item_variations . ']';
-		}
+		$item_name      = $cart_item_data->get_name();
 
 		return strip_tags( $item_name );
 	}
