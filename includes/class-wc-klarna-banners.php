@@ -55,6 +55,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 
 			if ( $show_banner ) {
 				?>
+				<div id="kb-spacer"></div>
 				<div id="klarna-banner">
 					<div id="kb-left">
 						<h1>Go live</h1>
