@@ -24,7 +24,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		public function load_admin_css() {
 			wp_enqueue_style(
 				'klarna_payments_admin',
-				plugins_url( 'assets/css/klarna-checkout-admin.css?v=12032018', KCO_WC_MAIN_FILE )
+				plugins_url( 'assets/css/klarna-checkout-admin.css?v=120320182110', KCO_WC_MAIN_FILE )
 			);
 		}
 
@@ -73,7 +73,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 					</div>
 					<img id="kb-image"
 						 src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_white.png"
-						 alt="Klarna logo" width="80"/>
+						 alt="Klarna logo" width="110"/>
 				</div>
 				<?php
 			}
