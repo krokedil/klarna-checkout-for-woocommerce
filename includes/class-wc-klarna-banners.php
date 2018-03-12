@@ -59,20 +59,14 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 				<div id="klarna-banner">
 					<div id="kb-left">
 						<h1>Go live</h1>
-						<p>Before you can start to sell with Klarna you need your store to be approved by Klarna. When
-							the installation is done and you are ready to go live, Klarna will need to verify the
-							integration. Then you can go live with your store! If you wish to switch Klarna products
-							then you’ll need the Klarna team to approve your store again.</p>
+						<p>Before you can start to sell with Klarna you need your store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will need to verify the integration. Then you can go live with your store! If you wish to switch Klarna products then you’ll need the Klarna team to approve your store again.</p>
 						<a class="kb-button"
 						   href="https://www.klarna.com/international/business/woocommerce/?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=banner"
 						   target="_blank">Click here to go live with your store</a>
 					</div>
 					<div id="kb-right">
 						<h1>Currently using Klarna?</h1>
-						<p>Pay now, Pay later and Slice it. Klarna is entering a new world of smoooth. We would love for
-							you to join us on the ride and to do so, you will need to upgrade your Klarna products to a
-							new integration. You will then always get the latest features that Klarna develops and
-							you’ll keep your current agreement along with your price settings.</p>
+						<p>Pay now, Pay later and Slice it. Klarna is entering a new world of smoooth. We would love for you to join us on the ride and to do so, you will need to upgrade your Klarna products to a new integration. You will then always get the latest features that Klarna develops and you’ll keep your current agreement along with your price settings.</p>
 						<a class="kb-button"
 						   href="https://hello.klarna.com/product-upgrade?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=banner"
 						   target="_blank">Click here to update your Klarna products</a>
@@ -101,10 +95,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 					<div class="kb-sidebar-section">
 						<img src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/icon_reminder.png" width="64"/>
 						<h3>Go live</h3>
-						<p>Before you can start to sell with Klarna you need your store to be approved by Klarna. When
-							the installation is done and you are ready to go live, Klarna will need to verify the
-							integration. Then you can go live with your store! If you wish to switch Klarna products
-							then you’ll need the Klarna team to approve your store again. </p>
+						<p>Before you can start to sell with Klarna you need your store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will need to verify the integration. Then you can go live with your store! If you wish to switch Klarna products then you’ll need the Klarna team to approve your store again.</p>
 						<a class="kb-button"
 						   href="https://www.klarna.com/international/business/woocommerce/?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=kco"
 						   target="_blank">Get Klarna to verify your store</a>
@@ -116,10 +107,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 								 width="192"/>
 						</div>
 						<h3>Currently using Klarna?</h3>
-						<p>Pay now, Pay later and Slice it. Klarna is entering a new world of smoooth. We would love for
-							you to join us on the ride and to do so, you will need to upgrade your Klarna products to a
-							new integration. You will then always get the latest features that Klarna develops and
-							you’ll keep your current agreement along with your price settings.</p>
+						<p>Pay now, Pay later and Slice it. Klarna is entering a new world of smoooth. We would love for you to join us on the ride and to do so, you will need to upgrade your Klarna products to a new integration. You will then always get the latest features that Klarna develops and you’ll keep your current agreement along with your price settings.</p>
 						<a class="kb-button"
 						   href="https://hello.klarna.com/product-upgrade?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=kco"
 						   target="_blank">Update your Klarna product</a>
