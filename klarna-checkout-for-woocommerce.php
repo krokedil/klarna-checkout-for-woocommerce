@@ -40,6 +40,7 @@ define( 'KCO_WC_MIN_PHP_VER', '5.3.0' );
 define( 'KCO_WC_MIN_WC_VER', '2.5.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
 define( 'KCO_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
+define( 'KCO_WC_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 
 if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 	/**
@@ -218,7 +219,8 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 							<?php echo esc_html( $description ); ?>
 							<a class="install-now button" data-slug="<?php esc_attr_e( $plugin_slug ); ?>"
 							   href="<?php echo esc_url( $url ); ?>"
-							   aria-label="Activate <?php esc_attr_e( $name ); ?> now" data-name="<?php esc_attr_e( $name ); ?>"><?php _e( 'Activate Now', 'klarna-checkout-for-woocommerce' ); ?></a>
+							   aria-label="Activate <?php esc_attr_e( $name ); ?> now"
+							   data-name="<?php esc_attr_e( $name ); ?>"><?php _e( 'Activate Now', 'klarna-checkout-for-woocommerce' ); ?></a>
 						</p>
 					</div>
 					<?php
@@ -241,7 +243,8 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 								<?php echo esc_html( $description ); ?>
 								<a class="install-now button" data-slug="<?php esc_attr_e( $plugin_slug ); ?>"
 								   href="<?php echo esc_url( $url ); ?>"
-								   aria-label="Install <?php esc_attr_e( $name ); ?> now" data-name="<?php esc_attr_e( $name ); ?>"><?php _e( 'Install	Now', 'klarna-checkout-for-woocommerce' ); ?></a>
+								   aria-label="Install <?php esc_attr_e( $name ); ?> now"
+								   data-name="<?php esc_attr_e( $name ); ?>"><?php _e( 'Install	Now', 'klarna-checkout-for-woocommerce' ); ?></a>
 							</p>
 						</div>
 						<?php
@@ -287,6 +290,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 
 			if ( is_admin() ) {
 				include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-admin-notices.php';
+				include_once KCO_WC_PLUGIN_PATH . '/includes/class-wc-klarna-banners.php';
 			}
 
 			$this->api           = new Klarna_Checkout_For_WooCommerce_API();
@@ -316,8 +320,8 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		/**
 		 * Filters cart item quantity output.
 		 *
-		 * @param string $output        HTML output.
-		 * @param array  $cart_item     Cart item.
+		 * @param string $output HTML output.
+		 * @param array $cart_item Cart item.
 		 * @param string $cart_item_key Cart item key.
 		 *
 		 * @return string $output
