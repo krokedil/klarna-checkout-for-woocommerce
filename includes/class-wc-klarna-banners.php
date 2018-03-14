@@ -118,6 +118,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			<?php
 		}
 	}
+
+	new WC_Klarna_Banners();
 }
 
-new WC_Klarna_Banners();
