@@ -60,6 +60,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2018.03.14  	- version 1.2.6 =
+* Fix           - Fixes how product name is fetched for Klarna.
+* Update        - Adds new mandatory PNO field.
+* Update        - Adds dashboard banners and Klarna information.
+* Update        - Adds exception error code to logger, in addition to error message.
+* Update        - Changes CSS selector from table to generic class for cart widget.
+
 = 2018.02.26  	- version 1.2.5 =
 * Feature       - Allows Klarna Checkout to be overwritten from the theme.
 * Fix           - Keeps extra checkout fields values on checkout page reload.
