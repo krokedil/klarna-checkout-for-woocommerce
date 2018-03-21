@@ -180,7 +180,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	public function validation_cb() {
 		$post_body = file_get_contents( 'php://input' );
 		$data      = json_decode( $post_body, true );
-		krokedil_log_events( $data['merchant_reference2'], 'Klarna validation callback data', $data );
+		krokedil_log_events( null, 'Klarna validation callback data', $data );
 		$all_in_stock    = true;
 		$shipping_chosen = false;
 
