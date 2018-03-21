@@ -1,0 +1,5 @@
+{
+    "require": {
+        "krokedil/krokedil-logger": "^1.0"
+    }
+}

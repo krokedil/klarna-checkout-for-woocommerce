@@ -1,0 +1,23 @@
+.krokedil_event {
+    margin:5px;
+    background-color:#f9f9f9;
+    overflow-x:auto;
+}
+.krokedil_event_header * {
+    display:inline-block;
+    margin:5px;
+}
+.krokedil_event_header {
+    padding:5px;
+    background-color:#f1f1f1;
+}
+.krokedil_event_header h5 {
+    float:right;
+}
+.krokedil_hidden {
+    display:none;
+}
+.krokedil_shown{
+    clear:both;
+    display:block;
+}

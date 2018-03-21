@@ -36,9 +36,13 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 			'body'       => $this->get_request_body( 'create' ),
 		);
-
+		$log_array = array(
+			'headers'    => $request_args['header'],
+			'user-agent' => $request_args['user-agent'],
+			'body'       => json_decode( $request_args['body'] ),
+		);
 		KCO_WC()->logger->log( 'Create Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
-
+		krokedil_log_events( null, 'Pre Create Order request args', $log_array );
 		$response = wp_safe_remote_post( $request_url, $request_args );
 
 		if ( is_wp_error( $response ) ) {
@@ -49,11 +53,13 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$klarna_order = json_decode( $response['body'] );
 			$this->save_order_id_to_session( sanitize_key( $klarna_order->order_id ) );
 			$this->save_order_api_to_session( $klarna_order );
-
+			$log_order = clone $klarna_order;
+			$log_order->html_snippet = '';
+			krokedil_log_events( null, 'Pre Create Order response', $log_order );
 			return $klarna_order;
 		} else {
 			$error = $this->extract_error_messages( $response );
-
+			krokedil_log_events( null, 'Pre Create Order response', $error );
 			return $error;
 		}
 	}
@@ -71,18 +77,20 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 		);
-
+		krokedil_log_events( $klarna_order_id, 'Pre Retrieve Order request args', $request_args );
 		KCO_WC()->logger->log( 'Retrieve ongoing Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
 
 		$response = wp_safe_remote_get( $request_url, $request_args );
 
 		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
 			$klarna_order = json_decode( $response['body'] );
-
+			$log_order = clone $klarna_order;
+			$log_order->html_snippet = '';
+			krokedil_log_events( $klarna_order_id, 'Pre Retrieve Order response', $log_order );
 			return $klarna_order;
 		} else {
 			$error = $this->extract_error_messages( $response );
-
+			krokedil_log_events( $klarna_order_id, 'Pre Retrieve Order response', $error );
 			return $error;
 		}
 	}
@@ -100,12 +108,16 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 			'body'       => $this->get_request_body(),
 		);
-
+		$log_array = array(
+			'headers'    => $request_args['header'],
+			'user-agent' => $request_args['user-agent'],
+			'body'       => json_decode( $request_args['body'] ),
+		);
 		// No update if nothing changed in data being sent to Klarna.
 		if ( WC()->session->get( 'kco_wc_update_md5' ) && WC()->session->get( 'kco_wc_update_md5' ) === md5( serialize( $request_args ) ) ) {
 			return;
 		}
-
+		krokedil_log_events( null, 'Pre Update Order request args', $log_array );
 		KCO_WC()->logger->log( 'Update ongoing Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
 
 		$response = wp_safe_remote_post( $request_url, $request_args );
@@ -114,13 +126,15 @@ class Klarna_Checkout_For_WooCommerce_API {
 			WC()->session->set( 'kco_wc_update_md5', md5( serialize( $request_args ) ) );
 
 			$klarna_order = json_decode( $response['body'] );
-
+			$log_order = clone $klarna_order;
+			$log_order->html_snippet = '';
+			krokedil_log_events( null, 'Pre Update Order response', $log_order );
 			return $klarna_order;
 		} else {
 			WC()->session->__unset( 'kco_wc_update_md5' );
 			WC()->session->__unset( 'kco_wc_order_id' );
 			$error = $this->extract_error_messages( $response );
-
+			krokedil_log_events( null, 'Pre Update Order response', $error );
 			return $error;
 		}
 
@@ -140,7 +154,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 		);
-
 		$response = wp_safe_remote_get( $request_url, $request_args );
 
 		return $response;

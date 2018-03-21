@@ -1,0 +1,22 @@
+{
+    "name": "krokedil/krokedil-logger",
+    "type": "library",
+    "description": "Logging for WooCommerce Gateways",
+    "keywords": ["log","logging", "woocommerce"],
+    "homepage": "https://www.krokedil.se",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Krokedil",
+            "email": "info@krokedil.se",
+            "homepage": "https://www.krokedil.se",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0"
+    },
+    "autoload": {
+        "files": ["src/krokedil-order-event-log.php"]
+    }
+}

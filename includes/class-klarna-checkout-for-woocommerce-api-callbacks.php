@@ -87,6 +87,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			// If the order was already created, send merchant reference.
 			$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 			$klarna_order = json_decode( $response['body'] );
+			krokedil_log_events( $order_id, 'Klarna push callback data', $klarna_order );
 
 			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 				$order->payment_complete( $klarna_order_id );
@@ -156,7 +157,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		} else {
 			$post_body = file_get_contents( 'php://input' );
 			$data      = json_decode( $post_body, true );
-
+			krokedil_log_events( $order_id, 'Klarna notification callback data', $data );
 			wp_schedule_single_event( time() + 300, 'kco_wc_punted_notification', array( $klarna_order_id, $data ) );
 		}
 	}
@@ -179,7 +180,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	public function validation_cb() {
 		$post_body = file_get_contents( 'php://input' );
 		$data      = json_decode( $post_body, true );
-
+		krokedil_log_events( $data['merchant_reference2'], 'Klarna validation callback data', $data );
 		$all_in_stock    = true;
 		$shipping_chosen = false;
 
