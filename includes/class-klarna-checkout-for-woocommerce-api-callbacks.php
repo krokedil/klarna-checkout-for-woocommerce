@@ -338,7 +338,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 					WC()->cart->add_to_cart( $id, $cart_item->quantity );
 				} catch ( Exception $e ) {
 					$logger = new WC_Logger();
-					$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error add to cart error: ' . $e->getMessage() );
+					$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error add to cart error: ' . $e->getCode() . ' - ' . $e->getMessage() );
 				}
 			}
 		}
@@ -429,7 +429,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			);
 		} catch ( Exception $e ) {
 			$logger = new WC_Logger();
-			$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error: ' . $e->getMessage() );
+			$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error: ' . $e->getCode() . ' - ' . $e->getMessage() );
 		}
 	}
 

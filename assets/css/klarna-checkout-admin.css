@@ -1,0 +1,145 @@
+@font-face {
+	font-family: Klarna;
+	src: url("../fonts/KlarnaSans-Regular.otf") format("opentype");
+}
+
+@font-face {
+	font-family: KlarnaHeadline;
+	font-weight: bold;
+	src: url("../fonts/KlarnaHeadline-Bold.otf") format("opentype");
+}
+
+/* Banner */
+#klarna-banner {
+	background-image: url("../img/admin-banner.jpg");
+	background-position: center center;
+	background-size: 100% auto;
+	padding: 30px;
+	margin: 0 20px 20px 0;
+	color: #fff;
+	position: relative;
+}
+
+#kb-spacer {
+	height: 20px;
+}
+
+#klarna-banner > div {
+	text-align: center;
+	padding: 0 60px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	font-family: Klarna, sans-serif;
+}
+
+#klarna-banner h1 {
+	font-size: 32px;
+	line-height: 1.2;
+	font-weight: bold;
+	color: #fff;
+	font-family: KlarnaHeadline, sans-serif;
+	margin-top: 0;
+}
+
+#klarna-banner p {
+	margin-bottom: 1em;
+	font-size: 14px;
+	letter-spacing: -0.2px;
+}
+
+#kb-image {
+	position: absolute;
+	right: 20px;
+	bottom: 20px;
+	z-index: 1;
+}
+
+a.kb-button {
+	display: inline-block;
+	background: #eb6f93;
+	color: #fff;
+	text-decoration: none;
+	padding: 0.75em 2em;
+	-webkit-border-radius: 0.5em;
+	-moz-border-radius: 0.5em;
+	border-radius: 0.5em;
+	-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 800px) {
+	#klarna-banner {
+		overflow: hidden;
+	}
+
+	#klarna-banner > div {
+		float: left;
+		width: 50%;
+	}
+
+	#klarna-banner > div > * {
+		margin-left: auto;
+		margin-right: auto;
+		max-width: 500px;
+	}
+}
+
+@media (max-width: 799px) {
+	#klarna-banner > div {
+		margin-bottom: 40px;
+	}
+}
+
+
+/* Sidebar */
+@media (min-width: 880px) {
+	#klarna-wrapper:after {
+		content: '';
+		display: block;
+		clear: both;
+	}
+
+	#klarna-main {
+		width: 70%;
+		float: left;
+		padding: 0 2% 0 0;
+		border-right: 1px solid #ccc;
+		box-sizing: border-box;
+	}
+
+	#klarna-sidebar {
+		width: 28%;
+		max-width: 350px;
+		margin-left: 2%;
+		float: left;
+		box-sizing: border-box;
+		text-align: center;
+		font-family: Klarna, sans-serif;
+	}
+}
+
+#klarna-settings-logo {
+	display: block;
+	margin: 20px 0;
+}
+
+#klarna-sidebar h3 {
+	font-family: KlarnaHeadline, sans-serif;
+	font-size: 24px;
+	line-height: 1.2;
+}
+
+#klarna-sidebar p {
+	margin-bottom: 1.5em;
+}
+
+#klarna-sidebar img {
+	display: inline-block;
+	margin: 0 5px;
+}
+
+.kb-sidebar-section {
+	margin-bottom: 40px;
+}
