@@ -37,7 +37,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'body'       => $this->get_request_body( 'create' ),
 		);
 		$log_array = array(
-			'headers'    => $request_args['header'],
+			'headers'    => $request_args['headers'],
 			'user-agent' => $request_args['user-agent'],
 			'body'       => json_decode( $request_args['body'] ),
 		);
@@ -109,7 +109,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'body'       => $this->get_request_body(),
 		);
 		$log_array = array(
-			'headers'    => $request_args['header'],
+			'headers'    => $request_args['headers'],
 			'user-agent' => $request_args['user-agent'],
 			'body'       => json_decode( $request_args['body'] ),
 		);
