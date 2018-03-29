@@ -3,8 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 4.9.1
+Tested up to: 4.9.4
 Requires PHP: 5.6
+WC requires at least: 3.0.0
+WC tested up to: 3.3.4
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -60,6 +62,15 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2018.03.29  	- version 1.3.0 =
+* Update        - Adds Krokedil logger class.
+* Update        - Adds status report on Woocommerce status page.
+* Enhancement   - Adds verify_national_identification_number alongside with national_identification_number_mandatory setting in order data sent to Klarna.
+* Enhancement   - Improved order note for orders created via API callback.
+* Enhancement   - Improved messaging in order note when order totals doesn’t match.
+* Enhancement   - Display admin notice if https isn’t enabled.
+* Fix           - Spelling fix in banner.
+
 = 2018.03.14  	- version 1.2.6 =
 * Fix           - Fixes how product name is fetched for Klarna.
 * Update        - Adds new mandatory PNO field.
