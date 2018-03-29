@@ -87,6 +87,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			// If the order was already created, send merchant reference.
 			$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 			$klarna_order = json_decode( $response['body'] );
+			krokedil_log_events( $order_id, 'Klarna push callback data', $klarna_order );
 
 			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 				$order->payment_complete( $klarna_order_id );
@@ -156,7 +157,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		} else {
 			$post_body = file_get_contents( 'php://input' );
 			$data      = json_decode( $post_body, true );
-
+			krokedil_log_events( $order_id, 'Klarna notification callback data', $data );
 			wp_schedule_single_event( time() + 300, 'kco_wc_punted_notification', array( $klarna_order_id, $data ) );
 		}
 	}
@@ -179,7 +180,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	public function validation_cb() {
 		$post_body = file_get_contents( 'php://input' );
 		$data      = json_decode( $post_body, true );
-
+		krokedil_log_events( null, 'Klarna validation callback data', $data );
 		$all_in_stock    = true;
 		$shipping_chosen = false;
 
@@ -204,6 +205,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				$shipping_chosen = true;
 			}
 		}
+
+		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
 
 		if ( $all_in_stock && $shipping_chosen ) {
 			header( 'HTTP/1.0 200 OK' );
@@ -407,14 +410,14 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 				$order->payment_complete( $klarna_order->order_id );
 				// translators: Klarna Order ID.
-				$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+				$note = sprintf( __( 'Order created via Klarna Checkout API Callback. Please verify the order in Klarnas system. Klarna order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
 				$order->add_order_note( $note );
 			} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
-				$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
+				$order->update_status( 'on-hold', __( 'Order created via Klarna Checkout API Callback. Klarna Checkout order was rejected. Klarna order ID: ' . $klarna_order->order_id, 'klarna-checkout-for-woocommerce' ) );
 			}
 
 			if ( (int) round( $order->get_total() * 100 ) !== (int) $klarna_order->order_amount ) {
-				$order->update_status( 'on-hold', __( 'Order needs manual review, WooCommerce total and Klarna total do not match.', 'klarna-checkout-for-woocommerce' ) );
+				$order->update_status( 'on-hold',  sprintf(__( 'Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->order_amount ) );
 			}
 
 			KCO_WC()->api->request_post_acknowledge_order( $klarna_order->order_id );

@@ -58,6 +58,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 */
 	public function process_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
+		krokedil_set_order_gateway_version( $order_id, KCO_WC_VERSION );
 
 		return array(
 			'result'   => 'success',

@@ -5,12 +5,12 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 1.2.6
+ * Version: 1.3.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 3.0
- * WC tested up to: 3.3
+ * WC tested up to: 3.3.4
  *
  * Copyright (c) 2017-2018 Krokedil
  *
@@ -35,12 +35,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.2.6' );
+define( 'KCO_WC_VERSION', '1.3.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.3.0' );
 define( 'KCO_WC_MIN_WC_VER', '2.5.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
 define( 'KCO_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'KCO_WC_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
+define( 'KROKEDIL_LOGGER_GATEWAY', 'kco' );
 
 if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 	/**
@@ -141,6 +142,10 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
+			$KCO_options = get_option( 'woocommerce_kco_settings' );
+			if ( 'yes' === $KCO_options['logging'] ) {
+				define( 'KROKEDIL_LOGGER_ON', true );
+			}
 		}
 
 		/**
@@ -286,7 +291,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-fields.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-confirmation.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-extra-checkout-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-status.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php';
+			include_once KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
 
 			if ( is_admin() ) {
 				include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-admin-notices.php';
