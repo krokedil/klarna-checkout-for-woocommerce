@@ -59,6 +59,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 			add_action( 'woocommerce_settings_saved', array( $this, 'check_terms' ) );
 		} else {
 			add_action( 'admin_notices', array( $this, 'check_terms' ) );
+			add_action( 'admin_notices', array( $this, 'check_https' ) );
 		}
 	}
 
@@ -74,6 +75,21 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 		if ( ! wc_get_page_id( 'terms' ) || wc_get_page_id( 'terms' ) < 0 ) {
 			echo '<div class="notice notice-error">';
 			echo '<p>' . esc_html( __( 'You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout.', 'klarna-checkout-for-woocommerce' ) ) . '</p>';
+			echo '</div>';
+		}
+	}
+
+	/**
+	 * Check if https is configured.
+	 */
+	public function check_terms() {
+		if ( 'yes' !== $this->enabled ) {
+			return;
+		}
+
+		if ( ! is_ssl() ) {
+			echo '<div class="notice notice-error">';
+			echo '<p>' . esc_html( __( 'You need to enable and configure https to be able to use Klarna Checkout.', 'klarna-checkout-for-woocommerce' ) ) . '</p>';
 			echo '</div>';
 		}
 	}
