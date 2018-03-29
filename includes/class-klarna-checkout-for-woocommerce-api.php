@@ -77,7 +77,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 		);
-		krokedil_log_events( $klarna_order_id, 'Pre Retrieve Order request args', $request_args );
+		krokedil_log_events( null, 'Pre Retrieve Order request args', $request_args );
 		KCO_WC()->logger->log( 'Retrieve ongoing Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
 
 		$response = wp_safe_remote_get( $request_url, $request_args );
@@ -86,11 +86,11 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$klarna_order = json_decode( $response['body'] );
 			$log_order = clone $klarna_order;
 			$log_order->html_snippet = '';
-			krokedil_log_events( $klarna_order_id, 'Pre Retrieve Order response', $log_order );
+			krokedil_log_events( null, 'Pre Retrieve Order response', $log_order );
 			return $klarna_order;
 		} else {
 			$error = $this->extract_error_messages( $response );
-			krokedil_log_events( $klarna_order_id, 'Pre Retrieve Order response', $error );
+			krokedil_log_events( null, 'Pre Retrieve Order response', $error );
 			return $error;
 		}
 	}
