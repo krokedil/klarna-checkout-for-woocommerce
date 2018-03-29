@@ -69,7 +69,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 						<p>Pay now, Pay later and Slice it. Klarna is entering a new world of smoooth. We would love for you to join us on the ride and to do so, you will need to upgrade your Klarna products to a new integration. You will then always get the latest features that Klarna develops and you’ll keep your current agreement along with your price settings.</p>
 						<a class="kb-button"
 						   href="https://hello.klarna.com/product-upgrade?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=banner"
-						   target="_blank">Upgrade you contract with Klarna</a>
+						   target="_blank">Upgrade your contract with Klarna</a>
 					</div>
 					<img id="kb-image"
 						 src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_white.png"
