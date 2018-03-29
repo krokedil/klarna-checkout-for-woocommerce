@@ -417,7 +417,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			}
 
 			if ( (int) round( $order->get_total() * 100 ) !== (int) $klarna_order->order_amount ) {
-				$order->update_status( 'on-hold', __( 'Order needs manual review, WooCommerce total and Klarna total do not match.', 'klarna-checkout-for-woocommerce' ) );
+				$order->update_status( 'on-hold',  sprintf(__( 'Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->order_amount ) );
 			}
 
 			KCO_WC()->api->request_post_acknowledge_order( $klarna_order->order_id );
