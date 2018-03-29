@@ -1,23 +1,23 @@
 [
     {
         "name": "krokedil/krokedil-logger",
-        "version": "1.0.5",
-        "version_normalized": "1.0.5.0",
+        "version": "1.0.6",
+        "version_normalized": "1.0.6.0",
         "source": {
             "type": "git",
             "url": "https://github.com/krokedil/krokedil-logger.git",
-            "reference": "ec785e6b08da6e09903001880edcb188d2206860"
+            "reference": "68fca237f3d53720d223373827531488d5ef7b21"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/krokedil/krokedil-logger/zipball/ec785e6b08da6e09903001880edcb188d2206860",
-            "reference": "ec785e6b08da6e09903001880edcb188d2206860",
+            "url": "https://api.github.com/repos/krokedil/krokedil-logger/zipball/68fca237f3d53720d223373827531488d5ef7b21",
+            "reference": "68fca237f3d53720d223373827531488d5ef7b21",
             "shasum": ""
         },
         "require": {
             "php": ">=5.6.0"
         },
-        "time": "2018-03-14T11:52:47+00:00",
+        "time": "2018-03-29T13:59:58+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
