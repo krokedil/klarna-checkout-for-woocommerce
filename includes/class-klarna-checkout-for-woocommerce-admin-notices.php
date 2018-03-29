@@ -82,7 +82,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 	/**
 	 * Check if https is configured.
 	 */
-	public function check_terms() {
+	public function check_https() {
 		if ( 'yes' !== $this->enabled ) {
 			return;
 		}
