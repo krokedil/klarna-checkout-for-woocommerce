@@ -232,11 +232,13 @@ jQuery(function($) {
 
 		checkoutError: function() {
 			if ('kco' === kco_wc.paymentMethod) {
+				var error_message = $( ".woocommerce-NoticeGroup-checkout" ).text();
 				$.ajax({
 					type: 'POST',
 					dataType: 'json',
 					data: {
 						kco: false,
+						error_message: error_message,
 						nonce: kco_params.checkout_error_nonce
 					},
 					url: kco_params.checkout_error_url,

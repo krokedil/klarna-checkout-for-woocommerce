@@ -253,6 +253,15 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			exit;
 		}
 
+		if ( ! empty( $_POST['error_message'] ) ) { // Input var okay.
+			$error_message = 'Error message: ' . trim( $_POST['error_message'] );
+		} else {
+			$error_message = 'Error message could not be retreived';
+		}
+
+		KCO_WC()->logger->log( 'Checkout form submission failed. Redirect customer to simplified thankyou page. ' . $error_message );
+		krokedil_log_events( null, 'Checkout form submission failed', $error_message );
+
 		$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
 		$redirect_url = add_query_arg( 'kco_wc', 'true', $redirect_url );
 
