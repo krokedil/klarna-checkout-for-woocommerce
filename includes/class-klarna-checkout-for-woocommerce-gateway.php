@@ -193,10 +193,45 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			return;
 		}
 
-		wp_enqueue_script(
-			'klarna_payments_admin',
-			plugins_url( 'assets/js/klarna-checkout-for-woocommerce-admin.js', KCO_WC_MAIN_FILE )
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$store_base_location = wc_get_base_location();
+		if ( 'US' === $store_base_location['country'] ) {
+			$location = 'US';
+		} else {
+			$location = $this->check_if_eu( $store_base_location['country'] );
+		}
+
+		wp_register_script(
+			'kco_admin',
+			plugins_url( 'assets/js/klarna-checkout-for-woocommerce-admin.js', KCO_WC_MAIN_FILE ),
+			array(),
+			KCO_WC_VERSION
 		);
+		$admin_localize_params = array(
+			'location' => $location,
+		);
+		wp_localize_script( 'kco_admin', 'kco_admin_params', $admin_localize_params );
+		wp_enqueue_script( 'kco_admin' );
+	}
+
+	/**
+	 * Detect if EU country.
+	 *
+	 * @param string $store_base_location The WooCommerce stores base country.
+	 */
+	private function check_if_eu( $store_base_location ) {
+		$eu_countries = array(
+			'AL', 'AD', 'AM', 'AT', 'BY', 'BE', 'BA', 'BG', 'CH', 'CY', 'CZ', 'DE',
+			'DK', 'EE', 'ES', 'FO', 'FI', 'FR', 'GB', 'GE', 'GI', 'GR', 'HU', 'HR',
+			'IE', 'IS', 'IT', 'LT', 'LU', 'LV', 'MC', 'MK', 'MT', 'NO', 'NL', 'PL',
+			'PT', 'RO', 'RU', 'SE', 'SI', 'SK', 'SM', 'TR', 'UA', 'VA',
+		);
+
+		if( in_array( $store_base_location, $eu_countries ) ) {
+			return 'EU';
+		} else {
+			return '';
+		}
 	}
 
 	/**
