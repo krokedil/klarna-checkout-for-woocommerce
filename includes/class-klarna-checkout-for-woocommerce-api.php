@@ -57,6 +57,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$log_order->html_snippet = '';
 			krokedil_log_events( null, 'Pre Create Order response', $log_order );
 			return $klarna_order;
+		} else if( $response['response']['code'] === 405 ) {
+			$error = $response['response']['message'];
+			return $error;
 		} else {
 			$error = $this->extract_error_messages( $response );
 			krokedil_log_events( null, 'Pre Create Order response', $error );
