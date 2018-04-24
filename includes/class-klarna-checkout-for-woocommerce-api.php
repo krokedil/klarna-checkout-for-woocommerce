@@ -158,6 +158,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 		);
 		$response = wp_safe_remote_get( $request_url, $request_args );
+		krokedil_log_events( null, 'Post Get Order response', stripslashes_deep( $response ) );
+		KCO_WC()->logger->log( 'Post Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
 
 		return $response;
 	}
