@@ -21,7 +21,7 @@ class Klarna_Checkout_For_WooCommerce_Logging {
 	 * @param string $message Error message.
 	 * @param string $level   Error level.
 	 */
-	public function log( $message, $level = 'error' ) {
+	public function log( $message, $level = 'info' ) {
 		if ( $this->log_enabled() ) {
 			if ( empty( $this->logger ) ) {
 				$this->logger = wc_get_logger();
