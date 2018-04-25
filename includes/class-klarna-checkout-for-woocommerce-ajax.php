@@ -259,11 +259,29 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$error_message = 'Error message could not be retreived';
 		}
 
-		KCO_WC()->logger->log( 'Checkout form submission failed. Redirect customer to simplified thankyou page. ' . $error_message );
+		KCO_WC()->logger->log( 'Checkout form submission failed. Starting fallback order creation.... ' . $error_message );
 		krokedil_log_events( null, 'Checkout form submission failed', $error_message );
 
-		$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
-		$redirect_url = add_query_arg( 'kco_wc', 'true', $redirect_url );
+		if ( ! empty( $_GET['kco_wc_order_id'] ) ) { // Input var okay.
+			$klarna_order_id = $_GET['kco_wc_order_id'];
+		} else {
+			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
+		}
+
+		// Create order via fallback sequence
+		$order = Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback::create( $klarna_order_id );
+		
+		if( is_object( $order ) ) {
+			KCO_WC()->logger->log( 'Fallback order creation done. Redirecting customer to thank you page.' );
+			krokedil_log_events( null, 'Fallback order creation done. Redirecting customer to thank you page.', '' );
+			$redirect_url = $order->get_checkout_order_received_url();
+		} else {
+			KCO_WC()->logger->log( 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.' . json_decode( $order ) );
+			krokedil_log_events( null, 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.', $order );
+			$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
+			$redirect_url = add_query_arg( 'kco_wc', 'true', $redirect_url );
+		}
+		
 
 		wp_send_json_success( array( 'redirect' => $redirect_url ) );
 		wp_die();
