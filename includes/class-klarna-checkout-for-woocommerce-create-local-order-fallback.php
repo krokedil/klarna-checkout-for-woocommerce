@@ -72,7 +72,7 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
             $order->set_shipping_tax( WC()->cart->shipping_tax_total );
             $order->set_total( WC()->cart->total );
 
-            update_post_meta( $order_id, '_created_via_klarna_fallback', 'yes' );
+			update_post_meta( $order_id, '_created_via_klarna_fallback', 'yes' );
             
             //Add payment method
             self::add_order_payment_method( $order );
@@ -86,10 +86,13 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
             //Add fees to order.
             self::create_order_fee_lines( $order, WC()->cart );
 
-            self::create_order_shipping_lines( $order );
-
+			// Add shipping
+			self::create_order_shipping_lines( $order );
+			
+			// Tax
             self::create_order_tax_lines( $order, WC()->cart );
 
+			// Coupons
             self::create_order_coupon_lines( $order, WC()->cart );
 
             // Save the order.
