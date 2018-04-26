@@ -15,6 +15,8 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		public function __construct() {
 			add_action( 'in_admin_header', array( $this, 'klarna_banner' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_css' ) );
+			add_action( 'wp_ajax_hide_klarna_banner', array( $this, 'hide_klarna_banner' ) );
+			add_action( 'wp_ajax_nopriv_hide_klarna_banner', array( $this, 'hide_klarna_banner' ) );
 		}
 
 		/**
@@ -24,7 +26,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		public function load_admin_css() {
 			wp_enqueue_style(
 				'klarna_payments_admin',
-				plugins_url( 'assets/css/klarna-checkout-admin.css?v=120320182110', KCO_WC_MAIN_FILE )
+				plugins_url( 'assets/css/klarna-checkout-admin.css?v=120320182113', KCO_WC_MAIN_FILE )
 			);
 		}
 
@@ -53,7 +55,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 				$show_banner = true;
 			}
 
-			if ( $show_banner ) {
+			if ( $show_banner && false === get_transient( 'klarna_hide_banner' ) ) {
 				?>
 				<div id="kb-spacer"></div>
 				<div id="klarna-banner">
@@ -74,7 +76,29 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 					<img id="kb-image"
 						 src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_white.png"
 						 alt="Klarna logo" width="110"/>
+						 <span class="kb-dismiss dashicons dashicons-dismiss"></span>
 				</div>
+				<script type="text/javascript">
+		
+				jQuery(document).ready(function($){
+	
+					jQuery('.kb-dismiss').click(function(){
+						jQuery('#klarna-banner').slideUp();
+						jQuery.post(
+							ajaxurl,
+							{
+								action		: 'hide_klarna_banner',
+								_wpnonce	: '<?php echo wp_create_nonce('hide-klarna-banner'); ?>',
+							},
+							function(response){
+								console.log('Success hide kco banner');
+								
+							}
+						);
+										
+					});
+				});
+				</script>
 				<?php
 			}
 		}
@@ -116,6 +140,15 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			</div>
 
 			<?php
+		}
+
+		/**
+		 * Hide Klarna banner in admin pages for.
+		 */
+		public function hide_klarna_banner() {
+			set_transient( 'klarna_hide_banner', '1', 5 * DAY_IN_SECONDS );
+			wp_send_json_success( 'Hejä' );
+			wp_die();
 		}
 	}
 
