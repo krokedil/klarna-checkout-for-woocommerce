@@ -346,8 +346,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		}
 
 		$product = wc_get_product( $cart_item['product_id'] );
-		if ( ( floatval( $product->get_sale_price() ) * $cart_item['quantity'] ) === $item_subtotal ) {
-			$item_subtotal = floatval( $product->get_regular_price() ) * $cart_item['quantity'];
+		if ( floatval( $product->get_sale_price() ) === $item_subtotal ) {
+			$item_subtotal = floatval( $product->get_regular_price() );
 		}
 		$item_price = $item_subtotal * 100 / $cart_item['quantity'];
 
@@ -412,7 +412,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$item_discount_amount = 0;
 		}
 		$product = wc_get_product( $cart_item['product_id'] );
-		$item_discount_amount = $item_discount_amount + ( ( ( floatval( $product->get_regular_price() ) - floatval( $product->get_price() ) ) * 100 ) * $cart_item['quantity'] );
+		$item_discount_amount = $item_discount_amount + ( ( floatval( $product->get_regular_price() ) - floatval( $product->get_price() ) ) * 100 );
 
 		return round( $item_discount_amount );
 	}
@@ -482,17 +482,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$item_total_amount = ( $cart_item['line_total'] * 100 );
 		} else {
 			$item_total_amount = ( ( $cart_item['line_total'] + $cart_item['line_tax'] ) * 100 );
-		}
-
-		$product = wc_get_product( $cart_item['product_id'] );
-		if ( $this->separate_sales_tax ) {
-			$item_subtotal = $cart_item['line_subtotal'];
-		} else {
-			$item_subtotal = $cart_item['line_subtotal'] + $cart_item['line_subtotal_tax'];
-		}
-		if ( ( floatval( $product->get_sale_price() ) * $cart_item['quantity'] ) === $item_subtotal ) {
-			$item_subtotal = floatval( $product->get_price() ) * $cart_item['quantity'];
-			$item_total_amount = $item_subtotal * 100;
 		}
 
 		return round( $item_total_amount );
