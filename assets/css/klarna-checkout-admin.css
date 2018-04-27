@@ -68,6 +68,15 @@ a.kb-button {
 	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+.kb-dismiss {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+.kb-dismiss:hover {
+	color: #eb6f93;
+	cursor: pointer;
+}
 
 @media (min-width: 800px) {
 	#klarna-banner {

@@ -73,7 +73,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		$orders = get_posts( $query_args );
 
-		// If zero matching orders were found, return.
+		// If zero matching orders were found, create backup order.
 		if ( empty( $orders ) ) {
 			// Backup order creation.
 			$this->backup_order_creation( $klarna_order_id );
@@ -84,32 +84,38 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$order    = wc_get_order( $order_id );
 
 		if ( $order ) {
-			// If the order was already created, send merchant reference.
-			$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
-			$klarna_order = json_decode( $response['body'] );
-			krokedil_log_events( $order_id, 'Klarna push callback data', $klarna_order );
+			// The order was already created. Check if order status was set (in thankyou page).
+			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
+			
+				$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
+				$klarna_order = json_decode( $response['body'] );
+				krokedil_log_events( $order_id, 'Klarna push callback. Updating order status.', $klarna_order );
 
-			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
-				$order->payment_complete( $klarna_order_id );
-				// translators: Klarna order ID.
-				$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
-				$order->add_order_note( $note );
-			} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
-				$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
-			} elseif ( 'PENDING' === $klarna_order->fraud_status ) {
-				// translators: Klarna order ID.
-				$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
-				$order->update_status( 'on-hold', $note );
+				if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
+					$order->payment_complete( $klarna_order_id );
+					// translators: Klarna order ID.
+					$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+					$order->add_order_note( $note );
+				} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
+					$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
+				} elseif ( 'PENDING' === $klarna_order->fraud_status ) {
+					// translators: Klarna order ID.
+					$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+					$order->update_status( 'on-hold', $note );
+				}
+				KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
+				KCO_WC()->api->request_post_set_merchant_reference(
+					$klarna_order_id,
+					array(
+						'merchant_reference1' => $order->get_order_number(),
+						'merchant_reference2' => $order->get_id(),
+					)
+				);
+
+			} else {
+				krokedil_log_events( $order_id, 'Klarna push callback. Order status already set to On hold/Processing/Completed.', $klarna_order );
 			}
 
-			KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
-			KCO_WC()->api->request_post_set_merchant_reference(
-				$klarna_order_id,
-				array(
-					'merchant_reference1' => $order->get_order_number(),
-					'merchant_reference2' => $order->get_id(),
-				)
-			);
 		} else {
 			// Backup order creation.
 			$this->backup_order_creation( $klarna_order_id );
@@ -409,17 +415,16 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 				$order->payment_complete( $klarna_order->order_id );
-				// translators: Klarna Order ID.
-				$note = sprintf( __( 'Order created via Klarna Checkout API Callback. Please verify the order in Klarnas system. Klarna order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+				// translators: Klarna order ID.
+				$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
 				$order->add_order_note( $note );
 			} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
-				$order->update_status( 'on-hold', __( 'Order created via Klarna Checkout API Callback. Klarna Checkout order was rejected. Klarna order ID: ' . $klarna_order->order_id, 'klarna-checkout-for-woocommerce' ) );
+				$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
+			} elseif ( 'PENDING' === $klarna_order->fraud_status ) {
+				// translators: Klarna order ID.
+				$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+				$order->update_status( 'on-hold', $note );
 			}
-
-			if ( (int) round( $order->get_total() * 100 ) !== (int) $klarna_order->order_amount ) {
-				$order->update_status( 'on-hold',  sprintf(__( 'Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->order_amount ) );
-			}
-
 			KCO_WC()->api->request_post_acknowledge_order( $klarna_order->order_id );
 			KCO_WC()->api->request_post_set_merchant_reference(
 				$klarna_order->order_id,
@@ -428,6 +433,11 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 					'merchant_reference2' => $order->get_id(),
 				)
 			);
+
+			if ( (int) round( $order->get_total() * 100 ) !== (int) $klarna_order->order_amount ) {
+				$order->update_status( 'on-hold',  sprintf(__( 'Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->order_amount ) );
+			}
+
 		} catch ( Exception $e ) {
 			$logger = new WC_Logger();
 			$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error: ' . $e->getCode() . ' - ' . $e->getMessage() );

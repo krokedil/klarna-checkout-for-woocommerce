@@ -254,7 +254,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		}
 
 		if ( ! empty( $_POST['error_message'] ) ) { // Input var okay.
-			$error_message = 'Error message: ' . trim( $_POST['error_message'] );
+			$error_message = 'Error message: ' . sanitize_text_field( trim( $_POST['error_message'] ) );
 		} else {
 			$error_message = 'Error message could not be retreived';
 		}
@@ -269,11 +269,13 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		}
 
 		// Create order via fallback sequence
-		$order = Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback::create( $klarna_order_id );
+		$order = Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback::create( $klarna_order_id, $error_message );
 		
 		if( is_object( $order ) ) {
 			KCO_WC()->logger->log( 'Fallback order creation done. Redirecting customer to thank you page.' );
 			krokedil_log_events( null, 'Fallback order creation done. Redirecting customer to thank you page.', '' );
+			$note = sprintf( __( 'This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna.', 'klarna-checkout-for-woocommerce' ), $error_message );
+			$order->add_order_note( $note );
 			$redirect_url = $order->get_checkout_order_received_url();
 		} else {
 			KCO_WC()->logger->log( 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.' . json_decode( $order ) );
