@@ -62,7 +62,7 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
-= 2018.03.29  	- version 1.4.0 =
+= 2018.04.27  	- version 1.4.0 =
 * Feature       - Added facllback order creation if checkout form submission fails.
 * Tweak         - Acknowledge Klarna order and set WC order to Processing in thankyou page if possible.
 * Tweak         - Improved UI in settings page.
