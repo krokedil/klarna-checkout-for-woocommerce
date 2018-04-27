@@ -16,37 +16,54 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:164
+#: ../klarna-checkout-for-woocommerce.php:170
 msgid "Settings"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:165
+#: ../klarna-checkout-for-woocommerce.php:171
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:221
+#: ../klarna-checkout-for-woocommerce.php:228
 msgid "Activate Now"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:244
+#: ../klarna-checkout-for-woocommerce.php:252
 msgid "Install	Now"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-admin-notices.php:76
+#: ../includes/class-klarna-checkout-for-woocommerce-admin-notices.php:77
 msgid "You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout."
 msgstr ""
 
+#: ../includes/class-klarna-checkout-for-woocommerce-admin-notices.php:92
+msgid "You need to enable and configure https to be able to use Klarna Checkout."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-ajax.php:277
+msgid "This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna."
+msgstr ""
+
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:94
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:97, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:419, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:272
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:97
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:100, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:422, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:275
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:413
-msgid "Order needs manual review, WooCommerce total and Klarna total do not match."
+#. translators: Klarna order ID.
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:103, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:425, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:278
+msgid "Klarna order is under review, order ID: %s."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:438
+msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-confirmation.php:56
+msgid "Please wait while we process your order."
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:19
@@ -174,7 +191,7 @@ msgid "If checked, the customer cannot skip date of birth. "
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:112, ../includes/class-klarna-checkout-for-woocommerce-fields.php:159
-msgid "Production Username"
+msgid "Production Username (UID)"
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:114, ../includes/class-klarna-checkout-for-woocommerce-fields.php:121, ../includes/class-klarna-checkout-for-woocommerce-fields.php:128, ../includes/class-klarna-checkout-for-woocommerce-fields.php:135
@@ -186,7 +203,7 @@ msgid "Production Password"
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:126, ../includes/class-klarna-checkout-for-woocommerce-fields.php:173
-msgid "Test Username"
+msgid "Test Username (UID)"
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:133, ../includes/class-klarna-checkout-for-woocommerce-fields.php:180
@@ -277,7 +294,7 @@ msgstr ""
 msgid "Checkout page radius border in pixels"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:19
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:19, ../includes/klarna-checkout-for-woocommerce-status-report.php:15
 msgid "Klarna Checkout"
 msgstr ""
 
@@ -285,14 +302,38 @@ msgstr ""
 msgid "Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:317
+msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:328
+msgid "An account is already registered with your email address. Please log in."
+msgstr ""
+
 #: ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:155, ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:156
 msgid "Sales Tax"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:515, ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:543
+#: ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:504, ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:532
 msgid "Shipping"
+msgstr ""
+
+#: ../includes/klarna-checkout-for-woocommerce-functions.php:58
+msgid "Create an account?"
 msgstr ""
 
 #: ../includes/klarna-checkout-for-woocommerce-functions.php:113
 msgid "Select another payment method"
+msgstr ""
+
+#: ../includes/klarna-checkout-for-woocommerce-status-report.php:15
+msgid "Klarna Checkout System Status."
+msgstr ""
+
+#: ../includes/klarna-checkout-for-woocommerce-status-report.php:21
+msgid "Orders created via API callback"
+msgstr ""
+
+#: ../includes/klarna-checkout-for-woocommerce-status-report.php:22
+msgid "Displays the number of orders created via the API callback feature during the last month."
 msgstr ""

@@ -193,10 +193,45 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			return;
 		}
 
-		wp_enqueue_script(
-			'klarna_payments_admin',
-			plugins_url( 'assets/js/klarna-checkout-for-woocommerce-admin.js', KCO_WC_MAIN_FILE )
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$store_base_location = wc_get_base_location();
+		if ( 'US' === $store_base_location['country'] ) {
+			$location = 'US';
+		} else {
+			$location = $this->check_if_eu( $store_base_location['country'] );
+		}
+
+		wp_register_script(
+			'kco_admin',
+			plugins_url( 'assets/js/klarna-checkout-for-woocommerce-admin.js', KCO_WC_MAIN_FILE ),
+			array(),
+			KCO_WC_VERSION
 		);
+		$admin_localize_params = array(
+			'location' => $location,
+		);
+		wp_localize_script( 'kco_admin', 'kco_admin_params', $admin_localize_params );
+		wp_enqueue_script( 'kco_admin' );
+	}
+
+	/**
+	 * Detect if EU country.
+	 *
+	 * @param string $store_base_location The WooCommerce stores base country.
+	 */
+	private function check_if_eu( $store_base_location ) {
+		$eu_countries = array(
+			'AL', 'AD', 'AM', 'AT', 'BY', 'BE', 'BA', 'BG', 'CH', 'CY', 'CZ', 'DE',
+			'DK', 'EE', 'ES', 'FO', 'FI', 'FR', 'GB', 'GE', 'GI', 'GR', 'HU', 'HR',
+			'IE', 'IS', 'IT', 'LT', 'LU', 'LV', 'MC', 'MK', 'MT', 'NO', 'NL', 'PL',
+			'PT', 'RO', 'RU', 'SE', 'SI', 'SK', 'SM', 'TR', 'UA', 'VA',
+		);
+
+		if( in_array( $store_base_location, $eu_countries ) ) {
+			return 'EU';
+		} else {
+			return '';
+		}
 	}
 
 	/**
@@ -224,6 +259,33 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 			$klarna_country = WC()->checkout()->get_value( 'billing_country' );
 			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
+			
+			krokedil_log_events( $order_id, 'Klarna order in show_thank_you_snippet', $klarna_order );
+
+			$response     		= KCO_WC()->api->request_post_get_order( $klarna_order->order_id );
+			$klarna_post_order 	= json_decode( $response['body'] );
+			krokedil_log_events( $order_id, 'Klarna post_order in show_thank_you_snippet', $klarna_post_order );
+			
+			if ( 'ACCEPTED' === $klarna_post_order->fraud_status ) {
+				$order->payment_complete();
+				// translators: Klarna order ID.
+				$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+				$order->add_order_note( $note );
+			} elseif ( 'REJECTED' === $klarna_post_order->fraud_status ) {
+				$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
+			} elseif ( 'PENDING' === $klarna_post_order->fraud_status ) {
+				// translators: Klarna order ID.
+				$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+				$order->update_status( 'on-hold', $note );
+			}
+			KCO_WC()->api->request_post_acknowledge_order( $klarna_order->order_id );
+			KCO_WC()->api->request_post_set_merchant_reference(
+				$klarna_order->order_id,
+				array(
+					'merchant_reference1' => $order->get_order_number(),
+					'merchant_reference2' => $order->get_id(),
+				)
+			);
 		}
 	}
 

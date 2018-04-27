@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 4.9.4
+Tested up to: 4.9.5
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.3.4
+WC tested up to: 3.3.5
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,18 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2018.04.27  	- version 1.4.0 =
+* Feature       - Added facllback order creation if checkout form submission fails.
+* Tweak         - Acknowledge Klarna order and set WC order to Processing in thankyou page if possible.
+* Tweak         - Improved UI in settings page.
+* Tweak         - Improved logging.
+* Tweak         - Added error handling in 405 response from Klarna.
+* Tweak         - Updated Krokedil logger.
+* Tweak         - Change standard log event type to INFO (previously ERROR).
+* Tweak         - Function for hiding Klarna banner (displayed when in test mode).
+* Tweak         - Added PHP version to user agent sent in orders to Klarna.
+
+
 = 2018.03.29  	- version 1.3.0 =
 * Update        - Adds Krokedil logger class.
 * Update        - Adds status report on Woocommerce status page.

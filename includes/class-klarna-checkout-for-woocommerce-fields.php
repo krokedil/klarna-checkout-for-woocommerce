@@ -105,11 +105,11 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 			),
 			// EU.
 			'credentials_eu'             => array(
-				'title' => '<img src="' . plugins_url( 'assets/img/flags/eu.svg', KCO_WC_MAIN_FILE ) . '" height="12" /> Europe',
+				'title' => '<img src="' . plugins_url( 'assets/img/flags/eu.svg', KCO_WC_MAIN_FILE ) . '" height="12" /> API Credentials Europe',
 				'type'  => 'title',
 			),
 			'merchant_id_eu'             => array(
-				'title'       => __( 'Production Username', 'klarna-checkout-for-woocommerce' ),
+				'title'       => __( 'Production Username (UID)', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
@@ -123,7 +123,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'desc_tip'    => true,
 			),
 			'test_merchant_id_eu'        => array(
-				'title'       => __( 'Test Username', 'klarna-checkout-for-woocommerce' ),
+				'title'       => __( 'Test Username (UID)', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
@@ -152,11 +152,11 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 			),
 			// US.
 			'credentials_us'             => array(
-				'title' => '<img src="' . plugins_url( 'assets/img/flags/us.svg', KCO_WC_MAIN_FILE ) . '" height="12" /> United States',
+				'title' => '<img src="' . plugins_url( 'assets/img/flags/us.svg', KCO_WC_MAIN_FILE ) . '" height="12" /> API Credentials United States',
 				'type'  => 'title',
 			),
 			'merchant_id_us'             => array(
-				'title'       => __( 'Production Username', 'klarna-checkout-for-woocommerce' ),
+				'title'       => __( 'Production Username (UID)', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
@@ -170,7 +170,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'desc_tip'    => true,
 			),
 			'test_merchant_id_us'        => array(
-				'title'       => __( 'Test Username', 'klarna-checkout-for-woocommerce' ),
+				'title'       => __( 'Test Username (UID)', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',

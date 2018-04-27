@@ -68,6 +68,15 @@ a.kb-button {
 	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+.kb-dismiss {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+.kb-dismiss:hover {
+	color: #eb6f93;
+	cursor: pointer;
+}
 
 @media (min-width: 800px) {
 	#klarna-banner {
@@ -143,3 +152,11 @@ a.kb-button {
 .kb-sidebar-section {
 	margin-bottom: 40px;
 }
+
+.wc-settings-sub-title a, .wc-settings-sub-title a:hover, .wc-settings-sub-title a:click, .wc-settings-sub-title a:visited, .wc-settings-sub-title a:focus {
+	border:none;
+	outline:none;
+	text-decoration:none;
+	color:black;
+}
+

@@ -57,6 +57,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$log_order->html_snippet = '';
 			krokedil_log_events( null, 'Pre Create Order response', $log_order );
 			return $klarna_order;
+		} else if( $response['response']['code'] === 405 ) {
+			$error = $response['response']['message'];
+			return $error;
 		} else {
 			$error = $this->extract_error_messages( $response );
 			krokedil_log_events( null, 'Pre Create Order response', $error );
@@ -155,6 +158,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 		);
 		$response = wp_safe_remote_get( $request_url, $request_args );
+		krokedil_log_events( null, 'Post Get Order response', stripslashes_deep( $response ) );
+		KCO_WC()->logger->log( 'Post Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
 
 		return $response;
 	}
@@ -464,7 +469,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_user_agent() {
-		$user_agent = apply_filters( 'http_headers_useragent', 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) ) . ' - KCO:' . KCO_WC_VERSION;
+		$user_agent = apply_filters( 'http_headers_useragent', 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) ) . ' - KCO:' . KCO_WC_VERSION . ' - PHP Version: ' . phpversion() . ' - Krokedil';
 
 		return $user_agent;
 	}

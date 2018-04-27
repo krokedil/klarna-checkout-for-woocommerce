@@ -253,8 +253,37 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			exit;
 		}
 
-		$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
-		$redirect_url = add_query_arg( 'kco_wc', 'true', $redirect_url );
+		if ( ! empty( $_POST['error_message'] ) ) { // Input var okay.
+			$error_message = 'Error message: ' . sanitize_text_field( trim( $_POST['error_message'] ) );
+		} else {
+			$error_message = 'Error message could not be retreived';
+		}
+
+		KCO_WC()->logger->log( 'Checkout form submission failed. Starting fallback order creation.... ' . $error_message );
+		krokedil_log_events( null, 'Checkout form submission failed', $error_message );
+
+		if ( ! empty( $_GET['kco_wc_order_id'] ) ) { // Input var okay.
+			$klarna_order_id = $_GET['kco_wc_order_id'];
+		} else {
+			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
+		}
+
+		// Create order via fallback sequence
+		$order = Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback::create( $klarna_order_id, $error_message );
+		
+		if( is_object( $order ) ) {
+			KCO_WC()->logger->log( 'Fallback order creation done. Redirecting customer to thank you page.' );
+			krokedil_log_events( null, 'Fallback order creation done. Redirecting customer to thank you page.', '' );
+			$note = sprintf( __( 'This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna.', 'klarna-checkout-for-woocommerce' ), $error_message );
+			$order->add_order_note( $note );
+			$redirect_url = $order->get_checkout_order_received_url();
+		} else {
+			KCO_WC()->logger->log( 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.' . json_decode( $order ) );
+			krokedil_log_events( null, 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.', $order );
+			$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
+			$redirect_url = add_query_arg( 'kco_wc', 'true', $redirect_url );
+		}
+		
 
 		wp_send_json_success( array( 'redirect' => $redirect_url ) );
 		wp_die();

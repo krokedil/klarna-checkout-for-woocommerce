@@ -5,12 +5,12 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 1.3.0
+ * Version: 1.4.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 3.0
- * WC tested up to: 3.3.4
+ * WC tested up to: 3.3.5
  *
  * Copyright (c) 2017-2018 Krokedil
  *
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.3.0' );
+define( 'KCO_WC_VERSION', '1.4.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.3.0' );
 define( 'KCO_WC_MIN_WC_VER', '2.5.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -292,6 +292,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-confirmation.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-extra-checkout-fields.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-status.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-create-local-order-fallback.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php';
 			include_once KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
 
