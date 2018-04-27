@@ -469,7 +469,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_user_agent() {
-		$user_agent = apply_filters( 'http_headers_useragent', 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) ) . ' - KCO:' . KCO_WC_VERSION . ' - PHP Version: ' . phpversion();
+		$user_agent = apply_filters( 'http_headers_useragent', 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) ) . ' - KCO:' . KCO_WC_VERSION . ' - PHP Version: ' . phpversion() . ' - Krokedil';
 
 		return $user_agent;
 	}
