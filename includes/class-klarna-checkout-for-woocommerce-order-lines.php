@@ -31,6 +31,13 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 */
 	public $separate_sales_tax = false;
 
+	/** 
+	 * The item tax rate.
+	 * 
+	 * @var int
+	 */
+	public $tax_rate = 0;
+
 	/**
 	 * WC_Klarna_Payments_Order_Lines constructor.
 	 *
@@ -76,7 +83,19 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @return int
 	 */
 	public function get_order_amount() {
-		return round( WC()->cart->total * 100 );
+		$klarna_items = $this->order_lines;
+		$total = 0;
+		foreach( $klarna_items as $klarna_item ) {
+			$total += $klarna_item['total_amount'];
+		}
+		$cart_total = WC()->cart->total * 100;
+
+		if ( $cart_total !== $total ) {
+			$difference = $cart_total - $total;
+			$this->create_order_rounding_line( $difference );
+		}
+
+		return $cart_total;
 	}
 
 	/**
@@ -118,10 +137,24 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 						$klarna_item['image_url'] = $this->get_item_image_url( $product );
 					}
 				}
-
 				$this->order_lines[] = $klarna_item;
 			}
 		}
+	}
+
+	public function create_order_rounding_line( $difference ) {
+		$klarna_item = array(
+			'reference'             => 'Rounding',
+			'name'                  => 'Rounding',
+			'quantity'              => 1,
+			'unit_price'            => $difference,
+			'tax_rate'              => 0,
+			'total_amount'          => $difference,
+			'total_tax_amount'      => 0,
+			'total_discount_amount' => 0,
+		);
+
+		$this->order_lines[] = $klarna_item;
 	}
 
 	/**
@@ -288,7 +321,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( $this->separate_sales_tax ) {
 			$item_tax_amount = 0;
 		} else {
-			$item_tax_amount = $cart_item['line_tax'] * 100;
+			$tax_rate = $this->tax_rate / 10000;
+			$item_tax_amount = $cart_item['line_subtotal'] * ( $this->tax_rate / 10000 ) * 100;
 		}
 
 		return round( $item_tax_amount );
@@ -323,7 +357,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		} else {
 			$item_tax_rate = 0;
 		}
-
+		$this->tax_rate = $item_tax_rate;
 		return round( $item_tax_rate );
 	}
 
