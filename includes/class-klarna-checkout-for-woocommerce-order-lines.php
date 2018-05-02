@@ -375,7 +375,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( $this->separate_sales_tax ) {
 			$item_subtotal = $cart_item['line_subtotal'];
 		} else {
-			$item_subtotal = $cart_item['line_subtotal'] + $cart_item['line_subtotal_tax'];
+			$item_subtotal = $cart_item['line_subtotal'] + ( $cart_item['line_subtotal'] * ( $this->tax_rate / 10000 ) );
 		}
 		$item_price = $item_subtotal * 100 / $cart_item['quantity'];
 
@@ -507,7 +507,9 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( $this->separate_sales_tax ) {
 			$item_total_amount = ( $cart_item['line_total'] * 100 );
 		} else {
-			$item_total_amount = ( ( $cart_item['line_total'] + $cart_item['line_tax'] ) * 100 );
+			$cart_line_total = $cart_item['line_total'];
+			$cart_line_total_tax = ( $cart_item['line_subtotal'] * ( $this->tax_rate / 10000 ) );
+			$item_total_amount = ( $cart_line_total + $cart_line_total_tax ) * 100;
 		}
 
 		return round( $item_total_amount );
