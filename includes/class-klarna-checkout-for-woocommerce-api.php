@@ -41,7 +41,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $request_args['user-agent'],
 			'body'       => json_decode( $request_args['body'] ),
 		);
-		KCO_WC()->logger->log( 'Create Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
+		KCO_WC()->logger->log( 'Create Klarna order (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
 		krokedil_log_events( null, 'Pre Create Order request args', $log_array );
 		$response = wp_safe_remote_post( $request_url, $request_args );
 
@@ -121,7 +121,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			return;
 		}
 		krokedil_log_events( null, 'Pre Update Order request args', $log_array );
-		KCO_WC()->logger->log( 'Update ongoing Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
+		KCO_WC()->logger->log( 'Update ongoing Klarna order (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
 
 		$response = wp_safe_remote_post( $request_url, $request_args );
 
