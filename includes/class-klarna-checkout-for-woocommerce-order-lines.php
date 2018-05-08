@@ -83,19 +83,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @return int
 	 */
 	public function get_order_amount() {
-		$klarna_items = $this->order_lines;
-		$total = 0;
-		foreach( $klarna_items as $klarna_item ) {
-			$total += $klarna_item['total_amount'];
-		}
-		$cart_total = WC()->cart->total * 100;
-
-		if ( $cart_total !== $total ) {
-			$difference = $cart_total - $total;
-			$this->create_order_rounding_line( $difference );
-		}
-
-		return $cart_total;
+		return round( WC()->cart->total * 100 );
 	}
 
 	/**
@@ -104,7 +92,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @return int
 	 */
 	public function get_order_tax_amount() {
-		return round( ( WC()->cart->tax_total + WC()->cart->shipping_tax_total ) * 100 );
+		//return round( ( WC()->cart->tax_total + WC()->cart->shipping_tax_total ) * 100 );
+		return round( $this->get_unrounded_order_tax_amount() + $this->get_shipping_tax_amount() );
 	}
 
 	/**
@@ -140,21 +129,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				$this->order_lines[] = $klarna_item;
 			}
 		}
-	}
-
-	public function create_order_rounding_line( $difference ) {
-		$klarna_item = array(
-			'reference'             => 'Rounding',
-			'name'                  => 'Rounding',
-			'quantity'              => 1,
-			'unit_price'            => $difference,
-			'tax_rate'              => 0,
-			'total_amount'          => $difference,
-			'total_tax_amount'      => 0,
-			'total_discount_amount' => 0,
-		);
-
-		$this->order_lines[] = $klarna_item;
 	}
 
 	/**
@@ -321,10 +295,11 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( $this->separate_sales_tax ) {
 			$item_tax_amount = 0;
 		} else {
-			$tax_rate = $this->tax_rate / 10000;
-			$item_tax_amount = $cart_item['line_subtotal'] * ( $this->tax_rate / 10000 ) * 100;
+			//$item_tax_amount = $cart_item['line_subtotal'] * ( $this->tax_rate / 10000 ) * 100;
+			$item_total_amount = $this->get_item_total_amount( $cart_item );
+			$item_total_exluding_tax = $item_total_amount / ( 1 + ( $this->tax_rate / 10000 ) );
+			$item_tax_amount = $item_total_amount - $item_total_exluding_tax;
 		}
-
 		return round( $item_tax_amount );
 	}
 
@@ -346,7 +321,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				$item_tax_rate = 0;
 			} else {
 				$_tax      = new WC_Tax();
-				$tmp_rates = $_tax->get_rates( $product->get_tax_class() );
+				$tmp_rates = $_tax->get_rates( '' );
 				$vat       = array_shift( $tmp_rates );
 				if ( isset( $vat['rate'] ) ) {
 					$item_tax_rate = round( $vat['rate'] * 100 );
@@ -373,12 +348,14 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 */
 	public function get_item_price( $cart_item ) {
 		if ( $this->separate_sales_tax ) {
-			$item_subtotal = $cart_item['line_subtotal'];
+			//$item_subtotal = $cart_item['line_subtotal'];
+			$item_subtotal = $cart_item['line_subtotal'] / $cart_item['quantity'];
 		} else {
-			$item_subtotal = $cart_item['line_subtotal'] + ( $cart_item['line_subtotal'] * ( $this->tax_rate / 10000 ) );
+			//$item_subtotal = $cart_item['line_subtotal'] + $cart_item['line_subtotal_tax'];
+			$item_subtotal = $cart_item['data']->get_price();
 		}
-		$item_price = $item_subtotal * 100 / $cart_item['quantity'];
-
+		//$item_price = $item_subtotal * 100 / $cart_item['quantity'];
+		$item_price = number_format( $item_subtotal, wc_get_price_decimals(), '.', '' ) * 100;
 		return round( $item_price );
 	}
 
@@ -429,6 +406,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @return integer $item_discount_amount Cart item discount.
 	 */
 	public function get_item_discount_amount( $cart_item ) {
+		/*
 		if ( $cart_item['line_subtotal'] > $cart_item['line_total'] ) {
 			if ( $this->separate_sales_tax ) {
 				$item_discount_amount = $cart_item['line_subtotal'] - $cart_item['line_total'];
@@ -436,6 +414,15 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				$item_discount_amount = $cart_item['line_subtotal'] + $cart_item['line_subtotal_tax'] - $cart_item['line_total'] - $cart_item['line_tax'];
 			}
 			$item_discount_amount = $item_discount_amount * 100;
+		} else {
+			$item_discount_amount = 0;
+		}
+		*/
+		$order_line_max_amount 	= ( number_format( $cart_item['data']->get_price(),  wc_get_price_decimals(), '.', '') * $cart_item['quantity'] ) * 100;
+		$order_line_amount 		= number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->tax_rate / 10000 ) ),  wc_get_price_decimals(), '.', '') * 100;
+		
+		if( $order_line_amount < $order_line_max_amount ) {
+			$item_discount_amount = $order_line_max_amount - $order_line_amount;
 		} else {
 			$item_discount_amount = 0;
 		}
@@ -504,12 +491,22 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @return integer $item_total_amount Cart item total amount.
 	 */
 	public function get_item_total_amount( $cart_item ) {
+		/*
 		if ( $this->separate_sales_tax ) {
 			$item_total_amount = ( $cart_item['line_total'] * 100 );
 		} else {
 			$cart_line_total = $cart_item['line_total'];
 			$cart_line_total_tax = ( $cart_item['line_subtotal'] * ( $this->tax_rate / 10000 ) );
 			$item_total_amount = ( $cart_line_total + $cart_line_total_tax ) * 100;
+		}
+		*/
+		$item_total_amount 		= number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->tax_rate / 10000 ) ),  wc_get_price_decimals(), '.', '') * 100;
+		$max_order_line_amount 	= ( number_format( $cart_item['data']->get_price(),  wc_get_price_decimals(), '.', '') * $cart_item['quantity'] ) * 100;
+		
+		// Check so the line_total isn't greater than product price x quantity
+		// This can happen when having price display set to 0 decimals
+		if( $item_total_amount > $max_order_line_amount ) {
+			$item_total_amount = $max_order_line_amount;
 		}
 
 		return round( $item_total_amount );
@@ -583,7 +580,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( $this->separate_sales_tax ) {
 			$shipping_amount = (int) number_format( WC()->cart->shipping_total * 100, 0, '', '' );
 		} else {
-			$shipping_amount = (int) number_format( ( WC()->cart->shipping_total + WC()->cart->shipping_tax_total ) * 100, 0, '', '' );
+			//$shipping_amount = (int) number_format( ( WC()->cart->shipping_total + WC()->cart->shipping_tax_total ) * 100, 0, '', '' );
+			$shipping_amount = number_format( WC()->cart->shipping_total + WC()->cart->shipping_tax_total, wc_get_price_decimals(), '.', '') * 100;
 		}
 
 		return $shipping_amount;
@@ -598,8 +596,24 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @return integer $shipping_tax_rate Tax rate for selected shipping method.
 	 */
 	public function get_shipping_tax_rate() {
+		/*
 		if ( WC()->cart->shipping_tax_total > 0 && ! $this->separate_sales_tax ) {
 			$shipping_tax_rate = round( WC()->cart->shipping_tax_total / WC()->cart->shipping_total, 2 ) * 100 * 100;
+		} else {
+			$shipping_tax_rate = 0;
+		}
+		*/
+
+		if ( WC()->cart->shipping_tax_total > 0 && ! $this->separate_sales_tax ) {
+			$_tax      		= new WC_Tax();
+			$tax_classes 	= WC()->cart->get_cart_item_tax_classes_for_shipping();
+			$tmp_rates 		= $_tax->get_rates( $tax_classes[0] );
+			$vat       		= array_shift( $tmp_rates );
+			if ( isset( $vat['rate'] ) ) {
+				$shipping_tax_rate = round( $vat['rate'] * 100 );
+			} else {
+				$shipping_tax_rate = 0;
+			}
 		} else {
 			$shipping_tax_rate = 0;
 		}
@@ -616,13 +630,39 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @return integer $shipping_tax_amount Tax amount for selected shipping method.
 	 */
 	public function get_shipping_tax_amount() {
+		/*
 		if ( $this->separate_sales_tax ) {
 			$shipping_tax_amount = 0;
 		} else {
 			$shipping_tax_amount = WC()->cart->shipping_tax_total * 100;
 		}
+		*/
+		if ( $this->separate_sales_tax ) {
+			$shipping_tax_amount = 0;
+		} else {
+			$shiping_total_amount 			= $this->get_shipping_amount();
+			$shipping_total_exluding_tax 	= $shiping_total_amount / ( 1 + ( $this->get_shipping_tax_rate() / 10000 ) );
+			$shipping_tax_amount 			= $shiping_total_amount - $shipping_total_exluding_tax;
+		}
 
 		return round( $shipping_tax_amount );
 	}
 
+	/**
+	 * Get unrounded order tax amount.
+	 *
+	 * @since  1.3
+	 * @access public
+	 *
+	 * @return integer $total_order_tax unrounded tax amount for entire order.
+	 */
+	public function get_unrounded_order_tax_amount() {
+		$total_order_tax = 0;
+		foreach ( WC()->cart->get_cart() as $cart_item ) {
+			if ( $cart_item['quantity'] ) {
+				$total_order_tax += $this->get_item_tax_amount( $cart_item );
+			}
+		}
+		return $total_order_tax;
+	}
 }
