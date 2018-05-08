@@ -368,7 +368,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_purchase_locale() {
-		switch ( $this->get_purchase_country() ) {
+		switch ( WC()->checkout()->get_value( 'billing_country' ) ) {
 			case 'AT':
 				if ( $this->site_has_english_locale() ) {
 					$klarna_locale = 'en-at';
