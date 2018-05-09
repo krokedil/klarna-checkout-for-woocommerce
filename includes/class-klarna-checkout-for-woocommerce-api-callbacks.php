@@ -206,6 +206,9 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 					if ( ! $cart_item_product->has_enough_stock( $cart_item['quantity'] ) ) {
 						$all_in_stock = false;
 					}
+					if( ! $cart_item_product->is_virtual() ) {
+						$needs_shipping = true;
+					}
 				}
 			} elseif ( 'shipping_fee' === $cart_item['type'] ) {
 				$shipping_chosen = true;
@@ -223,7 +226,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				$logger = new WC_Logger();
 				$logger->add( 'klarna-checkout-for-woocommerce', 'Stock validation failed for SKU ' . $cart_item['reference'] );
 				header( 'Location: ' . wc_get_cart_url() . '?stock_validate_failed' );
-			} elseif ( ! $shipping_chosen ) {
+			} elseif ( ! $shipping_chosen && $needs_shipping ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?no_shipping' );
 			} elseif ( $email_exists ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?login_required=yes' );
