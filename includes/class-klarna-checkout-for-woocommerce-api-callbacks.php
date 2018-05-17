@@ -190,6 +190,17 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$all_in_stock    = true;
 		$shipping_chosen = false;
 
+		$form_data = get_transient( $data['order_id'] );
+		$has_required_data = true;
+		$failed_required_check = array();
+		foreach ( $form_data as $form_row ) {
+			if ( isset( $form_row['required'] ) && '' === $form_row['value'] ) {
+				$has_required_data = false;
+				wc_add_notice( 'test', 'error' );
+				$failed_required_check[] = $form_row['name'];
+			}
+		}
+
 		// Check stock for each item and shipping method.
 		$cart_items = $data['order_lines'];
 
@@ -216,20 +227,19 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		}
 
 		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
-
-		if ( $all_in_stock && $shipping_chosen ) {
+		if ( $all_in_stock && $shipping_chosen && $has_required_data ) {
 			header( 'HTTP/1.0 200 OK' );
 		} else {
 			header( 'HTTP/1.0 303 See Other' );
-
 			if ( ! $all_in_stock ) {
 				$logger = new WC_Logger();
 				$logger->add( 'klarna-checkout-for-woocommerce', 'Stock validation failed for SKU ' . $cart_item['reference'] );
 				header( 'Location: ' . wc_get_cart_url() . '?stock_validate_failed' );
 			} elseif ( ! $shipping_chosen && $needs_shipping ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?no_shipping' );
-			} elseif ( $email_exists ) {
-				header( 'Location: ' . wc_get_checkout_url() . '?login_required=yes' );
+			} elseif ( ! $has_required_data ) {
+				$validation_hash = base64_encode( json_encode( $failed_required_check ) );
+				header( 'Location: ' . wc_get_checkout_url() . '?required_fields=' . $validation_hash );
 			}
 		}
 	}

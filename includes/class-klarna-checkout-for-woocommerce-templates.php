@@ -34,6 +34,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
 
 		// Template hooks.
+		add_action( 'kco_wc_before_checkout_form', 'kco_wc_print_notices' );
 		add_action( 'kco_wc_before_checkout_form', 'kco_wc_calculate_totals', 1 );
 		add_action( 'kco_wc_before_checkout_form', 'woocommerce_checkout_login_form', 10 );
 		add_action( 'kco_wc_before_checkout_form', 'woocommerce_checkout_coupon_form', 20 );
