@@ -352,7 +352,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$item_subtotal = $cart_item['line_subtotal'] / $cart_item['quantity'];
 		} else {
 			//$item_subtotal = $cart_item['line_subtotal'] + $cart_item['line_subtotal_tax'];
-			$item_subtotal = $cart_item['data']->get_price();
+			$item_subtotal = wc_get_price_including_tax($cart_item['data']);
 		}
 		//$item_price = $item_subtotal * 100 / $cart_item['quantity'];
 		$item_price = number_format( $item_subtotal, wc_get_price_decimals(), '.', '' ) * 100;
@@ -418,7 +418,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			$item_discount_amount = 0;
 		}
 		*/
-		$order_line_max_amount 	= ( number_format( $cart_item['data']->get_price(),  wc_get_price_decimals(), '.', '') * $cart_item['quantity'] ) * 100;
+		$order_line_max_amount 	= ( number_format( wc_get_price_including_tax( $cart_item['data'] ),  wc_get_price_decimals(), '.', '') * $cart_item['quantity'] ) * 100;
 		$order_line_amount 		= number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->tax_rate / 10000 ) ),  wc_get_price_decimals(), '.', '') * 100;
 		
 		if( $order_line_amount < $order_line_max_amount ) {
@@ -501,14 +501,14 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		}
 		*/
 		$item_total_amount 		= number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->tax_rate / 10000 ) ),  wc_get_price_decimals(), '.', '') * 100;
-		$max_order_line_amount 	= ( number_format( $cart_item['data']->get_price(),  wc_get_price_decimals(), '.', '') * $cart_item['quantity'] ) * 100;
-		
+		$max_order_line_amount 	= ( number_format( wc_get_price_including_tax($cart_item['data']),  wc_get_price_decimals(), '.', '') * $cart_item['quantity'] ) * 100;
+
 		// Check so the line_total isn't greater than product price x quantity
 		// This can happen when having price display set to 0 decimals
 		if( $item_total_amount > $max_order_line_amount ) {
 			$item_total_amount = $max_order_line_amount;
 		}
-
+		
 		return round( $item_total_amount );
 	}
 
