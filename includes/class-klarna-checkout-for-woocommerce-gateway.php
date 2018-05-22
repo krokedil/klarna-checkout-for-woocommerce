@@ -50,6 +50,17 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * Get gateway icon.
+	 *
+	 * @return string
+	 */
+	public function get_icon() {
+		$icon_src   = 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100';
+		$icon_html  = '<img src="' . $icon_src . '" alt="Klarna Checkout" style="border-radius:0px"/>';
+		return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
+	}
+
+	/**
 	 * Process the payment and return the result.
 	 *
 	 * @param  int $order_id WooCommerce order ID.
