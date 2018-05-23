@@ -15,28 +15,28 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 	 */
 	public static function fields() {
 		return apply_filters( 'kco_wc_gateway_settings', array(
-			'enabled'                    => array(
+			'enabled'                      => array(
 				'title'       => __( 'Enable/Disable', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Klarna Checkout', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
 				'description' => '',
 				'default'     => 'no',
 			),
-			'title'                      => array(
+			'title'                        => array(
 				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Payment method title.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'Klarna',
 				'desc_tip'    => true,
 			),
-			'description'                => array(
+			'description'                  => array(
 				'title'       => __( 'Description', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'textarea',
 				'description' => __( 'Payment method description.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'allow_separate_shipping'    => array(
+			'allow_separate_shipping'      => array(
 				'title'       => __( 'Separate shipping address', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Allow separate shipping address', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
@@ -44,14 +44,14 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
-			'select_another_method_text' => array(
+			'select_another_method_text'   => array(
 				'title'       => __( 'Other payment method button text', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Customize the <em>Select another payment method</em> button text that is displayed in checkout if using other payment methods than Klarna Checkout. Leave blank to use the default (and translatable) text.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'shipping_details'           => array(
+			'shipping_details'             => array(
 				'title'       => __( 'Shipping details', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Shipping details note shown to customer', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
@@ -59,7 +59,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => '',
 				'desc_tip'    => false,
 			),
-			'allowed_customer_types'     => array(
+			'allowed_customer_types'       => array(
 				'title'       => __( 'Allowed Customer Types', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'select',
 				'options'     => array(
@@ -72,14 +72,14 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'B2C',
 				'desc_tip'    => false
 			),
-			'send_product_urls'          => array(
+			'send_product_urls'            => array(
 				'title'    => __( 'Product URLs', 'klarna-checkout-for-woocommerce' ),
 				'type'     => 'checkbox',
 				'label'    => __( 'Send product and product image URLs to Klarna', 'klarna-checkout-for-woocommerce' ),
 				'default'  => 'yes',
 				'desc_tip' => true,
 			),
-			'logging'                    => array(
+			'logging'                      => array(
 				'title'       => __( 'Logging', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Log debug messages', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
@@ -87,7 +87,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
-			'testmode'                   => array(
+			'testmode'                     => array(
 				'title'       => __( 'Test mode', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Test Mode', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
@@ -95,7 +95,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'yes',
 				'desc_tip'    => true,
 			),
-			'dob_mandatory'              => array(
+			'dob_mandatory'                => array(
 				'title'       => __( 'Date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Make customer date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
@@ -103,40 +103,59 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
+			'display_privacy_policy_text' => array(
+				'title'   => __( 'Show terms and conditions', 'klarna-checkout-for-woocommerce' ),
+				'label'   => __( 'Select if you want to show terms and conditions on checkout page, and where you want to display them.', 'klarna-checkout-for-woocommerce' ),
+				'type'    => 'select',
+				'default' => 'no',
+				'options' => array(
+					'no'    => __( 'Do not display', 'klarna-checkout-for-woocommerce' ),
+					'above' => __( 'Display above checkout', 'klarna-checkout-for-woocommerce' ),
+					'below' => __( 'Display below checkout', 'klarna-checkout-for-woocommerce' ),
+				),
+			),
+			'add_terms_and_conditions_checkbox' => array(
+				'title'       => __( 'Add the terms and conditions', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Add the terms and conditions', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'Adds the terms and conditions checkbox to the Klarna iFrame. To change the text please use the site customizer', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
 			// EU.
-			'credentials_eu'             => array(
+			'credentials_eu'               => array(
 				'title' => '<img src="' . plugins_url( 'assets/img/flags/eu.svg', KCO_WC_MAIN_FILE ) . '" height="12" /> API Credentials Europe',
 				'type'  => 'title',
 			),
-			'merchant_id_eu'             => array(
+			'merchant_id_eu'               => array(
 				'title'       => __( 'Production Username (UID)', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'shared_secret_eu'           => array(
+			'shared_secret_eu'             => array(
 				'title'       => __( 'Production Password', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'test_merchant_id_eu'        => array(
+			'test_merchant_id_eu'          => array(
 				'title'       => __( 'Test Username (UID)', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'test_shared_secret_eu'      => array(
+			'test_shared_secret_eu'        => array(
 				'title'       => __( 'Test Password', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'title_mandatory'            => array(
+			'title_mandatory'              => array(
 				'title'       => __( 'Title mandatory (GB)', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Make customer title mandatory', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
@@ -144,39 +163,39 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'yes',
 				'desc_tip'    => true,
 			),
-			'prefill_consent'            => array(
+			'prefill_consent'              => array(
 				'title'   => __( 'Show prefill consent notice', 'klarna-checkout-for-woocommerce' ),
 				'label'   => __( 'Only applicable for stores based in Germany and Austria', 'klarna-checkout-for-woocommerce' ),
 				'type'    => 'checkbox',
 				'default' => 'yes',
 			),
 			// US.
-			'credentials_us'             => array(
+			'credentials_us'               => array(
 				'title' => '<img src="' . plugins_url( 'assets/img/flags/us.svg', KCO_WC_MAIN_FILE ) . '" height="12" /> API Credentials United States',
 				'type'  => 'title',
 			),
-			'merchant_id_us'             => array(
+			'merchant_id_us'               => array(
 				'title'       => __( 'Production Username (UID)', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'shared_secret_us'           => array(
+			'shared_secret_us'             => array(
 				'title'       => __( 'Production Password', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'test_merchant_id_us'        => array(
+			'test_merchant_id_us'          => array(
 				'title'       => __( 'Test Username (UID)', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'test_shared_secret_us'      => array(
+			'test_shared_secret_us'        => array(
 				'title'       => __( 'Test Password', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
@@ -184,53 +203,53 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'desc_tip'    => true,
 			),
 			// Checkout iframe settings.
-			'color_settings_title'       => array(
+			'color_settings_title'         => array(
 				'title' => __( 'Color Settings', 'klarna-checkout-for-woocommerce' ),
 				'type'  => 'title',
 			),
-			'color_button'               => array(
+			'color_button'                 => array(
 				'title'       => __( 'Checkout button color', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'color',
 				'description' => __( 'Checkout page button color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'color_button_text'          => array(
+			'color_button_text'            => array(
 				'title'       => __( 'Checkout button text color', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'color',
 				'description' => __( 'Checkout page button text color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'color_checkbox'             => array(
+			'color_checkbox'               => array(
 				'title'       => __( 'Checkout checkbox color', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'color',
 				'description' => __( 'Checkout page checkbox color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'color_checkbox_checkmark'   => array(
+			'color_checkbox_checkmark'     => array(
 				'title'       => __( 'Checkout checkbox checkmark color', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'color',
 				'description' => __( 'Checkout page checkbox checkmark color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'color_header'               => array(
+			'color_header'                 => array(
 				'title'       => __( 'Checkout header color', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'color',
 				'description' => __( 'Checkout page header color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'color_link'                 => array(
+			'color_link'                   => array(
 				'title'       => __( 'Checkout link color', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'color',
 				'description' => __( 'Checkout page link color', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'radius_border'              => array(
+			'radius_border'                => array(
 				'title'       => __( 'Checkout radius border (px)', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'number',
 				'description' => __( 'Checkout page radius border in pixels', 'klarna-checkout-for-woocommerce' ),
