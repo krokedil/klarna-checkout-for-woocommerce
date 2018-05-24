@@ -14,7 +14,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 	 * Returns the fields.
 	 */
 	public static function fields() {
-		return apply_filters( 'kco_wc_gateway_settings', array(
+		$settings = array(
 			'enabled'                      => array(
 				'title'       => __( 'Enable/Disable', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Klarna Checkout', 'klarna-checkout-for-woocommerce' ),
@@ -102,25 +102,6 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'description' => __( 'If checked, the customer cannot skip date of birth.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'no',
 				'desc_tip'    => true,
-			),
-			'display_privacy_policy_text' => array(
-				'title'   => __( 'Checkout privacy policy text', 'klarna-checkout-for-woocommerce' ),
-				'label'   => __( 'Select if you want to show the <em>Checkout privacy policy</em> text on the checkout page, and where you want to display it.', 'klarna-checkout-for-woocommerce' ),
-				'type'    => 'select',
-				'default' => 'no',
-				'options' => array(
-					'no'    => __( 'Do not display', 'klarna-checkout-for-woocommerce' ),
-					'above' => __( 'Display above checkout', 'klarna-checkout-for-woocommerce' ),
-					'below' => __( 'Display below checkout', 'klarna-checkout-for-woocommerce' ),
-				),
-			),
-			'add_terms_and_conditions_checkbox' => array(
-				'title'       => __( 'Terms and conditions checkbox', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Add a terms and conditions checkbox inside Klarna checkout iframe', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'checkbox',
-				'description' => __( 'To change the text navigate to → Appearance → Customize → WooCommerce → Checkout.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'no',
-				'desc_tip'    => false,
 			),
 			// EU.
 			'credentials_eu'               => array(
@@ -256,7 +237,37 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-		) );
-	}
+		);
+		$wc_version = defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
 
+		if ( version_compare( $wc_version, '3.4', '>=' ) ) {
+			$new_settings = array();
+			foreach ( $settings as $key => $value ) {
+				$new_settings[ $key ] = $value;
+				if ( 'dob_mandatory' === $key ) {
+					$new_settings['display_privacy_policy_text'] = array(
+						'title'   => __( 'Checkout privacy policy text', 'klarna-checkout-for-woocommerce' ),
+						'label'   => __( 'Select if you want to show the <em>Checkout privacy policy</em> text on the checkout page, and where you want to display it.', 'klarna-checkout-for-woocommerce' ),
+						'type'    => 'select',
+						'default' => 'no',
+						'options' => array(
+							'no'    => __( 'Do not display', 'klarna-checkout-for-woocommerce' ),
+							'above' => __( 'Display above checkout', 'klarna-checkout-for-woocommerce' ),
+							'below' => __( 'Display below checkout', 'klarna-checkout-for-woocommerce' ),
+						),
+					);
+					$new_settings['add_terms_and_conditions_checkbox'] = array(
+						'title'       => __( 'Terms and conditions checkbox', 'klarna-checkout-for-woocommerce' ),
+						'label'       => __( 'Add a terms and conditions checkbox inside Klarna checkout iframe', 'klarna-checkout-for-woocommerce' ),
+						'type'        => 'checkbox',
+						'description' => __( 'To change the text navigate to → Appearance → Customize → WooCommerce → Checkout.', 'klarna-checkout-for-woocommerce' ),
+						'default'     => 'no',
+						'desc_tip'    => false,
+					);
+				}
+			}
+			$settings = $new_settings;
+		}
+		return apply_filters( 'kco_wc_gateway_settings', $settings );
+	}
 }
