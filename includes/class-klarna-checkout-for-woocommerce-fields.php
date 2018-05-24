@@ -99,13 +99,17 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'title'       => __( 'Date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Make customer date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
-				'description' => __( 'If checked, the customer cannot skip date of birth. ', 'klarna-checkout-for-woocommerce' ),
+				'description' => __( 'If checked, the customer cannot skip date of birth.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
+			'privacy'               => array(
+				'title' => __( 'Privacy', 'klarna-checkout-for-woocommerce' ),
+				'type'  => 'title',
+			),
 			'display_privacy_policy_text' => array(
-				'title'   => __( 'Show terms and conditions', 'klarna-checkout-for-woocommerce' ),
-				'label'   => __( 'Select if you want to show terms and conditions on checkout page, and where you want to display them.', 'klarna-checkout-for-woocommerce' ),
+				'title'   => __( 'Checkout privacy policy text', 'klarna-checkout-for-woocommerce' ),
+				'label'   => __( 'Select if you want to show the <em>Checkout privacy policy</em> text on the checkout page, and where you want to display it.', 'klarna-checkout-for-woocommerce' ),
 				'type'    => 'select',
 				'default' => 'no',
 				'options' => array(
@@ -115,12 +119,12 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				),
 			),
 			'add_terms_and_conditions_checkbox' => array(
-				'title'       => __( 'Add the terms and conditions', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Add the terms and conditions', 'klarna-checkout-for-woocommerce' ),
+				'title'       => __( 'Terms and conditions checkbox', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Add a terms and conditions checkbox inside Klarna checkout iframe', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
-				'description' => __( 'Adds the terms and conditions checkbox to the Klarna iFrame. To change the text please use the site customizer', 'klarna-checkout-for-woocommerce' ),
+				'description' => __( 'To change the text navigate to → Appearance → Customize → WooCommerce → Checkout.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'no',
-				'desc_tip'    => true,
+				'desc_tip'    => false,
 			),
 			// EU.
 			'credentials_eu'               => array(
