@@ -64,7 +64,9 @@ class Klarna_Checkout_For_Woocommerce_GDPR {
 	 * @return void
 	 */
 	public function kco_wc_display_privacy_policy_text() {
-		echo wc_checkout_privacy_policy_text();
+		if ( function_exists( 'wc_checkout_privacy_policy_text' ) ) {
+			echo wc_checkout_privacy_policy_text();
+		}
 	}
 
 	/**
@@ -74,12 +76,14 @@ class Klarna_Checkout_For_Woocommerce_GDPR {
 	 * @return array $args The arguments array for the Klarna request.
 	 */
 	public function maybe_add_checkbox( $args ) {
-		$settings     = get_option( 'woocommerce_kco_settings' );
-		$add_checkbox = $settings['add_terms_and_conditions_checkbox'];
-		if ( 'yes' === $add_checkbox && wc_terms_and_conditions_checkbox_enabled() ) {
-			$args['options']['additional_checkbox']['text']     = wc_replace_policy_page_link_placeholders( wc_get_terms_and_conditions_checkbox_text() );
-			$args['options']['additional_checkbox']['checked']  = false;
-			$args['options']['additional_checkbox']['required'] = true;
+		if ( function_exists( 'wc_terms_and_conditions_checkbox_enabled' ) ) {
+			$settings     = get_option( 'woocommerce_kco_settings' );
+			$add_checkbox = $settings['add_terms_and_conditions_checkbox'];
+			if ( 'yes' === $add_checkbox && wc_terms_and_conditions_checkbox_enabled() ) {
+				$args['options']['additional_checkbox']['text']     = wc_replace_policy_page_link_placeholders( wc_get_terms_and_conditions_checkbox_text() );
+				$args['options']['additional_checkbox']['checked']  = false;
+				$args['options']['additional_checkbox']['required'] = true;
+			}
 		}
 		return $args;
 	}
