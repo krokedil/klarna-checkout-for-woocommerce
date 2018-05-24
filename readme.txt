@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 4.9.5
+Tested up to: 4.9.6
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.3.5
+WC tested up to: 3.4.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,16 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2018.05.24  	- version 1.5.0 =
+* Feature		- Added support for validation of required WooCommerce checkout fields displayed in kco_wc_show_extra_fields().
+* Feature		- Added support for wp_add_privacy_policy_content (for GDPR compliance). More info: https://core.trac.wordpress.org/attachment/ticket/43473/PRIVACY-POLICY-CONTENT-HOOK.md.
+* Feature		- Added setting for displaying privacy policy checkout text (above or below KCO iframe).
+* Feature		- Possibility to add terms checkbox inside KCO iframe via plugin settings (GDPR compliance for some companies).
+* Tweak			- Changed what we base purchase locale on. Adds better support for WPML compatibility.
+* Tweak			- Added support for handling cart with virtual products in validation callback (check if order needs shipping).
+* Tweak			- Added Klarna icon next to payment method title in regular checkout page.
+* Fix			- Fixed issue in validation callback logic (where purchase could be finalized without a valid shipping method).
+
 = 2018.04.27  	- version 1.4.0 =
 * Feature       - Added facllback order creation if checkout form submission fails.
 * Tweak         - Acknowledge Klarna order and set WC order to Processing in thankyou page if possible.
@@ -72,7 +82,6 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * Tweak         - Change standard log event type to INFO (previously ERROR).
 * Tweak         - Function for hiding Klarna banner (displayed when in test mode).
 * Tweak         - Added PHP version to user agent sent in orders to Klarna.
-
 
 = 2018.03.29  	- version 1.3.0 =
 * Update        - Adds Krokedil logger class.
