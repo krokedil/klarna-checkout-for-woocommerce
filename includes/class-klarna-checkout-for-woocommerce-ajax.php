@@ -31,6 +31,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			'kco_wc_update_klarna_order'            => true,
 			'kco_wc_iframe_shipping_address_change' => true,
 			'kco_wc_checkout_error'                 => true,
+			'kco_wc_save_form_data'                 => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -283,12 +284,25 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
 			$redirect_url = add_query_arg( 'kco_wc', 'true', $redirect_url );
 		}
-		
 
 		wp_send_json_success( array( 'redirect' => $redirect_url ) );
 		wp_die();
 	}
 
+	/**
+	 * Handles the saving of form data to transient.
+	 */
+	public static function kco_wc_save_form_data() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_save_form_data' ) ) { // Input var okay.
+			wp_send_json_error( 'bad_nonce' );
+			exit;
+		}
+		$form = $_POST['form'];
+		set_transient( WC()->session->get( 'kco_wc_order_id' ), $form, 60 * 60 * 24 );
+
+		wp_send_json_success();
+		wp_die();
+	}
 }
 
 Klarna_Checkout_For_WooCommerce_AJAX::init();

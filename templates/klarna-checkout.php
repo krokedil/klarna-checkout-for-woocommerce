@@ -6,6 +6,7 @@
  *
  * @package klarna-checkout-for-woocommerce
  */
+wc_print_notices();
 
 do_action( 'kco_wc_before_checkout_form' );
 ?>

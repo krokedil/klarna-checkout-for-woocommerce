@@ -24,9 +24,12 @@ jQuery(function($) {
 		paymentMethod: '',
 		selectAnotherSelector: '#klarna-checkout-select-other',
 
+		// Form fields
+		formFields: [],
+
 		documentReady: function() {
 			kco_wc.log(kco_params);
-
+			kco_wc.setFormData();
 			if (kco_wc.paymentMethodEl.length > 0) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter(':checked').val();
 			} else {
@@ -260,14 +263,59 @@ jQuery(function($) {
 			}
 		},
 
+		setFormData: function() {
+			var form = $('form[name="checkout"] input');
+			var i;
+			var newForm = [];
+			for ( i = 0; i < form.length; i++ ) { 
+				if ( form[i]['name'] !== '' ) {
+					var name    = form[i]['name'];
+					var field = $('*[name="' + name + '"]');
+					var id    = field.attr('id');
+					var label = $('label[for="' + id + '"]');
+					var check = ( label.has( "abbr" ).length ? true : false );
+					if ( check === true ) {
+						newForm.push({
+							name: form[i].name,
+							value: ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '',
+							required: true
+						});
+					} 
+				}
+			}
+			kco_wc.formFields = newForm;
+			kco_wc.saveFormData();
+		},
+
+		saveFormData: function() {
+			console.log( kco_wc.formFields );
+			$.ajax({
+				type: 'POST',
+				url: kco_params.save_form_data,
+				data: {
+					form: kco_wc.formFields,
+					nonce: kco_params.save_form_data_nonce
+				},
+				dataType: 'json',
+				success: function(data) {
+				},
+				error: function(data) {
+				},
+				complete: function(data) {
+					console.log('success save thingy');
+				}
+			});
+		},
+
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
 
 			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
 			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
-
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
+			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.setFormData);
+			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.setFormData);
 			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
@@ -331,4 +379,5 @@ jQuery(function($) {
 	};
 
 	kco_wc.init();
+	$('body').on('blur', kco_wc.setFormData );
 });
