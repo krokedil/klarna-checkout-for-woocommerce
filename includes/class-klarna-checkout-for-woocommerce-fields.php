@@ -103,10 +103,6 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
-			'privacy'               => array(
-				'title' => __( 'Privacy', 'klarna-checkout-for-woocommerce' ),
-				'type'  => 'title',
-			),
 			'display_privacy_policy_text' => array(
 				'title'   => __( 'Checkout privacy policy text', 'klarna-checkout-for-woocommerce' ),
 				'label'   => __( 'Select if you want to show the <em>Checkout privacy policy</em> text on the checkout page, and where you want to display it.', 'klarna-checkout-for-woocommerce' ),
