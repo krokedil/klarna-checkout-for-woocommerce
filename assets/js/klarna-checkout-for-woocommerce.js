@@ -17,7 +17,7 @@ jQuery(function($) {
 		// Order notes
 		extraFieldsValues: {},
 		extraFieldsSelectorText: 'div#kco-extra-fields input[type="text"], div#kco-extra-fields input[type="password"], div#kco-extra-fields textarea',
-		extraFieldsSelectorNonText: 'div#kco-extra-fields select, div#kco-extra-fields input[type="radio"], div#kco-extra-fields input[type="checkbox"], div#kco-extra-fields input.checkout-date-picker',
+		extraFieldsSelectorNonText: 'div#kco-extra-fields select, div#kco-extra-fields input[type="radio"], div#kco-extra-fields input[type="checkbox"], div#kco-extra-fields input.checkout-date-picker, input#terms input[type="checkbox"]',
 
 		// Payment method
 		paymentMethodEl: $('input[name="payment_method"]'),
@@ -91,8 +91,11 @@ jQuery(function($) {
 
 		updateExtraFields: function() {
 			var elementName = $(this).attr('name');
-			var updatedValue = $(this).val();
-
+			if( elementName === 'terms' ) {
+				var updatedValue = ( $("input#terms:checked").length === 1 ) ? 1 : '';
+			} else {
+				var updatedValue = $(this).val();
+			}
 			kco_wc.log('value');
 			kco_wc.log(updatedValue);
 			kco_wc.log('name');
@@ -273,11 +276,15 @@ jQuery(function($) {
 					var field = $('*[name="' + name + '"]');
 					var id    = field.attr('id');
 					var label = $('label[for="' + id + '"]');
-					var check = ( label.has( "abbr" ).length ? true : false );
+					var check = ( label.has( "abbr" ).length ? true : ( id === 'terms' ) ? true : false );
 					if ( check === true ) {
+						var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
+						if( form[i].name === 'terms' ) {
+							value = ( $("input#terms:checked").length === 1 ) ? 1 : '';
+						}
 						newForm.push({
 							name: form[i].name,
-							value: ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '',
+							value: value,
 							required: true
 						});
 					} 
@@ -288,7 +295,6 @@ jQuery(function($) {
 		},
 
 		saveFormData: function() {
-			console.log( kco_wc.formFields );
 			$.ajax({
 				type: 'POST',
 				url: kco_params.save_form_data,
@@ -302,7 +308,6 @@ jQuery(function($) {
 				error: function(data) {
 				},
 				complete: function(data) {
-					console.log('success save thingy');
 				}
 			});
 		},
@@ -320,6 +325,8 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
+			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.setFormData)
+			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.updateExtraFields)
 
 			if (typeof window._klarnaCheckout === 'function') {
 				window._klarnaCheckout(function (api) {
