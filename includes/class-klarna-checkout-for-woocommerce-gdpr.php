@@ -30,7 +30,7 @@ class Klarna_Checkout_For_Woocommerce_GDPR {
 			$content =
 				__(
 					'When you place an order in the webstore with Klarna Checkout as the choosen payment method, ' .
-					'information about the products in the order (namne, price, quantity, SKU) is sent to Klarna. ' .
+					'information about the products in the order (name, price, quantity, SKU) is sent to Klarna. ' .
 					'When the purchase is finalized Klarna sends your billing and shipping address back to the webstore. ' .
 					'This data plus an unique identifier for the purchase is then stored as billing and shipping data in the order in WooCommerce.',
 					'klarna-checkout-for-woocommerce'

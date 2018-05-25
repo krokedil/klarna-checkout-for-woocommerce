@@ -62,6 +62,11 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2018.05.25  	- version 1.5.1 =
+* Fix			- Fixed a check on a definition.
+* Fix			- Fixed minor spelling error in privacy policy text.
+* Fix			- Prevent default on customer pressing enter on checkout page to prevent accidental order submit.
+
 = 2018.05.24  	- version 1.5.0 =
 * Feature		- Added support for validation of required WooCommerce checkout fields displayed in kco_wc_show_extra_fields().
 * Feature		- Added support for wp_add_privacy_policy_content (for GDPR compliance). More info: https://core.trac.wordpress.org/attachment/ticket/43473/PRIVACY-POLICY-CONTENT-HOOK.md.
