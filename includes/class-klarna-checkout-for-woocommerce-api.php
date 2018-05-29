@@ -372,7 +372,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
 			$locale = ICL_LANGUAGE_CODE;
 		} else {
-			$locale = get_locale();
+			$locale = explode('_', get_locale());
 			$locale = $locale[0];
 		}
 

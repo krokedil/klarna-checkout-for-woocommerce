@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2018.05.29  	- version 1.5.2 =
+* Fix			- Fixed error in get_purchase_locale() (caused checkout to be rendered in English even if local lang was used in store).
+
 = 2018.05.25  	- version 1.5.1 =
 * Fix			- Fixed a check on a definition.
 * Fix			- Fixed minor spelling error in privacy policy text.
