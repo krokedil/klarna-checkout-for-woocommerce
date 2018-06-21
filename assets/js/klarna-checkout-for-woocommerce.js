@@ -17,16 +17,19 @@ jQuery(function($) {
 		// Order notes
 		extraFieldsValues: {},
 		extraFieldsSelectorText: 'div#kco-extra-fields input[type="text"], div#kco-extra-fields input[type="password"], div#kco-extra-fields textarea',
-		extraFieldsSelectorNonText: 'div#kco-extra-fields select, div#kco-extra-fields input[type="radio"], div#kco-extra-fields input[type="checkbox"], div#kco-extra-fields input.checkout-date-picker',
+		extraFieldsSelectorNonText: 'div#kco-extra-fields select, div#kco-extra-fields input[type="radio"], div#kco-extra-fields input[type="checkbox"], div#kco-extra-fields input.checkout-date-picker, input#terms input[type="checkbox"]',
 
 		// Payment method
 		paymentMethodEl: $('input[name="payment_method"]'),
 		paymentMethod: '',
 		selectAnotherSelector: '#klarna-checkout-select-other',
 
+		// Form fields
+		formFields: [],
+
 		documentReady: function() {
 			kco_wc.log(kco_params);
-
+			kco_wc.setFormData();
 			if (kco_wc.paymentMethodEl.length > 0) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter(':checked').val();
 			} else {
@@ -88,8 +91,11 @@ jQuery(function($) {
 
 		updateExtraFields: function() {
 			var elementName = $(this).attr('name');
-			var updatedValue = $(this).val();
-
+			if( elementName === 'terms' ) {
+				var updatedValue = ( $("input#terms:checked").length === 1 ) ? 1 : '';
+			} else {
+				var updatedValue = $(this).val();
+			}
 			kco_wc.log('value');
 			kco_wc.log(updatedValue);
 			kco_wc.log('name');
@@ -260,18 +266,67 @@ jQuery(function($) {
 			}
 		},
 
+		setFormData: function() {
+			var form = $('form[name="checkout"] input');
+			var i;
+			var newForm = [];
+			for ( i = 0; i < form.length; i++ ) { 
+				if ( form[i]['name'] !== '' ) {
+					var name    = form[i]['name'];
+					var field = $('*[name="' + name + '"]');
+					var id    = field.attr('id');
+					var label = $('label[for="' + id + '"]');
+					var check = ( label.has( "abbr" ).length ? true : ( id === 'terms' ) ? true : false );
+					if ( check === true ) {
+						var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
+						if( form[i].name === 'terms' ) {
+							value = ( $("input#terms:checked").length === 1 ) ? 1 : '';
+						}
+						newForm.push({
+							name: form[i].name,
+							value: value,
+							required: true
+						});
+					} 
+				}
+			}
+			kco_wc.formFields = newForm;
+			kco_wc.saveFormData();
+		},
+
+		saveFormData: function() {
+			$.ajax({
+				type: 'POST',
+				url: kco_params.save_form_data,
+				data: {
+					form: kco_wc.formFields,
+					nonce: kco_params.save_form_data_nonce
+				},
+				dataType: 'json',
+				success: function(data) {
+				},
+				error: function(data) {
+				},
+				complete: function(data) {
+				}
+			});
+		},
+
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
 
 			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
 			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
-
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
+			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.setFormData);
+			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.setFormData);
 			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
+			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.setFormData)
+			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.updateExtraFields)
 
 			if (typeof window._klarnaCheckout === 'function') {
 				window._klarnaCheckout(function (api) {
@@ -331,4 +386,10 @@ jQuery(function($) {
 	};
 
 	kco_wc.init();
+	$('body').on('blur', kco_wc.setFormData );
+	$(document).on("keypress", "#kco-order-review", function(event) {
+		if (event.keyCode == 13) {
+			event.preventDefault();
+		}
+	});
 });

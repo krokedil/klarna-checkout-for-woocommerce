@@ -50,6 +50,17 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * Get gateway icon.
+	 *
+	 * @return string
+	 */
+	public function get_icon() {
+		$icon_src   = 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100';
+		$icon_html  = '<img src="' . $icon_src . '" alt="Klarna Checkout" style="border-radius:0px"/>';
+		return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
+	}
+
+	/**
 	 * Process the payment and return the result.
 	 *
 	 * @param  int $order_id WooCommerce order ID.
@@ -134,7 +145,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		if ( ! kco_wc_prefill_allowed() ) {
 			add_thickbox();
 		}
-
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		wp_register_script(
@@ -152,6 +162,11 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			KCO_WC_VERSION
 		);
 
+		$form = array();
+		if ( false !== get_transient( WC()->session->get( 'kco_wc_order_id' ) ) ) {
+			$form = get_transient( WC()->session->get( 'kco_wc_order_id' ) );
+		}
+		
 		$checkout_localize_params = array(
 			'update_cart_url'                      => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
 			'update_cart_nonce'                    => wp_create_nonce( 'kco_wc_update_cart' ),
@@ -168,6 +183,9 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'checkout_error_url'                   => WC_AJAX::get_endpoint( 'kco_wc_checkout_error' ),
 			'checkout_error_nonce'                 => wp_create_nonce( 'kco_wc_checkout_error' ),
 			'logging'                              => $this->logging,
+			'save_form_data'                       => WC_AJAX::get_endpoint( 'kco_wc_save_form_data' ),
+			'save_form_data_nonce'                 => wp_create_nonce( 'kco_wc_save_form_data' ),
+			'form'                                 => $form,
 		);
 
 		wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );
