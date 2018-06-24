@@ -50,7 +50,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					$status = 'yes';
 				}
 				
-				echo '<strong><mark class="' . $status . '">' . $percent_of_orders . '% (' . $amont_of_api_callback_orders . ' of ' . $amont_of_klarna_orders . ')</mark></strong> of all orders payed via Klarna Checkout was created via API callback during the last month. This is a fallback order creation feature. You should aim for 0%.';
+				echo '<strong><mark class="' . $status . '">' . $percent_of_orders . '% (' . $amont_of_api_callback_orders . ' of ' . $amont_of_klarna_orders . ')</mark></strong> of all orders paid via Klarna Checkout were created via API callback during the last month. This is a fallback order creation feature. You should aim for 0%.';
 		
 			?>
 		</td>
