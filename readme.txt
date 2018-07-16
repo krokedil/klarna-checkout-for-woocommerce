@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 4.9.6
+Tested up to: 4.9.7
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.4.0
+WC tested up to: 3.4.3
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
