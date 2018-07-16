@@ -51,6 +51,21 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 				}
 			}
 
+			// Set args for the URL
+			$country        = wc_get_base_location()['country'];
+			$plugin         = 'klarna-checkout-for-woocommerce';
+			$plugin_version = KCO_WC_VERSION;
+			$wc_version     = defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
+			$url_queries    = '?country='. $country .'&products=kco&plugin=' . $plugin . '&pluginVersion=' . $plugin_version . '&platform=woocommerce&platformVersion=' . $wc_version;
+
+			if ( 'US' !== $country ) {
+				$url_base = 'https://eu.portal.klarna.com/signup/';
+			} else {
+				$url_base = 'https://us.portal.klarna.com/signup/';
+			}
+
+			$url = $url_base . $url_queries;
+
 			if ( ! $country_set ) {
 				$show_banner = true;
 			}
@@ -63,7 +78,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 						<h1>Go live</h1>
 						<p>Before you can start to sell with Klarna you need your store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will need to verify the integration. Then you can go live with your store! If you wish to switch Klarna products then you’ll need the Klarna team to approve your store again.</p>
 						<a class="kb-button"
-						   href="https://www.klarna.com/international/business/woocommerce/?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=banner"
+						   href="<?php echo $url ?>"
 						   target="_blank">Go live with Klarna</a>
 					</div>
 					<div id="kb-right">
