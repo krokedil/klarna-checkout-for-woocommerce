@@ -49,7 +49,7 @@ class Klarna_Checkout_For_Woocommerce_GDPR {
 	 */
 	public function maybe_add_privacy_policy_text() {
 		$settings                    = get_option( 'woocommerce_kco_settings' );
-		$display_privacy_policy_text = $settings['display_privacy_policy_text'];
+		$display_privacy_policy_text = ( isset( $settings['display_privacy_policy_text'] ) ) ? $settings['display_privacy_policy_text'] : 'no';
 
 		if ( 'above' == $display_privacy_policy_text ) {
 			add_action( 'kco_wc_before_snippet', array( $this, 'kco_wc_display_privacy_policy_text' ) );

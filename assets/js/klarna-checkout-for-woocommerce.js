@@ -387,7 +387,7 @@ jQuery(function($) {
 
 	kco_wc.init();
 	$('body').on('blur', kco_wc.setFormData );
-	$(document).on("keypress", "#kco-order-review", function(event) {
+	$(document).on("keypress", "#kco-order-review .qty", function(event) {
 		if (event.keyCode == 13) {
 			event.preventDefault();
 		}

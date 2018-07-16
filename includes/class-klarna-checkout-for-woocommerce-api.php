@@ -422,7 +422,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 				}
 				break;
 			case 'SE':
-				if ( 'sv' == $locale ) {
+				if ( 'sv' == $locale || 'sv_se' == $locale ) {
 					$klarna_locale = 'sv-se';
 				} else {
 					$klarna_locale = 'en-se';

@@ -100,6 +100,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		<script>
 			jQuery(function ($) {
 				$('input#terms').prop('checked', true);
+				$('input#ship-to-different-address-checkbox').prop('checked', true);
 
 				// If order value = 0, payment method fields will not be in the page, so we need to
 				if (!$('input#payment_method_kco').length) {
