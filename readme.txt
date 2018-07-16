@@ -62,6 +62,12 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2018.07.16  	- version 1.5.3 =
+* Fix			- Fixed issue where seperate shipping address was not saved to order.
+* Fix           - Limited preventDefault function on the checkout page. Now only prevents default on quantity field.
+* Fix           - Added check for a setting to prevent error.
+* Enhancement   - Added support for WPML with ICL_LANGUAGE_CODE in switch case.
+
 = 2018.05.29  	- version 1.5.2 =
 * Fix			- Fixed error in get_purchase_locale() (caused checkout to be rendered in English even if local lang was used in store).
 
