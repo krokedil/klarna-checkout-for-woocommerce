@@ -92,7 +92,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		}
 
 		WC()->session->set( 'chosen_shipping_methods', $chosen_shipping_methods );
-		
+
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_fees();
 		WC()->cart->calculate_totals();
@@ -305,9 +305,10 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
-		$form = $_POST['form'];
-		set_transient( WC()->session->get( 'kco_wc_order_id' ), $form, 60 * 60 * 24 );
-
+		if ( isset( $_POST['form'] ) ) {
+			$form = $_POST['form'];
+			set_transient( WC()->session->get( 'kco_wc_order_id' ), $form, 60 * 60 * 24 );
+		}
 		wp_send_json_success();
 		wp_die();
 	}
