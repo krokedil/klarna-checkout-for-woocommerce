@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+
+= 2018.07.23  	- version 1.5.4 =
+* Enhancement	- Added Klarna LEAP functionality (URL's for new customer signup & onboarding).
+* Fix			- Change fees to be sent to Klarna as surcharge.
+* Fix			- Maybe define constants WOOCOMMERCE_CHECKOUT & WOOCOMMERCE_CART in ajax functions. Fix compat issue with https://woocommerce.com/products/payment-gateway-based-fees/. 
+* Fix			- Updated krokedil-logger with json parse error fix (that could be triggered on signel order page).
+
 = 2018.07.16  	- version 1.5.3 =
 * Fix			- Fixed issue where seperate shipping address was not saved to order.
 * Fix           - Limited preventDefault function on the checkout page. Now only prevents default on quantity field.
