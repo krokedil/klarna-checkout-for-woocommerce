@@ -3,9 +3,14 @@ jQuery( function( $ ) {
         renderJson: function() {
             $(".krokedil_json").each(function(){
                 var string = $( this ).html();
-                var json = JSON.parse( string );
-                renderjson;
-                $( this ).html( renderjson.set_show_to_level( '2' )( json ) )
+                try {
+                    var json = JSON.parse( string );
+                    renderjson;
+                    $( this ).html( renderjson.set_show_to_level( '2' )( json ) );
+                } 
+                catch {
+                    console.log( 'Error parsing JSON' );
+                }
             });
         },
         toggleJson: function( event_nr ){

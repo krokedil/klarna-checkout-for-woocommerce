@@ -246,7 +246,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 
 				// Add separate discount line item, but only if it's a smart coupon or country is US.
 				$fee_item = array(
-					'type'                  => 'shipping_fee',
+					'type'                  => 'surcharge',
 					'reference'             => $fee->id,
 					'name'                  => $fee->name,
 					'quantity'              => 1,
