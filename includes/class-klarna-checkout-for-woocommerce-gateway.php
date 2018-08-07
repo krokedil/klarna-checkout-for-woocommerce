@@ -280,12 +280,14 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 			$klarna_country = WC()->checkout()->get_value( 'billing_country' );
 			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
-			
-			krokedil_log_events( $order_id, 'Klarna order in show_thank_you_snippet', $klarna_order );
 
 			$response     		= KCO_WC()->api->request_post_get_order( $klarna_order->order_id );
 			$klarna_post_order 	= json_decode( $response['body'] );
-			krokedil_log_events( $order_id, 'Klarna post_order in show_thank_you_snippet', $klarna_post_order );
+
+			// Remove html_snippet from what we're logging
+			$log_order = clone $klarna_post_order;
+			$log_order->html_snippet = '';
+			krokedil_log_events( $order_id, 'Klarna post_order in show_thank_you_snippet', $log_order );
 			
 			if ( 'ACCEPTED' === $klarna_post_order->fraud_status ) {
 				$order->payment_complete();
