@@ -32,12 +32,16 @@ msgstr ""
 msgid "Install	Now"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-admin-notices.php:77
+#: ../includes/class-klarna-checkout-for-woocommerce-admin-notices.php:79
 msgid "You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-admin-notices.php:92
+#: ../includes/class-klarna-checkout-for-woocommerce-admin-notices.php:94
 msgid "You need to enable and configure https to be able to use Klarna Checkout."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-admin-notices.php:110
+msgid "You need to let WooCommerce automatically generate a username from the customer email address when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href=\"%s\">Accounts & Privacy tab</a>."
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-ajax.php:286
