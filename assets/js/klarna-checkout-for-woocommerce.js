@@ -277,7 +277,7 @@ jQuery(function($) {
 					var id    = field.attr('id');
 					var label = $('label[for="' + id + '"]');
 					var check = ( label.has( "abbr" ).length ? true : ( id === 'terms' ) ? true : false );
-					
+
 					// Only keep track of non standard WooCommerce checkout fields 
 					if (jQuery.inArray(name, kco_params.standard_woo_checkout_fields)=='-1') {
 						if ( check === true ) {
