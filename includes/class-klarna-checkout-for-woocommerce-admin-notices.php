@@ -6,9 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Returns error messages depending on
  *
- * @class    Collector_Checkout_Admin_Notices
+ * @class    Klarna_Checkout_Admin_Notices
  * @version  1.0
- * @package  Collector_Checkout/Classes
+ * @package  Klarna_Checkout/Classes
  * @category Class
  * @author   Krokedil
  */
@@ -42,7 +42,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 	}
 
 	/**
-	 * Collector_Checkout_Admin_Notices constructor.
+	 * Klarna_Checkout_Admin_Notices constructor.
 	 */
 	public function __construct() {
 		$settings      = get_option( 'woocommerce_kco_settings' );
@@ -57,9 +57,11 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 	public function check_settings() {
 		if ( ! empty( $_POST ) ) {
 			add_action( 'woocommerce_settings_saved', array( $this, 'check_terms' ) );
+			add_action( 'woocommerce_settings_saved', array( $this, 'check_account' ) );
 		} else {
 			add_action( 'admin_notices', array( $this, 'check_terms' ) );
 			add_action( 'admin_notices', array( $this, 'check_https' ) );
+			add_action( 'admin_notices', array( $this, 'check_account' ) );
 		}
 	}
 
@@ -90,6 +92,28 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 		if ( ! is_ssl() ) {
 			echo '<div class="notice notice-error">';
 			echo '<p>' . esc_html( __( 'You need to enable and configure https to be able to use Klarna Checkout.', 'klarna-checkout-for-woocommerce' ) ) . '</p>';
+			echo '</div>';
+		}
+	}
+
+	/**
+	 * Check how account creation is set.
+	 */
+	public function check_account() {
+		if ( 'yes' !== $this->enabled ) {
+			return;
+		}
+
+		// Account page - username.
+		if ( 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) && 'no' === get_option( 'woocommerce_registration_generate_username' ) ) {
+			echo '<div class="notice notice-error">';
+			echo '<p>' . sprintf( __( 'You need to tick the checkbox <i>When creating an account, automatically generate a username from the customer\'s email address</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href="%s">Accounts & Privacy tab</a>.', 'klarna-checkout-for-woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=account' ) ) . '</p>';
+			echo '</div>';
+		}
+		// Account page - password.
+		if ( 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) && 'no' === get_option( 'woocommerce_registration_generate_password' ) ) {
+			echo '<div class="notice notice-error">';
+			echo '<p>' . sprintf( __( 'You need to tick the checkbox <i>When creating an account, automatically generate an account password</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href="%s">Accounts & Privacy tab</a>.', 'klarna-checkout-for-woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=account' ) ) . '</p>';
 			echo '</div>';
 		}
 	}
