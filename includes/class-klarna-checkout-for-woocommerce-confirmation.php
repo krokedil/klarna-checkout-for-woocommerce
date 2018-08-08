@@ -95,6 +95,37 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		if ( ! $this->is_kco_confirmation() ) {
 			return;
 		}
+
+		// Prevent duplicate orders if confirmation page is reloaded manually by customer 
+		$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
+		$query = new WC_Order_Query( array(
+	        'limit' => -1,
+	        'orderby' => 'date',
+	        'order' => 'DESC',
+	        'return' => 'ids',
+	        'payment_method' => 'kco',
+	        'date_created' => '>' . ( time() - DAY_IN_SECONDS )
+	    ) );
+	    $orders = $query->get_orders();
+		$order_id_match = null;
+	    foreach( $orders as $order_id ) {
+			
+			$order_klarna_order_id = get_post_meta( $order_id, '_wc_klarna_order_id', true );
+			
+	        if( $order_klarna_order_id === $klarna_order_id ) {
+	            $order_id_match = $order_id;
+	            break;
+	        }
+		}
+		// _wc_klarna_order_id already exist in an order. Let's redirect the customer to the thankyou page for that order 
+		if( $order_id_match ) {
+			krokedil_log_events( $order_id_match, 'Confirmation page rendered but _wc_klarna_order_id already exist in this order.' );
+			$order = wc_get_order( $order_id_match );
+			$location = $order->get_checkout_order_received_url();
+			wp_safe_redirect( $location, $status );
+			exit;
+			
+		}
 		?>
 
 		<script>
@@ -145,7 +176,9 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 				?>
 
 				$('.validate-required').removeClass('validate-required');
+				
 				$('form.woocommerce-checkout').submit();
+				console.log('yes submitted');
 			});
 		</script>
 		<?php

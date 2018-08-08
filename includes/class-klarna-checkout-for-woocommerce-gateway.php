@@ -166,6 +166,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		if ( false !== get_transient( WC()->session->get( 'kco_wc_order_id' ) ) ) {
 			$form = get_transient( WC()->session->get( 'kco_wc_order_id' ) );
 		}
+
+		$standard_woo_checkout_fields = array('billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'terms', 'account_username', 'account_password');
 		
 		$checkout_localize_params = array(
 			'update_cart_url'                      => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
@@ -186,6 +188,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'save_form_data'                       => WC_AJAX::get_endpoint( 'kco_wc_save_form_data' ),
 			'save_form_data_nonce'                 => wp_create_nonce( 'kco_wc_save_form_data' ),
 			'form'                                 => $form,
+			'standard_woo_checkout_fields'		   => $standard_woo_checkout_fields,
 		);
 
 		wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );
@@ -277,12 +280,14 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 			$klarna_country = WC()->checkout()->get_value( 'billing_country' );
 			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
-			
-			krokedil_log_events( $order_id, 'Klarna order in show_thank_you_snippet', $klarna_order );
 
 			$response     		= KCO_WC()->api->request_post_get_order( $klarna_order->order_id );
 			$klarna_post_order 	= json_decode( $response['body'] );
-			krokedil_log_events( $order_id, 'Klarna post_order in show_thank_you_snippet', $klarna_post_order );
+
+			// Remove html_snippet from what we're logging
+			$log_order = clone $klarna_post_order;
+			$log_order->html_snippet = '';
+			krokedil_log_events( $order_id, 'Klarna post_order in show_thank_you_snippet', $log_order );
 			
 			if ( 'ACCEPTED' === $klarna_post_order->fraud_status ) {
 				$order->payment_complete();

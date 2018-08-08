@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 4.9.7
+Tested up to: 4.9.8
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.4.3
+WC tested up to: 3.4.4
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+
+= 2018.08.08  	- version 1.5.5 =
+* Tweak			- Send url to single product image to Klarna (instead of tumbnail size).
+* Tweak			- Added Woo account settings check in Admin Notices class.
+* Fix			- Only check required empty form fields that are non standard checkout fields in validation callback.
+* Fix			- Improved logging. Removes html snippet in thank you page log message (to avoid "Oops"-message in edit order view).
+* Fix			- Prevent duplicate orders if KCO confirmation page is reloaded manually by customer during create Woo order process.
 
 = 2018.07.23  	- version 1.5.4 =
 * Enhancement	- Added Klarna LEAP functionality (URL's for new customer signup & onboarding).
