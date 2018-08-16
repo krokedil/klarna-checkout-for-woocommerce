@@ -191,7 +191,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					$coupon_reference  = 'Discount';
 				} else {
 					if ( 'US' === $this->shop_country ) {
-						$coupon_amount     = number_format( WC()->cart->get_coupon_discount_amount( $coupon_key ), wc_get_price_decimals(), '.', '' ) * 100;
+						$coupon_amount     = 0;
 						$coupon_tax_amount = 0;
 						if ( $coupon->is_type( 'fixed_cart' ) || $coupon->is_type( 'percent' ) ) {
 							$coupon_type = 'Cart discount';
@@ -210,9 +210,9 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 						'reference'             => $coupon_reference,
 						'name'                  => $coupon_key,
 						'quantity'              => 1,
-						'unit_price'            => -$coupon_amount,
+						'unit_price'            => $coupon_amount,
 						'tax_rate'              => 0,
-						'total_amount'          => -$coupon_amount,
+						'total_amount'          => $coupon_amount,
 						'total_discount_amount' => 0,
 						'total_tax_amount'      => $coupon_tax_amount,
 					);
@@ -425,7 +425,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		$order_line_max_amount 	= ( number_format( wc_get_price_including_tax( $cart_item['data'] ),  wc_get_price_decimals(), '.', '') * $cart_item['quantity'] ) * 100;
 		$order_line_amount 		= number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->tax_rate / 10000 ) ),  wc_get_price_decimals(), '.', '') * 100;
 		if ( $this->separate_sales_tax ) {
-			$item_discount_amount = 0;
+			$item_discount_amount = number_format( $cart_item['line_subtotal'] - $cart_item['line_total'],  wc_get_price_decimals(), '.', '') * 100;
 		} else {
 			if( $order_line_amount < $order_line_max_amount ) {
 				$item_discount_amount = $order_line_max_amount - $order_line_amount;
@@ -509,8 +509,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		*/
 		if ( $this->separate_sales_tax ) {
 			
-			$item_total_amount 		= $this->get_item_price( $cart_item ) * $this->get_item_quantity( $cart_item );
-			$max_order_line_amount 	= ( number_format( wc_get_price_excluding_tax($cart_item['data']),  wc_get_price_decimals(), '.', '') * $cart_item['quantity'] ) * 100;
+			//$item_total_amount 		= $this->get_item_price( $cart_item ) * $this->get_item_quantity( $cart_item );
+			//$max_order_line_amount 	= ( number_format( wc_get_price_excluding_tax($cart_item['data']),  wc_get_price_decimals(), '.', '') * $cart_item['quantity'] ) * 100;
+			$item_total_amount 		= number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->tax_rate / 10000 ) ),  wc_get_price_decimals(), '.', '') * 100;
+			$max_order_line_amount 	= ( number_format( wc_get_price_including_tax($cart_item['data']),  wc_get_price_decimals(), '.', '') * $cart_item['quantity'] ) * 100;
 		} else {
 			$item_total_amount 		= number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->tax_rate / 10000 ) ),  wc_get_price_decimals(), '.', '') * 100;
 			$max_order_line_amount 	= ( number_format( wc_get_price_including_tax($cart_item['data']),  wc_get_price_decimals(), '.', '') * $cart_item['quantity'] ) * 100;
