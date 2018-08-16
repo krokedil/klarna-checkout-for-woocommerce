@@ -465,7 +465,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		$image_url = false;
 		if ( $product->get_image_id() > 0 ) {
 			$image_id  = $product->get_image_id();
-			$image_url = wp_get_attachment_image_url( $image_id, 'shop_thumbnail', false );
+			$image_url = wp_get_attachment_image_url( $image_id, 'shop_single', false );
 		}
 
 		return $image_url;
