@@ -29,11 +29,10 @@ function kco_wc_show_order_notes() {
 function kco_wc_show_extra_fields() {
 	// Clear extra fields session values on reload.
 	// WC()->session->__unset( 'kco_wc_extra_fields_values' );
-
 	echo '<div id="kco-extra-fields">';
 
 	$extra_fields_values          = WC()->session->get( 'kco_wc_extra_fields_values', array() );
-	$kco_wc_extra_checkout_fields = new Klarna_Checkout_For_WooCommerce_Extra_Checkout_Fields;
+	$kco_wc_extra_checkout_fields = new Klarna_Checkout_For_WooCommerce_Extra_Checkout_Fields();
 	$extra_fields                 = $kco_wc_extra_checkout_fields->get_remaining_checkout_fields();
 
 	// Billing.
@@ -53,8 +52,8 @@ function kco_wc_show_extra_fields() {
 				<p class="form-row form-row-wide create-account">
 					<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
 						<input class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox"
-						       id="createaccount" <?php checked( ( true === WC()->checkout()->get_value( 'createaccount' ) || ( true === apply_filters( 'woocommerce_create_account_default_checked', false ) ) ), true ) ?>
-						       type="checkbox" name="createaccount" value="1"/>
+							   id="createaccount" <?php checked( ( true === WC()->checkout()->get_value( 'createaccount' ) || ( true === apply_filters( 'woocommerce_create_account_default_checked', false ) ) ), true ); ?>
+							   type="checkbox" name="createaccount" value="1"/>
 						<span><?php _e( 'Create an account?', 'klarna-checkout-for-woocommerce' ); ?></span>
 					</label>
 				</p>
@@ -186,7 +185,7 @@ function kco_wc_prefill_consent() {
 		?>
 		<p><a class="button" href="<?php echo $consent_url; ?>"><?php echo $button_text; ?></a></p>
 		<p><a href="#TB_inline?width=600&height=550&inlineId=consent-text"
-		      class="thickbox"><?php echo $link_text; ?></a>
+			  class="thickbox"><?php echo $link_text; ?></a>
 		</p>
 		<div id="consent-text" style="display:none;">
 			<p><?php echo $popup_text; ?></p>
@@ -472,5 +471,7 @@ function kco_wc_print_notices() {
 			$fields_string = $fields_string . ' ' . $field;
 		}
 		wc_add_notice( __( sprintf( 'The following fields are required:%s.', $fields_string ), 'klarna-checkout-for-woocommerce' ), 'error' );
+	} elseif ( isset( $_GET['invalid_coupon'] ) ) {
+		wc_add_notice( __( 'Invalid coupon.', 'klarna-checkout-for-woocommerce' ), 'error' );
 	}
 }
