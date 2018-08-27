@@ -168,7 +168,12 @@ jQuery(function($) {
 					error: function(data) {
 					},
 					complete: function(data) {
-						kco_wc.kcoResume();
+						if (true === data.responseJSON.success) {
+							kco_wc.kcoResume();
+						} else {
+							console.log('Cart do not need payment. Reloading checkout.');
+                    		window.location.href = data.responseJSON.data.redirect_url;
+						}
 					}
 				});
 			}

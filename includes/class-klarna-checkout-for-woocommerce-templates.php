@@ -55,6 +55,12 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	 */
 	public function override_template( $template, $template_name, $template_path ) {
 		if ( is_checkout() ) {
+
+			// Don't display KCO template if we have a cart that doesn't needs payment
+			if( ! WC()->cart->needs_payment() ) {
+				return $template;
+			}
+
 			// Klarna Checkout.
 			if ( 'checkout/form-checkout.php' === $template_name ) {
 				$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
