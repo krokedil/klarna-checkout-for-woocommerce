@@ -357,7 +357,7 @@ msgstr ""
 msgid "Sales Tax"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:508, ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:536
+#: ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:532, ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:560
 msgid "Shipping"
 msgstr ""
 
