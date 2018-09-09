@@ -176,9 +176,10 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 				?>
 
 				$('.validate-required').removeClass('validate-required');
-				
 				$('form.woocommerce-checkout').submit();
 				console.log('yes submitted');
+				$('form.woocommerce-checkout').addClass( 'processing' );
+				console.log('processing class added to form');
 			});
 		</script>
 		<?php
