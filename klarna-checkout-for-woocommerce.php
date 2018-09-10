@@ -92,6 +92,13 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		public $logger;
 
 		/**
+		 * Reference to order lines from order class.
+		 *
+		 * @var $log
+		 */
+		public $order_lines_from_order;
+
+		/**
 		 * Returns the *Singleton* instance of this class.
 		 *
 		 * @return self::$instance The *Singleton* instance.
@@ -206,17 +213,21 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				// If plugin is not active show Activate button.
 				if ( ! is_plugin_active( $plugin_slug . '/' . $plugin_slug . '.php' ) && current_user_can( 'activate_plugins' ) ) {
 					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-					$plugin      = plugins_api( 'plugin_information', array(
-						'slug' => $plugin_slug,
-					) );
+					$plugin      = plugins_api(
+						'plugin_information', array(
+							'slug' => $plugin_slug,
+						)
+					);
 					$plugin      = (array) $plugin;
 					$status      = install_plugin_install_status( $plugin );
 					$name        = wp_kses( $plugin['name'], array() );
-					$url         = add_query_arg( array(
-						'_wpnonce' => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
-						'action'   => 'activate',
-						'plugin'   => $status['file'],
-					), network_admin_url( 'plugins.php' ) );
+					$url         = add_query_arg(
+						array(
+							'_wpnonce' => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
+							'action'   => 'activate',
+							'plugin'   => $status['file'],
+						), network_admin_url( 'plugins.php' )
+					);
 					$description = $name . ' is not active. Please activate it so you can capture, cancel, update and refund Klarna orders.';
 					?>
 					<div class="notice notice-warning">
@@ -233,9 +244,11 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			} else { // If plugin file does not exist, show Install button.
 				if ( current_user_can( 'install_plugins' ) ) {
 					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-					$plugin = plugins_api( 'plugin_information', array(
-						'slug' => $plugin_slug,
-					) );
+					$plugin = plugins_api(
+						'plugin_information', array(
+							'slug' => $plugin_slug,
+						)
+					);
 					$plugin = (array) $plugin;
 					$status = install_plugin_install_status( $plugin );
 					if ( 'install' === $status['status'] && $status['url'] ) {
@@ -294,6 +307,8 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-status.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-create-local-order-fallback.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-gdpr.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-subscription.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines-from-order.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php';
 			include_once KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
 
@@ -302,11 +317,12 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				include_once KCO_WC_PLUGIN_PATH . '/includes/class-wc-klarna-banners.php';
 			}
 
-			$this->api           = new Klarna_Checkout_For_WooCommerce_API();
-			$this->merchant_urls = new Klarna_Checkout_For_WooCommerce_Merchant_URLs();
-			$this->order_lines   = new Klarna_Checkout_For_WooCommerce_Order_Lines();
-			$this->credentials   = new Klarna_Checkout_For_WooCommerce_Credentials();
-			$this->logger        = new Klarna_Checkout_For_WooCommerce_Logging();
+			$this->api                    = new Klarna_Checkout_For_WooCommerce_API();
+			$this->merchant_urls          = new Klarna_Checkout_For_WooCommerce_Merchant_URLs();
+			$this->order_lines            = new Klarna_Checkout_For_WooCommerce_Order_Lines();
+			$this->credentials            = new Klarna_Checkout_For_WooCommerce_Credentials();
+			$this->logger                 = new Klarna_Checkout_For_WooCommerce_Logging();
+			$this->order_lines_from_order = new Klarna_Checkout_For_Woocommerce_Order_Lines_From_Order();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
@@ -330,7 +346,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * Filters cart item quantity output.
 		 *
 		 * @param string $output HTML output.
-		 * @param array $cart_item Cart item.
+		 * @param array  $cart_item Cart item.
 		 * @param string $cart_item_key Cart item key.
 		 *
 		 * @return string $output
@@ -344,12 +360,14 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 						if ( $_product->is_sold_individually() ) {
 							$return_value = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1" />', $cart_key );
 						} else {
-							$return_value = woocommerce_quantity_input( array(
-								'input_name'  => 'cart[' . $cart_key . '][qty]',
-								'input_value' => $cart_item['quantity'],
-								'max_value'   => $_product->backorders_allowed() ? '' : $_product->get_stock_quantity(),
-								'min_value'   => '1',
-							), $_product, false );
+							$return_value = woocommerce_quantity_input(
+								array(
+									'input_name'  => 'cart[' . $cart_key . '][qty]',
+									'input_value' => $cart_item['quantity'],
+									'max_value'   => $_product->backorders_allowed() ? '' : $_product->get_stock_quantity(),
+									'min_value'   => '1',
+								), $_product, false
+							);
 						}
 
 						$output = $return_value;
