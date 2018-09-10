@@ -122,6 +122,11 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				$this->order_lines[] = $klarna_item;
 			}
 		}
+		foreach ( WC()->cart->get_applied_coupons() as $coupon ) {
+			$merchant_data                                      = json_decode( Klarna_Checkout_For_WooCommerce_API::$merchant_data );
+			$merchant_data['coupons'][]                         = $coupon;
+			Klarna_Checkout_For_WooCommerce_API::$merchant_data = json_encode( $merchant_data );
+		}
 	}
 
 	/**
@@ -174,6 +179,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				$coupon_reference  = '';
 				$coupon_amount     = 0;
 				$coupon_tax_amount = '';
+				
 				// Smart coupons are processed as real line items, cart and product discounts sent for reference only.
 				if ( 'smart_coupon' === $coupon->get_discount_type() ) {
 					$coupon_amount     = - WC()->cart->get_coupon_discount_amount( $coupon_key ) * 100;
@@ -208,6 +214,29 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					);
 					$this->order_lines[] = $discount;
 				}
+			} // End foreach().
+		} // End if().
+
+		// YITH Gift Cards
+		if ( ! empty( WC()->cart->applied_gift_cards ) ) {
+			foreach ( WC()->cart->applied_gift_cards as $coupon_key => $code ) {
+				$coupon_reference  = '';
+				$coupon_amount     = isset( WC()->cart->applied_gift_cards_amounts[ $code ] ) ? - WC()->cart->applied_gift_cards_amounts[ $code ] * 100 : 0;
+				$coupon_tax_amount = '';
+				$label = apply_filters( 'yith_ywgc_cart_totals_gift_card_label', esc_html( __( 'Gift card:', 'yith-woocommerce-gift-cards' ) . ' ' . $code ), $code );
+				
+				$gift_card            = array(
+					'type'                  => 'gift_card',
+					'reference'             => $code,
+					'name'                  => __( 'Gift card', 'yith-woocommerce-gift-cards' ),
+					'quantity'              => 1,
+					'unit_price'            => $coupon_amount,
+					'tax_rate'              => 0,
+					'total_amount'          => $coupon_amount,
+					'total_discount_amount' => 0,
+					'total_tax_amount'      => 0,
+				);
+				$this->order_lines[] = $gift_card;
 			} // End foreach().
 		} // End if().
 	}
@@ -256,7 +285,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	}
 
 	// Helpers.
-
 	/**
 	 * Get cart item name.
 	 *

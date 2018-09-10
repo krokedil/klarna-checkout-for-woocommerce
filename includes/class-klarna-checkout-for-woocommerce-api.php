@@ -18,6 +18,13 @@ class Klarna_Checkout_For_WooCommerce_API {
 	private $settings = array();
 
 	/**
+	 * Merchant data JSON string.
+	 *
+	 * @var string
+	 */
+	public static $merchant_data = '';
+
+	/**
 	 * Klarna_Checkout_For_WooCommerce_API constructor.
 	 */
 	public function __construct() {
@@ -36,32 +43,36 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 			'body'       => $this->get_request_body( 'create' ),
 		);
-		$log_array = array(
+		$log_array    = array(
 			'headers'    => $request_args['headers'],
 			'user-agent' => $request_args['user-agent'],
 			'body'       => json_decode( $request_args['body'] ),
 		);
-		KCO_WC()->logger->log( 'Create Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
+		KCO_WC()->logger->log( 'Create Klarna order (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
 		krokedil_log_events( null, 'Pre Create Order request args', $log_array );
 		$response = wp_safe_remote_post( $request_url, $request_args );
-
+		
 		if ( is_wp_error( $response ) ) {
-			return $this->extract_error_messages( $response );
+			$error = $this->extract_error_messages( $response );
+			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . $error . ') ' . stripslashes_deep( json_encode( $response ) ) );
+			return $error;
 		}
 
 		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
 			$klarna_order = json_decode( $response['body'] );
 			$this->save_order_id_to_session( sanitize_key( $klarna_order->order_id ) );
 			$this->save_order_api_to_session( $klarna_order );
-			$log_order = clone $klarna_order;
+			$log_order               = clone $klarna_order;
 			$log_order->html_snippet = '';
 			krokedil_log_events( null, 'Pre Create Order response', $log_order );
 			return $klarna_order;
-		} else if( $response['response']['code'] === 405 ) {
+		} elseif ( $response['response']['code'] === 405 ) {
 			$error = $response['response']['message'];
+			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . $error . ') ' . stripslashes_deep( json_encode( $response ) ) );
 			return $error;
 		} else {
 			$error = $this->extract_error_messages( $response );
+			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . stripslashes_deep( json_encode($error)) . ') ' . stripslashes_deep( json_encode( $response ) ) );
 			krokedil_log_events( null, 'Pre Create Order response', $error );
 			return $error;
 		}
@@ -86,8 +97,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$response = wp_safe_remote_get( $request_url, $request_args );
 
 		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
-			$klarna_order = json_decode( $response['body'] );
-			$log_order = clone $klarna_order;
+			$klarna_order            = json_decode( $response['body'] );
+			$log_order               = clone $klarna_order;
 			$log_order->html_snippet = '';
 			krokedil_log_events( null, 'Pre Retrieve Order response', $log_order );
 			return $klarna_order;
@@ -111,7 +122,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 			'body'       => $this->get_request_body(),
 		);
-		$log_array = array(
+		$log_array       = array(
 			'headers'    => $request_args['headers'],
 			'user-agent' => $request_args['user-agent'],
 			'body'       => json_decode( $request_args['body'] ),
@@ -128,8 +139,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
 			WC()->session->set( 'kco_wc_update_md5', md5( serialize( $request_args ) ) );
 
-			$klarna_order = json_decode( $response['body'] );
-			$log_order = clone $klarna_order;
+			$klarna_order            = json_decode( $response['body'] );
+			$log_order               = clone $klarna_order;
 			$log_order->html_snippet = '';
 			krokedil_log_events( null, 'Pre Update Order response', $log_order );
 			return $klarna_order;
@@ -157,7 +168,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 		);
-		$response = wp_safe_remote_get( $request_url, $request_args );
+		$response     = wp_safe_remote_get( $request_url, $request_args );
 		krokedil_log_events( null, 'Post Get Order response', stripslashes_deep( $response ) );
 		KCO_WC()->logger->log( 'Post Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
 
@@ -187,7 +198,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * Adds WooCommerce order ID to Klarna order as merchant_reference. And clear Klarna order ID value from WC session.
 	 *
 	 * @param  string $klarna_order_id Klarna order ID.
-	 * @param  array $merchant_references Array of merchant references.
+	 * @param  array  $merchant_references Array of merchant references.
 	 *
 	 * @return WP_Error|array $response
 	 */
@@ -197,10 +208,12 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'method'     => 'PATCH',
-			'body'       => wp_json_encode( array(
-				'merchant_reference1' => $merchant_references['merchant_reference1'],
-				'merchant_reference2' => $merchant_references['merchant_reference2'],
-			) ),
+			'body'       => wp_json_encode(
+				array(
+					'merchant_reference1' => $merchant_references['merchant_reference1'],
+					'merchant_reference2' => $merchant_references['merchant_reference2'],
+				)
+			),
 		);
 
 		$response = wp_safe_remote_request( $request_url, $request_args );
@@ -372,7 +385,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
 			$locale = ICL_LANGUAGE_CODE;
 		} else {
-			$locale = explode('_', get_locale());
+			$locale = explode( '_', get_locale() );
 			$locale = $locale[0];
 		}
 
@@ -401,7 +414,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			case 'FI':
 				if ( 'fi' == $locale ) {
 					$klarna_locale = 'fi-fi';
-				} elseif( 'sv' == $locale ) {
+				} elseif ( 'sv' == $locale ) {
 					$klarna_locale = 'sv-fi';
 				} else {
 					$klarna_locale = 'en-fi';
@@ -496,8 +509,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'order_tax_amount'   => KCO_WC()->order_lines->get_order_tax_amount(),
 			'order_lines'        => KCO_WC()->order_lines->get_order_lines(),
 			'shipping_countries' => $this->get_shipping_countries(),
+			'merchant_data'      => self::$merchant_data,
 		);
-				
+
 		if ( kco_wc_prefill_allowed() ) {
 			$request_args['billing_address'] = array(
 				'email'           => WC()->checkout()->get_value( 'billing_email' ),
@@ -514,9 +528,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 		}
 
 		$request_args['options']['title_mandatory']                 = $this->get_title_mandatory();
-		$request_args['options']                                             = array();
-		$request_args['options']['allow_separate_shipping_address']          = $this->get_allow_separate_shipping_address();
-		$request_args['options']['date_of_birth_mandatory']                  = $this->get_dob_mandatory();
+		$request_args['options']                                    = array();
+		$request_args['options']['allow_separate_shipping_address'] = $this->get_allow_separate_shipping_address();
+		$request_args['options']['date_of_birth_mandatory']         = $this->get_dob_mandatory();
 		$request_args['options']['national_identification_number_mandatory'] = $this->get_dob_mandatory();
 		$request_args['options']['title_mandatory']                          = $this->get_title_mandatory();
 
