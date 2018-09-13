@@ -750,7 +750,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'purchase_currency' => $order->get_currency(),
 			'order_tax_amount'  => KCO_WC()->order_lines_from_order->get_total_tax( $order_id ),
 		);
-
 		return json_encode( $body );
 	}
 }
