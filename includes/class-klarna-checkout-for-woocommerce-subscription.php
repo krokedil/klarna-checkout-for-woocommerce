@@ -153,15 +153,14 @@ class Klarna_Checkout_Subscription {
 		}
 
 		$create_order_response = new Klarna_Checkout_For_WooCommerce_API();
-		$create_order_response->request_create_recurring_order( $renewal_order, $recurring_token );
-
+		$create_order_response = $create_order_response->request_create_recurring_order( $renewal_order, $recurring_token );
 		if ( true === $create_order_response ) {
 			WC_Subscriptions_Manager::process_subscription_payments_on_order( $renewal_order );
 			$renewal_order->add_order_note( __( 'Subscription payment made with Klarna', 'klarna-checkout-for-woocommerce' ) );
 			$renewal_order->payment_complete();
 		} else {
 			WC_Subscriptions_Manager::process_subscription_payment_failure_on_order( $renewal_order );
-			$renewal_order->add_order_note( __( 'Subscription payment failed to create with Klarna', 'klarna-checkout-for-woocommerce' ) );
+			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s', 'klarna-checkout-for-woocommerce' ), $create_order_response['code'], $create_order_response['message'] ) );
 		}
 	}
 }

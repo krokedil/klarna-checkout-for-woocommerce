@@ -727,7 +727,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( 200 === $response['response']['code'] ) {
 			return true;
 		} else {
-			return false;
+			return $response['response'];
 		}
 	}
 
