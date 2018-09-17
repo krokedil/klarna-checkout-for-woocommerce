@@ -19,6 +19,7 @@ class Klarna_Checkout_Subscription {
 	public function __construct() {
 		// add_filter( 'kco_wc_api_request_args', array( $this, 'create_extra_merchant_data' ) );
 		add_filter( 'kco_wc_api_request_args', array( $this, 'set_recurring' ) );
+		add_filter( 'kco_wc_api_request_args', array( $this, 'set_merchant_data' ) );
 		add_action( 'woocommerce_thankyou_kco', array( $this, 'set_recurring_token_for_order' ) );
 		add_action( 'woocommerce_scheduled_subscription_payment_kco', array( $this, 'trigger_scheduled_payment' ), 10, 2 );
 	}
@@ -42,7 +43,17 @@ class Klarna_Checkout_Subscription {
 		}
 		return false;
 	}
+	public function set_merchant_data( $request_args ) {
+		if ( isset( $request_args['merchant_data'] ) ) {
+			$merchant_data = json_decode( $request_args['merchant_data'] );
+		} else {
+			$merchant_data = array();
+		}
+		$merchant_data['is_user_logged_in'] = is_user_logged_in();
+		$request_args['merchant_data']      = json_encode( $merchant_data );
 
+		return $request_args;
+	}
 	/**
 	 * Creates the extra merchant data array needed for a subscription.
 	 *
@@ -165,3 +176,4 @@ class Klarna_Checkout_Subscription {
 	}
 }
 new Klarna_Checkout_Subscription();
+
