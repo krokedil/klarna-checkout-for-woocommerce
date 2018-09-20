@@ -96,35 +96,37 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 			return;
 		}
 
-		// Prevent duplicate orders if confirmation page is reloaded manually by customer 
+		// Prevent duplicate orders if confirmation page is reloaded manually by customer
 		$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
-		$query = new WC_Order_Query( array(
-	        'limit' => -1,
-	        'orderby' => 'date',
-	        'order' => 'DESC',
-	        'return' => 'ids',
-	        'payment_method' => 'kco',
-	        'date_created' => '>' . ( time() - DAY_IN_SECONDS )
-	    ) );
-	    $orders = $query->get_orders();
-		$order_id_match = null;
-	    foreach( $orders as $order_id ) {
-			
+		$query           = new WC_Order_Query(
+			array(
+				'limit'          => -1,
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+				'return'         => 'ids',
+				'payment_method' => 'kco',
+				'date_created'   => '>' . ( time() - DAY_IN_SECONDS ),
+			)
+		);
+		$orders          = $query->get_orders();
+		$order_id_match  = null;
+		foreach ( $orders as $order_id ) {
+
 			$order_klarna_order_id = get_post_meta( $order_id, '_wc_klarna_order_id', true );
-			
-	        if( $order_klarna_order_id === $klarna_order_id ) {
-	            $order_id_match = $order_id;
-	            break;
-	        }
+
+			if ( $order_klarna_order_id === $klarna_order_id ) {
+				$order_id_match = $order_id;
+				break;
+			}
 		}
-		// _wc_klarna_order_id already exist in an order. Let's redirect the customer to the thankyou page for that order 
-		if( $order_id_match ) {
+		// _wc_klarna_order_id already exist in an order. Let's redirect the customer to the thankyou page for that order
+		if ( $order_id_match ) {
 			krokedil_log_events( $order_id_match, 'Confirmation page rendered but _wc_klarna_order_id already exist in this order.' );
-			$order = wc_get_order( $order_id_match );
+			$order    = wc_get_order( $order_id_match );
 			$location = $order->get_checkout_order_received_url();
 			wp_safe_redirect( $location, $status );
 			exit;
-			
+
 		}
 		?>
 
@@ -143,7 +145,8 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 				<?php
 				$extra_field_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
 
-				foreach ( $extra_field_values as $field_name => $field_value ) { ?>
+				foreach ( $extra_field_values as $field_name => $field_value ) {
+				?>
 
 				var elementName = "<?php echo $field_name; ?>";
 				var elementValue = <?php echo wp_json_encode( $field_value ); ?>;
@@ -224,6 +227,12 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		if ( isset( $klarna_order->billing_address->street_address2 ) ) {
 			WC()->customer->set_billing_address_2( sanitize_text_field( $klarna_order->billing_address->street_address2 ) );
 			WC()->customer->set_shipping_address_2( sanitize_text_field( $klarna_order->shipping_address->street_address2 ) );
+		}
+
+		// Company Name.
+		if ( isset( $klarna_order->billing_address->organization_name ) ) {
+			WC()->customer->set_billing_company( sanitize_text_field( $klarna_order->billing_address->organization_name ) );
+			WC()->customer->set_shipping_company( sanitize_text_field( $klarna_order->shipping_address->organization_name ) );
 		}
 
 		// City.

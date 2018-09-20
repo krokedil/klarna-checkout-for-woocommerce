@@ -428,7 +428,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 				}
 				break;
 			case 'NO':
-				if ( 'nb' == $locale || 'nn' == $locale ) {
+				if ( 'nb' == $locale || 'nn' == $locale || 'no' == $locale ) {
 					$klarna_locale = 'nb-no';
 				} else {
 					$klarna_locale = 'en-no';

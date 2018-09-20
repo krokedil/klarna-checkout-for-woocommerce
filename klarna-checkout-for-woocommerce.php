@@ -5,7 +5,7 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 1.6.0
+ * Version: 1.6.1
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.6.0' );
+define( 'KCO_WC_VERSION', '1.6.1' );
 define( 'KCO_WC_MIN_PHP_VER', '5.3.0' );
 define( 'KCO_WC_MIN_WC_VER', '2.5.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -206,17 +206,21 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				// If plugin is not active show Activate button.
 				if ( ! is_plugin_active( $plugin_slug . '/' . $plugin_slug . '.php' ) && current_user_can( 'activate_plugins' ) ) {
 					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-					$plugin      = plugins_api( 'plugin_information', array(
-						'slug' => $plugin_slug,
-					) );
+					$plugin      = plugins_api(
+						'plugin_information', array(
+							'slug' => $plugin_slug,
+						)
+					);
 					$plugin      = (array) $plugin;
 					$status      = install_plugin_install_status( $plugin );
 					$name        = wp_kses( $plugin['name'], array() );
-					$url         = add_query_arg( array(
-						'_wpnonce' => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
-						'action'   => 'activate',
-						'plugin'   => $status['file'],
-					), network_admin_url( 'plugins.php' ) );
+					$url         = add_query_arg(
+						array(
+							'_wpnonce' => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
+							'action'   => 'activate',
+							'plugin'   => $status['file'],
+						), network_admin_url( 'plugins.php' )
+					);
 					$description = $name . ' is not active. Please activate it so you can capture, cancel, update and refund Klarna orders.';
 					?>
 					<div class="notice notice-warning">
@@ -233,9 +237,11 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			} else { // If plugin file does not exist, show Install button.
 				if ( current_user_can( 'install_plugins' ) ) {
 					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-					$plugin = plugins_api( 'plugin_information', array(
-						'slug' => $plugin_slug,
-					) );
+					$plugin = plugins_api(
+						'plugin_information', array(
+							'slug' => $plugin_slug,
+						)
+					);
 					$plugin = (array) $plugin;
 					$status = install_plugin_install_status( $plugin );
 					if ( 'install' === $status['status'] && $status['url'] ) {
@@ -330,7 +336,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * Filters cart item quantity output.
 		 *
 		 * @param string $output HTML output.
-		 * @param array $cart_item Cart item.
+		 * @param array  $cart_item Cart item.
 		 * @param string $cart_item_key Cart item key.
 		 *
 		 * @return string $output
@@ -344,12 +350,14 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 						if ( $_product->is_sold_individually() ) {
 							$return_value = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1" />', $cart_key );
 						} else {
-							$return_value = woocommerce_quantity_input( array(
-								'input_name'  => 'cart[' . $cart_key . '][qty]',
-								'input_value' => $cart_item['quantity'],
-								'max_value'   => $_product->backorders_allowed() ? '' : $_product->get_stock_quantity(),
-								'min_value'   => '1',
-							), $_product, false );
+							$return_value = woocommerce_quantity_input(
+								array(
+									'input_name'  => 'cart[' . $cart_key . '][qty]',
+									'input_value' => $cart_item['quantity'],
+									'max_value'   => $_product->backorders_allowed() ? '' : $_product->get_stock_quantity(),
+									'min_value'   => '1',
+								), $_product, false
+							);
 						}
 
 						$output = $return_value;
