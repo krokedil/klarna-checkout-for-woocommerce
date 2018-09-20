@@ -63,6 +63,10 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2018.09.20  	- version 1.6.1 =
+* Fix	        - Added no as possible Norwegian locale code.
+* Fix			- Added bussiness name from B2B purchase to WooCommerce order.
+
 = 2018.09.10  	- version 1.6.0 =
 * Feature		- Added support for YITH WooCommerce Gift Cards.
 * Enhancement	- Added validation of coupons to validation callback.
