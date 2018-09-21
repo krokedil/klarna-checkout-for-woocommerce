@@ -724,11 +724,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'body'       => $this->get_recurring_body( $order ),
 		);
 		$response     = wp_safe_remote_post( $request_url, $request_args );
-		if ( 200 === $response['response']['code'] ) {
-			return true;
-		} else {
-			return $response['response'];
-		}
+		return $response;
 	}
 
 	public function get_recurring_body( $order ) {
