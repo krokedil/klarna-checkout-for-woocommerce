@@ -164,7 +164,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 * Updates Klarna order.
 	 */
 	public static function kco_wc_update_klarna_order() {
-		
+
 		wc_maybe_define_constant( 'WOOCOMMERCE_CHECKOUT', true );
 
 		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
@@ -176,8 +176,8 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				WC()->cart->calculate_fees();
 				WC()->cart->calculate_totals();
 
-				if( ! WC()->cart->needs_payment() ) {
-					$return = array();
+				if ( ! WC()->cart->needs_payment() ) {
+					$return                 = array();
 					$return['redirect_url'] = wc_get_checkout_url();
 					wp_send_json_error( $return );
 					wp_die();
@@ -250,13 +250,21 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_totals();
 
+		// Mailchimp abandoned cart support
+		$email = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_email();
+
 		KCO_WC()->api->request_pre_update_order();
 
 		ob_start();
 		woocommerce_order_review();
 		$html = ob_get_clean();
 
-		wp_send_json_success( array( 'html' => $html ) );
+		wp_send_json_success(
+			array(
+				'html'  => $html,
+				'email' => $email,
+			)
+		);
 		wp_die();
 	}
 

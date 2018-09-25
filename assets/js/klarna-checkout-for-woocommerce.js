@@ -365,6 +365,7 @@ jQuery(function($) {
 									success: function (response) {
 										kco_wc.log(response);
 										$('.woocommerce-checkout-review-order-table').replaceWith(response.data.html);
+										$('#billing_email').val(response.data.email);
 									},
 									error: function (response) {
 										kco_wc.log(response);
@@ -400,5 +401,5 @@ jQuery(function($) {
 		if (event.keyCode == 13) {
 			event.preventDefault();
 		}
-	});
+	});	
 });
