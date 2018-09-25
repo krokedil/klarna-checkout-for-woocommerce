@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 define( 'KCO_WC_VERSION', '1.6.1' );
 define( 'KCO_WC_MIN_PHP_VER', '5.3.0' );
-define( 'KCO_WC_MIN_WC_VER', '2.5.0' );
+define( 'KCO_WC_MIN_WC_VER', '3.0.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
 define( 'KCO_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'KCO_WC_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );

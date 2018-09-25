@@ -164,7 +164,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 * Updates Klarna order.
 	 */
 	public static function kco_wc_update_klarna_order() {
-		
+
 		wc_maybe_define_constant( 'WOOCOMMERCE_CHECKOUT', true );
 
 		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
@@ -176,8 +176,8 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				WC()->cart->calculate_fees();
 				WC()->cart->calculate_totals();
 
-				if( ! WC()->cart->needs_payment() ) {
-					$return = array();
+				if ( ! WC()->cart->needs_payment() ) {
+					$return                 = array();
 					$return['redirect_url'] = wc_get_checkout_url();
 					wp_send_json_error( $return );
 					wp_die();
@@ -210,37 +210,31 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		$customer_data = array();
 
 		if ( isset( $address['email'] ) ) {
-			$customer_data['email']         = $address['email'];
 			$customer_data['billing_email'] = $address['email'];
 		}
 
 		if ( isset( $address['postal_code'] ) ) {
-			$customer_data['postcode']          = $address['postal_code'];
 			$customer_data['billing_postcode']  = $address['postal_code'];
 			$customer_data['shipping_postcode'] = $address['postal_code'];
 		}
 
 		if ( isset( $address['given_name'] ) ) {
-			$customer_data['first_name']          = $address['given_name'];
 			$customer_data['billing_first_name']  = $address['given_name'];
 			$customer_data['shipping_first_name'] = $address['given_name'];
 		}
 
 		if ( isset( $address['family_name'] ) ) {
-			$customer_data['last_name']          = $address['family_name'];
 			$customer_data['billing_last_name']  = $address['family_name'];
 			$customer_data['shipping_last_name'] = $address['family_name'];
 		}
 
 		if ( isset( $address['region'] ) ) {
-			$customer_data['state']          = $address['region'];
 			$customer_data['billing_state']  = $address['region'];
 			$customer_data['shipping_state'] = $address['region'];
 		}
 
 		if ( isset( $address['country'] ) && kco_wc_country_code_converter( $address['country'] ) ) {
 			$country                           = kco_wc_country_code_converter( $address['country'] );
-			$customer_data['country']          = $country;
 			$customer_data['billing_country']  = $country;
 			$customer_data['shipping_country'] = $country;
 		}
