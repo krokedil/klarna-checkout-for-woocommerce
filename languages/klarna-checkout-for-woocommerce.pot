@@ -32,7 +32,7 @@ msgstr ""
 msgid "You need to tick the checkbox <i>When creating an account, automatically generate an account password</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href=\"%s\">Accounts & Privacy tab</a>."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-ajax.php:301
+#: ../includes/class-klarna-checkout-for-woocommerce-ajax.php:303
 msgid "This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna."
 msgstr ""
 

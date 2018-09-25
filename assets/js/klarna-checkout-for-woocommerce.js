@@ -321,6 +321,15 @@ jQuery(function($) {
 			});
 		},
 
+		setFieldValues: function( data ) {
+			// Billing fields
+			$('#billing_email').val(data.email);
+			$('#billing_state').val(data.states.billing_state);
+
+			// Shipping fields
+			$('#shipping_state').val(data.states.shipping_state);
+		},
+
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
 
@@ -365,7 +374,7 @@ jQuery(function($) {
 									success: function (response) {
 										kco_wc.log(response);
 										$('.woocommerce-checkout-review-order-table').replaceWith(response.data.html);
-										$('#billing_email').val(response.data.email);
+										kco_wc.setFieldValues( response.data );
 									},
 									error: function (response) {
 										kco_wc.log(response);

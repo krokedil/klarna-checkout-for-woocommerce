@@ -250,8 +250,9 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_totals();
 
-		// Mailchimp abandoned cart support
-		$email = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_email();
+		// Send customer data to frontend
+		$email  = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_email();
+		$states = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_state();
 
 		KCO_WC()->api->request_pre_update_order();
 
@@ -261,8 +262,9 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 		wp_send_json_success(
 			array(
-				'html'  => $html,
-				'email' => $email,
+				'html'   => $html,
+				'email'  => $email,
+				'states' => $states,
 			)
 		);
 		wp_die();
