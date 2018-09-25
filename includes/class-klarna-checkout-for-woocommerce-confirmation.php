@@ -179,9 +179,10 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 				?>
 
 				$('.validate-required').removeClass('validate-required');
-				
 				$('form.woocommerce-checkout').submit();
 				console.log('yes submitted');
+				$('form.woocommerce-checkout').addClass( 'processing' );
+				console.log('processing class added to form');
 			});
 		</script>
 		<?php
@@ -226,6 +227,12 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		if ( isset( $klarna_order->billing_address->street_address2 ) ) {
 			WC()->customer->set_billing_address_2( sanitize_text_field( $klarna_order->billing_address->street_address2 ) );
 			WC()->customer->set_shipping_address_2( sanitize_text_field( $klarna_order->shipping_address->street_address2 ) );
+		}
+
+		// Company Name.
+		if ( isset( $klarna_order->billing_address->organization_name ) ) {
+			WC()->customer->set_billing_company( sanitize_text_field( $klarna_order->billing_address->organization_name ) );
+			WC()->customer->set_shipping_company( sanitize_text_field( $klarna_order->shipping_address->organization_name ) );
 		}
 
 		// City.

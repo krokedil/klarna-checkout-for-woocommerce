@@ -164,7 +164,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	 * Updates Klarna order.
 	 */
 	public static function kco_wc_update_klarna_order() {
-
+		
 		wc_maybe_define_constant( 'WOOCOMMERCE_CHECKOUT', true );
 
 		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
@@ -175,6 +175,14 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				WC()->cart->calculate_shipping();
 				WC()->cart->calculate_fees();
 				WC()->cart->calculate_totals();
+
+				if( ! WC()->cart->needs_payment() ) {
+					$return = array();
+					$return['redirect_url'] = wc_get_checkout_url();
+					wp_send_json_error( $return );
+					wp_die();
+				}
+
 				KCO_WC()->api->request_pre_update_order();
 			}
 		}

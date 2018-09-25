@@ -48,12 +48,14 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $request_args['user-agent'],
 			'body'       => json_decode( $request_args['body'] ),
 		);
-		KCO_WC()->logger->log( 'Create Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
+		KCO_WC()->logger->log( 'Create Klarna order (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
 		krokedil_log_events( null, 'Pre Create Order request args', $log_array );
 		$response = wp_safe_remote_post( $request_url, $request_args );
-
+		
 		if ( is_wp_error( $response ) ) {
-			return $this->extract_error_messages( $response );
+			$error = $this->extract_error_messages( $response );
+			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . $error . ') ' . stripslashes_deep( json_encode( $response ) ) );
+			return $error;
 		}
 
 		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
@@ -66,9 +68,11 @@ class Klarna_Checkout_For_WooCommerce_API {
 			return $klarna_order;
 		} elseif ( $response['response']['code'] === 405 ) {
 			$error = $response['response']['message'];
+			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . $error . ') ' . stripslashes_deep( json_encode( $response ) ) );
 			return $error;
 		} else {
 			$error = $this->extract_error_messages( $response );
+			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . stripslashes_deep( json_encode($error)) . ') ' . stripslashes_deep( json_encode( $response ) ) );
 			krokedil_log_events( null, 'Pre Create Order response', $error );
 			return $error;
 		}
@@ -424,7 +428,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 				}
 				break;
 			case 'NO':
-				if ( 'nb' == $locale || 'nn' == $locale ) {
+				if ( 'nb' == $locale || 'nn' == $locale || 'no' == $locale ) {
 					$klarna_locale = 'nb-no';
 				} else {
 					$klarna_locale = 'en-no';

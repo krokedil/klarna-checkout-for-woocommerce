@@ -6,7 +6,7 @@ Requires at least: 4.0
 Tested up to: 4.9.8
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.4.4
+WC tested up to: 3.4.5
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,17 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+
+= 2018.09.20  	- version 1.6.1 =
+* Fix	        - Added no as possible Norwegian locale code.
+* Fix			- Added bussiness name from B2B purchase to WooCommerce order.
+
+= 2018.09.10  	- version 1.6.0 =
+* Feature		- Added support for YITH WooCommerce Gift Cards.
+* Enhancement	- Added validation of coupons to validation callback.
+* Enhancement	- Don’t use KCO template file if cart doesn’t need payment.
+* Tweak			- Logging improvements.
+* Fix			- Add class "processing" to form after trigger submit to avoid checkout form from being triggered twice.
 
 = 2018.08.08  	- version 1.5.5 =
 * Tweak			- Send url to single product image to Klarna (instead of tumbnail size).
