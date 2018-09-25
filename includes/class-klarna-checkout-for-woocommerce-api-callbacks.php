@@ -192,11 +192,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$form_data             = get_transient( $data['order_id'] );
 		$has_required_data     = true;
 		$failed_required_check = array();
-		foreach ( $form_data as $form_row ) {
-			if ( isset( $form_row['required'] ) && '' === $form_row['value'] ) {
-				$has_required_data = false;
-				wc_add_notice( 'test', 'error' );
-				$failed_required_check[] = $form_row['name'];
+		if ( false !== $form_data ) {
+			foreach ( $form_data as $form_row ) {
+				if ( isset( $form_row['required'] ) && '' === $form_row['value'] ) {
+					$has_required_data       = false;
+					$failed_required_check[] = $form_row['name'];
+				}
 			}
 		}
 
