@@ -194,8 +194,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$failed_required_check = array();
 		foreach ( $form_data as $form_row ) {
 			if ( isset( $form_row['required'] ) && '' === $form_row['value'] ) {
-				$has_required_data = false;
-				wc_add_notice( 'test', 'error' );
+				$has_required_data       = false;
 				$failed_required_check[] = $form_row['name'];
 			}
 		}
