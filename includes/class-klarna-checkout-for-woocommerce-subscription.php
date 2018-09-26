@@ -167,10 +167,9 @@ class Klarna_Checkout_Subscription {
 		$create_order_response = $create_order_response->request_create_recurring_order( $renewal_order, $recurring_token );
 		if ( 200 === $create_order_response['response']['code'] ) {
 			$klarna_order_id = json_decode( $create_order_response['body'] )->order_id;
-			$renewal_order->set_transaction_id( $klarna_order_id );
 			WC_Subscriptions_Manager::process_subscription_payments_on_order( $renewal_order );
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Klarna. Klarna order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
-			$renewal_order->payment_complete();
+			$renewal_order->payment_complete( $klarna_order_id );
 		} else {
 			WC_Subscriptions_Manager::process_subscription_payment_failure_on_order( $renewal_order );
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s', 'klarna-checkout-for-woocommerce' ), $create_order_response['response']['code'], $create_order_response['response']['message'] ) );
