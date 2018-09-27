@@ -328,6 +328,10 @@ jQuery(function($) {
 
 			// Shipping fields
 			$('#shipping_state').val(data.states.shipping_state);
+
+			// Trigger changes
+			$('#billing_email').change();
+			$('#billing_email').blur();
 		},
 
 		init: function () {
