@@ -22,6 +22,8 @@ class Klarna_Checkout_Subscription {
 		add_filter( 'kco_wc_api_request_args', array( $this, 'set_merchant_data' ) );
 		add_action( 'woocommerce_thankyou_kco', array( $this, 'set_recurring_token_for_order' ) );
 		add_action( 'woocommerce_scheduled_subscription_payment_kco', array( $this, 'trigger_scheduled_payment' ), 10, 2 );
+		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'show_recurring_token' ) );
+		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'save_kco_recurring_token_update' ), 45, 2 );
 	}
 
 	/**
@@ -135,11 +137,14 @@ class Klarna_Checkout_Subscription {
 	public function set_recurring_token_for_order( $order_id = null ) {
 		$wc_order = wc_get_order( $order_id );
 		if ( wcs_order_contains_subscription( $wc_order ) ) {
-			$klarna_api   = new Klarna_Checkout_For_WooCommerce_API();
-			$klarna_order = $klarna_api->get_order();
+			$subcriptions = wcs_get_subscriptions_for_order( $order_id );
+			$klarna_order = KCO_WC()->api->get_order();
 			if ( isset( $klarna_order->recurring_token ) ) {
 				$recurring_token = $klarna_order->recurring_token;
-				update_post_meta( $order_id, 'kco_recurring_token', $recurring_token );
+				foreach ( $subcriptions as $subcription ) {
+					update_post_meta( $subcription->get_id(), '_kco_recurring_token', $recurring_token );
+				}
+				update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
 			}
 		}
 	}
@@ -157,24 +162,56 @@ class Klarna_Checkout_Subscription {
 		reset( $subscriptions );
 		$subscription_id = key( $subscriptions );
 
-		$recurring_token = get_post_meta( $order_id, 'kco_recurring_token', true );
+		$recurring_token = get_post_meta( $order_id, '_kco_recurring_token', true );
 		if ( empty( $recurring_token ) ) {
-			$recurring_token = get_post_meta( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ), 'kco_recurring_token', true );
-			update_post_meta( $order_id, 'kco_recurring_token', $recurring_token );
+			$recurring_token = get_post_meta( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ), '_kco_recurring_token', true );
+			update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
 		}
 
 		$create_order_response = new Klarna_Checkout_For_WooCommerce_API();
 		$create_order_response = $create_order_response->request_create_recurring_order( $renewal_order, $recurring_token );
 		if ( 200 === $create_order_response['response']['code'] ) {
 			$klarna_order_id = json_decode( $create_order_response['body'] )->order_id;
-			$renewal_order->set_transaction_id( $klarna_order_id );
 			WC_Subscriptions_Manager::process_subscription_payments_on_order( $renewal_order );
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Klarna. Klarna order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
-			$renewal_order->payment_complete();
+			$renewal_order->payment_complete( $klarna_order_id );
 		} else {
 			WC_Subscriptions_Manager::process_subscription_payment_failure_on_order( $renewal_order );
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s', 'klarna-checkout-for-woocommerce' ), $create_order_response['response']['code'], $create_order_response['response']['message'] ) );
 		}
+	}
+
+	public function show_recurring_token( $order ) {
+		if ( 'shop_subscription' === $order->get_type() && get_post_meta( $order->get_id(), '_kco_recurring_token' ) ) {
+			?>
+			<div class="order_data_column" style="clear:both; float:none; width:100%;">
+				<div class="address">
+					<?php
+						echo '<p><strong>' . __( 'Klarna recurring token' ) . ':</strong>' . get_post_meta( $order->id, '_kco_recurring_token', true ) . '</p>';
+					?>
+				</div>
+				<div class="edit_address">
+					<?php
+						woocommerce_wp_text_input(
+							array(
+								'id'            => '_kco_recurring_token',
+								'label'         => __( 'Klarna recurring token' ),
+								'wrapper_class' => '_billing_company_field',
+							)
+						);
+					?>
+				</div>
+			</div>
+		<?php
+		}
+	}
+
+	public function save_kco_recurring_token_update( $post_id, $post ) {
+		$order = wc_get_order( $post_id );
+		if ( 'shop_subscription' === $order->get_type() && get_post_meta( $post_id, '_kco_recurring_token' ) ) {
+			update_post_meta( $post_id, '_kco_recurring_token', wc_clean( $_POST['_kco_recurring_token'] ) );
+		}
+
 	}
 }
 new Klarna_Checkout_Subscription();
