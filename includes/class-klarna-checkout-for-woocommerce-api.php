@@ -596,7 +596,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 		}
 
 		$request_body = wp_json_encode( apply_filters( 'kco_wc_api_request_args', $request_args ) );
-
 		return $request_body;
 	}
 
@@ -734,4 +733,43 @@ class Klarna_Checkout_For_WooCommerce_API {
 		return $error;
 	}
 
+	/**
+	 * Create a recurring order with Klarna
+	 *
+	 * @param object $order The WooCommerce order.
+	 * @param string $recurring_token The Recurring token from Klarna
+	 * @return void
+	 */
+	public function request_create_recurring_order( $order, $recurring_token ) {
+		$request_url  = $this->get_api_url_base() . '/customer-token/v1/tokens/' . $recurring_token . '/order';
+		$request_args = array(
+			'headers'    => $this->get_request_headers(),
+			'user-agent' => $this->get_user_agent(),
+			'body'       => $this->get_recurring_body( $order ),
+		);
+		$response     = wp_safe_remote_post( $request_url, $request_args );
+		return $response;
+	}
+
+	public function get_recurring_body( $order ) {
+		$order_id = $order->get_id();
+
+		$order_lines = array();
+
+		foreach ( $order->get_items() as $item ) {
+			array_push( $order_lines, KCO_WC()->order_lines_from_order->get_order_line_items( $item ) );
+		}
+		foreach ( $order->get_fees() as $fee ) {
+			array_push( $order_lines, KCO_WC()->order_lines_from_order->get_order_line_fees( $fee ) );
+		}
+		array_push( $order_lines, KCO_WC()->order_lines_from_order->get_order_line_shipping( $order ) );
+
+		$body = array(
+			'order_amount'      => KCO_WC()->order_lines_from_order->get_order_amount( $order_id ),
+			'order_lines'       => $order_lines,
+			'purchase_currency' => $order->get_currency(),
+			'order_tax_amount'  => KCO_WC()->order_lines_from_order->get_total_tax( $order_id ),
+		);
+		return json_encode( $body );
+	}
 }

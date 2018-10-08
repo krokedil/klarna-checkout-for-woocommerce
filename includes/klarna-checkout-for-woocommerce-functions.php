@@ -473,5 +473,7 @@ function kco_wc_print_notices() {
 		wc_add_notice( __( sprintf( 'The following fields are required:%s.', $fields_string ), 'klarna-checkout-for-woocommerce' ), 'error' );
 	} elseif ( isset( $_GET['invalid_coupon'] ) ) {
 		wc_add_notice( __( 'Invalid coupon.', 'klarna-checkout-for-woocommerce' ), 'error' );
+	} elseif ( isset( $_GET['needs_login'] ) ) {
+		wc_add_notice( __( 'You must be logged in to checkout.', 'woocommerce' ), 'error' );
 	}
 }
