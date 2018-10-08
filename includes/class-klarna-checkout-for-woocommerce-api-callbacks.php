@@ -88,7 +88,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
 
 				$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
-				$klarna_order = json_decode( $response['body'] );
+				$klarna_order = apply_filters( 'kco_wc_api_callbacks_push_klarna_order', json_decode( $response['body'] ) );
+
 				krokedil_log_events( $order_id, 'Klarna push callback. Updating order status.', $klarna_order );
 
 				if ( 'ACCEPTED' === $klarna_order->fraud_status ) {

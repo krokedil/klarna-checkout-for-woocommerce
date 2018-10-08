@@ -51,7 +51,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		KCO_WC()->logger->log( 'Create Klarna order (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
 		krokedil_log_events( null, 'Pre Create Order request args', $log_array );
 		$response = wp_safe_remote_post( $request_url, $request_args );
-		
+
 		if ( is_wp_error( $response ) ) {
 			$error = $this->extract_error_messages( $response );
 			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . $error . ') ' . stripslashes_deep( json_encode( $response ) ) );
@@ -72,7 +72,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			return $error;
 		} else {
 			$error = $this->extract_error_messages( $response );
-			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . stripslashes_deep( json_encode($error)) . ') ' . stripslashes_deep( json_encode( $response ) ) );
+			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response ) ) );
 			krokedil_log_events( null, 'Pre Create Order response', $error );
 			return $error;
 		}

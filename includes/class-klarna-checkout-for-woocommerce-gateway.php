@@ -343,7 +343,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			$log_order               = clone $klarna_post_order;
 			$log_order->html_snippet = '';
 			krokedil_log_events( $order_id, 'Klarna post_order in show_thank_you_snippet', $log_order );
-
 			if ( 'ACCEPTED' === $klarna_post_order->fraud_status ) {
 				$order->payment_complete();
 				// translators: Klarna order ID.
