@@ -138,8 +138,7 @@ class Klarna_Checkout_Subscription {
 		$wc_order = wc_get_order( $order_id );
 		if ( wcs_order_contains_subscription( $wc_order ) ) {
 			$subcriptions = wcs_get_subscriptions_for_order( $order_id );
-			$klarna_api   = new Klarna_Checkout_For_WooCommerce_API();
-			$klarna_order = $klarna_api->get_order();
+			$klarna_order = KCO_WC()->api->get_order();
 			if ( isset( $klarna_order->recurring_token ) ) {
 				$recurring_token = $klarna_order->recurring_token;
 				foreach ( $subcriptions as $subcription ) {
