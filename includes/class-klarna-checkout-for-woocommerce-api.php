@@ -182,6 +182,26 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 *
 	 * @return WP_Error|array $response
 	 */
+	public function request_pre_get_order( $klarna_order_id ) {
+		$request_url  = $this->get_api_url_base() . '/checkout/v3/orders/' . $klarna_order_id;
+		$request_args = array(
+			'headers'    => $this->get_request_headers(),
+			'user-agent' => $this->get_user_agent(),
+		);
+		$response     = wp_safe_remote_get( $request_url, $request_args );
+		krokedil_log_events( null, 'Pre Get Order response', stripslashes_deep( $response ) );
+		KCO_WC()->logger->log( 'Pre Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
+
+		return $response;
+	}
+
+	/**
+	 * Acknowledges Klarna Checkout order.
+	 *
+	 * @param  string $klarna_order_id Klarna order ID.
+	 *
+	 * @return WP_Error|array $response
+	 */
 	public function request_post_acknowledge_order( $klarna_order_id ) {
 		$request_url  = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id . '/acknowledge';
 		$request_args = array(
