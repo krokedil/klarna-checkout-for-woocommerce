@@ -136,7 +136,7 @@ class Klarna_Checkout_Subscription {
 	 */
 	public function set_recurring_token_for_order( $order_id = null ) {
 		$wc_order = wc_get_order( $order_id );
-		if ( wcs_order_contains_subscription( $wc_order ) ) {
+		if ( class_exists( 'WC_Subscription' ) && wcs_order_contains_subscription( $wc_order ) ) {
 			$subcriptions = wcs_get_subscriptions_for_order( $order_id );
 			$klarna_order = KCO_WC()->api->get_order();
 			if ( isset( $klarna_order->recurring_token ) ) {
