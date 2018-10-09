@@ -63,6 +63,15 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2018.10.09  	- version 1.7.0 =
+* Feature		- Added support for recurring payments via WooCommerce Subscriptions (in SE, NO, FI, DE & AT).
+* Feature		- Fetch and save customer email address in Woo on shipping address change event. Adds support for better compatibility with abandoned cart plugins.
+* Tweak			- Fetch and save customer state in Woo on shipping address change event.
+* Tweak			- Added admin notice if Autoptimize plugin is used and "Optimize shop cart/checkout" setting is on.
+* Tweak			- Removed customer address setters used before WC 3.0.0.
+* Tweak			- Added order note if order is created via API callback (Klarnas push notification).
+
+
 = 2018.09.20  	- version 1.6.1 =
 * Fix	        - Added no as possible Norwegian locale code.
 * Fix			- Added bussiness name from B2B purchase to WooCommerce order.

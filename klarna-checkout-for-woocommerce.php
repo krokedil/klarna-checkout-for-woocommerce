@@ -5,7 +5,7 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 1.6.1
+ * Version: 1.7.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
@@ -35,9 +35,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.6.1' );
+define( 'KCO_WC_VERSION', '1.7.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.3.0' );
-define( 'KCO_WC_MIN_WC_VER', '2.5.0' );
+define( 'KCO_WC_MIN_WC_VER', '3.0.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
 define( 'KCO_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'KCO_WC_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
@@ -90,6 +90,13 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * @var $log
 		 */
 		public $logger;
+
+		/**
+		 * Reference to order lines from order class.
+		 *
+		 * @var $log
+		 */
+		public $order_lines_from_order;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -300,6 +307,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-status.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-create-local-order-fallback.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-gdpr.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-checkout-form-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-subscription.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines-from-order.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php';
 			include_once KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
 
@@ -308,11 +318,12 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				include_once KCO_WC_PLUGIN_PATH . '/includes/class-wc-klarna-banners.php';
 			}
 
-			$this->api           = new Klarna_Checkout_For_WooCommerce_API();
-			$this->merchant_urls = new Klarna_Checkout_For_WooCommerce_Merchant_URLs();
-			$this->order_lines   = new Klarna_Checkout_For_WooCommerce_Order_Lines();
-			$this->credentials   = new Klarna_Checkout_For_WooCommerce_Credentials();
-			$this->logger        = new Klarna_Checkout_For_WooCommerce_Logging();
+			$this->api                    = new Klarna_Checkout_For_WooCommerce_API();
+			$this->merchant_urls          = new Klarna_Checkout_For_WooCommerce_Merchant_URLs();
+			$this->order_lines            = new Klarna_Checkout_For_WooCommerce_Order_Lines();
+			$this->credentials            = new Klarna_Checkout_For_WooCommerce_Credentials();
+			$this->logger                 = new Klarna_Checkout_For_WooCommerce_Logging();
+			$this->order_lines_from_order = new Klarna_Checkout_For_Woocommerce_Order_Lines_From_Order();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );

@@ -88,7 +88,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
 
 				$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
-				$klarna_order = json_decode( $response['body'] );
+				$klarna_order = apply_filters( 'kco_wc_api_callbacks_push_klarna_order', json_decode( $response['body'] ) );
+
 				krokedil_log_events( $order_id, 'Klarna push callback. Updating order status.', $klarna_order );
 
 				if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
@@ -185,22 +186,24 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$post_body = file_get_contents( 'php://input' );
 		$data      = json_decode( $post_body, true );
 		krokedil_log_events( null, 'Klarna validation callback data', $data );
-		$all_in_stock    = true;
-		$shipping_chosen = false;
-		$coupon_valid    = true;
+		$all_in_stock     = true;
+		$shipping_chosen  = false;
+		$coupon_valid     = true;
+		$has_subscription = false;
 
 		$form_data             = get_transient( $data['order_id'] );
 		$has_required_data     = true;
 		$failed_required_check = array();
-		foreach ( $form_data as $form_row ) {
-			if ( isset( $form_row['required'] ) && '' === $form_row['value'] ) {
-				$has_required_data = false;
-				wc_add_notice( 'test', 'error' );
-				$failed_required_check[] = $form_row['name'];
+		if ( false !== $form_data ) {
+			foreach ( $form_data as $form_row ) {
+				if ( isset( $form_row['required'] ) && '' === $form_row['value'] ) {
+					$has_required_data       = false;
+					$failed_required_check[] = $form_row['name'];
+				}
 			}
 		}
 
-		// Check stock for each item and shipping method.
+		// Check stock for each item and shipping method and if subscription.
 		$cart_items = $data['order_lines'];
 		foreach ( $cart_items as $cart_item ) {
 			if ( 'physical' === $cart_item['type'] ) {
@@ -218,6 +221,9 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 					if ( ! $cart_item_product->is_virtual() ) {
 						$needs_shipping = true;
 					}
+				}
+				if ( class_exists( 'WC_Subscriptions_Cart' ) ) {
+					$has_subscription = ( WC_Subscriptions_Product::is_subscription( $cart_item_product ) === true ) ? true : $has_subscription;
 				}
 			} elseif ( 'shipping_fee' === $cart_item['type'] ) {
 				$shipping_chosen = true;
@@ -264,23 +270,37 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 					}
 				}
 			}
-			do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
-			if ( $all_in_stock && $shipping_chosen && $has_required_data && $coupon_valid ) {
-				header( 'HTTP/1.0 200 OK' );
-			} else {
-				header( 'HTTP/1.0 303 See Other' );
-				if ( ! $all_in_stock ) {
-					$logger = new WC_Logger();
-					$logger->add( 'klarna-checkout-for-woocommerce', 'Stock validation failed for SKU ' . $cart_item['reference'] );
-					header( 'Location: ' . wc_get_cart_url() . '?stock_validate_failed' );
-				} elseif ( ! $shipping_chosen && $needs_shipping ) {
-					header( 'Location: ' . wc_get_checkout_url() . '?no_shipping' );
-				} elseif ( ! $has_required_data ) {
-					$validation_hash = base64_encode( json_encode( $failed_required_check ) );
-					header( 'Location: ' . wc_get_checkout_url() . '?required_fields=' . $validation_hash );
-				} elseif ( ! $coupon_valid ) {
-					header( 'Location: ' . wc_get_checkout_url() . '?invalid_coupon' );
-				}
+		}
+		$needs_login = false;
+		if ( ! empty( $data['merchant_data'] ) ) {
+			$is_user_logged_in = json_decode( $data['merchant_data'] )->is_user_logged_in;
+		}
+		// Check if any product is subscription product
+		if ( class_exists( 'WC_Subscriptions_Cart' ) && $has_subscription ) {
+			$checkout = WC()->checkout();
+			if ( ! $checkout->is_registration_enabled() && ! $is_user_logged_in ) {
+				$needs_login = true;
+			}
+		}
+
+		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
+		if ( $all_in_stock && $shipping_chosen && $has_required_data && $coupon_valid && ! $needs_login ) {
+			header( 'HTTP/1.0 200 OK' );
+		} else {
+			header( 'HTTP/1.0 303 See Other' );
+			if ( ! $all_in_stock ) {
+				$logger = new WC_Logger();
+				$logger->add( 'klarna-checkout-for-woocommerce', 'Stock validation failed for SKU ' . $cart_item['reference'] );
+				header( 'Location: ' . wc_get_cart_url() . '?stock_validate_failed' );
+			} elseif ( ! $shipping_chosen && $needs_shipping ) {
+				header( 'Location: ' . wc_get_checkout_url() . '?no_shipping' );
+			} elseif ( ! $has_required_data ) {
+				$validation_hash = base64_encode( json_encode( $failed_required_check ) );
+				header( 'Location: ' . wc_get_checkout_url() . '?required_fields=' . $validation_hash );
+			} elseif ( ! $coupon_valid ) {
+				header( 'Location: ' . wc_get_checkout_url() . '?invalid_coupon' );
+			} elseif ( $needs_login ) {
+				header( 'Location: ' . wc_get_checkout_url() . '?needs_login' );
 			}
 		}
 	}
@@ -465,6 +485,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
 
 			$order->save();
+
+			$order->add_order_note( __( 'Order created via Klarna Checkout API callback. Please verify the order in Klarnas system.', 'klarna-checkout-for-woocommerce' ) );
 
 			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 				$order->payment_complete( $klarna_order->order_id );
