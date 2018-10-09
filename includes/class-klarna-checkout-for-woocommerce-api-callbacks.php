@@ -486,6 +486,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 			$order->save();
 
+			$order->add_order_note( __( 'Order created via Klarna Checkout API callback. Please verify the order in Klarnas system.', 'klarna-checkout-for-woocommerce' ) );
+
 			if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 				$order->payment_complete( $klarna_order->order_id );
 				// translators: Klarna order ID.
