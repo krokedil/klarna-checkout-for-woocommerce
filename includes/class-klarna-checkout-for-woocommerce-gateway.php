@@ -126,6 +126,14 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			return false;
 		}
 
+		// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE or AT, disable KCO.
+		if ( is_checkout() && class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
+			$available_recurring_countries = array( 'SE', 'NO', 'FI', 'DE', 'AT' );
+			if ( ! in_array(WC()->customer->get_billing_country(), $available_recurring_countries) ) {
+				return false;
+			}
+		}
+
 		return true;
 	}
 
