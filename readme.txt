@@ -63,6 +63,11 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2018.10.10  	- version 1.7.1 =
+* Tweak			- Logging improvements.
+* Fix			- Don't save KCO html_snippet in logs.
+* Fix			- Don't let existing customers that isn't logged in finalize subscription purchase.
+
 = 2018.10.09  	- version 1.7.0 =
 * Feature		- Added support for recurring payments via WooCommerce Subscriptions (in SE, NO, FI, DE & AT).
 * Feature		- Fetch and save customer email address in Woo on shipping address change event. Adds support for better compatibility with abandoned cart plugins.

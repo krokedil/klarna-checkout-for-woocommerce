@@ -186,10 +186,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$post_body = file_get_contents( 'php://input' );
 		$data      = json_decode( $post_body, true );
 		krokedil_log_events( null, 'Klarna validation callback data', $data );
-		$all_in_stock     = true;
-		$shipping_chosen  = false;
-		$coupon_valid     = true;
-		$has_subscription = false;
+		$all_in_stock     	= true;
+		$shipping_chosen  	= false;
+		$coupon_valid     	= true;
+		$has_subscription 	= false;
+		$needs_login 		= false;
+		$email_exists 		= false;
 
 		$form_data             = get_transient( $data['order_id'] );
 		$has_required_data     = true;
@@ -271,7 +273,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				}
 			}
 		}
-		$needs_login = false;
+		
 		if ( ! empty( $data['merchant_data'] ) ) {
 			$is_user_logged_in = json_decode( $data['merchant_data'] )->is_user_logged_in;
 		}
@@ -281,10 +283,14 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			if ( ! $checkout->is_registration_enabled() && ! $is_user_logged_in ) {
 				$needs_login = true;
 			}
+			// If customer has account but isn't logged in - tell them to login.
+			if ( email_exists( $data['billing_address']['email'] ) && ! $is_user_logged_in ) {
+				$email_exists = true;
+			}
 		}
 
 		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
-		if ( $all_in_stock && $shipping_chosen && $has_required_data && $coupon_valid && ! $needs_login ) {
+		if ( $all_in_stock && $shipping_chosen && $has_required_data && $coupon_valid && ! $needs_login && ! $email_exists ) {
 			header( 'HTTP/1.0 200 OK' );
 		} else {
 			header( 'HTTP/1.0 303 See Other' );
@@ -301,6 +307,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				header( 'Location: ' . wc_get_checkout_url() . '?invalid_coupon' );
 			} elseif ( $needs_login ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?needs_login' );
+			} elseif ( $email_exists ) {
+				header( 'Location: ' . wc_get_checkout_url() . '?email_exists' );
 			}
 		}
 	}
