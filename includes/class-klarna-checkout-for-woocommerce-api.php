@@ -169,7 +169,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 		);
 		$response     = wp_safe_remote_get( $request_url, $request_args );
-		krokedil_log_events( null, 'Post Get Order response', stripslashes_deep( $response ) );
+		krokedil_log_events( null, 'Post Get Order response', stripslashes_deep( json_decode( $response['body'] ) ) );
 		KCO_WC()->logger->log( 'Post Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
 
 		return $response;
@@ -189,8 +189,12 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 		);
 		$response     = wp_safe_remote_get( $request_url, $request_args );
-		krokedil_log_events( null, 'Pre Get Order response', stripslashes_deep( $response ) );
-		KCO_WC()->logger->log( 'Pre Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
+
+		$log_order = $response['body'];
+		$log_order = (array) json_decode( $log_order );
+		$log_order['html_snippet'] = '';
+		krokedil_log_events( null, 'Pre Get Order response', stripslashes_deep( $log_order ) );
+		KCO_WC()->logger->log( 'Pre Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $log_order ) ) );
 
 		return $response;
 	}
@@ -747,7 +751,13 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 			'body'       => $this->get_recurring_body( $order ),
 		);
+		
+		KCO_WC()->logger->log( 'Create recurring order request (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
+		krokedil_log_events( $order->get_id(), 'Create recurring order request', $request_args );
 		$response     = wp_safe_remote_post( $request_url, $request_args );
+
+		KCO_WC()->logger->log( 'Create recurring order response' . stripslashes_deep( json_encode( $response ) ) );
+		krokedil_log_events( $order->get_id(), 'Create recurring order response', $response );
 		return $response;
 	}
 
