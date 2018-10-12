@@ -6,7 +6,7 @@ Requires at least: 4.0
 Tested up to: 4.9.8
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.4.5
+WC tested up to: 3.4.6
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+
+= 2018.10.12  	- version 1.7.2 =
+* Fix			- Fixed error when using coupons.
 
 = 2018.10.10  	- version 1.7.1 =
 * Tweak			- Logging improvements.
