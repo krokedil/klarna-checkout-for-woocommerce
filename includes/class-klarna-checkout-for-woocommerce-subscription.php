@@ -48,12 +48,12 @@ class Klarna_Checkout_Subscription {
 	public function set_merchant_data( $request_args ) {
 		if ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
 			if ( isset( $request_args['merchant_data'] ) ) {
-				$merchant_data = json_decode( $request_args['merchant_data'] );
+				$merchant_data = json_decode( $request_args['merchant_data'], true );
 			} else {
 				$merchant_data = array();
 			}
-			$merchant_data->is_user_logged_in = is_user_logged_in();
-			$request_args['merchant_data']    = json_encode( $merchant_data );
+			$merchant_data['is_user_logged_in'] = is_user_logged_in();
+			$request_args['merchant_data']      = json_encode( $merchant_data );
 		}
 		return $request_args;
 	}
