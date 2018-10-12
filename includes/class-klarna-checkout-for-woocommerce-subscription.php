@@ -51,8 +51,8 @@ class Klarna_Checkout_Subscription {
 		} else {
 			$merchant_data = array();
 		}
-		$merchant_data['is_user_logged_in'] = is_user_logged_in();
-		$request_args['merchant_data']      = json_encode( $merchant_data );
+		$merchant_data->is_user_logged_in = is_user_logged_in();
+		$request_args['merchant_data']    = json_encode( $merchant_data );
 
 		return $request_args;
 	}
