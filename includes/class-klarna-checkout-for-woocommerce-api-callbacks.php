@@ -186,12 +186,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$post_body = file_get_contents( 'php://input' );
 		$data      = json_decode( $post_body, true );
 		krokedil_log_events( null, 'Klarna validation callback data', $data );
-		$all_in_stock     	= true;
-		$shipping_chosen  	= false;
-		$coupon_valid     	= true;
-		$has_subscription 	= false;
-		$needs_login 		= false;
-		$email_exists 		= false;
+		$all_in_stock     = true;
+		$shipping_chosen  = false;
+		$coupon_valid     = true;
+		$has_subscription = false;
+		$needs_login      = false;
+		$email_exists     = false;
 
 		$form_data             = get_transient( $data['order_id'] );
 		$has_required_data     = true;
@@ -221,7 +221,15 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 						$all_in_stock = false;
 					}
 					if ( ! $cart_item_product->is_virtual() ) {
-						$needs_shipping = true;
+						if ( class_exists( 'WC_Subscriptions_Product' ) && WC_Subscriptions_Product::is_subscription( $cart_item_product ) ) {
+							if ( 0 === WC_Subscriptions_Product::get_trial_length( $cart_item_product ) ) {
+								$needs_shipping = true;
+							} else {
+								$needs_shipping = false;
+							}
+						} else {
+							$needs_shipping = true;
+						}
 					}
 				}
 				if ( class_exists( 'WC_Subscriptions_Cart' ) ) {
@@ -273,7 +281,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				}
 			}
 		}
-		
+
 		if ( ! empty( $data['merchant_data'] ) ) {
 			$is_user_logged_in = json_decode( $data['merchant_data'] )->is_user_logged_in;
 		}
