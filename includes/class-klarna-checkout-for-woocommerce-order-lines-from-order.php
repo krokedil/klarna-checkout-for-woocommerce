@@ -34,7 +34,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines_From_Order {
 			'total_amount'     => intval( ( $order->get_shipping_total() + $order->get_shipping_tax() ) * 100 ),
 			'unit_price'       => intval( ( $order->get_shipping_total() + $order->get_shipping_tax() ) * 100 ),
 			'total_tax_amount' => intval( $order->get_shipping_tax() * 100 ),
-			'tax_rate'         => $this->get_order_line_tax_rate( $order ),
+			'tax_rate'         => ( '0' !== $order->get_shipping_tax() ) ? $this->get_order_line_tax_rate( $order ) : 0,
 		);
 	}
 
@@ -47,7 +47,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines_From_Order {
 			'total_amount'     => intval( ( $order_fee->get_total() + $order_fee->get_total_tax() ) * 100 ),
 			'unit_price'       => intval( ( $order_fee->get_total() + $order_fee->get_total_tax() ) / $order_item->get_quantity() * 100 ),
 			'total_tax_amount' => intval( $order_fee->get_total_tax() * 100 ),
-			'tax_rate'         => $this->get_order_line_tax_rate( $order ),
+			'tax_rate'         => ( '0' !== $order->get_total_tax() ) ? $this->get_order_line_tax_rate( $order ) : 0,
 		);
 	}
 
