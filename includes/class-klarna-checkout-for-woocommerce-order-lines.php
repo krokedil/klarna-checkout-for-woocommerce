@@ -123,7 +123,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			}
 		}
 		foreach ( WC()->cart->get_applied_coupons() as $coupon ) {
-			$merchant_data                                      = json_decode( Klarna_Checkout_For_WooCommerce_API::$merchant_data );
+			$merchant_data                                      = json_decode( Klarna_Checkout_For_WooCommerce_API::$merchant_data, true );
 			$merchant_data['coupons'][]                         = $coupon;
 			Klarna_Checkout_For_WooCommerce_API::$merchant_data = json_encode( $merchant_data );
 		}
