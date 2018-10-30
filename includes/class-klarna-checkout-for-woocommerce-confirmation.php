@@ -78,7 +78,6 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		if ( ! $this->is_kco_confirmation() ) {
 			return;
 		}
-
 		echo '<div id="kco-confirm-loading"></div>';
 
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
@@ -121,68 +120,74 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		}
 		// _wc_klarna_order_id already exist in an order. Let's redirect the customer to the thankyou page for that order
 		if ( $order_id_match ) {
-			krokedil_log_events( $order_id_match, 'Confirmation page rendered but _wc_klarna_order_id already exist in this order.' );
+			krokedil_log_events( $order_id_match, 'Confirmation page rendered but _wc_klarna_order_id already exist in this order.', null );
 			$order    = wc_get_order( $order_id_match );
 			$location = $order->get_checkout_order_received_url();
-			wp_safe_redirect( $location, $status );
+			error_log( $location );
+			wp_safe_redirect( $location );
 			exit;
-
 		}
 		?>
 
 		<script>
 			jQuery(function ($) {
-				$('input#terms').prop('checked', true);
-				$('input#ship-to-different-address-checkbox').prop('checked', true);
+				if ( sessionStorage.orderSubmitted !== 'true' ) {
+					sessionStorage.orderSubmitted = 'true';
+					$('input#terms').prop('checked', true);
+					$('input#ship-to-different-address-checkbox').prop('checked', true);
 
-				// If order value = 0, payment method fields will not be in the page, so we need to
-				if (!$('input#payment_method_kco').length) {
-					$('#order_review').append('<input id="payment_method_kco" type="radio" class="input-radio" name="payment_method" value="kco" checked="checked" />');
-				}
-
-				$('input#payment_method_kco').prop('checked', true);
-
-				<?php
-				$extra_field_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
-
-				foreach ( $extra_field_values as $field_name => $field_value ) {
-				?>
-
-				var elementName = "<?php echo $field_name; ?>";
-				var elementValue = <?php echo wp_json_encode( $field_value ); ?>;
-				var element = $('*[name="' + elementName + '"]');
-
-				console.log(elementName);
-				console.log(elementValue);
-				console.log(element);
-				console.log(element.type);
-
-				if (element.length) {
-					if (element.is('select')) { // Select.
-						var selectedOption = element.find('option[value="' + elementValue + '"]');
-						selectedOption.prop('selected', true);
-					} else if ('radio' === element.get(0).type) { // Radio.
-						var checkedRadio = $('*[name="' + elementName + '"][value="' + elementValue + '"]');
-						checkedRadio.prop('checked', true);
-					} else if ('checkbox' === element.get(0).type) { // Checkbox.
-						if (elementValue) {
-							element.prop('checked', true);
-						}
-					} else { // Text and textarea.
-						element.val(elementValue);
+					// If order value = 0, payment method fields will not be in the page, so we need to
+					if (!$('input#payment_method_kco').length) {
+						$('#order_review').append('<input id="payment_method_kco" type="radio" class="input-radio" name="payment_method" value="kco" checked="checked" />');
 					}
-				}
 
-				<?php
-				}
-				do_action( 'kco_wc_before_submit' );
-				?>
+					$('input#payment_method_kco').prop('checked', true);
 
-				$('.validate-required').removeClass('validate-required');
-				$('form.woocommerce-checkout').submit();
-				console.log('yes submitted');
-				$('form.woocommerce-checkout').addClass( 'processing' );
-				console.log('processing class added to form');
+					<?php
+					$extra_field_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
+
+					foreach ( $extra_field_values as $field_name => $field_value ) {
+					?>
+
+					var elementName = "<?php echo $field_name; ?>";
+					var elementValue = <?php echo wp_json_encode( $field_value ); ?>;
+					var element = $('*[name="' + elementName + '"]');
+
+					console.log(elementName);
+					console.log(elementValue);
+					console.log(element);
+					console.log(element.type);
+
+					if (element.length) {
+						if (element.is('select')) { // Select.
+							var selectedOption = element.find('option[value="' + elementValue + '"]');
+							selectedOption.prop('selected', true);
+						} else if ('radio' === element.get(0).type) { // Radio.
+							var checkedRadio = $('*[name="' + elementName + '"][value="' + elementValue + '"]');
+							checkedRadio.prop('checked', true);
+						} else if ('checkbox' === element.get(0).type) { // Checkbox.
+							if (elementValue) {
+								element.prop('checked', true);
+							}
+						} else { // Text and textarea.
+							element.val(elementValue);
+						}
+					}
+
+					<?php
+					}
+					do_action( 'kco_wc_before_submit' );
+					?>
+
+					$('.validate-required').removeClass('validate-required');
+					$('form.woocommerce-checkout').submit();
+					console.log('yes submitted');
+					$('form.woocommerce-checkout').addClass( 'processing' );
+					console.log('processing class added to form');
+				} else {
+					console.log( 'order already submitted' );
+					location.reload();
+				}
 			});
 		</script>
 		<?php

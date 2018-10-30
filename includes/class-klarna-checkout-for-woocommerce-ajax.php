@@ -287,7 +287,11 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		} else {
 			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
 		}
-
+		// Check if we have items in cart. If not return redirect URL
+		if ( WC()->cart->is_empty() && ! is_customize_preview() && apply_filters( 'woocommerce_checkout_redirect_empty_cart', true ) ) {
+			wp_send_json_success( array( 'redirect' => wc_get_page_permalink( 'cart' ) ) );
+			wp_die();
+		}
 		// Create order via fallback sequence
 		$order = Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback::create( $klarna_order_id, $error_message );
 

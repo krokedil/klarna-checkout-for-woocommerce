@@ -190,8 +190,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 		);
 		$response     = wp_safe_remote_get( $request_url, $request_args );
 
-		$log_order = $response['body'];
-		$log_order = (array) json_decode( $log_order );
+		$log_order                 = $response['body'];
+		$log_order                 = (array) json_decode( $log_order );
 		$log_order['html_snippet'] = '';
 		krokedil_log_events( null, 'Pre Get Order response', stripslashes_deep( $log_order ) );
 		KCO_WC()->logger->log( 'Pre Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $log_order ) ) );
@@ -568,34 +568,35 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		// Allow external payment method plugin to do its thing.
 		// @TODO: Extract this into a hooked function.
-		if ( 'create' === $request_type ) {
-			if ( in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) ) {
-				if ( isset( $this->settings['allowed_customer_types'] ) ) {
-					$customer_types_setting = $this->settings['allowed_customer_types'];
+		if ( in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) ) {
+			if ( isset( $this->settings['allowed_customer_types'] ) ) {
+				$customer_types_setting = $this->settings['allowed_customer_types'];
 
-					switch ( $customer_types_setting ) {
-						case 'B2B':
-							$allowed_customer_types = array( 'organization' );
-							$customer_type          = 'organization';
-							break;
-						case 'B2BC':
-							$allowed_customer_types = array( 'person', 'organization' );
-							$customer_type          = 'organization';
-							break;
-						case 'B2CB':
-							$allowed_customer_types = array( 'person', 'organization' );
-							$customer_type          = 'person';
-							break;
-						default:
-							$allowed_customer_types = array( 'person' );
-							$customer_type          = 'person';
-					}
+				switch ( $customer_types_setting ) {
+					case 'B2B':
+						$allowed_customer_types = array( 'organization' );
+						$customer_type          = 'organization';
+						break;
+					case 'B2BC':
+						$allowed_customer_types = array( 'person', 'organization' );
+						$customer_type          = 'organization';
+						break;
+					case 'B2CB':
+						$allowed_customer_types = array( 'person', 'organization' );
+						$customer_type          = 'person';
+						break;
+					default:
+						$allowed_customer_types = array( 'person' );
+						$customer_type          = 'person';
+				}
 
-					$request_args['options']['allowed_customer_types'] = $allowed_customer_types;
-					$request_args['customer']['type']                  = $customer_type;
+				$request_args['options']['allowed_customer_types'] = $allowed_customer_types;
+				if ( 'create' === $request_type ) {
+					$request_args['customer']['type'] = $customer_type;
 				}
 			}
-
+		}
+		if ( 'create' === $request_type ) {
 			$request_args = apply_filters( 'kco_wc_create_order', $request_args );
 		}
 
@@ -751,10 +752,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 			'body'       => $this->get_recurring_body( $order ),
 		);
-		
+
 		KCO_WC()->logger->log( 'Create recurring order request (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
 		krokedil_log_events( $order->get_id(), 'Create recurring order request', $request_args );
-		$response     = wp_safe_remote_post( $request_url, $request_args );
+		$response = wp_safe_remote_post( $request_url, $request_args );
 
 		KCO_WC()->logger->log( 'Create recurring order response' . stripslashes_deep( json_encode( $response ) ) );
 		krokedil_log_events( $order->get_id(), 'Create recurring order response', $response );

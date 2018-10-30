@@ -12,4 +12,7 @@ if ( ! WC()->session->get( 'kco_wc_order_id' ) ) {
 }
 
 wc_empty_cart();
+?>
+	<script>sessionStorage.orderSubmitted = false</script>
+<?php
 kco_wc_show_snippet();

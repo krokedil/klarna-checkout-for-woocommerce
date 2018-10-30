@@ -129,7 +129,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE or AT, disable KCO.
 		if ( is_checkout() && class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
 			$available_recurring_countries = array( 'SE', 'NO', 'FI', 'DE', 'AT' );
-			if ( ! in_array(WC()->customer->get_billing_country(), $available_recurring_countries) ) {
+			if ( ! in_array( WC()->customer->get_billing_country(), $available_recurring_countries ) ) {
 				return false;
 			}
 		}
@@ -166,8 +166,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		if ( ! kco_wc_prefill_allowed() ) {
 			add_thickbox();
 		}
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-
+		$suffix = '';
+		// defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		wp_register_script(
 			'kco',
 			plugins_url( 'assets/js/klarna-checkout-for-woocommerce' . $suffix . '.js', KCO_WC_MAIN_FILE ),
@@ -235,7 +235,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			return;
 		}
 
-		$suffix              = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix              = '';// defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$store_base_location = wc_get_base_location();
 		if ( 'US' === $store_base_location['country'] ) {
 			$location = 'US';
@@ -330,6 +330,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		$klarna_order = KCO_WC()->api->get_order();
 		echo KCO_WC()->api->get_snippet( $klarna_order );
+		echo '<script>sessionStorage.orderSubmitted = false</script>';
 
 		if ( $order_id ) {
 			// Set WC order transaction ID.
