@@ -670,31 +670,31 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$color_settings = array();
 
 		if ( $this->check_option_field( 'color_button' ) ) {
-			$color_settings['color_button'] = self:add_hash_to_color( $this->check_option_field( 'color_button' ) );
+			$color_settings['color_button'] = self::add_hash_to_color( $this->check_option_field( 'color_button' ) );
 		}
 
 		if ( $this->check_option_field( 'color_button_text' ) ) {
-			$color_settings['color_button_text'] = self:add_hash_to_color( $this->check_option_field( 'color_button_text' ) );
+			$color_settings['color_button_text'] = self::add_hash_to_color( $this->check_option_field( 'color_button_text' ) );
 		}
 
 		if ( $this->check_option_field( 'color_checkbox' ) ) {
-			$color_settings['color_checkbox'] = self:add_hash_to_color( $this->check_option_field( 'color_checkbox' ) );
+			$color_settings['color_checkbox'] = self::add_hash_to_color( $this->check_option_field( 'color_checkbox' ) );
 		}
 
 		if ( $this->check_option_field( 'color_checkbox_checkmark' ) ) {
-			$color_settings['color_checkbox_checkmark'] = self:add_hash_to_color( $this->check_option_field( 'color_checkbox_checkmark' ) );
+			$color_settings['color_checkbox_checkmark'] = self::add_hash_to_color( $this->check_option_field( 'color_checkbox_checkmark' ) );
 		}
 
 		if ( $this->check_option_field( 'color_header' ) ) {
-			$color_settings['color_header'] = self:add_hash_to_color( $this->check_option_field( 'color_header' ) );
+			$color_settings['color_header'] = self::add_hash_to_color( $this->check_option_field( 'color_header' ) );
 		}
 
 		if ( $this->check_option_field( 'color_link' ) ) {
-			$color_settings['color_link'] = self:add_hash_to_color( $this->check_option_field( 'color_link' ) );
+			$color_settings['color_link'] = self::add_hash_to_color( $this->check_option_field( 'color_link' ) );
 		}
 
 		if ( $this->check_option_field( 'radius_border' ) ) {
-			$color_settings['radius_border'] = self:add_hash_to_color( $this->check_option_field( 'radius_border' ) );
+			$color_settings['radius_border'] = self::add_hash_to_color( $this->check_option_field( 'radius_border' ) );
 		}
 
 		if ( count( $color_settings ) > 0 ) {
