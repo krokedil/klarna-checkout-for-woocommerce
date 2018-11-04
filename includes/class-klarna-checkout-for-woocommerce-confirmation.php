@@ -41,7 +41,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'unrequire_fields' ), 99 );
 		add_filter( 'woocommerce_checkout_posted_data', array( $this, 'unrequire_posted_data' ), 99 );
 		add_action( 'woocommerce_checkout_after_order_review', array( $this, 'add_kco_order_id_field' ) );
-		add_action( 'woocommerce_checkout_create_order', array( $this, 'save_kco_order_id_field' ), 10, 2 );
+		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'save_kco_order_id_field' ), 10, 2 );
 	}
 
 	/**
@@ -317,15 +317,15 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	/**
 	 * Saves KCO order ID to WooCommerce order as meta field.
 	 *
-	 * @param WC_Order $order WooCommerce order.
+	 * @param string $order_id WooCommerce order ID.
 	 * @param array    $data  Posted data.
 	 */
-	public function save_kco_order_id_field( $order, $data ) {
+	public function save_kco_order_id_field( $order_id, $data ) {
 		if ( isset( $_POST['kco_order_id'] ) ) {
 			$kco_order_id = sanitize_text_field( $_POST['kco_order_id'] );
 
-			update_post_meta( $order->get_id(), '_wc_klarna_order_id', sanitize_key( $kco_order_id ) );
-			update_post_meta( $order->get_id(), '_transaction_id', sanitize_key( $kco_order_id ) );
+			update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $kco_order_id ) );
+			update_post_meta( $order_id, '_transaction_id', sanitize_key( $kco_order_id ) );
 		}
 	}
 
