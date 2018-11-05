@@ -41,7 +41,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'unrequire_fields' ), 99 );
 		add_filter( 'woocommerce_checkout_posted_data', array( $this, 'unrequire_posted_data' ), 99 );
 		add_action( 'woocommerce_checkout_after_order_review', array( $this, 'add_kco_order_id_field' ) );
-		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'save_kco_order_id_field' ), 10, 2 );
+		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_kco_order_id_field' ), 10, 2 );
 	}
 
 	/**
