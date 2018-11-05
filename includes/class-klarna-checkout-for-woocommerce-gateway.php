@@ -166,8 +166,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		if ( ! kco_wc_prefill_allowed() ) {
 			add_thickbox();
 		}
-		$suffix = '';
-		// defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
 		wp_register_script(
 			'kco',
 			plugins_url( 'assets/js/klarna-checkout-for-woocommerce' . $suffix . '.js', KCO_WC_MAIN_FILE ),
@@ -330,6 +330,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		$klarna_order = KCO_WC()->api->get_order();
 		echo KCO_WC()->api->get_snippet( $klarna_order );
+		// Clear session storage to prevent error.
 		echo '<script>sessionStorage.orderSubmitted = false</script>';
 
 		if ( $order_id ) {

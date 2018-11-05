@@ -123,7 +123,6 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 			krokedil_log_events( $order_id_match, 'Confirmation page rendered but _wc_klarna_order_id already exist in this order.', null );
 			$order    = wc_get_order( $order_id_match );
 			$location = $order->get_checkout_order_received_url();
-			error_log( $location );
 			wp_safe_redirect( $location );
 			exit;
 		}
@@ -131,7 +130,10 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 
 		<script>
 			jQuery(function ($) {
+				// Check if session storage is set to prevent double orders.
+				// Session storage over local storage, since it dies with the tab.
 				if ( sessionStorage.orderSubmitted !== 'true' ) {
+					// Set session storage.
 					sessionStorage.orderSubmitted = 'true';
 					$('input#terms').prop('checked', true);
 					$('input#ship-to-different-address-checkbox').prop('checked', true);
@@ -318,7 +320,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * Saves KCO order ID to WooCommerce order as meta field.
 	 *
 	 * @param string $order_id WooCommerce order ID.
-	 * @param array    $data  Posted data.
+	 * @param array  $data  Posted data.
 	 */
 	public function save_kco_order_id_field( $order_id, $data ) {
 		if ( isset( $_POST['kco_order_id'] ) ) {
