@@ -54,7 +54,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		if ( is_wp_error( $response ) ) {
 			$error = $this->extract_error_messages( $response );
-			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . $error . ') ' . stripslashes_deep( json_encode( $response ) ) );
+			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response ) ) );
 			return $error;
 		}
 
@@ -96,7 +96,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		$response = wp_safe_remote_get( $request_url, $request_args );
 
-		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
+		if ( ! is_wp_error( $response ) && ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) ) {
 			$klarna_order            = json_decode( $response['body'] );
 			$log_order               = clone $klarna_order;
 			$log_order->html_snippet = '';
@@ -136,7 +136,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		$response = wp_safe_remote_post( $request_url, $request_args );
 
-		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
+		if ( ! is_wp_error( $response ) && ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) ) {
 			WC()->session->set( 'kco_wc_update_md5', md5( serialize( $request_args ) ) );
 
 			$klarna_order            = json_decode( $response['body'] );
