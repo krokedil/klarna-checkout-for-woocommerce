@@ -322,7 +322,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		}
 		if ( ! empty( $_POST['form'] ) ) {
 			$form = $_POST['form'];
-			set_transient( WC()->session->get( 'kco_wc_order_id' ), $form, 60 * 60 * 24 );
+			set_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ), $form, 60 * 60 * 24 );
 		}
 		wp_send_json_success();
 		wp_die();

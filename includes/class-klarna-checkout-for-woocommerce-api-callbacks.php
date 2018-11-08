@@ -193,7 +193,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$needs_login      = false;
 		$email_exists     = false;
 
-		$form_data             = get_transient( $data['order_id'] );
+		$form_data             = get_transient( 'kco_wc_order_id_' . $data['order_id'] );
 		$has_required_data     = true;
 		$failed_required_check = array();
 		if ( false !== $form_data ) {
