@@ -477,5 +477,30 @@ function kco_wc_print_notices() {
 		wc_add_notice( __( 'You must be logged in to checkout.', 'woocommerce' ), 'error' );
 	} elseif ( isset( $_GET['email_exists'] ) ) {
 		wc_add_notice( __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ), 'error' );
+	} elseif ( isset( $_GET['invalid_cart_hash'] ) ) {
+		wc_add_notice( __( 'A mismatch in order totals between WooCommerce and Klarna was detected. Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
+	}
+}
+
+/**
+ * Save cart hash to KCO transient.
+ */
+function kco_wc_save_cart_hash() {
+	if ( ! empty( WC()->session->get( 'kco_wc_order_id' ) ) ) {
+		WC()->cart->calculate_totals();
+		$cart_hash = md5( wp_json_encode( wc_clean( WC()->cart->get_cart_for_session() ) ) . WC()->cart->total );
+
+		if ( false === get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) ) ) {
+			// No transient exist, lets create a new one.
+			set_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ), array( 'cart_hash' => $cart_hash ), 60 * 60 * 24 );
+		} else {
+			// A transient exist. Let's update only the cart_hash key.
+			$old_transient     = get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) );
+			$updated_transient = array( 'cart_hash' => $cart_hash );
+			if ( isset( $old_transient['form'] ) ) {
+				$updated_transient['form'] = $old_transient['form'];
+			}
+			set_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ), $updated_transient, 60 * 60 * 24 );
+		}
 	}
 }
