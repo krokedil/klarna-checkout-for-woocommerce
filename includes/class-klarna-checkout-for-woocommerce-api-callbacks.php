@@ -194,8 +194,11 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$email_exists     = false;
 		$cart_hash_valid  = true;
 
-		$kco_transient         = get_transient( 'kco_wc_order_id_' . $data['order_id'] );
-		$form_data             = $kco_transient['form'];
+		$kco_transient = get_transient( 'kco_wc_order_id_' . $data['order_id'] );
+		$form_data     = false;
+		if ( isset( $kco_transient['form'] ) ) {
+			$form_data = $kco_transient['form'];
+		}
 		$has_required_data     = true;
 		$failed_required_check = array();
 		if ( false !== $form_data ) {
@@ -242,7 +245,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			}
 		}
 		// Validate any potential coupons.
-		if ( ! empty( $data['merchant_data'] ) ) {
+		if ( ! empty( json_decode( $data['merchant_data'] )->coupons ) ) {
 			$coupons  = json_decode( $data['merchant_data'] )->coupons;
 			$emails[] = $data['billing_address']['email'];
 			foreach ( $coupons as $coupon ) {
@@ -284,10 +287,10 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			}
 		}
 
-		if ( ! empty( $data['merchant_data'] ) ) {
+		if ( ! empty( json_decode( $data['merchant_data'] )->is_user_logged_in ) ) {
 			$is_user_logged_in = json_decode( $data['merchant_data'] )->is_user_logged_in;
 		}
-		// Check if any product is subscription product
+		// Check if any product is subscription product.
 		if ( class_exists( 'WC_Subscriptions_Cart' ) && $has_subscription ) {
 			$checkout = WC()->checkout();
 			if ( ! $checkout->is_registration_enabled() && ! $is_user_logged_in ) {
