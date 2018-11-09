@@ -188,6 +188,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$form = array();
 		if ( false !== get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) ) ) {
 			$form = get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) );
+			$form = $form['form'];
 		}
 
 		$standard_woo_checkout_fields = array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'terms', 'account_username', 'account_password' );

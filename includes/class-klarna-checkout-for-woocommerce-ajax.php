@@ -322,7 +322,16 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		}
 		if ( ! empty( $_POST['form'] ) ) {
 			$form = $_POST['form'];
-			set_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ), $form, 60 * 60 * 24 );
+			if ( false === get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) ) ) {
+				set_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ), array( 'form' => $form ), 60 * 60 * 24 );
+			} else {
+				$old_transient     = get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) );
+				$updated_transient = array( 'form' => $form );
+				if ( isset( $old_transient['cart_hash'] ) ) {
+					$updated_transient['cart_hash'] = $old_transient['cart_hash'];
+				}
+				set_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ), $updated_transient, 60 * 60 * 24 );
+			}
 		}
 		wp_send_json_success();
 		wp_die();

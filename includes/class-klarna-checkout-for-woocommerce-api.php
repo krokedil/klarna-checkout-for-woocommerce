@@ -18,13 +18,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 	private $settings = array();
 
 	/**
-	 * Merchant data JSON string.
-	 *
-	 * @var string
-	 */
-	public static $merchant_data = '';
-
-	/**
 	 * Klarna_Checkout_For_WooCommerce_API constructor.
 	 */
 	public function __construct() {
@@ -353,6 +346,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 			WC()->session->__unset( 'kco_wc_order_api' );
 			WC()->session->__unset( 'kco_wc_extra_fields_values' );
 			WC()->session->__unset( 'kco_wc_prefill_consent' );
+			if ( $order ) {
+				delete_transient( 'kco_wc_order_id_' . $order->order_id );
+			}
 		}
 	}
 
@@ -488,6 +484,26 @@ class Klarna_Checkout_For_WooCommerce_API {
 	}
 
 	/**
+	 * Gets merchant data for Klarna purchase.
+	 *
+	 * @return array
+	 */
+	public function get_merchant_data() {
+		$merchant_data = array();
+
+		// Coupon info.
+		foreach ( WC()->cart->get_applied_coupons() as $coupon ) {
+			$merchant_data['coupons'][] = $coupon;
+		}
+
+		// Cart hash.
+		$cart_hash                  = md5( wp_json_encode( wc_clean( WC()->cart->get_cart_for_session() ) ) . WC()->cart->total );
+		$merchant_data['cart_hash'] = $cart_hash;
+
+		return json_encode( $merchant_data );
+	}
+
+	/**
 	 * Gets Klarna API request headers.
 	 *
 	 * @return array
@@ -533,7 +549,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'order_tax_amount'   => KCO_WC()->order_lines->get_order_tax_amount(),
 			'order_lines'        => KCO_WC()->order_lines->get_order_lines(),
 			'shipping_countries' => $this->get_shipping_countries(),
-			'merchant_data'      => self::$merchant_data,
+			'merchant_data'      => $this->get_merchant_data(),
 		);
 
 		if ( kco_wc_prefill_allowed() ) {
