@@ -332,8 +332,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 */
 	public function process_payment_handler( $order_id ) {
 		$klarna_order = KCO_WC()->api->get_order();
-
-		if ( $order_id ) {
+		if ( $order_id && $klarna_order ) {
 			// Set WC order transaction ID.
 			$order = wc_get_order( $order_id );
 
