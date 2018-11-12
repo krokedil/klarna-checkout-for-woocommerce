@@ -5,12 +5,12 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 1.7.3
+ * Version: 1.7.4
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 3.0
- * WC tested up to: 3.4.7
+ * WC tested up to: 3.5.1
  *
  * Copyright (c) 2017-2018 Krokedil
  *
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.7.3' );
+define( 'KCO_WC_VERSION', '1.7.4' );
 define( 'KCO_WC_MIN_PHP_VER', '5.3.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.0.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -146,6 +146,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
 			add_action( 'admin_notices', array( $this, 'order_management_check' ) );
+			add_action( 'woocommerce_add_to_cart', 'kco_wc_save_cart_hash' );
+			add_action( 'woocommerce_applied_coupon', 'kco_wc_save_cart_hash' );
+			add_action( 'kco_wc_before_checkout_form', 'kco_wc_save_cart_hash', 1 );
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );

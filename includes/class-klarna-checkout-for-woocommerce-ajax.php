@@ -287,7 +287,11 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		} else {
 			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
 		}
-
+		// Check if we have items in cart. If not return redirect URL
+		if ( WC()->cart->is_empty() && ! is_customize_preview() && apply_filters( 'woocommerce_checkout_redirect_empty_cart', true ) ) {
+			wp_send_json_success( array( 'redirect' => wc_get_page_permalink( 'cart' ) ) );
+			wp_die();
+		}
 		// Create order via fallback sequence
 		$order = Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback::create( $klarna_order_id, $error_message );
 
@@ -296,6 +300,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			krokedil_log_events( null, 'Fallback order creation done. Redirecting customer to thank you page.', '' );
 			$note = sprintf( __( 'This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna.', 'klarna-checkout-for-woocommerce' ), $error_message );
 			$order->add_order_note( $note );
+			$order->update_status( 'on-hold' );
 			$redirect_url = $order->get_checkout_order_received_url();
 		} else {
 			KCO_WC()->logger->log( 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.' . json_decode( $order ) );
@@ -318,7 +323,16 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		}
 		if ( ! empty( $_POST['form'] ) ) {
 			$form = $_POST['form'];
-			set_transient( WC()->session->get( 'kco_wc_order_id' ), $form, 60 * 60 * 24 );
+			if ( false === get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) ) ) {
+				set_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ), array( 'form' => $form ), 60 * 60 * 24 );
+			} else {
+				$old_transient     = get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) );
+				$updated_transient = array( 'form' => $form );
+				if ( isset( $old_transient['cart_hash'] ) ) {
+					$updated_transient['cart_hash'] = $old_transient['cart_hash'];
+				}
+				set_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ), $updated_transient, 60 * 60 * 24 );
+			}
 		}
 		wp_send_json_success();
 		wp_die();

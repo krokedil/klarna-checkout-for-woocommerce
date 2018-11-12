@@ -18,13 +18,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 	private $settings = array();
 
 	/**
-	 * Merchant data JSON string.
-	 *
-	 * @var string
-	 */
-	public static $merchant_data = '';
-
-	/**
 	 * Klarna_Checkout_For_WooCommerce_API constructor.
 	 */
 	public function __construct() {
@@ -54,7 +47,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		if ( is_wp_error( $response ) ) {
 			$error = $this->extract_error_messages( $response );
-			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . $error . ') ' . stripslashes_deep( json_encode( $response ) ) );
+			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response ) ) );
 			return $error;
 		}
 
@@ -96,7 +89,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		$response = wp_safe_remote_get( $request_url, $request_args );
 
-		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
+		if ( ! is_wp_error( $response ) && ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) ) {
 			$klarna_order            = json_decode( $response['body'] );
 			$log_order               = clone $klarna_order;
 			$log_order->html_snippet = '';
@@ -136,7 +129,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		$response = wp_safe_remote_post( $request_url, $request_args );
 
-		if ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) {
+		if ( ! is_wp_error( $response ) && ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) ) {
 			WC()->session->set( 'kco_wc_update_md5', md5( serialize( $request_args ) ) );
 
 			$klarna_order            = json_decode( $response['body'] );
@@ -190,8 +183,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 		);
 		$response     = wp_safe_remote_get( $request_url, $request_args );
 
-		$log_order = $response['body'];
-		$log_order = (array) json_decode( $log_order );
+		$log_order                 = $response['body'];
+		$log_order                 = (array) json_decode( $log_order );
 		$log_order['html_snippet'] = '';
 		krokedil_log_events( null, 'Pre Get Order response', stripslashes_deep( $log_order ) );
 		KCO_WC()->logger->log( 'Pre Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $log_order ) ) );
@@ -353,6 +346,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 			WC()->session->__unset( 'kco_wc_order_api' );
 			WC()->session->__unset( 'kco_wc_extra_fields_values' );
 			WC()->session->__unset( 'kco_wc_prefill_consent' );
+			if ( $order ) {
+				delete_transient( 'kco_wc_order_id_' . $order->order_id );
+			}
 		}
 	}
 
@@ -488,6 +484,26 @@ class Klarna_Checkout_For_WooCommerce_API {
 	}
 
 	/**
+	 * Gets merchant data for Klarna purchase.
+	 *
+	 * @return array
+	 */
+	public function get_merchant_data() {
+		$merchant_data = array();
+
+		// Coupon info.
+		foreach ( WC()->cart->get_applied_coupons() as $coupon ) {
+			$merchant_data['coupons'][] = $coupon;
+		}
+
+		// Cart hash.
+		$cart_hash                  = md5( wp_json_encode( wc_clean( WC()->cart->get_cart_for_session() ) ) . WC()->cart->total );
+		$merchant_data['cart_hash'] = $cart_hash;
+
+		return json_encode( $merchant_data );
+	}
+
+	/**
 	 * Gets Klarna API request headers.
 	 *
 	 * @return array
@@ -533,7 +549,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'order_tax_amount'   => KCO_WC()->order_lines->get_order_tax_amount(),
 			'order_lines'        => KCO_WC()->order_lines->get_order_lines(),
 			'shipping_countries' => $this->get_shipping_countries(),
-			'merchant_data'      => self::$merchant_data,
+			'merchant_data'      => $this->get_merchant_data(),
 		);
 
 		if ( kco_wc_prefill_allowed() ) {
@@ -568,34 +584,35 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 		// Allow external payment method plugin to do its thing.
 		// @TODO: Extract this into a hooked function.
-		if ( 'create' === $request_type ) {
-			if ( in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) ) {
-				if ( isset( $this->settings['allowed_customer_types'] ) ) {
-					$customer_types_setting = $this->settings['allowed_customer_types'];
+		if ( in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) ) {
+			if ( isset( $this->settings['allowed_customer_types'] ) ) {
+				$customer_types_setting = $this->settings['allowed_customer_types'];
 
-					switch ( $customer_types_setting ) {
-						case 'B2B':
-							$allowed_customer_types = array( 'organization' );
-							$customer_type          = 'organization';
-							break;
-						case 'B2BC':
-							$allowed_customer_types = array( 'person', 'organization' );
-							$customer_type          = 'organization';
-							break;
-						case 'B2CB':
-							$allowed_customer_types = array( 'person', 'organization' );
-							$customer_type          = 'person';
-							break;
-						default:
-							$allowed_customer_types = array( 'person' );
-							$customer_type          = 'person';
-					}
+				switch ( $customer_types_setting ) {
+					case 'B2B':
+						$allowed_customer_types = array( 'organization' );
+						$customer_type          = 'organization';
+						break;
+					case 'B2BC':
+						$allowed_customer_types = array( 'person', 'organization' );
+						$customer_type          = 'organization';
+						break;
+					case 'B2CB':
+						$allowed_customer_types = array( 'person', 'organization' );
+						$customer_type          = 'person';
+						break;
+					default:
+						$allowed_customer_types = array( 'person' );
+						$customer_type          = 'person';
+				}
 
-					$request_args['options']['allowed_customer_types'] = $allowed_customer_types;
-					$request_args['customer']['type']                  = $customer_type;
+				$request_args['options']['allowed_customer_types'] = $allowed_customer_types;
+				if ( 'create' === $request_type ) {
+					$request_args['customer']['type'] = $customer_type;
 				}
 			}
-
+		}
+		if ( 'create' === $request_type ) {
 			$request_args = apply_filters( 'kco_wc_create_order', $request_args );
 		}
 
@@ -669,31 +686,31 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$color_settings = array();
 
 		if ( $this->check_option_field( 'color_button' ) ) {
-			$color_settings['color_button'] = $this->check_option_field( 'color_button' );
+			$color_settings['color_button'] = self::add_hash_to_color( $this->check_option_field( 'color_button' ) );
 		}
 
 		if ( $this->check_option_field( 'color_button_text' ) ) {
-			$color_settings['color_button_text'] = $this->check_option_field( 'color_button_text' );
+			$color_settings['color_button_text'] = self::add_hash_to_color( $this->check_option_field( 'color_button_text' ) );
 		}
 
 		if ( $this->check_option_field( 'color_checkbox' ) ) {
-			$color_settings['color_checkbox'] = $this->check_option_field( 'color_checkbox' );
+			$color_settings['color_checkbox'] = self::add_hash_to_color( $this->check_option_field( 'color_checkbox' ) );
 		}
 
 		if ( $this->check_option_field( 'color_checkbox_checkmark' ) ) {
-			$color_settings['color_checkbox_checkmark'] = $this->check_option_field( 'color_checkbox_checkmark' );
+			$color_settings['color_checkbox_checkmark'] = self::add_hash_to_color( $this->check_option_field( 'color_checkbox_checkmark' ) );
 		}
 
 		if ( $this->check_option_field( 'color_header' ) ) {
-			$color_settings['color_header'] = $this->check_option_field( 'color_header' );
+			$color_settings['color_header'] = self::add_hash_to_color( $this->check_option_field( 'color_header' ) );
 		}
 
 		if ( $this->check_option_field( 'color_link' ) ) {
-			$color_settings['color_link'] = $this->check_option_field( 'color_link' );
+			$color_settings['color_link'] = self::add_hash_to_color( $this->check_option_field( 'color_link' ) );
 		}
 
 		if ( $this->check_option_field( 'radius_border' ) ) {
-			$color_settings['radius_border'] = $this->check_option_field( 'radius_border' );
+			$color_settings['radius_border'] = self::add_hash_to_color( $this->check_option_field( 'radius_border' ) );
 		}
 
 		if ( count( $color_settings ) > 0 ) {
@@ -701,6 +718,14 @@ class Klarna_Checkout_For_WooCommerce_API {
 		}
 
 		return false;
+	}
+
+	private static function add_hash_to_color( $hex ) {
+		if ( '' != $hex ) {
+			$hex = str_replace( '#', '', $hex );
+			$hex = '#' . $hex;
+		}
+		return $hex;
 	}
 
 	private function check_option_field( $field ) {
@@ -751,10 +776,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 			'body'       => $this->get_recurring_body( $order ),
 		);
-		
+
 		KCO_WC()->logger->log( 'Create recurring order request (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
 		krokedil_log_events( $order->get_id(), 'Create recurring order request', $request_args );
-		$response     = wp_safe_remote_post( $request_url, $request_args );
+		$response = wp_safe_remote_post( $request_url, $request_args );
 
 		KCO_WC()->logger->log( 'Create recurring order response' . stripslashes_deep( json_encode( $response ) ) );
 		krokedil_log_events( $order->get_id(), 'Create recurring order response', $response );

@@ -6,7 +6,7 @@ Requires at least: 4.0
 Tested up to: 4.9.8
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.4.7
+WC tested up to: 3.5.1
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,19 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+
+= 2018.11.12  	- version 1.7.4 =
+* Tweak			- Improved handling of order in WooCommerce. Payment now finalized during process_payment. Plugin now allows custom thankyou page.
+* Tweak			- Add prefix kco_wc_order_id_ to transient name used during purchase.
+* Tweak			- Order creation caused by checkout_error now sets order status to On hold.
+* Fix			- Add support for cart_hash control to avoid mismatch in order totals between Klarna & Woo.
+* Fix			- Changed Klarna country stored in Woo order to prevent issue with Klarna Global.
+* Fix			- Deletes kco_wc_order_id_ transient on order received page.
+* Fix			- Added checks to prevent duplicate orders.
+* Fix			- Added check to ensure hash sign is added to hexcode sent to Klarna (for color display of KCO).
+* Fix			- Save Klarna order id in Woo order on woocommerce_checkout_order_processed (previously only saved on thankyou page).
+* Fix			- Improved error handling/display when request to Klarna returns in wp_error.
+* Fix			- PHP notice fixes.
 
 = 2018.10.19  	- version 1.7.3 =
 * Fix			- Fixed issue with no_shipping error on free trial subscriptions.

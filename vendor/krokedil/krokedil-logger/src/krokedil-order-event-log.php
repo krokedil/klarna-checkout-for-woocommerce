@@ -2,7 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-if( ! function_exists( 'krokedil_log_events' ) ) {
+if ( ! function_exists( 'krokedil_log_events' ) ) {
 	define( 'KROKEDIL_LOGGER_VERSION', '1.0.4' );
 
 	add_action( 'admin_enqueue_scripts', 'krokedi_load_admin_scripts' );
@@ -49,7 +49,7 @@ if( ! function_exists( 'krokedil_log_events' ) ) {
 		wp_enqueue_style( 'krokedil_events_style' );
 	}
 
-	function krokedil_log_events( $order_id, $title, $data ) {
+	function krokedil_log_events( $order_id, $title, $data = null ) {
 		if ( WC()->session ) {
 			if ( null === $order_id ) {
 				if ( WC()->session->get( '_krokedil_events_session' ) ) {
@@ -60,7 +60,7 @@ if( ! function_exists( 'krokedil_log_events' ) ) {
 				$event    = array(
 					'title'     => $title,
 					'data'      => $data,
-					'timestamp' => current_time( 'Y-m-d H:i:s' )
+					'timestamp' => current_time( 'Y-m-d H:i:s' ),
 				);
 				$events[] = $event;
 				WC()->session->set( '_krokedil_events_session', $events );
@@ -74,7 +74,7 @@ if( ! function_exists( 'krokedil_log_events' ) ) {
 				$event = array(
 					'title'     => $title,
 					'data'      => $data,
-					'timestamp' => current_time( 'Y-m-d H:i:s' )
+					'timestamp' => current_time( 'Y-m-d H:i:s' ),
 				);
 
 				$events[] = $event;

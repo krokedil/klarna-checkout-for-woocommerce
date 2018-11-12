@@ -12,4 +12,8 @@ if ( ! WC()->session->get( 'kco_wc_order_id' ) ) {
 }
 
 wc_empty_cart();
+// Clear session storage to prevent error for customer in the future.
+?>
+	<script>sessionStorage.orderSubmitted = false</script>
+<?php
 kco_wc_show_snippet();

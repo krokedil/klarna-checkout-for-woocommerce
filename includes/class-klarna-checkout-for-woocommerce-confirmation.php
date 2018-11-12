@@ -41,7 +41,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'unrequire_fields' ), 99 );
 		add_filter( 'woocommerce_checkout_posted_data', array( $this, 'unrequire_posted_data' ), 99 );
 		add_action( 'woocommerce_checkout_after_order_review', array( $this, 'add_kco_order_id_field' ) );
-		add_action( 'woocommerce_checkout_create_order', array( $this, 'save_kco_order_id_field' ), 10, 2 );
+		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_kco_order_id_field' ), 10, 2 );
 	}
 
 	/**
@@ -78,7 +78,6 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		if ( ! $this->is_kco_confirmation() ) {
 			return;
 		}
-
 		echo '<div id="kco-confirm-loading"></div>';
 
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
@@ -121,68 +120,76 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		}
 		// _wc_klarna_order_id already exist in an order. Let's redirect the customer to the thankyou page for that order
 		if ( $order_id_match ) {
-			krokedil_log_events( $order_id_match, 'Confirmation page rendered but _wc_klarna_order_id already exist in this order.' );
+			krokedil_log_events( $order_id_match, 'Confirmation page rendered but _wc_klarna_order_id already exist in this order.', null );
 			$order    = wc_get_order( $order_id_match );
 			$location = $order->get_checkout_order_received_url();
-			wp_safe_redirect( $location, $status );
+			wp_safe_redirect( $location );
 			exit;
-
 		}
 		?>
 
 		<script>
 			jQuery(function ($) {
-				$('input#terms').prop('checked', true);
-				$('input#ship-to-different-address-checkbox').prop('checked', true);
+				// Check if session storage is set to prevent double orders.
+				// Session storage over local storage, since it dies with the tab.
+				if ( sessionStorage.orderSubmitted !== 'true' ) {
+					// Set session storage.
+					sessionStorage.orderSubmitted = 'true';
+					$('input#terms').prop('checked', true);
+					$('input#ship-to-different-address-checkbox').prop('checked', true);
 
-				// If order value = 0, payment method fields will not be in the page, so we need to
-				if (!$('input#payment_method_kco').length) {
-					$('#order_review').append('<input id="payment_method_kco" type="radio" class="input-radio" name="payment_method" value="kco" checked="checked" />');
-				}
-
-				$('input#payment_method_kco').prop('checked', true);
-
-				<?php
-				$extra_field_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
-
-				foreach ( $extra_field_values as $field_name => $field_value ) {
-				?>
-
-				var elementName = "<?php echo $field_name; ?>";
-				var elementValue = <?php echo wp_json_encode( $field_value ); ?>;
-				var element = $('*[name="' + elementName + '"]');
-
-				console.log(elementName);
-				console.log(elementValue);
-				console.log(element);
-				console.log(element.type);
-
-				if (element.length) {
-					if (element.is('select')) { // Select.
-						var selectedOption = element.find('option[value="' + elementValue + '"]');
-						selectedOption.prop('selected', true);
-					} else if ('radio' === element.get(0).type) { // Radio.
-						var checkedRadio = $('*[name="' + elementName + '"][value="' + elementValue + '"]');
-						checkedRadio.prop('checked', true);
-					} else if ('checkbox' === element.get(0).type) { // Checkbox.
-						if (elementValue) {
-							element.prop('checked', true);
-						}
-					} else { // Text and textarea.
-						element.val(elementValue);
+					// If order value = 0, payment method fields will not be in the page, so we need to
+					if (!$('input#payment_method_kco').length) {
+						$('#order_review').append('<input id="payment_method_kco" type="radio" class="input-radio" name="payment_method" value="kco" checked="checked" />');
 					}
-				}
 
-				<?php
-				}
-				do_action( 'kco_wc_before_submit' );
-				?>
+					$('input#payment_method_kco').prop('checked', true);
 
-				$('.validate-required').removeClass('validate-required');
-				$('form.woocommerce-checkout').submit();
-				console.log('yes submitted');
-				$('form.woocommerce-checkout').addClass( 'processing' );
-				console.log('processing class added to form');
+					<?php
+					$extra_field_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
+
+					foreach ( $extra_field_values as $field_name => $field_value ) {
+					?>
+
+					var elementName = "<?php echo $field_name; ?>";
+					var elementValue = <?php echo wp_json_encode( $field_value ); ?>;
+					var element = $('*[name="' + elementName + '"]');
+
+					console.log(elementName);
+					console.log(elementValue);
+					console.log(element);
+					console.log(element.type);
+
+					if (element.length) {
+						if (element.is('select')) { // Select.
+							var selectedOption = element.find('option[value="' + elementValue + '"]');
+							selectedOption.prop('selected', true);
+						} else if ('radio' === element.get(0).type) { // Radio.
+							var checkedRadio = $('*[name="' + elementName + '"][value="' + elementValue + '"]');
+							checkedRadio.prop('checked', true);
+						} else if ('checkbox' === element.get(0).type) { // Checkbox.
+							if (elementValue) {
+								element.prop('checked', true);
+							}
+						} else { // Text and textarea.
+							element.val(elementValue);
+						}
+					}
+
+					<?php
+					}
+					do_action( 'kco_wc_before_submit' );
+					?>
+
+					$('.validate-required').removeClass('validate-required');
+					$('form.woocommerce-checkout').submit();
+					console.log('yes submitted');
+					$('form.woocommerce-checkout').addClass( 'processing' );
+					console.log('processing class added to form');
+				} else {
+					console.log( 'order already submitted' );
+					location.reload();
+				}
 			});
 		</script>
 		<?php
@@ -312,15 +319,15 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	/**
 	 * Saves KCO order ID to WooCommerce order as meta field.
 	 *
-	 * @param WC_Order $order WooCommerce order.
-	 * @param array    $data  Posted data.
+	 * @param string $order_id WooCommerce order ID.
+	 * @param array  $data  Posted data.
 	 */
-	public function save_kco_order_id_field( $order, $data ) {
+	public function save_kco_order_id_field( $order_id, $data ) {
 		if ( isset( $_POST['kco_order_id'] ) ) {
 			$kco_order_id = sanitize_text_field( $_POST['kco_order_id'] );
 
-			update_post_meta( $order->get_id(), '_wc_klarna_order_id', sanitize_key( $kco_order_id ) );
-			update_post_meta( $order->get_id(), '_transaction_id', sanitize_key( $kco_order_id ) );
+			update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $kco_order_id ) );
+			update_post_meta( $order_id, '_transaction_id', sanitize_key( $kco_order_id ) );
 		}
 	}
 
