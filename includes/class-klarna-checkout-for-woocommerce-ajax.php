@@ -300,6 +300,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			krokedil_log_events( null, 'Fallback order creation done. Redirecting customer to thank you page.', '' );
 			$note = sprintf( __( 'This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna.', 'klarna-checkout-for-woocommerce' ), $error_message );
 			$order->add_order_note( $note );
+			$order->update_status( 'on-hold' );
 			$redirect_url = $order->get_checkout_order_received_url();
 		} else {
 			KCO_WC()->logger->log( 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.' . json_decode( $order ) );

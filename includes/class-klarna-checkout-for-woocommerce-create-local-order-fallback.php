@@ -73,6 +73,8 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 			$order->set_total( WC()->cart->total );
 
 			update_post_meta( $order_id, '_created_via_klarna_fallback', 'yes' );
+			update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
+			update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order_id ) );
 
 			// Add payment method
 			self::add_order_payment_method( $order );
@@ -94,6 +96,9 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 
 			// Coupons
 			self::create_order_coupon_lines( $order, WC()->cart );
+
+			// Acknowledge order in Klarna.
+			self::acknowledge_order_in_klarna( $order, $klarna_order );
 
 			// Save the order.
 			$order->save();
@@ -332,6 +337,23 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 			// Add item to order and save.
 			$order->add_item( $item );
 		}
+	}
+
+	/**
+	 * Set order number in Klarnas system.
+	 *
+	 * @param WC_Order              $order WooCommerce order.
+	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
+	 */
+	public static function acknowledge_order_in_klarna( $order, $klarna_order ) {
+		KCO_WC()->api->request_post_acknowledge_order( $klarna_order->order_id );
+		KCO_WC()->api->request_post_set_merchant_reference(
+			$klarna_order->order_id,
+			array(
+				'merchant_reference1' => $order->get_order_number(),
+				'merchant_reference2' => $order->get_id(),
+			)
+		);
 	}
 
 }
