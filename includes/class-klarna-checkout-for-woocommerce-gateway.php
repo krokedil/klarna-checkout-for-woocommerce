@@ -342,7 +342,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			$environment = $this->testmode ? 'test' : 'live';
 			update_post_meta( $order_id, '_wc_klarna_environment', $environment );
 
-			$klarna_country = WC()->checkout()->get_value( 'billing_country' );
+			$klarna_country = wc_get_base_location()['country'];
 			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
 
 			$response          = KCO_WC()->api->request_post_get_order( $klarna_order->order_id );
