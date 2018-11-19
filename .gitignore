@@ -4,3 +4,13 @@
 /package-lock.json
 package.json
 SyncToy_f76a6219-f902-4b34-8524-b4fd7b7279a4.dat
+lib/selenium-server-standalone.jar
+lib/drivers/chromedriver.exe
+lib/drivers/geckodriver.exe
+lib/drivers/MicrosoftWebDriver.exe
+reports/FIREFOX_62.0.3_10.0_test.xml
+reports/test.xml
+selenium-debug.log
+tests/test.js
+nightwatch.json
+nightwatch.conf.js
