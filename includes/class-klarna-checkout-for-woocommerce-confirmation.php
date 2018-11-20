@@ -37,28 +37,12 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		add_action( 'wp_head', array( $this, 'maybe_hide_checkout_form' ) );
 		add_action( 'woocommerce_before_checkout_form', array( $this, 'maybe_populate_wc_checkout' ) );
 		add_action( 'wp_footer', array( $this, 'maybe_submit_wc_checkout' ), 999 );
-		add_filter( 'the_title', array( $this, 'confirm_page_title' ) );
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'unrequire_fields' ), 99 );
 		add_filter( 'woocommerce_checkout_posted_data', array( $this, 'unrequire_posted_data' ), 99 );
 		add_action( 'woocommerce_checkout_after_order_review', array( $this, 'add_kco_order_id_field' ) );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_kco_order_id_field' ), 10, 2 );
 	}
 
-	/**
-	 * Filter Checkout page title in confirmation page.
-	 *
-	 * @param $title
-	 *
-	 * @return string
-	 */
-	public function confirm_page_title( $title ) {
-		if ( ! is_admin() && is_main_query() && in_the_loop() && is_page() && is_checkout() && isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] ) {
-			$title = __( 'Please wait while we process your order.', 'klarna-checkout-for-woocommerce' );
-			remove_filter( 'the_title', array( $this, 'confirm_page_title' ) );
-		}
-
-		return $title;
-	}
 
 	/**
 	 * Hides WooCommerce checkout form in KCO confirmation page.
@@ -133,6 +117,8 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 				if ( sessionStorage.getItem( 'orderSubmitted' ) === null || sessionStorage.getItem( 'orderSubmitted' ) === 'false' ) {
 					// Set session storage.
 					sessionStorage.setItem( 'orderSubmitted',  '1');
+					var klarna_process_text = '<?php echo __( 'Please wait while we process your order.', 'klarna-checkout-for-woocommerce' ); ?>';
+					$( 'body' ).append( $( '<div class="kco-modal"><div class="kco-modal-content">' + klarna_process_text + '</div></div>' ) );
 					$('input#terms').prop('checked', true);
 					$('input#ship-to-different-address-checkbox').prop('checked', true);
 
