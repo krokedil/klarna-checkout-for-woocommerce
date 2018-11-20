@@ -242,30 +242,26 @@ jQuery(function($) {
 		},
 
 		checkoutError: function() {
-			if ('kco' === kco_wc.paymentMethod) {
-				// Check if we are on confirmation page
-				var url = window.location.href;
-        		if(url.indexOf('confirm') !== -1) {
-					var error_message = $( ".woocommerce-NoticeGroup-checkout" ).text();
-					$.ajax({
-						type: 'POST',
-						dataType: 'json',
-						data: {
-							kco: false,
-							error_message: error_message,
-							nonce: kco_params.checkout_error_nonce
-						},
-						url: kco_params.checkout_error_url,
-						success: function (data) {
-						},
-						error: function (data) {
-						},
-						complete: function (data) {
-							kco_wc.log(data.responseJSON);
-							window.location.href = data.responseJSON.data.redirect;
-						}
-					});
-				}
+			if ('kco' === kco_wc.paymentMethod && kco_params.is_confirmation_page === 'yes') {
+				var error_message = $( ".woocommerce-NoticeGroup-checkout" ).text();
+				$.ajax({
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						kco: false,
+						error_message: error_message,
+						nonce: kco_params.checkout_error_nonce
+					},
+					url: kco_params.checkout_error_url,
+					success: function (data) {
+					},
+					error: function (data) {
+					},
+					complete: function (data) {
+						kco_wc.log(data.responseJSON);
+						window.location.href = data.responseJSON.data.redirect;
+					}
+				});
 			}
 		},
 

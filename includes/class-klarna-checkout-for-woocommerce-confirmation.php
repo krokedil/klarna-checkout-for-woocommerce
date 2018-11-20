@@ -64,7 +64,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * Hides WooCommerce checkout form in KCO confirmation page.
 	 */
 	public function maybe_hide_checkout_form() {
-		if ( ! $this->is_kco_confirmation() ) {
+		if ( ! is_kco_confirmation() ) {
 			return;
 		}
 
@@ -75,7 +75,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * Populates WooCommerce checkout form in KCO confirmation page.
 	 */
 	public function maybe_populate_wc_checkout( $checkout ) {
-		if ( ! $this->is_kco_confirmation() ) {
+		if ( ! is_kco_confirmation() ) {
 			return;
 		}
 		echo '<div id="kco-confirm-loading"></div>';
@@ -91,7 +91,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * Submits WooCommerce checkout form in KCO confirmation page.
 	 */
 	public function maybe_submit_wc_checkout() {
-		if ( ! $this->is_kco_confirmation() ) {
+		if ( ! is_kco_confirmation() ) {
 			return;
 		}
 		// Prevent duplicate orders if confirmation page is reloaded manually by customer
@@ -212,6 +212,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * Checks if in KCO confirmation page.
 	 *
 	 * @return bool
+	 * @todo Remove.
 	 */
 	private function is_kco_confirmation() {
 		if ( isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] && isset( $_GET['kco_wc_order_id'] ) ) {
