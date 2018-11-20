@@ -55,6 +55,13 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	 */
 	public function override_template( $template, $template_name, $template_path ) {
 		if ( is_checkout() ) {
+			// Fallback Klarna Order Received, used when WooCommerce checkout form submission fails.
+			if ( 'checkout/thankyou.php' === $template_name ) {
+				if ( isset( $_GET['kco_checkout_error'] ) && 'true' === $_GET['kco_checkout_error'] ) {
+					$template = KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout-order-received.php';
+				}
+			}
+
 			// Don't display KCO template if we have a cart that doesn't needs payment
 			if ( ! WC()->cart->needs_payment() ) {
 				return $template;
@@ -103,13 +110,6 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 						}
 					}
 				}
-			}
-		}
-
-		// Fallback Klarna Order Received, used when WooCommerce checkout form submission fails.
-		if ( 'checkout/thankyou.php' === $template_name ) {
-			if ( isset( $_GET['kco_wc'] ) && 'true' === $_GET['kco_wc'] ) {
-				$template = KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout-order-received.php';
 			}
 		}
 

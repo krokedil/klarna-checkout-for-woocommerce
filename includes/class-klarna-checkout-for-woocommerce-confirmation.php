@@ -94,7 +94,6 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		if ( ! $this->is_kco_confirmation() ) {
 			return;
 		}
-
 		// Prevent duplicate orders if confirmation page is reloaded manually by customer
 		$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
 		$query           = new WC_Order_Query(
@@ -127,14 +126,13 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 			exit;
 		}
 		?>
-
 		<script>
 			jQuery(function ($) {
 				// Check if session storage is set to prevent double orders.
 				// Session storage over local storage, since it dies with the tab.
-				if ( sessionStorage.orderSubmitted !== 'true' ) {
+				if ( sessionStorage.getItem( 'orderSubmitted' ) === null || sessionStorage.getItem( 'orderSubmitted' ) === 'false' ) {
 					// Set session storage.
-					sessionStorage.orderSubmitted = 'true';
+					sessionStorage.setItem( 'orderSubmitted',  '1');
 					$('input#terms').prop('checked', true);
 					$('input#ship-to-different-address-checkbox').prop('checked', true);
 
@@ -187,8 +185,23 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					$('form.woocommerce-checkout').addClass( 'processing' );
 					console.log('processing class added to form');
 				} else {
-					console.log( 'order already submitted' );
-					location.reload();
+					console.log( 'Order already submitted' );
+					// If session storage is string, force it to an int.
+					if( isNaN( parseInt(sessionStorage.getItem( 'orderSubmitted' ) ) ) ) {
+						sessionStorage.setItem( 'orderSubmitted',  '1');
+					}
+					// Add to session storage.
+					sessionStorage.setItem( 'orderSubmitted', parseInt( sessionStorage.getItem( 'orderSubmitted' ) ) + 1 );
+					if( parseInt( sessionStorage.getItem( 'orderSubmitted' ) ) > 2 ) {
+						<?php
+							$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
+							$redirect_url = add_query_arg( 'kco_checkout_error', 'true', $redirect_url );
+						?>
+						console.log('Max reloads reached.');
+						window.location.href = "<?php echo $redirect_url; ?>";
+					} else {
+						location.reload();
+					}
 				}
 			});
 		</script>

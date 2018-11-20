@@ -307,7 +307,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			KCO_WC()->logger->log( 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.' . json_decode( $order ) );
 			krokedil_log_events( null, 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.', $order );
 			$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
-			$redirect_url = add_query_arg( 'kco_wc', 'true', $redirect_url );
+			$redirect_url = add_query_arg( 'kco_checkout_error', 'true', $redirect_url );
 		}
 
 		wp_send_json_success( array( 'redirect' => $redirect_url ) );
