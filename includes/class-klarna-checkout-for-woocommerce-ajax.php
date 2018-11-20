@@ -273,7 +273,6 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
-
 		if ( ! empty( $_POST['error_message'] ) ) { // Input var okay.
 			$error_message = 'Error message: ' . sanitize_text_field( trim( $_POST['error_message'] ) );
 		} else {
