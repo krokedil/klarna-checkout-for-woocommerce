@@ -78,8 +78,12 @@ msgstr ""
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-confirmation.php:120
+#: ../includes/class-klarna-checkout-for-woocommerce-confirmation.php:122
 msgid "Please wait while we process your order."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-confirmation.php:180
+msgid "Trying again. Please wait while we process your order..."
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:19
