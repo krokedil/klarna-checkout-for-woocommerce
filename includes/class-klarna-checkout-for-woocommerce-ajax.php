@@ -209,8 +209,12 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 		$customer_data = array();
 
-		if ( isset( $address['email'] ) ) {
-			$customer_data['billing_email'] = $address['email'];
+		// Send customer data to frontend
+		$email  = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_email();
+		$states = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_state();
+
+		if ( isset( $email ) ) {
+			$customer_data['billing_email'] = $email;
 		}
 
 		if ( isset( $address['postal_code'] ) ) {
@@ -228,9 +232,9 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$customer_data['shipping_last_name'] = $address['family_name'];
 		}
 
-		if ( isset( $address['region'] ) ) {
-			$customer_data['billing_state']  = $address['region'];
-			$customer_data['shipping_state'] = $address['region'];
+		if ( isset( $states['billing_state'] ) ) {
+			$customer_data['billing_state']  = $states['billing_state'];
+			$customer_data['shipping_state'] = $states['shipping_state'];
 		}
 
 		if ( isset( $address['country'] ) && kco_wc_country_code_converter( $address['country'] ) ) {
@@ -238,15 +242,12 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$customer_data['billing_country']  = $country;
 			$customer_data['shipping_country'] = $country;
 		}
+
 		WC()->customer->set_props( $customer_data );
 		WC()->customer->save();
 
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_totals();
-
-		// Send customer data to frontend
-		$email  = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_email();
-		$states = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_state();
 
 		KCO_WC()->api->request_pre_update_order();
 
@@ -272,7 +273,6 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
-
 		if ( ! empty( $_POST['error_message'] ) ) { // Input var okay.
 			$error_message = 'Error message: ' . sanitize_text_field( trim( $_POST['error_message'] ) );
 		} else {
@@ -306,7 +306,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			KCO_WC()->logger->log( 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.' . json_decode( $order ) );
 			krokedil_log_events( null, 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.', $order );
 			$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
-			$redirect_url = add_query_arg( 'kco_wc', 'true', $redirect_url );
+			$redirect_url = add_query_arg( 'kco_checkout_error', 'true', $redirect_url );
 		}
 
 		wp_send_json_success( array( 'redirect' => $redirect_url ) );

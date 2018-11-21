@@ -504,3 +504,11 @@ function kco_wc_save_cart_hash() {
 		}
 	}
 }
+
+function is_kco_confirmation() {
+	if ( isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] && isset( $_GET['kco_wc_order_id'] ) ) {
+		return true;
+	}
+
+	return false;
+}

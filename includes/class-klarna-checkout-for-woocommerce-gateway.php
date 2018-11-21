@@ -215,6 +215,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'save_form_data_nonce'                 => wp_create_nonce( 'kco_wc_save_form_data' ),
 			'form'                                 => $form,
 			'standard_woo_checkout_fields'         => $standard_woo_checkout_fields,
+			'is_confirmation_page'                 => ( is_kco_confirmation() ) ? 'yes' : 'no',
 		);
 
 		wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );

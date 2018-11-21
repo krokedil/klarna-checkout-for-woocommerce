@@ -63,6 +63,14 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2018.11.21  	- version 1.7.5 =
+* Tweak			- Change Please wait while we process your order text to be displayed as a modal popup.
+* Fix			- Correct calculation of state based tax (for US) in shipping address change event.
+* Fix			- Improved calculation of shipping tax rates with decimals sent to Klarna.
+* Fix			- Added email and tel input fields as supported field types to extra checkout field handler.
+* Fix			- Updated feature for avoiding double orders (sessionStorage function) to prevent infinite reloading of checkout page.
+* Fix			- Only run checkout error fallback if it is triggered from the KCO confirmation page.
+
 = 2018.11.12  	- version 1.7.4 =
 * Tweak			- Improved handling of order in WooCommerce. Payment now finalized during process_payment. Plugin now allows custom thankyou page.
 * Tweak			- Add prefix kco_wc_order_id_ to transient name used during purchase.

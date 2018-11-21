@@ -37,34 +37,18 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		add_action( 'wp_head', array( $this, 'maybe_hide_checkout_form' ) );
 		add_action( 'woocommerce_before_checkout_form', array( $this, 'maybe_populate_wc_checkout' ) );
 		add_action( 'wp_footer', array( $this, 'maybe_submit_wc_checkout' ), 999 );
-		add_filter( 'the_title', array( $this, 'confirm_page_title' ) );
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'unrequire_fields' ), 99 );
 		add_filter( 'woocommerce_checkout_posted_data', array( $this, 'unrequire_posted_data' ), 99 );
 		add_action( 'woocommerce_checkout_after_order_review', array( $this, 'add_kco_order_id_field' ) );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_kco_order_id_field' ), 10, 2 );
 	}
 
-	/**
-	 * Filter Checkout page title in confirmation page.
-	 *
-	 * @param $title
-	 *
-	 * @return string
-	 */
-	public function confirm_page_title( $title ) {
-		if ( ! is_admin() && is_main_query() && in_the_loop() && is_page() && is_checkout() && isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] ) {
-			$title = __( 'Please wait while we process your order.', 'klarna-checkout-for-woocommerce' );
-			remove_filter( 'the_title', array( $this, 'confirm_page_title' ) );
-		}
-
-		return $title;
-	}
 
 	/**
 	 * Hides WooCommerce checkout form in KCO confirmation page.
 	 */
 	public function maybe_hide_checkout_form() {
-		if ( ! $this->is_kco_confirmation() ) {
+		if ( ! is_kco_confirmation() ) {
 			return;
 		}
 
@@ -75,7 +59,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * Populates WooCommerce checkout form in KCO confirmation page.
 	 */
 	public function maybe_populate_wc_checkout( $checkout ) {
-		if ( ! $this->is_kco_confirmation() ) {
+		if ( ! is_kco_confirmation() ) {
 			return;
 		}
 		echo '<div id="kco-confirm-loading"></div>';
@@ -91,10 +75,9 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * Submits WooCommerce checkout form in KCO confirmation page.
 	 */
 	public function maybe_submit_wc_checkout() {
-		if ( ! $this->is_kco_confirmation() ) {
+		if ( ! is_kco_confirmation() ) {
 			return;
 		}
-
 		// Prevent duplicate orders if confirmation page is reloaded manually by customer
 		$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
 		$query           = new WC_Order_Query(
@@ -127,14 +110,18 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 			exit;
 		}
 		?>
-
 		<script>
 			jQuery(function ($) {
 				// Check if session storage is set to prevent double orders.
 				// Session storage over local storage, since it dies with the tab.
-				if ( sessionStorage.orderSubmitted !== 'true' ) {
+				if ( sessionStorage.getItem( 'orderSubmitted' ) === null || sessionStorage.getItem( 'orderSubmitted' ) === 'false' ) {
 					// Set session storage.
-					sessionStorage.orderSubmitted = 'true';
+					sessionStorage.setItem( 'orderSubmitted',  '1');
+
+					// Add modal with process order message.
+					var klarna_process_text = '<?php echo __( 'Please wait while we process your order.', 'klarna-checkout-for-woocommerce' ); ?>';
+					$( 'body' ).append( $( '<div class="kco-modal"><div class="kco-modal-content">' + klarna_process_text + '</div></div>' ) );
+
 					$('input#terms').prop('checked', true);
 					$('input#ship-to-different-address-checkbox').prop('checked', true);
 
@@ -187,8 +174,28 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					$('form.woocommerce-checkout').addClass( 'processing' );
 					console.log('processing class added to form');
 				} else {
-					console.log( 'order already submitted' );
-					location.reload();
+					console.log( 'Order already submitted' );
+
+					// Add modal with retrying message.
+					var klarna_process_text = '<?php echo __( 'Trying again. Please wait while we process your order...', 'klarna-checkout-for-woocommerce' ); ?>';
+					$( 'body' ).append( $( '<div class="kco-modal"><div class="kco-modal-content">' + klarna_process_text + '</div></div>' ) );
+
+					// If session storage is string, force it to an int.
+					if( isNaN( parseInt(sessionStorage.getItem( 'orderSubmitted' ) ) ) ) {
+						sessionStorage.setItem( 'orderSubmitted',  '1');
+					}
+					// Add to session storage.
+					sessionStorage.setItem( 'orderSubmitted', parseInt( sessionStorage.getItem( 'orderSubmitted' ) ) + 1 );
+					if( parseInt( sessionStorage.getItem( 'orderSubmitted' ) ) > 2 ) {
+						<?php
+							$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
+							$redirect_url = add_query_arg( 'kco_checkout_error', 'true', $redirect_url );
+						?>
+						console.log('Max reloads reached.');
+						window.location.href = "<?php echo $redirect_url; ?>";
+					} else {
+						location.reload();
+					}
 				}
 			});
 		</script>
@@ -199,6 +206,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * Checks if in KCO confirmation page.
 	 *
 	 * @return bool
+	 * @todo Remove.
 	 */
 	private function is_kco_confirmation() {
 		if ( isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] && isset( $_GET['kco_wc_order_id'] ) ) {
