@@ -183,7 +183,15 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 					wp_die();
 				}
 
-				KCO_WC()->api->request_pre_update_order();
+				$response = KCO_WC()->api->request_pre_update_order();
+
+				// If the update failed - reload the checkout page and display the error.
+				if ( is_wp_error( $response ) ) {
+					$return                 = array();
+					$return['redirect_url'] = wc_get_checkout_url();
+					wp_send_json_error( $return );
+					wp_die();
+				}
 			}
 		}
 

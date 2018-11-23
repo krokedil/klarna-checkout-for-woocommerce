@@ -185,6 +185,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	public function validation_cb() {
 		$post_body = file_get_contents( 'php://input' );
 		$data      = json_decode( $post_body, true );
+		$checkout  = WC()->checkout();
 		krokedil_log_events( null, 'Klarna validation callback data', $data );
 		$all_in_stock     = true;
 		$shipping_chosen  = false;
@@ -292,7 +293,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		}
 		// Check if any product is subscription product.
 		if ( class_exists( 'WC_Subscriptions_Cart' ) && $has_subscription ) {
-			$checkout = WC()->checkout();
 			if ( ! $checkout->is_registration_enabled() && ! $is_user_logged_in ) {
 				$needs_login = true;
 			}
@@ -300,6 +300,11 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			if ( email_exists( $data['billing_address']['email'] ) && ! $is_user_logged_in ) {
 				$email_exists = true;
 			}
+		}
+
+		// Check if registration is required, customer is not logged in but have an existing account.
+		if ( $checkout->is_registration_required() && ! $is_user_logged_in && email_exists( $data['billing_address']['email'] ) ) {
+			$needs_login = true;
 		}
 
 		// Check cart hash.
@@ -312,6 +317,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		}
 
 		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
+
 		if ( $all_in_stock && $shipping_chosen && $has_required_data && $coupon_valid && $cart_hash_valid && ! $needs_login && ! $email_exists ) {
 			header( 'HTTP/1.0 200 OK' );
 		} else {
