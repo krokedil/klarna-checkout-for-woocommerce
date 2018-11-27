@@ -63,6 +63,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2018.11.27  	- version 1.7.6 =
+* Tweak			- Added check to see if customer have an account and needs to login before purchase with KCO can be completed.
+* Tweak			- Move sending of is_user_logged_in from subscription class to regular api class.
+* Tweak			- Plugin WordPress 5.0 compatible.
+* Fix			- Shipping tax rate calculation bug fix.
+* Fix			- Redirect customer to cart page if an error occurs during update of Klarna order in checkout page.
+
 = 2018.11.21  	- version 1.7.5 =
 * Tweak			- Change Please wait while we process your order text to be displayed as a modal popup.
 * Fix			- Correct calculation of state based tax (for US) in shipping address change event.
