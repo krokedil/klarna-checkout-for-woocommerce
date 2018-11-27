@@ -171,8 +171,10 @@ jQuery(function($) {
 						if (true === data.responseJSON.success) {
 							kco_wc.kcoResume();
 						} else {
-							console.log('Cart do not need payment. Reloading checkout.');
-                    		window.location.href = data.responseJSON.data.redirect_url;
+							if( '' !== data.responseJSON.data.redirect_url ) {
+								console.log('Cart do not need payment. Reloading checkout.');
+								window.location.href = data.responseJSON.data.redirect_url;
+							}
 						}
 					}
 				});

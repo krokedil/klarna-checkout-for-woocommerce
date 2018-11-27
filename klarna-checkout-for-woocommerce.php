@@ -5,7 +5,7 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 1.7.5
+ * Version: 1.7.6
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
@@ -35,8 +35,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.7.5' );
-define( 'KCO_WC_MIN_PHP_VER', '5.3.0' );
+define( 'KCO_WC_VERSION', '1.7.6' );
+define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.0.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
 define( 'KCO_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
@@ -146,9 +146,12 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
 			add_action( 'admin_notices', array( $this, 'order_management_check' ) );
+
+			// @todo - move the functions below to a separate class or file.
 			add_action( 'woocommerce_add_to_cart', 'kco_wc_save_cart_hash' );
 			add_action( 'woocommerce_applied_coupon', 'kco_wc_save_cart_hash' );
 			add_action( 'kco_wc_before_checkout_form', 'kco_wc_save_cart_hash', 1 );
+			add_action( 'template_redirect', array( $this, 'maybe_display_kco_order_error_message' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
@@ -282,6 +285,15 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				echo "<div class='" . esc_attr( $notice['class'] ) . "'><p>";
 				echo wp_kses( $notice['message'], array( 'a' => array( 'href' => array() ) ) );
 				echo '</p></div>';
+			}
+		}
+
+		/**
+		 * Display Klarna order error in cart page if customer have been redirected to cart because of a communication issue.
+		 */
+		public function maybe_display_kco_order_error_message() {
+			if ( is_cart() && isset( $_GET['kco-order'] ) && 'error' === $_GET['kco-order'] ) {
+				wc_add_notice( __( 'An error occurred during communication with Klarna. Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
 			}
 		}
 

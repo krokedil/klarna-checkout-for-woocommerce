@@ -3,7 +3,7 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 4.9.8
+Tested up to: 5.0.0
 Requires PHP: 5.6
 WC requires at least: 3.0.0
 WC tested up to: 3.5.1
@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+
+= 2018.11.27  	- version 1.7.6 =
+* Tweak			- Added check to see if customer have an account and needs to login before purchase with KCO can be completed.
+* Tweak			- Move sending of is_user_logged_in from subscription class to regular api class.
+* Tweak			- Plugin WordPress 5.0 compatible.
+* Fix			- Shipping tax rate calculation bug fix.
+* Fix			- Redirect customer to cart page if an error occurs during update of Klarna order in checkout page.
 
 = 2018.11.21  	- version 1.7.5 =
 * Tweak			- Change Please wait while we process your order text to be displayed as a modal popup.

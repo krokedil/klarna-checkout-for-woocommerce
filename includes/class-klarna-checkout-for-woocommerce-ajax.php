@@ -171,7 +171,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
 			$klarna_order    = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id );
 
-			if ( 'checkout_incomplete' === $klarna_order->status ) {
+			if ( ! is_wp_error( $klarna_order ) && 'checkout_incomplete' === $klarna_order->status ) {
 				WC()->cart->calculate_shipping();
 				WC()->cart->calculate_fees();
 				WC()->cart->calculate_totals();
@@ -183,7 +183,21 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 					wp_die();
 				}
 
-				KCO_WC()->api->request_pre_update_order();
+				$response = KCO_WC()->api->request_pre_update_order();
+
+				// If the update failed - reload the checkout page and display the error.
+				if ( is_wp_error( $response ) ) {
+					$return                 = array();
+					$return['redirect_url'] = wc_get_checkout_url();
+					wp_send_json_error( $return );
+					wp_die();
+				}
+			} else {
+				// Something is wrong with $klarna_order, redirect the customer to cart page (to avoid infinite reloading of checkout page).
+				$return                 = array();
+				$return['redirect_url'] = add_query_arg( 'kco-order', 'error', wc_get_cart_url() );
+				wp_send_json_error( $return );
+				wp_die();
 			}
 		}
 

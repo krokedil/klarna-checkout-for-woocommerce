@@ -496,6 +496,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$merchant_data['coupons'][] = $coupon;
 		}
 
+		// Is user logged in.
+		$merchant_data['is_user_logged_in'] = is_user_logged_in();
+
 		// Cart hash.
 		$cart_hash                  = md5( wp_json_encode( wc_clean( WC()->cart->get_cart_for_session() ) ) . WC()->cart->total );
 		$merchant_data['cart_hash'] = $cart_hash;
