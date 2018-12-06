@@ -168,8 +168,20 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		wc_maybe_define_constant( 'WOOCOMMERCE_CHECKOUT', true );
 
 		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
+
 			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
-			$klarna_order    = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id );
+
+			if ( empty( $klarna_order_id ) ) {
+				// $klarna_order_id is missing, redirect the customer to cart page (to avoid infinite reloading of checkout page).
+				KCO_WC()->logger->log( 'ERROR. Klarna Checkout order ID missing in kco_wc_update_klarna_order function. Redirecting customer to cart page.' );
+				krokedil_log_events( null, 'ERROR. Klarna Checkout order ID missing in kco_wc_update_klarna_order function. Redirecting customer to cart page.', '' );
+				$return                 = array();
+				$return['redirect_url'] = add_query_arg( 'kco-order', 'missing-id', wc_get_cart_url() );
+				wp_send_json_error( $return );
+				wp_die();
+			}
+
+			$klarna_order = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id );
 
 			if ( ! is_wp_error( $klarna_order ) && 'checkout_incomplete' === $klarna_order->status ) {
 				WC()->cart->calculate_shipping();
