@@ -265,13 +265,14 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 		KCO_WC()->api->request_pre_update_order();
 
+		/*
 		ob_start();
 		woocommerce_order_review();
-		$html = ob_get_clean();
+		$html = ob_get_clean();*/
 
 		wp_send_json_success(
 			array(
-				'html'   => $html,
+				// 'html'   => $html,
 				'email'  => $email,
 				'states' => $states,
 			)

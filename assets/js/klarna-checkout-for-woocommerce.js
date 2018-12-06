@@ -387,8 +387,8 @@ jQuery(function($) {
 									},
 									success: function (response) {
 										kco_wc.log(response);
-										$('.woocommerce-checkout-review-order-table').replaceWith(response.data.html);
 										kco_wc.setFieldValues( response.data );
+										$('body').trigger('update_checkout');
 									},
 									error: function (response) {
 										kco_wc.log(response);

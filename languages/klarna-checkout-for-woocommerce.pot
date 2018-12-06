@@ -36,7 +36,7 @@ msgstr ""
 msgid "It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href=\"%s\">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>)."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-ajax.php:315
+#: ../includes/class-klarna-checkout-for-woocommerce-ajax.php:316
 msgid "This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna."
 msgstr ""
 
@@ -355,6 +355,14 @@ msgid "An account is already registered with your email address. Please log in."
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-gdpr.php:31, ../includes/klarna-checkout-for-woocommerce-functions.php:473
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:157, ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:158
+msgid "Sales Tax"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:529, ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:557
+msgid "Shipping"
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-subscription.php:165
