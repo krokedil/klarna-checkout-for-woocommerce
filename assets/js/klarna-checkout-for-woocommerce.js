@@ -155,7 +155,7 @@ jQuery(function($) {
 		},
 
 		updateKlarnaOrder: function() {
-			if ('kco' === kco_wc.paymentMethod) {
+			if ( 'kco' === kco_wc.paymentMethod && kco_params.is_confirmation_page === 'no' ) {
 				$('.woocommerce-checkout-review-order-table').block({
 					message: null,
 					overlayCSS: {
