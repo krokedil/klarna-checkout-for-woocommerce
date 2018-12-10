@@ -40,7 +40,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'unrequire_fields' ), 99 );
 		add_filter( 'woocommerce_checkout_posted_data', array( $this, 'unrequire_posted_data' ), 99 );
 		add_action( 'woocommerce_checkout_after_order_review', array( $this, 'add_kco_order_id_field' ) );
-		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_kco_order_id_field' ), 10, 2 );
+		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_kco_order_id_field' ), 10, 3 );
 	}
 
 
@@ -64,7 +64,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		}
 		echo '<div id="kco-confirm-loading"></div>';
 
-		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+		$klarna_order_id = esc_attr( sanitize_text_field( $_GET['kco_wc_order_id'] ) );
 		$response        = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 		$klarna_order    = apply_filters( 'kco_wc_klarna_order_pre_submit', json_decode( $response['body'] ) );
 
@@ -169,9 +169,9 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					?>
 
 					$('.validate-required').removeClass('validate-required');
-					$('form.woocommerce-checkout').submit();
+					$('form[name="checkout"]').submit();
 					console.log('yes submitted');
-					$('form.woocommerce-checkout').addClass( 'processing' );
+					$('form[name="checkout"]').addClass( 'processing' );
 					console.log('processing class added to form');
 				} else {
 					console.log( 'Order already submitted' );
@@ -316,11 +316,9 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * Adds hidden field to WooCommerce checkout form, holding Klarna Checkout order ID.
 	 */
 	public function add_kco_order_id_field() {
-		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) && isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] ) {
-			if ( isset( $_GET['kco_wc_order_id'] ) ) { // Input var okay.
-				$klarna_order_id = esc_attr( sanitize_text_field( $_GET['kco_wc_order_id'] ) );
-				echo '<input type="hidden" id="kco_order_id" name="kco_order_id" value="' . $klarna_order_id . '" />';
-			}
+		if ( is_kco_confirmation() ) {
+			$klarna_order_id = esc_attr( sanitize_text_field( $_GET['kco_wc_order_id'] ) );
+			echo '<input type="hidden" id="kco_order_id" name="kco_order_id" value="' . $klarna_order_id . '" />';
 		}
 	}
 
@@ -329,13 +327,17 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 *
 	 * @param string $order_id WooCommerce order ID.
 	 * @param array  $data  Posted data.
+	 * @param object $order  WooCommerce order object.
 	 */
-	public function save_kco_order_id_field( $order_id, $data ) {
+	public function save_kco_order_id_field( $order_id, $data, $order ) {
 		if ( isset( $_POST['kco_order_id'] ) ) {
 			$kco_order_id = sanitize_text_field( $_POST['kco_order_id'] );
 
 			update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $kco_order_id ) );
-			update_post_meta( $order_id, '_transaction_id', sanitize_key( $kco_order_id ) );
+
+			if ( 'kco' === $order->get_payment_method() ) {
+				update_post_meta( $order_id, '_transaction_id', sanitize_key( $kco_order_id ) );
+			}
 		}
 	}
 

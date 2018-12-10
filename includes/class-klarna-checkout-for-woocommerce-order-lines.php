@@ -53,7 +53,9 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * Processes cart data
 	 */
 	public function process_data() {
-		// @TODO: Process fees
+		// Reset order lines.
+		$this->order_lines = array();
+
 		$this->process_cart();
 		$this->process_shipping();
 		$this->process_sales_tax();

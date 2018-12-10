@@ -5,12 +5,12 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 1.7.6
+ * Version: 1.7.7
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 3.0
- * WC tested up to: 3.5.1
+ * WC tested up to: 3.5.2
  *
  * Copyright (c) 2017-2018 Krokedil
  *
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.7.6' );
+define( 'KCO_WC_VERSION', '1.7.7' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.0.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -294,6 +294,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		public function maybe_display_kco_order_error_message() {
 			if ( is_cart() && isset( $_GET['kco-order'] ) && 'error' === $_GET['kco-order'] ) {
 				wc_add_notice( __( 'An error occurred during communication with Klarna. Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
+			}
+			if ( is_cart() && isset( $_GET['kco-order'] ) && 'missing-id' === $_GET['kco-order'] ) {
+				wc_add_notice( __( 'An error occurred during communication with Klarna (Klarna order ID is missing). Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
 			}
 		}
 

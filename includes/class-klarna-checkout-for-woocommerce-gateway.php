@@ -332,14 +332,21 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	public function process_payment_handler( $order_id ) {
-		$klarna_order = KCO_WC()->api->get_order();
+		// Get the Klarna order ID.
+		$order = wc_get_order( $order_id );
+		if ( is_object( $order ) && $order->get_transaction_id() ) {
+			$klarna_order_id = $order->get_transaction_id();
+		} else {
+			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+			KCO_WC()->logger->log( '$klarna_order_id fetched from session in process_payment_handler. Order ID ' . $order_id . '.' );
+		}
+
+		$klarna_order = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id );
+
 		if ( $order_id && $klarna_order ) {
 			// Set WC order transaction ID.
-			$order = wc_get_order( $order_id );
-
-			update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order->order_id ) );
-			update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order->order_id ) );
-
+			// update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order->order_id ) );
+			// update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order->order_id ) );
 			$environment = $this->testmode ? 'test' : 'live';
 			update_post_meta( $order_id, '_wc_klarna_environment', $environment );
 
@@ -386,14 +393,15 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			return;
 		}
 
-		$klarna_order = KCO_WC()->api->get_order();
-		echo KCO_WC()->api->get_snippet( $klarna_order );
-
-		// Clear session storage to prevent error.
-		echo '<script>sessionStorage.orderSubmitted = false</script>';
-
 		if ( $order_id ) {
 			$order = wc_get_order( $order_id );
+
+			if ( is_object( $order ) && $order->get_transaction_id() ) {
+				$klarna_order_id = $order->get_transaction_id();
+				$klarna_order    = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id );
+				echo KCO_WC()->api->get_snippet( $klarna_order );
+			}
+
 			// Check if we need to finalize purchase here. Should already been done in process_payment.
 			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
 				$this->process_payment_handler( $order_id );
@@ -401,6 +409,9 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 				WC()->cart->empty_cart();
 			}
 		}
+
+		// Clear session storage to prevent error.
+		echo '<script>sessionStorage.orderSubmitted = false</script>';
 	}
 
 	/**

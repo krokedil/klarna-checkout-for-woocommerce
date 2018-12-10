@@ -155,7 +155,14 @@ jQuery(function($) {
 		},
 
 		updateKlarnaOrder: function() {
-			if ('kco' === kco_wc.paymentMethod) {
+			if ( 'kco' === kco_wc.paymentMethod && kco_params.is_confirmation_page === 'no' ) {
+				$('.woocommerce-checkout-review-order-table').block({
+					message: null,
+					overlayCSS: {
+						background: '#fff',
+						opacity: 0.6
+					}
+				});
 				$.ajax({
 					type: 'POST',
 					url: kco_params.update_klarna_order_url,
@@ -170,6 +177,7 @@ jQuery(function($) {
 					complete: function(data) {
 						if (true === data.responseJSON.success) {
 							kco_wc.kcoResume();
+							$('.woocommerce-checkout-review-order-table').unblock();							
 						} else {
 							if( '' !== data.responseJSON.data.redirect_url ) {
 								console.log('Cart do not need payment. Reloading checkout.');
@@ -379,8 +387,8 @@ jQuery(function($) {
 									},
 									success: function (response) {
 										kco_wc.log(response);
-										$('.woocommerce-checkout-review-order-table').replaceWith(response.data.html);
 										kco_wc.setFieldValues( response.data );
+										$('body').trigger('update_checkout');
 									},
 									error: function (response) {
 										kco_wc.log(response);
