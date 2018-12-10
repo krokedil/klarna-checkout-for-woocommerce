@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.7.6' );
+define( 'KCO_WC_VERSION', '1.7.61' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.0.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
