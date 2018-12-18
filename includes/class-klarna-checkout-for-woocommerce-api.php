@@ -442,6 +442,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$locale = $locale[0];
 		}
 
+		$locale = strtolower( $locale );
+
 		switch ( WC()->checkout()->get_value( 'billing_country' ) ) {
 			case 'AT':
 				if ( 'de' == $locale ) {
