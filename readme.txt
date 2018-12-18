@@ -3,7 +3,7 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.0.0
+Tested up to: 5.0.1
 Requires PHP: 5.6
 WC requires at least: 3.0.0
 WC tested up to: 3.5.2
@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+
+= 2018.12.18  	- version 1.7.8 =
+* Tweak			- Improved error messaging if KCO order request fails.
+* Fix			- Check if Klarna order ID exist in Woo order before starting checkout_error order creation. To avoid double order creation.
+* Fix			- Don't try to update Klarna order if kco payment method isn't selected.
+* Fix			- Don't try to add shipping to virtual subscription renewal orders.
+* Fix			- Improved locale check for better compatibility with Polylang & WPML.
 
 = 2018.12.10  	- version 1.7.7 =
 * Tweak			- Moved from replacing Woo order review HTML to calling update_checkout event after ajax kco_wc_iframe_shipping_address_change har run.

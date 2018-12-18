@@ -152,7 +152,7 @@ function kco_wc_calculate_totals() {
 
 function kco_wc_show_payment_method_field() {
 	?>
-	<input style="display:none" type="radio" name="payment_method" value="kco"/>
+	<input style="display:none" type="radio" name="payment_method" value="kco" checked/>
 	<?php
 }
 

@@ -33,7 +33,7 @@ jQuery(function($) {
 			if (kco_wc.paymentMethodEl.length > 0) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter(':checked').val();
 			} else {
-				kco_wc.paymentMethod = 'kco';
+				kco_wc.paymentMethod = '';
 			}
 
 			kco_wc.confirmLoading();
@@ -180,7 +180,7 @@ jQuery(function($) {
 							$('.woocommerce-checkout-review-order-table').unblock();							
 						} else {
 							if( '' !== data.responseJSON.data.redirect_url ) {
-								console.log('Cart do not need payment. Reloading checkout.');
+								console.log('Updated Klarna order failed. Reloading checkout or redirecting to cart.');
 								window.location.href = data.responseJSON.data.redirect_url;
 							}
 						}
