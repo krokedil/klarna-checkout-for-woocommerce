@@ -783,7 +783,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 *
 	 * @return mixed
 	 */
-	private function extract_error_messages( $response ) {
+	public function extract_error_messages( $response ) {
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
