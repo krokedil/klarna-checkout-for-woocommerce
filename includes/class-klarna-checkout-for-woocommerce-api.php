@@ -108,16 +108,17 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * Retrieve ongoing Klarna order.
 	 *
 	 * @param  string $klarna_order_id Klarna order ID.
+	 * @param  string $order_id WooCommerce order ID. Passed if request happens after WooCommerce has been created.
 	 *
 	 * @return object $klarna_order    Klarna order.
 	 */
-	public function request_pre_retrieve_order( $klarna_order_id ) {
+	public function request_pre_retrieve_order( $klarna_order_id, $order_id = null ) {
 		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
 		$request_args = array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 		);
-		krokedil_log_events( null, 'Pre Retrieve Order request args', $request_args );
+		krokedil_log_events( $order_id, 'Pre Retrieve Order request args', $request_args );
 		KCO_WC()->logger->log( 'Retrieve ongoing Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
 
 		$response = wp_safe_remote_get( $request_url, $request_args );
@@ -126,11 +127,11 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$klarna_order            = json_decode( $response['body'] );
 			$log_order               = clone $klarna_order;
 			$log_order->html_snippet = '';
-			krokedil_log_events( null, 'Pre Retrieve Order response', $log_order );
+			krokedil_log_events( $order_id, 'Pre Retrieve Order response', $log_order );
 			return $klarna_order;
 		} else {
 			$error = $this->extract_error_messages( $response );
-			krokedil_log_events( null, 'Pre Retrieve Order response', $error );
+			krokedil_log_events( $order_id, 'Pre Retrieve Order response', $error );
 			return $error;
 		}
 	}
@@ -185,17 +186,18 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * Acknowledges Klarna Checkout order.
 	 *
 	 * @param  string $klarna_order_id Klarna order ID.
+	 * @param  string $order_id WooCommerce order ID. Passed if request happens after WooCommerce has been created.
 	 *
 	 * @return WP_Error|array $response
 	 */
-	public function request_post_get_order( $klarna_order_id ) {
+	public function request_post_get_order( $klarna_order_id, $order_id = null ) {
 		$request_url  = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id;
 		$request_args = array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 		);
 		$response     = wp_safe_remote_get( $request_url, $request_args );
-		krokedil_log_events( null, 'Post Get Order response', stripslashes_deep( json_decode( $response['body'] ) ) );
+		krokedil_log_events( $order_id, 'Post Get Order response', stripslashes_deep( json_decode( $response['body'] ) ) );
 		KCO_WC()->logger->log( 'Post Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
 
 		return $response;

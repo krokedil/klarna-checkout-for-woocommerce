@@ -341,7 +341,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			KCO_WC()->logger->log( '$klarna_order_id fetched from session in process_payment_handler. Order ID ' . $order_id . '.' );
 		}
 
-		$klarna_order = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id );
+		$klarna_order = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id, $order_id );
 
 		if ( $order_id && $klarna_order ) {
 			// Set WC order transaction ID.
@@ -353,7 +353,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			$klarna_country = wc_get_base_location()['country'];
 			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
 
-			$response          = KCO_WC()->api->request_post_get_order( $klarna_order->order_id );
+			$response          = KCO_WC()->api->request_post_get_order( $klarna_order->order_id, $order_id );
 			$klarna_post_order = json_decode( $response['body'] );
 
 			// Remove html_snippet from what we're logging.
@@ -398,7 +398,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 			if ( is_object( $order ) && $order->get_transaction_id() ) {
 				$klarna_order_id = $order->get_transaction_id();
-				$klarna_order    = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id );
+				$klarna_order    = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id, $order_id );
 				echo KCO_WC()->api->get_snippet( $klarna_order );
 			}
 
