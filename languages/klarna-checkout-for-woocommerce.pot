@@ -1,4 +1,4 @@
-# Copyright (C) 2018 klarna-checkout-for-woocommerce
+# Copyright (C) 2019 klarna-checkout-for-woocommerce
 # This file is distributed under the same license as the klarna-checkout-for-woocommerce package.
 msgid ""
 msgstr ""
@@ -32,11 +32,15 @@ msgstr ""
 msgid "Install	Now"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:296
-msgid "An error occurred during communication with Klarna. Please try again."
+#: ../klarna-checkout-for-woocommerce.php:297
+msgid "An error occurred during communication with Klarna (%s)."
 msgstr ""
 
 #: ../klarna-checkout-for-woocommerce.php:299
+msgid "An error occurred during communication with Klarna. Please try again."
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:304
 msgid "An error occurred during communication with Klarna (Klarna order ID is missing). Please try again."
 msgstr ""
 
@@ -60,29 +64,29 @@ msgstr ""
 msgid "It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href=\"%s\">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>)."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-ajax.php:355
+#: ../includes/class-klarna-checkout-for-woocommerce-ajax.php:376
 msgid "This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna."
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:98, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:532, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:366
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:98, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:542, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:366
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:101, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:535, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:369
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:101, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:545, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:369
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:104, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:538, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:372
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:104, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:548, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:372
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:527
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:537
 msgid "Order created via Klarna Checkout API callback. Please verify the order in Klarnas system."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:551
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:561
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
