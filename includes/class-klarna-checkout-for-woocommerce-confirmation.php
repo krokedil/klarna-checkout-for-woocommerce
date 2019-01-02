@@ -66,9 +66,11 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 
 		$klarna_order_id = esc_attr( sanitize_text_field( $_GET['kco_wc_order_id'] ) );
 		$response        = KCO_WC()->api->request_post_get_order( $klarna_order_id );
-		$klarna_order    = apply_filters( 'kco_wc_klarna_order_pre_submit', json_decode( $response['body'] ) );
 
-		$this->save_customer_data( $klarna_order );
+		if ( ! is_wp_error( $response ) ) {
+			$klarna_order = apply_filters( 'kco_wc_klarna_order_pre_submit', json_decode( $response['body'] ) );
+			$this->save_customer_data( $klarna_order );
+		}
 	}
 
 	/**

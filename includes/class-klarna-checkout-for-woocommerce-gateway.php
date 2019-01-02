@@ -343,7 +343,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		$klarna_order = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id, $order_id );
 
-		if ( $order_id && $klarna_order ) {
+		if ( $order_id && ! is_wp_error( $klarna_order ) ) {
 			// Set WC order transaction ID.
 			// update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order->order_id ) );
 			// update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order->order_id ) );

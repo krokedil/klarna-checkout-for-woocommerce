@@ -197,10 +197,24 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'user-agent' => $this->get_user_agent(),
 		);
 		$response     = wp_safe_remote_get( $request_url, $request_args );
-		krokedil_log_events( $order_id, 'Post Get Order response', stripslashes_deep( json_decode( $response['body'] ) ) );
-		KCO_WC()->logger->log( 'Post Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
 
-		return $response;
+		if ( ! is_wp_error( $response ) && ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) ) {
+			krokedil_log_events( $order_id, 'Post Get Order response', stripslashes_deep( json_decode( $response['body'] ) ) );
+			KCO_WC()->logger->log( 'Post Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
+			return $response;
+		} elseif ( 401 === $response['response']['code'] || 404 === $response['response']['code'] || 405 === $response['response']['code'] ) {
+			krokedil_log_events( $order_id, 'ERROR Post Get Order response', $response );
+			KCO_WC()->logger->log( 'ERROR Post Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
+			$error_message = $response['response']['message'];
+			$error         = new WP_Error();
+			$error->add( 'kco', $error_message );
+			return $error;
+		} else {
+			$error = $this->extract_error_messages( $response );
+			krokedil_log_events( $order_id, 'ERROR Post Get Order response', $response );
+			KCO_WC()->logger->log( 'ERROR Post Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
+			return $error;
+		}
 	}
 
 	/**
