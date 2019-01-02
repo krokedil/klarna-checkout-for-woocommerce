@@ -372,7 +372,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 			if ( is_object( $order ) ) {
 				KCO_WC()->logger->log( 'Fallback order creation done. Redirecting customer to thank you page.' );
-				krokedil_log_events( null, 'Fallback order creation done. Redirecting customer to thank you page.', '' );
+				krokedil_log_events( $order->get_id(), 'Fallback order creation done. Redirecting customer to thank you page.', '' );
 				$note = sprintf( __( 'This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna.', 'klarna-checkout-for-woocommerce' ), $error_message );
 				$order->add_order_note( $note );
 				$order->update_status( 'on-hold' );
@@ -392,7 +392,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$order        = wc_get_order( $order_id );
 			$redirect_url = $order->get_checkout_order_received_url();
 			KCO_WC()->logger->log( 'Order already exist in Woo. Redirecting customer to thank you page. ' . json_decode( $redirect_url ) );
-			krokedil_log_events( null, 'Order already exist in Woo. Redirecting customer to thank you page. ', $redirect_url );
+			krokedil_log_events( $order_id, 'Order already exist in Woo. Redirecting customer to thank you page. ', $redirect_url );
 			wp_send_json_success( array( 'redirect' => $redirect_url ) );
 			wp_die();
 		}
