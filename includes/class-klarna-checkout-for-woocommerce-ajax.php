@@ -244,6 +244,19 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 		wc_maybe_define_constant( 'WOOCOMMERCE_CHECKOUT', true );
 
+		$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
+
+		// Check if we have a klarna order id.
+		if ( empty( $klarna_order_id ) ) {
+			// $klarna_order_id is missing, redirect the customer to cart page (to avoid infinite reloading of checkout page).
+			KCO_WC()->logger->log( 'ERROR. Klarna Checkout order ID missing in kco_wc_iframe_shipping_address_change function. Redirecting customer to cart page.' );
+			krokedil_log_events( null, 'ERROR. Klarna Checkout order ID missing in kco_wc_iframe_shipping_address_change function. Redirecting customer to cart page.', '' );
+			$return                 = array();
+			$return['redirect_url'] = add_query_arg( 'kco-order', 'missing-id', wc_get_cart_url() );
+			wp_send_json_error( $return );
+			wp_die();
+		}
+
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_iframe_shipping_address_change' ) ) {
 			wp_send_json_error( 'bad_nonce' );
 			exit;
@@ -255,7 +268,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 		$customer_data = array();
 
-		// Send customer data to frontend
+		// Send customer data to frontend.
 		$email  = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_email();
 		$states = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_state();
 
@@ -359,7 +372,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 			if ( is_object( $order ) ) {
 				KCO_WC()->logger->log( 'Fallback order creation done. Redirecting customer to thank you page.' );
-				krokedil_log_events( null, 'Fallback order creation done. Redirecting customer to thank you page.', '' );
+				krokedil_log_events( $order->get_id(), 'Fallback order creation done. Redirecting customer to thank you page.', '' );
 				$note = sprintf( __( 'This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna.', 'klarna-checkout-for-woocommerce' ), $error_message );
 				$order->add_order_note( $note );
 				$order->update_status( 'on-hold' );
@@ -379,7 +392,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$order        = wc_get_order( $order_id );
 			$redirect_url = $order->get_checkout_order_received_url();
 			KCO_WC()->logger->log( 'Order already exist in Woo. Redirecting customer to thank you page. ' . json_decode( $redirect_url ) );
-			krokedil_log_events( null, 'Order already exist in Woo. Redirecting customer to thank you page. ', $redirect_url );
+			krokedil_log_events( $order_id, 'Order already exist in Woo. Redirecting customer to thank you page. ', $redirect_url );
 			wp_send_json_success( array( 'redirect' => $redirect_url ) );
 			wp_die();
 		}
