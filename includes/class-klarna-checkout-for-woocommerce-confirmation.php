@@ -145,7 +145,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					console.log(elementName);
 					console.log(elementValue);
 					console.log(element);
-					console.log(element.type);
+					console.log(element.type);                                                                                       
 
 					if (element.length) {
 						if (element.is('select')) { // Select.

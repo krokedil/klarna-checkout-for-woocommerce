@@ -33,10 +33,11 @@ jQuery(function($) {
 			if (kco_wc.paymentMethodEl.length > 0) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter(':checked').val();
 			} else {
-				kco_wc.paymentMethod = '';
+				kco_wc.paymentMethod = 'kco';
 			}
 
 			kco_wc.confirmLoading();
+			kco_wc.setFormFieldValuesFromTransiet();
 		},
 
 		kcoSuspend: function () {
@@ -90,18 +91,35 @@ jQuery(function($) {
 		},
 
 		updateExtraFields: function() {
-			var elementName = $(this).attr('name');
+			var field = $(this);
+
+			var formFields = kco_wc.formFields;
+
+			var elementName = field.attr('name');
+			var newValue = field.val();
+			$.each( formFields, function( index, value) {
+				if( value.name === elementName ) {
+					if( field.is(':checkbox') ) {
+						// If is checkbox
+						if( ! field.is(':checked') ) {
+							newValue = '';
+						}
+					}
+					// Update value
+					formFields[index].value = newValue;
+				}
+			} );
+			kco_wc.formFields = formFields;
+			console.table( kco_wc.formFields );
+			kco_wc.saveFormData();
+
+
+			/*var elementName = $(this).attr('name');
 			if( elementName === 'terms' ) {
 				var updatedValue = ( $("input#terms:checked").length === 1 ) ? 1 : '';
 			} else {
 				var updatedValue = $(this).val();
 			}
-			kco_wc.log('value');
-			kco_wc.log(updatedValue);
-			kco_wc.log('name');
-			kco_wc.log(elementName);
-			kco_wc.log(typeof kco_wc.extraFieldsValues);
-			kco_wc.log(kco_wc.extraFieldsValues);
 
 			if (null === kco_wc.extraFieldsValues && '' === updatedValue) {
 				return;
@@ -114,9 +132,6 @@ jQuery(function($) {
 			if (null === kco_wc.extraFieldsValues) {
 				kco_wc.extraFieldsValues = {};
 			}
-
-			kco_wc.log('update');
-
 			kco_wc.extraFieldsValues[elementName] = updatedValue;
 
 			$.ajax({
@@ -129,9 +144,8 @@ jQuery(function($) {
 				success: function (data) {},
 				error: function (data) {},
 				complete: function (data) {
-					kco_wc.log('complete', data);
 				}
-			});
+			});*/
 		},
 
 		updateOrderNotes: function() {
@@ -180,7 +194,7 @@ jQuery(function($) {
 							$('.woocommerce-checkout-review-order-table').unblock();							
 						} else {
 							if( '' !== data.responseJSON.data.redirect_url ) {
-								console.log('Updated Klarna order failed. Reloading checkout or redirecting to cart.');
+								console.log('Cart do not need payment. Reloading checkout.');
 								window.location.href = data.responseJSON.data.redirect_url;
 							}
 						}
@@ -291,21 +305,24 @@ jQuery(function($) {
 					var field = $('*[name="' + name + '"]');
 					var id    = field.attr('id');
 					var label = $('label[for="' + id + '"]');
-					var check = ( label.has( "abbr" ).length ? true : ( id === 'terms' ) ? true : false );
+					var parent = label.parents()[0];
+					var check = ( $(parent).hasClass('validate-required') ? true : ( id === 'terms' ) ? true : false );
 
 					// Only keep track of non standard WooCommerce checkout fields 
-					if (jQuery.inArray(name, kco_params.standard_woo_checkout_fields)=='-1') {
+					if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 ) {
+						var required = false;
+						var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
 						if ( check === true ) {
-							var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
 							if( form[i].name === 'terms' ) {
 								value = ( $("input#terms:checked").length === 1 ) ? 1 : '';
 							}
-							newForm.push({
-								name: form[i].name,
-								value: value,
-								required: true
-							});
+							required = true
 						}
+						newForm.push({
+							name: form[i].name,
+							value: value,
+							required: required,
+						});
 					}
 				}
 			}
@@ -331,6 +348,24 @@ jQuery(function($) {
 			});
 		},
 
+		setFormFieldValuesFromTransiet: function() {
+			var form_data = kco_params.form;
+			for ( i = 0; i < form_data.length; i++ ) {
+				var field = $('*[name="' + form_data[i].name + '"]');
+				var saved_value = form_data[i].value;
+				var id    = field.attr('id');
+				// Check if field is a checkbox
+				if( field.is(':checkbox') ) {
+					if( saved_value !== '' ) {
+						field.prop('checked', true);
+					}
+				} else {
+					//field.val( saved_value );
+				}
+
+			}
+		},
+
 		setFieldValues: function( data ) {
 			// Billing fields
 			$('#billing_email').val(data.email);
@@ -351,8 +386,8 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
 			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
-			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.setFormData);
-			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.setFormData);
+			//kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.setFormData);
+			//kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.setFormData);
 			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);

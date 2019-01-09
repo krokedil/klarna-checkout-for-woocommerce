@@ -193,18 +193,20 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$has_subscription = false;
 		$needs_login      = false;
 		$email_exists     = false;
-		$cart_hash_valid  = true;
+		$totals_match     = true;
 
-		$kco_transient = get_transient( 'kco_wc_order_id_' . $data['order_id'] );
-		$form_data     = false;
-		if ( isset( $kco_transient['form'] ) ) {
-			$form_data = $kco_transient['form'];
+		$session_id = $_GET['kco_session_id'];
+		$session    = $this->get_session_from_id( $session_id );
+
+		$form_data = false;
+		if ( isset( $session['kco_checkout_form'] ) ) {
+			$form_data = unserialize( $session['kco_checkout_form'] );
 		}
 		$has_required_data     = true;
 		$failed_required_check = array();
 		if ( false !== $form_data ) {
 			foreach ( $form_data as $form_row ) {
-				if ( isset( $form_row['required'] ) && '' === $form_row['value'] ) {
+				if ( 'true' === $form_row['required'] && '' === $form_row['value'] ) {
 					$has_required_data       = false;
 					$failed_required_check[] = $form_row['name'];
 				}
@@ -307,13 +309,11 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$needs_login = true;
 		}
 
-		// Check cart hash.
-		if ( ! empty( json_decode( $data['merchant_data'] )->cart_hash ) && ! empty( $kco_transient['cart_hash'] ) ) {
-			$sent_cart_hash  = json_decode( $data['merchant_data'] )->cart_hash;
-			$saved_cart_hash = $kco_transient['cart_hash'];
-			if ( $sent_cart_hash !== $saved_cart_hash ) {
-				$cart_hash_valid = false;
-			}
+		// Check cart totals.
+		$klarna_total = $data['order_amount'];
+		$wc_total     = intval( unserialize( $session['cart_totals'] )['total'] * 100 );
+		if ( $klarna_total !== $wc_total ) {
+			$totals_match = false;
 		}
 
 		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
@@ -337,8 +337,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				header( 'Location: ' . wc_get_checkout_url() . '?needs_login' );
 			} elseif ( $email_exists ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?email_exists' );
-			} elseif ( ! $cart_hash_valid ) {
-				header( 'Location: ' . wc_get_checkout_url() . '?invalid_cart_hash' );
+			} elseif ( ! $totals_match ) {
+				header( 'Location: ' . wc_get_checkout_url() . '?totals_dont_match' );
 			}
 		}
 	}
@@ -554,6 +554,13 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$logger = new WC_Logger();
 			$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error: ' . $e->getCode() . ' - ' . $e->getMessage() );
 		}
+	}
+
+	private function get_session_from_id( $session_id ) {
+		$sessions_handler = new WC_Session_Handler();
+		$session          = $sessions_handler->get_session( $session_id );
+
+		return $session;
 	}
 
 }
