@@ -124,8 +124,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$response = wp_safe_remote_get( $request_url, $request_args );
 
 		if ( ! is_wp_error( $response ) && ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) ) {
-			$klarna_order            = json_decode( $response['body'] );
-			$log_order               = clone $klarna_order;
+			$klarna_order            = $response;
+			$log_order               = json_decode( $response['body'] );
+			$log_order               = clone $log_order;
 			$log_order->html_snippet = '';
 			krokedil_log_events( $order_id, 'Pre Retrieve Order response', $log_order );
 			return $klarna_order;
@@ -824,7 +825,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return void
 	 */
 	public function request_create_recurring_order( $order, $recurring_token ) {
-		$request_url  = $this->get_api_url_base() . '/customer-token/v1/tokens/' . $recurring_token . '/order';
+		$request_url  = $this->get_api_url_base() . 'customer-token/v1/tokens/' . $recurring_token . '/order';
 		$request_args = array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
