@@ -60,7 +60,9 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * Processes cart data
 	 */
 	public function process_data() {
-		// @TODO: Process fees
+		// Reset order lines.
+		$this->order_lines = array();
+
 		$this->process_cart();
 		$this->process_shipping();
 		$this->process_sales_tax();
@@ -184,6 +186,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				$coupon_reference  = '';
 				$coupon_amount     = 0;
 				$coupon_tax_amount = '';
+
 				// Smart coupons are processed as real line items, cart and product discounts sent for reference only.
 				if ( 'smart_coupon' === $coupon->get_discount_type() ) {
 					$coupon_amount     = - WC()->cart->get_coupon_discount_amount( $coupon_key ) * 100;
@@ -218,6 +221,29 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					);
 					$this->order_lines[] = $discount;
 				}
+			} // End foreach().
+		} // End if().
+
+		// YITH Gift Cards.
+		if ( ! empty( WC()->cart->applied_gift_cards ) ) {
+			foreach ( WC()->cart->applied_gift_cards as $coupon_key => $code ) {
+				$coupon_reference  = '';
+				$coupon_amount     = isset( WC()->cart->applied_gift_cards_amounts[ $code ] ) ? - WC()->cart->applied_gift_cards_amounts[ $code ] * 100 : 0;
+				$coupon_tax_amount = '';
+				$label             = apply_filters( 'yith_ywgc_cart_totals_gift_card_label', esc_html( __( 'Gift card:', 'yith-woocommerce-gift-cards' ) . ' ' . $code ), $code );
+
+				$gift_card           = array(
+					'type'                  => 'gift_card',
+					'reference'             => $code,
+					'name'                  => __( 'Gift card', 'yith-woocommerce-gift-cards' ),
+					'quantity'              => 1,
+					'unit_price'            => $coupon_amount,
+					'tax_rate'              => 0,
+					'total_amount'          => $coupon_amount,
+					'total_discount_amount' => 0,
+					'total_tax_amount'      => 0,
+				);
+				$this->order_lines[] = $gift_card;
 			} // End foreach().
 		} // End if().
 	}
@@ -266,7 +292,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	}
 
 	// Helpers.
-
 	/**
 	 * Get cart item name.
 	 *
@@ -612,7 +637,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	public function get_shipping_tax_rate() {
 		/*
 		if ( WC()->cart->shipping_tax_total > 0 && ! $this->separate_sales_tax ) {
-			$shipping_tax_rate = round( WC()->cart->shipping_tax_total / WC()->cart->shipping_total, 2 ) * 100 * 100;
+			$shipping_tax_rate = round( ( WC()->cart->shipping_tax_total / WC()->cart->shipping_total ) * 100, 2 ) * 100;
 		} else {
 			$shipping_tax_rate = 0;
 		}

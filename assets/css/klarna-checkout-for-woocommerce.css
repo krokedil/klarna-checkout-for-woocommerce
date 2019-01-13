@@ -14,7 +14,26 @@
 #kco-order-review table.woocommerce-checkout-review-order-table .product-name {
 	width: auto;
 }
-
+.kco-modal {
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(255, 255, 255, 0.9);
+    transition: all 1s;
+    padding: 20px;
+}
+.kco-modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    max-width: 600px; /* Could be more or less, depending on screen size */
+    text-align: center;
+}
 @media only screen and (min-width : 769px) {
 	#kco-order-review {
 		float: left;

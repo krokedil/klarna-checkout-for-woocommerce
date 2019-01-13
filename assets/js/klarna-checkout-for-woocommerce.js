@@ -16,7 +16,7 @@ jQuery(function($) {
 
 		// Order notes
 		extraFieldsValues: {},
-		extraFieldsSelectorText: 'div#kco-extra-fields input[type="text"], div#kco-extra-fields input[type="password"], div#kco-extra-fields textarea',
+		extraFieldsSelectorText: 'div#kco-extra-fields input[type="text"], div#kco-extra-fields input[type="password"], div#kco-extra-fields textarea, div#kco-extra-fields input[type="email"], div#kco-extra-fields input[type="tel"]',
 		extraFieldsSelectorNonText: 'div#kco-extra-fields select, div#kco-extra-fields input[type="radio"], div#kco-extra-fields input[type="checkbox"], div#kco-extra-fields input.checkout-date-picker, input#terms input[type="checkbox"]',
 
 		// Payment method
@@ -33,7 +33,7 @@ jQuery(function($) {
 			if (kco_wc.paymentMethodEl.length > 0) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter(':checked').val();
 			} else {
-				kco_wc.paymentMethod = 'kco';
+				kco_wc.paymentMethod = '';
 			}
 
 			kco_wc.confirmLoading();
@@ -155,7 +155,14 @@ jQuery(function($) {
 		},
 
 		updateKlarnaOrder: function() {
-			if ('kco' === kco_wc.paymentMethod) {
+			if ( 'kco' === kco_wc.paymentMethod && kco_params.is_confirmation_page === 'no' ) {
+				$('.woocommerce-checkout-review-order-table').block({
+					message: null,
+					overlayCSS: {
+						background: '#fff',
+						opacity: 0.6
+					}
+				});
 				$.ajax({
 					type: 'POST',
 					url: kco_params.update_klarna_order_url,
@@ -168,7 +175,15 @@ jQuery(function($) {
 					error: function(data) {
 					},
 					complete: function(data) {
-						kco_wc.kcoResume();
+						if (true === data.responseJSON.success) {
+							kco_wc.kcoResume();
+							$('.woocommerce-checkout-review-order-table').unblock();							
+						} else {
+							if( '' !== data.responseJSON.data.redirect_url ) {
+								console.log('Updated Klarna order failed. Reloading checkout or redirecting to cart.');
+								window.location.href = data.responseJSON.data.redirect_url;
+							}
+						}
 					}
 				});
 			}
@@ -237,7 +252,7 @@ jQuery(function($) {
 		},
 
 		checkoutError: function() {
-			if ('kco' === kco_wc.paymentMethod) {
+			if ('kco' === kco_wc.paymentMethod && kco_params.is_confirmation_page === 'yes') {
 				var error_message = $( ".woocommerce-NoticeGroup-checkout" ).text();
 				$.ajax({
 					type: 'POST',
@@ -316,6 +331,19 @@ jQuery(function($) {
 			});
 		},
 
+		setFieldValues: function( data ) {
+			// Billing fields
+			$('#billing_email').val(data.email);
+			$('#billing_state').val(data.states.billing_state);
+
+			// Shipping fields
+			$('#shipping_state').val(data.states.shipping_state);
+
+			// Trigger changes
+			$('#billing_email').change();
+			$('#billing_email').blur();
+		},
+
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
 
@@ -359,14 +387,22 @@ jQuery(function($) {
 									},
 									success: function (response) {
 										kco_wc.log(response);
-										$('.woocommerce-checkout-review-order-table').replaceWith(response.data.html);
 									},
 									error: function (response) {
 										kco_wc.log(response);
 									},
-									complete: function() {
-										$('.woocommerce-checkout-review-order-table').unblock();
-										kco_wc.kcoResume();
+									complete: function(response) {
+										if (true === response.responseJSON.success) {
+											kco_wc.setFieldValues( response.responseJSON.data );
+											$('body').trigger('update_checkout');
+											$('.woocommerce-checkout-review-order-table').unblock();
+											kco_wc.kcoResume();							
+										} else {
+											if( '' !== response.responseJSON.data.redirect_url ) {
+												console.log('Shipping address change update failed. Redirecting to cart.');
+												window.location.href = response.responseJSON.data.redirect_url;
+											}
+										}
 									}
 								}
 							);
@@ -395,5 +431,5 @@ jQuery(function($) {
 		if (event.keyCode == 13) {
 			event.preventDefault();
 		}
-	});
+	});	
 });

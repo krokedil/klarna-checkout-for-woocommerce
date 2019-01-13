@@ -19,7 +19,18 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->method_title       = __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' );
 		$this->method_description = __( 'Klarna Checkout replaces standard WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' );
 		$this->has_fields         = false;
-		$this->supports           = apply_filters( 'kco_wc_supports', array( 'products' ) );
+		$this->supports           = apply_filters(
+			'kco_wc_supports', array(
+				'products',
+				'subscriptions',
+				'subscription_cancellation',
+				'subscription_suspension',
+				'subscription_reactivation',
+				'subscription_amount_changes',
+				'subscription_date_changes',
+				'multiple_subscriptions',
+			)
+		);
 
 		// Load the form fields.
 		$this->init_form_fields();
@@ -34,10 +45,12 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->testmode = 'yes' === $this->get_option( 'testmode' );
 		$this->logging  = 'yes' === $this->get_option( 'logging' );
 
-		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array(
-			$this,
-			'process_admin_options',
-		) );
+		add_action(
+			'woocommerce_update_options_payment_gateways_' . $this->id, array(
+				$this,
+				'process_admin_options',
+			)
+		);
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'show_thank_you_snippet' ) );
@@ -55,8 +68,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * @return string
 	 */
 	public function get_icon() {
-		$icon_src   = 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100';
-		$icon_html  = '<img src="' . $icon_src . '" alt="Klarna Checkout" style="border-radius:0px"/>';
+		$icon_src  = 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100';
+		$icon_html = '<img src="' . $icon_src . '" alt="Klarna Checkout" style="border-radius:0px"/>';
 		return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
 	}
 
@@ -71,6 +84,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$order = wc_get_order( $order_id );
 		krokedil_set_order_gateway_version( $order_id, KCO_WC_VERSION );
 
+		$this->process_payment_handler( $order_id );
+
 		return array(
 			'result'   => 'success',
 			'redirect' => $this->get_return_url( $order ),
@@ -81,9 +96,9 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * This plugin doesn't handle order management, but it allows Klarna Order Management plugin to process refunds
 	 * and then return true or false.
 	 *
-	 * @param int $order_id WooCommerce order ID.
+	 * @param int      $order_id WooCommerce order ID.
 	 * @param null|int $amount Refund amount.
-	 * @param string $reason Reason for refund.
+	 * @param string   $reason Reason for refund.
 	 *
 	 * @return bool
 	 */
@@ -111,6 +126,14 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		// If we can't retrieve a set of credentials, disable KCO.
 		if ( is_checkout() && ! KCO_WC()->credentials->get_credentials_from_session() ) {
 			return false;
+		}
+
+		// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE or AT, disable KCO.
+		if ( is_checkout() && class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
+			$available_recurring_countries = array( 'SE', 'NO', 'FI', 'DE', 'AT' );
+			if ( ! in_array( WC()->customer->get_billing_country(), $available_recurring_countries ) ) {
+				return false;
+			}
 		}
 
 		return true;
@@ -163,12 +186,15 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		);
 
 		$form = array();
-		if ( false !== get_transient( WC()->session->get( 'kco_wc_order_id' ) ) ) {
-			$form = get_transient( WC()->session->get( 'kco_wc_order_id' ) );
+		if ( false !== get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) ) ) {
+			$kco_transient = get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) );
+			if ( isset( $kco_transient['form'] ) ) {
+				$form = $kco_transient['form'];
+			}
 		}
 
-		$standard_woo_checkout_fields = array('billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'terms', 'account_username', 'account_password');
-		
+		$standard_woo_checkout_fields = array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'terms', 'account_username', 'account_password' );
+
 		$checkout_localize_params = array(
 			'update_cart_url'                      => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
 			'update_cart_nonce'                    => wp_create_nonce( 'kco_wc_update_cart' ),
@@ -188,7 +214,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'save_form_data'                       => WC_AJAX::get_endpoint( 'kco_wc_save_form_data' ),
 			'save_form_data_nonce'                 => wp_create_nonce( 'kco_wc_save_form_data' ),
 			'form'                                 => $form,
-			'standard_woo_checkout_fields'		   => $standard_woo_checkout_fields,
+			'standard_woo_checkout_fields'         => $standard_woo_checkout_fields,
+			'is_confirmation_page'                 => ( is_kco_confirmation() ) ? 'yes' : 'no',
 		);
 
 		wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );
@@ -214,7 +241,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			return;
 		}
 
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix              = '';// defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$store_base_location = wc_get_base_location();
 		if ( 'US' === $store_base_location['country'] ) {
 			$location = 'US';
@@ -242,13 +269,55 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 */
 	private function check_if_eu( $store_base_location ) {
 		$eu_countries = array(
-			'AL', 'AD', 'AM', 'AT', 'BY', 'BE', 'BA', 'BG', 'CH', 'CY', 'CZ', 'DE',
-			'DK', 'EE', 'ES', 'FO', 'FI', 'FR', 'GB', 'GE', 'GI', 'GR', 'HU', 'HR',
-			'IE', 'IS', 'IT', 'LT', 'LU', 'LV', 'MC', 'MK', 'MT', 'NO', 'NL', 'PL',
-			'PT', 'RO', 'RU', 'SE', 'SI', 'SK', 'SM', 'TR', 'UA', 'VA',
+			'AL',
+			'AD',
+			'AM',
+			'AT',
+			'BY',
+			'BE',
+			'BA',
+			'BG',
+			'CH',
+			'CY',
+			'CZ',
+			'DE',
+			'DK',
+			'EE',
+			'ES',
+			'FO',
+			'FI',
+			'FR',
+			'GB',
+			'GE',
+			'GI',
+			'GR',
+			'HU',
+			'HR',
+			'IE',
+			'IS',
+			'IT',
+			'LT',
+			'LU',
+			'LV',
+			'MC',
+			'MK',
+			'MT',
+			'NO',
+			'NL',
+			'PL',
+			'PT',
+			'RO',
+			'RU',
+			'SE',
+			'SI',
+			'SK',
+			'SM',
+			'TR',
+			'UA',
+			'VA',
 		);
 
-		if( in_array( $store_base_location, $eu_countries ) ) {
+		if ( in_array( $store_base_location, $eu_countries ) ) {
 			return 'EU';
 		} else {
 			return '';
@@ -256,39 +325,42 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Displays Klarna Checkout thank you iframe and clears Klarna order ID value from WC session.
+	 * Process the payment with information from Klarna and return the result.
 	 *
-	 * @param int $order_id WooCommerce order ID.
+	 * @param  int $order_id WooCommerce order ID.
+	 *
+	 * @return void
 	 */
-	public function show_thank_you_snippet( $order_id = null ) {
-		if ( ! WC()->session->get( 'kco_wc_order_id' ) ) {
-			return;
+	public function process_payment_handler( $order_id ) {
+		// Get the Klarna order ID.
+		$order = wc_get_order( $order_id );
+		if ( is_object( $order ) && $order->get_transaction_id() ) {
+			$klarna_order_id = $order->get_transaction_id();
+		} else {
+			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+			KCO_WC()->logger->log( '$klarna_order_id fetched from session in process_payment_handler. Order ID ' . $order_id . '.' );
 		}
 
-		$klarna_order = KCO_WC()->api->get_order();
-		echo KCO_WC()->api->get_snippet( $klarna_order );
+		$response     = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id, $order_id );
+		$klarna_order = json_decode( $response['body'] );
 
-		if ( $order_id ) {
+		if ( $order_id && ! is_wp_error( $klarna_order ) ) {
 			// Set WC order transaction ID.
-			$order = wc_get_order( $order_id );
-
-			update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order->order_id ) );
-			update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order->order_id ) );
-
+			// update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order->order_id ) );
+			// update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order->order_id ) );
 			$environment = $this->testmode ? 'test' : 'live';
 			update_post_meta( $order_id, '_wc_klarna_environment', $environment );
 
-			$klarna_country = WC()->checkout()->get_value( 'billing_country' );
+			$klarna_country = wc_get_base_location()['country'];
 			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
 
-			$response     		= KCO_WC()->api->request_post_get_order( $klarna_order->order_id );
-			$klarna_post_order 	= json_decode( $response['body'] );
+			$response          = KCO_WC()->api->request_post_get_order( $klarna_order->order_id, $order_id );
+			$klarna_post_order = json_decode( $response['body'] );
 
-			// Remove html_snippet from what we're logging
-			$log_order = clone $klarna_post_order;
+			// Remove html_snippet from what we're logging.
+			$log_order               = clone $klarna_post_order;
 			$log_order->html_snippet = '';
-			krokedil_log_events( $order_id, 'Klarna post_order in show_thank_you_snippet', $log_order );
-			
+			krokedil_log_events( $order_id, 'Klarna post_order in process_payment_handler', $log_order );
 			if ( 'ACCEPTED' === $klarna_post_order->fraud_status ) {
 				$order->payment_complete();
 				// translators: Klarna order ID.
@@ -310,6 +382,37 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 				)
 			);
 		}
+	}
+
+	/**
+	 * Displays Klarna Checkout thank you iframe and clears Klarna order ID value from WC session.
+	 *
+	 * @param int $order_id WooCommerce order ID.
+	 */
+	public function show_thank_you_snippet( $order_id = null ) {
+		if ( ! WC()->session->get( 'kco_wc_order_id' ) ) {
+			return;
+		}
+
+		if ( $order_id ) {
+			$order = wc_get_order( $order_id );
+
+			if ( is_object( $order ) && $order->get_transaction_id() ) {
+				$klarna_order_id = $order->get_transaction_id();
+				$klarna_order    = KCO_WC()->api->request_pre_retrieve_order( $klarna_order_id, $order_id );
+				echo KCO_WC()->api->get_snippet( $klarna_order );
+			}
+
+			// Check if we need to finalize purchase here. Should already been done in process_payment.
+			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
+				$this->process_payment_handler( $order_id );
+				$order->add_order_note( __( 'Order finalized in thankyou page.', 'klarna-checkout-for-woocommerce' ) );
+				WC()->cart->empty_cart();
+			}
+		}
+
+		// Clear session storage to prevent error.
+		echo '<script>sessionStorage.orderSubmitted = false</script>';
 	}
 
 	/**
@@ -336,7 +439,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 */
 	public function address_notice( $order ) {
 		if ( $this->id === $order->get_payment_method() ) {
-			echo '<div style="margin: 10px 0; padding: 10px; border: 1px solid #B33A3A; font-size: 12px">';
+			echo '<div style="clear:both; margin: 10px 0; padding: 10px; border: 1px solid #B33A3A; font-size: 12px">';
 			esc_html_e( 'Order address should not be changed and any changes you make will not be reflected in Klarna system.', 'klarna-checkout-for-woocommerce' );
 			echo '</div>';
 		}
@@ -348,10 +451,12 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	public function show_log_in_notice() {
 		if ( isset( $_GET['login_required'] ) && 'yes' === $_GET['login_required'] ) {
 			wc_add_notice(
-				sanitize_textarea_field( __(
-					'An account is already registered with your email address. Please log in.',
-					'klarna-checkout-for-woocommerce'
-				) ),
+				sanitize_textarea_field(
+					__(
+						'An account is already registered with your email address. Please log in.',
+						'klarna-checkout-for-woocommerce'
+					)
+				),
 				'error'
 			);
 		}

@@ -5,14 +5,14 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 1.5.5
+ * Version: 1.7.9
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 3.0
- * WC tested up to: 3.4.4
+ * WC tested up to: 3.5.3
  *
- * Copyright (c) 2017-2018 Krokedil
+ * Copyright (c) 2017-2019 Krokedil
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,9 +35,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.5.5' );
-define( 'KCO_WC_MIN_PHP_VER', '5.3.0' );
-define( 'KCO_WC_MIN_WC_VER', '2.5.0' );
+define( 'KCO_WC_VERSION', '1.7.9' );
+define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
+define( 'KCO_WC_MIN_WC_VER', '3.0.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
 define( 'KCO_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'KCO_WC_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
@@ -92,6 +92,13 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		public $logger;
 
 		/**
+		 * Reference to order lines from order class.
+		 *
+		 * @var $log
+		 */
+		public $order_lines_from_order;
+
+		/**
 		 * Returns the *Singleton* instance of this class.
 		 *
 		 * @return self::$instance The *Singleton* instance.
@@ -139,6 +146,12 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
 			add_action( 'admin_notices', array( $this, 'order_management_check' ) );
+
+			// @todo - move the functions below to a separate class or file.
+			add_action( 'woocommerce_add_to_cart', 'kco_wc_save_cart_hash' );
+			add_action( 'woocommerce_applied_coupon', 'kco_wc_save_cart_hash' );
+			add_action( 'kco_wc_before_checkout_form', 'kco_wc_save_cart_hash', 1 );
+			add_action( 'template_redirect', array( $this, 'maybe_display_kco_order_error_message' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
@@ -206,17 +219,21 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				// If plugin is not active show Activate button.
 				if ( ! is_plugin_active( $plugin_slug . '/' . $plugin_slug . '.php' ) && current_user_can( 'activate_plugins' ) ) {
 					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-					$plugin      = plugins_api( 'plugin_information', array(
-						'slug' => $plugin_slug,
-					) );
+					$plugin      = plugins_api(
+						'plugin_information', array(
+							'slug' => $plugin_slug,
+						)
+					);
 					$plugin      = (array) $plugin;
 					$status      = install_plugin_install_status( $plugin );
 					$name        = wp_kses( $plugin['name'], array() );
-					$url         = add_query_arg( array(
-						'_wpnonce' => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
-						'action'   => 'activate',
-						'plugin'   => $status['file'],
-					), network_admin_url( 'plugins.php' ) );
+					$url         = add_query_arg(
+						array(
+							'_wpnonce' => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
+							'action'   => 'activate',
+							'plugin'   => $status['file'],
+						), network_admin_url( 'plugins.php' )
+					);
 					$description = $name . ' is not active. Please activate it so you can capture, cancel, update and refund Klarna orders.';
 					?>
 					<div class="notice notice-warning">
@@ -233,9 +250,11 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			} else { // If plugin file does not exist, show Install button.
 				if ( current_user_can( 'install_plugins' ) ) {
 					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-					$plugin = plugins_api( 'plugin_information', array(
-						'slug' => $plugin_slug,
-					) );
+					$plugin = plugins_api(
+						'plugin_information', array(
+							'slug' => $plugin_slug,
+						)
+					);
 					$plugin = (array) $plugin;
 					$status = install_plugin_install_status( $plugin );
 					if ( 'install' === $status['status'] && $status['url'] ) {
@@ -270,6 +289,23 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		}
 
 		/**
+		 * Display Klarna order error in cart page if customer have been redirected to cart because of a communication issue.
+		 */
+		public function maybe_display_kco_order_error_message() {
+			if ( is_cart() && isset( $_GET['kco-order'] ) && 'error' === $_GET['kco-order'] ) {
+				if ( isset( $_GET['reason'] ) ) {
+					$message = sprintf( __( 'An error occurred during communication with Klarna (%s).', 'klarna-checkout-for-woocommerce' ), sanitize_textarea_field( base64_decode( $_GET['reason'] ) ) );
+				} else {
+					$message = __( 'An error occurred during communication with Klarna. Please try again.', 'klarna-checkout-for-woocommerce' );
+				}
+				wc_add_notice( $message, 'error' );
+			}
+			if ( is_cart() && isset( $_GET['kco-order'] ) && 'missing-id' === $_GET['kco-order'] ) {
+				wc_add_notice( __( 'An error occurred during communication with Klarna (Klarna order ID is missing). Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
+			}
+		}
+
+		/**
 		 * Initialize the gateway. Called very early - in the context of the plugins_loaded action
 		 *
 		 * @since 1.0.0
@@ -294,6 +330,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-status.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-create-local-order-fallback.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-gdpr.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-checkout-form-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-subscription.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines-from-order.php';
 			include_once KCO_WC_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php';
 			include_once KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
 
@@ -302,11 +341,12 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				include_once KCO_WC_PLUGIN_PATH . '/includes/class-wc-klarna-banners.php';
 			}
 
-			$this->api           = new Klarna_Checkout_For_WooCommerce_API();
-			$this->merchant_urls = new Klarna_Checkout_For_WooCommerce_Merchant_URLs();
-			$this->order_lines   = new Klarna_Checkout_For_WooCommerce_Order_Lines();
-			$this->credentials   = new Klarna_Checkout_For_WooCommerce_Credentials();
-			$this->logger        = new Klarna_Checkout_For_WooCommerce_Logging();
+			$this->api                    = new Klarna_Checkout_For_WooCommerce_API();
+			$this->merchant_urls          = new Klarna_Checkout_For_WooCommerce_Merchant_URLs();
+			$this->order_lines            = new Klarna_Checkout_For_WooCommerce_Order_Lines();
+			$this->credentials            = new Klarna_Checkout_For_WooCommerce_Credentials();
+			$this->logger                 = new Klarna_Checkout_For_WooCommerce_Logging();
+			$this->order_lines_from_order = new Klarna_Checkout_For_Woocommerce_Order_Lines_From_Order();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
@@ -330,7 +370,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * Filters cart item quantity output.
 		 *
 		 * @param string $output HTML output.
-		 * @param array $cart_item Cart item.
+		 * @param array  $cart_item Cart item.
 		 * @param string $cart_item_key Cart item key.
 		 *
 		 * @return string $output
@@ -344,12 +384,14 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 						if ( $_product->is_sold_individually() ) {
 							$return_value = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1" />', $cart_key );
 						} else {
-							$return_value = woocommerce_quantity_input( array(
-								'input_name'  => 'cart[' . $cart_key . '][qty]',
-								'input_value' => $cart_item['quantity'],
-								'max_value'   => $_product->backorders_allowed() ? '' : $_product->get_stock_quantity(),
-								'min_value'   => '1',
-							), $_product, false );
+							$return_value = woocommerce_quantity_input(
+								array(
+									'input_name'  => 'cart[' . $cart_key . '][qty]',
+									'input_value' => $cart_item['quantity'],
+									'max_value'   => $_product->backorders_allowed() ? '' : $_product->get_stock_quantity(),
+									'min_value'   => '1',
+								), $_product, false
+							);
 						}
 
 						$output = $return_value;

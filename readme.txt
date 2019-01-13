@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 4.9.8
+Tested up to: 5.0.2
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.4.4
+WC tested up to: 3.5.3
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,94 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+
+= 2019.01.02  	- version 1.7.9 =
+* Fix			- If checkout registration is disabled and not logged in, the user cannot checkout.
+* Fix			- Fixed issue with krokedil_log_events where logs got saved in wrong order id.
+* Fix			- Redirect customer to cart page if KCO id session is missing in shipping address change ajax function.
+* Fix			- Check that we have KCO id session before trying to retreive Klarna order.
+* Fix			- Improved handling of errors in request_post_get_order.
+* Fix			- Check that we have a valid Klarna order before creating a Woo order in backup_order_creation.
+
+= 2018.12.18  	- version 1.7.8 =
+* Tweak			- Improved error messaging if KCO order request fails.
+* Fix			- Check if Klarna order ID exist in Woo order before starting checkout_error order creation. To avoid double order creation.
+* Fix			- Don't try to update Klarna order if kco payment method isn't selected.
+* Fix			- Don't try to add shipping to virtual subscription renewal orders.
+* Fix			- Improved locale check for better compatibility with Polylang & WPML.
+
+= 2018.12.10  	- version 1.7.7 =
+* Tweak			- Moved from replacing Woo order review HTML to calling update_checkout event after ajax kco_wc_iframe_shipping_address_change har run.
+* Fix			- Reset order lines before collecting and sending them to Klarna. In rare cases order lines was added twice.
+* Fix			- Added order review blocker to updateKlarnaOrder call (to avoid changes in WooCommerce cart during Klarna order update).
+* Fix 			- Don’t try to update Klarna order if the $klarna_order_id is missing in update Klarna order function.
+* Fix			- Don’t try to update Klarna order if we’re on confirmation page.
+* Fix			- Changed update Klarna order function to handle status checkout_complete scenarios.
+* Fix			- Get $klarna_order_id from url instead of session in confirmation page.
+* Fix			- Don’t rely on session when saving kco_order_id to WC order.
+* Fix			- Improved way of fetching Klarna order in process_payment.
+* Fix			- Submit form with name ”checkout” instead of form with class name woocommerce-checkout (to avoid theme template compatibility issues).
+
+= 2018.11.27  	- version 1.7.6 =
+* Tweak			- Added check to see if customer have an account and needs to login before purchase with KCO can be completed.
+* Tweak			- Move sending of is_user_logged_in from subscription class to regular api class.
+* Tweak			- Plugin WordPress 5.0 compatible.
+* Fix			- Shipping tax rate calculation bug fix.
+* Fix			- Redirect customer to cart page if an error occurs during update of Klarna order in checkout page.
+
+= 2018.11.21  	- version 1.7.5 =
+* Tweak			- Change Please wait while we process your order text to be displayed as a modal popup.
+* Fix			- Correct calculation of state based tax (for US) in shipping address change event.
+* Fix			- Improved calculation of shipping tax rates with decimals sent to Klarna.
+* Fix			- Added email and tel input fields as supported field types to extra checkout field handler.
+* Fix			- Updated feature for avoiding double orders (sessionStorage function) to prevent infinite reloading of checkout page.
+* Fix			- Only run checkout error fallback if it is triggered from the KCO confirmation page.
+
+= 2018.11.12  	- version 1.7.4 =
+* Tweak			- Improved handling of order in WooCommerce. Payment now finalized during process_payment. Plugin now allows custom thankyou page.
+* Tweak			- Add prefix kco_wc_order_id_ to transient name used during purchase.
+* Tweak			- Order creation caused by checkout_error now sets order status to On hold.
+* Fix			- Add support for cart_hash control to avoid mismatch in order totals between Klarna & Woo.
+* Fix			- Changed Klarna country stored in Woo order to prevent issue with Klarna Global.
+* Fix			- Deletes kco_wc_order_id_ transient on order received page.
+* Fix			- Added checks to prevent duplicate orders.
+* Fix			- Added check to ensure hash sign is added to hexcode sent to Klarna (for color display of KCO).
+* Fix			- Save Klarna order id in Woo order on woocommerce_checkout_order_processed (previously only saved on thankyou page).
+* Fix			- Improved error handling/display when request to Klarna returns in wp_error.
+* Fix			- PHP notice fixes.
+
+= 2018.10.19  	- version 1.7.3 =
+* Fix			- Fixed issue with no_shipping error on free trial subscriptions.
+* Fix			- json_decode fix to avoid crash when using more than 1 coupon code (props @johanholm).
+* Fix			- Fixed tax rate for zero tax shipping and fee in order lines sent to Klarna for recurring orders.
+
+= 2018.10.12  	- version 1.7.2 =
+* Fix			- Fixed error when using coupons.
+
+= 2018.10.10  	- version 1.7.1 =
+* Tweak			- Logging improvements.
+* Fix			- Don't save KCO html_snippet in logs.
+* Fix			- Don't let existing customers that isn't logged in finalize subscription purchase.
+
+= 2018.10.09  	- version 1.7.0 =
+* Feature		- Added support for recurring payments via WooCommerce Subscriptions (in SE, NO, FI, DE & AT).
+* Feature		- Fetch and save customer email address in Woo on shipping address change event. Adds support for better compatibility with abandoned cart plugins.
+* Tweak			- Fetch and save customer state in Woo on shipping address change event.
+* Tweak			- Added admin notice if Autoptimize plugin is used and "Optimize shop cart/checkout" setting is on.
+* Tweak			- Removed customer address setters used before WC 3.0.0.
+* Tweak			- Added order note if order is created via API callback (Klarnas push notification).
+
+
+= 2018.09.20  	- version 1.6.1 =
+* Fix	        - Added no as possible Norwegian locale code.
+* Fix			- Added bussiness name from B2B purchase to WooCommerce order.
+
+= 2018.09.10  	- version 1.6.0 =
+* Feature		- Added support for YITH WooCommerce Gift Cards.
+* Enhancement	- Added validation of coupons to validation callback.
+* Enhancement	- Don’t use KCO template file if cart doesn’t need payment.
+* Tweak			- Logging improvements.
+* Fix			- Add class "processing" to form after trigger submit to avoid checkout form from being triggered twice.
 
 = 2018.08.08  	- version 1.5.5 =
 * Tweak			- Send url to single product image to Klarna (instead of tumbnail size).
