@@ -214,7 +214,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			} // End foreach().
 		} // End if().
 
-		// YITH Gift Cards
+		// YITH Gift Cards.
 		if ( ! empty( WC()->cart->applied_gift_cards ) ) {
 			foreach ( WC()->cart->applied_gift_cards as $coupon_key => $code ) {
 				$coupon_reference  = '';
