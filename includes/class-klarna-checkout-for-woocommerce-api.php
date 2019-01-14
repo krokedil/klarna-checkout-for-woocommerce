@@ -324,9 +324,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$order_id = $this->get_order_id_from_session();
 
 		if ( $order_id ) {
-			$order = $this->request_pre_get_order( $order_id );
+			$response = $this->request_pre_get_order( $order_id );
+			$order    = json_decode( $response['body'] );
 
-			if ( ! $order || is_wp_error( $order ) ) {
+			if ( ! $order || is_wp_error( $response ) ) {
 				$order = $this->request_pre_create_order();
 			} elseif ( 'checkout_incomplete' === $order->status ) {
 				// Only update order if its status is incomplete.
