@@ -34,7 +34,7 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 	public static function maybe_set_customer_email() {
 		$klarna_order = self::maybe_set_klarna_order();
 		// Check that we got a response.
-		if ( empty( $klarna_order ) ) {
+		if ( empty( $klarna_order ) || is_wp_error( $klarna_order ) ) {
 			$email = null;
 		} else {
 			$klarna_order = json_decode( $klarna_order['body'] );
@@ -50,7 +50,7 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 		if ( 'US' === WC()->customer->get_billing_country() ) {
 			$klarna_order = self::maybe_set_klarna_order();
 			// Check that we got a response.
-			if ( empty( $klarna_order ) ) {
+			if ( empty( $klarna_order ) || is_wp_error( $klarna_order ) ) {
 				$billing_state  = null;
 				$shipping_state = null;
 			} else {

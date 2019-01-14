@@ -49,7 +49,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( is_wp_error( $response ) ) {
 			$error = $this->extract_error_messages( $response );
 			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response ) ) );
-			// return $error;
+			// return $error.
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',
@@ -112,7 +112,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 *
 	 * @return object $klarna_order    Klarna order.
 	 */
-	public function request_pre_retrieve_order( $klarna_order_id, $order_id = null ) {
+	public function request_pre_get_order( $klarna_order_id, $order_id = null ) {
 		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
 		$request_args = array(
 			'headers'    => $this->get_request_headers(),
@@ -218,29 +218,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 		}
 	}
 
-	/**
-	 * Acknowledges Klarna Checkout order.
-	 *
-	 * @param  string $klarna_order_id Klarna order ID.
-	 *
-	 * @return WP_Error|array $response
-	 */
-	public function request_pre_get_order( $klarna_order_id ) {
-		$request_url  = $this->get_api_url_base() . '/checkout/v3/orders/' . $klarna_order_id;
-		$request_args = array(
-			'headers'    => $this->get_request_headers(),
-			'user-agent' => $this->get_user_agent(),
-		);
-		$response     = wp_safe_remote_get( $request_url, $request_args );
-
-		$log_order                 = $response['body'];
-		$log_order                 = (array) json_decode( $log_order );
-		$log_order['html_snippet'] = '';
-		krokedil_log_events( null, 'Pre Get Order response', stripslashes_deep( $log_order ) );
-		KCO_WC()->logger->log( 'Pre Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $log_order ) ) );
-
-		return $response;
-	}
 
 	/**
 	 * Acknowledges Klarna Checkout order.
@@ -347,7 +324,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$order_id = $this->get_order_id_from_session();
 
 		if ( $order_id ) {
-			$order = $this->request_pre_retrieve_order( $order_id );
+			$order = $this->request_pre_get_order( $order_id );
 
 			if ( ! $order || is_wp_error( $order ) ) {
 				$order = $this->request_pre_create_order();
