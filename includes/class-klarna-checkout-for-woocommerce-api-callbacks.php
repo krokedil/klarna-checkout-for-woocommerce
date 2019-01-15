@@ -372,17 +372,27 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * @throws Exception WC_Data_Exception.
 	 */
 	public function backup_order_creation( $klarna_order_id ) {
-		$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
-		$klarna_order = json_decode( $response['body'] );
+		$response = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 
-		// Process customer data.
-		$this->process_customer_data( $klarna_order );
+		if ( ! is_wp_error( $response ) && ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) ) {
+			// Retrieve Klarna order.
+			$klarna_order = json_decode( $response['body'] );
 
-		// Process customer data.
-		$this->process_cart( $klarna_order );
+			// Process customer data.
+			$this->process_customer_data( $klarna_order );
 
-		// Process order.
-		$this->process_order( $klarna_order );
+			// Process cart.
+			$this->process_cart( $klarna_order );
+
+			// Process order.
+			$this->process_order( $klarna_order );
+
+		} else {
+			// Retrieve error.
+			$error = KCO_WC()->api->extract_error_messages( $response );
+			KCO_WC()->logger->log( 'ERROR when requesting Klarna order in backup_order_creation (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response ) ) );
+			return false;
+		}
 	}
 
 	/**

@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.0.1
+Tested up to: 5.0.2
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.5.2
+WC tested up to: 3.5.3
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,14 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+
+= 2019.01.02  	- version 1.7.9 =
+* Fix			- If checkout registration is disabled and not logged in, the user cannot checkout.
+* Fix			- Fixed issue with krokedil_log_events where logs got saved in wrong order id.
+* Fix			- Redirect customer to cart page if KCO id session is missing in shipping address change ajax function.
+* Fix			- Check that we have KCO id session before trying to retreive Klarna order.
+* Fix			- Improved handling of errors in request_post_get_order.
+* Fix			- Check that we have a valid Klarna order before creating a Woo order in backup_order_creation.
 
 = 2018.12.18  	- version 1.7.8 =
 * Tweak			- Improved error messaging if KCO order request fails.
