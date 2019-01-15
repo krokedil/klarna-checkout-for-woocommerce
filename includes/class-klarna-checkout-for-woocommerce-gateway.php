@@ -356,25 +356,34 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			$klarna_country = wc_get_base_location()['country'];
 			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
 
-			$response          = KCO_WC()->api->request_post_get_order( $klarna_order->order_id, $order_id );
-			$klarna_post_order = json_decode( $response['body'] );
-
-			// Remove html_snippet from what we're logging.
-			$log_order               = clone $klarna_post_order;
-			$log_order->html_snippet = '';
-			krokedil_log_events( $order_id, 'Klarna post_order in process_payment_handler', $log_order );
-			if ( 'ACCEPTED' === $klarna_post_order->fraud_status ) {
-				$order->payment_complete();
-				// translators: Klarna order ID.
-				$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
-				$order->add_order_note( $note );
-			} elseif ( 'REJECTED' === $klarna_post_order->fraud_status ) {
-				$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
-			} elseif ( 'PENDING' === $klarna_post_order->fraud_status ) {
-				// translators: Klarna order ID.
-				$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+			$response = KCO_WC()->api->request_post_get_order( $klarna_order->order_id, $order_id );
+			if ( is_wp_error( $response ) ) {
+				// Request error. Set order status to On hold and print the error message as a note.
+				$error = KCO_WC()->api->extract_error_messages( $response );
+				$note  = sprintf( __( 'Klarna post_order request in process_payment_handler failed. Error message: %s.', 'klarna-checkout-for-woocommerce' ), stripslashes_deep( json_encode( $error ) ) );
 				$order->update_status( 'on-hold', $note );
+			} else {
+				$klarna_post_order = json_decode( $response['body'] );
+
+				// Remove html_snippet from what we're logging.
+				$log_order               = clone $klarna_post_order;
+				$log_order->html_snippet = '';
+				krokedil_log_events( $order_id, 'Klarna post_order in process_payment_handler', $log_order );
+				if ( 'ACCEPTED' === $klarna_post_order->fraud_status ) {
+					$order->payment_complete();
+					// translators: Klarna order ID.
+					$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+					$order->add_order_note( $note );
+				} elseif ( 'REJECTED' === $klarna_post_order->fraud_status ) {
+					$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
+				} elseif ( 'PENDING' === $klarna_post_order->fraud_status ) {
+					// translators: Klarna order ID.
+					$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+					$order->update_status( 'on-hold', $note );
+				}
 			}
+
+			// Acknowledge order in Klarna.
 			KCO_WC()->api->request_post_acknowledge_order( $klarna_order->order_id );
 			KCO_WC()->api->request_post_set_merchant_reference(
 				$klarna_order->order_id,
