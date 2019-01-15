@@ -409,22 +409,15 @@ jQuery(function($) {
 									},
 									success: function (response) {
 										kco_wc.log(response);
+										kco_wc.setFieldValues( response.data );
+										$('body').trigger('update_checkout');
 									},
 									error: function (response) {
 										kco_wc.log(response);
 									},
-									complete: function(response) {
-										if (true === response.responseJSON.success) {
-											kco_wc.setFieldValues( response.responseJSON.data );
-											$('body').trigger('update_checkout');
-											$('.woocommerce-checkout-review-order-table').unblock();
-											kco_wc.kcoResume();							
-										} else {
-											if( '' !== response.responseJSON.data.redirect_url ) {
-												console.log('Shipping address change update failed. Redirecting to cart.');
-												window.location.href = response.responseJSON.data.redirect_url;
-											}
-										}
+									complete: function() {
+										$('.woocommerce-checkout-review-order-table').unblock();
+										kco_wc.kcoResume();
 									}
 								}
 							);
