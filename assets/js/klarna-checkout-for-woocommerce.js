@@ -97,6 +97,7 @@ jQuery(function($) {
 
 			var elementName = field.attr('name');
 			var newValue = field.val();
+
 			$.each( formFields, function( index, value) {
 				if( value.name === elementName ) {
 					if( field.is(':checkbox') ) {
@@ -105,47 +106,23 @@ jQuery(function($) {
 							newValue = '';
 						}
 					}
+					if( field.is(':radio ') ) {
+						// If is radio
+						if( ! field.is(':checked') ) {
+							newValue = '';
+						}
+					}
+					if( field.prop('type') === 'select-one' ) {
+						// If is select one
+						newValue = field.find(":selected").val();
+					}
 					// Update value
 					formFields[index].value = newValue;
 				}
 			} );
 			kco_wc.formFields = formFields;
-			console.table( kco_wc.formFields );
+
 			kco_wc.saveFormData();
-
-
-			/*var elementName = $(this).attr('name');
-			if( elementName === 'terms' ) {
-				var updatedValue = ( $("input#terms:checked").length === 1 ) ? 1 : '';
-			} else {
-				var updatedValue = $(this).val();
-			}
-
-			if (null === kco_wc.extraFieldsValues && '' === updatedValue) {
-				return;
-			}
-
-			if (null !== kco_wc.extraFieldsValues && elementName in kco_wc.extraFieldsValues && updatedValue === kco_wc.extraFieldsValues) {
-				return;
-			}
-
-			if (null === kco_wc.extraFieldsValues) {
-				kco_wc.extraFieldsValues = {};
-			}
-			kco_wc.extraFieldsValues[elementName] = updatedValue;
-
-			$.ajax({
-				type: 'POST',
-				url: kco_params.update_extra_fields_url,
-				data: {
-					extra_fields_values: kco_wc.extraFieldsValues,
-					nonce: kco_params.update_extra_fields_nonce
-				},
-				success: function (data) {},
-				error: function (data) {},
-				complete: function (data) {
-				}
-			});*/
 		},
 
 		updateOrderNotes: function() {
@@ -296,19 +273,15 @@ jQuery(function($) {
 		},
 
 		setFormData: function() {
-			var form = $('form[name="checkout"] input');
+			var form = $('form[name="checkout"] input, form[name="checkout"] select');
 			var i;
 			var newForm = [];
 			for ( i = 0; i < form.length; i++ ) { 
 				if ( form[i]['name'] !== '' ) {
 					var name    = form[i]['name'];
 					var field = $('*[name="' + name + '"]');
-					var id    = field.attr('id');
-					var label = $('label[for="' + id + '"]');
-					var parent = label.parents()[0];
-					var check = ( $(parent).hasClass('validate-required') ? true : ( id === 'terms' ) ? true : false );
-
-					// Only keep track of non standard WooCommerce checkout fields 
+					var check = ( field.parents('p.form-row').hasClass('validate-required') ? true: false );
+					// Only keep track of non standard WooCommerce checkout fields
 					if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 ) {
 						var required = false;
 						var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
@@ -318,11 +291,20 @@ jQuery(function($) {
 							}
 							required = true
 						}
-						newForm.push({
-							name: form[i].name,
-							value: value,
-							required: required,
-						});
+						// Check if we already have the name in the form to prevent errors.
+						var rowExists = newForm.find( function( row ) { 
+							if( row.name && row.name === name ) {
+							  return true;
+						  }
+						  return false;
+						} );
+						if( ! rowExists ) {
+							newForm.push({
+								name: form[i].name,
+								value: value,
+								required: required,
+							});
+						}
 					}
 				}
 			}
@@ -353,14 +335,19 @@ jQuery(function($) {
 			for ( i = 0; i < form_data.length; i++ ) {
 				var field = $('*[name="' + form_data[i].name + '"]');
 				var saved_value = form_data[i].value;
-				var id    = field.attr('id');
 				// Check if field is a checkbox
 				if( field.is(':checkbox') ) {
 					if( saved_value !== '' ) {
 						field.prop('checked', true);
 					}
+				} else if( field.is(':radio') ) {
+					for ( x = 0; x < field.length; x++ ) {
+						if( field[x].value === form_data[i].value ) {
+							$(field[x]).prop('checked', true);
+						}
+					}
 				} else {
-					//field.val( saved_value );
+					field.val( saved_value );
 				}
 
 			}

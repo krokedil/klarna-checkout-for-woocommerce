@@ -131,40 +131,31 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					}
 
 					$('input#payment_method_kco').prop('checked', true);
-
 					<?php
-					$extra_field_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
-
-					foreach ( $extra_field_values as $field_name => $field_value ) {
+					$extra_field_values = WC()->session->get( 'kco_checkout_form', array() );
 					?>
-
-					var elementName = "<?php echo $field_name; ?>";
-					var elementValue = <?php echo wp_json_encode( $field_value ); ?>;
-					var element = $('*[name="' + elementName + '"]');
-
-					console.log(elementName);
-					console.log(elementValue);
-					console.log(element);
-					console.log(element.type);                                                                                       
-
-					if (element.length) {
-						if (element.is('select')) { // Select.
-							var selectedOption = element.find('option[value="' + elementValue + '"]');
-							selectedOption.prop('selected', true);
-						} else if ('radio' === element.get(0).type) { // Radio.
-							var checkedRadio = $('*[name="' + elementName + '"][value="' + elementValue + '"]');
-							checkedRadio.prop('checked', true);
-						} else if ('checkbox' === element.get(0).type) { // Checkbox.
-							if (elementValue) {
-								element.prop('checked', true);
+					var form_data = <?php echo json_encode( $extra_field_values ); ?>;
+					for ( i = 0; i < form_data.length; i++ ) {
+						var field = $('*[name="' + form_data[i].name + '"]');
+						var saved_value = form_data[i].value;
+						// Check if field is a checkbox
+						if( field.is(':checkbox') ) {
+							if( saved_value !== '' ) {
+								field.prop('checked', true);
 							}
-						} else { // Text and textarea.
-							element.val(elementValue);
+						} else if( field.is(':radio') ) {
+							for ( x = 0; x < field.length; x++ ) {
+								if( field[x].value === form_data[i].value ) {
+									$(field[x]).prop('checked', true);
+								}
+							}
+						} else {
+							field.val( saved_value );
 						}
+
 					}
 
 					<?php
-					}
 					do_action( 'kco_wc_before_submit' );
 					?>
 
