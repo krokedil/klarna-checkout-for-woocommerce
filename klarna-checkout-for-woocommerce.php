@@ -148,9 +148,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			add_action( 'admin_notices', array( $this, 'order_management_check' ) );
 
 			// @todo - move the functions below to a separate class or file.
-			add_action( 'woocommerce_add_to_cart', 'kco_wc_save_cart_hash' );
-			add_action( 'woocommerce_applied_coupon', 'kco_wc_save_cart_hash' );
-			add_action( 'kco_wc_before_checkout_form', 'kco_wc_save_cart_hash', 1 );
+			// add_action( 'woocommerce_add_to_cart', 'kco_wc_save_cart_hash' );
+			// add_action( 'woocommerce_applied_coupon', 'kco_wc_save_cart_hash' );
+			// add_action( 'kco_wc_before_checkout_form', 'kco_wc_save_cart_hash', 1 );
 			add_action( 'template_redirect', array( $this, 'maybe_display_kco_order_error_message' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
@@ -293,12 +293,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 */
 		public function maybe_display_kco_order_error_message() {
 			if ( is_cart() && isset( $_GET['kco-order'] ) && 'error' === $_GET['kco-order'] ) {
-				if ( isset( $_GET['reason'] ) ) {
-					$message = sprintf( __( 'An error occurred during communication with Klarna (%s).', 'klarna-checkout-for-woocommerce' ), sanitize_textarea_field( base64_decode( $_GET['reason'] ) ) );
-				} else {
-					$message = __( 'An error occurred during communication with Klarna. Please try again.', 'klarna-checkout-for-woocommerce' );
-				}
-				wc_add_notice( $message, 'error' );
+				wc_add_notice( __( 'An error occurred during communication with Klarna. Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
 			}
 			if ( is_cart() && isset( $_GET['kco-order'] ) && 'missing-id' === $_GET['kco-order'] ) {
 				wc_add_notice( __( 'An error occurred during communication with Klarna (Klarna order ID is missing). Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );

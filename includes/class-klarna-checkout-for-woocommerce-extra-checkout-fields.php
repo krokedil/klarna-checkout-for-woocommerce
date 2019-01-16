@@ -83,6 +83,12 @@ class Klarna_Checkout_For_WooCommerce_Extra_Checkout_Fields {
 			unset( $all_fields['shipping']['shipping_company'] ); // B2C only for now.
 		}
 
+		// Support for WooCommerce Germanized plugin
+		if ( class_exists( 'WooCommerce_Germanized' ) ) {
+			$manager = WC_GZD_Legal_Checkbox_Manager::instance();
+			$manager->render();
+		}
+
 		return $all_fields;
 	}
 }
