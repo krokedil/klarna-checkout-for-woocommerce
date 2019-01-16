@@ -183,7 +183,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				wp_die();
 			} else {
 				// Get the Klarna order from Klarna.
-				$response = KCO_WC()->api->request_pre_get_order( $klarna_order_id, $order_id );
+				$response = KCO_WC()->api->request_pre_get_order( $klarna_order_id );
 
 				// Check if we got a wp_error.
 				if ( is_wp_error( $response ) ) {
