@@ -407,8 +407,11 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 			if ( is_object( $order ) && $order->get_transaction_id() ) {
 				$klarna_order_id = $order->get_transaction_id();
-				$klarna_order    = KCO_WC()->api->request_pre_get_order( $klarna_order_id, $order_id );
-				echo KCO_WC()->api->get_snippet( $klarna_order );
+				$response        = KCO_WC()->api->request_pre_get_order( $klarna_order_id, $order_id );
+				if ( ! is_wp_error( $response ) ) {
+					$klarna_order = json_decode( $response['body'] );
+					echo KCO_WC()->api->get_snippet( $klarna_order );
+				}
 			}
 
 			// Check if we need to finalize purchase here. Should already been done in process_payment.
