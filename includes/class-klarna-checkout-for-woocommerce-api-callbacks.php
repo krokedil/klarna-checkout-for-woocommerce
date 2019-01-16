@@ -318,7 +318,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
 
-		if ( $all_in_stock && $shipping_chosen && $has_required_data && $coupon_valid && $cart_hash_valid && ! $needs_login && ! $email_exists ) {
+		if ( $all_in_stock && $shipping_chosen && $has_required_data && $coupon_valid && $totals_match && ! $needs_login && ! $email_exists ) {
 			header( 'HTTP/1.0 200 OK' );
 		} else {
 			header( 'HTTP/1.0 303 See Other' );
