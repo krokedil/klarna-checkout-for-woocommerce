@@ -69,7 +69,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$log_order               = clone $klarna_order;
 			$log_order->html_snippet = '';
 			krokedil_log_events( null, 'Pre Create Order response', $log_order );
-			return $klarna_order;
+			return $response;
 		} elseif ( 405 === $response['response']['code'] || 401 === $response['response']['code'] ) {
 			// 405 or 401 response from Klarna. Redirect customer to cart page and display the error message.
 			$error = $response['response']['message'];
@@ -328,7 +328,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$order    = json_decode( $response['body'] );
 
 			if ( ! $order || is_wp_error( $response ) ) {
-				$order = $this->request_pre_create_order();
+				$response = $this->request_pre_create_order();
+				$order    = json_decode( $response['body'] );
 			} elseif ( 'checkout_incomplete' === $order->status ) {
 				// Only update order if its status is incomplete.
 				$this->request_pre_update_order();
@@ -338,7 +339,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 				return;
 			}
 
-			$order = $this->request_pre_create_order();
+			$response = $this->request_pre_create_order();
+			$order    = json_decode( $response['body'] );
 		}
 
 		return $order;
