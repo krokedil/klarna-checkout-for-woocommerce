@@ -376,6 +376,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			WC()->session->__unset( 'kco_wc_order_api' );
 			WC()->session->__unset( 'kco_wc_extra_fields_values' );
 			WC()->session->__unset( 'kco_wc_prefill_consent' );
+			WC()->session->__unset( 'kco_checkout_form' );
 		}
 	}
 
