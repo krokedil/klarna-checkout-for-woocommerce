@@ -293,7 +293,12 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 */
 		public function maybe_display_kco_order_error_message() {
 			if ( is_cart() && isset( $_GET['kco-order'] ) && 'error' === $_GET['kco-order'] ) {
-				wc_add_notice( __( 'An error occurred during communication with Klarna. Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
+				if ( isset( $_GET['reason'] ) ) {
+					$message = sprintf( __( 'An error occurred during communication with Klarna (%s).', 'klarna-checkout-for-woocommerce' ), sanitize_textarea_field( base64_decode( $_GET['reason'] ) ) );
+				} else {
+					$message = __( 'An error occurred during communication with Klarna. Please try again.', 'klarna-checkout-for-woocommerce' );
+				}
+				wc_add_notice( $message, 'error' );
 			}
 			if ( is_cart() && isset( $_GET['kco-order'] ) && 'missing-id' === $_GET['kco-order'] ) {
 				wc_add_notice( __( 'An error occurred during communication with Klarna (Klarna order ID is missing). Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
