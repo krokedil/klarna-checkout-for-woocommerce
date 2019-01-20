@@ -570,14 +570,22 @@ class Klarna_Checkout_For_WooCommerce_API {
 	public function get_request_body( $request_type = null ) {
 		KCO_WC()->order_lines->process_data();
 
+		$order_lines      = KCO_WC()->order_lines->get_order_lines();
+		$order_tax_amount = KCO_WC()->order_lines->get_order_tax_amount( $order_lines );
+		$order_amount     = KCO_WC()->order_lines->get_order_amount();
+
+		if ( $order_amount !== KCO_WC()->order_lines->get_order_lines_total_amount( $order_lines ) ) {
+			$order_lines = KCO_WC()->order_lines->adjust_order_lines( $order_lines );
+		}
+
 		$request_args = array(
 			'purchase_country'   => $this->get_purchase_country(),
 			'purchase_currency'  => $this->get_purchase_currency(),
 			'locale'             => $this->get_purchase_locale(),
 			'merchant_urls'      => $this->get_merchant_urls(),
-			'order_amount'       => KCO_WC()->order_lines->get_order_amount(),
-			'order_tax_amount'   => KCO_WC()->order_lines->get_order_tax_amount(),
-			'order_lines'        => KCO_WC()->order_lines->get_order_lines(),
+			'order_amount'       => $order_amount,
+			'order_tax_amount'   => $order_tax_amount,
+			'order_lines'        => $order_lines,
 			'shipping_countries' => $this->get_shipping_countries(),
 			'merchant_data'      => $this->get_merchant_data(),
 		);
