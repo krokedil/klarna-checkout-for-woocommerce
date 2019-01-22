@@ -374,6 +374,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				header( 'Location: ' . wc_get_checkout_url() . '?email_exists' );
 			} elseif ( ! $totals_match ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?totals_dont_match' );
+			} else {
+				header( 'Location: ' . wc_get_checkout_url() . '?unable_to_process' );
 			}
 		}
 	}

@@ -479,6 +479,8 @@ function kco_wc_print_notices() {
 		wc_add_notice( __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ), 'error' );
 	} elseif ( isset( $_GET['totals_dont_match'] ) ) {
 		wc_add_notice( __( 'A mismatch in order totals between WooCommerce and Klarna was detected. Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
+	} elseif ( isset( $_GET['unable_to_process'] ) ) {
+		wc_add_notice( __( 'We were unable to process your order, please try again.', 'woocommerce' ), 'error' );
 	}
 }
 
