@@ -42,6 +42,41 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		add_action( 'woocommerce_api_kco_wc_shipping_option_update', array( $this, 'shipping_option_update_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
 		add_action( 'kco_wc_punted_notification', array( $this, 'kco_wc_punted_notification_cb' ), 10, 2 );
+		// Make WC->cart & WC()->session available in backend.
+		add_action( 'wp_loaded', array( $this, 'maybe_prepare_wc_session_for_server_side_callback' ), 1 );
+		add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'maybe_prepare_wc_cart_for_server_side_callback' ), 1 );
+	}
+
+
+	/**
+	 * Maybe set WC()->session if this is a Klarna callback.
+	 * We do this to be able to retrieve WC()->cart in backend.
+	 */
+	public function maybe_prepare_wc_session_for_server_side_callback() {
+		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' == $_GET['kco-action'] || 'push' == $_GET['kco-action'] ) ) ) {
+			$session_id = sanitize_key( $_GET['kco_session_id'] );
+			$sessions_handler = new WC_Session_Handler();
+			$session_data     = $sessions_handler->get_session( $session_id );
+
+			if( ! empty( $session_data ) ) {
+				WC()->session = $sessions_handler;
+
+				foreach ( $session_data as $key => $value ) {
+					WC()->session->set( $key, maybe_unserialize( $value ) );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Maybe set WC()->cart if this is a Klarna callback.
+	 * We do this to be able to retrieve WC()->cart in backend.
+	 * 
+	 */
+	public function maybe_prepare_wc_cart_for_server_side_callback( $cart ) {
+		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' == $_GET['kco-action'] || 'push' == $_GET['kco-action'] ) ) ) {
+			WC()->cart = $cart;
+		}
 	}
 
 	/**
@@ -193,18 +228,20 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$has_subscription = false;
 		$needs_login      = false;
 		$email_exists     = false;
-		$cart_hash_valid  = true;
+		$totals_match     = true;
 
-		$kco_transient = get_transient( 'kco_wc_order_id_' . $data['order_id'] );
-		$form_data     = false;
-		if ( isset( $kco_transient['form'] ) ) {
-			$form_data = $kco_transient['form'];
+		$session_id = $_GET['kco_session_id'];
+		$session    = $this->get_session_from_id( $session_id );
+
+		$form_data = false;
+		if ( isset( $session['kco_checkout_form'] ) ) {
+			$form_data = unserialize( $session['kco_checkout_form'] );
 		}
 		$has_required_data     = true;
 		$failed_required_check = array();
 		if ( false !== $form_data ) {
 			foreach ( $form_data as $form_row ) {
-				if ( isset( $form_row['required'] ) && '' === $form_row['value'] ) {
+				if ( 'true' === $form_row['required'] && '' === $form_row['value'] ) {
 					$has_required_data       = false;
 					$failed_required_check[] = $form_row['name'];
 				}
@@ -307,18 +344,16 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$needs_login = true;
 		}
 
-		// Check cart hash.
-		if ( ! empty( json_decode( $data['merchant_data'] )->cart_hash ) && ! empty( $kco_transient['cart_hash'] ) ) {
-			$sent_cart_hash  = json_decode( $data['merchant_data'] )->cart_hash;
-			$saved_cart_hash = $kco_transient['cart_hash'];
-			if ( $sent_cart_hash !== $saved_cart_hash ) {
-				$cart_hash_valid = false;
-			}
+		// Check cart totals.
+		$klarna_total = $data['order_amount'];
+		$wc_total     = intval( unserialize( $session['cart_totals'] )['total'] * 100 );
+		if ( $klarna_total !== $wc_total ) {
+			$totals_match = false;
 		}
 
 		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
 
-		if ( $all_in_stock && $shipping_chosen && $has_required_data && $coupon_valid && $cart_hash_valid && ! $needs_login && ! $email_exists ) {
+		if ( $all_in_stock && $shipping_chosen && $has_required_data && $coupon_valid && $totals_match && ! $needs_login && ! $email_exists ) {
 			header( 'HTTP/1.0 200 OK' );
 		} else {
 			header( 'HTTP/1.0 303 See Other' );
@@ -337,8 +372,10 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				header( 'Location: ' . wc_get_checkout_url() . '?needs_login' );
 			} elseif ( $email_exists ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?email_exists' );
-			} elseif ( ! $cart_hash_valid ) {
-				header( 'Location: ' . wc_get_checkout_url() . '?invalid_cart_hash' );
+			} elseif ( ! $totals_match ) {
+				header( 'Location: ' . wc_get_checkout_url() . '?totals_dont_match' );
+			} else {
+				header( 'Location: ' . wc_get_checkout_url() . '?unable_to_process' );
 			}
 		}
 	}
@@ -381,8 +418,11 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			// Process customer data.
 			$this->process_customer_data( $klarna_order );
 
-			// Process cart.
-			$this->process_cart( $klarna_order );
+			// Process cart with data from Klarna. 
+			// Only do this if we where unable to create the cart object from session ID.
+			if( WC()->cart->is_empty() ) {
+				$this->process_cart( $klarna_order );
+			}
 
 			// Process order.
 			$this->process_order( $klarna_order );
@@ -471,10 +511,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			}
 		}
 
-		WC()->cart->calculate_shipping();
-		WC()->cart->calculate_fees();
-		WC()->cart->calculate_totals();
-
 		// Check cart items (quantity, coupon validity etc).
 		if ( ! WC()->cart->check_cart_items() ) {
 			return;
@@ -491,9 +527,13 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * @throws Exception WC_Data_Exception.
 	 */
 	private function process_order( $klarna_order ) {
+
+		WC()->cart->calculate_shipping();
+		WC()->cart->calculate_fees();
+		WC()->cart->calculate_totals();
+
 		try {
 			$order = new WC_Order();
-
 			$order->set_billing_first_name( sanitize_text_field( $klarna_order->billing_address->given_name ) );
 			$order->set_billing_last_name( sanitize_text_field( $klarna_order->billing_address->family_name ) );
 			$order->set_billing_country( sanitize_text_field( $klarna_order->billing_address->country ) );
@@ -528,7 +568,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 			WC()->checkout()->create_order_line_items( $order, WC()->cart );
 			WC()->checkout()->create_order_fee_lines( $order, WC()->cart );
-			WC()->checkout()->create_order_shipping_lines( $order, WC()->session->get( 'chosen_shipping_methods' ), WC()->shipping->get_packages() );
+			WC()->checkout()->create_order_shipping_lines( $order, WC()->session->get( 'chosen_shipping_methods' ), WC()->shipping()->get_packages() );
 			WC()->checkout()->create_order_tax_lines( $order, WC()->cart );
 			WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
 
@@ -564,6 +604,13 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$logger = new WC_Logger();
 			$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error: ' . $e->getCode() . ' - ' . $e->getMessage() );
 		}
+	}
+
+	private function get_session_from_id( $session_id ) {
+		$sessions_handler = new WC_Session_Handler();
+		$session          = $sessions_handler->get_session( $session_id );
+
+		return $session;
 	}
 
 }

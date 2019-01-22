@@ -186,11 +186,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		);
 
 		$form = array();
-		if ( false !== get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) ) ) {
-			$kco_transient = get_transient( 'kco_wc_order_id_' . WC()->session->get( 'kco_wc_order_id' ) );
-			if ( isset( $kco_transient['form'] ) ) {
-				$form = $kco_transient['form'];
-			}
+		if ( WC()->session->get( 'kco_checkout_form' ) ) {
+			$form = WC()->session->get( 'kco_checkout_form' );
 		}
 
 		$standard_woo_checkout_fields = array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'terms', 'account_username', 'account_password' );
@@ -410,8 +407,11 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 			if ( is_object( $order ) && $order->get_transaction_id() ) {
 				$klarna_order_id = $order->get_transaction_id();
-				$klarna_order    = KCO_WC()->api->request_pre_get_order( $klarna_order_id, $order_id );
-				echo KCO_WC()->api->get_snippet( $klarna_order );
+				$response        = KCO_WC()->api->request_pre_get_order( $klarna_order_id, $order_id );
+				if ( ! is_wp_error( $response ) ) {
+					$klarna_order = json_decode( $response['body'] );
+					echo KCO_WC()->api->get_snippet( $klarna_order );
+				}
 			}
 
 			// Check if we need to finalize purchase here. Should already been done in process_payment.

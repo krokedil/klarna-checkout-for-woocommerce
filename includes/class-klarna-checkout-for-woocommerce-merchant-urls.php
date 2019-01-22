@@ -74,7 +74,8 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_push_url() {
-		$push_url = get_home_url() . '/wc-api/KCO_WC_Push/?kco_wc_order_id={checkout.order.id}';
+		$session_id = $this->get_session_id();
+		$push_url  = get_home_url() . '/wc-api/KCO_WC_Push/?kco-action=push&kco_wc_order_id={checkout.order.id}&kco_session_id=' . $session_id;
 		return $push_url;
 	}
 
@@ -86,7 +87,8 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_validation_url() {
-		$validation_url = get_home_url() . '/wc-api/KCO_WC_Validation/?kco_wc_order_id={checkout.order.id}';
+		$session_id     = $this->get_session_id();
+		$validation_url = get_home_url() . '/wc-api/KCO_WC_Validation/?kco-action=validation&kco_wc_order_id={checkout.order.id}&kco_session_id=' . $session_id;
 		return str_replace( 'http:', 'https:', $validation_url );
 	}
 
@@ -138,4 +140,20 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 		return str_replace( 'http:', 'https:', $country_change_url );
 	}
 
+	/**
+	 * Get session ID.
+	 *
+	 * Gets WooCommerce session ID. Used to send in merchant url's to Klarn.
+	 * So we can retrieve the cart object in server to server calls from Klarna.
+	 *
+	 * @return string
+	 */
+	private function get_session_id() {
+		foreach ( $_COOKIE as $key => $value ) {
+			if ( strpos( $key, 'wp_woocommerce_session_' ) !== false ) {
+				$session_id = explode( '||', $value );
+				return $session_id[0];
+			}
+		}
+	}
 }

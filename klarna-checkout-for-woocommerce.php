@@ -148,9 +148,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			add_action( 'admin_notices', array( $this, 'order_management_check' ) );
 
 			// @todo - move the functions below to a separate class or file.
-			add_action( 'woocommerce_add_to_cart', 'kco_wc_save_cart_hash' );
-			add_action( 'woocommerce_applied_coupon', 'kco_wc_save_cart_hash' );
-			add_action( 'kco_wc_before_checkout_form', 'kco_wc_save_cart_hash', 1 );
+			// add_action( 'woocommerce_add_to_cart', 'kco_wc_save_cart_hash' );
+			// add_action( 'woocommerce_applied_coupon', 'kco_wc_save_cart_hash' );
+			// add_action( 'kco_wc_before_checkout_form', 'kco_wc_save_cart_hash', 1 );
 			add_action( 'template_redirect', array( $this, 'maybe_display_kco_order_error_message' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
