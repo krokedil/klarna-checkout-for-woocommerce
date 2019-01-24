@@ -24,23 +24,23 @@ msgstr ""
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:245
+#: ../klarna-checkout-for-woocommerce.php:247
 msgid "Activate Now"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:271
+#: ../klarna-checkout-for-woocommerce.php:274
 msgid "Install	Now"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:297
+#: ../klarna-checkout-for-woocommerce.php:300
 msgid "An error occurred during communication with Klarna (%s)."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:299
+#: ../klarna-checkout-for-woocommerce.php:302
 msgid "An error occurred during communication with Klarna. Please try again."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:304
+#: ../klarna-checkout-for-woocommerce.php:307
 msgid "An error occurred during communication with Klarna (Klarna order ID is missing). Please try again."
 msgstr ""
 
@@ -71,26 +71,26 @@ msgstr ""
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:132, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:581, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:379
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:132, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:586, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:379
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:135, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:584, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:382
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:135, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:589, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:382
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:138, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:587, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:385
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:138, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:592, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:385
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:576
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:581
 msgid "Order created via Klarna Checkout API callback. Please verify the order in Klarnas system."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:600
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:605
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 

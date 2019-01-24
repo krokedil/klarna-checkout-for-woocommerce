@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.0.2
+Tested up to: 5.0.3
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.5.3
+WC tested up to: 3.5.4
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,22 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+
+= 2019.01.24  	- version 1.8.0 =
+* Feature       - Improved backup order creation (WC order created on API callback). Possibility to add coupons, item meta data etc to the order in a more correct way.
+* Tweak         - Store extra checkout fields data as session. Removed use of transients.
+* Tweak         - Improved extra checkout field validation. Better support for select and radio fields.
+* Tweak         - Make it possible to retrieve WC()->cart/session data in push and validation notification callback.
+* Tweak         - First introduction of 0 decimals support.
+* Tweak         - Add billing & shipping country to hidden form fields in checkout. Adds support for switching currency based on country in Aelia currency switcher plugin.
+* Tweak         - Merged request_pre_get_order & request_pre_retrieve_order into one function. Now uses only request_pre_get_order.
+* Tweak         - Tweak in how we return response in request_pre_get_order.
+* Tweak         - Use totals_match instead of cart_hash_validation in validate callback.
+* Fix           - Check for is_wp_error in several KCO request. To avoid php errors if request fails.
+* Fix           - Added default message and redirect url if validation callback check fail.
+* Fix           - Updated shipping controll in validate callback. Fixes issue with only digital/virtual orders.
+* Fix           - Fixed external payment methods error.
+* Fix           - Only enqueue front end scripts if plugin is enabled in Woo settings.
 
 = 2019.01.02  	- version 1.7.9 =
 * Fix			- If checkout registration is disabled and not logged in, the user cannot checkout.
