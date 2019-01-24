@@ -272,43 +272,49 @@ jQuery(function($) {
 		},
 
 		setFormData: function() {
-			var form = $('form[name="checkout"] input, form[name="checkout"] select');
-			var i;
-			var newForm = [];
-			for ( i = 0; i < form.length; i++ ) { 
-				if ( form[i]['name'] !== '' ) {
-					var name    = form[i]['name'];
-					var field = $('*[name="' + name + '"]');
-					var check = ( field.parents('p.form-row').hasClass('validate-required') ? true: false );
-					// Only keep track of non standard WooCommerce checkout fields
-					if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 ) {
-						var required = false;
-						var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
-						if ( check === true ) {
-							if( form[i].name === 'terms' ) {
-								value = ( $("input#terms:checked").length === 1 ) ? 1 : '';
+			// Check if we have a form already and set that if we do. Prevents overwriting old data.
+			if( ! $.isArray( kco_params.form ) ) {
+				var form = $('form[name="checkout"] input, form[name="checkout"] select');
+				var i;
+				var newForm = [];
+				for ( i = 0; i < form.length; i++ ) { 
+					if ( form[i]['name'] !== '' ) {
+						var name    = form[i]['name'];
+						var field = $('*[name="' + name + '"]');
+						var check = ( field.parents('p.form-row').hasClass('validate-required') ? true: false );
+						// Only keep track of non standard WooCommerce checkout fields
+						if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 ) {
+							var required = false;
+							var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
+							if ( check === true ) {
+								if( form[i].name === 'terms' ) {
+									value = ( $("input#terms:checked").length === 1 ) ? 1 : '';
+								}
+								required = true
 							}
-							required = true
-						}
-						// Check if we already have the name in the form to prevent errors.
-						var rowExists = newForm.find( function( row ) { 
-							if( row.name && row.name === name ) {
-							  return true;
-						  }
-						  return false;
-						} );
-						if( ! rowExists ) {
-							newForm.push({
-								name: form[i].name,
-								value: value,
-								required: required,
-							});
+							// Check if we already have the name in the form to prevent errors.
+							var rowExists = newForm.find( function( row ) { 
+								if( row.name && row.name === name ) {
+								return true;
+							}
+							return false;
+							} );
+							if( ! rowExists ) {
+								newForm.push({
+									name: form[i].name,
+									value: value,
+									required: required,
+								});
+							}
 						}
 					}
 				}
+				kco_wc.formFields = newForm;
+				kco_wc.saveFormData();
+			} else {
+				kco_wc.formFields = kco_params.form;
+				kco_wc.saveFormData();
 			}
-			kco_wc.formFields = newForm;
-			kco_wc.saveFormData();
 		},
 
 		saveFormData: function() {

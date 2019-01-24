@@ -185,7 +185,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			KCO_WC_VERSION
 		);
 
-		$form = array();
+		$form = false;
 		if ( WC()->session->get( 'kco_checkout_form' ) ) {
 			$form = WC()->session->get( 'kco_checkout_form' );
 		}
