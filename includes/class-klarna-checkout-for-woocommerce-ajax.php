@@ -321,8 +321,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		wp_send_json_success(
 			array(
 				// 'html'   => $html,
-				'email'  => $email,
-				'states' => $states,
+				'customer_data' => $customer_data,
 			)
 		);
 		wp_die();
