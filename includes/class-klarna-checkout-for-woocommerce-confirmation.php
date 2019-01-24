@@ -159,6 +159,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 
 					<?php
 					do_action( 'kco_wc_before_submit' );
+					KCO_WC()->logger->log( 'Confirmation page rendered and checkout form about to be submitted for Klarna order ID ' . $klarna_order_id );
 					?>
 
 					$('.validate-required').removeClass('validate-required');
