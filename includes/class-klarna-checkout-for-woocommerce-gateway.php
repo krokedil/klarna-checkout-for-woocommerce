@@ -20,7 +20,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->method_description = __( 'Klarna Checkout replaces standard WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' );
 		$this->has_fields         = false;
 		$this->supports           = apply_filters(
-			'kco_wc_supports', array(
+			'kco_wc_supports',
+			array(
 				'products',
 				'subscriptions',
 				'subscription_cancellation',
@@ -46,7 +47,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->logging  = 'yes' === $this->get_option( 'logging' );
 
 		add_action(
-			'woocommerce_update_options_payment_gateways_' . $this->id, array(
+			'woocommerce_update_options_payment_gateways_' . $this->id,
+			array(
 				$this,
 				'process_admin_options',
 			)
@@ -157,6 +159,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * @hook wp_enqueue_scripts
 	 */
 	public function enqueue_scripts() {
+		if ( 'yes' !== $this->enabled ) {
+			return;
+		}
+
 		if ( ! is_checkout() ) {
 			return;
 		}
