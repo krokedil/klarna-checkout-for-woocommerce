@@ -54,11 +54,11 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 */
 	public function maybe_prepare_wc_session_for_server_side_callback() {
 		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' == $_GET['kco-action'] || 'push' == $_GET['kco-action'] ) ) ) {
-			$session_id = sanitize_key( $_GET['kco_session_id'] );
+			$session_id       = sanitize_key( $_GET['kco_session_id'] );
 			$sessions_handler = new WC_Session_Handler();
 			$session_data     = $sessions_handler->get_session( $session_id );
 
-			if( ! empty( $session_data ) ) {
+			if ( ! empty( $session_data ) ) {
 				WC()->session = $sessions_handler;
 
 				foreach ( $session_data as $key => $value ) {
@@ -71,7 +71,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	/**
 	 * Maybe set WC()->cart if this is a Klarna callback.
 	 * We do this to be able to retrieve WC()->cart in backend.
-	 * 
 	 */
 	public function maybe_prepare_wc_cart_for_server_side_callback( $cart ) {
 		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' == $_GET['kco-action'] || 'push' == $_GET['kco-action'] ) ) ) {
@@ -418,9 +417,9 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			// Process customer data.
 			$this->process_customer_data( $klarna_order );
 
-			// Process cart with data from Klarna. 
+			// Process cart with data from Klarna.
 			// Only do this if we where unable to create the cart object from session ID.
-			if( WC()->cart->is_empty() ) {
+			if ( WC()->cart->is_empty() ) {
 				$this->process_cart( $klarna_order );
 			}
 
