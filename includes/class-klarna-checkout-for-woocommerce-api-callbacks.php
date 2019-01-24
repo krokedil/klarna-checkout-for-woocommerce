@@ -223,6 +223,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		krokedil_log_events( null, 'Klarna validation callback data', $data );
 		$all_in_stock     = true;
 		$shipping_chosen  = false;
+		$shipping_valid   = true;
 		$coupon_valid     = true;
 		$has_subscription = false;
 		$needs_login      = false;
@@ -250,7 +251,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		// Check stock for each item and shipping method and if subscription.
 		$cart_items = $data['order_lines'];
 		foreach ( $cart_items as $cart_item ) {
-			if ( 'physical' === $cart_item['type'] ) {
+			if ( 'physical' === $cart_item['type'] || 'digital' === $cart_item['type'] ) {
+				$needs_shipping = false;
 				// Get product by SKU or ID.
 				if ( wc_get_product_id_by_sku( $cart_item['reference'] ) ) {
 					$cart_item_product = wc_get_product( wc_get_product_id_by_sku( $cart_item['reference'] ) );
@@ -279,6 +281,9 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				}
 			} elseif ( 'shipping_fee' === $cart_item['type'] ) {
 				$shipping_chosen = true;
+			}
+			if ( $needs_shipping ) {
+				$shipping_valid = $shipping_chosen;
 			}
 		}
 		// Validate any potential coupons.
@@ -352,7 +357,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
 
-		if ( $all_in_stock && $shipping_chosen && $has_required_data && $coupon_valid && $totals_match && ! $needs_login && ! $email_exists ) {
+		if ( $all_in_stock && $shipping_valid && $has_required_data && $coupon_valid && $totals_match && ! $needs_login && ! $email_exists ) {
 			header( 'HTTP/1.0 200 OK' );
 		} else {
 			header( 'HTTP/1.0 303 See Other' );
