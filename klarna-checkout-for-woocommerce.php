@@ -5,12 +5,12 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 1.7.9
+ * Version: 1.8.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 3.0
- * WC tested up to: 3.5.3
+ * WC tested up to: 3.5.4
  *
  * Copyright (c) 2017-2019 Krokedil
  *
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.7.9' );
+define( 'KCO_WC_VERSION', '1.8.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.0.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -148,9 +148,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			add_action( 'admin_notices', array( $this, 'order_management_check' ) );
 
 			// @todo - move the functions below to a separate class or file.
-			add_action( 'woocommerce_add_to_cart', 'kco_wc_save_cart_hash' );
-			add_action( 'woocommerce_applied_coupon', 'kco_wc_save_cart_hash' );
-			add_action( 'kco_wc_before_checkout_form', 'kco_wc_save_cart_hash', 1 );
+			// add_action( 'woocommerce_add_to_cart', 'kco_wc_save_cart_hash' );
+			// add_action( 'woocommerce_applied_coupon', 'kco_wc_save_cart_hash' );
+			// add_action( 'kco_wc_before_checkout_form', 'kco_wc_save_cart_hash', 1 );
 			add_action( 'template_redirect', array( $this, 'maybe_display_kco_order_error_message' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
@@ -220,7 +220,8 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				if ( ! is_plugin_active( $plugin_slug . '/' . $plugin_slug . '.php' ) && current_user_can( 'activate_plugins' ) ) {
 					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 					$plugin      = plugins_api(
-						'plugin_information', array(
+						'plugin_information',
+						array(
 							'slug' => $plugin_slug,
 						)
 					);
@@ -232,7 +233,8 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 							'_wpnonce' => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
 							'action'   => 'activate',
 							'plugin'   => $status['file'],
-						), network_admin_url( 'plugins.php' )
+						),
+						network_admin_url( 'plugins.php' )
 					);
 					$description = $name . ' is not active. Please activate it so you can capture, cancel, update and refund Klarna orders.';
 					?>
@@ -251,7 +253,8 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				if ( current_user_can( 'install_plugins' ) ) {
 					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 					$plugin = plugins_api(
-						'plugin_information', array(
+						'plugin_information',
+						array(
 							'slug' => $plugin_slug,
 						)
 					);
@@ -390,7 +393,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 									'input_value' => $cart_item['quantity'],
 									'max_value'   => $_product->backorders_allowed() ? '' : $_product->get_stock_quantity(),
 									'min_value'   => '1',
-								), $_product, false
+								),
+								$_product,
+								false
 							);
 						}
 

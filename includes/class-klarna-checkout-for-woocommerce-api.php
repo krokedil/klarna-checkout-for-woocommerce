@@ -49,7 +49,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( is_wp_error( $response ) ) {
 			$error = $this->extract_error_messages( $response );
 			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response ) ) );
-			// return $error;
+			// return $error.
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',
@@ -69,7 +69,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$log_order               = clone $klarna_order;
 			$log_order->html_snippet = '';
 			krokedil_log_events( null, 'Pre Create Order response', $log_order );
-			return $klarna_order;
+			return $response;
 		} elseif ( 405 === $response['response']['code'] || 401 === $response['response']['code'] ) {
 			// 405 or 401 response from Klarna. Redirect customer to cart page and display the error message.
 			$error = $response['response']['message'];
@@ -112,7 +112,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 *
 	 * @return object $klarna_order    Klarna order.
 	 */
-	public function request_pre_retrieve_order( $klarna_order_id, $order_id = null ) {
+	public function request_pre_get_order( $klarna_order_id, $order_id = null ) {
 		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
 		$request_args = array(
 			'headers'    => $this->get_request_headers(),
@@ -124,8 +124,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$response = wp_safe_remote_get( $request_url, $request_args );
 
 		if ( ! is_wp_error( $response ) && ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) ) {
-			$klarna_order            = json_decode( $response['body'] );
-			$log_order               = clone $klarna_order;
+			$klarna_order            = $response;
+			$log_order               = json_decode( $response['body'] );
+			$log_order               = clone $log_order;
 			$log_order->html_snippet = '';
 			krokedil_log_events( $order_id, 'Pre Retrieve Order response', $log_order );
 			return $klarna_order;
@@ -159,7 +160,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			return;
 		}
 		krokedil_log_events( null, 'Pre Update Order request args', $log_array );
-		KCO_WC()->logger->log( 'Update ongoing Klarna order (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
+		KCO_WC()->logger->log( 'Update ongoing Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
 
 		$response = wp_safe_remote_post( $request_url, $request_args );
 
@@ -175,7 +176,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			WC()->session->__unset( 'kco_wc_update_md5' );
 			WC()->session->__unset( 'kco_wc_order_id' );
 			$error = $this->extract_error_messages( $response );
-			krokedil_log_events( null, 'ERROR Pre Update Order response', $error );
+			krokedil_log_events( null, 'Pre Update Order response', $error );
 			return $error;
 		}
 
@@ -202,7 +203,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			krokedil_log_events( $order_id, 'Post Get Order response', stripslashes_deep( json_decode( $response['body'] ) ) );
 			KCO_WC()->logger->log( 'Post Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
 			return $response;
-		} elseif ( 401 === $response['response']['code'] || 404 === $response['response']['code'] || 405 === $response['response']['code'] ) {
+		} elseif ( ! is_wp_error( $response ) && ( 401 === $response['response']['code'] || 404 === $response['response']['code'] || 405 === $response['response']['code'] ) ) {
 			krokedil_log_events( $order_id, 'ERROR Post Get Order response', $response );
 			KCO_WC()->logger->log( 'ERROR Post Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
 			$error_message = $response['response']['message'];
@@ -217,29 +218,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 		}
 	}
 
-	/**
-	 * Acknowledges Klarna Checkout order.
-	 *
-	 * @param  string $klarna_order_id Klarna order ID.
-	 *
-	 * @return WP_Error|array $response
-	 */
-	public function request_pre_get_order( $klarna_order_id ) {
-		$request_url  = $this->get_api_url_base() . '/checkout/v3/orders/' . $klarna_order_id;
-		$request_args = array(
-			'headers'    => $this->get_request_headers(),
-			'user-agent' => $this->get_user_agent(),
-		);
-		$response     = wp_safe_remote_get( $request_url, $request_args );
-
-		$log_order                 = $response['body'];
-		$log_order                 = (array) json_decode( $log_order );
-		$log_order['html_snippet'] = '';
-		krokedil_log_events( null, 'Pre Get Order response', stripslashes_deep( $log_order ) );
-		KCO_WC()->logger->log( 'Pre Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $log_order ) ) );
-
-		return $response;
-	}
 
 	/**
 	 * Acknowledges Klarna Checkout order.
@@ -346,10 +324,12 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$order_id = $this->get_order_id_from_session();
 
 		if ( $order_id ) {
-			$order = $this->request_pre_retrieve_order( $order_id );
+			$response = $this->request_pre_get_order( $order_id );
+			$order    = json_decode( $response['body'] );
 
-			if ( ! $order || is_wp_error( $order ) ) {
-				$order = $this->request_pre_create_order();
+			if ( ! $order || is_wp_error( $response ) ) {
+				$response = $this->request_pre_create_order();
+				$order    = json_decode( $response['body'] );
 			} elseif ( 'checkout_incomplete' === $order->status ) {
 				// Only update order if its status is incomplete.
 				$this->request_pre_update_order();
@@ -359,7 +339,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 				return;
 			}
 
-			$order = $this->request_pre_create_order();
+			$response = $this->request_pre_create_order();
+			$order    = json_decode( $response['body'] );
 		}
 
 		return $order;
@@ -395,9 +376,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			WC()->session->__unset( 'kco_wc_order_api' );
 			WC()->session->__unset( 'kco_wc_extra_fields_values' );
 			WC()->session->__unset( 'kco_wc_prefill_consent' );
-			if ( $order ) {
-				delete_transient( 'kco_wc_order_id_' . $order->order_id );
-			}
+			WC()->session->__unset( 'kco_checkout_form' );
 		}
 	}
 
@@ -457,8 +436,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$locale = explode( '_', get_locale() );
 			$locale = $locale[0];
 		}
-
-		$locale = strtolower( $locale );
 
 		switch ( WC()->checkout()->get_value( 'billing_country' ) ) {
 			case 'AT':
@@ -551,9 +528,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$merchant_data['is_user_logged_in'] = is_user_logged_in();
 
 		// Cart hash.
-		$cart_hash                  = md5( wp_json_encode( wc_clean( WC()->cart->get_cart_for_session() ) ) . WC()->cart->total );
-		$merchant_data['cart_hash'] = $cart_hash;
-
+		// $cart_hash                  = md5( wp_json_encode( wc_clean( WC()->cart->get_cart_for_session() ) ) . WC()->cart->total );
+		// $merchant_data['cart_hash'] = $cart_hash;
 		return json_encode( $merchant_data );
 	}
 
@@ -594,14 +570,22 @@ class Klarna_Checkout_For_WooCommerce_API {
 	public function get_request_body( $request_type = null ) {
 		KCO_WC()->order_lines->process_data();
 
+		$order_lines      = KCO_WC()->order_lines->get_order_lines();
+		$order_tax_amount = KCO_WC()->order_lines->get_order_tax_amount( $order_lines );
+		$order_amount     = KCO_WC()->order_lines->get_order_amount();
+
+		if ( $order_amount !== KCO_WC()->order_lines->get_order_lines_total_amount( $order_lines ) ) {
+			$order_lines = KCO_WC()->order_lines->adjust_order_lines( $order_lines );
+		}
+
 		$request_args = array(
 			'purchase_country'   => $this->get_purchase_country(),
 			'purchase_currency'  => $this->get_purchase_currency(),
 			'locale'             => $this->get_purchase_locale(),
 			'merchant_urls'      => $this->get_merchant_urls(),
-			'order_amount'       => KCO_WC()->order_lines->get_order_amount(),
-			'order_tax_amount'   => KCO_WC()->order_lines->get_order_tax_amount(),
-			'order_lines'        => KCO_WC()->order_lines->get_order_lines(),
+			'order_amount'       => $order_amount,
+			'order_tax_amount'   => $order_tax_amount,
+			'order_lines'        => $order_lines,
 			'shipping_countries' => $this->get_shipping_countries(),
 			'merchant_data'      => $this->get_merchant_data(),
 		);
@@ -824,7 +808,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return void
 	 */
 	public function request_create_recurring_order( $order, $recurring_token ) {
-		$request_url  = $this->get_api_url_base() . '/customer-token/v1/tokens/' . $recurring_token . '/order';
+		$request_url  = $this->get_api_url_base() . 'customer-token/v1/tokens/' . $recurring_token . '/order';
 		$request_args = array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
@@ -851,9 +835,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		foreach ( $order->get_fees() as $fee ) {
 			array_push( $order_lines, KCO_WC()->order_lines_from_order->get_order_line_fees( $fee ) );
 		}
-		if ( ! empty( $order->get_shipping_method() ) ) {
-			array_push( $order_lines, KCO_WC()->order_lines_from_order->get_order_line_shipping( $order ) );
-		}
+		array_push( $order_lines, KCO_WC()->order_lines_from_order->get_order_line_shipping( $order ) );
 
 		$body = array(
 			'order_amount'      => KCO_WC()->order_lines_from_order->get_order_amount( $order_id ),

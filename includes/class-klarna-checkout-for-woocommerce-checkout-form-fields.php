@@ -8,17 +8,17 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 	public static $klarna_order;
 
 	public function __construct() {
-		add_action( 'kco_wc_after_snippet', array( $this, 'add_email_field_to_form' ) );
-		add_action( 'kco_wc_after_snippet', array( $this, 'add_state_fields_to_form' ) );
+		add_action( 'kco_wc_after_snippet', array( $this, 'add_woocommerce_checkout_form_fields' ) );
 	}
 
-	public function add_email_field_to_form() {
+	public function add_woocommerce_checkout_form_fields() {
 		echo '<input type="email" style="display:none" class="input-text " name="billing_email" id="billing_email" placeholder="">';
-	}
-	public function add_state_fields_to_form() {
 		echo '<input type="text" style="display:none" class="input-text " name="billing_state" id="billing_state" placeholder="">';
 		echo '<input type="text" style="display:none" class="input-text " name="shipping_state" id="shipping_state" placeholder="">';
+		echo '<input type="text" style="display:none" class="input-text " name="billing_country" id="billing_country" placeholder="">';
+		echo '<input type="text" style="display:none" class="input-text " name="shipping_country" id="shipping_country" placeholder="">';
 	}
+
 
 	public static function maybe_set_klarna_order() {
 		if ( empty( self::$klarna_order ) ) {
@@ -34,7 +34,7 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 	public static function maybe_set_customer_email() {
 		$klarna_order = self::maybe_set_klarna_order();
 		// Check that we got a response.
-		if ( empty( $klarna_order ) ) {
+		if ( empty( $klarna_order ) || is_wp_error( $klarna_order ) ) {
 			$email = null;
 		} else {
 			$klarna_order = json_decode( $klarna_order['body'] );
@@ -50,7 +50,7 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 		if ( 'US' === WC()->customer->get_billing_country() ) {
 			$klarna_order = self::maybe_set_klarna_order();
 			// Check that we got a response.
-			if ( empty( $klarna_order ) ) {
+			if ( empty( $klarna_order ) || is_wp_error( $klarna_order ) ) {
 				$billing_state  = null;
 				$shipping_state = null;
 			} else {
