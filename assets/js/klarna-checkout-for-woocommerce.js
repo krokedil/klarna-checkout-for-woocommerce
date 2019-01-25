@@ -283,7 +283,8 @@ jQuery(function($) {
 						var field = $('*[name="' + name + '"]');
 						var check = ( field.parents('p.form-row').hasClass('validate-required') ? true: false );
 						// Only keep track of non standard WooCommerce checkout fields
-						if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 ) {
+						//if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 ) {
+						if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0  ) {
 							var required = false;
 							var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
 							if ( check === true ) {
