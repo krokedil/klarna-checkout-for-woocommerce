@@ -274,7 +274,7 @@ jQuery(function($) {
 		setFormData: function() {
 			// Check if we have a form already and set that if we do. Prevents overwriting old data.
 			if( ! $.isArray( kco_params.form ) ) {
-				var form = $('form[name="checkout"] input, form[name="checkout"] select');
+				var form = $('form[name="checkout"] input, form[name="checkout"] select, textarea');
 				var i;
 				var newForm = [];
 				for ( i = 0; i < form.length; i++ ) { 
@@ -284,7 +284,7 @@ jQuery(function($) {
 						var check = ( field.parents('p.form-row').hasClass('validate-required') ? true: false );
 						// Only keep track of non standard WooCommerce checkout fields
 						//if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 ) {
-						if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0  ) {
+						if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
 							var required = false;
 							var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
 							if ( check === true ) {
@@ -316,6 +316,7 @@ jQuery(function($) {
 				kco_wc.formFields = kco_params.form;
 				kco_wc.saveFormData();
 			}
+			console.table( kco_wc.formFields );
 		},
 
 		saveFormData: function() {
