@@ -63,6 +63,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2019.01.25  	- version 1.8.1 =
+* Tweak         - Removed WooCommerce Germanized specific code from plugin. Use following gist instead: https://gist.github.com/krokedilgists/7fab7cf5d6a7b3c52fdd6bbc641592d0
+* Fix           - Added customer order comment to extra checkout fields handling.
+* Fix           - Fixes issue with customer country not being set & calculated correctly on initial checkout page rendering.
+* Fix           - Exclude payment_method from extra checkout field handling. Could cause wrong payment method being set in order.
+
+
 = 2019.01.24  	- version 1.8.0 =
 * Feature       - Improved backup order creation (WC order created on API callback). Possibility to add coupons, item meta data etc to the order in a more correct way.
 * Tweak         - Store extra checkout fields data as session. Removed use of transients.
