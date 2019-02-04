@@ -30,6 +30,7 @@ function kco_wc_show_extra_fields() {
 	// Clear extra fields session values on reload.
 	// WC()->session->__unset( 'kco_wc_extra_fields_values' );
 	echo '<div id="kco-extra-fields">';
+	do_action( 'kco_wc_before_extra_fields' );
 
 	$extra_fields_values          = WC()->session->get( 'kco_wc_extra_fields_values', array() );
 	$kco_wc_extra_checkout_fields = new Klarna_Checkout_For_WooCommerce_Extra_Checkout_Fields();
@@ -97,7 +98,7 @@ function kco_wc_show_extra_fields() {
 		}
 	}
 	do_action( 'woocommerce_after_order_notes', WC()->checkout() );
-
+	do_action( 'kco_wc_after_extra_fields' );
 	echo '</div>';
 }
 
