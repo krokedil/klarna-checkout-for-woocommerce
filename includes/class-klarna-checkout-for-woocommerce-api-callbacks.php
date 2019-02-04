@@ -499,7 +499,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		WC()->cart->empty_cart();
 
 		foreach ( $klarna_order->order_lines as $cart_item ) {
-			if ( 'physical' === $cart_item->type ) {
+			if ( 'physical' === $cart_item->type || 'digital' === $cart_item->type ) {
 				if ( wc_get_product_id_by_sku( $cart_item->reference ) ) {
 					$id = wc_get_product_id_by_sku( $cart_item->reference );
 				} else {
