@@ -350,7 +350,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		// Check cart totals.
 		$klarna_total = $data['order_amount'];
-		$wc_total     = intval( unserialize( $session['cart_totals'] )['total'] * 100 );
+		$wc_total     = intval( round( maybe_unserialize( $session['cart_totals'] )['total'] * 100 ) );
 		if ( $klarna_total !== $wc_total ) {
 			$totals_match = false;
 		}
@@ -365,7 +365,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				$logger = new WC_Logger();
 				$logger->add( 'klarna-checkout-for-woocommerce', 'Stock validation failed for SKU ' . $cart_item['reference'] );
 				header( 'Location: ' . wc_get_cart_url() . '?stock_validate_failed' );
-			} elseif ( ! $shipping_chosen && $needs_shipping ) {
+			} elseif ( ! $shipping_valid ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?no_shipping' );
 			} elseif ( ! $has_required_data ) {
 				$validation_hash = base64_encode( json_encode( $failed_required_check ) );
