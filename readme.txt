@@ -63,6 +63,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2019.02.06  	- version 1.8.2 =
+* Tweak         - Added action hooks kco_wc_before_extra_fields & kco_wc_after_extra_fields in kco_wc_show_extra_fields() function.
+* Fix           - Fixed totals match issue in validation callback.
+* Fix           - Fixed valid shipping check in validation callback. General error message was returned instead of specific shipping message.
+* Fix           - Improved handling of communication errors in get_order() function (used to create and display KCO iframe).
+* Fix           - Look for digital cart item type in process_cart() in API callback class. Digital item type was added in cart data sent to Klarna in v1.8.0.
+
 = 2019.01.25  	- version 1.8.1 =
 * Tweak         - Removed WooCommerce Germanized specific code from plugin. Use following gist instead: https://gist.github.com/krokedilgists/7fab7cf5d6a7b3c52fdd6bbc641592d0
 * Fix           - Added customer order comment to extra checkout fields handling.
