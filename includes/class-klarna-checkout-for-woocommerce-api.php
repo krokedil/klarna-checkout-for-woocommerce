@@ -324,26 +324,37 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$order_id = $this->get_order_id_from_session();
 
 		if ( $order_id ) {
+			// Get Klarna order.
 			$response = $this->request_pre_get_order( $order_id );
-			$order    = json_decode( $response['body'] );
 
-			if ( ! $order || is_wp_error( $response ) ) {
-				$response = $this->request_pre_create_order();
-				$order    = json_decode( $response['body'] );
-			} elseif ( 'checkout_incomplete' === $order->status ) {
-				// Only update order if its status is incomplete.
-				$this->request_pre_update_order();
+			// Check if we got errors. Return the error object if something is wrong.
+			if ( is_wp_error( $response ) ) {
+				return $response;
+			}
+
+			// Check that we got a response body.
+			if ( ! empty( $response['body'] ) ) {
+				$order = json_decode( $response['body'] );
+				return $order;
 			}
 		} else {
 			if ( is_order_received_page() ) {
 				return;
 			}
-
+			// Create new Klarna order.
 			$response = $this->request_pre_create_order();
-			$order    = json_decode( $response['body'] );
-		}
 
-		return $order;
+			// Check if we got errors. Return the error object if something is wrong.
+			if ( is_wp_error( $response ) ) {
+				return $response;
+			}
+
+			// Check that we got a response body.
+			if ( ! empty( $response['body'] ) ) {
+				$order = json_decode( $response['body'] );
+				return $order;
+			}
+		}
 	}
 
 	/**
