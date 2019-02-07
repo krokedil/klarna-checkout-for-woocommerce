@@ -327,8 +327,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 			// Get Klarna order.
 			$response = $this->request_pre_get_order( $order_id );
 
-			// Check if we got errors. Return the error object if something is wrong.
+			// If we got errors - delete the Klarna order id session and return the error object.
 			if ( is_wp_error( $response ) ) {
+				WC()->session->__unset( 'kco_wc_order_id' );
 				return $response;
 			}
 
