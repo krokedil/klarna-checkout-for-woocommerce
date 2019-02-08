@@ -327,15 +327,18 @@ class Klarna_Checkout_For_WooCommerce_API {
 			// Get Klarna order.
 			$response = $this->request_pre_get_order( $order_id );
 
-			// Check if we got errors. Return the error object if something is wrong.
+			// If we got errors - delete the Klarna order id session and return the error object.
 			if ( is_wp_error( $response ) ) {
+				WC()->session->__unset( 'kco_wc_order_id' );
 				return $response;
 			}
 
-			// Check that we got a response body.
+			// Check that we got a response body and that the status is checkout_incomplete.
 			if ( ! empty( $response['body'] ) ) {
 				$order = json_decode( $response['body'] );
-				return $order;
+				if ( 'checkout_incomplete' === $order->status ) {
+					return $order;
+				}
 			}
 		} else {
 			if ( is_order_received_page() ) {
@@ -355,6 +358,18 @@ class Klarna_Checkout_For_WooCommerce_API {
 				return $order;
 			}
 		}
+
+		// Something went wrong, delet the Klarna order id from session and redirect user to cart page.
+		WC()->session->__unset( 'kco_wc_order_id' );
+		$url = add_query_arg(
+			array(
+				'kco-order' => 'error',
+				'reason'    => base64_encode( __( 'The Klarna session has expired. Please try again', 'klarna-checkout-for-woocommerce' ) ),
+			),
+			wc_get_cart_url()
+		);
+		wp_safe_redirect( $url );
+		exit;
 	}
 
 	/**

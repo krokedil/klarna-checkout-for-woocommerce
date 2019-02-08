@@ -63,6 +63,10 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2019.02.08  	- version 1.8.3 =
+* Fix           - Fixed out of stock problem in validation callback.
+* Fix           - Fixed issue where customer couldn't checkout if Klarna order ID session had expired.
+
 = 2019.02.06  	- version 1.8.2 =
 * Tweak         - Added action hooks kco_wc_before_extra_fields & kco_wc_after_extra_fields in kco_wc_show_extra_fields() function.
 * Fix           - Fixed totals match issue in validation callback.
