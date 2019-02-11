@@ -337,7 +337,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			// @todo - only check for status expired and create a new order if that's the case.
 			if ( ! empty( $response['body'] ) ) {
 				$order = json_decode( $response['body'] );
-				if ( in_array( strtolower( $order->status ), array( 'checkout_incomplete', 'authorized' ) ) ) {
+				if ( in_array( strtolower( $order->status ), array( 'checkout_incomplete', 'checkout_complete', 'authorized' ) ) ) {
 					return $order;
 				}
 			}
