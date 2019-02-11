@@ -333,10 +333,11 @@ class Klarna_Checkout_For_WooCommerce_API {
 				return $response;
 			}
 
-			// Check that we got a response body and that the status is checkout_incomplete.
+			// Check that we got a response body and that the status is checkout_incomplete or authorized.
+			// @todo - only check for status expired and create a new order if that's the case.
 			if ( ! empty( $response['body'] ) ) {
 				$order = json_decode( $response['body'] );
-				if ( 'checkout_incomplete' === $order->status ) {
+				if ( in_array( strtolower( $order->status ), array( 'checkout_incomplete', 'authorized' ) ) ) {
 					return $order;
 				}
 			}
