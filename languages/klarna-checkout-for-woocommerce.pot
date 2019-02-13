@@ -94,7 +94,7 @@ msgstr ""
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api.php:368
+#: ../includes/class-klarna-checkout-for-woocommerce-api.php:367
 msgid "The Klarna session has expired. Please try again"
 msgstr ""
 
