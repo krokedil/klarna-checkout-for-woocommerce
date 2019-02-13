@@ -147,7 +147,6 @@ function kco_wc_prefill_allowed() {
  */
 function kco_wc_calculate_totals() {
 	WC()->cart->calculate_fees();
-	WC()->cart->calculate_shipping();
 	WC()->cart->calculate_totals();
 }
 

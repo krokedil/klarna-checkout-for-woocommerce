@@ -12,11 +12,11 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 	}
 
 	public function add_woocommerce_checkout_form_fields() {
-		echo '<div id="kco-hidden" style="display:none;">';
+		echo '<div id="kco-hidden" style="position:absolute;top:-9999px;left:-9999px;">';
 		// Billing fields.
 		$billing_fields = WC()->checkout()->get_checkout_fields( 'billing' );
 		foreach ( $billing_fields as $key => $field ) {
-			if ( in_array( $key, array( 'billing_country', 'billing_email', 'billing_state' ) ) ) {
+			if ( in_array( $key, array( 'billing_country', 'billing_email', 'billing_state', 'billing_postcode' ) ) ) {
 				if ( isset( $field['country_field'], $fields[ $field['country_field'] ] ) ) {
 					$field['country'] = WC()->checkout->get_value( $field['country_field'] );
 				}
@@ -27,7 +27,7 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 		// Shipping fields.
 		$shipping_fields = WC()->checkout()->get_checkout_fields( 'shipping' );
 		foreach ( $shipping_fields as $key => $field ) {
-			if ( in_array( $key, array( 'shipping_country', 'shipping_state' ) ) ) {
+			if ( in_array( $key, array( 'shipping_country', 'shipping_state', 'shipping_postcode' ) ) ) {
 				if ( isset( $field['country_field'], $fields[ $field['country_field'] ] ) ) {
 					$field['country'] = WC()->checkout->get_value( $field['country_field'] );
 				}

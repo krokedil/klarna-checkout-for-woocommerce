@@ -64,7 +64,6 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			WC()->cart->set_quantity( $cart_key, $new_quantity, false );
 		}
 
-		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_fees();
 		WC()->cart->calculate_totals();
 		KCO_WC()->api->request_pre_update_order();
@@ -197,7 +196,6 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				$klarna_order = json_decode( $response['body'] );
 
 				// Calculate cart totals
-				WC()->cart->calculate_shipping();
 				WC()->cart->calculate_fees();
 				WC()->cart->calculate_totals();
 
