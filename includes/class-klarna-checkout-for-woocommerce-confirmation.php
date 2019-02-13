@@ -37,7 +37,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		add_action( 'wp_head', array( $this, 'maybe_hide_checkout_form' ) );
 		add_action( 'woocommerce_before_checkout_form', array( $this, 'maybe_populate_wc_checkout' ) );
 		add_action( 'wp_footer', array( $this, 'maybe_submit_wc_checkout' ), 999 );
-		add_filter( 'woocommerce_checkout_fields', array( $this, 'unrequire_fields' ), 99 );
+		add_filter( 'woocommerce_checkout_fields', array( $this, 'maybe_unrequire_fields' ), 99 );
 		add_filter( 'woocommerce_checkout_posted_data', array( $this, 'unrequire_posted_data' ), 99 );
 		add_action( 'woocommerce_checkout_after_order_review', array( $this, 'add_kco_order_id_field' ) );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_kco_order_id_field' ), 10, 3 );
@@ -273,8 +273,8 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 *
 	 * @return mixed
 	 */
-	public function unrequire_fields( $fields ) {
-		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
+	public function maybe_unrequire_fields( $fields ) {
+		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) && is_kco_confirmation() ) {
 			foreach ( $fields as $fieldset_key => $fieldset ) {
 				foreach ( $fieldset as $key => $field ) {
 					$fields[ $fieldset_key ][ $key ]['required']        = '';

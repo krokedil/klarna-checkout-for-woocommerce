@@ -63,6 +63,14 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2019.02.13  	- version 1.8.4 =
+* Tweak         - Added WC hooks woocommerce_checkout_create_order & woocommerce_checkout_update_order_meta in backup order creation. Better support for Sequential order numbers plugin (props @jonathan-dejong). 
+* Tweak         - Added billing_state, billing_country, shipping_state & shipping_country to standard chekout fields to exclude from extra checkout fields control.
+* Tweak         - Don't display shipping on checkout page until customer address has been entered if WC setting "Hide shipping costs until an address is entered" is active.
+* Tweak         - Only unrequire checkout fields on KCO confirmation page.
+* Fix           - Bug fix in get_order(). Could cause issues with purchases being placed in Klarna but checkout displayed error notice in Woo.
+* Fix           - Fix for populating Billing email in setFieldValues.
+
 = 2019.02.08  	- version 1.8.3 =
 * Fix           - Fixed out of stock problem in validation callback.
 * Fix           - Fixed issue where customer couldn't checkout if Klarna order ID session had expired.

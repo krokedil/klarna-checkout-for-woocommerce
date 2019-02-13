@@ -362,11 +362,13 @@ jQuery(function($) {
 
 		setFieldValues: function( data ) {
 			// Billing fields
-			$('#billing_email').val(data.customer_data.email);
+			$('#billing_email').val(data.customer_data.billing_email);
+			$('#billing_postcode').val(data.customer_data.billing_postcode);
 			$('#billing_state').val(data.customer_data.billing_state);
 			$('#billing_country').val(data.customer_data.billing_country);
 
 			// Shipping fields
+			$('#shipping_postcode').val(data.customer_data.shipping_postcode);
 			$('#shipping_state').val(data.customer_data.shipping_state);
 			$('#shipping_country').val(data.customer_data.billing_country);
 
