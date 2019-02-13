@@ -333,18 +333,17 @@ class Klarna_Checkout_For_WooCommerce_API {
 				return $response;
 			}
 
-			// Check that we got a response body and that the status is checkout_incomplete or authorized.
-			// @todo - only check for status expired and create a new order if that's the case.
+			// Check that we got a response body.
 			if ( ! empty( $response['body'] ) ) {
 				$order = json_decode( $response['body'] );
-				if ( in_array( strtolower( $order->status ), array( 'checkout_incomplete', 'checkout_complete', 'authorized' ) ) ) {
-					return $order;
-				}
+				return $order;
 			}
 		} else {
+			// Abort if we're on the thankyou page.
 			if ( is_order_received_page() ) {
 				return;
 			}
+
 			// Create new Klarna order.
 			$response = $this->request_pre_create_order();
 
@@ -360,7 +359,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			}
 		}
 
-		// Something went wrong, delet the Klarna order id from session and redirect user to cart page.
+		// Something went wrong, delete the Klarna order id from session and redirect user to cart page.
 		WC()->session->__unset( 'kco_wc_order_id' );
 		$url = add_query_arg(
 			array(
