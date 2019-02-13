@@ -362,7 +362,7 @@ jQuery(function($) {
 
 		setFieldValues: function( data ) {
 			// Billing fields
-			$('#billing_email').val(data.customer_data.email);
+			$('#billing_email').val(data.customer_data.billing_email);
 			$('#billing_postcode').val(data.customer_data.billing_postcode);
 			$('#billing_state').val(data.customer_data.billing_state);
 			$('#billing_country').val(data.customer_data.billing_country);
