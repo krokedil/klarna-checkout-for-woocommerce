@@ -577,7 +577,22 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			WC()->checkout()->create_order_tax_lines( $order, WC()->cart );
 			WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
 
-			$order->save();
+			/**
+			 * Added to simulate WCs own order creation.
+			 *
+			 * TODO: Add the order content into a $data variable and pass as second parameter to the hook.
+			 */
+			do_action( 'woocommerce_checkout_create_order', $order, array() );
+
+			// Save the order
+			$order_id = $order->save();
+
+			/**
+			 * Added to simulate WCs own order creation.
+			 *
+			 * TODO: Add the order content into a $data variable and pass as second parameter to the hook.
+			 */
+			do_action( 'woocommerce_checkout_update_order_meta', $order_id, array() );
 
 			$order->add_order_note( __( 'Order created via Klarna Checkout API callback. Please verify the order in Klarnas system.', 'klarna-checkout-for-woocommerce' ) );
 
