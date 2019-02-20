@@ -523,6 +523,18 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$payment_method     = $available_gateways['kco'];
 			$order->set_payment_method( $payment_method );
 
+			// Apply coupons if it has been used.
+			// @todo - fix so that original price and the discounted amount is displayed in the order.
+			if ( isset( $klarna_order->merchant_data ) ) {
+				$merchant_data = json_decode( $klarna_order->merchant_data );
+				if ( isset( $merchant_data->coupons ) && ! empty( $merchant_data->coupons ) ) {
+					$coupons = $merchant_data->coupons;
+					foreach ( $coupons as $coupon ) {
+						$order->apply_coupon( $coupon );
+					}
+				}
+			}
+
 			$this->process_cart( $klarna_order, $order );
 
 			$order->set_shipping_total( self::get_shipping_total( $klarna_order ) );
