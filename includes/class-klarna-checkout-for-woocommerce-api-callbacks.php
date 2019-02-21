@@ -423,12 +423,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			// Process customer data.
 			$this->process_customer_data( $klarna_order );
 
-			// Process cart with data from Klarna.
-			// Only do this if we where unable to create the cart object from session ID.
-			if ( WC()->cart->is_empty() ) {
-				$this->process_cart( $klarna_order );
-			}
-
 			// Process order.
 			$this->process_order( $klarna_order );
 
@@ -489,40 +483,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		WC()->customer->save();
 	}
 
-	/**
-	 * Processes cart contents on backup order creation.
-	 *
-	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
-	 *
-	 * @throws Exception WC_Data_Exception.
-	 */
-	private function process_cart( $klarna_order ) {
-		WC()->cart->empty_cart();
-
-		foreach ( $klarna_order->order_lines as $cart_item ) {
-			if ( 'physical' === $cart_item->type || 'digital' === $cart_item->type ) {
-				if ( wc_get_product_id_by_sku( $cart_item->reference ) ) {
-					$id = wc_get_product_id_by_sku( $cart_item->reference );
-				} else {
-					$id = $cart_item->reference;
-				}
-
-				try {
-					WC()->cart->add_to_cart( $id, $cart_item->quantity );
-				} catch ( Exception $e ) {
-					$logger = new WC_Logger();
-					$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error add to cart error: ' . $e->getCode() . ' - ' . $e->getMessage() );
-				}
-			}
-		}
-
-		// Check cart items (quantity, coupon validity etc).
-		if ( ! WC()->cart->check_cart_items() ) {
-			return;
-		}
-
-		WC()->cart->check_cart_coupons();
-	}
 
 	/**
 	 * Processes WooCommerce order on backup order creation.
@@ -532,13 +492,9 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * @throws Exception WC_Data_Exception.
 	 */
 	private function process_order( $klarna_order ) {
-
-		WC()->cart->calculate_shipping();
-		WC()->cart->calculate_fees();
-		WC()->cart->calculate_totals();
-
 		try {
-			$order = new WC_Order();
+			$order = wc_create_order( array( 'status' => 'pending' ) );
+
 			$order->set_billing_first_name( sanitize_text_field( $klarna_order->billing_address->given_name ) );
 			$order->set_billing_last_name( sanitize_text_field( $klarna_order->billing_address->family_name ) );
 			$order->set_billing_country( sanitize_text_field( $klarna_order->billing_address->country ) );
@@ -562,20 +518,30 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$order->set_created_via( 'klarna_checkout_backup_order_creation' );
 			$order->set_currency( sanitize_text_field( $klarna_order->purchase_currency ) );
 			$order->set_prices_include_tax( 'yes' === get_option( 'woocommerce_prices_include_tax' ) );
-			$order->set_payment_method( 'kco' );
 
-			$order->set_shipping_total( WC()->cart->get_shipping_total() );
-			$order->set_discount_total( WC()->cart->get_discount_total() );
-			$order->set_discount_tax( WC()->cart->get_discount_tax() );
-			$order->set_cart_tax( WC()->cart->get_cart_contents_tax() + WC()->cart->get_fee_tax() );
-			$order->set_shipping_tax( WC()->cart->get_shipping_tax() );
-			$order->set_total( WC()->cart->get_total( 'edit' ) );
+			$available_gateways = WC()->payment_gateways->payment_gateways();
+			$payment_method     = $available_gateways['kco'];
+			$order->set_payment_method( $payment_method );
 
-			WC()->checkout()->create_order_line_items( $order, WC()->cart );
-			WC()->checkout()->create_order_fee_lines( $order, WC()->cart );
-			WC()->checkout()->create_order_shipping_lines( $order, WC()->session->get( 'chosen_shipping_methods' ), WC()->shipping()->get_packages() );
-			WC()->checkout()->create_order_tax_lines( $order, WC()->cart );
-			WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
+			// Apply coupons if it has been used.
+			// @todo - fix so that original price and the discounted amount is displayed in the order.
+			if ( isset( $klarna_order->merchant_data ) ) {
+				$merchant_data = json_decode( $klarna_order->merchant_data );
+				if ( isset( $merchant_data->coupons ) && ! empty( $merchant_data->coupons ) ) {
+					$coupons = $merchant_data->coupons;
+					foreach ( $coupons as $coupon ) {
+						$order->apply_coupon( $coupon );
+					}
+				}
+			}
+
+			$this->process_cart( $klarna_order, $order );
+
+			$order->set_shipping_total( self::get_shipping_total( $klarna_order ) );
+			$order->set_cart_tax( self::get_cart_contents_tax( $klarna_order ) );
+			$order->set_shipping_tax( self::get_shipping_tax_total( $klarna_order ) );
+			$order->set_total( $klarna_order->order_amount / 100 );
+			$order->calculate_totals();
 
 			/**
 			 * Added to simulate WCs own order creation.
@@ -626,11 +592,143 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		}
 	}
 
+	/**
+	 * Processes cart contents on backup order creation.
+	 *
+	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
+	 * @param WooCommerce_Order     $order WooCommerce order.
+	 *
+	 * @throws Exception WC_Data_Exception.
+	 */
+	private function process_cart( $klarna_order, $order ) {
+
+		foreach ( $klarna_order->order_lines as $cart_item ) {
+			if ( 'physical' === $cart_item->type || 'digital' === $cart_item->type ) {
+				if ( wc_get_product_id_by_sku( $cart_item->reference ) ) {
+					$id = wc_get_product_id_by_sku( $cart_item->reference );
+				} else {
+					$id = $cart_item->reference;
+				}
+
+				try {
+					$product = wc_get_product( $id );
+					$args    = array(
+						'name'         => $product->get_name(),
+						'tax_class'    => $product->get_tax_class(),
+						'product_id'   => $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id(),
+						'variation_id' => $product->is_type( 'variation' ) ? $product->get_id() : 0,
+						'variation'    => $product->is_type( 'variation' ) ? $product->get_attributes() : array(),
+						'subtotal'     => ( $cart_item->total_amount - $cart_item->total_tax_amount ) / 100,
+						'total'        => ( $cart_item->total_amount - $cart_item->total_tax_amount ) / 100,
+						'quantity'     => $cart_item->quantity,
+					);
+					$item    = new WC_Order_Item_Product();
+					$item->set_props( $args );
+					$item->set_backorder_meta();
+					$item->set_order_id( $order->get_id() );
+					$item->save();
+					$order->add_item( $item );
+
+				} catch ( Exception $e ) {
+					$logger = new WC_Logger();
+					$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error add to cart error: ' . $e->getCode() . ' - ' . $e->getMessage() );
+				}
+			}
+
+			if ( 'shipping_fee' === $cart_item->type ) {
+				try {
+					$method_id   = substr( $cart_item->reference, 0, strpos( $cart_item->reference, ':' ) );
+					$instance_id = substr( $cart_item->reference, strpos( $cart_item->reference, ':' ) + 1 );
+					$rate        = new WC_Shipping_Rate( $cart_item->reference, $cart_item->name, ( $cart_item->total_amount - $cart_item->total_tax_amount ) / 100, array(), $method_id, $instance_id );
+					$item        = new WC_Order_Item_Shipping();
+					$item->set_props(
+						array(
+							'method_title' => $rate->label,
+							'method_id'    => $rate->id,
+							'total'        => wc_format_decimal( $rate->cost ),
+							'taxes'        => $rate->taxes,
+							'meta_data'    => $rate->get_meta_data(),
+						)
+					);
+					$order->add_item( $item );
+				} catch ( Exception $e ) {
+					$logger = new WC_Logger();
+					$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error add shipping error: ' . $e->getCode() . ' - ' . $e->getMessage() );
+				}
+			}
+
+			if ( 'surcharge' === $cart_item->type ) {
+				$tax_class = '';
+				if ( isset( $cart_item->merchant_data ) ) {
+					$merchant_data = json_decode( $cart_item->merchant_data );
+					$tax_class     = $merchant_data->tax_class;
+				}
+				try {
+					$args = array(
+						'name'      => $cart_item->name,
+						'tax_class' => $tax_class,
+						'subtotal'  => ( $cart_item->total_amount - $cart_item->total_tax_amount ) / 100,
+						'total'     => ( $cart_item->total_amount - $cart_item->total_tax_amount ) / 100,
+						'quantity'  => $cart_item->quantity,
+					);
+					$fee  = new WC_Order_Item_Fee();
+					$fee->set_props( $args );
+					$order->add_item( $fee );
+				} catch ( Exception $e ) {
+					$logger = new WC_Logger();
+					$logger->add( 'klarna-checkout-for-woocommerce', 'Backup order creation error add fee error: ' . $e->getCode() . ' - ' . $e->getMessage() );
+				}
+			}
+		}
+	}
+
 	private function get_session_from_id( $session_id ) {
 		$sessions_handler = new WC_Session_Handler();
 		$session          = $sessions_handler->get_session( $session_id );
 
 		return $session;
+	}
+
+	private static function get_shipping_total( $klarna_order ) {
+		$shipping_total = 0;
+		foreach ( $klarna_order->order_lines as $cart_item ) {
+			if ( 'shipping_fee' === $cart_item->type ) {
+				$shipping_total += $cart_item->total_amount;
+			}
+		}
+		if ( $shipping_total > 0 ) {
+			$shipping_total = $shipping_total / 100;
+		}
+
+		return $shipping_total;
+	}
+
+	private static function get_shipping_tax_total( $klarna_order ) {
+		$shipping_tax_total = 0;
+		foreach ( $klarna_order->order_lines as $cart_item ) {
+			if ( 'shipping_fee' === $cart_item->type ) {
+				$shipping_tax_total += $cart_item->total_tax_amount;
+			}
+		}
+		if ( $shipping_tax_total > 0 ) {
+			$shipping_tax_total = $shipping_tax_total / 100;
+		}
+
+		return $shipping_tax_total;
+	}
+
+	private static function get_cart_contents_tax( $klarna_order ) {
+		$cart_contents_tax = 0;
+		foreach ( $klarna_order->order_lines as $cart_item ) {
+			if ( 'physical' === $cart_item->type || 'digital' === $cart_item->type ) {
+				$cart_contents_tax += $cart_item->total_tax_amount;
+			}
+		}
+		if ( $cart_contents_tax > 0 ) {
+			$cart_contents_tax = $cart_contents_tax / 100;
+		}
+
+		return $cart_contents_tax;
 	}
 
 }
