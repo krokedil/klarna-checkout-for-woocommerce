@@ -441,6 +441,38 @@ jQuery(function($) {
 						},
 						'shipping_option_change': function(data) {
 							kco_wc.log('shipping_option_change', data);
+							kco_wc.log( data );
+							$('.woocommerce-checkout-review-order-table').block({
+								message: null,
+								overlayCSS: {
+									background: '#fff',
+									opacity: 0.6
+								}
+							});
+							kco_wc.kcoSuspend();
+
+							$.ajax(
+								{
+									url: kco_params.update_shipping_url,
+									type: 'POST',
+									dataType: 'json',
+									data: {
+										data: data,
+										nonce: kco_params.update_shipping_nonce
+									},
+									success: function (response) {
+										kco_wc.log(response);
+										$('body').trigger('update_checkout');
+									},
+									error: function (response) {
+										kco_wc.log(response);
+									},
+									complete: function() {
+										$('.woocommerce-checkout-review-order-table').unblock();
+										kco_wc.kcoResume();
+									}
+								}
+							);
 						},
 						'can_not_complete_order': function(data) {
 							kco_wc.log('can_not_complete_order', data);
