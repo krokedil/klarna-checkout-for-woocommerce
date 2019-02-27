@@ -64,7 +64,7 @@ msgstr ""
 msgid "It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href=\"%s\">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>)."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-ajax.php:373
+#: ../includes/class-klarna-checkout-for-woocommerce-ajax.php:378
 msgid "This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna."
 msgstr ""
 

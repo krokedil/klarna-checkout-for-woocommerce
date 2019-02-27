@@ -94,6 +94,11 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		WC()->cart->calculate_totals();
 		KCO_WC()->api->request_pre_update_order();
 
+		$shipping_option_name = 'shipping_method_0_' . str_replace( ':', '', $shipping_option['id'] );
+		$data                 = array(
+			'shipping_option_name' => $shipping_option_name,
+		);
+		wp_send_json_success( $data );
 		wp_die();
 	}
 

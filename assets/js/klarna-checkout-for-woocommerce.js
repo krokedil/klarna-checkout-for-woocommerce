@@ -467,7 +467,9 @@ jQuery(function($) {
 									error: function (response) {
 										kco_wc.log(response);
 									},
-									complete: function() {
+									complete: function(response) {
+										$('#shipping_method #' + response.responseJSON.data.shipping_option_name).prop('checked', true);
+										$('body').trigger('kco_shipping_option_changed');
 										$('.woocommerce-checkout-review-order-table').unblock();
 										kco_wc.kcoResume();
 									}
