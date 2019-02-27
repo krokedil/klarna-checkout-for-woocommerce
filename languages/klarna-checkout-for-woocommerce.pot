@@ -71,26 +71,26 @@ msgstr ""
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:132, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:568, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:379
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:132, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:608, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:379
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:135, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:571, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:382
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:135, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:611, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:382
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:138, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:574, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:385
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:138, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:614, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:385
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:563
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:603
 msgid "Order created via Klarna Checkout API callback. Please verify the order in Klarnas system."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:587
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:627
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
@@ -397,7 +397,7 @@ msgstr ""
 msgid "Sales Tax"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:636, ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:664
+#: ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:651, ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:679
 msgid "Shipping"
 msgstr ""
 
