@@ -444,3 +444,11 @@ msgstr ""
 #: ../includes/klarna-checkout-for-woocommerce-status-report.php:22
 msgid "Displays the number of orders created via the API callback feature during the last month."
 msgstr ""
+
+#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:55, ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:55
+msgid "Checkout addons"
+msgstr ""
+
+#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:64
+msgid "Checkout Addons"
+msgstr ""

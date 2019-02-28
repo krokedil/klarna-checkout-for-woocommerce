@@ -1,0 +1,40 @@
+.list {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+    justify-items: stretch;
+    align-items: stretch;
+}
+.checkout-addon {
+    border: 1px solid #ddd;
+    position: relative;
+    background: #fff;
+    border-radius: 3px;
+}
+
+.checkout-addon-title {
+    margin: 20px;
+}
+.checkout-addon-excerpt {
+    margin: 20px;
+}
+.checkout-addon-footer {
+    background: #f7f7f7;
+    border-top: 1px solid #ddd;
+}
+.checkout-addon-status {
+    float: left;
+}
+.checkout-addon-action {
+    float: right;
+}
+.inside-wrapper {
+    padding: 20px;
+}
+.inside-wrapper:after {
+    content: "";
+    display: table;
+    clear: both;
+}
