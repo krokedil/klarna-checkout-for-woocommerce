@@ -220,7 +220,30 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$post_body = file_get_contents( 'php://input' );
 		$data      = json_decode( $post_body, true );
 		$checkout  = WC()->checkout();
-		krokedil_log_events( null, 'Klarna validation callback data', $data );
+
+		if ( is_array( $data ) ) {
+			$log_order                 = $data;
+			$log_order['html_snippet'] = '';
+			krokedil_log_events( null, 'Klarna validation callback data', $log_order );
+			KCO_WC()->logger->log( 'Klarna validation callback data: ' . stripslashes_deep( json_encode( $log_order ) ) );
+		}
+
+		// Country.
+		WC()->customer->set_billing_country( strtoupper( sanitize_text_field( $data['billing_address']['country'] ) ) );
+		WC()->customer->set_shipping_country( strtoupper( sanitize_text_field( $data['shipping_address']['country'] ) ) );
+
+		// County/State.
+		if ( isset( $data['billing_address']['region'] ) ) {
+			WC()->customer->set_billing_state( sanitize_text_field( $data['billing_address']['region'] ) );
+			WC()->customer->set_shipping_state( sanitize_text_field( $data['shipping_address']['region'] ) );
+		}
+
+		// Postcode.
+		WC()->customer->set_billing_postcode( sanitize_text_field( $data['billing_address']['postal_code'] ) );
+		WC()->customer->set_shipping_postcode( sanitize_text_field( $data['shipping_address']['postal_code'] ) );
+
+		WC()->cart->calculate_totals();
+
 		$all_in_stock     = true;
 		$shipping_chosen  = false;
 		$shipping_valid   = true;
@@ -351,9 +374,10 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		// Check cart totals.
 		$klarna_total = $data['order_amount'];
-		$wc_total     = intval( round( maybe_unserialize( $session['cart_totals'] )['total'] * 100 ) );
+		$wc_total     = intval( round( WC()->cart->get_total( 'edit' ) * 100 ) );
 		if ( $klarna_total !== $wc_total ) {
 			$totals_match = false;
+			KCO_WC()->logger->log( 'Cart totals does not match in validation callback. Klarna_total: ' . $klarna_total . ' WC_total: ' . $wc_total );
 		}
 
 		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
@@ -538,13 +562,29 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				}
 			}
 
-			$this->process_cart( $klarna_order, $order );
+			// Process cart with data from Klarna.
+			// Only do this if we where unable to create the cart object from session ID.
+			if ( WC()->cart->is_empty() ) {
+				$this->process_order_lines( $klarna_order, $order );
+				$order->set_shipping_total( self::get_shipping_total( $klarna_order ) );
+				$order->set_cart_tax( self::get_cart_contents_tax( $klarna_order ) );
+				$order->set_shipping_tax( self::get_shipping_tax_total( $klarna_order ) );
+				$order->set_total( $klarna_order->order_amount / 100 );
+				$order->calculate_totals();
+			} else {
+				$order->set_shipping_total( WC()->cart->get_shipping_total() );
+				$order->set_discount_total( WC()->cart->get_discount_total() );
+				$order->set_discount_tax( WC()->cart->get_discount_tax() );
+				$order->set_cart_tax( WC()->cart->get_cart_contents_tax() + WC()->cart->get_fee_tax() );
+				$order->set_shipping_tax( WC()->cart->get_shipping_tax() );
+				$order->set_total( WC()->cart->get_total( 'edit' ) );
 
-			$order->set_shipping_total( self::get_shipping_total( $klarna_order ) );
-			$order->set_cart_tax( self::get_cart_contents_tax( $klarna_order ) );
-			$order->set_shipping_tax( self::get_shipping_tax_total( $klarna_order ) );
-			$order->set_total( $klarna_order->order_amount / 100 );
-			$order->calculate_totals();
+				WC()->checkout()->create_order_line_items( $order, WC()->cart );
+				WC()->checkout()->create_order_fee_lines( $order, WC()->cart );
+				WC()->checkout()->create_order_shipping_lines( $order, WC()->session->get( 'chosen_shipping_methods' ), WC()->shipping()->get_packages() );
+				WC()->checkout()->create_order_tax_lines( $order, WC()->cart );
+				WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
+			}
 
 			/**
 			 * Added to simulate WCs own order creation.
@@ -603,7 +643,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 *
 	 * @throws Exception WC_Data_Exception.
 	 */
-	private function process_cart( $klarna_order, $order ) {
+	private function process_order_lines( $klarna_order, $order ) {
 
 		foreach ( $klarna_order->order_lines as $cart_item ) {
 			if ( 'physical' === $cart_item->type || 'digital' === $cart_item->type ) {

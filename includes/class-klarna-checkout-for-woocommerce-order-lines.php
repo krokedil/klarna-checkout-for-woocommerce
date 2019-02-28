@@ -263,9 +263,24 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					}
 				}
 				// Add separate discount line item, but only if it's a smart coupon or country is US.
-				if ( 'US' === $this->shop_country || 'smart_coupon' === $coupon->get_discount_type() ) {
+				if ( 'US' === $this->shop_country && 'smart_coupon' !== $coupon->get_discount_type() ) {
 					$discount            = array(
 						'type'                  => 'discount',
+						'reference'             => $coupon_reference,
+						'name'                  => $coupon_key,
+						'quantity'              => 1,
+						'unit_price'            => $coupon_amount,
+						'tax_rate'              => 0,
+						'total_amount'          => $coupon_amount,
+						'total_discount_amount' => 0,
+						'total_tax_amount'      => $coupon_tax_amount,
+					);
+					$this->order_lines[] = $discount;
+				}
+
+				if ( 'smart_coupon' === $coupon->get_discount_type() ) {
+					$discount            = array(
+						'type'                  => 'gift_card',
 						'reference'             => $coupon_reference,
 						'name'                  => $coupon_key,
 						'quantity'              => 1,
