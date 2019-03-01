@@ -420,6 +420,10 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$post_body = file_get_contents( 'php://input' );
 		$data      = json_decode( $post_body, true );
 		do_action( 'wc_klarna_shipping_option_update_cb', $data );
+
+		header( 'HTTP/1.0 200 OK' );
+		echo wp_json_encode( $data, JSON_PRETTY_PRINT );
+		die();
 	}
 
 	/**

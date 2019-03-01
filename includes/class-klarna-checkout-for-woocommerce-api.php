@@ -646,6 +646,10 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$request_args['options']['shipping_details'] = $this->get_shipping_details();
 		}
 
+		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {
+			$request_args['shipping_options'] = $this->get_shipping_options();
+		}
+
 		// Allow external payment method plugin to do its thing.
 		// @TODO: Extract this into a hooked function.
 		if ( in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) ) {
@@ -704,6 +708,45 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$allow_separate_shipping = array_key_exists( 'allow_separate_shipping', $this->settings ) && 'yes' === $this->settings['allow_separate_shipping'];
 
 		return $allow_separate_shipping;
+	}
+
+	/**
+	 * Gets shipping options formatted for Klarna.
+	 *
+	 * @return array
+	 */
+	public function get_shipping_options() {
+		if ( WC()->cart->needs_shipping() ) {
+			$shipping_options = array();
+			$packages         = WC()->shipping->get_packages();
+			foreach ( $packages as $i => $package ) {
+				$chosen_method = isset( WC()->session->chosen_shipping_methods[ $i ] ) ? WC()->session->chosen_shipping_methods[ $i ] : '';
+				foreach ( $package['rates'] as $method ) {
+					$method_id    = $method->id;
+					$method_name  = $method->label;
+					$method_price = intval( round( $method->cost + array_sum( $method->taxes ), 2 ) * 100 );
+					if ( array_sum( $method->taxes ) > 0 ) {
+						$method_tax_amount = intval( round( array_sum( $method->taxes ), 2 ) * 100 );
+						$method_tax_rate   = intval( round( ( array_sum( $method->taxes ) / $method->cost ) * 100, 2 ) * 100 );
+					} else {
+						$method_tax_amount = 0;
+						$method_tax_rate   = 0;
+					}
+					$method_selected    = $method->id === $chosen_method ? true : false;
+					$shipping_options[] = array(
+						'id'          => $method_id,
+						'name'        => $method_name,
+						'price'       => $method_price,
+						'tax_amount'  => $method_tax_amount,
+						'tax_rate'    => $method_tax_rate,
+						'preselected' => $method_selected,
+					);
+				}
+			}
+			return apply_filters( 'kco_wc_shipping_options', $shipping_options );
+		} else {
+			return array();
+		}
 	}
 
 	/**

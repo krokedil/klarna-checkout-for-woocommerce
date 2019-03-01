@@ -179,6 +179,17 @@ jQuery(function($) {
 			}
 		},
 
+		// Display Shipping Price in order review if Display shipping methods in iframe settings is active.
+		maybeDisplayShippingPrice: function() {
+			if ( 'kco' === kco_wc.paymentMethod && kco_params.shipping_methods_in_iframe === 'yes' && kco_params.is_confirmation_page === 'no' ) {
+				$("#shipping_method input[type='radio']:checked").each(function() {
+					var idVal = $(this).attr("id");
+					var shippingPrice = $("label[for='"+idVal+"']").text();
+					$(".woocommerce-shipping-totals td").html(shippingPrice);
+				});
+			}
+		},
+
 		// When "Change to another payment method" is clicked.
 		changeFromKco: function(e) {
 			e.preventDefault();
@@ -382,6 +393,7 @@ jQuery(function($) {
 
 			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
+			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
 			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			//kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.setFormData);
