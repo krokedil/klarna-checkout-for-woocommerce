@@ -71,26 +71,26 @@ msgstr ""
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:132, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:611, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:379
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:132, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:615, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:384
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:135, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:614, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:382
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:135, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:618, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:387
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:138, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:617, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:385
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:138, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:621, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:390
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:606
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:610
 msgid "Order created via Klarna Checkout API callback. Please verify the order in Klarnas system."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:630
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:634
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
@@ -131,238 +131,258 @@ msgid "Payment method description."
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:40
-msgid "Separate shipping address"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:41
-msgid "Allow separate shipping address"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:43
-msgid "If this option is checked, customers will be able to enter shipping address different than their billing address in checkout."
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:48
 msgid "Other payment method button text"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:50
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:42
 msgid "Customize the <em>Select another payment method</em> button text that is displayed in checkout if using other payment methods than Klarna Checkout. Leave blank to use the default (and translatable) text."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:55
-msgid "Shipping details"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:56
-msgid "Shipping details note shown to customer"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:58
-msgid "Will be shown to customer in thank you page."
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:63
-msgid "Allowed Customer Types"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:66
-msgid "B2C only"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:67
-msgid "B2B only"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:68
-msgid "B2C & B2B (defaults to B2C)"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:69
-msgid "B2B & B2C (defaults to B2B)"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:71
-msgid "Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO and FI). Learn more and <a href=\"%s\" target=\"_blank\">sign up for Klarna Checkout B2B here</a>."
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:76
-msgid "Product URLs"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:78
-msgid "Send product and product image URLs to Klarna"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:83
-msgid "Logging"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:84
-msgid "Log debug messages"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:86
-msgid "Save debug messages to the WooCommerce System Status log."
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:91
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:47
 msgid "Test mode"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:92
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:48
 msgid "Enable Test Mode"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:94
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:50
 msgid "Place the payment gateway in test mode using test API keys."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:99
-msgid "Date of birth mandatory"
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:55
+msgid "Logging"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:100
-msgid "Make customer date of birth mandatory"
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:56
+msgid "Log debug messages"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:102
-msgid "If checked, the customer cannot skip date of birth."
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:58
+msgid "Save debug messages to the WooCommerce System Status log."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:112, ../includes/class-klarna-checkout-for-woocommerce-fields.php:159
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:68, ../includes/class-klarna-checkout-for-woocommerce-fields.php:101
 msgid "Production Username (UID)"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:114, ../includes/class-klarna-checkout-for-woocommerce-fields.php:121, ../includes/class-klarna-checkout-for-woocommerce-fields.php:128, ../includes/class-klarna-checkout-for-woocommerce-fields.php:135
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:70, ../includes/class-klarna-checkout-for-woocommerce-fields.php:77, ../includes/class-klarna-checkout-for-woocommerce-fields.php:84, ../includes/class-klarna-checkout-for-woocommerce-fields.php:91
 msgid "Get your API keys from your Klarna Checkout merchant account for Europe."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:119, ../includes/class-klarna-checkout-for-woocommerce-fields.php:166
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:75, ../includes/class-klarna-checkout-for-woocommerce-fields.php:108
 msgid "Production Password"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:126, ../includes/class-klarna-checkout-for-woocommerce-fields.php:173
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:82, ../includes/class-klarna-checkout-for-woocommerce-fields.php:115
 msgid "Test Username (UID)"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:133, ../includes/class-klarna-checkout-for-woocommerce-fields.php:180
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:89, ../includes/class-klarna-checkout-for-woocommerce-fields.php:122
 msgid "Test Password"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:140
-msgid "Title mandatory (GB)"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:141
-msgid "Make customer title mandatory"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:143
-msgid "If unchecked, title becomes optional. Only available for orders for country GB."
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:148
-msgid "Show prefill consent notice"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:149
-msgid "Only applicable for stores based in Germany and Austria"
-msgstr ""
-
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:161, ../includes/class-klarna-checkout-for-woocommerce-fields.php:168, ../includes/class-klarna-checkout-for-woocommerce-fields.php:175, ../includes/class-klarna-checkout-for-woocommerce-fields.php:182
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:103, ../includes/class-klarna-checkout-for-woocommerce-fields.php:110, ../includes/class-klarna-checkout-for-woocommerce-fields.php:117, ../includes/class-klarna-checkout-for-woocommerce-fields.php:124
 msgid "Get your API keys from your Klarna Checkout merchant account for US."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:188
-msgid "Color Settings"
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:130
+msgid "Shipping settings"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:134
+msgid "Separate shipping address"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:135
+msgid "Allow separate shipping address"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:137
+msgid "If this option is checked, customers will be able to enter shipping address different than their billing address in checkout."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:142
+msgid "Shipping methods in iframe"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:143
+msgid "Display Shipping methods in Klarna iframe."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:145
+msgid "If this option is checked, selection of shipping methods is done in Klarna iframe. Shipping price and name of the selected shipping method will still be displayed in WooCommerce order review."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:150
+msgid "Shipping details"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:151
+msgid "Shipping details note shown to customer"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:153
+msgid "Will be shown to customer in thank you page."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:158
+msgid "Allowed Customer Types"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:161
+msgid "B2C only"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:162
+msgid "B2B only"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:163
+msgid "B2C & B2B (defaults to B2C)"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:164
+msgid "B2B & B2C (defaults to B2B)"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:166
+msgid "Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO and FI). Learn more and <a href=\"%s\" target=\"_blank\">sign up for Klarna Checkout B2B here</a>."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:172
+msgid "Checkout settings"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:176
+msgid "Product URLs"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:178
+msgid "Send product and product image URLs to Klarna"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:183
+msgid "Date of birth mandatory"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:184
+msgid "Make customer date of birth mandatory"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:186
+msgid "If checked, the customer cannot skip date of birth."
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:191
+msgid "Title mandatory (GB)"
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:192
-msgid "Checkout button color"
+msgid "Make customer title mandatory"
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:194
-msgid "Checkout page button color"
+msgid "If unchecked, title becomes optional. Only available for orders for country GB."
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:199
-msgid "Checkout button text color"
+msgid "Show prefill consent notice"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:201
-msgid "Checkout page button text color"
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:200
+msgid "Only applicable for stores based in Germany and Austria"
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:206
+msgid "Color Settings"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:210
+msgid "Checkout button color"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:212
+msgid "Checkout page button color"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:217
+msgid "Checkout button text color"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:219
+msgid "Checkout page button text color"
+msgstr ""
+
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:224
 msgid "Checkout checkbox color"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:208
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:226
 msgid "Checkout page checkbox color"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:213
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:231
 msgid "Checkout checkbox checkmark color"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:215
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:233
 msgid "Checkout page checkbox checkmark color"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:220
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:238
 msgid "Checkout header color"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:222
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:240
 msgid "Checkout page header color"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:227
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:245
 msgid "Checkout link color"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:229
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:247
 msgid "Checkout page link color"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:234
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:252
 msgid "Checkout radius border (px)"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:236
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:254
 msgid "Checkout page radius border in pixels"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:249
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:267
 msgid "Checkout privacy policy text"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:250
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:268
 msgid "Select if you want to show the <em>Checkout privacy policy</em> text on the checkout page, and where you want to display it."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:254
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:272
 msgid "Do not display"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:255
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:273
 msgid "Display above checkout"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:256
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:274
 msgid "Display below checkout"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:260
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:278
 msgid "Terms and conditions checkbox"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:261
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:279
 msgid "Add a terms and conditions checkbox inside Klarna checkout iframe"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:263
+#: ../includes/class-klarna-checkout-for-woocommerce-fields.php:281
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
@@ -374,19 +394,19 @@ msgstr ""
 msgid "Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:366
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:371
 msgid "Klarna post_order request in process_payment_handler failed. Error message: %s."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:427
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:432
 msgid "Order finalized in thankyou page."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:461
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:466
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:473
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:478
 msgid "An account is already registered with your email address. Please log in."
 msgstr ""
 
