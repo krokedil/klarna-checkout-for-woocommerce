@@ -182,11 +182,19 @@ jQuery(function($) {
 		// Display Shipping Price in order review if Display shipping methods in iframe settings is active.
 		maybeDisplayShippingPrice: function() {
 			if ( 'kco' === kco_wc.paymentMethod && kco_params.shipping_methods_in_iframe === 'yes' && kco_params.is_confirmation_page === 'no' ) {
-				$("#shipping_method input[type='radio']:checked").each(function() {
-					var idVal = $(this).attr("id");
+				if( jQuery("#shipping_method input[type='radio']").length ) {
+					// Multiple shipping options available.
+					$("#shipping_method input[type='radio']:checked").each(function() {
+						var idVal = $(this).attr("id");
+						var shippingPrice = $("label[for='"+idVal+"']").text();
+						$(".woocommerce-shipping-totals td").html(shippingPrice);
+					});
+				} else {
+					// Only one shipping option available.
+					var idVal = $("#shipping_method input[name='shipping_method[0]']").attr("id");
 					var shippingPrice = $("label[for='"+idVal+"']").text();
 					$(".woocommerce-shipping-totals td").html(shippingPrice);
-				});
+				}
 			}
 		},
 
