@@ -36,8 +36,7 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 100 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_css' ) );
-		add_action( 'wp_ajax_activate_klarna_addon', array( $this, 'activate_klarna_addon' ) );
-		add_action( 'wp_ajax_deactivate_klarna_addon', array( $this, 'deactivate_klarna_addon' ) );
+		add_action( 'wp_ajax_change_klarna_addon_status', array( $this, 'change_klarna_addon_status' ) );
 	}
 
 	/**
@@ -47,6 +46,8 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 		if ( 'woocommerce_page_checkout-addons' == $hook || 'settings_page_specter-admin' == $hook ) {
 			wp_register_style( 'klarna-checkout-addons', KCO_WC_PLUGIN_URL . '/assets/css/checkout-addons.css', false, KCO_WC_VERSION );
 			wp_enqueue_style( 'klarna-checkout-addons' );
+			wp_register_script( 'klarna-checkout-addons', KCO_WC_PLUGIN_URL . '/assets/js/klarna-checkout-for-woocommerce-addons.js', true, KCO_WC_VERSION );
+			wp_enqueue_script( 'klarna-checkout-addons' );
 		}
 	}
 
@@ -135,16 +136,75 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 				$action = '<a class="button install" href="#">Install</a>';
 				break;
 			case 'activated':
-				$action = '<a class="button install" href="#"><label class="switch"><input type="checkbox" checked="checked"><span class="slider round"></span></label>Deactivate</a>';
+				$action = '<div class="button install" data-status="activated" data-action="deactivate" data-plugin-slug="' . $plugin_slug . '"><label class="switch"><span class="slider round"></span></label>Deactivate</div>';
 				break;
 			case 'deactivated':
-				$action = '<a class="button install" href="#"><label class="switch"><input type="checkbox"><span class="slider round"></span></label>Activate</a>';
+				$action = '<div class="button install" data-status="deactivated" data-action="activate" data-plugin-slug="' . $plugin_slug . '"><label class="switch"><span class="slider round"></span></label>Activate</div>';
 				break;
 			default:
 				$action = '<a class="button install" href="#">Install</a>';
 		}
 
 		return $action;
+	}
+
+	/**
+	 * Ajax request callback function
+	 */
+
+
+	public function change_klarna_addon_status() {
+		$status      = $_REQUEST['plugin_status'];
+		$action      = $_REQUEST['plugin_action'];
+		$plugin_slug = $_REQUEST['plugin_slug'];
+		$plugin      = WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php';
+
+		if ( 'activate' === $action ) {
+			$result = activate_plugin( $plugin, null, false, true );
+
+			if ( is_wp_error( $result ) ) {
+				// Process Error.
+				$new_status       = 'deactivated';
+				$new_action       = 'activate';
+				$new_status_label = 'Deactivated';
+			} else {
+				$new_status       = 'activated';
+				$new_action       = 'deactivate';
+				$new_status_label = 'Activated';
+			}
+		}
+		if ( 'deactivate' === $action ) {
+			$result = deactivate_plugins( $plugin, true, null );
+			if ( is_wp_error( $result ) ) {
+				// Process Error.
+				$new_status       = 'activated';
+				$new_action       = 'deactivate';
+				$new_status_label = 'Activated';
+			} else {
+				$new_status       = 'deactivated';
+				$new_action       = 'activate';
+				$new_status_label = 'Deactivated';
+			}
+		}
+		error_log( '$result ' . var_export( $result, true ) );
+		if ( is_wp_error( $result ) ) {
+			$return = array(
+				'error_message'    => $result->get_error_message(),
+				'new_status'       => $new_status,
+				'new_action'       => $new_action,
+				'new_status_label' => $new_status_label,
+			);
+			wp_send_json_error( $return );
+		} else {
+			$return = array(
+				'new_status'       => $new_status,
+				'new_action'       => $new_action,
+				'new_status_label' => $new_status_label,
+			);
+			wp_send_json_success( $return );
+		}
+
+		wp_die();
 	}
 
 }
