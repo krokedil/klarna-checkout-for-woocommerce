@@ -18,10 +18,25 @@ class Klarna_Checkout_For_WooCommerce_API {
 	private $settings = array();
 
 	/**
+	 * Send sales tax as separate item (US merchants).
+	 *
+	 * @var bool
+	 */
+	public $separate_sales_tax = false;
+
+	/**
 	 * Klarna_Checkout_For_WooCommerce_API constructor.
 	 */
 	public function __construct() {
 		$this->settings = get_option( 'woocommerce_kco_settings' );
+
+		$base_location      = wc_get_base_location();
+		$shop_country       = $base_location['country'];
+		$this->shop_country = $shop_country;
+
+		if ( 'US' === $this->shop_country ) {
+			$this->separate_sales_tax = true;
+		}
 	}
 
 	/**
@@ -719,13 +734,21 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( WC()->cart->needs_shipping() ) {
 			$shipping_options = array();
 			$packages         = WC()->shipping->get_packages();
+			$tax_display      = get_option( 'woocommerce_tax_display_cart' );
+
 			foreach ( $packages as $i => $package ) {
 				$chosen_method = isset( WC()->session->chosen_shipping_methods[ $i ] ) ? WC()->session->chosen_shipping_methods[ $i ] : '';
 				foreach ( $package['rates'] as $method ) {
-					$method_id    = $method->id;
-					$method_name  = $method->label;
-					$method_price = intval( round( $method->cost + array_sum( $method->taxes ), 2 ) * 100 );
-					if ( array_sum( $method->taxes ) > 0 ) {
+					$method_id   = $method->id;
+					$method_name = $method->label;
+
+					if ( $this->separate_sales_tax || 'excl' === $tax_display ) {
+						$method_price = intval( round( $method->cost, 2 ) * 100 );
+					} else {
+						$method_price = intval( round( $method->cost + array_sum( $method->taxes ), 2 ) * 100 );
+					}
+
+					if ( array_sum( $method->taxes ) > 0 && ( ! $this->separate_sales_tax && 'excl' !== $tax_display ) ) {
 						$method_tax_amount = intval( round( array_sum( $method->taxes ), 2 ) * 100 );
 						$method_tax_rate   = intval( round( ( array_sum( $method->taxes ) / $method->cost ) * 100, 2 ) * 100 );
 					} else {
