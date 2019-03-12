@@ -58,7 +58,9 @@ span.checkout-addon-status {
     height: 20px;
     margin-right: 8px;
 }
-  
+.checkout-addon .switch.download {
+    width: auto;
+}
 /* Hide default HTML checkbox */
 .checkout-addon .switch input {
     opacity: 0;
