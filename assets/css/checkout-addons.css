@@ -1,18 +1,37 @@
 /* Addon grid boxes */
-.list {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: auto;
-    grid-column-gap: 20px;
-    grid-row-gap: 20px;
-    justify-items: stretch;
-    align-items: stretch;
+@media screen and (max-width: 659px) {
+    .checkout-addon {
+        margin-bottom: 20px;
+    }
+}
+@media screen and (min-width: 660px) {
+    .list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+        grid-column-gap: 20px;
+        grid-row-gap: 20px;
+        justify-items: stretch;
+        align-items: stretch;
+    }
+}
+@media screen and (min-width: 1130px) {
+    .list {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: auto;
+        grid-column-gap: 20px;
+        grid-row-gap: 20px;
+        justify-items: stretch;
+        align-items: stretch;
+    }
 }
 .checkout-addon {
     border: 1px solid #ddd;
     position: relative;
     background: #fff;
     border-radius: 3px;
+    padding-bottom: 100px;
 }
 
 .checkout-addon-title {
@@ -24,6 +43,9 @@
 .checkout-addon-footer {
     background: #f7f7f7;
     border-top: 1px solid #ddd;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
 }
 .checkout-addon-status {
     float: left;
@@ -34,7 +56,8 @@
 .inside-wrapper {
     padding: 20px;
 }
-.inside-wrapper:after {
+.inside-wrapper:after,
+.checkout-addon:after {
     content: "";
     display: table;
     clear: both;
@@ -43,7 +66,11 @@
 /* Buttons */
 .wp-core-ui .checkout-addon .button {
     height: 32px;
-    line-height:30px;
+}
+@media screen and (min-width: 784px) {
+    .wp-core-ui .checkout-addon .button {
+        line-height:30px;
+    }
 }
 span.checkout-addon-status {
     line-height: 30px;
@@ -114,4 +141,13 @@ span.checkout-addon-status {
   
 .checkout-addon .slider.round:before {
     border-radius: 50%;
+}
+
+/* Remove all admin notices on addon page */
+.update-nag, 
+.updated, 
+.error, 
+.is-dismissible,
+.notice { 
+    display: none; 
 }
