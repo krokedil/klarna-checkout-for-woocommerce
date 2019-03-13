@@ -861,7 +861,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 		foreach ( $order->get_fees() as $fee ) {
 			array_push( $order_lines, KCO_WC()->order_lines_from_order->get_order_line_fees( $fee ) );
 		}
-		array_push( $order_lines, KCO_WC()->order_lines_from_order->get_order_line_shipping( $order ) );
+		if ( ! empty( $order->get_shipping_method() ) ) {
+			array_push( $order_lines, KCO_WC()->order_lines_from_order->get_order_line_shipping( $order ) );
+		}
 
 		$body = array(
 			'order_amount'      => KCO_WC()->order_lines_from_order->get_order_amount( $order_id ),
