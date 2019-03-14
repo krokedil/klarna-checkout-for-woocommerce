@@ -113,7 +113,7 @@ function kco_wc_show_another_gateway_button() {
 		$select_another_method_text = isset( $settings['select_another_method_text'] ) && '' !== $settings['select_another_method_text'] ? $settings['select_another_method_text'] : __( 'Select another payment method', 'klarna-checkout-for-woocommerce' );
 
 		?>
-		<p style="margin-top:30px">
+		<p class="klarna-checkout-select-other-wrapper">
 			<a class="checkout-button button" href="#" id="klarna-checkout-select-other">
 				<?php echo $select_another_method_text; ?>
 			</a>
