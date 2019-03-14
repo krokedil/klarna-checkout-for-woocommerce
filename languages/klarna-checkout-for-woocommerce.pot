@@ -155,7 +155,7 @@ msgid "B2B & B2C (defaults to B2B)"
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:71
-msgid "Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO and FI). Learn more and <a href=\"%s\" target=\"_blank\">sign up for Klarna Checkout B2B here</a>."
+msgid "Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO and FI). You need to contact Klarna directly to activate this with your account."
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-fields.php:76
