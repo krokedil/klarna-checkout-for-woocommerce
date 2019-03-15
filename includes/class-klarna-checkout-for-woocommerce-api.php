@@ -35,11 +35,13 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'body'       => $this->get_request_body( 'create' ),
+			'timeout'    => 10,
 		);
 		$log_array    = array(
 			'headers'    => $request_args['headers'],
 			'user-agent' => $request_args['user-agent'],
 			'body'       => json_decode( $request_args['body'] ),
+			'timeout'    => 10,
 		);
 		KCO_WC()->logger->log( 'Create Klarna order (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
 		krokedil_log_events( null, 'Pre Create Order request args', $log_array );
@@ -117,6 +119,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$request_args = array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
+			'timeout'    => 10,
 		);
 		krokedil_log_events( $order_id, 'Pre Retrieve Order request args', $request_args );
 		KCO_WC()->logger->log( 'Retrieve ongoing Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
@@ -149,11 +152,13 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'body'       => $this->get_request_body(),
+			'timeout'    => 10,
 		);
 		$log_array       = array(
 			'headers'    => $request_args['headers'],
 			'user-agent' => $request_args['user-agent'],
 			'body'       => json_decode( $request_args['body'] ),
+			'timeout'    => 10,
 		);
 		// No update if nothing changed in data being sent to Klarna.
 		if ( WC()->session->get( 'kco_wc_update_md5' ) && WC()->session->get( 'kco_wc_update_md5' ) === md5( serialize( $request_args ) ) ) {
@@ -196,6 +201,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$request_args = array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
+			'timeout'    => 10,
 		);
 		$response     = wp_safe_remote_get( $request_url, $request_args );
 
@@ -231,6 +237,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$request_args = array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
+			'timeout'    => 10,
 		);
 
 		$response = wp_safe_remote_post( $request_url, $request_args );
@@ -258,6 +265,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 					'merchant_reference2' => $merchant_references['merchant_reference2'],
 				)
 			),
+			'timeout'    => 10,
 		);
 
 		$response = wp_safe_remote_request( $request_url, $request_args );
@@ -839,6 +847,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'body'       => $this->get_recurring_body( $order ),
+			'timeout'    => 10,
 		);
 
 		KCO_WC()->logger->log( 'Create recurring order request (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
