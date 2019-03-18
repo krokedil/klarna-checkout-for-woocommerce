@@ -14,7 +14,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 	 * Returns the fields.
 	 */
 	public static function fields() {
-		$settings   = array(
+		$settings = array(
 			'enabled'                    => array(
 				'title'       => __( 'Enable/Disable', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Klarna Checkout', 'klarna-checkout-for-woocommerce' ),
@@ -36,55 +36,11 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'allow_separate_shipping'    => array(
-				'title'       => __( 'Separate shipping address', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Allow separate shipping address', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'checkbox',
-				'description' => __( 'If this option is checked, customers will be able to enter shipping address different than their billing address in checkout.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'no',
-				'desc_tip'    => true,
-			),
 			'select_another_method_text' => array(
 				'title'       => __( 'Other payment method button text', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Customize the <em>Select another payment method</em> button text that is displayed in checkout if using other payment methods than Klarna Checkout. Leave blank to use the default (and translatable) text.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
-				'desc_tip'    => true,
-			),
-			'shipping_details'           => array(
-				'title'       => __( 'Shipping details', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Shipping details note shown to customer', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Will be shown to customer in thank you page.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => false,
-			),
-			'allowed_customer_types'     => array(
-				'title'       => __( 'Allowed Customer Types', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'select',
-				'options'     => array(
-					'B2C'  => __( 'B2C only', 'klarna-checkout-for-woocommerce' ),
-					'B2B'  => __( 'B2B only', 'klarna-checkout-for-woocommerce' ),
-					'B2CB' => __( 'B2C & B2B (defaults to B2C)', 'klarna-checkout-for-woocommerce' ),
-					'B2BC' => __( 'B2B & B2C (defaults to B2B)', 'klarna-checkout-for-woocommerce' ),
-				),
-				'description' => __( 'Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO and FI). You need to contact Klarna directly to activate this with your account.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'B2C',
-				'desc_tip'    => false,
-			),
-			'send_product_urls'          => array(
-				'title'    => __( 'Product URLs', 'klarna-checkout-for-woocommerce' ),
-				'type'     => 'checkbox',
-				'label'    => __( 'Send product and product image URLs to Klarna', 'klarna-checkout-for-woocommerce' ),
-				'default'  => 'yes',
-				'desc_tip' => true,
-			),
-			'logging'                    => array(
-				'title'       => __( 'Logging', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Log debug messages', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'checkbox',
-				'description' => __( 'Save debug messages to the WooCommerce System Status log.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'no',
 				'desc_tip'    => true,
 			),
 			'testmode'                   => array(
@@ -95,12 +51,12 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => 'yes',
 				'desc_tip'    => true,
 			),
-			'dob_mandatory'              => array(
-				'title'       => __( 'Date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Make customer date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
+			'logging'                    => array(
+				'title'       => __( 'Logging', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Log debug messages', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
-				'description' => __( 'If checked, the customer cannot skip date of birth.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'no',
+				'description' => __( 'Save debug messages to the WooCommerce System Status log.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'yes',
 				'desc_tip'    => true,
 			),
 			// EU.
@@ -136,20 +92,6 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'title_mandatory'            => array(
-				'title'       => __( 'Title mandatory (GB)', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Make customer title mandatory', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'checkbox',
-				'description' => __( 'If unchecked, title becomes optional. Only available for orders for country GB.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'yes',
-				'desc_tip'    => true,
-			),
-			'prefill_consent'            => array(
-				'title'   => __( 'Show prefill consent notice', 'klarna-checkout-for-woocommerce' ),
-				'label'   => __( 'Only applicable for stores based in Germany and Austria', 'klarna-checkout-for-woocommerce' ),
-				'type'    => 'checkbox',
-				'default' => 'yes',
-			),
 			// US.
 			'credentials_us'             => array(
 				'title' => '<img src="' . plugins_url( 'assets/img/flags/us.svg', KCO_WC_MAIN_FILE ) . '" height="12" /> API Credentials United States',
@@ -182,6 +124,82 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
+			),
+			// Shipping.
+			'shipping_section'           => array(
+				'title' => __( 'Shipping settings', 'klarna-checkout-for-woocommerce' ),
+				'type'  => 'title',
+			),
+			'allow_separate_shipping'    => array(
+				'title'       => __( 'Separate shipping address', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Allow separate shipping address', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If this option is checked, customers will be able to enter shipping address different than their billing address in checkout.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
+			'shipping_methods_in_iframe' => array(
+				'title'       => __( 'Shipping methods in iframe', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Display Shipping methods in Klarna iframe.', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If this option is checked, selection of shipping methods is done in Klarna iframe. Shipping price and name of the selected shipping method will still be displayed in WooCommerce order review.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
+			'shipping_details'           => array(
+				'title'       => __( 'Shipping details', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Shipping details note shown to customer', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'text',
+				'description' => __( 'Will be shown to customer in thank you page.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => '',
+				'desc_tip'    => false,
+			),
+			'allowed_customer_types'     => array(
+				'title'       => __( 'Allowed Customer Types', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'select',
+				'options'     => array(
+					'B2C'  => __( 'B2C only', 'klarna-checkout-for-woocommerce' ),
+					'B2B'  => __( 'B2B only', 'klarna-checkout-for-woocommerce' ),
+					'B2CB' => __( 'B2C & B2B (defaults to B2C)', 'klarna-checkout-for-woocommerce' ),
+					'B2BC' => __( 'B2B & B2C (defaults to B2B)', 'klarna-checkout-for-woocommerce' ),
+				),
+				'description' => __( 'Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO and FI). You need to contact Klarna directly to activate this with your account.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'B2C',
+				'desc_tip'    => false,
+			),
+			// Checkout.
+			'checkout_section'           => array(
+				'title' => __( 'Checkout settings', 'klarna-checkout-for-woocommerce' ),
+				'type'  => 'title',
+			),
+			'send_product_urls'          => array(
+				'title'    => __( 'Product URLs', 'klarna-checkout-for-woocommerce' ),
+				'type'     => 'checkbox',
+				'label'    => __( 'Send product and product image URLs to Klarna', 'klarna-checkout-for-woocommerce' ),
+				'default'  => 'yes',
+				'desc_tip' => true,
+			),
+			'dob_mandatory'              => array(
+				'title'       => __( 'Date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Make customer date of birth mandatory', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If checked, the customer cannot skip date of birth.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
+			'title_mandatory'            => array(
+				'title'       => __( 'Title mandatory (GB)', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Make customer title mandatory', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If unchecked, title becomes optional. Only available for orders for country GB.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'yes',
+				'desc_tip'    => true,
+			),
+			'prefill_consent'            => array(
+				'title'   => __( 'Show prefill consent notice', 'klarna-checkout-for-woocommerce' ),
+				'label'   => __( 'Only applicable for stores based in Germany and Austria', 'klarna-checkout-for-woocommerce' ),
+				'type'    => 'checkbox',
+				'default' => 'yes',
 			),
 			// Checkout iframe settings.
 			'color_settings_title'       => array(
