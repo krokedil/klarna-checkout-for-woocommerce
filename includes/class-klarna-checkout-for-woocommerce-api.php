@@ -133,6 +133,13 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$log_order->html_snippet = '';
 			krokedil_log_events( $order_id, 'Pre Retrieve Order response', $log_order );
 			return $klarna_order;
+		} elseif ( ! is_wp_error( $response ) && ( 401 === $response['response']['code'] || 404 === $response['response']['code'] || 405 === $response['response']['code'] ) ) {
+			krokedil_log_events( $order_id, 'ERROR Pre Get Order response', $response );
+			KCO_WC()->logger->log( 'ERROR Pre Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
+			$error_message = $response['response']['message'];
+			$error         = new WP_Error();
+			$error->add( 'kco', $error_message );
+			return $error;
 		} else {
 			$error = $this->extract_error_messages( $response );
 			krokedil_log_events( $order_id, 'Pre Retrieve Order response', $error );
@@ -335,10 +342,18 @@ class Klarna_Checkout_For_WooCommerce_API {
 			// Get Klarna order.
 			$response = $this->request_pre_get_order( $order_id );
 
-			// If we got errors - delete the Klarna order id session and return the error object.
+			// If we got errors - delete the Klarna order id session and redirect the customer to cart page.
 			if ( is_wp_error( $response ) ) {
 				WC()->session->__unset( 'kco_wc_order_id' );
-				return $response;
+				$url = add_query_arg(
+					array(
+						'kco-order' => 'error',
+						'reason'    => base64_encode( $response->get_error_message() ),
+					),
+					wc_get_cart_url()
+				);
+				wp_safe_redirect( $url );
+				exit;
 			}
 
 			// Check that we got a response body.

@@ -187,7 +187,15 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				// Check if we got a wp_error.
 				if ( is_wp_error( $response ) ) {
 					// If wp_error, redirect with error.
-					$return['redirect_url'] = add_query_arg( 'kco-order', 'error', wc_get_cart_url() );
+					$url                    = add_query_arg(
+						array(
+							'kco-order' => 'error',
+							'reason'    => base64_encode( $response->get_error_message() ),
+						),
+						wc_get_cart_url()
+					);
+					$return['redirect_url'] = $url;
+
 					wp_send_json_error( $return );
 					wp_die();
 				}
