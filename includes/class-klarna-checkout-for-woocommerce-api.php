@@ -151,7 +151,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		} elseif ( ! is_wp_error( $response ) && ( 401 === $response['response']['code'] || 404 === $response['response']['code'] || 405 === $response['response']['code'] ) ) {
 			krokedil_log_events( $order_id, 'ERROR Pre Get Order response', $response );
 			KCO_WC()->logger->log( 'ERROR Pre Get Order response (' . $request_url . ') ' . stripslashes_deep( json_encode( $response ) ) );
-			$error_message = $response['response']['message'];
+			$error_message = $response['response']['code'] . ' - ' . $response['response']['message'];
 			$error         = new WP_Error();
 			$error->add( 'kco', $error_message );
 			return $error;
