@@ -16,34 +16,6 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:183
-msgid "Settings"
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:184
-msgid "Support"
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:247
-msgid "Activate Now"
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:274
-msgid "Install	Now"
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:300
-msgid "An error occurred during communication with Klarna (%s)."
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:302
-msgid "An error occurred during communication with Klarna. Please try again."
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:307
-msgid "An error occurred during communication with Klarna (Klarna order ID is missing). Please try again."
-msgstr ""
-
 #: ../includes/class-klarna-checkout-for-woocommerce-admin-notices.php:81
 msgid "You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout."
 msgstr ""
@@ -94,7 +66,7 @@ msgstr ""
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api.php:367
+#: ../includes/class-klarna-checkout-for-woocommerce-api.php:375
 msgid "The Klarna session has expired. Please try again"
 msgstr ""
 
@@ -463,4 +435,32 @@ msgstr ""
 
 #: ../includes/klarna-checkout-for-woocommerce-status-report.php:22
 msgid "Displays the number of orders created via the API callback feature during the last month."
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:183
+msgid "Settings"
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:184
+msgid "Support"
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:247
+msgid "Activate Now"
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:274
+msgid "Install	Now"
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:300
+msgid "An error occurred during communication with Klarna (%s)."
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:302
+msgid "An error occurred during communication with Klarna. Please try again."
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:307
+msgid "An error occurred during communication with Klarna (Klarna order ID is missing). Please try again."
 msgstr ""

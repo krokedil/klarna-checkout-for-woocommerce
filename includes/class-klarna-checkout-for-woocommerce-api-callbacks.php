@@ -245,8 +245,9 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		WC()->cart->calculate_totals();
 
 		$all_in_stock     = true;
-		$shipping_chosen  = false;
 		$shipping_valid   = true;
+		$shipping_chosen  = false;
+		$needs_shipping   = false;
 		$coupon_valid     = true;
 		$has_subscription = false;
 		$needs_login      = false;
@@ -275,7 +276,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$cart_items = $data['order_lines'];
 		foreach ( $cart_items as $cart_item ) {
 			if ( 'physical' === $cart_item['type'] || 'digital' === $cart_item['type'] ) {
-				$needs_shipping = false;
+
 				// Get product by SKU or ID.
 				if ( wc_get_product_id_by_sku( $cart_item['reference'] ) ) {
 					$cart_item_product = wc_get_product( wc_get_product_id_by_sku( $cart_item['reference'] ) );
@@ -306,10 +307,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			} elseif ( 'shipping_fee' === $cart_item['type'] ) {
 				$shipping_chosen = true;
 			}
-			if ( $needs_shipping ) {
-				$shipping_valid = $shipping_chosen;
-			}
 		}
+
+		if ( $needs_shipping ) {
+			$shipping_valid = $shipping_chosen;
+		}
+
 		// Validate any potential coupons.
 		if ( ! empty( json_decode( $data['merchant_data'] )->coupons ) ) {
 			$coupons  = json_decode( $data['merchant_data'] )->coupons;
