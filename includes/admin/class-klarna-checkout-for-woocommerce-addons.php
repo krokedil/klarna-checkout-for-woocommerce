@@ -62,45 +62,33 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 	 * Add the Addons options page to WooCommerce.
 	 **/
 	public function options_page() {
+		$addon_content = self::get_addons();
+		error_log( '$addon_content ' . var_export( $addon_content, true ) );
 		?>
-		<div id="checkout-addon-heading" class="checkout-addon-heading">
-			<h1><?php esc_html_e( 'Checkout Addons', 'klarna-checkout-for-woocommerce' ); ?></h1>
-		</div>	
-		<div id="checkout-addons" class="wrap">
-			<div class="list">
-				<div class="checkout-addon klarna-order-management-for-woocommerce">
-					<h3 class="checkout-addon-title">Klarna Order Management for WooCommerce</h3>
-					<p class="checkout-addon-excerpt">Handle post purchase order management in Klarnas system directly from WooCommerce.</p>
-					<div class="checkout-addon-footer">
-						<div class="inside-wrapper">
-							<span class="checkout-addon-status" data-plugin-slug="klarna-order-management-for-woocommerce">Status: <span class="status-text"><?php echo self::get_addon_status( 'klarna-order-management-for-woocommerce' )['title']; ?></span></span>
-							<span class="checkout-addon-action"><?php echo self::get_addon_action_button( 'klarna-order-management-for-woocommerce' ); ?></span>
+		<div id="checkout-addons-heading" class="checkout-addons-heading">
+			<h1><?php esc_html_e( 'Klarna resources', 'klarna-checkout-for-woocommerce' ); ?></h1>
+		</div>
+		<div id="checkout-addons-body" class="checkout-addons-body">
+			<?php if ( $addon_content->sections ) : ?>
+				<?php foreach ( $addon_content->sections as $section ) : ?>
+					<div id="<?php echo esc_html( $section->module ); ?>" class="wrap">
+						<div class="list">
+							<?php foreach ( $section->items as $item ) : ?>
+								<div class="checkout-addon <?php echo esc_html( strtok( $item->plugin_slug, '/' ) ); ?>">
+									<h3 class="checkout-addon-title"><?php echo esc_html( $item->title ); ?></h3>
+									<p class="checkout-addon-excerpt"><?php echo esc_html( $item->description ); ?></p>
+									<div class="checkout-addon-footer">
+										<div class="inside-wrapper">
+											<span class="checkout-addon-status" data-plugin-slug="<?php echo $item->plugin_slug; ?>">Status: <span class="status-text"><?php echo self::get_addon_status( $item->plugin_slug )['title']; ?></span></span>
+											<span class="checkout-addon-action"><?php echo self::get_addon_action_button( $item ); ?></span>
+										</div>
+									</div>
+								</div>
+							<?php endforeach; ?>
 						</div>
 					</div>
-				</div>
-
-				<div class="checkout-addon klarna-onsite-messaging-for-woocommerce">
-					<h3 class="checkout-addon-title">Klarna On-Site Messaging for WooCommerce</h3>
-					<p class="checkout-addon-excerpt">Handle post purchase order management in Klarnas system directly from WooCommerce.</p>
-					<div class="checkout-addon-footer">
-						<div class="inside-wrapper">
-							<span class="checkout-addon-status" data-plugin-slug="klarna-onsite-messaging-for-woocommerce">Status: <span class="status-text"><?php echo self::get_addon_status( 'klarna-onsite-messaging-for-woocommerce' )['title']; ?></span></span>
-							<span class="checkout-addon-action"><?php echo self::get_addon_action_button( 'klarna-onsite-messaging-for-woocommerce' ); ?></span>
-						</div>
-					</div>
-				</div>
-				
-				<div class="checkout-addon">
-					<h3 class="checkout-addon-title">My addon</h3>
-					<p class="checkout-addon-excerpt">A short text to describe the addon.</p>
-					<div class="checkout-addon-footer">
-						<div class="inside-wrapper">
-							<span class="checkout-addon-status">Status: <span><?php self::get_addon_status( 'hej' ); ?></span></span>
-							<span class="checkout-addon-action"><a class="button install" href="#">Install</a></span>
-						</div>
-					</div>
-				</div>
-			</div>
+				<?php endforeach; ?>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
@@ -113,9 +101,10 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 			'id'    => 'unknown',
 			'title' => 'Unknown',
 		);
+
 		// If plugin file exists.
-		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
-			if ( is_plugin_active( $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
+		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug ) ) {
+			if ( is_plugin_active( $plugin_slug ) ) {
 				$status['id']    = 'activated';
 				$status['title'] = 'Activated';
 			} else {
@@ -132,20 +121,20 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 	/**
 	 * Get addon action button helper function.
 	 **/
-	public static function get_addon_action_button( $plugin_slug ) {
+	public static function get_addon_action_button( $item ) {
 
-		$status = self::get_addon_status( $plugin_slug );
+		$status = self::get_addon_status( $item->plugin_slug );
 		$action = '';
 
 		switch ( $status['id'] ) {
 			case 'not-installed':
-				$action = '<div class="button install" data-status="not-installed" data-action="install" data-plugin-slug="' . $plugin_slug . '"><label class="switch download"><span class="dashicons dashicons-download round"></span></label><span class="action-text">' . __( 'Install', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
+				$action = '<div class="button install" data-status="not-installed" data-action="install" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch download"><span class="dashicons dashicons-download round"></span></label><span class="action-text">' . __( 'Install', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
 				break;
 			case 'activated':
-				$action = '<div class="button install" data-status="activated" data-action="deactivate" data-plugin-slug="' . $plugin_slug . '"><label class="switch"><span class="slider round"></span></label><span class="action-text">' . __( 'Deactivate', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
+				$action = '<div class="button install" data-status="activated" data-action="deactivate" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch"><span class="slider round"></span></label><span class="action-text">' . __( 'Deactivate', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
 				break;
 			case 'deactivated':
-				$action = '<div class="button install" data-status="deactivated" data-action="activate" data-plugin-slug="' . $plugin_slug . '"><label class="switch"><span class="slider round"></span></label><span class="action-text">' . __( 'Activate', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
+				$action = '<div class="button install" data-status="deactivated" data-action="activate" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch"><span class="slider round"></span></label><span class="action-text">' . __( 'Activate', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
 				break;
 			default:
 				$action = '<a class="button install" href="#">Install</a>';
@@ -158,11 +147,11 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 	 * Ajax request callback function
 	 */
 	public function change_klarna_addon_status() {
-		$status                     = $_REQUEST['plugin_status'];
-		$action                     = $_REQUEST['plugin_action'];
-		$plugin_slug                = $_REQUEST['plugin_slug'];
-		$plugin_folder_and_filename = $plugin_slug . '/' . $plugin_slug . '.php';
-		$plugin                     = WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php';
+		$status      = $_REQUEST['plugin_status'];
+		$action      = $_REQUEST['plugin_action'];
+		$plugin_slug = $_REQUEST['plugin_slug'];
+		// $plugin_folder_and_filename = $plugin_slug . '/' . $plugin_slug . '.php';
+		$plugin = WP_PLUGIN_DIR . '/' . $plugin_slug;
 
 		if ( 'activate' === $action ) {
 			$result = activate_plugin( $plugin, null, false, true );
@@ -205,9 +194,9 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 			}
 
 			$all_plugins = get_plugins();
-			if ( ! array_key_exists( $plugin_folder_and_filename, $all_plugins ) ) {
-
-				$result = self::install_plugin( self::get_download_link_from_slug( $plugin_slug ) );
+			if ( ! array_key_exists( $plugin_slug, $all_plugins ) ) {
+				$plugin_url = $_REQUEST['plugin_url'];
+				$result     = self::install_plugin( $plugin_url );
 
 				if ( is_wp_error( $result ) || 'error' === $result['status'] ) {
 					$new_status       = 'not-installed';
@@ -294,21 +283,26 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 		);
 	}
 
+
 	/**
-	 * Get plugin download link from slug helper function.
-	 **/
-	public static function get_download_link_from_slug( $slug ) {
-		switch ( $slug ) {
-			case 'klarna-onsite-messaging-for-woocommerce':
-				$url = 'https://s3-eu-west-1.amazonaws.com/krokedil-plugins/klarna-onsite-messaging-for-woocommerce.zip';
-				break;
-			case 'klarna-order-management-for-woocommerce':
-				$url = 'https://downloads.wordpress.org/plugin/klarna-order-management-for-woocommerce.zip';
-				break;
-			default:
-				$url = '';
+	 * Get featured for the addons screen
+	 *
+	 * @return array of objects
+	 */
+	public static function get_addons() {
+		if ( false === ( $addons = get_transient( 'wc_kco_addons' ) ) ) {
+			$raw_addons = wp_safe_remote_get( 'https://s3-eu-west-1.amazonaws.com/krokedil-checkout-addons/klarna-checkout-for-woocommerce-addons.json', array( 'user-agent' => 'KCO Addons Page' ) );
+			if ( ! is_wp_error( $raw_addons ) ) {
+				$addons = json_decode( wp_remote_retrieve_body( $raw_addons ) );
+				if ( $addons ) {
+					// set_transient( 'wc_kco_addons', $addons, HOUR_IN_SECONDS );
+				}
+			}
 		}
-		return $url;
+
+		if ( is_object( $addons ) ) {
+			return $addons;
+		}
 	}
 
 }

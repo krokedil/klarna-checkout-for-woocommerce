@@ -26,12 +26,27 @@
         align-items: stretch;
     }
 }
+.checkout-addons-heading {
+    background: #EB6F93;
+    color: #fff;
+    min-height: 120px;
+    margin-left: -20px;
+    margin-bottom: 20px;
+    padding:20px;
+}
+.checkout-addons-heading h1 {
+    color: #fff;
+    margin-top: 0;
+}
 .checkout-addon {
     border: 1px solid #ddd;
     position: relative;
     background: #fff;
     border-radius: 3px;
     padding-bottom: 100px;
+}
+.checkout-addons-body {
+    max-width: 1400px;
 }
 
 .checkout-addon-title {
