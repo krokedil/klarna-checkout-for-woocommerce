@@ -179,6 +179,25 @@ jQuery(function($) {
 			}
 		},
 
+		// Display Shipping Price in order review if Display shipping methods in iframe settings is active.
+		maybeDisplayShippingPrice: function() {
+			if ( 'kco' === kco_wc.paymentMethod && kco_params.shipping_methods_in_iframe === 'yes' && kco_params.is_confirmation_page === 'no' ) {
+				if( jQuery("#shipping_method input[type='radio']").length ) {
+					// Multiple shipping options available.
+					$("#shipping_method input[type='radio']:checked").each(function() {
+						var idVal = $(this).attr("id");
+						var shippingPrice = $("label[for='"+idVal+"']").text();
+						$(".woocommerce-shipping-totals td").html(shippingPrice);
+					});
+				} else {
+					// Only one shipping option available.
+					var idVal = $("#shipping_method input[name='shipping_method[0]']").attr("id");
+					var shippingPrice = $("label[for='"+idVal+"']").text();
+					$(".woocommerce-shipping-totals td").html(shippingPrice);
+				}
+			}
+		},
+
 		// When "Change to another payment method" is clicked.
 		changeFromKco: function(e) {
 			e.preventDefault();
@@ -382,6 +401,7 @@ jQuery(function($) {
 
 			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
+			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
 			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			//kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.setFormData);
@@ -441,6 +461,40 @@ jQuery(function($) {
 						},
 						'shipping_option_change': function(data) {
 							kco_wc.log('shipping_option_change', data);
+							kco_wc.log( data );
+							$('.woocommerce-checkout-review-order-table').block({
+								message: null,
+								overlayCSS: {
+									background: '#fff',
+									opacity: 0.6
+								}
+							});
+							kco_wc.kcoSuspend();
+
+							$.ajax(
+								{
+									url: kco_params.update_shipping_url,
+									type: 'POST',
+									dataType: 'json',
+									data: {
+										data: data,
+										nonce: kco_params.update_shipping_nonce
+									},
+									success: function (response) {
+										kco_wc.log(response);
+										$('body').trigger('update_checkout');
+									},
+									error: function (response) {
+										kco_wc.log(response);
+									},
+									complete: function(response) {
+										$('#shipping_method #' + response.responseJSON.data.shipping_option_name).prop('checked', true);
+										$('body').trigger('kco_shipping_option_changed');
+										$('.woocommerce-checkout-review-order-table').unblock();
+										kco_wc.kcoResume();
+									}
+								}
+							);
 						},
 						'can_not_complete_order': function(data) {
 							kco_wc.log('can_not_complete_order', data);

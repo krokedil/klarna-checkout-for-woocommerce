@@ -82,21 +82,23 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 		wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
 
-		$chosen_shipping_methods = WC()->session->get( 'chosen_shipping_methods' );
-
-		if ( isset( $_POST['shipping'] ) && is_array( $_POST['shipping'] ) ) {
-			foreach ( $_POST['shipping'] as $i => $value ) {
-				$chosen_shipping_methods[ $i ] = wc_clean( $value );
-			}
+		if ( isset( $_POST['data'] ) && is_array( $_POST['data'] ) ) {
+			$shipping_option           = $_POST['data'];
+			$chosen_shipping_methods   = array();
+			$chosen_shipping_methods[] = wc_clean( $shipping_option['id'] );
+			WC()->session->set( 'chosen_shipping_methods', $chosen_shipping_methods );
 		}
-
-		WC()->session->set( 'chosen_shipping_methods', $chosen_shipping_methods );
 
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_fees();
 		WC()->cart->calculate_totals();
 		KCO_WC()->api->request_pre_update_order();
 
+		$shipping_option_name = 'shipping_method_0_' . str_replace( ':', '', $shipping_option['id'] );
+		$data                 = array(
+			'shipping_option_name' => $shipping_option_name,
+		);
+		wp_send_json_success( $data );
 		wp_die();
 	}
 

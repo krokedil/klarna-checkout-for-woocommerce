@@ -50,6 +50,12 @@
 		box-sizing: border-box;
 	}
 }
+/* Hide shipping methods in order review if displayed in KCO iframe */
+.kco-shipping-display ul#shipping_method {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+}
 .klarna-checkout-select-other-wrapper {
     margin-top:30px;
 }
