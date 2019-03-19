@@ -55,7 +55,7 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 	 * Add the Addons menu to WooCommerce
 	 **/
 	public function add_menu() {
-		$submenu = add_submenu_page( 'woocommerce', __( 'Checkout addons', 'klarna-checkout-for-woocommerce' ), __( 'Checkout addons', 'klarna-checkout-for-woocommerce' ), 'manage_woocommerce', 'checkout-addons', array( $this, 'options_page' ) );
+		$submenu = add_submenu_page( 'woocommerce', __( 'Klarna addons', 'klarna-checkout-for-woocommerce' ), __( 'Klarna addons', 'klarna-checkout-for-woocommerce' ), 'manage_woocommerce', 'checkout-addons', array( $this, 'options_page' ) );
 	}
 
 	/**
@@ -66,12 +66,20 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 		error_log( '$addon_content ' . var_export( $addon_content, true ) );
 		?>
 		<div id="checkout-addons-heading" class="checkout-addons-heading">
-			<h1><?php esc_html_e( 'Klarna resources', 'klarna-checkout-for-woocommerce' ); ?></h1>
+			<div class="checkout-addons-wrap">
+				<h1><?php esc_html_e( 'Klarna resources', 'klarna-checkout-for-woocommerce' ); ?></h1>
+			</div>
 		</div>
-		<div id="checkout-addons-body" class="checkout-addons-body">
+
+		<div class="checkout-addons-banner-block checkout-addons-wrap wrap">
+			<h2>Welcome to the new Klarna resource page</h2>
+			<p>Here you can find information about new features and addons for your WooCommerce store.</p>
+		</div>
+
+		<div id="checkout-addons-body" class="checkout-addons-body checkout-addons-wrap wrap">
 			<?php if ( $addon_content->sections ) : ?>
 				<?php foreach ( $addon_content->sections as $section ) : ?>
-					<div id="<?php echo esc_html( $section->module ); ?>" class="wrap">
+					<div id="<?php echo esc_html( $section->module ); ?>" class="<?php echo esc_html( $section->module ); ?>">
 						<div class="list">
 							<?php foreach ( $section->items as $item ) : ?>
 								<div class="checkout-addon <?php echo esc_html( strtok( $item->plugin_slug, '/' ) ); ?>">
