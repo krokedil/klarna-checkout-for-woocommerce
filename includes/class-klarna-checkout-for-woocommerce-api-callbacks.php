@@ -118,11 +118,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$order    = wc_get_order( $order_id );
 
 		if ( $order ) {
-			// The order was already created. Check if order status was set (in thankyou page).
-			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
+			// Get the Klarna order data.
+			$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
+			$klarna_order = apply_filters( 'kco_wc_api_callbacks_push_klarna_order', json_decode( $response['body'] ) );
 
-				$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
-				$klarna_order = apply_filters( 'kco_wc_api_callbacks_push_klarna_order', json_decode( $response['body'] ) );
+			// The Woo order was already created. Check if order status was set (in process_payment_handler).
+			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
 
 				krokedil_log_events( $order_id, 'Klarna push callback. Updating order status.', $klarna_order );
 
@@ -138,18 +139,19 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 					$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
 					$order->update_status( 'on-hold', $note );
 				}
-				KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
-				KCO_WC()->api->request_post_set_merchant_reference(
-					$klarna_order_id,
-					array(
-						'merchant_reference1' => $order->get_order_number(),
-						'merchant_reference2' => $order->get_id(),
-					)
-				);
-
 			} else {
 				krokedil_log_events( $order_id, 'Klarna push callback. Order status already set to On hold/Processing/Completed.', $klarna_order );
 			}
+
+			// Acknowledge order in Klarna.
+			KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
+			KCO_WC()->api->request_post_set_merchant_reference(
+				$klarna_order_id,
+				array(
+					'merchant_reference1' => $order->get_order_number(),
+					'merchant_reference2' => $order->get_id(),
+				)
+			);
 		} else {
 			// Backup order creation.
 			$this->backup_order_creation( $klarna_order_id );
