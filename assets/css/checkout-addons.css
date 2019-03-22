@@ -29,9 +29,11 @@
 
 .checkout-addons-wrap {
     max-width: 1400px;
+    box-sizing: border-box;
 }
 
 /* Style */
+/*
 .checkout-addons-heading {
     background: #EB6F93;
     color: #fff;
@@ -44,6 +46,10 @@
     color: #fff;
     margin-top: 0;
 }
+*/
+.checkout-addons-heading h1 {
+    margin: 1.5em 0;
+}
 .checkout-addons-banner-block {
     background: #fff;
     border: 1px solid #ddd;
@@ -55,6 +61,13 @@
     background: #fff;
     border-radius: 3px;
     padding-bottom: 100px;
+}
+.checkout-addon-icon {
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+    padding-top: 20px;
+    max-width: 125px;
 }
 .checkout-addon-title {
     margin: 20px;
