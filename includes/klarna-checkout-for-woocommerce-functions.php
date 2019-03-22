@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function kco_wc_show_snippet() {
 	$klarna_order = KCO_WC()->api->get_order();
+	do_action( 'kco_wc_show_snippet', $klarna_order );
 	echo KCO_WC()->api->get_snippet( $klarna_order );
 }
 
