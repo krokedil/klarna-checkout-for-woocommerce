@@ -169,6 +169,22 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		wc_maybe_define_constant( 'WOOCOMMERCE_CHECKOUT', true );
 
 		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
+
+			// If Klarna Checkout template hasn't been loaded, redirect the customer to cart page and display an error message.
+			if ( ! did_action( 'kco_wc_show_snippet' ) ) {
+				$url                    = add_query_arg(
+					array(
+						'kco-order' => 'error',
+						'reason'    => base64_encode( __( 'Failed to load Klarna Checkout template file', 'klarna-checkout-for-woocommerce' ) ),
+					),
+					wc_get_cart_url()
+				);
+				$return['redirect_url'] = $url;
+
+				wp_send_json_error( $return );
+				wp_die();
+			}
+
 			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
 
 			// Set empty return array for errors.
