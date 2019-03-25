@@ -26,6 +26,8 @@ jQuery(function($) {
 
 		// Form fields
 		formFields: [],
+		formNeedsUpdate: false,
+		formSessionSet: false,
 
 		documentReady: function() {
 			kco_wc.log(kco_params);
@@ -329,35 +331,44 @@ jQuery(function($) {
 						}
 					}
 				}
+				localStorage.setItem("KCOFormFields", JSON.stringify(newForm));
 				kco_wc.formFields = newForm;
-				kco_wc.saveFormData();
 			} else {
+				localStorage.setItem("KCOFormFields", JSON.stringify(kco_params.form));
 				kco_wc.formFields = kco_params.form;
+			}
+			kco_wc.formNeedsUpdate = true;
+			if( kco_wc.formSessionSet === true ) {
 				kco_wc.saveFormData();
 			}
 			console.table( kco_wc.formFields );
 		},
 
 		saveFormData: function() {
-			$.ajax({
-				type: 'POST',
-				url: kco_params.save_form_data,
-				data: {
-					form: kco_wc.formFields,
-					nonce: kco_params.save_form_data_nonce
-				},
-				dataType: 'json',
-				success: function(data) {
-				},
-				error: function(data) {
-				},
-				complete: function(data) {
-				}
-			});
+			if( kco_wc.formNeedsUpdate === true ) {
+				$.ajax({
+					type: 'POST',
+					url: kco_params.save_form_data,
+					data: {
+						form: kco_wc.formFields,
+						nonce: kco_params.save_form_data_nonce
+					},
+					dataType: 'json',
+					success: function(data) {
+					},
+					error: function(data) {
+					},
+					complete: function(data) {
+						kco_wc.formNeedsUpdate = false;
+						kco_wc.formSessionSet = true;
+					}
+				});
+			}
 		},
 
 		setFormFieldValuesFromTransiet: function() {
-			var form_data = kco_params.form;
+			var form_data = JSON.parse( localStorage.getItem("KCOFormFields") );
+
 			for ( i = 0; i < form_data.length; i++ ) {
 				var field = $('*[name="' + form_data[i].name + '"]');
 				var saved_value = form_data[i].value;
@@ -404,14 +415,14 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
 			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
-			//kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.setFormData);
-			//kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.setFormData);
+			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.setFormData);
+			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.setFormData);
 			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
-			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.setFormData)
-			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.updateExtraFields)
+			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.setFormData);
+			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.updateExtraFields);
 
 			if (typeof window._klarnaCheckout === 'function') {
 				window._klarnaCheckout(function (api) {
@@ -455,6 +466,7 @@ jQuery(function($) {
 						},
 						'change': function(data) {
 							kco_wc.log('change', data);
+							kco_wc.saveFormData();
 						},
 						'order_total_change': function(data) {
 							kco_wc.log('order_total_change', data);
