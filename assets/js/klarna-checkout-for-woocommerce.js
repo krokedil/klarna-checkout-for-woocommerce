@@ -423,7 +423,6 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
 			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.setFormData);
 			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.updateExtraFields);
-
 			if (typeof window._klarnaCheckout === 'function') {
 				window._klarnaCheckout(function (api) {
 					api.on({
@@ -523,5 +522,8 @@ jQuery(function($) {
 		if (event.keyCode == 13) {
 			event.preventDefault();
 		}
+	});
+	$(document).ajaxStop( function() {
+		kco_wc.saveFormData();
 	});	
 });
