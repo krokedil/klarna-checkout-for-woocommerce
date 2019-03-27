@@ -42,9 +42,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$this->title       = $this->get_option( 'title' );
 		$this->description = $this->get_option( 'description' );
 
-		$this->enabled  = $this->get_option( 'enabled' );
-		$this->testmode = 'yes' === $this->get_option( 'testmode' );
-		$this->logging  = 'yes' === $this->get_option( 'logging' );
+		$this->enabled                    = $this->get_option( 'enabled' );
+		$this->testmode                   = 'yes' === $this->get_option( 'testmode' );
+		$this->logging                    = 'yes' === $this->get_option( 'logging' );
+		$this->shipping_methods_in_iframe = $this->get_option( 'shipping_methods_in_iframe' );
 
 		add_action(
 			'woocommerce_update_options_payment_gateways_' . $this->id,
@@ -62,6 +63,9 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		// Remove WooCommerce footer text from our settings page.
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 999 );
+
+		// Body class for KSS.
+		add_filter( 'body_class', array( $this, 'add_body_class' ) );
 	}
 
 	/**
@@ -219,6 +223,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'form'                                 => $form,
 			'standard_woo_checkout_fields'         => $standard_woo_checkout_fields,
 			'is_confirmation_page'                 => ( is_kco_confirmation() ) ? 'yes' : 'no',
+			'shipping_methods_in_iframe'           => $this->shipping_methods_in_iframe,
 		);
 
 		wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );
@@ -491,4 +496,32 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		}
 	}
 
+	/**
+	 * Add kco-shipping-display body class.
+	 *
+	 * @param $class
+	 *
+	 * @return array
+	 */
+	public function add_body_class( $class ) {
+		if ( is_checkout() && 'yes' === $this->shipping_methods_in_iframe ) {
+			// Don't display KCO Shipping Display body classes if we have a cart that doesn't needs payment.
+			if ( method_exists( WC()->cart, 'needs_payment' ) && ! WC()->cart->needs_payment() ) {
+				return $class;
+			}
+
+			$first_gateway = '';
+			if ( WC()->session->get( 'chosen_payment_method' ) ) {
+				$first_gateway = WC()->session->get( 'chosen_payment_method' );
+			} else {
+				$available_payment_gateways = WC()->payment_gateways->get_available_payment_gateways();
+				reset( $available_payment_gateways );
+				$first_gateway = key( $available_payment_gateways );
+			}
+			if ( 'kco' == $first_gateway ) {
+				$class[] = 'kco-shipping-display';
+			}
+		}
+		return $class;
+	}
 }

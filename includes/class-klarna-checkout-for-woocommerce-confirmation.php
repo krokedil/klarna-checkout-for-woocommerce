@@ -121,7 +121,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					sessionStorage.setItem( 'orderSubmitted',  '1');
 
 					// Add modal with process order message.
-					var klarna_process_text = '<?php echo __( 'Please wait while we process your order.', 'klarna-checkout-for-woocommerce' ); ?>';
+					var klarna_process_text = '<?php echo wp_strip_all_tags( __( 'Please wait while we process your order.', 'klarna-checkout-for-woocommerce' ), true ); ?>';
 					$( 'body' ).append( $( '<div class="kco-modal"><div class="kco-modal-content">' + klarna_process_text + '</div></div>' ) );
 
 					$('input#terms').prop('checked', true);
@@ -171,7 +171,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					console.log( 'Order already submitted' );
 
 					// Add modal with retrying message.
-					var klarna_process_text = '<?php echo __( 'Trying again. Please wait while we process your order...', 'klarna-checkout-for-woocommerce' ); ?>';
+					var klarna_process_text = '<?php echo wp_strip_all_tags( __( 'Trying again. Please wait while we process your order...', 'klarna-checkout-for-woocommerce' ), true ); ?>';
 					$( 'body' ).append( $( '<div class="kco-modal"><div class="kco-modal-content">' + klarna_process_text + '</div></div>' ) );
 
 					// If session storage is string, force it to an int.

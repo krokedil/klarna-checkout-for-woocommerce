@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function kco_wc_show_snippet() {
 	$klarna_order = KCO_WC()->api->get_order();
+	do_action( 'kco_wc_show_snippet', $klarna_order );
 	echo KCO_WC()->api->get_snippet( $klarna_order );
 }
 
@@ -113,13 +114,29 @@ function kco_wc_show_another_gateway_button() {
 		$select_another_method_text = isset( $settings['select_another_method_text'] ) && '' !== $settings['select_another_method_text'] ? $settings['select_another_method_text'] : __( 'Select another payment method', 'klarna-checkout-for-woocommerce' );
 
 		?>
-		<p style="margin-top:30px">
+		<p class="klarna-checkout-select-other-wrapper">
 			<a class="checkout-button button" href="#" id="klarna-checkout-select-other">
 				<?php echo $select_another_method_text; ?>
 			</a>
 		</p>
 		<?php
 	}
+}
+
+/**
+ * Get the selected, or the first, payment method.
+ */
+function kco_wc_get_selected_payment_method() {
+	$selected_payment_method = '';
+	if ( method_exists( WC()->session, 'get' ) && WC()->session->get( 'chosen_payment_method' ) ) {
+		$selected_payment_method = WC()->session->get( 'chosen_payment_method' );
+	} else {
+		$available_payment_gateways = WC()->payment_gateways->get_available_payment_gateways();
+		reset( $available_payment_gateways );
+		$selected_payment_method = key( $available_payment_gateways );
+	}
+
+	return $selected_payment_method;
 }
 
 /**

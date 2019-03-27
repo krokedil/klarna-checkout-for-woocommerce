@@ -118,11 +118,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$order    = wc_get_order( $order_id );
 
 		if ( $order ) {
-			// The order was already created. Check if order status was set (in thankyou page).
-			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
+			// Get the Klarna order data.
+			$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
+			$klarna_order = apply_filters( 'kco_wc_api_callbacks_push_klarna_order', json_decode( $response['body'] ) );
 
-				$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
-				$klarna_order = apply_filters( 'kco_wc_api_callbacks_push_klarna_order', json_decode( $response['body'] ) );
+			// The Woo order was already created. Check if order status was set (in process_payment_handler).
+			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
 
 				krokedil_log_events( $order_id, 'Klarna push callback. Updating order status.', $klarna_order );
 
@@ -138,18 +139,19 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 					$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
 					$order->update_status( 'on-hold', $note );
 				}
-				KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
-				KCO_WC()->api->request_post_set_merchant_reference(
-					$klarna_order_id,
-					array(
-						'merchant_reference1' => $order->get_order_number(),
-						'merchant_reference2' => $order->get_id(),
-					)
-				);
-
 			} else {
 				krokedil_log_events( $order_id, 'Klarna push callback. Order status already set to On hold/Processing/Completed.', $klarna_order );
 			}
+
+			// Acknowledge order in Klarna.
+			KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
+			KCO_WC()->api->request_post_set_merchant_reference(
+				$klarna_order_id,
+				array(
+					'merchant_reference1' => $order->get_order_number(),
+					'merchant_reference2' => $order->get_id(),
+				)
+			);
 		} else {
 			// Backup order creation.
 			$this->backup_order_creation( $klarna_order_id );
@@ -245,8 +247,9 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		WC()->cart->calculate_totals();
 
 		$all_in_stock     = true;
-		$shipping_chosen  = false;
 		$shipping_valid   = true;
+		$shipping_chosen  = false;
+		$needs_shipping   = false;
 		$coupon_valid     = true;
 		$has_subscription = false;
 		$needs_login      = false;
@@ -275,7 +278,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$cart_items = $data['order_lines'];
 		foreach ( $cart_items as $cart_item ) {
 			if ( 'physical' === $cart_item['type'] || 'digital' === $cart_item['type'] ) {
-				$needs_shipping = false;
+
 				// Get product by SKU or ID.
 				if ( wc_get_product_id_by_sku( $cart_item['reference'] ) ) {
 					$cart_item_product = wc_get_product( wc_get_product_id_by_sku( $cart_item['reference'] ) );
@@ -306,10 +309,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			} elseif ( 'shipping_fee' === $cart_item['type'] ) {
 				$shipping_chosen = true;
 			}
-			if ( $needs_shipping ) {
-				$shipping_valid = $shipping_chosen;
-			}
 		}
+
+		if ( $needs_shipping ) {
+			$shipping_valid = $shipping_chosen;
+		}
+
 		// Validate any potential coupons.
 		if ( ! empty( json_decode( $data['merchant_data'] )->coupons ) ) {
 			$coupons  = json_decode( $data['merchant_data'] )->coupons;
@@ -417,6 +422,13 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 */
 	public function shipping_option_update_cb() {
 		// Send back order amount, order tax amount, order lines, purchase currency and status 200.
+		$post_body = file_get_contents( 'php://input' );
+		$data      = json_decode( $post_body, true );
+		do_action( 'wc_klarna_shipping_option_update_cb', $data );
+
+		header( 'HTTP/1.0 200 OK' );
+		echo wp_json_encode( $data, JSON_PRETTY_PRINT );
+		die();
 	}
 
 	/**
