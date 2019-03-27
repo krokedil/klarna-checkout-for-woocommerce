@@ -72,9 +72,9 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 
 		<?php if ( $addon_content->start ) : ?>
 			<?php foreach ( $addon_content->start as $start ) : ?>
-				<div class="checkout-addons-banner-block checkout-addons-wrap wrap <?php echo esc_html( $section->module ); ?>">
+				<div class="checkout-addons-banner-block checkout-addons-wrap wrap <?php echo esc_html( $start->class ); ?>">
 					<h2><?php echo esc_html( $start->title ); ?></h2>
-					<p><?php echo esc_attr( $start->content ); ?></p>
+					<?php echo self::get_dynamic_content( $start->content ); ?>
 				</div>
 			<?php endforeach; ?>
 		<?php endif; ?>
@@ -82,10 +82,10 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 		<div id="checkout-addons-body" class="checkout-addons-body checkout-addons-wrap wrap">
 			<?php if ( $addon_content->sections ) : ?>
 				<?php foreach ( $addon_content->sections as $section ) : ?>
-					<div id="<?php echo esc_html( $section->module ); ?>" class="<?php echo esc_html( $section->module ); ?>">
+					<div id="<?php echo esc_html( $section->class ); ?>" class="<?php echo esc_html( $section->class ); ?>">
 						<div class="list">
 							<?php foreach ( $section->items as $item ) : ?>
-								<div class="checkout-addon <?php echo esc_html( strtok( $item->plugin_slug, '/' ) ); ?>">
+								<div class="checkout-addon <?php echo esc_html( $item->class ); ?>">
 									<?php if ( $item->image ) : ?>
 										<img src="<?php echo esc_attr( $item->image ); ?>" alt="<?php echo esc_html( $item->title ); ?>" class="checkout-addon-icon"/>
 									<?php endif; ?>
@@ -168,6 +168,20 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 		}
 
 		return $action;
+	}
+
+	/**
+	 * Returns dynamic content. Replaces certain url's related to the specific domain.
+	 *
+	 * @param string $content
+	 * @return string formatted $content
+	 */
+	public static function get_dynamic_content( $content = '' ) {
+		// pattern substitution
+		$replacements = array(
+			'{{klarna-settings-page-url}}' => admin_url( 'admin.php?page=wc-settings&tab=checkout&section=kco' ),
+		);
+		return str_replace( array_keys( $replacements ), $replacements, $content );
 	}
 
 	/**
@@ -318,7 +332,8 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 	 */
 	public static function get_addons() {
 		if ( false === ( $addons = get_transient( 'wc_kco_addons' ) ) ) {
-			$raw_addons = wp_safe_remote_get( 'https://s3-eu-west-1.amazonaws.com/krokedil-checkout-addons/klarna-checkout-for-woocommerce-addons.json', array( 'user-agent' => 'KCO Addons Page' ) );
+			$kco_settings = get_option( 'woocommerce_kco_settings' );
+			$raw_addons   = wp_safe_remote_get( 'https://s3-eu-west-1.amazonaws.com/krokedil-checkout-addons/klarna-checkout-for-woocommerce-addons.json', array( 'user-agent' => 'KCO Addons Page. Testmode: ' . $kco_settings['testmode'] ) );
 			if ( ! is_wp_error( $raw_addons ) ) {
 				$addons = json_decode( wp_remote_retrieve_body( $raw_addons ) );
 				if ( $addons ) {

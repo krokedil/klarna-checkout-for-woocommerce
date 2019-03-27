@@ -48,12 +48,16 @@
 }
 */
 .checkout-addons-heading h1 {
-    margin: 1.5em 0;
+    margin: 1.0em 0;
 }
 .checkout-addons-banner-block {
     background: #fff;
     border: 1px solid #ddd;
     padding: 2em 2em 1em;
+    margin-bottom: 20px;
+}
+.checkout-addons-banner-block hr {
+    margin: 25px 0;
 }
 .checkout-addon {
     border: 1px solid #ddd;
@@ -81,6 +85,12 @@
     position: absolute;
     width: 100%;
     bottom: 0;
+}
+.coming-soon .checkout-addon-footer {
+    display: none;
+}
+.checkout-addon.coming-soon {
+    opacity: 0.5;
 }
 .checkout-addon-status {
     float: left;
