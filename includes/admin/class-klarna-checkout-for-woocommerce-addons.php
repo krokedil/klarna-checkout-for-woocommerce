@@ -341,7 +341,7 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 			if ( ! is_wp_error( $raw_addons ) ) {
 				$addons = json_decode( wp_remote_retrieve_body( $raw_addons ) );
 				if ( $addons ) {
-					// set_transient( 'wc_kco_addons', $addons, HOUR_IN_SECONDS );
+					set_transient( 'wc_kco_addons', $addons, DAY_IN_SECONDS );
 				}
 			}
 		}
