@@ -154,19 +154,6 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'default'     => '',
 				'desc_tip'    => false,
 			),
-			'allowed_customer_types'     => array(
-				'title'       => __( 'Allowed Customer Types', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'select',
-				'options'     => array(
-					'B2C'  => __( 'B2C only', 'klarna-checkout-for-woocommerce' ),
-					'B2B'  => __( 'B2B only', 'klarna-checkout-for-woocommerce' ),
-					'B2CB' => __( 'B2C & B2B (defaults to B2C)', 'klarna-checkout-for-woocommerce' ),
-					'B2BC' => __( 'B2B & B2C (defaults to B2B)', 'klarna-checkout-for-woocommerce' ),
-				),
-				'description' => __( 'Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO and FI). You need to contact Klarna directly to activate this with your account.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'B2C',
-				'desc_tip'    => false,
-			),
 			// Checkout.
 			'checkout_section'           => array(
 				'title' => __( 'Checkout settings', 'klarna-checkout-for-woocommerce' ),
@@ -186,6 +173,19 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 				'description' => __( 'If checked, the customer cannot skip date of birth.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'no',
 				'desc_tip'    => true,
+			),
+			'allowed_customer_types'     => array(
+				'title'       => __( 'Allowed Customer Types', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'select',
+				'options'     => array(
+					'B2C'  => __( 'B2C only', 'klarna-checkout-for-woocommerce' ),
+					'B2B'  => __( 'B2B only', 'klarna-checkout-for-woocommerce' ),
+					'B2CB' => __( 'B2C & B2B (defaults to B2C)', 'klarna-checkout-for-woocommerce' ),
+					'B2BC' => __( 'B2B & B2C (defaults to B2B)', 'klarna-checkout-for-woocommerce' ),
+				),
+				'description' => __( 'Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO and FI). You need to contact Klarna directly to activate this with your account.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'B2C',
+				'desc_tip'    => false,
 			),
 			'title_mandatory'            => array(
 				'title'       => __( 'Title mandatory (GB)', 'klarna-checkout-for-woocommerce' ),
