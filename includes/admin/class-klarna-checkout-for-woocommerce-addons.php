@@ -158,7 +158,7 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 
 			switch ( $status['id'] ) {
 				case 'not-installed':
-					$action = '<div class="' . $class_name . '" data-status="not-installed" data-action="install" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch download"><span class="dashicons dashicons-download round"></span></label><span class="action-text">' . __( 'Not installed', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
+					$action = '<div class="' . $class_name . '" data-status="not-installed" data-action="install" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch download"><span class="dashicons dashicons-download round"></span></label><span class="action-text" title="' . __( 'Install', 'klarna-checkout-for-woocommerce' ) . '">' . __( 'Not installed', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
 					break;
 				case 'activated':
 					$action = '<div class="' . $class_name . '" data-status="activated" data-action="deactivate" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch"><span class="slider round"></span></label><span class="action-text">' . __( 'Activated', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
