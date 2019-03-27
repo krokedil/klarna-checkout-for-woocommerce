@@ -96,7 +96,7 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 											<?php if ( $item->href ) : ?>
 												<span class="checkout-addon-action"><?php echo self::get_addon_action_button( $item ); ?></span>
 											<?php else : ?>
-												<span class="checkout-addon-status" data-plugin-slug="<?php echo $item->plugin_slug; ?>">Status: <span class="status-text"><?php echo self::get_addon_status( $item->plugin_slug )['title']; ?></span></span>
+												<span class="checkout-addon-status"></span>
 												<span class="checkout-addon-action"><?php echo self::get_addon_action_button( $item ); ?></span>
 											<?php endif; ?>	
 										</div>
@@ -140,30 +140,34 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 	 * Get addon action button helper function.
 	 **/
 	public static function get_addon_action_button( $item ) {
-
+		if ( current_user_can( 'activate_plugins' ) ) {
+			$class_name = 'button install';
+		} else {
+			$class_name = 'button install disabled';
+		}
 		if ( ! empty( $item->href ) ) {
 			if ( 'kco-settings-page' === $item->href ) {
 				$url = admin_url( 'admin.php?page=wc-settings&tab=checkout&section=kco' );
 			} else {
 				$url = $item->href;
 			}
-			$action = '<a class="button install" href="' . $url . '" target="_blank">' . $item->button . '</a>';
+			$action = '<a class="' . $class_name . '" href="' . $url . '" target="_blank">' . $item->button . '</a>';
 		} else {
 			$status = self::get_addon_status( $item->plugin_slug );
 			$action = '';
 
 			switch ( $status['id'] ) {
 				case 'not-installed':
-					$action = '<div class="button install" data-status="not-installed" data-action="install" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch download"><span class="dashicons dashicons-download round"></span></label><span class="action-text">' . __( 'Install', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
+					$action = '<div class="' . $class_name . '" data-status="not-installed" data-action="install" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch download"><span class="dashicons dashicons-download round"></span></label><span class="action-text">' . __( 'Not installed', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
 					break;
 				case 'activated':
-					$action = '<div class="button install" data-status="activated" data-action="deactivate" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch"><span class="slider round"></span></label><span class="action-text">' . __( 'Deactivate', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
+					$action = '<div class="' . $class_name . '" data-status="activated" data-action="deactivate" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch"><span class="slider round"></span></label><span class="action-text">' . __( 'Activated', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
 					break;
 				case 'deactivated':
-					$action = '<div class="button install" data-status="deactivated" data-action="activate" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch"><span class="slider round"></span></label><span class="action-text">' . __( 'Activate', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
+					$action = '<div class="' . $class_name . '" data-status="deactivated" data-action="activate" data-plugin-id="' . strtok( $item->plugin_slug, '/' ) . '" data-plugin-slug="' . $item->plugin_slug . '" data-plugin-url="' . $item->plugin_url . '"><label class="switch"><span class="slider round"></span></label><span class="action-text">' . __( 'Deactivated', 'klarna-checkout-for-woocommerce' ) . '</span></div>';
 					break;
 				default:
-					$action = '<a class="button install" href="#">Install</a>';
+					$action = '<a class="' . $class_name . '" href="#">Install</a>';
 			}
 		}
 

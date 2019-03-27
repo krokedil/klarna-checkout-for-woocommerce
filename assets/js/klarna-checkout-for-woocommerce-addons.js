@@ -6,11 +6,17 @@ jQuery( function($) {
 		var pluginId = $(this).attr('data-plugin-id');
 		var pluginSlug = $(this).attr('data-plugin-slug');
 		var pluginUrl = $(this).attr('data-plugin-url');
-		var element = this;
+		var disabledStatus = $(this).hasClass('disabled');
 		console.log('status start');
 		console.log(pluginStatus);
 		console.log(pluginAction);
 		console.log(pluginSlug);
+		
+		// Abort function if current user can't activate plugins.
+		if( true === disabledStatus ) {
+			return;
+		}
+
 		$.ajax({
 			type: 'POST',
 			url: ajaxurl,
@@ -40,8 +46,7 @@ jQuery( function($) {
 					// Change the status.
 					$( '.checkout-addon.' + pluginId + ' .button' ).attr('data-status', data.responseJSON.data.new_status );
 					$( '.checkout-addon.' + pluginId + ' .button' ).attr('data-action', data.responseJSON.data.new_action );
-					$( '.checkout-addon-status[data-plugin-slug="' + pluginSlug + '"] .status-text').text( data.responseJSON.data.new_status_label );
-					$( '.checkout-addon.' + pluginId + ' .button .action-text').text( data.responseJSON.data.new_action_label );
+					$( '.checkout-addon.' + pluginId + ' .button .action-text').text( data.responseJSON.data.new_status_label );
 
 					if( 'installed' === data.responseJSON.data.new_status ) {
 						$( '.checkout-addon.' + pluginId + ' .button .switch' ).removeClass('download');
