@@ -187,7 +187,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			return;
 		}
 		krokedil_log_events( null, 'Pre Update Order request args', $log_array );
-		KCO_WC()->logger->log( 'Update ongoing Klarna order (' . $request_url . ') ' . json_encode( $request_args ) );
+		KCO_WC()->logger->log( 'Update ongoing Klarna order (' . $request_url . ') ' . stripslashes_deep( json_encode( $request_args ) ) );
 
 		$response = wp_safe_remote_post( $request_url, $request_args );
 
