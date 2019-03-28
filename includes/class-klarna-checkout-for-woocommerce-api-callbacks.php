@@ -75,6 +75,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	public function maybe_prepare_wc_cart_for_server_side_callback( $cart ) {
 		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' == $_GET['kco-action'] || 'push' == $_GET['kco-action'] ) ) ) {
 			WC()->cart = $cart;
+			// If Aelia Currency Switcher plugin is used - ser correct currency.
+			add_filter( 'wc_aelia_cs_selected_currency', array( $this, 'wc_aelia_cs_selected_currency' ) );
 		}
 	}
 
@@ -783,6 +785,20 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		return $cart_contents_tax;
 	}
 
+	/**
+	 * Set selected currency if Aelia Currency Switcher is used.
+	 * Used in validate and push notification callback.
+	 *
+	 * @param string $currency Currency used for calculation.
+	 */
+	public function wc_aelia_cs_selected_currency( $currency ) {
+		$post_body = file_get_contents( 'php://input' );
+		$data      = json_decode( $post_body, true );
+		if ( ! empty( $data['purchase_currency'] ) ) {
+			$currency = $data['purchase_currency'];
+		}
+		return $currency;
+	}
 }
 
 Klarna_Checkout_For_WooCommerce_API_Callbacks::get_instance();
