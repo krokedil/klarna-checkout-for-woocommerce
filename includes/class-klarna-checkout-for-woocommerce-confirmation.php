@@ -115,7 +115,6 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		<script>
 			jQuery(function ($) {
 				// Check if session storage is set to prevent double orders.
-				// Session storage over local storage, since it dies with the tab.
 				if ( sessionStorage.getItem( 'orderSubmitted' ) === null || sessionStorage.getItem( 'orderSubmitted' ) === 'false' ) {
 					// Set session storage.
 					sessionStorage.setItem( 'orderSubmitted',  '1');
@@ -133,13 +132,10 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					}
 
 					$('input#payment_method_kco').prop('checked', true);
-					<?php
-					$extra_field_values = WC()->session->get( 'kco_checkout_form', array() );
-					?>
-					var form_data = <?php echo json_encode( $extra_field_values ); ?>;
-					for ( i = 0; i < form_data.length; i++ ) {
-						var field = $('*[name="' + form_data[i].name + '"]');
-						var saved_value = form_data[i].value;
+					var form_data = JSON.parse( sessionStorage.getItem( 'KCOFieldData' ) );
+					$.each( form_data, function( name, value ) {
+						var field = $('*[name="' + name + '"]');
+						var saved_value = value;
 						// Check if field is a checkbox
 						if( field.is(':checkbox') ) {
 							if( saved_value !== '' ) {
@@ -155,7 +151,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 							field.val( saved_value );
 						}
 
-					}
+					});
 
 					<?php
 					do_action( 'kco_wc_before_submit' );

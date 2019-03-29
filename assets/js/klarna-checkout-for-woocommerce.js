@@ -25,13 +25,12 @@ jQuery(function($) {
 		selectAnotherSelector: '#klarna-checkout-select-other',
 
 		// Form fields
-		formFields: [],
-		formNeedsUpdate: false,
-		formSessionSet: false,
+		needsUpdate: false,
 
 		documentReady: function() {
+			kco_wc.setFormFieldValues();
 			kco_wc.log(kco_params);
-			kco_wc.setFormData();
+			kco_wc.checkFormData();
 			if (kco_wc.paymentMethodEl.length > 0) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter(':checked').val();
 			} else {
@@ -39,7 +38,6 @@ jQuery(function($) {
 			}
 
 			kco_wc.confirmLoading();
-			kco_wc.setFormFieldValuesFromTransiet();
 		},
 
 		kcoSuspend: function () {
@@ -123,7 +121,6 @@ jQuery(function($) {
 				}
 			} );
 			kco_wc.formFields = formFields;
-			kco_wc.saveFormData();
 		},
 
 		updateOrderNotes: function() {
@@ -292,86 +289,81 @@ jQuery(function($) {
 			}
 		},
 
-		setFormData: function() {
-			// Check if we have a form already and set that if we do. Prevents overwriting old data.
-			if( ! $.isArray( kco_params.form ) ) {
-				var form = $('form[name="checkout"] input, form[name="checkout"] select, textarea');
-				var i;
-				var newForm = [];
+		checkFormData: function() {
+			var form = $('form[name="checkout"] input, form[name="checkout"] select, textarea');
+				var requiredFields = [];
+				var fieldData = {};
+				// Get all form fields.
 				for ( i = 0; i < form.length; i++ ) { 
+					// Check if the form has a name set.
 					if ( form[i]['name'] !== '' ) {
-						var name    = form[i]['name'];
 						var field = $('*[name="' + name + '"]');
-						var check = ( field.parents('p.form-row').hasClass('validate-required') ? true: false );
+						var name    = form[i]['name'];
+						var required = ( $('p#' + name + '_field').hasClass('validate-required') ? true : false );
 						// Only keep track of non standard WooCommerce checkout fields
-						//if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 ) {
-						if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
-							var required = false;
+						if ($.inArray(name, kco_params.standard_woo_checkout_fields) == '-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
+							// Only keep track of required fields for validation.
+							if ( required === true ) {
+								requiredFields.push(name);
+							}
+							// Get the value from the field.
 							var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
-							if ( check === true ) {
-								if( form[i].name === 'terms' ) {
-									value = ( $("input#terms:checked").length === 1 ) ? 1 : '';
-								}
-								required = true
-							}
-							// Check if we already have the name in the form to prevent errors.
-							var rowExists = newForm.find( function( row ) { 
-								if( row.name && row.name === name ) {
-								return true;
-							}
-							return false;
-							} );
-							if( ! rowExists ) {
-								newForm.push({
-									name: form[i].name,
-									value: value,
-									required: required,
-								});
-							}
+
+							// Set field data with values.
+							fieldData[name] = value;
 						}
 					}
 				}
-				localStorage.setItem("KCOFormFields", JSON.stringify(newForm));
-				kco_wc.formFields = newForm;
-			} else {
-				localStorage.setItem("KCOFormFields", JSON.stringify(kco_params.form));
-				kco_wc.formFields = kco_params.form;
-			}
-			kco_wc.formNeedsUpdate = true;
-			if( kco_wc.formSessionSet === true ) {
-				kco_wc.saveFormData();
-			}
-			console.table( kco_wc.formFields );
+				sessionStorage.setItem( 'KCORequiredFields', JSON.stringify( requiredFields ) );
+				sessionStorage.setItem( 'KCOFieldData', JSON.stringify( fieldData ) );
+				kco_wc.needsUpdate = true;
+				kco_wc.validateRequiredFields();
 		},
 
-		saveFormData: function() {
-			if( kco_wc.formNeedsUpdate === true ) {
-				$.ajax({
-					type: 'POST',
-					url: kco_params.save_form_data,
-					data: {
-						form: kco_wc.formFields,
-						nonce: kco_params.save_form_data_nonce
-					},
-					dataType: 'json',
-					success: function(data) {
-					},
-					error: function(data) {
-					},
-					complete: function(data) {
-						kco_wc.formNeedsUpdate = false;
-						kco_wc.formSessionSet = true;
-					}
-				});
+		validateRequiredFields: function() {
+			// Get data from session storage.
+			var requiredFields = JSON.parse( sessionStorage.getItem( 'KCORequiredFields' ) );
+			var fieldData = JSON.parse( sessionStorage.getItem( 'KCOFieldData' ) );
+			// Check if all data is set for required fields.
+			var allValid = true;
+			for( i = 0; i < requiredFields.length; i++ ) {
+				fieldName = requiredFields[i];
+				if ( '' === fieldData[fieldName] ) {
+					allValid = false;
+				}
 			}
+			kco_wc.updateSession( allValid );
 		},
 
-		setFormFieldValuesFromTransiet: function() {
-			var form_data = JSON.parse( localStorage.getItem("KCOFormFields") );
+		updateSession: function( allValid ) {
+			if ( false === kco_wc.needsUpdate ) {
+				return;
+			}
+			// Update the session with the current value.
+			$.ajax({
+				type: 'POST',
+				url: kco_params.set_session_value_url,
+				data: {
+					bool: allValid,
+					nonce: kco_params.set_session_value_nonce
+				},
+				dataType: 'json',
+				success: function(data) {
+				},
+				error: function(data) {
+				},
+				complete: function(data) {
+					kco_wc.needsUpdate = false;
+					console.log( 'Success?' );
+				}
+			});
+		},
 
-			for ( i = 0; i < form_data.length; i++ ) {
-				var field = $('*[name="' + form_data[i].name + '"]');
-				var saved_value = form_data[i].value;
+		setFormFieldValues: function() {
+			var form_data = JSON.parse( sessionStorage.getItem( 'KCOFieldData' ) );
+			$.each( form_data, function( name, value ) {
+				var field = $('*[name="' + name + '"]');
+				var saved_value = value;
 				// Check if field is a checkbox
 				if( field.is(':checkbox') ) {
 					if( saved_value !== '' ) {
@@ -387,24 +379,7 @@ jQuery(function($) {
 					field.val( saved_value );
 				}
 
-			}
-		},
-
-		setFieldValues: function( data ) {
-			// Billing fields
-			$('#billing_email').val(data.customer_data.billing_email);
-			$('#billing_postcode').val(data.customer_data.billing_postcode);
-			$('#billing_state').val(data.customer_data.billing_state);
-			$('#billing_country').val(data.customer_data.billing_country);
-
-			// Shipping fields
-			$('#shipping_postcode').val(data.customer_data.shipping_postcode);
-			$('#shipping_state').val(data.customer_data.shipping_state);
-			$('#shipping_country').val(data.customer_data.billing_country);
-
-			// Trigger changes
-			$('#billing_email').change();
-			$('#billing_email').blur();
+			});
 		},
 
 		init: function () {
@@ -415,14 +390,14 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
 			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
-			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.setFormData);
-			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.setFormData);
-			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.updateExtraFields);
-			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
-			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.setFormData);
-			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.updateExtraFields);
+
+			// Extra checkout fields.
+			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.checkFormData);
+			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.checkFormData);
+			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.checkFormData);
+
 			if (typeof window._klarnaCheckout === 'function') {
 				window._klarnaCheckout(function (api) {
 					api.on({
@@ -450,7 +425,6 @@ jQuery(function($) {
 									},
 									success: function (response) {
 										kco_wc.log(response);
-										kco_wc.setFieldValues( response.data );
 										$('body').trigger('update_checkout');
 									},
 									error: function (response) {
@@ -465,7 +439,6 @@ jQuery(function($) {
 						},
 						'change': function(data) {
 							kco_wc.log('change', data);
-							kco_wc.saveFormData();
 						},
 						'order_total_change': function(data) {
 							kco_wc.log('order_total_change', data);
@@ -517,13 +490,13 @@ jQuery(function($) {
 	};
 
 	kco_wc.init();
-	$('body').on('blur', kco_wc.setFormData );
+	$('body').on('blur', kco_wc.checkFormData );
 	$(document).on("keypress", "#kco-order-review .qty", function(event) {
 		if (event.keyCode == 13) {
 			event.preventDefault();
 		}
 	});
 	$(document).ajaxStop( function() {
-		kco_wc.saveFormData();
+		kco_wc.validateRequiredFields();
 	});	
 });
