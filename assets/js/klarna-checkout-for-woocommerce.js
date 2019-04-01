@@ -297,8 +297,8 @@ jQuery(function($) {
 				for ( i = 0; i < form.length; i++ ) { 
 					// Check if the form has a name set.
 					if ( form[i]['name'] !== '' ) {
-						var field = $('*[name="' + name + '"]');
 						var name    = form[i]['name'];
+						var field = $('*[name="' + name + '"]');
 						var required = ( $('p#' + name + '_field').hasClass('validate-required') ? true : false );
 						// Only keep track of non standard WooCommerce checkout fields
 						if ($.inArray(name, kco_params.standard_woo_checkout_fields) == '-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
@@ -307,8 +307,18 @@ jQuery(function($) {
 								requiredFields.push(name);
 							}
 							// Get the value from the field.
-							var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
-
+							var value = '';
+							if( field.is(':checkbox') ) {
+								if( field.is(':checked') ) {
+									value = form[i].value;
+								}
+							} else if( field.is(':radio') ) {
+								if( field.is(':checked') ) {
+									value = $( 'input[name="' + name + '"]:checked').val();
+								}
+							} else {
+								value = form[i].value
+							}
 							// Set field data with values.
 							fieldData[name] = value;
 						}
@@ -354,7 +364,6 @@ jQuery(function($) {
 				},
 				complete: function(data) {
 					kco_wc.needsUpdate = false;
-					console.log( 'Success?' );
 				}
 			});
 		},
@@ -371,7 +380,7 @@ jQuery(function($) {
 					}
 				} else if( field.is(':radio') ) {
 					for ( x = 0; x < field.length; x++ ) {
-						if( field[x].value === form_data[i].value ) {
+						if( field[x].value === value ) {
 							$(field[x]).prop('checked', true);
 						}
 					}

@@ -143,7 +143,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 							}
 						} else if( field.is(':radio') ) {
 							for ( x = 0; x < field.length; x++ ) {
-								if( field[x].value === form_data[i].value ) {
+								if( field[x].value === value ) {
 									$(field[x]).prop('checked', true);
 								}
 							}
