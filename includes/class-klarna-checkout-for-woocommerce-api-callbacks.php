@@ -258,11 +258,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$email_exists     = false;
 		$totals_match     = true;
 
-		$session_id = $_GET['kco_session_id'];
-		$session    = $this->get_session_from_id( $session_id );
+		$session_id        = $_GET['kco_session_id'];
+		$session           = $this->get_session_from_id( $session_id );
 		$has_required_data = false;
 		// Check if all fields are valid.
-		if ( isset( $session['kco_valid_checkout'] ) && $session['kco_valid_checkout'] ) {
+		error_log( var_export( $session, true ) );
+		if ( isset( $session['kco_valid_checkout'] ) && 'false' !== $session['kco_valid_checkout'] ) {
 			$has_required_data = true;
 		}
 
