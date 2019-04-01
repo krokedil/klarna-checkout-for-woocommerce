@@ -262,7 +262,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$session           = $this->get_session_from_id( $session_id );
 		$has_required_data = false;
 		// Check if all fields are valid.
-		error_log( var_export( $session, true ) );
 		if ( isset( $session['kco_valid_checkout'] ) && 'false' !== $session['kco_valid_checkout'] ) {
 			$has_required_data = true;
 		}
