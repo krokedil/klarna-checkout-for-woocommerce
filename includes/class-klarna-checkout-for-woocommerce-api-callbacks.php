@@ -12,6 +12,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 	/**
+	 * Klarna purchase currency.
+	 * Used for multi currency calculation in callbacks if Aelia plugin is installed.
+	 *
+	 * @var bool
+	 */
+	public $klarna_purchase_currency = false;
+
+	/**
 	 * The reference the *Singleton* instance of this class.
 	 *
 	 * @var $instance
