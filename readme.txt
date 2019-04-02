@@ -67,6 +67,8 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * Feature       - Added support for displaying shipping methods in KCO iframe. Activate/deactivate feature via settings.
 * Feature       - Added new Klarna Add-ons page.
 * Feature       - Added Klarna On-site Messaging & Klarna order management as available add-ons.
+* Tweak         - Save extra checkout form field data in session storage instead of WC session.
+* Tweak         - Validate if required extra checkout fields have been entered in front-end (during shipping_address_change event) instead of during validate callback.
 * Tweak         - Use cart data in backup_order_creation if it exist.
 * Tweak         - Use data from Klarna order in backup_order_creation if cart is missing (instead of regular product price).
 * Tweak         - Send smart coupon to Klarna as gift_card (instead of discount).
