@@ -398,11 +398,11 @@ msgstr ""
 msgid "Order finalized in thankyou page."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:463
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:465
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:475
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:477
 msgid "An account is already registered with your email address. Please log in."
 msgstr ""
 

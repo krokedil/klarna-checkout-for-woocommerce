@@ -434,7 +434,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		// Clear session storage to prevent error.
 		echo '<script>sessionStorage.orderSubmitted = false</script>';
 		echo '<script>sessionStorage.removeItem("KCORequiredFields")</script>';
-		echo '<script>sessionStorage.removeItem("KCOFieldData") = false</script>';
+		echo '<script>sessionStorage.removeItem("KCOFieldData")</script>';
 	}
 
 	/**
