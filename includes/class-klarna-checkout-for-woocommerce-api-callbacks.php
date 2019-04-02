@@ -75,7 +75,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	public function maybe_prepare_wc_cart_for_server_side_callback( $cart ) {
 		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' == $_GET['kco-action'] || 'push' == $_GET['kco-action'] ) ) ) {
 			WC()->cart = $cart;
-			// If Aelia Currency Switcher plugin is used - ser correct currency.
+
+			// If Aelia Currency Switcher plugin is used - set correct currency.
 			add_filter( 'wc_aelia_cs_selected_currency', array( $this, 'wc_aelia_cs_selected_currency' ) );
 		}
 	}
@@ -224,6 +225,9 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$post_body = file_get_contents( 'php://input' );
 		$data      = json_decode( $post_body, true );
 		$checkout  = WC()->checkout();
+
+		// Set currency if multi currency plugins needs this when calculating cart.
+		$this->klarna_purchase_currency = sanitize_text_field( $data['purchase_currency'] );
 
 		if ( is_array( $data ) ) {
 			$log_order                 = $data;
@@ -565,6 +569,11 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				$order->set_total( $klarna_order->order_amount / 100 );
 				$order->calculate_totals();
 			} else {
+
+				// Set currency if multi currency plugins needs this when calculating cart.
+				$this->klarna_purchase_currency = sanitize_text_field( $klarna_order->purchase_currency );
+
+				WC()->cart->calculate_totals();
 				$order->set_shipping_total( WC()->cart->get_shipping_total() );
 				$order->set_discount_total( WC()->cart->get_discount_total() );
 				$order->set_discount_tax( WC()->cart->get_discount_tax() );
@@ -774,10 +783,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * @param string $currency Currency used for calculation.
 	 */
 	public function wc_aelia_cs_selected_currency( $currency ) {
-		$post_body = file_get_contents( 'php://input' );
-		$data      = json_decode( $post_body, true );
-		if ( ! empty( $data['purchase_currency'] ) ) {
-			$currency = $data['purchase_currency'];
+		if ( $this->klarna_purchase_currency ) {
+			$currency = $this->klarna_purchase_currency;
 		}
 		return $currency;
 	}
