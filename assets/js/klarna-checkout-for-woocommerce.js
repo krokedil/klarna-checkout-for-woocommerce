@@ -25,7 +25,8 @@ jQuery(function($) {
 		selectAnotherSelector: '#klarna-checkout-select-other',
 
 		// Form fields
-		needsUpdate: false,
+		shippingUpdated: false,
+		blocked: false,
 
 		documentReady: function() {
 			kco_wc.setFormFieldValues();
@@ -43,7 +44,11 @@ jQuery(function($) {
 		kcoSuspend: function () {
 			if (window._klarnaCheckout) {
 				window._klarnaCheckout(function (api) {
-					api.suspend();
+					api.suspend({ 
+						autoResume: {
+						  enabled: false
+						}
+					  });
 				});
 			}
 		},
@@ -51,7 +56,9 @@ jQuery(function($) {
 		kcoResume: function () {
 			if (window._klarnaCheckout) {
 				window._klarnaCheckout(function (api) {
-					api.resume();
+					if ( false === kco_wc.blocked ) {
+						api.resume();
+					}
 				});
 			}
 		},
@@ -326,8 +333,9 @@ jQuery(function($) {
 				}
 				sessionStorage.setItem( 'KCORequiredFields', JSON.stringify( requiredFields ) );
 				sessionStorage.setItem( 'KCOFieldData', JSON.stringify( fieldData ) );
-				kco_wc.needsUpdate = true;
-				kco_wc.validateRequiredFields();
+				if ( true === kco_wc.shippingUpdated ) {
+					kco_wc.validateRequiredFields();
+				}
 		},
 
 		validateRequiredFields: function() {
@@ -342,30 +350,23 @@ jQuery(function($) {
 					allValid = false;
 				}
 			}
-			kco_wc.updateSession( allValid );
+			kco_wc.maybeSuspendIframe( allValid );
 		},
-
-		updateSession: function( allValid ) {
-			if ( false === kco_wc.needsUpdate ) {
-				return;
+		
+		maybeSuspendIframe: function( allValid ) {
+			if ( true === allValid ) {
+				kco_wc.blocked = false;
+				$('#kco-required-fields-notice').remove();
+				kco_wc.kcoResume();
+			} else {
+				kco_wc.blocked = true;
+				$('form.checkout').prepend( '<div id="kco-required-fields-notice" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' + 'Please fill in all required checkout fields.' + '</li></ul></div>' );
+				var etop = $('form.checkout').offset().top;
+				$('html, body').animate({
+					scrollTop: etop
+					}, 1000);
+				kco_wc.kcoSuspend();
 			}
-			// Update the session with the current value.
-			$.ajax({
-				type: 'POST',
-				url: kco_params.set_session_value_url,
-				data: {
-					bool: allValid,
-					nonce: kco_params.set_session_value_nonce
-				},
-				dataType: 'json',
-				success: function(data) {
-				},
-				error: function(data) {
-				},
-				complete: function(data) {
-					kco_wc.needsUpdate = false;
-				}
-			});
 		},
 
 		setFormFieldValues: function() {
@@ -387,7 +388,6 @@ jQuery(function($) {
 				} else {
 					field.val( saved_value );
 				}
-
 			});
 		},
 
@@ -441,7 +441,8 @@ jQuery(function($) {
 									},
 									complete: function() {
 										$('.woocommerce-checkout-review-order-table').unblock();
-										kco_wc.kcoResume();
+										kco_wc.shippingUpdated = true;
+										kco_wc.validateRequiredFields();
 									}
 								}
 							);
@@ -505,7 +506,4 @@ jQuery(function($) {
 			event.preventDefault();
 		}
 	});
-	$(document).ajaxStop( function() {
-		kco_wc.validateRequiredFields();
-	});	
 });

@@ -481,8 +481,6 @@ function kco_wc_print_notices() {
 		wc_add_notice( __( 'Not all products are in stock.', 'klarna-checkout-for-woocommerce' ), 'error' );
 	} elseif ( isset( $_GET['no_shipping'] ) ) {
 		wc_add_notice( __( 'No shipping was selected.', 'klarna-checkout-for-woocommerce' ), 'error' );
-	} elseif ( isset( $_GET['required_fields'] ) ) {
-		wc_add_notice( __( 'Please fill in all required fields.', 'klarna-checkout-for-woocommerce' ), 'error' );
 	} elseif ( isset( $_GET['invalid_coupon'] ) ) {
 		wc_add_notice( __( 'Invalid coupon.', 'klarna-checkout-for-woocommerce' ), 'error' );
 	} elseif ( isset( $_GET['needs_login'] ) ) {

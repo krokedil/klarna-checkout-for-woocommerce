@@ -258,13 +258,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$email_exists     = false;
 		$totals_match     = true;
 
-		$session_id        = $_GET['kco_session_id'];
-		$session           = $this->get_session_from_id( $session_id );
-		$has_required_data = false;
-		// Check if all fields are valid.
-		if ( isset( $session['kco_valid_checkout'] ) && 'false' !== $session['kco_valid_checkout'] ) {
-			$has_required_data = true;
-		}
+		$session_id = $_GET['kco_session_id'];
+		$session    = $this->get_session_from_id( $session_id );
 
 		// Check stock for each item and shipping method and if subscription.
 		$cart_items = $data['order_lines'];
@@ -379,7 +374,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
 
-		if ( $all_in_stock && $shipping_valid && $has_required_data && $coupon_valid && $totals_match && ! $needs_login && ! $email_exists ) {
+		if ( $all_in_stock && $shipping_valid && $coupon_valid && $totals_match && ! $needs_login && ! $email_exists ) {
 			header( 'HTTP/1.0 200 OK' );
 		} else {
 			header( 'HTTP/1.0 303 See Other' );
@@ -389,8 +384,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				header( 'Location: ' . wc_get_cart_url() . '?stock_validate_failed' );
 			} elseif ( ! $shipping_valid ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?no_shipping' );
-			} elseif ( ! $has_required_data ) {
-				header( 'Location: ' . wc_get_checkout_url() . '?required_fields' );
 			} elseif ( ! $coupon_valid ) {
 				header( 'Location: ' . wc_get_checkout_url() . '?invalid_coupon' );
 			} elseif ( $needs_login ) {
