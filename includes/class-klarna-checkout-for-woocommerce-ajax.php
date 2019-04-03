@@ -26,12 +26,11 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		$ajax_events = array(
 			'kco_wc_update_cart'                    => true,
 			'kco_wc_update_shipping'                => true,
-			'kco_wc_update_extra_fields'            => true,
 			'kco_wc_change_payment_method'          => true,
 			'kco_wc_update_klarna_order'            => true,
 			'kco_wc_iframe_shipping_address_change' => true,
 			'kco_wc_checkout_error'                 => true,
-			'kco_wc_save_form_data'                 => true,
+			'kco_wc_set_session_value'              => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -99,30 +98,6 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			'shipping_option_name' => $shipping_option_name,
 		);
 		wp_send_json_success( $data );
-		wp_die();
-	}
-
-	/**
-	 * Save order notes value to session and use it when creating the order.
-	 */
-	public static function kco_wc_update_extra_fields() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_update_extra_fields' ) ) {
-			wp_send_json_error( 'bad_nonce' );
-			exit;
-		}
-
-		if ( is_array( $_POST['extra_fields_values'] ) ) {
-			$update_values  = array_map( 'sanitize_textarea_field', $_POST['extra_fields_values'] );
-			$session_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
-
-			// Update session array, instead of overwriting it.
-			foreach ( $update_values as $update_key => $update_value ) {
-				$session_values[ $update_key ] = $update_value;
-			}
-
-			WC()->session->set( 'kco_wc_extra_fields_values', $session_values );
-		}
-
 		wp_die();
 	}
 
@@ -411,17 +386,15 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	}
 
 	/**
-	 * Handles the saving of form data to session.
+	 * Sets validation session value.
 	 */
-	public static function kco_wc_save_form_data() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_save_form_data' ) ) { // Input var okay.
+	public static function kco_wc_set_session_value() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_set_session_value' ) ) { // Input var okay.
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
-		if ( ! empty( $_POST['form'] ) ) {
-			$form = $_POST['form'];
-			WC()->session->set( 'kco_checkout_form', $form );
-		}
+		WC()->session->set( 'kco_valid_checkout', $_POST['bool'] );
+
 		wp_send_json_success();
 		wp_die();
 	}

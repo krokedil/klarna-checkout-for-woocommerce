@@ -207,8 +207,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'update_cart_nonce'                    => wp_create_nonce( 'kco_wc_update_cart' ),
 			'update_shipping_url'                  => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
 			'update_shipping_nonce'                => wp_create_nonce( 'kco_wc_update_shipping' ),
-			'update_extra_fields_url'              => WC_AJAX::get_endpoint( 'kco_wc_update_extra_fields' ),
-			'update_extra_fields_nonce'            => wp_create_nonce( 'kco_wc_update_extra_fields' ),
 			'change_payment_method_url'            => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
 			'change_payment_method_nonce'          => wp_create_nonce( 'kco_wc_change_payment_method' ),
 			'update_klarna_order_url'              => WC_AJAX::get_endpoint( 'kco_wc_update_klarna_order' ),
@@ -218,12 +216,12 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'checkout_error_url'                   => WC_AJAX::get_endpoint( 'kco_wc_checkout_error' ),
 			'checkout_error_nonce'                 => wp_create_nonce( 'kco_wc_checkout_error' ),
 			'logging'                              => $this->logging,
-			'save_form_data'                       => WC_AJAX::get_endpoint( 'kco_wc_save_form_data' ),
-			'save_form_data_nonce'                 => wp_create_nonce( 'kco_wc_save_form_data' ),
-			'form'                                 => $form,
+			'set_session_value_url'                => WC_AJAX::get_endpoint( 'kco_wc_set_session_value' ),
+			'set_session_value_nonce'              => wp_create_nonce( 'kco_wc_set_session_value' ),
 			'standard_woo_checkout_fields'         => $standard_woo_checkout_fields,
 			'is_confirmation_page'                 => ( is_kco_confirmation() ) ? 'yes' : 'no',
 			'shipping_methods_in_iframe'           => $this->shipping_methods_in_iframe,
+			'required_fields_text'                 => __( 'Please fill in all required checkout fields.', 'klarna-checkout-for-woocommerce' ),
 		);
 
 		wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );
@@ -436,6 +434,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		// Clear session storage to prevent error.
 		echo '<script>sessionStorage.orderSubmitted = false</script>';
+		echo '<script>sessionStorage.removeItem("KCORequiredFields")</script>';
+		echo '<script>sessionStorage.removeItem("KCOFieldData")</script>';
 	}
 
 	/**
