@@ -391,6 +391,24 @@ jQuery(function($) {
 			});
 		},
 
+		// Set Woo address field values when shipping address change event has triggered.
+		setFieldValues: function( data ) {
+			// Billing fields
+			$('#billing_email').val(data.customer_data.billing_email);
+			$('#billing_postcode').val(data.customer_data.billing_postcode);
+			$('#billing_state').val(data.customer_data.billing_state);
+			$('#billing_country').val(data.customer_data.billing_country);
+
+			// Shipping fields
+			$('#shipping_postcode').val(data.customer_data.shipping_postcode);
+			$('#shipping_state').val(data.customer_data.shipping_state);
+			$('#shipping_country').val(data.customer_data.billing_country);
+
+			// Trigger changes
+			$('#billing_email').change();
+			$('#billing_email').blur();
+		},
+
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
 
@@ -434,6 +452,7 @@ jQuery(function($) {
 									},
 									success: function (response) {
 										kco_wc.log(response);
+										kco_wc.setFieldValues( response.data );
 										$('body').trigger('update_checkout');
 									},
 									error: function (response) {
