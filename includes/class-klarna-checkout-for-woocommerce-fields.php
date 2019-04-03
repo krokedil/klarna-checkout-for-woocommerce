@@ -73,7 +73,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 			),
 			'shared_secret_eu'           => array(
 				'title'       => __( 'Production Password', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
+				'type'        => 'password',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
@@ -87,7 +87,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 			),
 			'test_shared_secret_eu'      => array(
 				'title'       => __( 'Test Password', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
+				'type'        => 'password',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
@@ -106,7 +106,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 			),
 			'shared_secret_us'           => array(
 				'title'       => __( 'Production Password', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
+				'type'        => 'password',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
@@ -120,7 +120,7 @@ class Klarna_Checkout_For_WooCommerce_Fields {
 			),
 			'test_shared_secret_us'      => array(
 				'title'       => __( 'Test Password', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'text',
+				'type'        => 'password',
 				'description' => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
