@@ -16,28 +16,32 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:58, ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:58, ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:69
-msgid "Klarna Add-ons"
+#: ../klarna-checkout-for-woocommerce.php:183
+msgid "Settings"
 msgstr ""
 
-#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:161
-msgid "Install"
+#: ../klarna-checkout-for-woocommerce.php:184
+msgid "Support"
 msgstr ""
 
-#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:161
-msgid "Not installed"
+#: ../klarna-checkout-for-woocommerce.php:247
+msgid "Activate Now"
 msgstr ""
 
-#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:164
-msgid "Activated"
+#: ../klarna-checkout-for-woocommerce.php:274
+msgid "Install	Now"
 msgstr ""
 
-#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:167
-msgid "Deactivated"
+#: ../klarna-checkout-for-woocommerce.php:300
+msgid "Klarna Checkout error (%s)."
 msgstr ""
 
-#: ../includes/admin/class-klarna-checkout-for-woocommerce-skin.php:84
-msgid "There was an error installing the addon. Please try again."
+#: ../klarna-checkout-for-woocommerce.php:302
+msgid "Klarna Checkout error. Please try again."
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:307
+msgid "An error occurred during communication with Klarna (Klarna order ID is missing). Please try again."
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-admin-notices.php:81
@@ -473,30 +477,26 @@ msgstr ""
 msgid "Displays the number of orders created via the API callback feature during the last month."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:183
-msgid "Settings"
+#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:58, ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:58, ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:69
+msgid "Klarna Add-ons"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:184
-msgid "Support"
+#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:161
+msgid "Install"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:247
-msgid "Activate Now"
+#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:161
+msgid "Not installed"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:274
-msgid "Install	Now"
+#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:164
+msgid "Activated"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:300
-msgid "Klarna Checkout error (%s)."
+#: ../includes/admin/class-klarna-checkout-for-woocommerce-addons.php:167
+msgid "Deactivated"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:302
-msgid "Klarna Checkout error. Please try again."
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:307
-msgid "An error occurred during communication with Klarna (Klarna order ID is missing). Please try again."
+#: ../includes/admin/class-klarna-checkout-for-woocommerce-skin.php:84
+msgid "There was an error installing the addon. Please try again."
 msgstr ""
