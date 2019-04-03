@@ -360,7 +360,7 @@ jQuery(function($) {
 				kco_wc.kcoResume();
 			} else 	if( ! $('#kco-required-fields-notice').length ) { // Only if we dont have an error message already.
 				kco_wc.blocked = true;
-				$('form.checkout').prepend( '<div id="kco-required-fields-notice" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' + 'Please fill in all required checkout fields.' + '</li></ul></div>' );
+				$('form.checkout').prepend( '<div id="kco-required-fields-notice" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' +  kco_params.required_fields_text + '</li></ul></div>' );
 				var etop = $('form.checkout').offset().top;
 				$('html, body').animate({
 					scrollTop: etop

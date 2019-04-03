@@ -221,6 +221,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'standard_woo_checkout_fields'         => $standard_woo_checkout_fields,
 			'is_confirmation_page'                 => ( is_kco_confirmation() ) ? 'yes' : 'no',
 			'shipping_methods_in_iframe'           => $this->shipping_methods_in_iframe,
+			'required_fields_text'                 => __( 'Please fill in all required checkout fields.', 'klarna-checkout-for-woocommerce' ),
 		);
 
 		wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );
