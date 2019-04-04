@@ -16,23 +16,23 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:182
+#: ../klarna-checkout-for-woocommerce.php:177
 msgid "Settings"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:183
+#: ../klarna-checkout-for-woocommerce.php:178
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:219
+#: ../klarna-checkout-for-woocommerce.php:214
 msgid "Klarna Checkout error (%s)."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:221
+#: ../klarna-checkout-for-woocommerce.php:216
 msgid "Klarna Checkout error. Please try again."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:226
+#: ../klarna-checkout-for-woocommerce.php:221
 msgid "An error occurred during communication with Klarna (Klarna order ID is missing). Please try again."
 msgstr ""
 
