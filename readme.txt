@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.0.3
+Tested up to: 5.1.1
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.5.4
+WC tested up to: 3.5.7
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -63,7 +63,7 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
-= 2019.04.02  	- version 1.9.0 =
+= 2019.04.04  	- version 1.9.0 =
 * Feature       - Added support for displaying shipping methods in KCO iframe. Activate/deactivate feature via settings.
 * Feature       - Added new Klarna Add-ons page.
 * Feature       - Added Klarna On-site Messaging & Klarna order management as available add-ons.
