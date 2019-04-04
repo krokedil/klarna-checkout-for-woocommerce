@@ -122,7 +122,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	 * payment method but the KCO template file hasn't been loaded.
 	 */
 	public function check_that_kco_template_has_loaded() {
-		if ( is_checkout() && 'kco' === kco_wc_get_selected_payment_method() && ( method_exists( WC()->cart, 'needs_payment' ) && WC()->cart->needs_payment() ) && ! is_kco_confirmation() && ! is_wc_endpoint_url( 'order-received' ) && ! did_action( 'kco_wc_show_snippet' ) ) {
+		if ( is_checkout() && array_key_exists( 'kco', WC()->payment_gateways->get_available_payment_gateways() ) && 'kco' === kco_wc_get_selected_payment_method() && ( method_exists( WC()->cart, 'needs_payment' ) && WC()->cart->needs_payment() ) && ! is_kco_confirmation() && ! is_wc_endpoint_url( 'order-received' ) && ! did_action( 'kco_wc_show_snippet' ) ) {
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',
