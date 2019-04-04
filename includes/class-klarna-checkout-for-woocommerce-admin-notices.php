@@ -49,6 +49,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 		$this->enabled = $settings['enabled'];
 
 		add_action( 'admin_init', array( $this, 'check_settings' ) );
+		add_action( 'admin_notices', array( $this, 'check_klarna_upstream' ) );
 	}
 
 	/**
@@ -132,6 +133,26 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 			echo '<div class="notice notice-error">';
 			echo '<p>' . sprintf( __( 'It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href="%s">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>).', 'klarna-checkout-for-woocommerce' ), admin_url( 'options-general.php?page=autoptimize' ) ) . '</p>';
 			echo '</div>';
+		}
+	}
+
+	/**
+	 * Show admin notice if old Klarna Upstream plugin is installed..
+	 */
+	public function check_klarna_upstream() {
+
+		$plugin_slug = 'klarna-upstream-for-woocommerce';
+
+		// If plugin file exists.
+		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
+			// If can activate plugins.
+			if ( current_user_can( 'activate_plugins' ) ) {
+				?>
+				<div class="notice notice-warning">
+					<p><?php echo sprintf( __( 'The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href="%s">Klarna Add-ons page</a>.', 'klarna-checkout-for-woocommerce' ), admin_url( '/admin.php?page=checkout-addons' ) ); ?></p>
+				</div>
+				<?php
+			}
 		}
 	}
 }
