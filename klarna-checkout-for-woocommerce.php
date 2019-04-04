@@ -5,12 +5,12 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 1.8.4
+ * Version: 1.9.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 3.0
- * WC tested up to: 3.5.4
+ * WC tested up to: 3.5.7
  *
  * Copyright (c) 2017-2019 Krokedil
  *
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.8.4' );
+define( 'KCO_WC_VERSION', '1.9.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.0.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -145,12 +145,6 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		protected function __construct() {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
-			add_action( 'admin_notices', array( $this, 'order_management_check' ) );
-
-			// @todo - move the functions below to a separate class or file.
-			// add_action( 'woocommerce_add_to_cart', 'kco_wc_save_cart_hash' );
-			// add_action( 'woocommerce_applied_coupon', 'kco_wc_save_cart_hash' );
-			// add_action( 'kco_wc_before_checkout_form', 'kco_wc_save_cart_hash', 1 );
 			add_action( 'template_redirect', array( $this, 'maybe_display_kco_order_error_message' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
@@ -201,86 +195,6 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		}
 
 		/**
-		 * Show admin notice if Order Management plugin is not active.
-		 */
-		public function order_management_check() {
-			/**
-			 * Check if file exists
-			 *  - yes: check if activated
-			 *    - yes: all good
-			 *    - no: show activate button
-			 * - no: show install button
-			 */
-
-			$plugin_slug = 'klarna-order-management-for-woocommerce';
-
-			// If plugin file exists.
-			if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
-				// If plugin is not active show Activate button.
-				if ( ! is_plugin_active( $plugin_slug . '/' . $plugin_slug . '.php' ) && current_user_can( 'activate_plugins' ) ) {
-					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-					$plugin      = plugins_api(
-						'plugin_information',
-						array(
-							'slug' => $plugin_slug,
-						)
-					);
-					$plugin      = (array) $plugin;
-					$status      = install_plugin_install_status( $plugin );
-					$name        = wp_kses( $plugin['name'], array() );
-					$url         = add_query_arg(
-						array(
-							'_wpnonce' => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
-							'action'   => 'activate',
-							'plugin'   => $status['file'],
-						),
-						network_admin_url( 'plugins.php' )
-					);
-					$description = $name . ' is not active. Please activate it so you can capture, cancel, update and refund Klarna orders.';
-					?>
-					<div class="notice notice-warning">
-						<p>
-							<?php echo esc_html( $description ); ?>
-							<a class="install-now button" data-slug="<?php esc_attr_e( $plugin_slug ); ?>"
-							   href="<?php echo esc_url( $url ); ?>"
-							   aria-label="Activate <?php esc_attr_e( $name ); ?> now"
-							   data-name="<?php esc_attr_e( $name ); ?>"><?php _e( 'Activate Now', 'klarna-checkout-for-woocommerce' ); ?></a>
-						</p>
-					</div>
-					<?php
-				}
-			} else { // If plugin file does not exist, show Install button.
-				if ( current_user_can( 'install_plugins' ) ) {
-					include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-					$plugin = plugins_api(
-						'plugin_information',
-						array(
-							'slug' => $plugin_slug,
-						)
-					);
-					$plugin = (array) $plugin;
-					$status = install_plugin_install_status( $plugin );
-					if ( 'install' === $status['status'] && $status['url'] ) {
-						$name        = wp_kses( $plugin['name'], array() );
-						$url         = $status['url'];
-						$description = $name . ' is not installed. Please install and activate it so you can capture, cancel, update and refund Klarna orders.';
-						?>
-						<div class="notice notice-warning">
-							<p>
-								<?php echo esc_html( $description ); ?>
-								<a class="install-now button" data-slug="<?php esc_attr_e( $plugin_slug ); ?>"
-								   href="<?php echo esc_url( $url ); ?>"
-								   aria-label="Install <?php esc_attr_e( $name ); ?> now"
-								   data-name="<?php esc_attr_e( $name ); ?>"><?php _e( 'Install	Now', 'klarna-checkout-for-woocommerce' ); ?></a>
-							</p>
-						</div>
-						<?php
-					}
-				}
-			} // End if().
-		}
-
-		/**
 		 * Display any notices we've collected thus far (e.g. for connection, disconnection)
 		 */
 		public function admin_notices() {
@@ -297,9 +211,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		public function maybe_display_kco_order_error_message() {
 			if ( is_cart() && isset( $_GET['kco-order'] ) && 'error' === $_GET['kco-order'] ) {
 				if ( isset( $_GET['reason'] ) ) {
-					$message = sprintf( __( 'An error occurred during communication with Klarna (%s).', 'klarna-checkout-for-woocommerce' ), sanitize_textarea_field( base64_decode( $_GET['reason'] ) ) );
+					$message = sprintf( __( 'Klarna Checkout error (%s).', 'klarna-checkout-for-woocommerce' ), sanitize_textarea_field( base64_decode( $_GET['reason'] ) ) );
 				} else {
-					$message = __( 'An error occurred during communication with Klarna. Please try again.', 'klarna-checkout-for-woocommerce' );
+					$message = __( 'Klarna Checkout error. Please try again.', 'klarna-checkout-for-woocommerce' );
 				}
 				wc_add_notice( $message, 'error' );
 			}
@@ -342,6 +256,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			if ( is_admin() ) {
 				include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-admin-notices.php';
 				include_once KCO_WC_PLUGIN_PATH . '/includes/class-wc-klarna-banners.php';
+				include_once KCO_WC_PLUGIN_PATH . '/includes/admin/class-klarna-checkout-for-woocommerce-addons.php';
 			}
 
 			$this->api                    = new Klarna_Checkout_For_WooCommerce_API();

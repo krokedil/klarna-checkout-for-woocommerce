@@ -26,12 +26,11 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		$ajax_events = array(
 			'kco_wc_update_cart'                    => true,
 			'kco_wc_update_shipping'                => true,
-			'kco_wc_update_extra_fields'            => true,
 			'kco_wc_change_payment_method'          => true,
 			'kco_wc_update_klarna_order'            => true,
 			'kco_wc_iframe_shipping_address_change' => true,
 			'kco_wc_checkout_error'                 => true,
-			'kco_wc_save_form_data'                 => true,
+			'kco_wc_set_session_value'              => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -82,45 +81,23 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 		wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
 
-		$chosen_shipping_methods = WC()->session->get( 'chosen_shipping_methods' );
-
-		if ( isset( $_POST['shipping'] ) && is_array( $_POST['shipping'] ) ) {
-			foreach ( $_POST['shipping'] as $i => $value ) {
-				$chosen_shipping_methods[ $i ] = wc_clean( $value );
-			}
+		if ( isset( $_POST['data'] ) && is_array( $_POST['data'] ) ) {
+			$shipping_option           = $_POST['data'];
+			$chosen_shipping_methods   = array();
+			$chosen_shipping_methods[] = wc_clean( $shipping_option['id'] );
+			WC()->session->set( 'chosen_shipping_methods', $chosen_shipping_methods );
 		}
-
-		WC()->session->set( 'chosen_shipping_methods', $chosen_shipping_methods );
 
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_fees();
 		WC()->cart->calculate_totals();
 		KCO_WC()->api->request_pre_update_order();
 
-		wp_die();
-	}
-
-	/**
-	 * Save order notes value to session and use it when creating the order.
-	 */
-	public static function kco_wc_update_extra_fields() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_update_extra_fields' ) ) {
-			wp_send_json_error( 'bad_nonce' );
-			exit;
-		}
-
-		if ( is_array( $_POST['extra_fields_values'] ) ) {
-			$update_values  = array_map( 'sanitize_textarea_field', $_POST['extra_fields_values'] );
-			$session_values = WC()->session->get( 'kco_wc_extra_fields_values', array() );
-
-			// Update session array, instead of overwriting it.
-			foreach ( $update_values as $update_key => $update_value ) {
-				$session_values[ $update_key ] = $update_value;
-			}
-
-			WC()->session->set( 'kco_wc_extra_fields_values', $session_values );
-		}
-
+		$shipping_option_name = 'shipping_method_0_' . str_replace( ':', '', $shipping_option['id'] );
+		$data                 = array(
+			'shipping_option_name' => $shipping_option_name,
+		);
+		wp_send_json_success( $data );
 		wp_die();
 	}
 
@@ -167,6 +144,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		wc_maybe_define_constant( 'WOOCOMMERCE_CHECKOUT', true );
 
 		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
+
 			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
 
 			// Set empty return array for errors.
@@ -187,7 +165,15 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				// Check if we got a wp_error.
 				if ( is_wp_error( $response ) ) {
 					// If wp_error, redirect with error.
-					$return['redirect_url'] = add_query_arg( 'kco-order', 'error', wc_get_cart_url() );
+					$url                    = add_query_arg(
+						array(
+							'kco-order' => 'error',
+							'reason'    => base64_encode( $response->get_error_message() ),
+						),
+						wc_get_cart_url()
+					);
+					$return['redirect_url'] = $url;
+
 					wp_send_json_error( $return );
 					wp_die();
 				}
@@ -375,6 +361,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				krokedil_log_events( $order->get_id(), 'Fallback order creation done. Redirecting customer to thank you page.', '' );
 				$note = sprintf( __( 'This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna.', 'klarna-checkout-for-woocommerce' ), $error_message );
 				$order->add_order_note( $note );
+				$order->payment_complete( $klarna_order_id );
 				$order->update_status( 'on-hold' );
 				$redirect_url = $order->get_checkout_order_received_url();
 			} else {
@@ -399,17 +386,15 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	}
 
 	/**
-	 * Handles the saving of form data to session.
+	 * Sets validation session value.
 	 */
-	public static function kco_wc_save_form_data() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_save_form_data' ) ) { // Input var okay.
+	public static function kco_wc_set_session_value() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_set_session_value' ) ) { // Input var okay.
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
-		if ( ! empty( $_POST['form'] ) ) {
-			$form = $_POST['form'];
-			WC()->session->set( 'kco_checkout_form', $form );
-		}
+		WC()->session->set( 'kco_valid_checkout', $_POST['bool'] );
+
 		wp_send_json_success();
 		wp_die();
 	}

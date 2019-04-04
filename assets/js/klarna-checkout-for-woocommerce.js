@@ -25,11 +25,13 @@ jQuery(function($) {
 		selectAnotherSelector: '#klarna-checkout-select-other',
 
 		// Form fields
-		formFields: [],
+		shippingUpdated: false,
+		blocked: false,
 
 		documentReady: function() {
+			kco_wc.setFormFieldValues();
 			kco_wc.log(kco_params);
-			kco_wc.setFormData();
+			kco_wc.checkFormData();
 			if (kco_wc.paymentMethodEl.length > 0) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter(':checked').val();
 			} else {
@@ -37,13 +39,16 @@ jQuery(function($) {
 			}
 
 			kco_wc.confirmLoading();
-			kco_wc.setFormFieldValuesFromTransiet();
 		},
 
 		kcoSuspend: function () {
 			if (window._klarnaCheckout) {
 				window._klarnaCheckout(function (api) {
-					api.suspend();
+					api.suspend({ 
+						autoResume: {
+						  enabled: false
+						}
+					  });
 				});
 			}
 		},
@@ -51,7 +56,9 @@ jQuery(function($) {
 		kcoResume: function () {
 			if (window._klarnaCheckout) {
 				window._klarnaCheckout(function (api) {
-					api.resume();
+					if ( false === kco_wc.blocked ) {
+						api.resume();
+					}
 				});
 			}
 		},
@@ -121,7 +128,6 @@ jQuery(function($) {
 				}
 			} );
 			kco_wc.formFields = formFields;
-			kco_wc.saveFormData();
 		},
 
 		updateOrderNotes: function() {
@@ -176,6 +182,25 @@ jQuery(function($) {
 						}
 					}
 				});
+			}
+		},
+
+		// Display Shipping Price in order review if Display shipping methods in iframe settings is active.
+		maybeDisplayShippingPrice: function() {
+			if ( 'kco' === kco_wc.paymentMethod && kco_params.shipping_methods_in_iframe === 'yes' && kco_params.is_confirmation_page === 'no' ) {
+				if( jQuery("#shipping_method input[type='radio']").length ) {
+					// Multiple shipping options available.
+					$("#shipping_method input[type='radio']:checked").each(function() {
+						var idVal = $(this).attr("id");
+						var shippingPrice = $("label[for='"+idVal+"']").text();
+						$(".woocommerce-shipping-totals td").html(shippingPrice);
+					});
+				} else {
+					// Only one shipping option available.
+					var idVal = $("#shipping_method input[name='shipping_method[0]']").attr("id");
+					var shippingPrice = $("label[for='"+idVal+"']").text();
+					$(".woocommerce-shipping-totals td").html(shippingPrice);
+				}
 			}
 		},
 
@@ -271,77 +296,92 @@ jQuery(function($) {
 			}
 		},
 
-		setFormData: function() {
-			// Check if we have a form already and set that if we do. Prevents overwriting old data.
-			if( ! $.isArray( kco_params.form ) ) {
-				var form = $('form[name="checkout"] input, form[name="checkout"] select, textarea');
-				var i;
-				var newForm = [];
+		checkFormData: function() {
+			var form = $('form[name="checkout"] input, form[name="checkout"] select, textarea');
+				var requiredFields = [];
+				var fieldData = {};
+				var requiredFieldsDirty = $('form[name="checkout"]').find( '.validate-required:visible' );
+				// Get all form fields.
 				for ( i = 0; i < form.length; i++ ) { 
+					// Check if the form has a name set.
 					if ( form[i]['name'] !== '' ) {
 						var name    = form[i]['name'];
 						var field = $('*[name="' + name + '"]');
-						var check = ( field.parents('p.form-row').hasClass('validate-required') ? true: false );
 						// Only keep track of non standard WooCommerce checkout fields
-						//if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 ) {
-						if ($.inArray(name, kco_params.standard_woo_checkout_fields)=='-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
-							var required = false;
-							var value = ( ! field.is(':checkbox') ) ? form[i].value : ( field.is(":checked") ) ? form[i].value : '';
-							if ( check === true ) {
-								if( form[i].name === 'terms' ) {
-									value = ( $("input#terms:checked").length === 1 ) ? 1 : '';
+						if ($.inArray(name, kco_params.standard_woo_checkout_fields) == '-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
+							// Only keep track of required fields for validation.
+							/*if ( required === true ) {
+								requiredFields.push(name);
+							}*/
+							// Get the value from the field.
+							var value = '';
+							if( field.is(':checkbox') ) {
+								if( field.is(':checked') ) {
+									value = form[i].value;
 								}
-								required = true
+							} else if( field.is(':radio') ) {
+								if( field.is(':checked') ) {
+									value = $( 'input[name="' + name + '"]:checked').val();
+								}
+							} else {
+								value = form[i].value
 							}
-							// Check if we already have the name in the form to prevent errors.
-							var rowExists = newForm.find( function( row ) { 
-								if( row.name && row.name === name ) {
-								return true;
-							}
-							return false;
-							} );
-							if( ! rowExists ) {
-								newForm.push({
-									name: form[i].name,
-									value: value,
-									required: required,
-								});
-							}
+							// Set field data with values.
+							fieldData[name] = value;
 						}
 					}
 				}
-				kco_wc.formFields = newForm;
-				kco_wc.saveFormData();
-			} else {
-				kco_wc.formFields = kco_params.form;
-				kco_wc.saveFormData();
-			}
-			console.table( kco_wc.formFields );
-		},
-
-		saveFormData: function() {
-			$.ajax({
-				type: 'POST',
-				url: kco_params.save_form_data,
-				data: {
-					form: kco_wc.formFields,
-					nonce: kco_params.save_form_data_nonce
-				},
-				dataType: 'json',
-				success: function(data) {
-				},
-				error: function(data) {
-				},
-				complete: function(data) {
+				for ( i = 0; i < requiredFieldsDirty.length; i++ ) {
+					var requiredField = requiredFieldsDirty[i]
+					var input = $(requiredField).find(':input');
+					var name = input.attr('name');
+					if ($.inArray(name, kco_params.standard_woo_checkout_fields) == '-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
+						requiredFields.push( name );
+					}
 				}
-			});
+				sessionStorage.setItem( 'KCORequiredFields', JSON.stringify( requiredFields ) );
+				sessionStorage.setItem( 'KCOFieldData', JSON.stringify( fieldData ) );
+				if ( true === kco_wc.shippingUpdated ) {
+					kco_wc.validateRequiredFields();
+				}
 		},
 
-		setFormFieldValuesFromTransiet: function() {
-			var form_data = kco_params.form;
-			for ( i = 0; i < form_data.length; i++ ) {
-				var field = $('*[name="' + form_data[i].name + '"]');
-				var saved_value = form_data[i].value;
+		validateRequiredFields: function() {
+			// Get data from session storage.
+			var requiredFields = JSON.parse( sessionStorage.getItem( 'KCORequiredFields' ) );
+			var fieldData = JSON.parse( sessionStorage.getItem( 'KCOFieldData' ) );
+			// Check if all data is set for required fields.
+			var allValid = true;
+			for( i = 0; i < requiredFields.length; i++ ) {
+				fieldName = requiredFields[i];
+				if ( '' === fieldData[fieldName] ) {
+					allValid = false;
+				}
+			}
+			kco_wc.maybeSuspendIframe( allValid );
+		},
+		
+		maybeSuspendIframe: function( allValid ) {
+			if ( true === allValid ) {
+				kco_wc.blocked = false;
+				$('#kco-required-fields-notice').remove();
+				kco_wc.kcoResume();
+			} else 	if( ! $('#kco-required-fields-notice').length ) { // Only if we dont have an error message already.
+				kco_wc.blocked = true;
+				$('form.checkout').prepend( '<div id="kco-required-fields-notice" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' +  kco_params.required_fields_text + '</li></ul></div>' );
+				var etop = $('form.checkout').offset().top;
+				$('html, body').animate({
+					scrollTop: etop
+					}, 1000);
+				kco_wc.kcoSuspend();
+			}
+		},
+
+		setFormFieldValues: function() {
+			var form_data = JSON.parse( sessionStorage.getItem( 'KCOFieldData' ) );
+			$.each( form_data, function( name, value ) {
+				var field = $('*[name="' + name + '"]');
+				var saved_value = value;
 				// Check if field is a checkbox
 				if( field.is(':checkbox') ) {
 					if( saved_value !== '' ) {
@@ -349,17 +389,17 @@ jQuery(function($) {
 					}
 				} else if( field.is(':radio') ) {
 					for ( x = 0; x < field.length; x++ ) {
-						if( field[x].value === form_data[i].value ) {
+						if( field[x].value === value ) {
 							$(field[x]).prop('checked', true);
 						}
 					}
 				} else {
 					field.val( saved_value );
 				}
-
-			}
+			});
 		},
 
+		// Set Woo address field values when shipping address change event has triggered.
 		setFieldValues: function( data ) {
 			// Billing fields
 			$('#billing_email').val(data.customer_data.billing_email);
@@ -382,16 +422,16 @@ jQuery(function($) {
 
 			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
+			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
 			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
-			//kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.setFormData);
-			//kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.setFormData);
-			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.updateExtraFields);
-			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.updateExtraFields);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
-			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.setFormData)
-			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.updateExtraFields)
+
+			// Extra checkout fields.
+			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.checkFormData);
+			kco_wc.bodyEl.on('change', kco_wc.extraFieldsSelectorNonText, kco_wc.checkFormData);
+			kco_wc.bodyEl.on('click', 'input#terms', kco_wc.checkFormData);
 
 			if (typeof window._klarnaCheckout === 'function') {
 				window._klarnaCheckout(function (api) {
@@ -428,7 +468,8 @@ jQuery(function($) {
 									},
 									complete: function() {
 										$('.woocommerce-checkout-review-order-table').unblock();
-										kco_wc.kcoResume();
+										kco_wc.shippingUpdated = true;
+										kco_wc.validateRequiredFields();
 									}
 								}
 							);
@@ -441,6 +482,40 @@ jQuery(function($) {
 						},
 						'shipping_option_change': function(data) {
 							kco_wc.log('shipping_option_change', data);
+							kco_wc.log( data );
+							$('.woocommerce-checkout-review-order-table').block({
+								message: null,
+								overlayCSS: {
+									background: '#fff',
+									opacity: 0.6
+								}
+							});
+							kco_wc.kcoSuspend();
+
+							$.ajax(
+								{
+									url: kco_params.update_shipping_url,
+									type: 'POST',
+									dataType: 'json',
+									data: {
+										data: data,
+										nonce: kco_params.update_shipping_nonce
+									},
+									success: function (response) {
+										kco_wc.log(response);
+										$('body').trigger('update_checkout');
+									},
+									error: function (response) {
+										kco_wc.log(response);
+									},
+									complete: function(response) {
+										$('#shipping_method #' + response.responseJSON.data.shipping_option_name).prop('checked', true);
+										$('body').trigger('kco_shipping_option_changed');
+										$('.woocommerce-checkout-review-order-table').unblock();
+										kco_wc.kcoResume();
+									}
+								}
+							);
 						},
 						'can_not_complete_order': function(data) {
 							kco_wc.log('can_not_complete_order', data);
@@ -452,10 +527,10 @@ jQuery(function($) {
 	};
 
 	kco_wc.init();
-	$('body').on('blur', kco_wc.setFormData );
+	$('body').on('blur', kco_wc.checkFormData );
 	$(document).on("keypress", "#kco-order-review .qty", function(event) {
 		if (event.keyCode == 13) {
 			event.preventDefault();
 		}
-	});	
+	});
 });

@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.0.3
+Tested up to: 5.1.1
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.5.4
+WC tested up to: 3.5.7
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,33 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+
+= 2019.04.04  	- version 1.9.0 =
+* Feature       - Added support for displaying shipping methods in KCO iframe. Activate/deactivate feature via settings.
+* Feature       - Added new Klarna Add-ons page.
+* Feature       - Added Klarna On-site Messaging & Klarna order management as available add-ons.
+* Tweak         - Save extra checkout form field data in sessionStorage instead of WC session.
+* Tweak         - Validate if required extra checkout fields have been entered in front-end (during shipping_address_change event) instead of during validate callback.
+* Tweak         - Use cart data in backup_order_creation if it exist.
+* Tweak         - Use data from Klarna order in backup_order_creation if cart is missing (instead of regular product price).
+* Tweak         - Send smart coupon to Klarna as gift_card (instead of discount).
+* Tweak         - Calculate cart_total and use that instead of cart session data in totals match validation.
+* Tweak         - Added class instead of inline CSS to select different payment method button wrapper.
+* Tweak         - Adds payment_complete() to fallback order creation to send mail to customer.
+* Tweak         - Re arranged plugin settings fields.
+* Tweak         - Changed customer type info in settings.
+* Tweak         - Added 10sec timeout to all requests.
+* Tweak         - Added cleaning to string added to JS (klarna_process_text).
+* Tweak         - Added WooCommerce version to user agent string.
+* Tweak         - Changed priority to 999 for woocommerce_locate_template hook to avoid conflicts with other plugins.
+* Tweak         - Redirect customer to cart page if KCO template file hasn't been loaded.
+* Tweak         - Improved handling of gift cards.
+* Tweak         - Use request_pre_get_order instead of get_order in set_recurring_token_for_order.
+* Fix           - Added support for Aelia multi currency plugin in validate and push (backup order creation) callbacks.
+* Fix           - Allways aknowledge the order in push cb if order exist in Woo.
+* Fix           - Improved error handling to avoid situations with displaying "Missing Klarnas order ID".
+* Fix           - Re added check on recurring shipping.
+* Fix           - Bug fix in shipping_valid in validation callback.
 
 = 2019.02.13  	- version 1.8.4 =
 * Tweak         - Added WC hooks woocommerce_checkout_create_order & woocommerce_checkout_update_order_meta in backup order creation. Better support for Sequential order numbers plugin (props @jonathan-dejong). 

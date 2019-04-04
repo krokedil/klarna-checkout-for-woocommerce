@@ -31,7 +31,8 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	 */
 	public function __construct() {
 		// Override template if Klarna Checkout page.
-		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 10, 3 );
+		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 999, 3 );
+		add_action( 'wp_footer', array( $this, 'check_that_kco_template_has_loaded' ) );
 
 		// Template hooks.
 		add_action( 'kco_wc_before_checkout_form', 'kco_wc_print_notices' );
@@ -116,6 +117,23 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 		return $template;
 	}
 
+	/**
+	 * Redirect customer to cart page if Klarna Checkout is the selected (or first)
+	 * payment method but the KCO template file hasn't been loaded.
+	 */
+	public function check_that_kco_template_has_loaded() {
+		if ( is_checkout() && array_key_exists( 'kco', WC()->payment_gateways->get_available_payment_gateways() ) && 'kco' === kco_wc_get_selected_payment_method() && ( method_exists( WC()->cart, 'needs_payment' ) && WC()->cart->needs_payment() ) && ! is_kco_confirmation() && ! is_wc_endpoint_url( 'order-received' ) && ! did_action( 'kco_wc_show_snippet' ) ) {
+			$url = add_query_arg(
+				array(
+					'kco-order' => 'error',
+					'reason'    => base64_encode( __( 'Failed to load Klarna Checkout template file.', 'klarna-checkout-for-woocommerce' ) ),
+				),
+				wc_get_cart_url()
+			);
+			wp_safe_redirect( $url );
+			exit;
+		}
+	}
 }
 
 Klarna_Checkout_For_WooCommerce_Templates::get_instance();

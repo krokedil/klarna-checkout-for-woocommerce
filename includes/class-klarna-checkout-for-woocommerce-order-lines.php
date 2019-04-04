@@ -141,7 +141,10 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			if ( 'sales_tax' === $order_line['type'] && $this->separate_sales_tax ) {
 				$total_tax_amount = $order_line['total_amount'];
 			} else {
-				$total_tax_amount += $order_line['total_tax_amount'];
+				// Add all order lines but exclude gift cards.
+				if ( 'gift_card' !== $order_line['type'] ) {
+					$total_tax_amount += $order_line['total_tax_amount'];
+				}
 			}
 		}
 		return round( $total_tax_amount );
@@ -245,9 +248,17 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 
 				// Smart coupons are processed as real line items, cart and product discounts sent for reference only.
 				if ( 'smart_coupon' === $coupon->get_discount_type() ) {
-					$coupon_amount     = - WC()->cart->get_coupon_discount_amount( $coupon_key ) * 100;
+					$apply_before_tax = get_option( 'woocommerce_smart_coupon_apply_before_tax', 'no' );
+					// If Smart coupon is applied before tax calculation,
+					// the sum is discounted from order lines so we send it as 0 for reference.
+					if ( wc_tax_enabled() && 'yes' === $apply_before_tax ) {
+						$coupon_amount    = 0;
+						$coupon_reference = __( 'Gift card', 'klarna-checkout-for-woocommerce' ) . ' (amount: ' . WC()->cart->get_coupon_discount_amount( $coupon_key ) . ')';
+					} else {
+						$coupon_amount    = - WC()->cart->get_coupon_discount_amount( $coupon_key ) * 100;
+						$coupon_reference = __( 'Gift card', 'klarna-checkout-for-woocommerce' );
+					}
 					$coupon_tax_amount = - WC()->cart->get_coupon_discount_tax_amount( $coupon_key ) * 100;
-					$coupon_reference  = 'Discount';
 				} else {
 					if ( 'US' === $this->shop_country ) {
 						$coupon_amount     = 0;
@@ -263,7 +274,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					}
 				}
 				// Add separate discount line item, but only if it's a smart coupon or country is US.
-				if ( 'US' === $this->shop_country || 'smart_coupon' === $coupon->get_discount_type() ) {
+				if ( 'US' === $this->shop_country && 'smart_coupon' !== $coupon->get_discount_type() ) {
 					$discount            = array(
 						'type'                  => 'discount',
 						'reference'             => $coupon_reference,
@@ -274,6 +285,21 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 						'total_amount'          => $coupon_amount,
 						'total_discount_amount' => 0,
 						'total_tax_amount'      => $coupon_tax_amount,
+					);
+					$this->order_lines[] = $discount;
+				}
+
+				if ( 'smart_coupon' === $coupon->get_discount_type() ) {
+					$discount            = array(
+						'type'                  => 'gift_card',
+						'reference'             => $coupon_key,
+						'name'                  => $coupon_reference,
+						'quantity'              => 1,
+						'unit_price'            => $coupon_amount,
+						'tax_rate'              => 0,
+						'total_amount'          => $coupon_amount,
+						'total_discount_amount' => 0,
+						'total_tax_amount'      => 0,
 					);
 					$this->order_lines[] = $discount;
 				}
@@ -332,7 +358,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				}
 
 				// Add separate discount line item, but only if it's a smart coupon or country is US.
-				$fee_item = array(
+				$fee_item            = array(
 					'type'                  => 'surcharge',
 					'reference'             => $fee->id,
 					'name'                  => $fee->name,
@@ -342,8 +368,12 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					'total_amount'          => $fee_amount,
 					'total_discount_amount' => 0,
 					'total_tax_amount'      => $fee_tax_amount,
+					'merchant_data'         => json_encode(
+						array(
+							'tax_class' => $fee->tax_class,
+						)
+					),
 				);
-
 				$this->order_lines[] = $fee_item;
 			} // End foreach().
 		} // End if().

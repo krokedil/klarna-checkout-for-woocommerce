@@ -34,6 +34,13 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		 * Loads Klarna banner in admin pages.
 		 */
 		public function klarna_banner() {
+			global $pagenow;
+
+			// Only display the banner on WP admin dashboard page or KCO settings page.
+			if ( 'index.php' !== $pagenow && ! ( isset( $_GET['section'] ) && 'kco' === $_GET['section'] ) ) {
+				return;
+			}
+
 			$kco_settings = get_option( 'woocommerce_kco_settings' );
 			$show_banner  = false;
 
@@ -88,7 +95,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 							ajaxurl,
 							{
 								action		: 'hide_klarna_banner',
-								_wpnonce	: '<?php echo wp_create_nonce('hide-klarna-banner'); ?>',
+								_wpnonce	: '<?php echo wp_create_nonce( 'hide-klarna-banner' ); ?>',
 							},
 							function(response){
 								console.log('Success hide kco banner');
@@ -160,13 +167,13 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			$plugin         = 'klarna-checkout-for-woocommerce';
 			$plugin_version = KCO_WC_VERSION;
 			$wc_version     = defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
-			$url_queries    = '?country='. $country .'&products=kco&plugin=' . $plugin . '&pluginVersion=' . $plugin_version . '&platform=woocommerce&platformVersion=' . $wc_version;
+			$url_queries    = '?country=' . $country . '&products=kco&plugin=' . $plugin . '&pluginVersion=' . $plugin_version . '&platform=woocommerce&platformVersion=' . $wc_version;
 
 			if ( 'US' !== $country ) {
 				$url_base = 'https://eu.portal.klarna.com/signup/';
-				$url = $url_base . $url_queries;
+				$url      = $url_base . $url_queries;
 			} else {
-				//$url_base = 'https://us.portal.klarna.com/signup/';
+				// $url_base = 'https://us.portal.klarna.com/signup/';
 				$url = 'https://www.klarna.com/international/business/woocommerce/?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=banner';
 			}
 
