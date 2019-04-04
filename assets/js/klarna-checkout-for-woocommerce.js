@@ -300,19 +300,19 @@ jQuery(function($) {
 			var form = $('form[name="checkout"] input, form[name="checkout"] select, textarea');
 				var requiredFields = [];
 				var fieldData = {};
+				var requiredFieldsDirty = $('form[name="checkout"]').find( '.validate-required:visible' );
 				// Get all form fields.
 				for ( i = 0; i < form.length; i++ ) { 
 					// Check if the form has a name set.
 					if ( form[i]['name'] !== '' ) {
 						var name    = form[i]['name'];
 						var field = $('*[name="' + name + '"]');
-						var required = ( $('p#' + name + '_field').hasClass('validate-required') ? true : false );
 						// Only keep track of non standard WooCommerce checkout fields
 						if ($.inArray(name, kco_params.standard_woo_checkout_fields) == '-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
 							// Only keep track of required fields for validation.
-							if ( required === true ) {
+							/*if ( required === true ) {
 								requiredFields.push(name);
-							}
+							}*/
 							// Get the value from the field.
 							var value = '';
 							if( field.is(':checkbox') ) {
@@ -329,6 +329,14 @@ jQuery(function($) {
 							// Set field data with values.
 							fieldData[name] = value;
 						}
+					}
+				}
+				for ( i = 0; i < requiredFieldsDirty.length; i++ ) {
+					var requiredField = requiredFieldsDirty[i]
+					var input = $(requiredField).find(':input');
+					var name = input.attr('name');
+					if ($.inArray(name, kco_params.standard_woo_checkout_fields) == '-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
+						requiredFields.push( name );
 					}
 				}
 				sessionStorage.setItem( 'KCORequiredFields', JSON.stringify( requiredFields ) );
