@@ -425,6 +425,7 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
+			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeSuspendIframe);
 			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
