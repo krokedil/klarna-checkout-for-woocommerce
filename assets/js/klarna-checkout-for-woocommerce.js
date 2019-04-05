@@ -334,9 +334,11 @@ jQuery(function($) {
 				for ( i = 0; i < requiredFieldsDirty.length; i++ ) {
 					var requiredField = requiredFieldsDirty[i]
 					var input = $(requiredField).find(':input');
-					var name = input.attr('name');
-					if ($.inArray(name, kco_params.standard_woo_checkout_fields) == '-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
-						requiredFields.push( name );
+					if ( input.length > 0 ) {
+						var name = input.attr('name');
+						if ($.inArray(name, kco_params.standard_woo_checkout_fields) == '-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
+							requiredFields.push( name );
+						}
 					}
 				}
 				sessionStorage.setItem( 'KCORequiredFields', JSON.stringify( requiredFields ) );
