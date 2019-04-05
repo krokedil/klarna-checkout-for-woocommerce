@@ -379,6 +379,16 @@ jQuery(function($) {
 			}
 		},
 
+		maybePrintValidationMessage: function() {
+			if ( true === kco_wc.blocked && ! $('#kco-required-fields-notice').length ) {
+				$('form.checkout').prepend( '<div id="kco-required-fields-notice" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' +  kco_params.required_fields_text + '</li></ul></div>' );
+				var etop = $('form.checkout').offset().top;
+				$('html, body').animate({
+					scrollTop: etop
+					}, 1000);
+			}
+		},
+
 		setFormFieldValues: function() {
 			var form_data = JSON.parse( sessionStorage.getItem( 'KCOFieldData' ) );
 			$.each( form_data, function( name, value ) {
@@ -425,7 +435,7 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
-			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeSuspendIframe);
+			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybePrintValidationMessage);
 			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
