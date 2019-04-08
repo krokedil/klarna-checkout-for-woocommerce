@@ -63,6 +63,10 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2019.04.05  	- version 1.9.1 =
+* Tweak         - Added check to see if validate-required form row contains input field (in extra checkout field handling).
+* Tweak         - Retain error notice regarding required checkout fields needs to be entered after updated_checkout event has triggered.
+
 = 2019.04.04  	- version 1.9.0 =
 * Feature       - Added support for displaying shipping methods in KCO iframe. Activate/deactivate feature via settings.
 * Feature       - Added new Klarna Add-ons page.
