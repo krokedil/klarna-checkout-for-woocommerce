@@ -41,12 +41,12 @@ jQuery(function($) {
 			kco_wc.confirmLoading();
 		},
 
-		kcoSuspend: function () {
+		kcoSuspend: function ( autoResumeBool ) {
 			if (window._klarnaCheckout) {
 				window._klarnaCheckout(function (api) {
 					api.suspend({ 
 						autoResume: {
-						  enabled: false
+						  enabled: autoResumeBool
 						}
 					  });
 				});
@@ -76,7 +76,7 @@ jQuery(function($) {
 		},
 
 		updateCart: function () {
-			kco_wc.kcoSuspend();
+			kco_wc.kcoSuspend( true );
 
 			$.ajax({
 				type: 'POST',
@@ -375,7 +375,7 @@ jQuery(function($) {
 				$('html, body').animate({
 					scrollTop: etop
 					}, 1000);
-				kco_wc.kcoSuspend();
+				kco_wc.kcoSuspend( false );
 			}
 		},
 
@@ -432,7 +432,7 @@ jQuery(function($) {
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
 
-			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend);
+			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend( true ) );
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybePrintValidationMessage);
@@ -460,7 +460,7 @@ jQuery(function($) {
 									opacity: 0.6
 								}
 							});
-							kco_wc.kcoSuspend();
+							kco_wc.kcoSuspend( true );
 
 							$.ajax(
 								{
@@ -503,7 +503,7 @@ jQuery(function($) {
 									opacity: 0.6
 								}
 							});
-							kco_wc.kcoSuspend();
+							kco_wc.kcoSuspend( true );
 
 							$.ajax(
 								{
