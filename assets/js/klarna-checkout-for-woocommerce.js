@@ -173,13 +173,13 @@ jQuery(function($) {
 					complete: function(data) {
 						if (true === data.responseJSON.success) {
 							kco_wc.kcoResume();
-							$('.woocommerce-checkout-review-order-table').unblock();							
-						} else {
-							if( '' !== data.responseJSON.data.redirect_url ) {
+							$('.woocommerce-checkout-review-order-table').unblock();
+						} else if( '' !== data.responseJSON.data.redirect_url ) {
 								console.log('Cart do not need payment. Reloading checkout.');
 								window.location.href = data.responseJSON.data.redirect_url;
-							}
 						}
+
+						kco_wc.bodyEl.trigger('updatedKlarnaOrder', [data.responseJSON]);
 					}
 				});
 			}
