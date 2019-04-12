@@ -180,6 +180,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 						<?php
 							$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
 							$redirect_url = add_query_arg( 'kco_checkout_error', 'true', $redirect_url );
+							$redirect_url = apply_filters('kco_wc_redirect_url', $redirect_url );
 						?>
 						console.log('Max reloads reached.');
 						window.location.href = "<?php echo $redirect_url; ?>";

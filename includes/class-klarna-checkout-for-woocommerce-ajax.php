@@ -155,7 +155,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				// $klarna_order_id is missing, redirect the customer to cart page (to avoid infinite reloading of checkout page).
 				KCO_WC()->logger->log( 'ERROR. Klarna Checkout order ID missing in kco_wc_update_klarna_order function. Redirecting customer to cart page.' );
 				krokedil_log_events( null, 'ERROR. Klarna Checkout order ID missing in kco_wc_update_klarna_order function. Redirecting customer to cart page.', '' );
-				$return['redirect_url'] = add_query_arg( 'kco-order', 'missing-id', wc_get_cart_url() );
+				$return['redirect_url'] = apply_filters('kco_wc_redirect_url', add_query_arg( 'kco-order', 'missing-id', wc_get_cart_url() ));
 				wp_send_json_error( $return );
 				wp_die();
 			} else {
@@ -172,7 +172,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 						),
 						wc_get_cart_url()
 					);
-					$return['redirect_url'] = $url;
+					$return['redirect_url'] = apply_filters('kco_wc_redirect_url', $url );
 
 					wp_send_json_error( $return );
 					wp_die();
@@ -187,7 +187,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 				// Check if order needs payment.
 				if ( ! WC()->cart->needs_payment() && 'checkout_incomplete' === $klarna_order->status ) {
-					$return['redirect_url'] = wc_get_checkout_url();
+					$return['redirect_url'] = apply_filters('kco_wc_redirect_url', wc_get_checkout_url() );
 					wp_send_json_error( $return );
 					wp_die();
 				}
@@ -205,14 +205,14 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 							),
 							wc_get_cart_url()
 						);
-						$return['redirect_url'] = $url;
+						$return['redirect_url'] = apply_filters('kco_wc_redirect_url', $url );
 
 						wp_send_json_error( $return );
 						wp_die();
 					}
 				} elseif ( 'checkout_complete' !== $klarna_order->status ) {
 					// Checkout is not completed or incomplete. Send to cart and display error.
-					$return['redirect_url'] = add_query_arg( 'kco-order', 'error', wc_get_cart_url() );
+					$return['redirect_url'] = apply_filters('kco_wc_redirect_url', add_query_arg( 'kco-order', 'error', wc_get_cart_url() ) );
 					wp_send_json_error( $return );
 					wp_die();
 				}
@@ -239,7 +239,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			KCO_WC()->logger->log( 'ERROR. Klarna Checkout order ID missing in kco_wc_iframe_shipping_address_change function. Redirecting customer to cart page.' );
 			krokedil_log_events( null, 'ERROR. Klarna Checkout order ID missing in kco_wc_iframe_shipping_address_change function. Redirecting customer to cart page.', '' );
 			$return                 = array();
-			$return['redirect_url'] = add_query_arg( 'kco-order', 'missing-id', wc_get_cart_url() );
+			$return['redirect_url'] = apply_filters('kco_wc_redirect_url', add_query_arg( 'kco-order', 'missing-id', wc_get_cart_url() ) );
 			wp_send_json_error( $return );
 			wp_die();
 		}
@@ -363,12 +363,12 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				$order->add_order_note( $note );
 				$order->payment_complete( $klarna_order_id );
 				$order->update_status( 'on-hold' );
-				$redirect_url = $order->get_checkout_order_received_url();
+				$redirect_url = apply_filters('kco_wc_redirect_url', $order->get_checkout_order_received_url() );
 			} else {
 				KCO_WC()->logger->log( 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.' . json_decode( $order ) );
 				krokedil_log_events( null, 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.', $order );
 				$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
-				$redirect_url = add_query_arg( 'kco_checkout_error', 'true', $redirect_url );
+				$redirect_url = apply_filters('kco_wc_redirect_url', add_query_arg( 'kco_checkout_error', 'true', $redirect_url ) );
 			}
 
 			wp_send_json_success( array( 'redirect' => $redirect_url ) );
@@ -377,7 +377,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			// Order already exist in Woo. Redirect customer to the corresponding order received page.
 			$order_id     = $orders[0];
 			$order        = wc_get_order( $order_id );
-			$redirect_url = $order->get_checkout_order_received_url();
+			$redirect_url = apply_filters('kco_wc_redirect_url', $order->get_checkout_order_received_url() );
 			KCO_WC()->logger->log( 'Order already exist in Woo. Redirecting customer to thank you page. ' . json_decode( $redirect_url ) );
 			krokedil_log_events( $order_id, 'Order already exist in Woo. Redirecting customer to thank you page. ', $redirect_url );
 			wp_send_json_success( array( 'redirect' => $redirect_url ) );
