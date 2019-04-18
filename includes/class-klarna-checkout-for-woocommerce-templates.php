@@ -122,7 +122,15 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	 * payment method but the KCO template file hasn't been loaded.
 	 */
 	public function check_that_kco_template_has_loaded() {
-		if ( is_checkout() && array_key_exists( 'kco', WC()->payment_gateways->get_available_payment_gateways() ) && 'kco' === kco_wc_get_selected_payment_method() && ( method_exists( WC()->cart, 'needs_payment' ) && WC()->cart->needs_payment() ) && ! is_kco_confirmation() && ! is_wc_endpoint_url( 'order-received' ) && ! did_action( 'kco_wc_show_snippet' ) ) {
+		if ( is_checkout() && array_key_exists( 'kco', WC()->payment_gateways->get_available_payment_gateways() ) && 'kco' === kco_wc_get_selected_payment_method() && ( method_exists( WC()->cart, 'needs_payment' ) && WC()->cart->needs_payment() ) ) {
+
+			// Get checkout object.
+			$checkout = WC()->checkout();
+			// Bail if this is KCO confirmation page, order received page, KCO page (kco_wc_show_snippet has run) or user is not logged and registration is disabled.
+			if ( is_kco_confirmation() || is_wc_endpoint_url( 'order-received' ) || did_action( 'kco_wc_show_snippet' ) || ( ! $checkout->is_registration_enabled() && $checkout->is_registration_required() && ! is_user_logged_in() ) ) {
+				return;
+			}
+
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',

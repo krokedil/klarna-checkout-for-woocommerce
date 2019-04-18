@@ -41,12 +41,12 @@ jQuery(function($) {
 			kco_wc.confirmLoading();
 		},
 
-		kcoSuspend: function () {
+		kcoSuspend: function ( autoResumeBool ) {
 			if (window._klarnaCheckout) {
 				window._klarnaCheckout(function (api) {
 					api.suspend({ 
 						autoResume: {
-						  enabled: false
+						  enabled: autoResumeBool
 						}
 					  });
 				});
@@ -76,7 +76,7 @@ jQuery(function($) {
 		},
 
 		updateCart: function () {
-			kco_wc.kcoSuspend();
+			kco_wc.kcoSuspend( true );
 
 			$.ajax({
 				type: 'POST',
@@ -334,9 +334,11 @@ jQuery(function($) {
 				for ( i = 0; i < requiredFieldsDirty.length; i++ ) {
 					var requiredField = requiredFieldsDirty[i]
 					var input = $(requiredField).find(':input');
-					var name = input.attr('name');
-					if ($.inArray(name, kco_params.standard_woo_checkout_fields) == '-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
-						requiredFields.push( name );
+					if ( input.length > 0 ) {
+						var name = input.attr('name');
+						if ($.inArray(name, kco_params.standard_woo_checkout_fields) == '-1' && name.indexOf('[qty]') < 0 && name.indexOf( 'shipping_method' ) < 0 && name.indexOf( 'payment_method' ) < 0 ) {
+							requiredFields.push( name );
+						}
 					}
 				}
 				sessionStorage.setItem( 'KCORequiredFields', JSON.stringify( requiredFields ) );
@@ -373,7 +375,17 @@ jQuery(function($) {
 				$('html, body').animate({
 					scrollTop: etop
 					}, 1000);
-				kco_wc.kcoSuspend();
+				kco_wc.kcoSuspend( false );
+			}
+		},
+
+		maybePrintValidationMessage: function() {
+			if ( true === kco_wc.blocked && ! $('#kco-required-fields-notice').length ) {
+				$('form.checkout').prepend( '<div id="kco-required-fields-notice" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' +  kco_params.required_fields_text + '</li></ul></div>' );
+				var etop = $('form.checkout').offset().top;
+				$('html, body').animate({
+					scrollTop: etop
+					}, 1000);
 			}
 		},
 
@@ -420,9 +432,10 @@ jQuery(function($) {
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
 
-			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend);
+			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend( true ) );
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
+			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybePrintValidationMessage);
 			kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
@@ -447,7 +460,7 @@ jQuery(function($) {
 									opacity: 0.6
 								}
 							});
-							kco_wc.kcoSuspend();
+							kco_wc.kcoSuspend( true );
 
 							$.ajax(
 								{
@@ -490,7 +503,7 @@ jQuery(function($) {
 									opacity: 0.6
 								}
 							});
-							kco_wc.kcoSuspend();
+							kco_wc.kcoSuspend( true );
 
 							$.ajax(
 								{
