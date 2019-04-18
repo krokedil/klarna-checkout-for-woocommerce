@@ -63,6 +63,11 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2019.04.18  	- version 1.9.2 =
+* Fix           - Only set autoResume = false when suspending KCO iframe during required extra checkout fields check. Otherwise keep it to 10 seconds.
+* Fix           - Don't redirect customer in check_that_kco_template_has_loaded function if user is not logged and registration is disabled.
+* Fix           - Organization name and address line 2 no longer dependenat on billing address for the shipping address to be added.
+
 = 2019.04.05  	- version 1.9.1 =
 * Tweak         - Added check to see if validate-required form row contains input field (in extra checkout field handling).
 * Tweak         - Retain error notice regarding required checkout fields needs to be entered after updated_checkout event has triggered.
