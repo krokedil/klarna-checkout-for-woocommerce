@@ -50,7 +50,6 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	 *
 	 * @param string $template      Template.
 	 * @param string $template_name Template name.
-	 * @param string $template_path Template path.
 	 *
 	 * @return string
 	 */
