@@ -31,7 +31,7 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	 */
 	public function __construct() {
 		// Override template if Klarna Checkout page.
-		add_filter( 'woocommerce_locate_template', array( $this, 'override_template' ), 999, 3 );
+		add_filter( 'wc_get_template', array( $this, 'override_template' ), 999, 2 );
 		add_action( 'wp_footer', array( $this, 'check_that_kco_template_has_loaded' ) );
 
 		// Template hooks.
@@ -50,11 +50,10 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	 *
 	 * @param string $template      Template.
 	 * @param string $template_name Template name.
-	 * @param string $template_path Template path.
 	 *
 	 * @return string
 	 */
-	public function override_template( $template, $template_name, $template_path ) {
+	public function override_template( $template, $template_name ) {
 		if ( is_checkout() ) {
 			// Fallback Klarna Order Received, used when WooCommerce checkout form submission fails.
 			if ( 'checkout/thankyou.php' === $template_name ) {

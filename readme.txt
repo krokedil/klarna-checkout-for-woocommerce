@@ -63,6 +63,10 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2019.04.30  	- version 1.9.3 =
+* Fix           - Changed filter to wc_get_template for overriding checkout template (props @forsvunnet).
+* Fix           - Improved logic in locale sent to Klarna. Fixes WC 3.6 bug where English where displayed as default lang in some stores. 
+
 = 2019.04.18  	- version 1.9.2 =
 * Fix           - Only set autoResume = false when suspending KCO iframe during required extra checkout fields check. Otherwise keep it to 10 seconds.
 * Fix           - Don't redirect customer in check_that_kco_template_has_loaded function if user is not logged and registration is disabled.

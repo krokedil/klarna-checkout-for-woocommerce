@@ -495,76 +495,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * @return string
 	 */
 	public function get_purchase_locale() {
-
-		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
-			$locale = ICL_LANGUAGE_CODE;
-		} else {
-			$locale = explode( '_', get_locale() );
-			$locale = $locale[0];
-		}
-
-		switch ( WC()->checkout()->get_value( 'billing_country' ) ) {
-			case 'AT':
-				if ( 'de' == $locale ) {
-					$klarna_locale = 'de-at';
-				} else {
-					$klarna_locale = 'en-at';
-				}
-				break;
-			case 'DE':
-				if ( 'de' == $locale ) {
-					$klarna_locale = 'de-de';
-				} else {
-					$klarna_locale = 'en-de';
-				}
-				break;
-			case 'DK':
-				if ( 'da' == $locale ) {
-					$klarna_locale = 'da-dk';
-				} else {
-					$klarna_locale = 'en-dk';
-				}
-				break;
-			case 'FI':
-				if ( 'fi' == $locale ) {
-					$klarna_locale = 'fi-fi';
-				} elseif ( 'sv' == $locale ) {
-					$klarna_locale = 'sv-fi';
-				} else {
-					$klarna_locale = 'en-fi';
-				}
-				break;
-			case 'NL':
-				if ( 'nl' == $locale ) {
-					$klarna_locale = 'nl-nl';
-				} else {
-					$klarna_locale = 'en-nl';
-				}
-				break;
-			case 'NO':
-				if ( 'nb' == $locale || 'nn' == $locale || 'no' == $locale ) {
-					$klarna_locale = 'nb-no';
-				} else {
-					$klarna_locale = 'en-no';
-				}
-				break;
-			case 'SE':
-				if ( 'sv' == $locale || 'sv_se' == $locale ) {
-					$klarna_locale = 'sv-se';
-				} else {
-					$klarna_locale = 'en-se';
-				}
-				break;
-			case 'GB':
-				$klarna_locale = 'en-gb';
-				break;
-			case 'US':
-				$klarna_locale = 'en-us';
-				break;
-			default:
-				$klarna_locale = 'en-us';
-		} // End switch().
-
+		$klarna_locale = str_replace( '_', '-', get_locale() );
 		return $klarna_locale;
 	}
 
