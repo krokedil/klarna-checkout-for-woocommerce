@@ -63,6 +63,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2019.05.02  	- version 1.9.4 =
+* Fix           - Improved handling of multi-currency plugins during validation process of order totals.
+
 = 2019.04.30  	- version 1.9.3 =
 * Fix           - Changed filter to wc_get_template for overriding checkout template (props @forsvunnet).
 * Fix           - Improved logic in locale sent to Klarna. Fixes WC 3.6 bug where English where displayed as default lang in some stores. 
