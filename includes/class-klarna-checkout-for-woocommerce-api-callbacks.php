@@ -380,8 +380,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		$klarna_total = $data['order_amount'];
 		$wc_total     = intval( round( WC()->cart->get_total( 'edit' ) * 100 ) );
 		if ( $klarna_total !== $wc_total ) {
-			$totals_match = false;
-			KCO_WC()->logger->log( 'Cart totals does not match in validation callback. Klarna_total: ' . $klarna_total . ' WC_total: ' . $wc_total );
+			// Do another check against raw session data if the first fails.
+			$wc_total = intval( round( maybe_unserialize( $session['cart_totals'] )['total'] * 100 ) );
+			if ( $klarna_total !== $wc_total ) {
+				$total_match = false;
+				KCO_WC()->logger->log( 'Cart totals does not match in validation callback. Klarna_total: ' . $klarna_total . ' WC_total: ' . $wc_total );
+			}
 		}
 
 		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
