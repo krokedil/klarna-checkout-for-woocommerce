@@ -496,7 +496,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 */
 	public function get_purchase_locale() {
 		$klarna_locale = str_replace( '_', '-', get_locale() );
-		return $klarna_locale;
+		return substr( $klarna_locale, 0, 5 );
 	}
 
 	/**
