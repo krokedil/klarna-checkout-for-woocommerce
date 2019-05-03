@@ -63,6 +63,10 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 
+= 2019.05.03  	- version 1.9.5 =
+* Tweak         - Limit locale sent to Klarna to max 5 characters (to avoid issues when DE formal is used).
+* Fix           - Fixed iframe not updating properly after switching shipping method.
+
 = 2019.05.02  	- version 1.9.4 =
 * Fix           - Improved handling of multi-currency plugins during validation process of order totals.
 
