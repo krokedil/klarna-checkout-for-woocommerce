@@ -112,7 +112,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',
-					'reason'    => base64_encode( $error->get_error_message() ),
+					'reason'    => base64_encode( $error->get_error_message() ? $error->get_error_message() : $response['response']['code'] . " " . $response['response']['message'] ),
 				),
 				wc_get_cart_url()
 			);
