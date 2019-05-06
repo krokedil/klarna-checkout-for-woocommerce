@@ -112,7 +112,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',
-					'reason'    => base64_encode( $error->get_error_message() ),
+					'reason'    => base64_encode( $error->get_error_message() ? $error->get_error_message() : $response['response']['code'] . " " . $response['response']['message'] ),
 				),
 				wc_get_cart_url()
 			);
@@ -496,7 +496,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 */
 	public function get_purchase_locale() {
 		$klarna_locale = str_replace( '_', '-', get_locale() );
-		return $klarna_locale;
+		return substr( $klarna_locale, 0, 5 );
 	}
 
 	/**

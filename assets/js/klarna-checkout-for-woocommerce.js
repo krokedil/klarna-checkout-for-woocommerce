@@ -77,7 +77,6 @@ jQuery(function($) {
 
 		updateCart: function () {
 			kco_wc.kcoSuspend( true );
-
 			$.ajax({
 				type: 'POST',
 				url: kco_params.update_cart_url,
@@ -152,6 +151,7 @@ jQuery(function($) {
 
 		updateKlarnaOrder: function() {
 			if ( 'kco' === kco_wc.paymentMethod && kco_params.is_confirmation_page === 'no' ) {
+				kco_wc.kcoSuspend();
 				$('.woocommerce-checkout-review-order-table').block({
 					message: null,
 					overlayCSS: {
@@ -504,7 +504,6 @@ jQuery(function($) {
 								}
 							});
 							kco_wc.kcoSuspend( true );
-
 							$.ajax(
 								{
 									url: kco_params.update_shipping_url,

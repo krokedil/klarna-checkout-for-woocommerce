@@ -212,6 +212,11 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	 * @param $klarna_order
 	 */
 	private function save_customer_data( $klarna_order ) {
+		if ( is_user_logged_in() ) {
+			// Load customer object, if user is logged in.
+			WC()->customer = new WC_Customer( get_current_user_id() );
+		}
+
 		// First name.
 		WC()->customer->set_billing_first_name( sanitize_text_field( $klarna_order->billing_address->given_name ) );
 		WC()->customer->set_shipping_first_name( sanitize_text_field( $klarna_order->shipping_address->given_name ) );
