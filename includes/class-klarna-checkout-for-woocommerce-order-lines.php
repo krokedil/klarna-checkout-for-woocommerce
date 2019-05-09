@@ -653,7 +653,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				$package_rates = $package['rates'];
 				foreach ( $package_rates as $rate_key => $rate_value ) {
 					if ( $rate_key === $chosen_method ) {
-						$shipping_name = $rate_value->label;
+						$shipping_name = $rate_value->get_label();
 					}
 				}
 			}
