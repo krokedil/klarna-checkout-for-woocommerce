@@ -52,7 +52,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'body'       => $this->get_request_body( 'create' ),
 			'timeout'    => 10,
 		);
-		error_log( var_export( $request_args['body'], true ) );
+
 		$log_array = array(
 			'headers'    => $request_args['headers'],
 			'user-agent' => $request_args['user-agent'],
