@@ -623,9 +623,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		}
 
 		// Check if WooCommerce setting for checkout phone field is mandatory.
-		if ( 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ) ) {
-			$request_args['options']['phone_mandatory'] = true;
-		}
+		$request_args['options']['phone_mandatory'] = 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ); // Bool.
 
 		// Allow external payment method plugin to do its thing.
 		// @TODO: Extract this into a hooked function.
