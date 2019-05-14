@@ -99,7 +99,7 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * Tweak         - Calculate cart_total and use that instead of cart session data in totals match validation.
 * Tweak         - Added class instead of inline CSS to select different payment method button wrapper.
 * Tweak         - Adds payment_complete() to fallback order creation to send mail to customer.
-* Tweak         - Re arranged plugin settings fields.
+* Tweak         - Re-arranged plugin settings fields.
 * Tweak         - Changed customer type info in settings.
 * Tweak         - Added 10sec timeout to all requests.
 * Tweak         - Added cleaning to string added to JS (klarna_process_text).
@@ -109,14 +109,14 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * Tweak         - Improved handling of gift cards.
 * Tweak         - Use request_pre_get_order instead of get_order in set_recurring_token_for_order.
 * Fix           - Added support for Aelia multi currency plugin in validate and push (backup order creation) callbacks.
-* Fix           - Allways aknowledge the order in push cb if order exist in Woo.
+* Fix           - Always acknowledge the order in push callback if order exist in Woo.
 * Fix           - Improved error handling to avoid situations with displaying "Missing Klarnas order ID".
-* Fix           - Re added check on recurring shipping.
+* Fix           - Re-added check on recurring shipping.
 * Fix           - Bug fix in shipping_valid in validation callback.
 
 = 2019.02.13  	- version 1.8.4 =
 * Tweak         - Added WC hooks woocommerce_checkout_create_order & woocommerce_checkout_update_order_meta in backup order creation. Better support for Sequential order numbers plugin (props @jonathan-dejong). 
-* Tweak         - Added billing_state, billing_country, shipping_state & shipping_country to standard chekout fields to exclude from extra checkout fields control.
+* Tweak         - Added billing_state, billing_country, shipping_state & shipping_country to standard checkout fields to exclude from extra checkout fields control.
 * Tweak         - Don't display shipping on checkout page until customer address has been entered if WC setting "Hide shipping costs until an address is entered" is active.
 * Tweak         - Only unrequire checkout fields on KCO confirmation page.
 * Fix           - Bug fix in get_order(). Could cause issues with purchases being placed in Klarna but checkout displayed error notice in Woo.
@@ -151,7 +151,7 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * Tweak         - Use totals_match instead of cart_hash_validation in validate callback.
 * Fix           - Check for is_wp_error in several KCO request. To avoid php errors if request fails.
 * Fix           - Added default message and redirect url if validation callback check fail.
-* Fix           - Updated shipping controll in validate callback. Fixes issue with only digital/virtual orders.
+* Fix           - Updated shipping control in validate callback. Fixes issue with only digital/virtual orders.
 * Fix           - Fixed external payment methods error.
 * Fix           - Only enqueue front end scripts if plugin is enabled in Woo settings.
 
@@ -171,7 +171,7 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * Fix			- Improved locale check for better compatibility with Polylang & WPML.
 
 = 2018.12.10  	- version 1.7.7 =
-* Tweak			- Moved from replacing Woo order review HTML to calling update_checkout event after ajax kco_wc_iframe_shipping_address_change har run.
+* Tweak			- Moved from replacing Woo order review HTML to calling update_checkout event after ajax kco_wc_iframe_shipping_address_change has run.
 * Fix			- Reset order lines before collecting and sending them to Klarna. In rare cases order lines was added twice.
 * Fix			- Added order review blocker to updateKlarnaOrder call (to avoid changes in WooCommerce cart during Klarna order update).
 * Fix 			- Don’t try to update Klarna order if the $klarna_order_id is missing in update Klarna order function.
@@ -281,7 +281,7 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * Fix			- Fixed issue in validation callback logic (where purchase could be finalized without a valid shipping method).
 
 = 2018.04.27  	- version 1.4.0 =
-* Feature       - Added facllback order creation if checkout form submission fails.
+* Feature       - Added fallback order creation if checkout form submission fails.
 * Tweak         - Acknowledge Klarna order and set WC order to Processing in thankyou page if possible.
 * Tweak         - Improved UI in settings page.
 * Tweak         - Improved logging.
@@ -311,7 +311,7 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * Feature       - Allows Klarna Checkout to be overwritten from the theme.
 * Fix           - Keeps extra checkout fields values on checkout page reload.
 * Enhancement   - Cleans up template files.
-* Enhancement   - Adds WC required and tested up to data to main plugin file.
+* Enhancement   - Adds WC required and tested up to date to main plugin file.
 * Enhancement   - Allows English locale for non-english countries.
 * Dev           - Adds Gulp task for .pot file processing.
 
