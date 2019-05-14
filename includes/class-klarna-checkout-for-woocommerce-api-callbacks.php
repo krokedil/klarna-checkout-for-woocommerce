@@ -272,6 +272,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		$session_id = $_GET['kco_session_id'];
 		$session    = $this->get_session_from_id( $session_id );
+		if ( is_array( $data ) ) {
+			$log_session                             = $session;
+			$log_session['_krokedil_events_session'] = '';
+			krokedil_log_events( null, 'Klarna validation callback session data', $log_session );
+			KCO_WC()->logger->log( 'Klarna validation callback session data: ' . stripslashes_deep( json_encode( $log_session ) ) );
+		}
 
 		// Check stock for each item and shipping method and if subscription.
 		$cart_items = $data['order_lines'];
@@ -384,7 +390,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$wc_total = intval( round( maybe_unserialize( $session['cart_totals'] )['total'] * 100 ) );
 			if ( $klarna_total !== $wc_total ) {
 				$totals_match = false;
-				KCO_WC()->logger->log( 'Cart totals does not match in validation callback. Klarna_total: ' . $klarna_total . ' WC_total: ' . $wc_total );
+				KCO_WC()->logger->log( 'Cart totals does not match in validation callback. Klarna_total: ' . $klarna_total . ' WC_total: ' . $wc_total . ' Cart Totals: ' . maybe_unserialize( $session['cart_totals'] ) );
 			}
 		}
 
