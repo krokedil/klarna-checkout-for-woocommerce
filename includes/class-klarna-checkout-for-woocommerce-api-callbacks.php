@@ -456,6 +456,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * @throws Exception WC_Data_Exception.
 	 */
 	public function backup_order_creation( $klarna_order_id ) {
+		KCO_WC()->logger->log( 'Starting backup order creation for Klarna order ID ' . $klarna_order_id );
 		$response = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 
 		if ( ! is_wp_error( $response ) && ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) ) {
@@ -565,21 +566,22 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$payment_method     = $available_gateways['kco'];
 			$order->set_payment_method( $payment_method );
 
-			// Apply coupons if it has been used.
-			// @todo - fix so that original price and the discounted amount is displayed in the order.
-			if ( isset( $klarna_order->merchant_data ) ) {
-				$merchant_data = json_decode( $klarna_order->merchant_data );
-				if ( isset( $merchant_data->coupons ) && ! empty( $merchant_data->coupons ) ) {
-					$coupons = $merchant_data->coupons;
-					foreach ( $coupons as $coupon ) {
-						$order->apply_coupon( $coupon );
-					}
-				}
-			}
-
 			// Process cart with data from Klarna.
 			// Only do this if we where unable to create the cart object from session ID.
 			if ( WC()->cart->is_empty() ) {
+
+				// Apply coupons if it has been used.
+				// @todo - fix so that original price and the discounted amount is displayed in the order.
+				if ( isset( $klarna_order->merchant_data ) ) {
+					$merchant_data = json_decode( $klarna_order->merchant_data );
+					if ( isset( $merchant_data->coupons ) && ! empty( $merchant_data->coupons ) ) {
+						$coupons = $merchant_data->coupons;
+						foreach ( $coupons as $coupon ) {
+							$order->apply_coupon( $coupon );
+						}
+					}
+				}
+
 				$this->process_order_lines( $klarna_order, $order );
 				$order->set_shipping_total( self::get_shipping_total( $klarna_order ) );
 				$order->set_cart_tax( self::get_cart_contents_tax( $klarna_order ) );
@@ -599,11 +601,18 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				$order->set_shipping_tax( WC()->cart->get_shipping_tax() );
 				$order->set_total( WC()->cart->get_total( 'edit' ) );
 
+				KCO_WC()->logger->log( 'Processing order lines (from WC cart) during backup order creation for Klarna order ID ' . $klarna_order->order_id );
+				krokedil_log_events( $order->get_id(), 'Processing order lines (from WC cart) during backup order creation.', array() );
 				WC()->checkout()->create_order_line_items( $order, WC()->cart );
 				WC()->checkout()->create_order_fee_lines( $order, WC()->cart );
 				WC()->checkout()->create_order_shipping_lines( $order, WC()->session->get( 'chosen_shipping_methods' ), WC()->shipping()->get_packages() );
 				WC()->checkout()->create_order_tax_lines( $order, WC()->cart );
 				WC()->checkout()->create_order_coupon_lines( $order, WC()->cart );
+
+				// Check order totals.
+				if ( ! $this->order_totals_match( $order, $klarna_order ) ) {
+					$this->update_order_line_prices( $order, $klarna_order );
+				}
 			}
 
 			/**
@@ -646,7 +655,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 				)
 			);
 
-			if ( (int) round( $order->get_total() * 100 ) !== (int) $klarna_order->order_amount ) {
+			if ( ! $this->order_totals_match( $order, $klarna_order ) ) {
 				$order->update_status( 'on-hold', sprintf( __( 'Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->order_amount ) );
 			}
 		} catch ( Exception $e ) {
@@ -664,7 +673,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * @throws Exception WC_Data_Exception.
 	 */
 	private function process_order_lines( $klarna_order, $order ) {
-
+		KCO_WC()->logger->log( 'Processing order lines (from Klarna order) during backup order creation for Klarna order ID ' . $klarna_order->order_id );
+		krokedil_log_events( $order->get_id(), 'Processing order lines (from Klarna order) during backup order creation.', array() );
 		foreach ( $klarna_order->order_lines as $cart_item ) {
 			if ( 'physical' === $cart_item->type || 'digital' === $cart_item->type ) {
 				if ( wc_get_product_id_by_sku( $cart_item->reference ) ) {
@@ -745,6 +755,64 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		}
 	}
 
+	/**
+	 * Update order line item prices on backup order creation.
+	 *
+	 * @param WooCommerce_Order     $order WooCommerce order.
+	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
+	 *
+	 * @throws Exception WC_Data_Exception.
+	 */
+	public function update_order_line_prices( $order, $klarna_order ) {
+		$old_order_total = $order->get_total();
+		// Loop through Order items ("line_item" type).
+		foreach ( $order->get_items() as $item_id => $item ) {
+			$product          = $order->get_product_from_item( $item );
+			$klarna_reference = KCO_WC()->order_lines->get_item_reference( $product );
+			$klarna_line_item = $this->get_klarna_line_item( $klarna_reference, $klarna_order );
+
+			if ( ! empty( $klarna_line_item ) ) {
+				$new_total           = ( $klarna_line_item->total_amount - $klarna_line_item->total_tax_amount ) / 100;
+				$tax_for_calculation = ( $klarna_line_item->tax_rate / 10000 ) + 1;
+				$new_sub_total       = ( ( $klarna_line_item->unit_price * $klarna_line_item->quantity ) / $tax_for_calculation ) / 100;
+
+				$item->set_subtotal( $new_sub_total );
+				$item->set_total( $new_total );
+
+				// Make new taxes calculations.
+				$item->calculate_taxes();
+				// Save line item data.
+				$item->save();
+			}
+		}
+		$order->set_total( $klarna_order->order_amount / 100 );
+		$order->calculate_totals();
+
+		$note = 'Order lines adjusted for order id ' . $order->get_id() . ' (KCO order ' . $klarna_order->order_id . '). Old order total: ' . $old_order_total . '. New order total: ' . $order->get_total();
+		KCO_WC()->logger->log( $note );
+		krokedil_log_events( $order->get_id(), 'Order line prices adjusted during backup order creation', $note );
+	}
+
+	/**
+	 * Get a specific line item from Klarna order based on the passed reference.
+	 *
+	 * @param string                $klarna_reference Product ID/SKU retrieved from order_lines->get_item_reference.
+	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
+	 *
+	 * @return bool
+	 */
+	public function get_klarna_line_item( $klarna_reference, $klarna_order ) {
+		$klarna_line_item = null;
+
+		foreach ( $klarna_order->order_lines as $order_line ) {
+			if ( $klarna_reference === $order_line->reference ) {
+				$klarna_line_item = $order_line;
+				break;
+			}
+		}
+		return $klarna_line_item;
+	}
+
 	private function get_session_from_id( $session_id ) {
 		$sessions_handler = new WC_Session_Handler();
 		$session          = $sessions_handler->get_session( $session_id );
@@ -805,6 +873,21 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$currency = $this->klarna_purchase_currency;
 		}
 		return $currency;
+	}
+
+	/**
+	 * Compare order totals between Woo & Klarna order.
+	 *
+	 * @param WooCommerce_Order     $order WooCommerce order.
+	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
+	 *
+	 * @return bool
+	 */
+	public function order_totals_match( $order, $klarna_order ) {
+		if ( (int) round( $order->get_total() * 100 ) !== (int) $klarna_order->order_amount ) {
+			return false;
+		}
+		return true;
 	}
 }
 
