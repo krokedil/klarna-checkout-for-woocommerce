@@ -71,6 +71,8 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 			$klarna_order = apply_filters( 'kco_wc_klarna_order_pre_submit', json_decode( $response['body'] ) );
 			$this->save_customer_data( $klarna_order );
 		}
+		// Set payment method.
+		WC()->session->set( 'chosen_payment_method', 'kco' );
 	}
 
 	/**
