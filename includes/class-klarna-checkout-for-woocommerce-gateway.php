@@ -371,6 +371,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			} else {
 				$klarna_post_order = json_decode( $response['body'] );
 
+				do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
+
 				// Remove html_snippet from what we're logging.
 				$log_order               = clone $klarna_post_order;
 				$log_order->html_snippet = '';
