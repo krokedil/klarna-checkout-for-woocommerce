@@ -52,7 +52,7 @@ class Klarna_Checkout_For_WooCommerce_Credentials {
 			'shared_secret' => htmlspecialchars_decode( $this->settings[ $test_string . 'shared_secret_' . $country_string ] ),
 		);
 
-		return $credentials;
+		return apply_filters( 'kco_wc_credentials_from_session', $credentials, $this->settings['testmode'] );
 	}
 
 	/**
