@@ -479,10 +479,11 @@ jQuery(function($) {
 									error: function (response) {
 										kco_wc.log(response);
 									},
-									complete: function() {
+									complete: function(response) {
 										$('.woocommerce-checkout-review-order-table').unblock();
 										kco_wc.shippingUpdated = true;
 										kco_wc.validateRequiredFields();
+										kco_wc.bodyEl.trigger( 'kco_shipping_address_changed', response );
 									}
 								}
 							);
