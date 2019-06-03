@@ -62,53 +62,59 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 	 * Add the Addons options page to WooCommerce.
 	 **/
 	public function options_page() {
-		$addon_content = self::get_addons();
-		?>
-		<div id="checkout-addons-heading" class="checkout-addons-heading">
-			<div class="checkout-addons-wrap">
-				<h1><?php esc_html_e( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ); ?></h1>
-			</div>
-		</div>
-
-		<?php if ( $addon_content->start ) : ?>
-			<?php foreach ( $addon_content->start as $start ) : ?>
-				<div class="checkout-addons-banner-block checkout-addons-wrap wrap <?php echo esc_html( $start->class ); ?>">
-					<h2><?php echo esc_html( $start->title ); ?></h2>
-					<?php echo self::get_dynamic_content( $start->content ); ?>
+		$tab = ( isset( $_GET['tab'] ) ) ? $_GET['tab'] : 'addons';
+		$this->add_page_tabs( $tab );
+		if ( ! isset( $_GET['tab'] ) || $_GET['tab'] === 'addons' ) {
+			$addon_content = self::get_addons();
+			?>
+			<div id="checkout-addons-heading" class="checkout-addons-heading">
+				<div class="checkout-addons-wrap">
+					<h1><?php esc_html_e( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ); ?></h1>
 				</div>
-			<?php endforeach; ?>
-		<?php endif; ?>
+			</div>
 
-		<div id="checkout-addons-body" class="checkout-addons-body checkout-addons-wrap wrap">
-			<?php if ( $addon_content->sections ) : ?>
-				<?php foreach ( $addon_content->sections as $section ) : ?>
-					<div id="<?php echo esc_html( $section->class ); ?>" class="<?php echo esc_html( $section->class ); ?>">
-						<div class="list">
-							<?php foreach ( $section->items as $item ) : ?>
-								<div class="checkout-addon <?php echo esc_html( $item->class ); ?>">
-									<?php if ( $item->image ) : ?>
-										<img src="<?php echo esc_attr( $item->image ); ?>" alt="<?php echo esc_html( $item->title ); ?>" class="checkout-addon-icon"/>
-									<?php endif; ?>
-									<h3 class="checkout-addon-title"><?php echo esc_html( $item->title ); ?></h3>
-									<p class="checkout-addon-excerpt"><?php echo esc_textarea( $item->description ); ?></p>
-									<div class="checkout-addon-footer">
-										<div class="inside-wrapper">
-											<?php if ( $item->href ) : ?>
-												<span class="checkout-addon-action"><?php echo self::get_addon_action_button( $item ); ?></span>
-											<?php else : ?>
-												<span class="checkout-addon-status"></span>
-												<span class="checkout-addon-action"><?php echo self::get_addon_action_button( $item ); ?></span>
-											<?php endif; ?>	
-										</div>
-									</div>
-								</div>
-							<?php endforeach; ?>
-						</div>
+			<?php if ( $addon_content->start ) : ?>
+				<?php foreach ( $addon_content->start as $start ) : ?>
+					<div class="checkout-addons-banner-block checkout-addons-wrap wrap <?php echo esc_html( $start->class ); ?>">
+						<h2><?php echo esc_html( $start->title ); ?></h2>
+						<?php echo self::get_dynamic_content( $start->content ); ?>
 					</div>
 				<?php endforeach; ?>
 			<?php endif; ?>
-		</div>
-		<?php
+
+			<div id="checkout-addons-body" class="checkout-addons-body checkout-addons-wrap wrap">
+				<?php if ( $addon_content->sections ) : ?>
+					<?php foreach ( $addon_content->sections as $section ) : ?>
+						<div id="<?php echo esc_html( $section->class ); ?>" class="<?php echo esc_html( $section->class ); ?>">
+							<div class="list">
+								<?php foreach ( $section->items as $item ) : ?>
+									<div class="checkout-addon <?php echo esc_html( $item->class ); ?>">
+										<?php if ( $item->image ) : ?>
+											<img src="<?php echo esc_attr( $item->image ); ?>" alt="<?php echo esc_html( $item->title ); ?>" class="checkout-addon-icon"/>
+										<?php endif; ?>
+										<h3 class="checkout-addon-title"><?php echo esc_html( $item->title ); ?></h3>
+										<p class="checkout-addon-excerpt"><?php echo esc_textarea( $item->description ); ?></p>
+										<div class="checkout-addon-footer">
+											<div class="inside-wrapper">
+												<?php if ( $item->href ) : ?>
+													<span class="checkout-addon-action"><?php echo self::get_addon_action_button( $item ); ?></span>
+												<?php else : ?>
+													<span class="checkout-addon-status"></span>
+													<span class="checkout-addon-action"><?php echo self::get_addon_action_button( $item ); ?></span>
+												<?php endif; ?>	
+											</div>
+										</div>
+									</div>
+								<?php endforeach; ?>
+							</div>
+						</div>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</div>
+			<?php
+		} elseif ( isset( $_GET['tab'] ) && $_GET['tab'] === 'settings' ) {
+			do_action( 'klarna_addons_settings_tab', ( isset( $_GET['section'] ) ) ? $_GET['section'] : null );
+		}
 	}
 
 	/**
@@ -351,6 +357,25 @@ class Klarna_Checkout_For_WooCommerce_Addons {
 		}
 	}
 
+	/**
+	 * Adds tabs to the Addons page.
+	 *
+	 * @param string $current Wich tab is to be selected.
+	 * @return void
+	 */
+	public function add_page_tabs( $current = 'addons' ) {
+		$tabs = array(
+			'addons'   => __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ),
+			'settings' => __( 'Settings', 'klarna-checkout-for-woocommerce' ),
+		);
+		$html = '<h2 class="nav-tab-wrapper">';
+		foreach ( $tabs as $tab => $name ) {
+			$class = ( $tab == $current ) ? 'nav-tab-active' : '';
+			$html .= '<a class="nav-tab ' . $class . '" href="?page=checkout-addons&tab=' . $tab . '">' . $name . '</a>';
+		}
+		$html .= '</h2>';
+		echo $html;
+	}
 }
 
 Klarna_Checkout_For_WooCommerce_Addons::get_instance();
