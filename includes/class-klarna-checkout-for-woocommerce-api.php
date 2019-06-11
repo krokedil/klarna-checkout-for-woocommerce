@@ -52,7 +52,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'body'       => $this->get_request_body( 'create' ),
 			'timeout'    => 10,
 		);
-		$log_array    = array(
+
+		$log_array = array(
 			'headers'    => $request_args['headers'],
 			'user-agent' => $request_args['user-agent'],
 			'body'       => json_decode( $request_args['body'] ),
@@ -614,6 +615,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {
 			$request_args['shipping_options'] = $this->get_shipping_options();
 		}
+
+		// Check if WooCommerce setting for checkout phone field is mandatory.
+		$request_args['options']['phone_mandatory'] = 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ); // Bool.
 
 		// Allow external payment method plugin to do its thing.
 		// @TODO: Extract this into a hooked function.
