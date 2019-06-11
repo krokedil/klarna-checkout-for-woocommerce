@@ -16,7 +16,9 @@ jQuery( function($) {
 		if( true === disabledStatus ) {
 			return;
 		}
-
+		$(this).attr('disabled','disabled');
+		$(this).children().attr('disabled','disabled');
+		var button = this;
 		$.ajax({
 			type: 'POST',
 			url: ajaxurl,
@@ -56,8 +58,8 @@ jQuery( function($) {
 					
 					$( '.checkout-addon.' + pluginId ).append( '<p>' + data.responseJSON.error + '</p>' );
 				}
-				
-				
+				$(button).removeAttr('disabled');
+				$(button).children().removeAttr('disabled');
 			}
 		});
 						

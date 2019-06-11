@@ -257,7 +257,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			if ( is_admin() ) {
 				include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-admin-notices.php';
 				include_once KCO_WC_PLUGIN_PATH . '/includes/class-wc-klarna-banners.php';
-				include_once KCO_WC_PLUGIN_PATH . '/includes/admin/class-klarna-checkout-for-woocommerce-addons.php';
+				include_once KCO_WC_PLUGIN_PATH . '/includes/admin/class-klarna-for-woocommerce-addons.php';
 			}
 
 			$this->api                    = new Klarna_Checkout_For_WooCommerce_API();
