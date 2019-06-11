@@ -73,9 +73,9 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 				<h1><?php esc_html_e( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ); ?></h1>
 			</div>
 			</div>
-			<?php if ( $addon_content->start ) : ?>
-				<?php foreach ( $addon_content->start as $start ) : ?>
-					<?php if ( isset( $start->plugin_id ) && $start->plugin_id === 'kco' ) : ?>
+				<?php if ( $addon_content->start ) : ?>
+					<?php foreach ( $addon_content->start as $start ) : ?>
+						<?php if ( isset( $start->plugin_id ) && $start->plugin_id === 'kco' ) : ?>
 						<div class="checkout-addons-banner-block checkout-addons-wrap wrap <?php echo esc_html( $start->class ); ?>">
 							<h2><?php echo esc_html( $start->title ); ?></h2>
 							<?php echo self::get_dynamic_content( $start->content ); ?>
@@ -85,7 +85,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			<?php endif; ?>
 
 			<div id="checkout-addons-body" class="checkout-addons-body checkout-addons-wrap wrap">
-			<?php if ( $addon_content->sections ) : ?>
+				<?php if ( $addon_content->sections ) : ?>
 					<?php foreach ( $addon_content->sections as $section ) : ?>
 						<?php if ( isset( $section->plugin_id ) && in_array( $section->plugin_id, array( 'kco', 'both' ) ) ) : ?>
 							<div id="<?php echo esc_html( $section->class ); ?>" class="<?php echo esc_html( $section->class ); ?>">
@@ -115,11 +115,11 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</div>
-			<?php
+				<?php
 			} elseif ( isset( $_GET['tab'] ) && $_GET['tab'] === 'settings' ) {
 				do_action( 'klarna_addons_settings_tab', ( isset( $_GET['section'] ) ) ? $_GET['section'] : null );
 				?>
-				<p><?php _e( 'Please install an addon to be able to see the settings.', 'klarna-checkout-for-woocommerce' ); ?></p>
+				<p><?php _e( 'Please install an add-on to be able to see the settings.', 'klarna-checkout-for-woocommerce' ); ?></p>
 				<?php
 			}
 		}
