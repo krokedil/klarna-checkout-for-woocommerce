@@ -118,6 +118,9 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			<?php
 			} elseif ( isset( $_GET['tab'] ) && $_GET['tab'] === 'settings' ) {
 				do_action( 'klarna_addons_settings_tab', ( isset( $_GET['section'] ) ) ? $_GET['section'] : null );
+				?>
+				<p><?php _e( 'Please install an addon to be able to see the settings.', 'klarna-checkout-for-woocommerce' ); ?></p>
+				<?php
 			}
 		}
 
