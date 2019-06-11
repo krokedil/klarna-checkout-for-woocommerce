@@ -112,7 +112,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',
-					'reason'    => base64_encode( $error->get_error_message() ? $error->get_error_message() : $response['response']['code'] . " " . $response['response']['message'] ),
+					'reason'    => base64_encode( $error->get_error_message() ? $error->get_error_message() : $response['response']['code'] . ' ' . $response['response']['message'] ),
 				),
 				wc_get_cart_url()
 			);
@@ -419,8 +419,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 */
 	public function get_snippet( $order ) {
 		if ( ! is_wp_error( $order ) ) {
-			$this->maybe_clear_session_values( $order );
-
 			return $order->html_snippet;
 		}
 
@@ -432,18 +430,14 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 *
 	 * @param Klarna_Order $order Klarna Checkout order.
 	 */
-	public function maybe_clear_session_values( $order ) {
-		if ( 'checkout_complete' === $order->status ) {
+	public function maybe_clear_session_values() {
 			WC()->session->__unset( 'kco_wc_update_md5' );
 			WC()->session->__unset( 'kco_wc_order_id' );
-			WC()->session->__unset( 'kco_wc_order_notes' );
 			WC()->session->__unset( 'kco_wc_order_api' );
 			WC()->session->__unset( 'kco_wc_extra_fields_values' );
 			WC()->session->__unset( 'kco_wc_prefill_consent' );
 			WC()->session->__unset( 'kco_checkout_form' );
 			WC()->session->__unset( 'kco_valid_checkout' );
-
-		}
 	}
 
 	/**
