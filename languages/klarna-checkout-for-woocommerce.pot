@@ -16,11 +16,11 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:177
+#: ../klarna-checkout-for-woocommerce.php:176
 msgid "Settings"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:178
+#: ../klarna-checkout-for-woocommerce.php:177
 msgid "Support"
 msgstr ""
 
@@ -67,26 +67,26 @@ msgstr ""
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:144, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:621, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:382
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:144, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:640, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:385
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:147, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:624, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:385
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:147, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:643, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:388
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:150, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:627, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:388
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:150, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:646, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:391
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:616
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:635
 msgid "Order created via Klarna Checkout API callback. Please verify the order in Klarnas system."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:640
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:659
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
@@ -94,11 +94,11 @@ msgstr ""
 msgid "The Klarna session has expired. Please try again"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-confirmation.php:123
+#: ../includes/class-klarna-checkout-for-woocommerce-confirmation.php:125
 msgid "Please wait while we process your order."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-confirmation.php:170
+#: ../includes/class-klarna-checkout-for-woocommerce-confirmation.php:172
 msgid "Trying again. Please wait while we process your order..."
 msgstr ""
 
@@ -390,11 +390,11 @@ msgstr ""
 msgid "Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:224
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:225
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:369
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:370
 msgid "Klarna post_order request in process_payment_handler failed. Error message: %s."
 msgstr ""
 
@@ -433,7 +433,7 @@ msgstr ""
 msgid "Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-templates.php:129
+#: ../includes/class-klarna-checkout-for-woocommerce-templates.php:136
 msgid "Failed to load Klarna Checkout template file."
 msgstr ""
 

@@ -52,7 +52,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'body'       => $this->get_request_body( 'create' ),
 			'timeout'    => 10,
 		);
-		$log_array    = array(
+
+		$log_array = array(
 			'headers'    => $request_args['headers'],
 			'user-agent' => $request_args['user-agent'],
 			'body'       => json_decode( $request_args['body'] ),
@@ -112,7 +113,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',
-					'reason'    => base64_encode( $error->get_error_message() ? $error->get_error_message() : $response['response']['code'] . " " . $response['response']['message'] ),
+					'reason'    => base64_encode( $error->get_error_message() ? $error->get_error_message() : $response['response']['code'] . ' ' . $response['response']['message'] ),
 				),
 				wc_get_cart_url()
 			);
@@ -419,8 +420,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 */
 	public function get_snippet( $order ) {
 		if ( ! is_wp_error( $order ) ) {
-			$this->maybe_clear_session_values( $order );
-
 			return $order->html_snippet;
 		}
 
@@ -432,18 +431,14 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 *
 	 * @param Klarna_Order $order Klarna Checkout order.
 	 */
-	public function maybe_clear_session_values( $order ) {
-		if ( 'checkout_complete' === $order->status ) {
+	public function maybe_clear_session_values() {
 			WC()->session->__unset( 'kco_wc_update_md5' );
 			WC()->session->__unset( 'kco_wc_order_id' );
-			WC()->session->__unset( 'kco_wc_order_notes' );
 			WC()->session->__unset( 'kco_wc_order_api' );
 			WC()->session->__unset( 'kco_wc_extra_fields_values' );
 			WC()->session->__unset( 'kco_wc_prefill_consent' );
 			WC()->session->__unset( 'kco_checkout_form' );
 			WC()->session->__unset( 'kco_valid_checkout' );
-
-		}
 	}
 
 	/**
@@ -620,6 +615,9 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {
 			$request_args['shipping_options'] = $this->get_shipping_options();
 		}
+
+		// Check if WooCommerce setting for checkout phone field is mandatory.
+		$request_args['options']['phone_mandatory'] = 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ); // Bool.
 
 		// Allow external payment method plugin to do its thing.
 		// @TODO: Extract this into a hooked function.

@@ -186,7 +186,7 @@ function kco_wc_prefill_consent() {
 		$credentials = KCO_WC()->credentials->get_credentials_from_session();
 		$merchant_id = $credentials['merchant_id'];
 
-		if ( 'de_DE' === get_locale() ) {
+		if ( 'de_DE' === get_locale() || 'de_DE_formal' === get_locale() ) {
 			$button_text = 'Meine Adressdaten vorausfüllen';
 			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
 			$popup_text  = 'In unserem Kassenbereich nutzen wir Klarna Checkout. Dazu werden Ihre Daten, wie E-Mail-Adresse, Vor- und

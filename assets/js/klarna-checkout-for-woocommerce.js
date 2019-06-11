@@ -354,10 +354,12 @@ jQuery(function($) {
 			var fieldData = JSON.parse( sessionStorage.getItem( 'KCOFieldData' ) );
 			// Check if all data is set for required fields.
 			var allValid = true;
-			for( i = 0; i < requiredFields.length; i++ ) {
-				fieldName = requiredFields[i];
-				if ( '' === fieldData[fieldName] ) {
-					allValid = false;
+			if ( requiredFields !== null ) {
+				for( i = 0; i < requiredFields.length; i++ ) {
+					fieldName = requiredFields[i];
+					if ( '' === fieldData[fieldName] ) {
+						allValid = false;
+					}
 				}
 			}
 			kco_wc.maybeSuspendIframe( allValid );
@@ -391,24 +393,26 @@ jQuery(function($) {
 
 		setFormFieldValues: function() {
 			var form_data = JSON.parse( sessionStorage.getItem( 'KCOFieldData' ) );
-			$.each( form_data, function( name, value ) {
-				var field = $('*[name="' + name + '"]');
-				var saved_value = value;
-				// Check if field is a checkbox
-				if( field.is(':checkbox') ) {
-					if( saved_value !== '' ) {
-						field.prop('checked', true);
-					}
-				} else if( field.is(':radio') ) {
-					for ( x = 0; x < field.length; x++ ) {
-						if( field[x].value === value ) {
-							$(field[x]).prop('checked', true);
+			if( form_data !== null ) {
+				$.each( form_data, function( name, value ) {
+					var field = $('*[name="' + name + '"]');
+					var saved_value = value;
+					// Check if field is a checkbox
+					if( field.is(':checkbox') ) {
+						if( saved_value !== '' ) {
+							field.prop('checked', true);
 						}
+					} else if( field.is(':radio') ) {
+						for ( x = 0; x < field.length; x++ ) {
+							if( field[x].value === value ) {
+								$(field[x]).prop('checked', true);
+							}
+						}
+					} else {
+						field.val( saved_value );
 					}
-				} else {
-					field.val( saved_value );
-				}
-			});
+				});
+			}
 		},
 
 		// Set Woo address field values when shipping address change event has triggered.
@@ -479,10 +483,11 @@ jQuery(function($) {
 									error: function (response) {
 										kco_wc.log(response);
 									},
-									complete: function() {
+									complete: function(response) {
 										$('.woocommerce-checkout-review-order-table').unblock();
 										kco_wc.shippingUpdated = true;
 										kco_wc.validateRequiredFields();
+										kco_wc.bodyEl.trigger( 'kco_shipping_address_changed', response );
 									}
 								}
 							);

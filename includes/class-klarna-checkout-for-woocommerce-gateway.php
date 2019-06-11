@@ -56,10 +56,11 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		);
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
-		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'show_thank_you_snippet' ) );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'address_notice' ) );
 		add_action( 'woocommerce_checkout_init', array( $this, 'prefill_consent' ) );
 		add_action( 'woocommerce_checkout_init', array( $this, 'show_log_in_notice' ) );
+		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'show_thank_you_snippet' ) );
+		add_action( 'woocommerce_thankyou', array( $this, 'maybe_delete_klarna_sessions' ), 100, 1 );
 
 		// Remove WooCommerce footer text from our settings page.
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 999 );
@@ -371,6 +372,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			} else {
 				$klarna_post_order = json_decode( $response['body'] );
 
+				do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
+
 				// Remove html_snippet from what we're logging.
 				$log_order               = clone $klarna_post_order;
 				$log_order->html_snippet = '';
@@ -408,9 +411,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * @param int $order_id WooCommerce order ID.
 	 */
 	public function show_thank_you_snippet( $order_id = null ) {
-		if ( ! WC()->session->get( 'kco_wc_order_id' ) ) {
-			return;
-		}
 
 		if ( $order_id ) {
 			$order = wc_get_order( $order_id );
@@ -523,5 +523,14 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			}
 		}
 		return $class;
+	}
+
+	/**
+	 * Unsets Klarna specific WC sessions.
+	 *
+	 * @param string $order_id WC Order id.
+	 */
+	public function maybe_delete_klarna_sessions( $order_id ) {
+		KCO_WC()->api->maybe_clear_session_values();
 	}
 }
