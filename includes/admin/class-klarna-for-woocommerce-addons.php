@@ -87,7 +87,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			<div id="checkout-addons-body" class="checkout-addons-body checkout-addons-wrap wrap">
 			<?php if ( $addon_content->sections ) : ?>
 					<?php foreach ( $addon_content->sections as $section ) : ?>
-						<?php if ( isset( $section->plugin_id ) && $section->plugin_id === 'kco' ) : ?>
+						<?php if ( isset( $section->plugin_id ) && in_array( $section->plugin_id, array( 'kco', 'both' ) ) ) : ?>
 							<div id="<?php echo esc_html( $section->class ); ?>" class="<?php echo esc_html( $section->class ); ?>">
 								<div class="list">
 									<?php foreach ( $section->items as $item ) : ?>
@@ -349,7 +349,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 				$kco_settings = get_option( 'woocommerce_kco_settings' );
 				$raw_addons   = wp_safe_remote_get( 'https://s3-eu-west-1.amazonaws.com/krokedil-checkout-addons/klarna-checkout-for-woocommerce-addons.json', array( 'user-agent' => 'KCO Addons Page. Testmode: ' . $kco_settings['testmode'] ) );
 				if ( ! is_wp_error( $raw_addons ) ) {
-					$addons = json_decode( $raw_addons );
+					$addons = json_decode( wp_remote_retrieve_body( $raw_addons ) );
 					if ( $addons ) {
 						set_transient( 'wc_kco_addons', $addons, DAY_IN_SECONDS );
 					}
