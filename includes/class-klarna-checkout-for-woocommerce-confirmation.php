@@ -118,8 +118,6 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 			jQuery(function ($) {
 				// Check if session storage is set to prevent double orders.
 				if ( sessionStorage.getItem( 'orderSubmitted' ) === null || sessionStorage.getItem( 'orderSubmitted' ) === 'false' ) {
-					// Set session storage.
-					sessionStorage.setItem( 'orderSubmitted',  '1');
 
 					// Add modal with process order message.
 					var klarna_process_text = '<?php echo wp_strip_all_tags( __( 'Please wait while we process your order.', 'klarna-checkout-for-woocommerce' ), true ); ?>';
@@ -159,7 +157,11 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					do_action( 'kco_wc_before_submit' );
 					KCO_WC()->logger->log( 'Confirmation page rendered and checkout form about to be submitted for Klarna order ID ' . $klarna_order_id );
 					?>
-
+					// Set session storage.
+					var urlParams = new URLSearchParams(window.location.search);
+					if( ! urlParams.has('kco-external-payment') ) {
+						sessionStorage.setItem( 'orderSubmitted',  '1');
+					}
 					$('.validate-required').removeClass('validate-required');
 					$('form[name="checkout"]').submit();
 					console.log('yes submitted');
