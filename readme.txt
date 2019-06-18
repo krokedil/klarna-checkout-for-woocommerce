@@ -62,6 +62,8 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2019.06.13  	- version 1.10.1 =
+* Fix           - Don't set orderSubmitted sessionStorage for external payment orders. Sets correct payment method in Woo order if EPM purchase is cancelled and KCO is selected payment method again.
 
 = 2019.06.11  	- version 1.10.0 =
 * Feature       - Added check for WooCommerce checkout phone field setting to determine if phone should be mandatory or not in Klarna Checkout.
