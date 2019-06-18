@@ -557,6 +557,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$order->set_shipping_city( sanitize_text_field( $klarna_order->shipping_address->city ) );
 			$order->set_shipping_state( sanitize_text_field( $klarna_order->shipping_address->region ) );
 			$order->set_shipping_postcode( sanitize_text_field( $klarna_order->shipping_address->postal_code ) );
+			update_post_meta( $order->get_id(), '_shipping_phone', sanitize_text_field( $klarna_order->shipping_address->phone ) );
+			update_post_meta( $order->get_id(), '_shipping_email', sanitize_text_field( $klarna_order->shipping_address->email ) );
 
 			$order->set_created_via( 'klarna_checkout_backup_order_creation' );
 			$order->set_currency( sanitize_text_field( $klarna_order->purchase_currency ) );
