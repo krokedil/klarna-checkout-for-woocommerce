@@ -159,3 +159,9 @@ a.kb-button {
 	text-decoration:none;
 	color:black;
 }
+
+div.kco-message.notice {
+	border-left-color: #bb2525!important;
+	position: relative;
+	overflow: hidden;
+}
