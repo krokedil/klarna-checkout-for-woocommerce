@@ -204,11 +204,11 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 	 * @return void
 	 */
 	public function check_hide_action() {
-		if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_kco_notice_nonce'] ) ), 'kco_hide_notices_nonce' ) ) { // WPCS: input var ok, CSRF ok.
-			wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'woocommerce' ) );
-		}
-
+	
 		if ( isset( $_GET['kco-hide-notice'] ) ) {
+			if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_kco_notice_nonce'] ) ), 'kco_hide_notices_nonce' ) ) { // WPCS: input var ok, CSRF ok.
+				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'woocommerce' ) );
+			}
 			update_user_meta( get_current_user_id(), 'dismissed_kco_version_number', $_GET['kco-hide-notice'] ); // WPCS: input var ok, CSRF ok.
 		}
 	}
