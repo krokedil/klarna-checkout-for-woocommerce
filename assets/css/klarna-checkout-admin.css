@@ -165,3 +165,7 @@ div.kco-message.notice {
 	position: relative;
 	overflow: hidden;
 }
+
+input.bad_credential {
+	border-color: #bb2525!important;
+}

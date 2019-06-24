@@ -5,6 +5,9 @@ jQuery( function($) {
 	var tables = $('h3.wc-settings-sub-title + table.form-table');
 	var submit = $('.wrap.woocommerce p.submit');
 
+	var credentialsFields = 'input#woocommerce_kco_test_merchant_id_eu, input#woocommerce_kco_merchant_id_eu, input#woocommerce_kco_test_merchant_id_us, input#woocommerce_kco_merchant_id_us';
+
+
 	titles.append(' <a href="#" style="font-size:12px; font-weight: normal; text-decoration: none"><span class="dashicons dashicons-arrow-down-alt2"></span></a>');
 	tables.css('marginLeft', '20px').hide();
 	if(location === 'EU') {
@@ -39,4 +42,27 @@ jQuery( function($) {
 
 	titles.before('<hr style="margin-top:2em;margin-bottom:2em" />');
 	submit.before('<hr style="margin-top:2em;margin-bottom:2em" />');
+
+	function testCredentail() {
+		var field = $(this);
+		var regex = /[A-Za-z]{1,2}[0-9]{6}/;
+
+		// Remove any old blocks at this point.
+		field.removeClass( 'bad_credential' );
+		$('button[name="save"]').removeAttr( 'disabled' );
+
+		// If value is empty do nothing.
+		if( '' === field.val() ) {
+			return;
+		}
+
+		if ( ! regex.test( field.val() ) ) {
+			field.addClass( 'bad_credential' );
+			$('button[name="save"]').attr( 'disabled', 'disabled' );
+			window.alert('Please verify your Klarna Credentials.');
+			return;
+		}
+	}
+
+	$('body').on('change', credentialsFields, testCredentail);
 });
