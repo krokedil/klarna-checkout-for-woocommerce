@@ -608,6 +608,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$request_args['options']['date_of_birth_mandatory']         = $this->get_dob_mandatory();
 		$request_args['options']['national_identification_number_mandatory'] = $this->get_dob_mandatory();
 		$request_args['options']['title_mandatory']                          = $this->get_title_mandatory();
+		$request_args['options']['require_validate_callback_success']        = true;
 
 		if ( $this->get_iframe_colors() ) {
 			$request_args['options'] = array_merge( $request_args['options'], $this->get_iframe_colors() );

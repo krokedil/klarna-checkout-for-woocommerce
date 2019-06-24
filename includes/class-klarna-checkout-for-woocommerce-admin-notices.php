@@ -183,9 +183,9 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 	 * @return void
 	 */
 	public function version_warning_message() {
-		$current_message_version = null;
+		$current_message_version = '1.10.2';
 		$dismissed_version       = get_user_meta( get_current_user_id(), 'dismissed_kco_version_number', true );
-		$message                 = __( '', 'klarna-checkout-for-woocommerce' );
+		$message                 = __( '<h3>Klarna Checkout 1.10.2 notice</h3><p>With version 1.10.2 we have added a control to make sure that validation requests from Klarna gets a valid response. This might mean that orders are not going through if your store is blocking these signals. Please test and see that everything is working correctly, and verify that no firewalls or security plugins are blocking Klarnas request.</p>', 'klarna-checkout-for-woocommerce' );
 		if ( $current_message_version !== null ) {
 			if ( ! $dismissed_version || ! version_compare( $dismissed_version, $current_message_version, '>=' ) ) {
 				?>
@@ -204,7 +204,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 	 * @return void
 	 */
 	public function check_hide_action() {
-	
+
 		if ( isset( $_GET['kco-hide-notice'] ) ) {
 			if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_kco_notice_nonce'] ) ), 'kco_hide_notices_nonce' ) ) { // WPCS: input var ok, CSRF ok.
 				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'woocommerce' ) );
