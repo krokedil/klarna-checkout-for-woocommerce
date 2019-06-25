@@ -62,7 +62,12 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_confirmation_url() {
-		$confirmation_url = wc_get_checkout_url() . '?confirm=yes&kco_wc_order_id={checkout.order.id}';
+		$confirmation_url = add_query_arg(
+			array(
+				'confirm'         => 'yes',
+				'kco_wc_order_id' => '{checkout.order.id}',
+			), wc_get_checkout_url()
+		);
 		return $confirmation_url;
 	}
 
@@ -75,7 +80,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 */
 	private function get_push_url() {
 		$session_id = $this->get_session_id();
-		$push_url  = get_home_url() . '/wc-api/KCO_WC_Push/?kco-action=push&kco_wc_order_id={checkout.order.id}&kco_session_id=' . $session_id;
+		$push_url   = get_home_url() . '/wc-api/KCO_WC_Push/?kco-action=push&kco_wc_order_id={checkout.order.id}&kco_session_id=' . $session_id;
 		return $push_url;
 	}
 
