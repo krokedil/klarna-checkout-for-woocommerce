@@ -65,6 +65,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 			add_action( 'admin_notices', array( $this, 'check_terms' ) );
 			add_action( 'admin_notices', array( $this, 'check_account' ) );
 			add_action( 'admin_notices', array( $this, 'check_autoptimize' ) );
+			add_action( 'admin_notices', array( $this, 'check_optimize' ) );
 			add_action( 'admin_notices', array( $this, 'version_warning_message' ) );
 		}
 	}
@@ -148,6 +149,26 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 			<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href="%s">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>).', 'klarna-checkout-for-woocommerce' ) . '</p>' ) ); ?>
 			</div>
 			<?php
+		}
+	}
+
+	/**
+	 * Check if Optimizing plugins exist.
+	 */
+	public function check_optimize() {
+		if ( 'yes' !== $this->enabled ) {
+			return;
+		}
+
+		if ( ! get_user_meta( get_current_user_id(), 'dismissed_kco_check_optimize_notice', true ) ) {
+			if ( class_exists( 'autoptimizeBase' ) || class_exists( 'WpFastestCache' ) || function_exists( 'w3tc_class_autoload' ) ) {
+				?>
+				<div class="kco-message notice woocommerce-message notice-error">
+				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_optimize' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php _e( 'Dismiss', 'woocommerce' ); ?></a>
+				<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks as if you have a Optimizing or Caching plugin installed. Please make sure to not enable these features on the checkout page, as this can cause issues with Klarna Checkout. The checkout page should never be minified, concatenated, or cached', 'klarna-checkout-for-woocommerce' ) . '</p>' ) ); ?>
+				</div>
+				<?php
+			}
 		}
 	}
 
