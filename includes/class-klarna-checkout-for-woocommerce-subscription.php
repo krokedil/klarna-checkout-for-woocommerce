@@ -32,15 +32,7 @@ class Klarna_Checkout_Subscription {
 	 */
 	public function check_if_subscription() {
 		if ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
-			$subscription_product_id = false;
-			if ( ! empty( WC()->cart->cart_contents ) ) {
-				foreach ( WC()->cart->cart_contents as $cart_item ) {
-					if ( WC_Subscriptions_Product::is_subscription( $cart_item['product_id'] ) ) {
-						$subscription_product_id = $cart_item['product_id'];
-						return true;
-					}
-				}
-			}
+			return true;
 		}
 		return false;
 	}
