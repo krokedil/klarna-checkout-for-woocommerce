@@ -470,7 +470,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 */
 	public function get_purchase_country() {
 		// Try to use customer country if available.
-		if ( ! empty( WC()->customer->get_billing_country() ) ) {
+		if ( ! empty( WC()->customer->get_billing_country() ) && strlen( WC()->customer->get_billing_country() ) === 2 ) {
 			return WC()->customer->get_billing_country( 'edit' );
 		}
 
