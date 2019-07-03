@@ -45,7 +45,7 @@ jQuery( function($) {
 
 	function testCredentail() {
 		var field = $(this);
-		var regex = /[A-Za-z]{1,2}[0-9]{6}/;
+		var regex = /[A-Za-z]{1,2}[0-9]{5}/;
 
 		// Remove any old blocks at this point.
 		field.removeClass( 'bad_credential' );

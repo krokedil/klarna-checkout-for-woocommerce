@@ -6,7 +6,7 @@ Requires at least: 4.0
 Tested up to: 5.2.1
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.6.4
+WC tested up to: 3.6.5
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,17 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2019.07.03  	- version 1.10.2 =
+* Enhancement	- Added require_validate_callback_success to the API calls. This means that all orders have to get a valid response from your store on the validation callback to be able to be completed. For more info about this read here: https://docs.krokedil.com/article/287-klarna-checkout-faq
+* Enhancement	- Changed purchase_country to be based on customer billing address instead of store base address.
+* Enhancement	- Improved logging for subscription errors.
+* Enhancement	- Added saving of shipping phone and email to the order as _shipping_phone and _shipping_email meta fields for other plugins to use if needed.
+* Enhancement	- Added functionality to dismiss notices.
+* Enhancement	- Now save the klarna order id as the transaction id every time to prevent possible issues if the update_post_meta function failed for any reasson.
+* Fix			- Correctly add query params to the confirmation URL to prevent issues with other plugins trying to do the same.
+* Fix			- Improved subscription controlls to prevent issues with other plugins.
+* Fix			- Changed from using home_url to site_url for the validation callback to better support other plugins.
+
 = 2019.06.13  	- version 1.10.1 =
 * Fix           - Don't set orderSubmitted sessionStorage for external payment orders. Sets correct payment method in Woo order if EPM purchase is cancelled and KCO is selected payment method again.
 
