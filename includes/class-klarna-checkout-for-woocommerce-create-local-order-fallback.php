@@ -165,9 +165,11 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 
 		// Phone.
 		$order->set_billing_phone( sanitize_text_field( $klarna_order->billing_address->phone ) );
+		update_post_meta( $order->get_id(), '_shipping_phone', sanitize_text_field( $klarna_order->shipping_address->phone ) );
 
 		// Email.
 		$order->set_billing_email( sanitize_text_field( $klarna_order->billing_address->email ) );
+		update_post_meta( $order->get_id(), '_shipping_email', sanitize_text_field( $klarna_order->shipping_address->email ) );
 
 	}
 

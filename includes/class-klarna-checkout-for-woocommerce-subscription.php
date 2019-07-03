@@ -32,15 +32,7 @@ class Klarna_Checkout_Subscription {
 	 */
 	public function check_if_subscription() {
 		if ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
-			$subscription_product_id = false;
-			if ( ! empty( WC()->cart->cart_contents ) ) {
-				foreach ( WC()->cart->cart_contents as $cart_item ) {
-					if ( WC_Subscriptions_Product::is_subscription( $cart_item['product_id'] ) ) {
-						$subscription_product_id = $cart_item['product_id'];
-						return true;
-					}
-				}
-			}
+			return true;
 		}
 		return false;
 	}
@@ -167,8 +159,13 @@ class Klarna_Checkout_Subscription {
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Klarna. Klarna order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
 			$renewal_order->payment_complete( $klarna_order_id );
 		} else {
+			$error_message = ' ';
+			$errors        = json_decode( $create_order_response['body'], true );
+			foreach ( $errors['error_messages'] as $error ) {
+				$error_message = $error_message . $error . '. ';
+			}
 			WC_Subscriptions_Manager::process_subscription_payment_failure_on_order( $renewal_order );
-			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s', 'klarna-checkout-for-woocommerce' ), $create_order_response['response']['code'], $create_order_response['response']['message'] ) );
+			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s', 'klarna-checkout-for-woocommerce' ), $create_order_response['response']['code'], $error_message ) );
 		}
 	}
 

@@ -363,6 +363,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			$klarna_country = wc_get_base_location()['country'];
 			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
 
+			// Set shipping phone and email.
+			update_post_meta( $order_id, '_shipping_phone', sanitize_text_field( $klarna_order->shipping_address->phone ) );
+			update_post_meta( $order_id, '_shipping_email', sanitize_text_field( $klarna_order->shipping_address->email ) );
+
 			$response = KCO_WC()->api->request_post_get_order( $klarna_order->order_id, $order_id );
 			if ( is_wp_error( $response ) ) {
 				// Request error. Set order status to On hold and print the error message as a note.
@@ -380,7 +384,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 				krokedil_log_events( $order_id, 'Klarna post_order in process_payment_handler', $log_order );
 				KCO_WC()->logger->log( 'Order processed (process_payment_handler) for Klarna order ID ' . $klarna_order_id . '. WC order ID ' . $order_id . '. Post order info ' . stripslashes_deep( json_encode( $log_order ) ) );
 				if ( 'ACCEPTED' === $klarna_post_order->fraud_status ) {
-					$order->payment_complete();
+					$order->payment_complete( $klarna_order_id );
 					// translators: Klarna order ID.
 					$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
 					$order->add_order_note( $note );
