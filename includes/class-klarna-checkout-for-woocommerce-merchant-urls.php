@@ -93,7 +93,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 */
 	private function get_validation_url() {
 		$session_id     = $this->get_session_id();
-		$validation_url = get_site_url() . '/wc-api/KCO_WC_Validation/?kco-action=validation&kco_wc_order_id={checkout.order.id}&kco_session_id=' . $session_id;
+		$validation_url = get_home_url() . '/wc-api/KCO_WC_Validation/?kco-action=validation&kco_wc_order_id={checkout.order.id}&kco_session_id=' . $session_id;
 		return str_replace( 'http:', 'https:', $validation_url );
 	}
 
