@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2019.07.05  	- version 1.10.3 =
+* Fix			- Reverted change to the validation callback URL from site to home URL. We are now using the home_url again.
+
 = 2019.07.03  	- version 1.10.2 =
 * Enhancement	- Added require_validate_callback_success to the API calls. This means that all orders have to get a valid response from your store on the validation callback to be able to be completed. For more info about this read here: https://docs.krokedil.com/article/287-klarna-checkout-faq
 * Enhancement	- Changed purchase_country to be based on customer billing address instead of store base address.
