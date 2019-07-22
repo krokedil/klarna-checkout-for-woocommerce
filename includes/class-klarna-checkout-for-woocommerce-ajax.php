@@ -62,7 +62,6 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$new_quantity = (int) $cart_value['qty'];
 			WC()->cart->set_quantity( $cart_key, $new_quantity, false );
 		}
-
 		WC()->cart->calculate_fees();
 		WC()->cart->calculate_totals();
 		KCO_WC()->api->request_pre_update_order();
@@ -85,9 +84,8 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$shipping_option           = $_POST['data'];
 			$chosen_shipping_methods   = array();
 			$chosen_shipping_methods[] = wc_clean( $shipping_option['id'] );
-			WC()->session->set( 'chosen_shipping_methods', $chosen_shipping_methods );
+			WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
 		}
-
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_fees();
 		WC()->cart->calculate_totals();
@@ -289,6 +287,16 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			$customer_data['shipping_country'] = $country;
 		}
 
+		// If customer is not logged in and this is a subscription purchase.
+		$must_login         = 'no';
+		$must_login_message = apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) );
+		if ( ! is_user_logged_in() && ( ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) || 'no' === get_option( 'woocommerce_enable_guest_checkout' ) ) ) {
+			if ( email_exists( $email ) ) {
+				// Email exist in a user account, customer must login.
+				$must_login = 'yes';
+			}
+		}
+
 		WC()->customer->set_props( $customer_data );
 		WC()->customer->save();
 
@@ -305,7 +313,9 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		wp_send_json_success(
 			array(
 				// 'html'   => $html,
-				'customer_data' => $customer_data,
+				'customer_data'      => $customer_data,
+				'must_login'         => $must_login,
+				'must_login_message' => $must_login_message,
 			)
 		);
 		wp_die();
