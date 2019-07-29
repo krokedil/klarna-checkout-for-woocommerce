@@ -184,10 +184,12 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				WC()->cart->calculate_totals();
 
 				// Check if order needs payment.
-				if ( ! WC()->cart->needs_payment() && 'checkout_incomplete' === $klarna_order->status ) {
-					$return['redirect_url'] = wc_get_checkout_url();
-					wp_send_json_error( $return );
-					wp_die();
+				if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
+					if ( ! WC()->cart->needs_payment() && 'checkout_incomplete' === $klarna_order->status ) {
+						$return['redirect_url'] = wc_get_checkout_url();
+						wp_send_json_error( $return );
+						wp_die();
+					}
 				}
 
 				// Check if payment status is checkout_incomplete.

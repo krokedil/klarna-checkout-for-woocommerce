@@ -63,8 +63,10 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 			}
 
 			// Don't display KCO template if we have a cart that doesn't needs payment
-			if ( ! WC()->cart->needs_payment() ) {
-				return $template;
+			if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
+				if ( ! WC()->cart->needs_payment() ) {
+					return $template;
+				}
 			}
 
 			// Klarna Checkout.
