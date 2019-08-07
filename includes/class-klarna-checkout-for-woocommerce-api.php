@@ -531,6 +531,17 @@ class Klarna_Checkout_For_WooCommerce_API {
 	}
 
 	/**
+	 * Gets billing countries formatted for Klarna.
+	 *
+	 * @return array
+	 */
+	public function get_billing_countries() {
+		$wc_countries = new WC_Countries();
+
+		return array_keys( $wc_countries->get_allowed_countries() );
+	}
+
+	/**
 	 * Gets Klarna API request headers.
 	 *
 	 * @return array
@@ -585,6 +596,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 			'order_lines'        => $order_lines,
 			'shipping_countries' => $this->get_shipping_countries(),
 			'merchant_data'      => $this->get_merchant_data(),
+			'billing_countries'  => $this->get_billing_countries(),
 		);
 
 		if ( kco_wc_prefill_allowed() ) {

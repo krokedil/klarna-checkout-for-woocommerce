@@ -477,8 +477,23 @@ jQuery(function($) {
 									},
 									success: function (response) {
 										kco_wc.log(response);
-										kco_wc.setFieldValues( response.data );
-										$('body').trigger('update_checkout');
+										if( 'yes' == response.data.must_login ) {
+											// Customer might need to login. Inform customer and freeze KCO checkout.
+											kco_wc.kcoSuspend( false );
+											var $form = $( 'form.checkout' );
+											$form.prepend( '<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' + response.data.must_login_message + '</li></ul></div>' );
+											
+											var etop = $('form.checkout').offset().top;
+											$('html, body').animate({
+												scrollTop: etop
+											  }, 1000);
+										} else {
+											// All good release checkout and trigger update_checkout event
+											kco_wc.kcoResume();
+											kco_wc.validateRequiredFields();
+											kco_wc.setFieldValues( response.data );
+											$('body').trigger('update_checkout');	
+										}
 									},
 									error: function (response) {
 										kco_wc.log(response);
@@ -486,7 +501,6 @@ jQuery(function($) {
 									complete: function(response) {
 										$('.woocommerce-checkout-review-order-table').unblock();
 										kco_wc.shippingUpdated = true;
-										kco_wc.validateRequiredFields();
 										kco_wc.bodyEl.trigger( 'kco_shipping_address_changed', response );
 									}
 								}
@@ -527,7 +541,8 @@ jQuery(function($) {
 									},
 									complete: function(response) {
 										$('#shipping_method #' + response.responseJSON.data.shipping_option_name).prop('checked', true);
-										$('body').trigger('kco_shipping_option_changed');
+										console.log( 'triggering TMS stuff.' );
+										$('body').trigger('kco_shipping_option_changed', [ data ] );
 										$('.woocommerce-checkout-review-order-table').unblock();
 										kco_wc.kcoResume();
 									}

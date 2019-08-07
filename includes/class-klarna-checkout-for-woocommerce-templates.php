@@ -63,8 +63,10 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 			}
 
 			// Don't display KCO template if we have a cart that doesn't needs payment
-			if ( ! WC()->cart->needs_payment() ) {
-				return $template;
+			if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
+				if ( ! WC()->cart->needs_payment() ) {
+					return $template;
+				}
 			}
 
 			// Klarna Checkout.
@@ -125,8 +127,8 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 
 			// Get checkout object.
 			$checkout = WC()->checkout();
-			// Bail if this is KCO confirmation page, order received page, KCO page (kco_wc_show_snippet has run) or user is not logged and registration is disabled.
-			if ( is_kco_confirmation() || is_wc_endpoint_url( 'order-received' ) || did_action( 'kco_wc_show_snippet' ) || ( ! $checkout->is_registration_enabled() && $checkout->is_registration_required() && ! is_user_logged_in() ) ) {
+			// Bail if this is KCO confirmation page, order received page, KCO page (kco_wc_show_snippet has run), user is not logged and registration is disabled or if woocommerce_cart_has_errors has run.
+			if ( is_kco_confirmation() || is_wc_endpoint_url( 'order-received' ) || did_action( 'kco_wc_show_snippet' ) || ( ! $checkout->is_registration_enabled() && $checkout->is_registration_required() && ! is_user_logged_in() ) || did_action( 'woocommerce_cart_has_errors' ) ) {
 				return;
 			}
 

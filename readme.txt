@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2019.08.07	- version 1.10.4 =
+* Enhancement	- Added a filter to keep displaying Klarna on free orders "kco_check_if_needs_payment".
+* Enhancement	- We now send billing_countries field to Klarna.
+* Enhancement	- Added check to prevent people from placing orders without logging in to existing account first if that is required.
+* Fix			- Added a fix for handling cart errors in a better way.
+* Fix			- Fixed an issue with multiple tax classes for subscription renewal orders.
+
 = 2019.07.05  	- version 1.10.3 =
 * Fix			- Reverted change to the validation callback URL from site to home URL. We are now using the home_url again.
 
