@@ -47,7 +47,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines_From_Order {
 			'total_amount'     => round( ( $order_fee->get_total() + $order_fee->get_total_tax() ) * 100 ),
 			'unit_price'       => round( ( $order_fee->get_total() + $order_fee->get_total_tax() ) / $order_item->get_quantity() * 100 ),
 			'total_tax_amount' => round( $order_fee->get_total_tax() * 100 ),
-			'tax_rate'         => ( '0' !== $order->get_total_tax() ) ? $this->get_order_line_tax_rate( $order ) : 0,
+			'tax_rate'         => ( '0' !== $order->get_total_tax() ) ? $this->get_order_line_tax_rate( $order, current( $order->get_items( 'fee' ) ) ) : 0,
 		);
 	}
 
@@ -55,8 +55,12 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines_From_Order {
 		$tax_items = $order->get_items( 'tax' );
 		foreach ( $tax_items as $tax_item ) {
 			$rate_id = $tax_item->get_rate_id();
-			if ( $rate_id === key( $order_item->get_taxes()['total'] ) ) {
-				return round( WC_Tax::_get_tax_rate( $rate_id )['tax_rate'] * 100 );
+			foreach ( $order_item->get_taxes()['total'] as $key => $value ) {
+				if ( '' !== $value ) {
+					if ( $rate_id === $key ) {
+						return round( WC_Tax::_get_tax_rate( $rate_id )['tax_rate'] * 100 );
+					}
+				}
 			}
 		}
 	}
