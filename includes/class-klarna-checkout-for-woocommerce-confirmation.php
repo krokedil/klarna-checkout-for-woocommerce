@@ -157,10 +157,31 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					do_action( 'kco_wc_before_submit' );
 					KCO_WC()->logger->log( 'Confirmation page rendered and checkout form about to be submitted for Klarna order ID ' . $klarna_order_id );
 					?>
-					// Set session storage.
-					var urlParams = new URLSearchParams(window.location.search);
-					if( ! urlParams.has('kco-external-payment') ) {
-						sessionStorage.setItem( 'orderSubmitted',  '1');
+
+					/* Check if user is using Internet Explorer */
+					if(navigator.userAgent.indexOf('MSIE')!==-1 || navigator.appVersion.indexOf('Trident/') > -1) {
+						console.log('internet explorer is being used');
+						// function for getting params for Internet Explorer
+						$.urlParam = function(name){
+							var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+							if (results == null){
+								return null;
+							}
+							else {
+								return decodeURI(results[0]) || 0;
+							}
+						}			
+						urlParams = $.urlParam('confirm') + $.urlParam('kco_wc_order_id');
+
+						if( null === $.urlParam('kco-external-payment') ) {
+							sessionStorage.setItem( 'orderSubmitted',  '1');
+						}
+					} else {
+						// Set session storage.
+						var urlParams = new URLSearchParams(window.location.search);
+						if( ! urlParams.has('kco-external-payment') ) {
+							sessionStorage.setItem( 'orderSubmitted',  '1');
+						}
 					}
 					$('.validate-required').removeClass('validate-required');
 					$('form[name="checkout"]').submit();
