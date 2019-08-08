@@ -160,7 +160,6 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 
 					/* Check if user is using Internet Explorer */
 					if(navigator.userAgent.indexOf('MSIE')!==-1 || navigator.appVersion.indexOf('Trident/') > -1) {
-						console.log('internet explorer is being used');
 						// function for getting params for Internet Explorer
 						$.urlParam = function(name){
 							var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
