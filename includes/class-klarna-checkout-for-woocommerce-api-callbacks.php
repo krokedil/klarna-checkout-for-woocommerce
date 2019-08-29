@@ -572,7 +572,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$response_data = KCO_WC()->api->request_pre_get_order( $klarna_order->order_id );
 			if ( ! is_wp_error( $response_data ) && ( $response_data['response']['code'] >= 200 && $response_data['response']['code'] <= 299 ) ) {
 				$klarna_order_data = json_decode( $response_data['body'] );
-				if ( class_exists( 'WC_Subscription' ) && isset( $klarna_order_data->recurring_token ) ) {
+				if ( isset( $klarna_order_data->recurring_token ) && ! empty( $klarna_order_data->recurring_token ) ) {
 					$recurring_token = $klarna_order_data->recurring_token;
 					update_post_meta( $order->get_id(), '_kco_recurring_token', $recurring_token );
 				}
