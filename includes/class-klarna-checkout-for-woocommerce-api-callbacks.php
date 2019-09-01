@@ -568,6 +568,20 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$payment_method     = $available_gateways['kco'];
 			$order->set_payment_method( $payment_method );
 
+			// Add recurring token to order via Checkout API
+			$response_data = KCO_WC()->api->request_pre_get_order( $klarna_order->order_id );
+			if ( ! is_wp_error( $response_data ) && ( $response_data['response']['code'] >= 200 && $response_data['response']['code'] <= 299 ) ) {
+				$klarna_order_data = json_decode( $response_data['body'] );
+				if ( isset( $klarna_order_data->recurring_token ) && ! empty( $klarna_order_data->recurring_token ) ) {
+					$recurring_token = $klarna_order_data->recurring_token;
+					update_post_meta( $order->get_id(), '_kco_recurring_token', $recurring_token );
+				}
+			} else {
+				// Retrieve error.
+				$error = KCO_WC()->api->extract_error_messages( $response_data );
+				KCO_WC()->logger->log( 'ERROR when requesting Klarna order via Checkout API (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response_data ) ) );
+			}
+
 			// Process cart with data from Klarna.
 			// Only do this if we where unable to create the cart object from session ID.
 			if ( WC()->cart->is_empty() ) {
