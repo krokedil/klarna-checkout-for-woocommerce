@@ -31,7 +31,7 @@ class Klarna_Checkout_Subscription {
 	 * @return bool
 	 */
 	public function check_if_subscription() {
-		if ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
+		if ( class_exists( 'WC_Subscriptions_Cart' ) && ( WC_Subscriptions_Cart::cart_contains_subscription() || wcs_cart_contains_renewal() ) ) {
 			return true;
 		}
 		return false;
@@ -117,7 +117,7 @@ class Klarna_Checkout_Subscription {
 	 */
 	public function set_recurring_token_for_order( $order_id = null ) {
 		$wc_order = wc_get_order( $order_id );
-		if ( class_exists( 'WC_Subscription' ) && wcs_order_contains_subscription( $wc_order ) ) {
+		if ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
 			$subcriptions    = wcs_get_subscriptions_for_order( $order_id );
 			$klarna_order_id = $wc_order->get_transaction_id();
 			$response        = KCO_WC()->api->request_pre_get_order( $klarna_order_id, $order_id );
@@ -125,8 +125,10 @@ class Klarna_Checkout_Subscription {
 			if ( isset( $klarna_order->recurring_token ) ) {
 				$recurring_token = $klarna_order->recurring_token;
 				foreach ( $subcriptions as $subcription ) {
+					// Store the recurring order in the subscription.
 					update_post_meta( $subcription->get_id(), '_kco_recurring_token', $recurring_token );
 				}
+				// Store recurring token in the order.
 				update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
 			}
 		}
