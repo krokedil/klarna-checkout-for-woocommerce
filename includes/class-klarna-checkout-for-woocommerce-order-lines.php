@@ -313,11 +313,12 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				$coupon_amount     = isset( WC()->cart->applied_gift_cards_amounts[ $code ] ) ? - WC()->cart->applied_gift_cards_amounts[ $code ] * 100 : 0;
 				$coupon_tax_amount = '';
 				$label             = apply_filters( 'yith_ywgc_cart_totals_gift_card_label', esc_html( __( 'Gift card:', 'yith-woocommerce-gift-cards' ) . ' ' . $code ), $code );
+				$giftcard_sku      = apply_filters( 'kco_yith_gift_card_sku', esc_html( __( 'giftcard', 'klarna-checkout-for-woocommerce' ) ), $code );
 
 				$gift_card           = array(
 					'type'                  => 'gift_card',
-					'reference'             => $code,
-					'name'                  => __( 'Gift card', 'yith-woocommerce-gift-cards' ),
+					'reference'             => $giftcard_sku,
+					'name'                  => $label,
 					'quantity'              => 1,
 					'unit_price'            => $coupon_amount,
 					'tax_rate'              => 0,
