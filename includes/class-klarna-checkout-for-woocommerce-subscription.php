@@ -23,6 +23,10 @@ class Klarna_Checkout_Subscription {
 		add_action( 'woocommerce_scheduled_subscription_payment_kco', array( $this, 'trigger_scheduled_payment' ), 10, 2 );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'show_recurring_token' ) );
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'save_kco_recurring_token_update' ), 45, 2 );
+
+		add_action( 'wc_klarna_push_cb', array( $this, 'handle_push_cb_for_payment_method_change' ) );
+		add_action( 'init', array( $this, 'display_thankyou_message_for_payment_method_change' ) );
+
 	}
 
 	/**
@@ -32,6 +36,19 @@ class Klarna_Checkout_Subscription {
 	 */
 	public function check_if_subscription() {
 		if ( class_exists( 'WC_Subscriptions_Cart' ) && ( WC_Subscriptions_Cart::cart_contains_subscription() || wcs_cart_contains_renewal() ) ) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Checks if this is a KCO subscription payment method change.
+	 *
+	 * @return bool
+	 */
+	public function is_kco_subs_change_payment_method() {
+		if ( isset( $_GET['key'] ) && ( isset( $_GET['kco-action'] ) && 'change-subs-payment' === $_GET['kco-action'] ) ) {
+
 			return true;
 		}
 		return false;
@@ -103,10 +120,56 @@ class Klarna_Checkout_Subscription {
 	 * @return array
 	 */
 	public function set_recurring( $request_args ) {
+
 		// Check if we have a subscription product. If yes set recurring field.
-		if ( $this->check_if_subscription() ) {
+		if ( $this->check_if_subscription() || $this->is_kco_subs_change_payment_method() ) {
 			$request_args['recurring'] = true;
 		}
+
+		// If this is a change payment method request.
+		if ( $this->is_kco_subs_change_payment_method() ) {
+			$order_id = wc_get_order_id_by_order_key( sanitize_key( $_GET['key'] ) );
+			if ( $order_id ) {
+				$wc_order = wc_get_order( $order_id );
+				if ( is_object( $wc_order ) && function_exists( 'wcs_order_contains_subscription' ) && function_exists( 'wcs_is_subscription' ) ) {
+					if ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) {
+
+						// Modify order lines.
+						$order_lines = array();
+						foreach ( $wc_order->get_items() as $item ) {
+							$order_lines[] = array(
+								'name'             => $item->get_name(),
+								'quantity'         => $item->get_quantity(),
+								'total_amount'     => 0,
+								'unit_price'       => 0,
+								'total_tax_amount' => 0,
+								'tax_rate'         => 0,
+							);
+						}
+						$request_args['order_lines'] = $order_lines;
+
+						// Modify merchant url's.
+						global $wp;
+						$current_url      = add_query_arg( $_SERVER['QUERY_STRING'], '', home_url( $wp->request ) );
+						$confirmation_url = add_query_arg( 'kco-action', 'subs-payment-changed', $wc_order->get_view_order_url() );
+						$push_url         = add_query_arg(
+							array(
+								'kco-action' => 'subs-payment-changed',
+								'key'        => sanitize_key( $_GET['key'] ),
+							),
+							$request_args['merchant_urls']['push']
+						);
+
+						unset( $request_args['merchant_urls']['validation'] );
+						unset( $request_args['merchant_urls']['shipping_option_update'] );
+						$request_args['merchant_urls']['checkout']     = $current_url;
+						$request_args['merchant_urls']['confirmation'] = $confirmation_url;
+						$request_args['merchant_urls']['push']         = $push_url;
+					}
+				}
+			}
+		}
+
 		return $request_args;
 	}
 
@@ -203,6 +266,59 @@ class Klarna_Checkout_Subscription {
 			update_post_meta( $post_id, '_kco_recurring_token', wc_clean( $_POST['_kco_recurring_token'] ) );
 		}
 
+	}
+
+	/**
+	 * Handle pus callback from Klarna if this is a KCO subscription payment method change.
+	 *
+	 * @return void
+	 */
+	public function handle_push_cb_for_payment_method_change( $klarna_order_id ) {
+		if ( isset( $_GET['key'] ) && ( isset( $_GET['kco-action'] ) && 'subs-payment-changed' === $_GET['kco-action'] ) ) {
+			$order_id = wc_get_order_id_by_order_key( sanitize_key( $_GET['key'] ) );
+			$order    = wc_get_order( $order_id );
+
+			// Add recurring token to order via Checkout API.
+			$response_data = KCO_WC()->api->request_pre_get_order( $klarna_order_id );
+			if ( ! is_wp_error( $response_data ) && ( $response_data['response']['code'] >= 200 && $response_data['response']['code'] <= 299 ) ) {
+				$klarna_order_data = json_decode( $response_data['body'] );
+				if ( isset( $klarna_order_data->recurring_token ) && ! empty( $klarna_order_data->recurring_token ) ) {
+					update_post_meta( $order->get_id(), '_kco_recurring_token', sanitize_key( $klarna_order_data->recurring_token ) );
+					$note = sprintf( __( 'Payment method changed via Klarna Checkout. New recurring token for subscription: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order_data->recurring_token ) );
+					$order->add_order_note( $note );
+				}
+			} else {
+				// Retrieve error.
+				$error = KCO_WC()->api->extract_error_messages( $response_data );
+				KCO_WC()->logger->log( 'ERROR when requesting Klarna order via Checkout API (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response_data ) ) );
+				$note = sprintf( __( 'Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order_data->recurring_token ) );
+				$order->add_order_note( $note );
+			}
+
+			// Acknowledge order in Klarna.
+			KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
+			KCO_WC()->api->request_post_set_merchant_reference(
+				$klarna_order_id,
+				array(
+					'merchant_reference1' => $order->get_order_number(),
+					'merchant_reference2' => $order->get_id(),
+				)
+			);
+		}
+		exit;
+	}
+
+	/**
+	 * Display thankyou notice when customer is redirected back to the
+	 * subscription page in front-end after changing payment method.
+	 *
+	 * @return void
+	 */
+	public function display_thankyou_message_for_payment_method_change() {
+		if ( isset( $_GET['kco-action'] ) && 'subs-payment-changed' === $_GET['kco-action'] ) {
+			wc_add_notice( __( 'Thank you, your subscription payment method is now updated.', 'klarna-checkout-for-woocommerce' ), 'success' );
+			KCO_WC()->api->maybe_clear_session_values();
+		}
 	}
 }
 new Klarna_Checkout_Subscription();
