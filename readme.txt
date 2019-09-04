@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.2.1
+Tested up to: 5.2.2
 Requires PHP: 5.6
 WC requires at least: 3.0.0
-WC tested up to: 3.6.5
+WC tested up to: 3.7.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2019.09.04	- version 1.11.0 =
+* Feature       - Added support for changing subscription payment method. Useful if customers card has expired.
+* Tweak         - Changed YITH giftcard reference sent to Klarna to "giftcard".
+* Tweak         - Check if wcs_cart_contains_renewal() to maybe add subscription data to Klarna. So subscription token is created if manual subscription renewal payment is done via KCO.
+* Tweak         - Added action wc_klarna_push_cb.
+* Fix           - Adding subscription recurring token to fallback order creation.
+
 = 2019.08.07	- version 1.10.4 =
 * Enhancement	- Added a filter to keep displaying Klarna on free orders "kco_check_if_needs_payment".
 * Enhancement	- We now send billing_countries field to Klarna.
