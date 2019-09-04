@@ -30,6 +30,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 				'subscription_amount_changes',
 				'subscription_date_changes',
 				'multiple_subscriptions',
+				'subscription_payment_method_change_customer',
+				'subscription_payment_method_change_admin',
 			)
 		);
 
@@ -57,6 +59,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'address_notice' ) );
+
 		add_action( 'woocommerce_checkout_init', array( $this, 'prefill_consent' ) );
 		add_action( 'woocommerce_checkout_init', array( $this, 'show_log_in_notice' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'show_thank_you_snippet' ) );
@@ -67,7 +70,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		// Body class for KSS.
 		add_filter( 'body_class', array( $this, 'add_body_class' ) );
+
+		add_action( 'woocommerce_receipt_kco', array( $this, 'receipt_page' ) );
 	}
+
 
 	/**
 	 * Get gateway icon.
@@ -91,12 +97,43 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		$order = wc_get_order( $order_id );
 		krokedil_set_order_gateway_version( $order_id, KCO_WC_VERSION );
 
+		// Order-pay purchase (or subscription payment method change)
+		// 1. Redirect to receipt page.
+		// 2. Process the payment by displaying the KCO iframe via woocommerce_receipt_kco hook.
+		if ( isset( $_GET['change_payment_method'] ) ) {
+			$pay_url = add_query_arg(
+				array(
+					'kco-action' => 'change-subs-payment',
+				),
+				$order->get_checkout_payment_url( true )
+			);
+
+			return array(
+				'result'   => 'success',
+				'redirect' => $pay_url,
+			);
+		}
+
+		// Regular purchase.
+		// 1. Process the payment.
+		// 2. Redirect to order received page.
 		$this->process_payment_handler( $order_id );
 
 		return array(
 			'result'   => 'success',
 			'redirect' => $this->get_return_url( $order ),
 		);
+	}
+
+	/**
+	 * Receipt page. Used to display the KCO iframe during subscription payment method change.
+	 *
+	 * @return void
+	 */
+	public function receipt_page( $order ) {
+		if ( isset( $_GET['kco-action'] ) && 'change-subs-payment' === $_GET['kco-action'] ) {
+			kco_wc_show_snippet();
+		}
 	}
 
 	/**
@@ -126,6 +163,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * @return bool
 	 */
 	public function is_available() {
+		return true;
 		if ( 'yes' !== $this->enabled ) {
 			return false;
 		}
@@ -173,6 +211,10 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 		}
 
 		if ( is_order_received_page() ) {
+			return;
+		}
+
+		if ( is_wc_endpoint_url( 'order-pay' ) ) {
 			return;
 		}
 
