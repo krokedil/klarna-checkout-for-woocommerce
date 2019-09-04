@@ -108,6 +108,10 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 
 		$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
 
+		// Let other plugins hook into the push notification.
+		// Used by Klarna_Checkout_Subscription::handle_push_cb_for_payment_method_change().
+		do_action( 'wc_klarna_push_cb', $klarna_order_id );
+
 		$query_args = array(
 			'fields'      => 'ids',
 			'post_type'   => wc_get_order_types(),
