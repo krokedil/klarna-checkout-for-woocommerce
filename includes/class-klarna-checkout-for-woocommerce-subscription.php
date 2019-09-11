@@ -304,8 +304,8 @@ class Klarna_Checkout_Subscription {
 					'merchant_reference2' => $order->get_id(),
 				)
 			);
+			exit;
 		}
-		exit;
 	}
 
 	/**
