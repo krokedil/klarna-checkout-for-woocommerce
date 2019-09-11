@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2019.09.11    - version 1.11.1 =
+* Fix           - Small fix in handle_push_cb_for_payment_method_change function that caused API Callback creation to not being created on the Push from Klarna.
+
 = 2019.09.04	- version 1.11.0 =
 * Feature       - Added support for changing subscription payment method. Useful if customers card has expired.
 * Tweak         - Changed YITH giftcard reference sent to Klarna to "giftcard".
