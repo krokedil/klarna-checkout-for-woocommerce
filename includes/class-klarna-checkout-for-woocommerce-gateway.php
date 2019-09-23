@@ -396,9 +396,14 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 			$klarna_order = json_decode( $response['body'] );
 
-			// Set WC order transaction ID.
-			// update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order->order_id ) );
-			// update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order->order_id ) );
+			// Maybe set WC order transaction ID.
+			if ( empty( get_post_meta( $order_id, '_wc_klarna_order_id' ) ) ) {
+				update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order->order_id ) );
+			}
+			if ( empty( get_post_meta( $order_id, '_transaction_id' ) ) ) {
+				update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order->order_id ) );
+			}
+
 			$environment = $this->testmode ? 'test' : 'live';
 			update_post_meta( $order_id, '_wc_klarna_environment', $environment );
 
