@@ -267,7 +267,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				if ( 'US' === $this->shop_country && 'smart_coupon' !== $coupon->get_discount_type() ) {
 					$discount            = array(
 						'type'                  => 'discount',
-						'reference'             => $coupon_key,
+						'reference'             => substr( (string) $coupon_key, 0, 64 ),
 						'name'                  => $coupon_reference,
 						'quantity'              => 1,
 						'unit_price'            => $coupon_amount,
@@ -282,7 +282,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 				if ( 'smart_coupon' === $coupon->get_discount_type() ) {
 					$discount            = array(
 						'type'                  => 'gift_card',
-						'reference'             => $coupon_key,
+						'reference'             => substr( (string) $coupon_key, 0, 64 ),
 						'name'                  => $coupon_reference,
 						'quantity'              => 1,
 						'unit_price'            => $coupon_amount,
