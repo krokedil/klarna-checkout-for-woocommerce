@@ -690,8 +690,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 		if ( ! isset( $shipping_reference ) ) {
 			$shipping_reference = __( 'Shipping', 'klarna-checkout-for-woocommerce' );
 		}
-
-		return (string) $shipping_reference;
+		return substr( (string) $shipping_reference, 0, 64 );
 	}
 
 	/**
