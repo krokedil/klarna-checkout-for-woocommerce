@@ -243,6 +243,14 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			$form = WC()->session->get( 'kco_checkout_form' );
 		}
 
+		$email_exists = 'no';
+		if ( method_exists( WC()->customer, 'get_billing_email' ) && ! empty( WC()->customer->get_billing_email() ) ) {
+			if ( email_exists( WC()->customer->get_billing_email() ) ) {
+				// Email exist in a user account.
+				$email_exists = 'yes';
+			}
+		}
+
 		$standard_woo_checkout_fields = array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'terms', 'account_username', 'account_password' );
 
 		$checkout_localize_params = array(
@@ -265,6 +273,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'is_confirmation_page'                 => ( is_kco_confirmation() ) ? 'yes' : 'no',
 			'shipping_methods_in_iframe'           => $this->shipping_methods_in_iframe,
 			'required_fields_text'                 => __( 'Please fill in all required checkout fields.', 'klarna-checkout-for-woocommerce' ),
+			'email_exists'                         => $email_exists,
+			'must_login_message'                   => apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) ),
 		);
 
 		wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );

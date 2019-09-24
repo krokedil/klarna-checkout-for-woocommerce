@@ -4,7 +4,6 @@ jQuery(function($) {
 	if ( typeof kco_params === 'undefined' ) {
 		return false;
 	}
-
 	var kco_wc = {
 		bodyEl: $('body'),
 		checkoutFormSelector: 'form.checkout',
@@ -27,6 +26,9 @@ jQuery(function($) {
 		// Form fields
 		shippingUpdated: false,
 		blocked: false,
+
+		// Email exist
+		emailExists: kco_params.email_exists,
 
 		documentReady: function() {
 			kco_wc.setFormFieldValues();
@@ -391,6 +393,18 @@ jQuery(function($) {
 			}
 		},
 
+		maybePrintLoginMessage: function() {
+			if ( true === $('input[name=createaccount]').prop('checked') && 'yes' === kco_wc.emailExists ) {
+				$('form.checkout').prepend( '<div id="kco-login-notice" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' +  kco_params.must_login_message + '</li></ul></div>' );
+				var etop = $('form.checkout').offset().top;
+				$('html, body').animate({
+					scrollTop: etop
+					}, 1000);
+			} else {
+				$('#kco-login-notice').remove();
+			}
+		},
+
 		setFormFieldValues: function() {
 			var form_data = JSON.parse( sessionStorage.getItem( 'KCOFieldData' ) );
 			if( form_data !== null ) {
@@ -444,6 +458,8 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
+			kco_wc.bodyEl.on('change', 'input[name="createaccount"]', kco_wc.maybePrintLoginMessage);
+			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybePrintLoginMessage);
 
 			// Extra checkout fields.
 			kco_wc.bodyEl.on('blur', kco_wc.extraFieldsSelectorText, kco_wc.checkFormData);
@@ -456,7 +472,7 @@ jQuery(function($) {
 						'shipping_address_change': function(data) {
 							kco_wc.log('shipping_address_change');
 							kco_wc.log(data);
-
+							var form_data = JSON.parse( sessionStorage.getItem( 'KCOFieldData' ) );
 							$('.woocommerce-checkout-review-order-table').block({
 								message: null,
 								overlayCSS: {
@@ -473,15 +489,19 @@ jQuery(function($) {
 									dataType: 'json',
 									data: {
 										data: data,
+										createaccount: form_data.createaccount,
 										nonce: kco_params.iframe_shipping_address_change_nonce
 									},
 									success: function (response) {
 										kco_wc.log(response);
+										// Set emailExists variable. Used if customers clicks the create account checkbox.
+										kco_wc.emailExists = response.data.email_exists;
+
 										if( 'yes' == response.data.must_login ) {
 											// Customer might need to login. Inform customer and freeze KCO checkout.
 											kco_wc.kcoSuspend( false );
 											var $form = $( 'form.checkout' );
-											$form.prepend( '<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' + response.data.must_login_message + '</li></ul></div>' );
+											$form.prepend( '<div id="kco-login-notice" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' + response.data.must_login_message + '</li></ul></div>' );
 											
 											var etop = $('form.checkout').offset().top;
 											$('html, body').animate({
@@ -541,7 +561,6 @@ jQuery(function($) {
 									},
 									complete: function(response) {
 										$('#shipping_method #' + response.responseJSON.data.shipping_option_name).prop('checked', true);
-										console.log( 'triggering TMS stuff.' );
 										$('body').trigger('kco_shipping_option_changed', [ data ] );
 										$('.woocommerce-checkout-review-order-table').unblock();
 										kco_wc.kcoResume();
