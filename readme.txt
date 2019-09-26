@@ -3,9 +3,9 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.2.2
+Tested up to: 5.2.3
 Requires PHP: 5.6
-WC requires at least: 3.0.0
+WC requires at least: 3.2.0
 WC tested up to: 3.7.0
 Stable tag: trunk
 License: GPLv3 or later
@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2019.09.26    - version 1.11.2 =
+* Tweak         - Increased minimum required WooCommerce version to 3.2.0.
+* Tweak         - Store _wc_klarna_order_id and _transaction_id during process_payment_handler() function if not yet stored in order.
+* Tweak         - Truncate Shipping reference field to 64 characters sent to Klarna.
+* Tweak         - Set $coupon_key as reference instead of description for US dicsounts sent to Klarna.
+* Fix           - Improved support for notifying customer to login if customer tries to create an account but already have one (and is not logged in). Could trigger orders created on checkout_error event.
+
 = 2019.09.11    - version 1.11.1 =
 * Fix           - Small fix in handle_push_cb_for_payment_method_change function that caused API Callback creation to not being created on the Push from Klarna.
 
