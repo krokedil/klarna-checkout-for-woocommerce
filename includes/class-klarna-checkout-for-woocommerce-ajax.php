@@ -292,11 +292,18 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		// If customer is not logged in and this is a subscription purchase.
 		$must_login         = 'no';
 		$must_login_message = apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) );
-		if ( ! is_user_logged_in() && ( ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) || 'no' === get_option( 'woocommerce_enable_guest_checkout' ) ) ) {
+		if ( ! is_user_logged_in() && ( ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) || 'no' === get_option( 'woocommerce_enable_guest_checkout' ) || '1' === $_POST['createaccount'] ) ) {
 			if ( email_exists( $email ) ) {
 				// Email exist in a user account, customer must login.
 				$must_login = 'yes';
 			}
+		}
+
+		// Check if email exist in a user account.
+		if ( email_exists( $email ) ) {
+			$email_exists = 'yes';
+		} else {
+			$email_exists = 'no';
 		}
 
 		WC()->customer->set_props( $customer_data );
@@ -318,6 +325,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				'customer_data'      => $customer_data,
 				'must_login'         => $must_login,
 				'must_login_message' => $must_login_message,
+				'email_exists'       => $email_exists,
 			)
 		);
 		wp_die();
