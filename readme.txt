@@ -62,6 +62,10 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2019.10.02    - version 1.11.3 =
+* Fix           - IE support in logic for checking if kco-external-payment exist in url during order confirmation process.
+* Fix           - Request order from checkout API (instead of Order Management API) for address field population during confirmation process in Woo to avoid 404-responses from Klarna. 
+
 = 2019.09.26    - version 1.11.2 =
 * Tweak         - Increased minimum required WooCommerce version to 3.2.0.
 * Tweak         - Store _wc_klarna_order_id and _transaction_id during process_payment_handler() function if not yet stored in order.
