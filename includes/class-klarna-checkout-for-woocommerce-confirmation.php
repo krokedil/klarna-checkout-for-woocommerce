@@ -158,10 +158,23 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 					KCO_WC()->logger->log( 'Confirmation page rendered and checkout form about to be submitted for Klarna order ID ' . $klarna_order_id );
 					?>
 					// Set session storage.
-					var urlParams = new URLSearchParams(window.location.search);
-					if( ! urlParams.has('kco-external-payment') ) {
-						sessionStorage.setItem( 'orderSubmitted',  '1');
+					var urlHasParam = function getUrlParameter(param) {
+						var pageUrl = window.location.search.substring(1),
+							urlVariables = pageUrl.split('&'),
+							parameterName,
+							i;
+						for (i = 0; i < urlVariables.length; i++) {
+							parameterName = urlVariables[i].split('=');
+
+							if (parameterName[0] === param) {
+								return parameterName[1] === undefined ? true : decodeURIComponent(parameterName[1]);
+							}
+						}
+					};
+					if( ! urlHasParam('kco-external-payment') ) {
+						sessionStorage.setItem( 'orderSubmitted', '1');
 					}
+
 					$('.validate-required').removeClass('validate-required');
 					$('form[name="checkout"]').submit();
 					console.log('yes submitted');
