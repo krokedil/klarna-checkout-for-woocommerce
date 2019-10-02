@@ -75,18 +75,18 @@ msgstr ""
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:148, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:660, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:446
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:148, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:660, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:447
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:151, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:663, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:449
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:151, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:663, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:450
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:154, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:666, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:452
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:154, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:666, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:453
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
@@ -106,7 +106,7 @@ msgstr ""
 msgid "Please wait while we process your order."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-confirmation.php:174
+#: ../includes/class-klarna-checkout-for-woocommerce-confirmation.php:187
 msgid "Trying again. Please wait while we process your order..."
 msgstr ""
 
@@ -402,19 +402,19 @@ msgstr ""
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:431
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:434
 msgid "Klarna post_order request in process_payment_handler failed. Error message: %s."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:491
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:492
 msgid "Order finalized in thankyou page."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:527
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:528
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:539
+#: ../includes/class-klarna-checkout-for-woocommerce-gateway.php:540
 msgid "An account is already registered with your email address. Please log in."
 msgstr ""
 
