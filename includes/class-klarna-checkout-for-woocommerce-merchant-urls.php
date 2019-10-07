@@ -27,7 +27,8 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 			// 'country_change'         => $this->get_country_change_url(),         // HTTPS.
 		);
 
-		return $merchant_urls;
+		return apply_filters('kco_wc_merchant_urls', $merchant_urls);
+
 	}
 
 	/**
@@ -39,7 +40,8 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 */
 	private function get_terms_url() {
 		$terms_url = get_permalink( wc_get_page_id( 'terms' ) );
-		return $terms_url;
+
+		return apply_filters('kco_wc_terms_url', $terms_url);
 	}
 
 	/**
@@ -51,7 +53,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 */
 	private function get_checkout_url() {
 		$checkout_url = wc_get_checkout_url();
-		return $checkout_url;
+		return apply_filters('kco_wc_checkout_url', $checkout_url);
 	}
 
 	/**
