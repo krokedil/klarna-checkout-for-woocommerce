@@ -543,7 +543,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * @throws Exception WC_Data_Exception.
 	 */
 	private function process_order( $klarna_order ) {
-		error_log( 'k orderr ' . var_export( $klarna_order, true ) );
 		$billing_first_name  = isset( $klarna_order->billing_address->given_name ) ? $klarna_order->billing_address->given_name : '.';
 		$billing_last_name   = isset( $klarna_order->billing_address->family_name ) ? $klarna_order->billing_address->family_name : '.';
 		$billing_address     = isset( $klarna_order->billing_address->street_address ) ? $klarna_order->billing_address->street_address : '.';
