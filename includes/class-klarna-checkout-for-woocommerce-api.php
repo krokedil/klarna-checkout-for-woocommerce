@@ -1,4 +1,10 @@
 <?php
+/**
+ * API Class file.
+ *
+ * @package Klarna_Checkout/Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -67,7 +73,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 		if ( is_wp_error( $response ) ) {
 			$error = $this->extract_error_messages( $response );
 			KCO_WC()->logger->log( 'Create Klarna order ERROR (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response ) ) );
-			// return $error.
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',
@@ -329,8 +334,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * Saves Klarna order API to WooCommerce session.
 	 *
 	 * 'na' or 'eu', used for order updates, to avoid trying to switch API when updating KCO Global orders.
-	 *
-	 * @param string $klarna_order Klarna order.
 	 */
 	public function save_order_api_to_session() {
 		if ( 'US' === $this->get_purchase_country() ) {
@@ -428,8 +431,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 
 	/**
 	 * Clear WooCommerce session values if Klarna Checkout order is completed.
-	 *
-	 * @param Klarna_Order $order Klarna Checkout order.
 	 */
 	public function maybe_clear_session_values() {
 			WC()->session->__unset( 'kco_wc_update_md5' );
@@ -524,9 +525,6 @@ class Klarna_Checkout_For_WooCommerce_API {
 		// Is user logged in.
 		$merchant_data['is_user_logged_in'] = is_user_logged_in();
 
-		// Cart hash.
-		// $cart_hash                  = md5( wp_json_encode( wc_clean( WC()->cart->get_cart_for_session() ) ) . WC()->cart->total );
-		// $merchant_data['cart_hash'] = $cart_hash;
 		return json_encode( $merchant_data );
 	}
 
@@ -582,7 +580,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 		$order_tax_amount = KCO_WC()->order_lines->get_order_tax_amount( $order_lines );
 		$order_amount     = KCO_WC()->order_lines->get_order_amount();
 
-		if ( $order_amount !== KCO_WC()->order_lines->get_order_lines_total_amount( $order_lines ) ) {
+		if ( KCO_WC()->order_lines->get_order_lines_total_amount( $order_lines ) !== $order_amount ) {
 			$order_lines = KCO_WC()->order_lines->adjust_order_lines( $order_lines );
 		}
 
@@ -822,6 +820,12 @@ class Klarna_Checkout_For_WooCommerce_API {
 		return false;
 	}
 
+	/**
+	 * Adds hash to color hex.
+	 *
+	 * @param string $hex Hex color code.
+	 * @return string
+	 */
 	private static function add_hash_to_color( $hex ) {
 		if ( '' != $hex ) {
 			$hex = str_replace( '#', '', $hex );
@@ -830,6 +834,12 @@ class Klarna_Checkout_For_WooCommerce_API {
 		return $hex;
 	}
 
+	/**
+	 * Checks option fields.
+	 *
+	 * @param string $field Field name.
+	 * @return array|bool
+	 */
 	private function check_option_field( $field ) {
 		if ( array_key_exists( $field, $this->settings ) && '' !== $this->settings[ $field ] ) {
 			return $this->settings[ $field ];
@@ -868,8 +878,8 @@ class Klarna_Checkout_For_WooCommerce_API {
 	 * Create a recurring order with Klarna
 	 *
 	 * @param object $order The WooCommerce order.
-	 * @param string $recurring_token The Recurring token from Klarna
-	 * @return void
+	 * @param string $recurring_token The Recurring token from Klarna.
+	 * @return array
 	 */
 	public function request_create_recurring_order( $order, $recurring_token ) {
 		$request_url  = $this->get_api_url_base() . 'customer-token/v1/tokens/' . $recurring_token . '/order';
@@ -889,6 +899,12 @@ class Klarna_Checkout_For_WooCommerce_API {
 		return $response;
 	}
 
+	/**
+	 * Gets the body for a recurring order.
+	 *
+	 * @param WCS_Order_Recurring $order Woocommerce subscription recurring order.
+	 * @return string
+	 */
 	public function get_recurring_body( $order ) {
 		$order_id = $order->get_id();
 
