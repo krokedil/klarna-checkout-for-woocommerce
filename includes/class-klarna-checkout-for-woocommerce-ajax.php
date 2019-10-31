@@ -1,4 +1,10 @@
 <?php
+/**
+ * AJAX class file.
+ *
+ * @package Klarna_Checkout/Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -179,7 +185,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 				// Get the Klarna order object.
 				$klarna_order = json_decode( $response['body'] );
 
-				// Calculate cart totals
+				// Calculate cart totals.
 				WC()->cart->calculate_fees();
 				WC()->cart->calculate_totals();
 
@@ -314,14 +320,8 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 
 		KCO_WC()->api->request_pre_update_order();
 
-		/*
-		ob_start();
-		woocommerce_order_review();
-		$html = ob_get_clean();*/
-
 		wp_send_json_success(
 			array(
-				// 'html'   => $html,
 				'customer_data'      => $customer_data,
 				'must_login'         => $must_login,
 				'must_login_message' => $must_login_message,
@@ -342,7 +342,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		if ( ! empty( $_POST['error_message'] ) ) { // Input var okay.
 			$error_message = 'Error message: ' . sanitize_text_field( trim( $_POST['error_message'] ) );
 		} else {
-			$error_message = 'Error message could not be retreived';
+			$error_message = 'Error message could not be retrieved';
 		}
 
 		KCO_WC()->logger->log( 'Checkout form submission failed. ' . $error_message );
@@ -379,6 +379,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			if ( is_object( $order ) ) {
 				KCO_WC()->logger->log( 'Fallback order creation done. Redirecting customer to thank you page.' );
 				krokedil_log_events( $order->get_id(), 'Fallback order creation done. Redirecting customer to thank you page.', '' );
+				// translators: %s: Error message from Klarna.
 				$note = sprintf( __( 'This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna.', 'klarna-checkout-for-woocommerce' ), $error_message );
 				$order->add_order_note( $note );
 				$order->payment_complete( $klarna_order_id );
