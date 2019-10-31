@@ -1,4 +1,9 @@
 <?php
+/**
+ * File for create local order fallback.
+ *
+ * @package Klarna_Checkout/Classes
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -40,7 +45,7 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 
 
 	/**
-	 * Fallbck order creation, in case checkout process failed.
+	 * Fallback order creation, in case checkout process failed.
 	 *
 	 * @param string $klarna_order_id Klarna order ID.
 	 *
@@ -50,7 +55,7 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 		$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 		$klarna_order = json_decode( $response['body'] );
 
-		// Create order
+		// Create order.
 		$order = wc_create_order();
 
 		try {
@@ -76,7 +81,7 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 			update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
 			update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order_id ) );
 
-			// Add payment method
+			// Add payment method.
 			self::add_order_payment_method( $order );
 
 			// Process customer data.
@@ -88,13 +93,13 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 			// Add fees to order.
 			self::create_order_fee_lines( $order, WC()->cart );
 
-			// Add shipping
+			// Add shipping.
 			self::create_order_shipping_lines( $order );
 
-			// Tax
+			// Tax.
 			self::create_order_tax_lines( $order, WC()->cart );
 
-			// Coupons
+			// Coupons.
 			self::create_order_coupon_lines( $order, WC()->cart );
 
 			// Acknowledge order in Klarna.
@@ -177,8 +182,8 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 	/**
 	 * Processes cart contents on fallback order creation.
 	 *
-	 * @paramWC_Order $order WooCommerce order.
-	 *
+	 * @param WC_Order $order WooCommerce order.
+	 * @param WC_Cart  $cart WooCommerce cart.
 	 * @throws Exception WC_Data_Exception.
 	 */
 	private static function create_order_line_items( &$order, $cart ) {
@@ -227,7 +232,8 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 	/**
 	 * Add fees to the order.
 	 *
-	 * @param  WC_Order $order
+	 * @param  WC_Order $order WooCommerce order.
+	 * @param WC_Cart  $cart WooCommerce cart.
 	 */
 	public static function create_order_fee_lines( &$order, $cart ) {
 		foreach ( $cart->get_fees() as $fee_key => $fee ) {
@@ -259,7 +265,7 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 	/**
 	 * Add shipping lines to the order.
 	 *
-	 * @param  WC_Order $order
+	 * @param  WC_Order $order WooCommerce order.
 	 */
 	public static function create_order_shipping_lines( &$order ) {
 
@@ -287,7 +293,8 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 	/**
 	 * Add tax lines to the order.
 	 *
-	 * @param  WC_Order $order
+	 * @param WC_Order $order WooCommerce order.
+	 * @param WC_Cart  $cart WooCommerce cart.
 	 */
 	public static function create_order_tax_lines( &$order, $cart ) {
 		foreach ( array_keys( $cart->taxes + $cart->shipping_taxes ) as $tax_rate_id ) {
@@ -318,7 +325,8 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 	/**
 	 * Add coupon lines to the order.
 	 *
-	 * @param  WC_Order $order
+	 * @param WC_Order $order WooCommerce order.
+	 * @param WC_Cart  $cart WooCommerce cart.
 	 */
 	public static function create_order_coupon_lines( &$order, $cart ) {
 		foreach ( $cart->get_coupons() as $code => $coupon ) {
