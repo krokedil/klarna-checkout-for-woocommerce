@@ -1,4 +1,10 @@
 <?php
+/**
+ * File for Credentials class.
+ *
+ * @package Klarna_Checkout/Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -54,12 +60,4 @@ class Klarna_Checkout_For_WooCommerce_Credentials {
 
 		return apply_filters( 'kco_wc_credentials_from_session', $credentials, $this->settings['testmode'] );
 	}
-
-	/**
-	 * Gets Klarna API credentials (merchant ID and shared secret) from a completed WC order.
-	 */
-	public function get_credentials_from_order() {
-
-	}
-
 }
