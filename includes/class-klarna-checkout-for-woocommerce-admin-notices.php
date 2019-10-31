@@ -1,6 +1,12 @@
 <?php
+/**
+ * Admin notice class file.
+ *
+ * @package Klarna_Checkout/Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -119,6 +125,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 			?>
 			<div class="kco-message notice woocommerce-message notice-error">
 			<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_username' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php _e( 'Dismiss', 'woocommerce' ); ?></a>
+			<?php // translators: %s: URL. ?>
 			<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'You need to tick the checkbox <i>When creating an account, automatically generate a username from the customer\'s email address</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href="%s">Accounts & Privacy tab', 'klarna-checkout-for-woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=account' ) ) . '</p>' ) ); ?>
 			</div>
 			<?php
@@ -128,6 +135,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 			?>
 			<div class="kco-message notice woocommerce-message notice-error">
 			<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_password' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php _e( 'Dismiss', 'woocommerce' ); ?></a>
+			<?php // translators: %s: URL. ?>
 			<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'You need to tick the checkbox <i>When creating an account, automatically generate an account password</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href="%s">Accounts & Privacy tab', 'klarna-checkout-for-woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=account' ) ) . '</p>' ) ); ?>
 			</div>
 			<?php
@@ -146,6 +154,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 			?>
 			<div class="kco-message notice woocommerce-message notice-error">
 			<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_autoptimize' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php _e( 'Dismiss', 'woocommerce' ); ?></a>
+			<?php // translators: %s: URL. ?>
 			<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href="%s">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>).', 'klarna-checkout-for-woocommerce' ) . '</p>' ) ); ?>
 			</div>
 			<?php
@@ -186,6 +195,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 				?>
 				<div class="kco-message notice woocommerce-message notice-error">
 				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_upstream' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php _e( 'Dismiss', 'woocommerce' ); ?></a>
+				<?php // translators: %s: URL. ?>
 				<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href="%s">Klarna Add-ons page</a>..', 'klarna-checkout-for-woocommerce' ), admin_url( '/admin.php?page=checkout-addons' ) ) . '</p>' ) ); ?>
 				</div>
 				<?php
@@ -195,11 +205,11 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 
 	/**
 	 * Adds a version warning message for the merchant.
-	 * To use this, change the current_message_version to the currenct KCO version that you want to add a warning for as a string. IE: '10.1.1'.
+	 * To use this, change the current_message_version to the current KCO version that you want to add a warning for as a string. IE: '10.1.1'.
 	 * Then add a message to the message string.
 	 *
 	 * Next time we want to add a message, update the current_message_version number and change the message again.
-	 * Aslong as the version number is above the old version number, this should display the message to the user again.
+	 * As long as the version number is above the old version number, this should display the message to the user again.
 	 *
 	 * @return void
 	 */
@@ -207,7 +217,7 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 		$current_message_version = '1.10.2';
 		$dismissed_version       = get_user_meta( get_current_user_id(), 'dismissed_kco_version_number', true );
 		$message                 = __( '<h3>Klarna Checkout 1.10.2 notice</h3><p>With version 1.10.2 we have added a control to make sure that validation requests from Klarna gets a valid response. This might mean that orders are not going through if your store is blocking these signals. Please test and see that everything is working correctly, and verify that no firewalls or security plugins are blocking Klarnas request.</p>', 'klarna-checkout-for-woocommerce' );
-		if ( $current_message_version !== null ) {
+		if ( null !== $current_message_version ) {
 			if ( ! $dismissed_version || ! version_compare( $dismissed_version, $current_message_version, '>=' ) ) {
 				?>
 				<div class="kco-message notice woocommerce-message notice-error">
