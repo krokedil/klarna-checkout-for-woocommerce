@@ -1,23 +1,45 @@
 <?php
+/**
+ * Checkout form fields class.
+ *
+ * @package Klarna_Checkout/Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Class for handing the checkout form fields.
+ */
 class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 
+	/**
+	 * Klarna order
+	 *
+	 * @var array The Klarna order.
+	 */
 	public static $klarna_order;
 
+	/**
+	 * Class constructor.
+	 */
 	public function __construct() {
 		add_action( 'kco_wc_after_snippet', array( $this, 'add_woocommerce_checkout_form_fields' ) );
 	}
 
+	/**
+	 * Adds WooCommerce checkout form fields.
+	 *
+	 * @return void
+	 */
 	public function add_woocommerce_checkout_form_fields() {
 		echo '<div id="kco-hidden" style="position:absolute;top:-9999px;left:-9999px;">';
 		// Billing fields.
 		$billing_fields = WC()->checkout()->get_checkout_fields( 'billing' );
 		foreach ( $billing_fields as $key => $field ) {
 			if ( in_array( $key, array( 'billing_country', 'billing_email', 'billing_state', 'billing_postcode' ) ) ) {
-				if ( isset( $field['country_field'], $fields[ $field['country_field'] ] ) ) {
+				if ( isset( $field['country_field'], $billing_fields[ $field['country_field'] ] ) ) {
 					$field['country'] = WC()->checkout->get_value( $field['country_field'] );
 				}
 				woocommerce_form_field( $key, $field, WC()->checkout->get_value( $key ) );
@@ -28,7 +50,7 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 		$shipping_fields = WC()->checkout()->get_checkout_fields( 'shipping' );
 		foreach ( $shipping_fields as $key => $field ) {
 			if ( in_array( $key, array( 'shipping_country', 'shipping_state', 'shipping_postcode' ) ) ) {
-				if ( isset( $field['country_field'], $fields[ $field['country_field'] ] ) ) {
+				if ( isset( $field['country_field'], $shipping_fields[ $field['country_field'] ] ) ) {
 					$field['country'] = WC()->checkout->get_value( $field['country_field'] );
 				}
 				woocommerce_form_field( $key, $field, WC()->checkout->get_value( $key ) );
@@ -37,7 +59,11 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 		echo '</div>';
 	}
 
-
+	/**
+	 * Maybe sets the klarna order.
+	 *
+	 * @return array
+	 */
 	public static function maybe_set_klarna_order() {
 		if ( empty( self::$klarna_order ) ) {
 			if ( empty( WC()->session->get( 'kco_wc_order_id' ) ) ) {
@@ -49,6 +75,11 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 		return self::$klarna_order;
 	}
 
+	/**
+	 * Maybe sets the customer email.
+	 *
+	 * @return string
+	 */
 	public static function maybe_set_customer_email() {
 		$klarna_order = self::maybe_set_klarna_order();
 		// Check that we got a response.
@@ -62,6 +93,11 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 		return $email;
 	}
 
+	/**
+	 * Maybe sets the customer state.
+	 *
+	 * @return array
+	 */
 	public static function maybe_set_customer_state() {
 		$billing_state  = '';
 		$shipping_state = '';
