@@ -50,7 +50,6 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	public function __construct() {
 		add_action( 'woocommerce_api_kco_wc_push', array( $this, 'push_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_notification', array( $this, 'notification_cb' ) );
-		// add_action( 'woocommerce_api_kco_wc_country_change', array( $this, 'country_change_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_validation', array( $this, 'validation_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_shipping_option_update', array( $this, 'shipping_option_update_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
@@ -84,6 +83,8 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	/**
 	 * Maybe set WC()->cart if this is a Klarna callback.
 	 * We do this to be able to retrieve WC()->cart in backend.
+	 *
+	 * @param WC_Cart $cart WooCommerce cart.
 	 */
 	public function maybe_prepare_wc_cart_for_server_side_callback( $cart ) {
 		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' == $_GET['kco-action'] || 'push' == $_GET['kco-action'] ) ) ) {
@@ -227,6 +228,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * Punted notification callback.
 	 *
 	 * @param string $klarna_order_id Klarna order ID.
+	 * @param array  $data Klarna order data.
 	 */
 	public function kco_wc_punted_notification_cb( $klarna_order_id, $data ) {
 		do_action( 'wc_klarna_notification_listener', $klarna_order_id, $data );
@@ -577,7 +579,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$payment_method     = $available_gateways['kco'];
 			$order->set_payment_method( $payment_method );
 
-			// Add recurring token to order via Checkout API
+			// Add recurring token to order via Checkout API.
 			$response_data = KCO_WC()->api->request_pre_get_order( $klarna_order->order_id );
 			if ( ! is_wp_error( $response_data ) && ( $response_data['response']['code'] >= 200 && $response_data['response']['code'] <= 299 ) ) {
 				$klarna_order_data = json_decode( $response_data['body'] );
@@ -647,7 +649,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			 */
 			do_action( 'woocommerce_checkout_create_order', $order, array() );
 
-			// Save the order
+			// Save the order.
 			$order_id = $order->save();
 
 			/**
@@ -681,6 +683,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			);
 
 			if ( ! $this->order_totals_match( $order, $klarna_order ) ) {
+				// translators: %s: Klarna order amount.
 				$order->update_status( 'on-hold', sprintf( __( 'Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->order_amount ) );
 			}
 		} catch ( Exception $e ) {
@@ -838,6 +841,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		return $klarna_line_item;
 	}
 
+	/**
+	 * Gets the session from session ID
+	 *
+	 * @param string $session_id WooCommerce session id.
+	 * @return WC_Session
+	 */
 	private function get_session_from_id( $session_id ) {
 		$sessions_handler = new WC_Session_Handler();
 		$session          = $sessions_handler->get_session( $session_id );
@@ -845,6 +854,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		return $session;
 	}
 
+	/**
+	 * Gets shipping total
+	 *
+	 * @param array $klarna_order Klarna order.
+	 * @return int
+	 */
 	private static function get_shipping_total( $klarna_order ) {
 		$shipping_total = 0;
 		foreach ( $klarna_order->order_lines as $cart_item ) {
@@ -859,6 +874,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		return $shipping_total;
 	}
 
+	/**
+	 * Get shipping tax total.
+	 *
+	 * @param array $klarna_order Klarna order.
+	 * @return float
+	 */
 	private static function get_shipping_tax_total( $klarna_order ) {
 		$shipping_tax_total = 0;
 		foreach ( $klarna_order->order_lines as $cart_item ) {
@@ -873,6 +894,12 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		return $shipping_tax_total;
 	}
 
+	/**
+	 * Gets the cart contents tax.
+	 *
+	 * @param array $klarna_order Klarna order.
+	 * @return float
+	 */
 	private static function get_cart_contents_tax( $klarna_order ) {
 		$cart_contents_tax = 0;
 		foreach ( $klarna_order->order_lines as $cart_item ) {
