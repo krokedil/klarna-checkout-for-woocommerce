@@ -1,4 +1,10 @@
 <?php
+/**
+ * Confirmation page class file.
+ *
+ * @package Klarna_Checkout/Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -57,6 +63,8 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 
 	/**
 	 * Populates WooCommerce checkout form in KCO confirmation page.
+	 *
+	 * @param WC_Checkout $checkout WooCommerce checkout object.
 	 */
 	public function maybe_populate_wc_checkout( $checkout ) {
 		if ( ! is_kco_confirmation() ) {
@@ -82,7 +90,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 		if ( ! is_kco_confirmation() ) {
 			return;
 		}
-		// Prevent duplicate orders if confirmation page is reloaded manually by customer
+		// Prevent duplicate orders if confirmation page is reloaded manually by customer.
 		$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
 		$query           = new WC_Order_Query(
 			array(
@@ -226,7 +234,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	/**
 	 * Saves customer data from Klarna order into WC()->customer.
 	 *
-	 * @param $klarna_order
+	 * @param array $klarna_order Klarna order.
 	 */
 	private function save_customer_data( $klarna_order ) {
 		if ( is_user_logged_in() ) {
