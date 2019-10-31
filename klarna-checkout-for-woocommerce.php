@@ -1,5 +1,5 @@
-<?php
-/*
+<?php // phpcs:ignore
+/**
  * Plugin Name: Klarna Checkout for WooCommerce
  * Plugin URI: https://krokedil.com/klarna/
  * Description: Klarna Checkout payment gateway for WooCommerce.
@@ -26,7 +26,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -148,8 +148,8 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
-			$KCO_options = get_option( 'woocommerce_kco_settings' );
-			if ( 'yes' === $KCO_options['logging'] ) {
+			$kco_options = get_option( 'woocommerce_kco_settings' );
+			if ( 'yes' === $kco_options['logging'] ) {
 				define( 'KROKEDIL_LOGGER_ON', true );
 			}
 		}
@@ -211,7 +211,9 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			if ( class_exists( 'WooCommerce' ) ) {
 				if ( is_cart() && isset( $_GET['kco-order'] ) && 'error' === $_GET['kco-order'] ) {
 					if ( isset( $_GET['reason'] ) ) {
-						$message = sprintf( __( 'Klarna Checkout error (%s).', 'klarna-checkout-for-woocommerce' ), sanitize_textarea_field( base64_decode( $_GET['reason'] ) ) );
+						$reason  = sanitize_textarea_field( base64_decode( $_GET['reason'] ) );
+						$text    = __( 'Klarna Checkout error', 'klarna-checkout-for-woocommerce' ) . ' %s.';
+						$message = sprintf( $text, $reason );
 					} else {
 						$message = __( 'Klarna Checkout error. Please try again.', 'klarna-checkout-for-woocommerce' );
 					}
@@ -334,6 +336,6 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
  *
  * @return Klarna_Checkout_For_WooCommerce
  */
-function KCO_WC() {
+function KCO_WC() { // phpcs:ignore
 	return Klarna_Checkout_For_WooCommerce::get_instance();
 }
