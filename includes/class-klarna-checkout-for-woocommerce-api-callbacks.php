@@ -1,4 +1,9 @@
 <?php
+/**
+ * API Callbacks class.
+ *
+ * @package Klarna_Checkout/Classes
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
