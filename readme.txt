@@ -62,6 +62,14 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2019.10.02    - version 1.11.4 =
+* Fix           - Made recurring payments more compatible with new WooCommerce subscription flow.
+* Fix           - Added merchant references to renewal orders.
+* Fix           - Fixed an issue where some orders failed with zero decimals for subscriptions.
+* Fix           - B2B purchases are now saved correctly on backup order creation.
+* Enhancement   - Added filters to merchant URLs. ( Thank you Hampus Alstermo )
+* Enhancement   - Changed from get_home_url to home_url function. ( Thank you Hampus Alstermo )
+
 = 2019.10.02    - version 1.11.3 =
 * Fix           - IE support in logic for checking if kco-external-payment exist in url during order confirmation process.
 * Fix           - Request order from checkout API (instead of Order Management API) for address field population during confirmation process in Woo to avoid 404-responses from Klarna. 
