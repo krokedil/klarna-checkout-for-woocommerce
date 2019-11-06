@@ -527,9 +527,13 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 		// Email.
 		WC()->customer->set_billing_email( sanitize_text_field( $klarna_order->billing_address->email ) );
 
+		if ( 'organization' === $klarna_order->customer->type ) {
+			WC()->customer->set_billing_company( sanitize_text_field( $klarna_order->billing_address->organization_name ) );
+			WC()->customer->set_shipping_company( sanitize_text_field( $klarna_order->shipping_address->organization_name ) );
+		}
+
 		WC()->customer->save();
 	}
-
 
 	/**
 	 * Processes WooCommerce order on backup order creation.
@@ -539,30 +543,62 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	 * @throws Exception WC_Data_Exception.
 	 */
 	private function process_order( $klarna_order ) {
+		$billing_first_name  = isset( $klarna_order->billing_address->given_name ) ? $klarna_order->billing_address->given_name : '.';
+		$billing_last_name   = isset( $klarna_order->billing_address->family_name ) ? $klarna_order->billing_address->family_name : '.';
+		$billing_address     = isset( $klarna_order->billing_address->street_address ) ? $klarna_order->billing_address->street_address : '.';
+		$billing_address2    = isset( $klarna_order->billing_address->street_address2 ) ? $klarna_order->billing_address->street_address2 : '';
+		$billing_postal_code = isset( $klarna_order->billing_address->postal_code ) ? $klarna_order->billing_address->postal_code : $fallback_postcode;
+		$billing_city        = isset( $klarna_order->billing_address->city ) ? $klarna_order->billing_address->city : '.';
+		$billing_region      = isset( $klarna_order->billing_address->region ) ? $klarna_order->billing_address->region : '';
+		$billing_country     = isset( $klarna_order->billing_address->country ) ? $klarna_order->billing_address->country : WC()->countries->get_base_country();
+		$billing_phone       = isset( $klarna_order->billing_address->phone ) ? $klarna_order->billing_address->phone : '.';
+		$billing_email       = isset( $klarna_order->billing_address->email ) ? $klarna_order->billing_address->email : '.';
+
+		$shipping_first_name  = isset( $klarna_order->shipping_address->given_name ) ? $klarna_order->shipping_address->given_name : '.';
+		$shipping_last_name   = isset( $klarna_order->shipping_address->family_name ) ? $klarna_order->shipping_address->family_name : '.';
+		$shipping_address     = isset( $klarna_order->shipping_address->street_address ) ? $klarna_order->shipping_address->street_address : '.';
+		$shipping_address2    = isset( $klarna_order->shipping_address->street_address2 ) ? $klarna_order->shipping_address->street_address2 : '';
+		$shipping_postal_code = isset( $klarna_order->shipping_address->postal_code ) ? $klarna_order->shipping_address->postal_code : '.';
+		$shipping_city        = isset( $klarna_order->shipping_address->city ) ? $klarna_order->shipping_address->city : '.';
+		$shipping_region      = isset( $klarna_order->shipping_address->region ) ? $klarna_order->shipping_address->region : '';
+		$shipping_country     = isset( $klarna_order->shipping_address->country ) ? $klarna_order->shipping_address->country : WC()->countries->get_base_country();
+		$shipping_phone       = isset( $klarna_order->shipping_address->phone ) ? $klarna_order->shipping_address->phone : '.';
+		$shipping_email       = isset( $klarna_order->shipping_address->email ) ? $klarna_order->shipping_address->email : '.';
+
+		$billing_company  = isset( $klarna_order->billing_address->organization_name ) ? $klarna_order->billing_address->organization_name : '.';
+		$shipping_company = isset( $klarna_order->shipping_address->organization_name ) ? $klarna_order->shipping_address->organization_name : '.';
+		$org_nr           = isset( $klarna_order->customer->organization_registration_id ) ? $klarna_order->customer->organization_registration_id : '.';
+
 		try {
 			$order = wc_create_order( array( 'status' => 'pending' ) );
 
-			$order->set_billing_first_name( sanitize_text_field( $klarna_order->billing_address->given_name ) );
-			$order->set_billing_last_name( sanitize_text_field( $klarna_order->billing_address->family_name ) );
-			$order->set_billing_country( sanitize_text_field( $klarna_order->billing_address->country ) );
-			$order->set_billing_address_1( sanitize_text_field( $klarna_order->billing_address->street_address ) );
-			$order->set_billing_address_2( sanitize_text_field( $klarna_order->billing_address->street_address2 ) );
-			$order->set_billing_city( sanitize_text_field( $klarna_order->billing_address->city ) );
-			$order->set_billing_state( sanitize_text_field( $klarna_order->billing_address->region ) );
-			$order->set_billing_postcode( sanitize_text_field( $klarna_order->billing_address->postal_code ) );
-			$order->set_billing_phone( sanitize_text_field( $klarna_order->billing_address->phone ) );
-			$order->set_billing_email( sanitize_text_field( $klarna_order->billing_address->email ) );
+			$order->set_billing_first_name( sanitize_text_field( $billing_first_name ) );
+			$order->set_billing_last_name( sanitize_text_field( $billing_last_name ) );
+			$order->set_billing_country( sanitize_text_field( $billing_country ) );
+			$order->set_billing_address_1( sanitize_text_field( $billing_address ) );
+			$order->set_billing_address_2( sanitize_text_field( $billing_address2 ) );
+			$order->set_billing_city( sanitize_text_field( $billing_city ) );
+			$order->set_billing_state( sanitize_text_field( $billing_region ) );
+			$order->set_billing_postcode( sanitize_text_field( $billing_postal_code ) );
+			$order->set_billing_phone( sanitize_text_field( $billing_phone ) );
+			$order->set_billing_email( sanitize_text_field( $billing_email ) );
 
-			$order->set_shipping_first_name( sanitize_text_field( $klarna_order->shipping_address->given_name ) );
-			$order->set_shipping_last_name( sanitize_text_field( $klarna_order->shipping_address->family_name ) );
-			$order->set_shipping_country( sanitize_text_field( $klarna_order->shipping_address->country ) );
-			$order->set_shipping_address_1( sanitize_text_field( $klarna_order->shipping_address->street_address ) );
-			$order->set_shipping_address_2( sanitize_text_field( $klarna_order->shipping_address->street_address2 ) );
-			$order->set_shipping_city( sanitize_text_field( $klarna_order->shipping_address->city ) );
-			$order->set_shipping_state( sanitize_text_field( $klarna_order->shipping_address->region ) );
-			$order->set_shipping_postcode( sanitize_text_field( $klarna_order->shipping_address->postal_code ) );
-			update_post_meta( $order->get_id(), '_shipping_phone', sanitize_text_field( $klarna_order->shipping_address->phone ) );
-			update_post_meta( $order->get_id(), '_shipping_email', sanitize_text_field( $klarna_order->shipping_address->email ) );
+			$order->set_shipping_first_name( sanitize_text_field( $shipping_first_name ) );
+			$order->set_shipping_last_name( sanitize_text_field( $shipping_last_name ) );
+			$order->set_shipping_country( sanitize_text_field( $shipping_country ) );
+			$order->set_shipping_address_1( sanitize_text_field( $shipping_address ) );
+			$order->set_shipping_address_2( sanitize_text_field( $shipping_address2 ) );
+			$order->set_shipping_city( sanitize_text_field( $shipping_city ) );
+			$order->set_shipping_state( sanitize_text_field( $shipping_region ) );
+			$order->set_shipping_postcode( sanitize_text_field( $shipping_postal_code ) );
+			update_post_meta( $order->get_id(), '_shipping_phone', sanitize_text_field( $shipping_phone ) );
+			update_post_meta( $order->get_id(), '_shipping_email', sanitize_text_field( $shipping_email ) );
+
+			if ( 'organization' === $klarna_order->customer->type ) {
+				$order->set_billing_company( sanitize_text_field( $billing_company ) );
+				$order->set_shipping_company( sanitize_text_field( $shipping_company ) );
+				// update_post_meta( $order->get_id(), '_kco_org_nr', $org_nr );
+			}
 
 			$order->set_created_via( 'klarna_checkout_backup_order_creation' );
 			$order->set_currency( sanitize_text_field( $klarna_order->purchase_currency ) );
@@ -572,7 +608,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 			$payment_method     = $available_gateways['kco'];
 			$order->set_payment_method( $payment_method );
 
-			// Add recurring token to order via Checkout API
+			// Add recurring token to order via Checkout API.
 			$response_data = KCO_WC()->api->request_pre_get_order( $klarna_order->order_id );
 			if ( ! is_wp_error( $response_data ) && ( $response_data['response']['code'] >= 200 && $response_data['response']['code'] <= 299 ) ) {
 				$klarna_order_data = json_decode( $response_data['body'] );
