@@ -424,6 +424,9 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			update_post_meta( $order_id, '_shipping_phone', sanitize_text_field( $klarna_order->shipping_address->phone ) );
 			update_post_meta( $order_id, '_shipping_email', sanitize_text_field( $klarna_order->shipping_address->email ) );
 
+			// Let other plugins hook into this sequence.
+			do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
+
 			$response = KCO_WC()->api->request_post_get_order( $klarna_order->order_id, $order_id );
 			if ( is_wp_error( $response ) ) {
 				// Request error. Set order status to On hold and print the error message as a note.
@@ -432,8 +435,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 				$order->update_status( 'on-hold', $note );
 			} else {
 				$klarna_post_order = json_decode( $response['body'] );
-
-				do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
 
 				// Remove html_snippet from what we're logging.
 				$log_order               = clone $klarna_post_order;
