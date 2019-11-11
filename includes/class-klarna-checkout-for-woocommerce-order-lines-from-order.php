@@ -66,6 +66,15 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines_From_Order {
 	}
 
 	/**
+	 * Reset total tax variable.
+	 *
+	 * @return void
+	 */
+	public function reset_total_tax() {
+		$this->total_tax = 0;
+	}
+
+	/**
 	 * Get order line items.
 	 *
 	 * @param object $order_item Order item.
