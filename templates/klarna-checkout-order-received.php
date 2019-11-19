@@ -6,6 +6,7 @@
  *
  * @package klarna-checkout-for-woocommerce
  */
+
 if ( ! WC()->session->get( 'kco_wc_order_id' ) ) {
 	return;
 }
