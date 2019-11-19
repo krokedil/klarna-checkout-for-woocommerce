@@ -1,18 +1,24 @@
 <?php
+/**
+ * Logging class file.
+ *
+ * @package Klarna_Checkout/Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * Klarna_Checkout_For_WooCommerce_AJAX class.
- *
- * Registers AJAX actions for Klarna Checkout for WooCommerce.
- *
- * @extends WC_AJAX
+ * Klarna_Checkout_For_WooCommerce_Logging class.
  */
 class Klarna_Checkout_For_WooCommerce_Logging {
 
-	/** @var WC_Logger Logger instance */
+	/**
+	 * WooCommerce logger class instance.
+	 *
+	 * @var WC_Logger $logger Logger instance
+	 */
 	private $logger = false;
 
 	/**
