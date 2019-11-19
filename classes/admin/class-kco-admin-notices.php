@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @category Class
  * @author   Krokedil
  */
-class Klarna_Checkout_For_WooCommerce_Admin_Notices {
+class KCO_Admin_Notices {
 
 	/**
 	 * The reference the *Singleton* instance of this class.
@@ -245,4 +245,4 @@ class Klarna_Checkout_For_WooCommerce_Admin_Notices {
 	}
 }
 
-Klarna_Checkout_For_WooCommerce_Admin_Notices::get_instance();
+KCO_Admin_Notices::get_instance();

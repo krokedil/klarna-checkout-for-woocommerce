@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Compliance with European Union's General Data Protection Regulation.
  */
-class Klarna_Checkout_For_Woocommerce_GDPR {
+class KCO_GDPR {
 	/**
 	 * Class constructor.
 	 */
@@ -90,4 +90,4 @@ class Klarna_Checkout_For_Woocommerce_GDPR {
 		return $args;
 	}
 }
-new Klarna_Checkout_For_Woocommerce_GDPR();
+new KCO_GDPR();

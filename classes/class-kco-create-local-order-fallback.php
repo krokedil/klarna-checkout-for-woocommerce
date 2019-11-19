@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback class.
+ * KCO_Create_Local_Order_Fallback class.
  *
  * Class that handles fallback order creation in Woocommerce if checkout form submission fails.
  */
-class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
+class KCO_Create_Local_Order_Fallback {
 
 	/**
 	 * The reference the *Singleton* instance of this class.
@@ -37,7 +37,7 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 	}
 
 	/**
-	 * Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback constructor.
+	 * KCO_Create_Local_Order_Fallback constructor.
 	 */
 	public function __construct() {
 
@@ -368,4 +368,4 @@ class Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback {
 
 }
 
-Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback::get_instance();
+KCO_Create_Local_Order_Fallback::get_instance();

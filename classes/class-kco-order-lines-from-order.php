@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class for processing order lines from a WooCommerce order.
  */
-class Klarna_Checkout_For_WooCommerce_Order_Lines_From_Order {
+class KCO_Order_Lines_From_Order {
 	/**
 	 * Gets the order amount
 	 *

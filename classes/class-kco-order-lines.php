@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Klarna_Checkout_For_WooCommerce_Order_Lines class.
+ * KCO_Order_Lines class.
  *
  * Class that formats WooCommerce cart contents for Klarna API.
  */
-class Klarna_Checkout_For_WooCommerce_Order_Lines {
+class KCO_Order_Lines {
 
 	/**
 	 * Formatted order lines.

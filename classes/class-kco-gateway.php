@@ -1,6 +1,6 @@
 <?php
 /**
- * Class file for Klarna_Checkout_For_WooCommerce_Gateway class.
+ * Class file for KCO_Gateway class.
  *
  * @package Klarna_Checkout/Classes
  */
@@ -10,14 +10,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Klarna_Checkout_For_WooCommerce_Gateway class.
+ * KCO_Gateway class.
  *
  * @extends WC_Payment_Gateway
  */
-class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
+class KCO_Gateway extends WC_Payment_Gateway {
 
 	/**
-	 * Klarna_Checkout_For_WooCommerce_Gateway constructor.
+	 * KCO_Gateway constructor.
 	 */
 	public function __construct() {
 		$this->id                 = 'kco';
@@ -160,7 +160,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	 * Initialise settings fields.
 	 */
 	public function init_form_fields() {
-		$this->form_fields = Klarna_Checkout_For_WooCommerce_Fields::fields();
+		$this->form_fields = KCO_Fields::fields();
 	}
 
 	/**

@@ -9,11 +9,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 /**
- * Klarna_Checkout_For_WooCommerce_Merchant_URLs class.
+ * KCO_Merchant_URLs class.
  *
  * Class that formats gets merchant URLs Klarna API.
  */
-class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
+class KCO_Merchant_URLs {
 
 	/**
 	 * Gets formatted merchant URLs array.

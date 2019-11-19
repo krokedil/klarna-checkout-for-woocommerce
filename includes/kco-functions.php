@@ -40,7 +40,7 @@ function kco_wc_show_extra_fields() {
 	do_action( 'kco_wc_before_extra_fields' );
 
 	$extra_fields_values          = WC()->session->get( 'kco_wc_extra_fields_values', array() );
-	$kco_wc_extra_checkout_fields = new Klarna_Checkout_For_WooCommerce_Extra_Checkout_Fields();
+	$kco_wc_extra_checkout_fields = new KCO_Extra_Checkout_Fields();
 	$extra_fields                 = $kco_wc_extra_checkout_fields->get_remaining_checkout_fields();
 
 	// Billing.

@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Klarna_Checkout_For_WooCommerce_API_Callbacks class.
+ * KCO_API_Callbacks class.
  *
  * Class that handles KCO API callbacks.
  */
-class Klarna_Checkout_For_WooCommerce_API_Callbacks {
+class KCO_API_Callbacks {
 
 	/**
 	 * Klarna purchase currency.
@@ -45,7 +45,7 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	}
 
 	/**
-	 * Klarna_Checkout_For_WooCommerce_API_Callbacks constructor.
+	 * KCO_API_Callbacks constructor.
 	 */
 	public function __construct() {
 		add_action( 'woocommerce_api_kco_wc_push', array( $this, 'push_cb' ) );
@@ -943,4 +943,4 @@ class Klarna_Checkout_For_WooCommerce_API_Callbacks {
 	}
 }
 
-Klarna_Checkout_For_WooCommerce_API_Callbacks::get_instance();
+KCO_API_Callbacks::get_instance();

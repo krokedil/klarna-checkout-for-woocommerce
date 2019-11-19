@@ -9,9 +9,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 /**
- * Klarna_Checkout_For_WooCommerce_Templates class.
+ * KCO_Templates class.
  */
-class Klarna_Checkout_For_WooCommerce_Templates {
+class KCO_Templates {
 
 	/**
 	 * The reference the *Singleton* instance of this class.
@@ -151,4 +151,4 @@ class Klarna_Checkout_For_WooCommerce_Templates {
 	}
 }
 
-Klarna_Checkout_For_WooCommerce_Templates::get_instance();
+KCO_Templates::get_instance();

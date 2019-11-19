@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Klarna_Checkout_For_WooCommerce_Fields class.
+ * KCO_Fields class.
  *
  * Klarna Checkout for WooCommerce settings fields.
  */
-class Klarna_Checkout_For_WooCommerce_Fields {
+class KCO_Fields {
 
 	/**
 	 * Returns the fields.

@@ -42,11 +42,11 @@ define( 'KCO_WC_MAIN_FILE', __FILE__ );
 define( 'KCO_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'KCO_WC_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 define( 'KROKEDIL_LOGGER_GATEWAY', 'kco' );
-if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
+if ( ! class_exists( 'KCO' ) ) {
 	/**
-	 * Class Klarna_Checkout_For_WooCommerce
+	 * Class KCO
 	 */
-	class Klarna_Checkout_For_WooCommerce {
+	class KCO {
 
 		/**
 		 * The reference the *Singleton* instance of this class.
@@ -236,41 +236,41 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			}
 
 			// Classes.
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-gateway.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-api.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-api-callbacks.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-templates.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-ajax.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-order-lines.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-merchant-urls.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-credentials.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-logging.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-fields.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-confirmation.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-extra-checkout-fields.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-status.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-create-local-order-fallback.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-gdpr.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-checkout-form-fields.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-subscription.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-order-lines-from-order.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gateway.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api-callbacks.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-templates.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-ajax.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-order-lines.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-merchant-urls.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-credentials.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-logging.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-confirmation.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-extra-checkout-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-status.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-create-local-order-fallback.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gdpr.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-checkout-form-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-subscription.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-order-lines-from-order.php';
 			if ( is_admin() ) {
-				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-checkout-for-woocommerce-admin-notices.php';
+				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-kco-admin-notices.php';
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-wc-klarna-banners.php';
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-for-woocommerce-addons.php';
 			}
 
 			// Includes.
-			include_once KCO_WC_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php';
+			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
 			include_once KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
 
 			// Set class variables.
-			$this->api                    = new Klarna_Checkout_For_WooCommerce_API();
-			$this->merchant_urls          = new Klarna_Checkout_For_WooCommerce_Merchant_URLs();
-			$this->order_lines            = new Klarna_Checkout_For_WooCommerce_Order_Lines();
-			$this->credentials            = new Klarna_Checkout_For_WooCommerce_Credentials();
-			$this->logger                 = new Klarna_Checkout_For_WooCommerce_Logging();
-			$this->order_lines_from_order = new Klarna_Checkout_For_Woocommerce_Order_Lines_From_Order();
+			$this->api                    = new KCO_API();
+			$this->merchant_urls          = new KCO_Merchant_URLs();
+			$this->order_lines            = new KCO_Order_Lines();
+			$this->credentials            = new KCO_Credentials();
+			$this->logger                 = new KCO_Logging();
+			$this->order_lines_from_order = new KCO_Order_Lines_From_Order();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
@@ -285,7 +285,7 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * @since  1.0.0
 		 */
 		public function add_gateways( $methods ) {
-			$methods[] = 'Klarna_Checkout_For_WooCommerce_Gateway';
+			$methods[] = 'KCO_Gateway';
 
 			return $methods;
 		}
@@ -329,16 +329,16 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		}
 
 	}
-	Klarna_Checkout_For_WooCommerce::get_instance();
+	KCO::get_instance();
 }
 
 /**
- * Main instance Klarna_Checkout_For_WooCommerce WooCommerce.
+ * Main instance KCO WooCommerce.
  *
- * Returns the main instance of Klarna_Checkout_For_WooCommerce.
+ * Returns the main instance of KCO.
  *
- * @return Klarna_Checkout_For_WooCommerce
+ * @return KCO
  */
 function KCO_WC() { // phpcs:ignore
-	return Klarna_Checkout_For_WooCommerce::get_instance();
+	return KCO::get_instance();
 }

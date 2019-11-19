@@ -2,9 +2,9 @@
 /**
  * WooCommerce status page extension
  *
- * @class    Klarna_Checkout_For_WooCommerce_Status
+ * @class    KCO_Status
  * @version  0.8.0
- * @package  Klarna_Checkout_For_WooCommerce/Classes
+ * @package  KCO/Classes
  * @category Class
  * @author   Krokedil
  */
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class for WooCommerce status page.
  */
-class Klarna_Checkout_For_WooCommerce_Status {
+class KCO_Status {
 	/**
 	 * Class constructor.
 	 */
@@ -32,4 +32,4 @@ class Klarna_Checkout_For_WooCommerce_Status {
 		include_once KCO_WC_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-status-report.php';
 	}
 }
-$wc_collector_checkout_status = new Klarna_Checkout_For_WooCommerce_Status();
+$wc_collector_checkout_status = new KCO_Status();

@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Klarna_Checkout_For_WooCommerce_Extra_Checkout_Fields class.
+ * KCO_Extra_Checkout_Fields class.
  *
  * Class that handles extra checkout fields displayed when Klarna Checkout is the selected payment option.
  */
-class Klarna_Checkout_For_WooCommerce_Extra_Checkout_Fields {
+class KCO_Extra_Checkout_Fields {
 
 	/**
 	 * Returns array of all WooCommerce Checkout fields.

@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @category Class
  * @author   Krokedil
  */
-class Klarna_Checkout_For_WooCommerce_Subscription {
+class KCO_Subscription {
 	/**
 	 * Class constructor.
 	 */
@@ -223,7 +223,7 @@ class Klarna_Checkout_For_WooCommerce_Subscription {
 			update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
 		}
 
-		$create_order_response = new Klarna_Checkout_For_WooCommerce_API();
+		$create_order_response = new KCO_API();
 		$create_order_response = $create_order_response->request_create_recurring_order( $renewal_order, $recurring_token );
 		if ( 200 === $create_order_response['response']['code'] ) {
 			$klarna_order_id = json_decode( $create_order_response['body'] )->order_id;
@@ -345,5 +345,5 @@ class Klarna_Checkout_For_WooCommerce_Subscription {
 		}
 	}
 }
-new Klarna_Checkout_For_WooCommerce_Subscription();
+new KCO_Subscription();
 

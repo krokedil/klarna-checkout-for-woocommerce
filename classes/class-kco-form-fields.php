@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class for handing the checkout form fields.
  */
-class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
+class KCO_Checkout_Form_Fields {
 
 	/**
 	 * Klarna order
@@ -120,4 +120,4 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 			'shipping_state' => $shipping_state,
 		);
 	}
-} new Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields();
+} new KCO_Checkout_Form_Fields();

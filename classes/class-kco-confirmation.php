@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Klarna_Checkout_For_WooCommerce_Confirmation class.
+ * KCO_Confirmation class.
  *
  * Handles Klarna Checkout confirmation page.
  */
-class Klarna_Checkout_For_WooCommerce_Confirmation {
+class KCO_Confirmation {
 
 	/**
 	 * The reference the *Singleton* instance of this class.
@@ -37,7 +37,7 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 	}
 
 	/**
-	 * Klarna_Checkout_For_WooCommerce_Confirmation constructor.
+	 * KCO_Confirmation constructor.
 	 */
 	public function __construct() {
 		add_action( 'wp_head', array( $this, 'maybe_hide_checkout_form' ) );
@@ -371,4 +371,4 @@ class Klarna_Checkout_For_WooCommerce_Confirmation {
 
 }
 
-Klarna_Checkout_For_WooCommerce_Confirmation::get_instance();
+KCO_Confirmation::get_instance();

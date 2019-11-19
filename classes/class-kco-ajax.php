@@ -10,13 +10,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Klarna_Checkout_For_WooCommerce_AJAX class.
+ * KCO_AJAX class.
  *
  * Registers AJAX actions for Klarna Checkout for WooCommerce.
  *
  * @extends WC_AJAX
  */
-class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
+class KCO_AJAX extends WC_AJAX {
 
 	/**
 	 * Hook in ajax handlers.
@@ -262,8 +262,8 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 		$customer_data = array();
 
 		// Send customer data to frontend.
-		$email  = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_email();
-		$states = Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields::maybe_set_customer_state();
+		$email  = KCO_Checkout_Form_Fields::maybe_set_customer_email();
+		$states = KCO_Checkout_Form_Fields::maybe_set_customer_state();
 
 		if ( isset( $email ) ) {
 			$customer_data['billing_email'] = $email;
@@ -374,7 +374,7 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 			// No order found. Create order via fallback sequence.
 			KCO_WC()->logger->log( 'Starting Fallback order creation.' );
 			krokedil_log_events( null, 'Starting Fallback order creation.', '' );
-			$order = Klarna_Checkout_For_WooCommerce_Create_Local_Order_Fallback::create( $klarna_order_id, $error_message );
+			$order = KCO_Create_Local_Order_Fallback::create( $klarna_order_id, $error_message );
 
 			if ( is_object( $order ) ) {
 				KCO_WC()->logger->log( 'Fallback order creation done. Redirecting customer to thank you page.' );
@@ -421,4 +421,4 @@ class Klarna_Checkout_For_WooCommerce_AJAX extends WC_AJAX {
 	}
 }
 
-Klarna_Checkout_For_WooCommerce_AJAX::init();
+KCO_AJAX::init();

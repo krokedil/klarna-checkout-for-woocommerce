@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 	/**
-	 * Klarna_Checkout_For_WooCommerce_Addons class.
+	 * KCO_Addons class.
 	 *
 	 * Handles Klarna Checkout addons page.
 	 */
@@ -32,7 +32,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		}
 
 		/**
-		 * Klarna_Checkout_For_WooCommerce_Confirmation constructor.
+		 * KCO_Confirmation constructor.
 		 */
 		public function __construct() {
 			add_action( 'admin_menu', array( $this, 'add_menu' ), 100 );

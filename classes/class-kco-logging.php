@@ -10,9 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Klarna_Checkout_For_WooCommerce_Logging class.
+ * KCO_Logging class.
  */
-class Klarna_Checkout_For_WooCommerce_Logging {
+class KCO_Logging {
 
 	/**
 	 * WooCommerce logger class instance.

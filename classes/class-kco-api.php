@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Klarna_Checkout_For_WooCommerce_API class.
+ * KCO_API class.
  *
  * Class that talks to KCO API, wrapper for V2 and V3.
  */
-class Klarna_Checkout_For_WooCommerce_API {
+class KCO_API {
 
 	/**
 	 * Klarna Checkout for WooCommerce settings.
@@ -31,7 +31,7 @@ class Klarna_Checkout_For_WooCommerce_API {
 	public $separate_sales_tax = false;
 
 	/**
-	 * Klarna_Checkout_For_WooCommerce_API constructor.
+	 * KCO_API constructor.
 	 */
 	public function __construct() {
 		$this->settings = get_option( 'woocommerce_kco_settings' );
