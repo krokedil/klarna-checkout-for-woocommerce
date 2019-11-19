@@ -8,13 +8,26 @@
  * @category Class
  * @author   Krokedil
  */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
+/**
+ * Class for WooCommerce status page.
+ */
 class Klarna_Checkout_For_WooCommerce_Status {
+	/**
+	 * Class constructor.
+	 */
 	public function __construct() {
 		add_action( 'woocommerce_system_status_report', array( $this, 'add_status_page_box' ) );
 	}
+
+	/**
+	 * Adds status page box for KCO.
+	 *
+	 * @return void
+	 */
 	public function add_status_page_box() {
 		include_once KCO_WC_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-status-report.php';
 	}
