@@ -235,33 +235,36 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				return;
 			}
 
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-gateway.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api-callbacks.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-templates.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-ajax.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-merchant-urls.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-credentials.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-logging.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-fields.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-confirmation.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-extra-checkout-fields.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-status.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-create-local-order-fallback.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-gdpr.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-checkout-form-fields.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-subscription.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines-from-order.php';
+			// Classes.
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-gateway.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-api.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-api-callbacks.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-templates.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-ajax.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-order-lines.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-merchant-urls.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-credentials.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-logging.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-confirmation.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-extra-checkout-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-status.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-create-local-order-fallback.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-gdpr.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-checkout-form-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-subscription.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-klarna-checkout-for-woocommerce-order-lines-from-order.php';
+			if ( is_admin() ) {
+				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-checkout-for-woocommerce-admin-notices.php';
+				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-wc-klarna-banners.php';
+				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-for-woocommerce-addons.php';
+			}
+
+			// Includes.
 			include_once KCO_WC_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php';
 			include_once KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
 
-			if ( is_admin() ) {
-				include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-admin-notices.php';
-				include_once KCO_WC_PLUGIN_PATH . '/includes/class-wc-klarna-banners.php';
-				include_once KCO_WC_PLUGIN_PATH . '/includes/admin/class-klarna-for-woocommerce-addons.php';
-			}
-
+			// Set class variables.
 			$this->api                    = new Klarna_Checkout_For_WooCommerce_API();
 			$this->merchant_urls          = new Klarna_Checkout_For_WooCommerce_Merchant_URLs();
 			$this->order_lines            = new Klarna_Checkout_For_WooCommerce_Order_Lines();
