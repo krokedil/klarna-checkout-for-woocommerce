@@ -1,4 +1,9 @@
 <?php
+/**
+ * Class file for Klarna_Checkout_For_WooCommerce_Gateway class.
+ *
+ * @package Klarna_Checkout/Classes
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -128,6 +133,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	/**
 	 * Receipt page. Used to display the KCO iframe during subscription payment method change.
 	 *
+	 * @param WC_Order $order The WooCommerce order.
 	 * @return void
 	 */
 	public function receipt_page( $order ) {
@@ -300,7 +306,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			return;
 		}
 
-		$suffix              = '';// defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix              = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$store_base_location = wc_get_base_location();
 		if ( 'US' === $store_base_location['country'] ) {
 			$location = 'US';
@@ -310,7 +316,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 		wp_register_script(
 			'kco_admin',
-			plugins_url( 'assets/js/klarna-checkout-for-woocommerce-admin.js', KCO_WC_MAIN_FILE ),
+			plugins_url( 'assets/js/klarna-checkout-for-woocommerce-admin' . $suffix . '.js', KCO_WC_MAIN_FILE ),
 			array(),
 			KCO_WC_VERSION
 		);
@@ -431,7 +437,8 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			if ( is_wp_error( $response ) ) {
 				// Request error. Set order status to On hold and print the error message as a note.
 				$error = KCO_WC()->api->extract_error_messages( $response );
-				$note  = sprintf( __( 'Klarna post_order request in process_payment_handler failed. Error message: %s.', 'klarna-checkout-for-woocommerce' ), stripslashes_deep( json_encode( $error ) ) );
+				// translators: %s: Error.
+				$note = sprintf( __( 'Klarna post_order request in process_payment_handler failed. Error message: %s.', 'klarna-checkout-for-woocommerce' ), stripslashes_deep( json_encode( $error ) ) );
 				$order->update_status( 'on-hold', $note );
 			} else {
 				$klarna_post_order = json_decode( $response['body'] );
@@ -561,7 +568,7 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 	/**
 	 * Add kco-shipping-display body class.
 	 *
-	 * @param $class
+	 * @param array $class Array of classes.
 	 *
 	 * @return array
 	 */
