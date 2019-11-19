@@ -1,4 +1,10 @@
 <?php
+/**
+ * Functions file for the plugin.
+ *
+ * @package  Klarna_Checkout/Includes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -28,8 +34,8 @@ function kco_wc_show_order_notes() {
  * Shows extra fields in Klarna Checkout page.
  */
 function kco_wc_show_extra_fields() {
+	// @TODO: Check if this is still used.
 	// Clear extra fields session values on reload.
-	// WC()->session->__unset( 'kco_wc_extra_fields_values' );
 	echo '<div id="kco-extra-fields">';
 	do_action( 'kco_wc_before_extra_fields' );
 
@@ -52,10 +58,10 @@ function kco_wc_show_extra_fields() {
 		<div class="woocommerce-account-fields">
 			<?php if ( ! WC()->checkout()->is_registration_required() ) { ?>
 				<p class="form-row form-row-wide create-account">
-					<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
-						<input class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox"
-							   id="createaccount" <?php checked( ( true === WC()->checkout()->get_value( 'createaccount' ) || ( true === apply_filters( 'woocommerce_create_account_default_checked', false ) ) ), true ); ?>
-							   type="checkbox" name="createaccount" value="1"/>
+				<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
+					<input class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox"
+							id="createaccount" <?php checked( ( true === WC()->checkout()->get_value( 'createaccount' ) || ( true === apply_filters( 'woocommerce_create_account_default_checked', false ) ) ), true ); ?>
+							type="checkbox" name="createaccount" value="1"/>
 						<span><?php _e( 'Create an account?', 'klarna-checkout-for-woocommerce' ); ?></span>
 					</label>
 				</p>
@@ -167,6 +173,11 @@ function kco_wc_calculate_totals() {
 	WC()->cart->calculate_totals();
 }
 
+/**
+ * Adds payment method field.
+ *
+ * @return void
+ */
 function kco_wc_show_payment_method_field() {
 	?>
 	<input style="display:none" type="radio" name="payment_method" value="kco"/>
@@ -202,7 +213,7 @@ function kco_wc_prefill_consent() {
 		?>
 		<p><a class="button" href="<?php echo $consent_url; ?>"><?php echo $button_text; ?></a></p>
 		<p><a href="#TB_inline?width=600&height=550&inlineId=consent-text"
-			  class="thickbox"><?php echo $link_text; ?></a>
+			class="thickbox"><?php echo $link_text; ?></a>
 		</p>
 		<div id="consent-text" style="display:none;">
 			<p><?php echo $popup_text; ?></p>
@@ -214,7 +225,7 @@ function kco_wc_prefill_consent() {
 /**
  * Converts 3-letter ISO returned from Klarna to 2-letter code used in WooCommerce.
  *
- * @param $country
+ * @param string $country Country code.
  */
 function kco_wc_country_code_converter( $country ) {
 	$countries = array(
@@ -503,6 +514,11 @@ function kco_wc_save_cart_hash() {
 	WC()->session->set( 'kco_cart_hash', $cart_hash );
 }
 
+/**
+ * Checks if the current page is the confirmation page.
+ *
+ * @return boolean
+ */
 function is_kco_confirmation() {
 	if ( isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] && isset( $_GET['kco_wc_order_id'] ) ) {
 		return true;
