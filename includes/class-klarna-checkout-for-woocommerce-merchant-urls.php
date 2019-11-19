@@ -1,4 +1,10 @@
 <?php
+/**
+ * Class that formats metchant URLs for Klarnas API.
+ *
+ * @package Klarna_Checkout/Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -22,9 +28,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 			'push'                   => $this->get_push_url(),                   // Required.
 			'validation'             => $this->get_validation_url(),             // HTTPS.
 			'shipping_option_update' => $this->get_shipping_option_update_url(), // HTTPS.
-			// 'address_update'         => $this->get_address_update_url(),         // HTTPS.
 			'notification'           => $this->get_notification_url(),
-			// 'country_change'         => $this->get_country_change_url(),         // HTTPS.
 		);
 
 		return apply_filters( 'kco_wc_merchant_urls', $merchant_urls );
