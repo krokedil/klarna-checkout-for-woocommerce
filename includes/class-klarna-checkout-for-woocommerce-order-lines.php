@@ -1,4 +1,10 @@
 <?php
+/**
+ * Order lines processor
+ *
+ * @package Klarna_Checkout/Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -84,6 +90,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	/**
 	 * Gets order amount for Klarna API.
 	 *
+	 * @param array $order_lines Order lines from cart.
 	 * @return int
 	 */
 	public function get_order_lines_total_amount( $order_lines ) {
@@ -100,6 +107,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	/**
 	 * Adjust order lines if there is a mismatch with cart total.
 	 *
+	 * @param array $order_lines Order lines from cart.
 	 * @return int
 	 */
 	public function adjust_order_lines( $order_lines ) {
@@ -124,6 +132,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	/**
 	 * Gets order tax amount for Klarna API.
 	 *
+	 * @param array $order_lines Order lines from cart.
 	 * @return int
 	 */
 	public function get_order_tax_amount( $order_lines ) {
@@ -293,8 +302,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					);
 					$this->order_lines[] = $discount;
 				}
-			} // End foreach().
-		} // End if().
+			}
+		}
 
 		// YITH Gift Cards
 		if ( ! empty( WC()->cart->applied_gift_cards ) ) {
@@ -317,8 +326,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					'total_tax_amount'      => 0,
 				);
 				$this->order_lines[] = $gift_card;
-			} // End foreach().
-		} // End if().
+			}
+		}
 	}
 
 	/**
@@ -366,8 +375,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 					),
 				);
 				$this->order_lines[] = $fee_item;
-			} // End foreach().
-		} // End if().
+			}
+		}
 	}
 
 	// Helpers.
@@ -378,7 +387,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @access public
 	 *
 	 * @param  array $cart_item Cart item.
-	 *
 	 * @return string $item_name Cart item name.
 	 */
 	public function get_item_name( $cart_item ) {
@@ -395,7 +403,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @access public
 	 *
 	 * @param  array $cart_item Cart item.
-	 *
 	 * @return integer $item_tax_amount Item tax amount.
 	 */
 	public function get_item_tax_amount( $cart_item, $product ) {
@@ -418,7 +425,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 *
 	 * @param  array  $cart_item Cart item.
 	 * @param  object $product   Product object.
-	 *
 	 * @return integer $item_tax_rate Item tax percentage formatted for Klarna.
 	 */
 	public function get_item_tax_rate( $cart_item, $product ) {
@@ -450,7 +456,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @access public
 	 *
 	 * @param  array $cart_item Cart item.
-	 *
 	 * @return integer $item_price Cart item price.
 	 */
 	public function get_item_price( $cart_item ) {
@@ -470,7 +475,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @access public
 	 *
 	 * @param  array $cart_item Cart item.
-	 *
 	 * @return integer $item_quantity Cart item quantity.
 	 */
 	public function get_item_quantity( $cart_item ) {
@@ -486,7 +490,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @access public
 	 *
 	 * @param  object $product Product object.
-	 *
 	 * @return string $item_reference Cart item reference.
 	 */
 	public function get_item_reference( $product ) {
@@ -506,7 +509,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @access public
 	 *
 	 * @param  array $cart_item Cart item.
-	 *
 	 * @return integer $item_discount_amount Cart item discount.
 	 */
 	public function get_item_discount_amount( $cart_item, $product ) {
@@ -533,7 +535,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @access public
 	 *
 	 * @param  WC_Product $product Product.
-	 *
 	 * @return string $item_product_url Cart item product URL.
 	 */
 	public function get_item_product_url( $product ) {
@@ -547,7 +548,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @access public
 	 *
 	 * @param  WC_Product $product Product.
-	 *
 	 * @return string $item_product_image_url Cart item product image URL.
 	 */
 	public function get_item_image_url( $product ) {
@@ -567,7 +567,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @access public
 	 *
 	 * @param  array $cart_item Cart item.
-	 *
 	 * @return integer $item_discount_rate Cart item discount rate.
 	 */
 	public function get_item_discount_rate( $cart_item ) {
@@ -583,7 +582,6 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @access public
 	 *
 	 * @param  array $cart_item Cart item.
-	 *
 	 * @return integer $item_total_amount Cart item total amount.
 	 */
 	public function get_item_total_amount( $cart_item, $product ) {
