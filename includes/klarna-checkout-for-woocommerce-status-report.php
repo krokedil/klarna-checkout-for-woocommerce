@@ -1,6 +1,8 @@
 <?php
 /**
  * Admin View: Page - Status Report.
+ *
+ * @package Klarna_Checkout/Includes
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
