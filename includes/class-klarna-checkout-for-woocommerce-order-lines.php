@@ -305,7 +305,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 			}
 		}
 
-		// YITH Gift Cards
+		// YITH Gift Cards.
 		if ( ! empty( WC()->cart->applied_gift_cards ) ) {
 			foreach ( WC()->cart->applied_gift_cards as $coupon_key => $code ) {
 				$coupon_reference  = '';
@@ -402,7 +402,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array $cart_item Cart item.
+	 * @param  array      $cart_item Cart item.
+	 * @param  WC_Product $product WooCommerce product.
 	 * @return integer $item_tax_amount Item tax amount.
 	 */
 	public function get_item_tax_amount( $cart_item, $product ) {
@@ -508,7 +509,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array $cart_item Cart item.
+	 * @param  array      $cart_item Cart item.
+	 * @param  WC_Product $product WooCommerce product.
 	 * @return integer $item_discount_amount Cart item discount.
 	 */
 	public function get_item_discount_amount( $cart_item, $product ) {
@@ -581,7 +583,8 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array $cart_item Cart item.
+	 * @param  array      $cart_item Cart item.
+	 * @param  WC_Product $product WooCommerce product.
 	 * @return integer $item_total_amount Cart item total amount.
 	 */
 	public function get_item_total_amount( $cart_item, $product ) {
