@@ -1,4 +1,10 @@
 <?php
+/**
+ * Klarna addons file.
+ *
+ * @package Klarna_Checkout/Classes/Admin
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -32,7 +38,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		}
 
 		/**
-		 * KCO_Confirmation constructor.
+		 * Class constructor.
 		 */
 		public function __construct() {
 			add_action( 'admin_menu', array( $this, 'add_menu' ), 100 );
@@ -42,6 +48,8 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 
 		/**
 		 * Load Admin CSS
+		 *
+		 * @param string $hook The hook.
 		 **/
 		public function enqueue_css( $hook ) {
 			if ( 'woocommerce_page_checkout-addons' == $hook || 'settings_page_specter-admin' == $hook ) {
@@ -63,9 +71,9 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		 * Add the Addons options page to WooCommerce.
 		 **/
 		public function options_page() {
-			$tab = ( isset( $_GET['tab'] ) ) ? $_GET['tab'] : 'addons';
+			$tab = ( isset( $_GET['tab'] ) ) ? $_GET['tab'] : 'addons'; // phpcs: ignore.
 			$this->add_page_tabs( $tab );
-			if ( ! isset( $_GET['tab'] ) || $_GET['tab'] === 'addons' ) {
+			if ( ! isset( $_GET['tab'] ) || 'addons' === $_GET['tab'] ) {
 				$addon_content = self::get_addons();
 				?>
 				<div id="checkout-addons-heading" class="checkout-addons-heading">
@@ -75,7 +83,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			</div>
 				<?php if ( $addon_content->start ) : ?>
 					<?php foreach ( $addon_content->start as $start ) : ?>
-						<?php if ( isset( $start->plugin_id ) && $start->plugin_id === 'kco' ) : ?>
+						<?php if ( isset( $start->plugin_id ) && 'kco' === $start->plugin_id ) : ?>
 						<div class="checkout-addons-banner-block checkout-addons-wrap wrap <?php echo esc_html( $start->class ); ?>">
 							<h2><?php echo esc_html( $start->title ); ?></h2>
 							<?php echo self::get_dynamic_content( $start->content ); ?>
@@ -116,7 +124,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 				<?php endif; ?>
 			</div>
 				<?php
-			} elseif ( isset( $_GET['tab'] ) && $_GET['tab'] === 'settings' ) {
+			} elseif ( isset( $_GET['tab'] ) && 'settings' === $_GET['tab'] ) {
 				do_action( 'klarna_addons_settings_tab', ( isset( $_GET['section'] ) ) ? $_GET['section'] : null );
 				?>
 				<p><?php _e( 'Please install an add-on to be able to see the settings.', 'klarna-checkout-for-woocommerce' ); ?></p>
@@ -126,6 +134,9 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 
 		/**
 		 * Get addon status helper function.
+		 *
+		 * @param string $plugin_slug The slug for the plugin.
+		 * @return array
 		 **/
 		public static function get_addon_status( $plugin_slug ) {
 			$status = array(
@@ -151,6 +162,9 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 
 		/**
 		 * Get addon action button helper function.
+		 *
+		 * @param object $item The item object.
+		 * @return string
 		 **/
 		public static function get_addon_action_button( $item ) {
 			if ( current_user_can( 'activate_plugins' ) ) {
@@ -190,11 +204,11 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		/**
 		 * Returns dynamic content. Replaces certain url's related to the specific domain.
 		 *
-		 * @param string $content
+		 * @param string $content the Dynamic content.
 		 * @return string formatted $content
 		 */
 		public static function get_dynamic_content( $content = '' ) {
-			// pattern substitution
+			// Pattern substitution.
 			$replacements = array(
 				'{{klarna-settings-page-url}}' => admin_url( 'admin.php?page=wc-settings&tab=checkout&section=kco' ),
 			);
@@ -302,7 +316,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		/**
 		 * Install and activate dependency.
 		 *
-		 * @param string $slug Plugin slug.
+		 * @param string $url Plugin slug.
 		 *
 		 * @return bool|array false or Message.
 		 */
@@ -313,10 +327,10 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			}
 
 			if ( ! class_exists( 'Klarna_Skin', false ) ) {
-				include_once KCO_WC_PLUGIN_PATH . '/includes/admin/class-klarna-for-woocommerce-skin.php';
+				include_once KCO_WC_PLUGIN_PATH . '/includes/admin/class-klarna-skin.php';
 			}
-
-			$installer = new Plugin_Upgrader( $skin = new Klarna_Skin() );
+			$skin      = new Klarna_Skin();
+			$installer = new Plugin_Upgrader( $skin );
 			$result    = $installer->install( $url );
 
 			wp_cache_flush();
@@ -348,7 +362,8 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		 * @return array of objects
 		 */
 		public static function get_addons() {
-			if ( false === ( $addons = get_transient( 'wc_kco_addons' ) ) ) {
+			$addons = get_transient( 'wc_kco_addons' );
+			if ( false === $addons ) {
 				$kco_settings = get_option( 'woocommerce_kco_settings' );
 				$raw_addons   = wp_safe_remote_get( 'https://s3-eu-west-1.amazonaws.com/krokedil-checkout-addons/klarna-checkout-for-woocommerce-addons.json', array( 'user-agent' => 'KCO Addons Page. Testmode: ' . $kco_settings['testmode'] ) );
 				if ( ! is_wp_error( $raw_addons ) ) {
@@ -366,7 +381,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		/**
 		 * Adds tabs to the Addons page.
 		 *
-		 * @param string $current Wich tab is to be selected.
+		 * @param string $current Which tab is to be selected.
 		 * @return void
 		 */
 		public function add_page_tabs( $current = 'addons' ) {

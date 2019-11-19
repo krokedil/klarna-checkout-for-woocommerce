@@ -4,7 +4,7 @@
  *
  * @since 1.9.0
  *
- * @package Krokedil
+ * @package Krokedil/Classes/Admin
  */
 
 // Exit if accessed directly.
@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Class for the skin for the addons page.
+ */
 class Klarna_Skin extends WP_Upgrader_Skin {
 
 	/**
