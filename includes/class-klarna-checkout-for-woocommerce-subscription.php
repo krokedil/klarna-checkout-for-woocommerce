@@ -1,6 +1,12 @@
 <?php
+/**
+ * Subscription handler.
+ *
+ * @package Klarna_Checkout/Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -12,12 +18,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @category Class
  * @author   Krokedil
  */
-class Klarna_Checkout_Subscription {
+class Klarna_Checkout_For_WooCommerce_Subscription {
 	/**
 	 * Class constructor.
 	 */
 	public function __construct() {
-		// add_filter( 'kco_wc_api_request_args', array( $this, 'create_extra_merchant_data' ) );
+		// add_filter( 'kco_wc_api_request_args', array( $this, 'create_extra_merchant_data' ) );.
 		add_filter( 'kco_wc_api_request_args', array( $this, 'set_recurring' ) );
 		add_action( 'woocommerce_thankyou_kco', array( $this, 'set_recurring_token_for_order' ) );
 		add_action( 'woocommerce_scheduled_subscription_payment_kco', array( $this, 'trigger_scheduled_payment' ), 10, 2 );
@@ -176,6 +182,7 @@ class Klarna_Checkout_Subscription {
 	/**
 	 * Sets the recurring token for the subscription order
 	 *
+	 * @param int $order_id The WooCommerce order id.
 	 * @return void
 	 */
 	public function set_recurring_token_for_order( $order_id = null ) {
@@ -221,6 +228,7 @@ class Klarna_Checkout_Subscription {
 		if ( 200 === $create_order_response['response']['code'] ) {
 			$klarna_order_id = json_decode( $create_order_response['body'] )->order_id;
 			WC_Subscriptions_Manager::process_subscription_payments_on_order( $renewal_order );
+			// translators: %s Klarna order id.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Klarna. Klarna order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
 			$renewal_order->payment_complete( $klarna_order_id );
 		} else {
@@ -231,10 +239,17 @@ class Klarna_Checkout_Subscription {
 			}
 			$subscriptions[ $subscription_id ]->payment_failed();
 			do_action( 'processed_subscription_payment_failure_for_order', $renewal_order );
+			// translators: %1$s Error code %2$s Error message.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s', 'klarna-checkout-for-woocommerce' ), $create_order_response['response']['code'], $error_message ) );
 		}
 	}
 
+	/**
+	 * Shows the recurring token for the order.
+	 *
+	 * @param WC_Order $order The WooCommerce order.
+	 * @return void
+	 */
 	public function show_recurring_token( $order ) {
 		if ( 'shop_subscription' === $order->get_type() && get_post_meta( $order->get_id(), '_kco_recurring_token' ) ) {
 			?>
@@ -260,6 +275,13 @@ class Klarna_Checkout_Subscription {
 		}
 	}
 
+	/**
+	 * Saves the recurring token.
+	 *
+	 * @param int     $post_id WordPress post id.
+	 * @param WP_Post $post The WordPress post.
+	 * @return void
+	 */
 	public function save_kco_recurring_token_update( $post_id, $post ) {
 		$order = wc_get_order( $post_id );
 		if ( 'shop_subscription' === $order->get_type() && get_post_meta( $post_id, '_kco_recurring_token' ) ) {
@@ -271,6 +293,7 @@ class Klarna_Checkout_Subscription {
 	/**
 	 * Handle pus callback from Klarna if this is a KCO subscription payment method change.
 	 *
+	 * @param string $klarna_order_id The order id for the Klarna order.
 	 * @return void
 	 */
 	public function handle_push_cb_for_payment_method_change( $klarna_order_id ) {
@@ -284,6 +307,7 @@ class Klarna_Checkout_Subscription {
 				$klarna_order_data = json_decode( $response_data['body'] );
 				if ( isset( $klarna_order_data->recurring_token ) && ! empty( $klarna_order_data->recurring_token ) ) {
 					update_post_meta( $order->get_id(), '_kco_recurring_token', sanitize_key( $klarna_order_data->recurring_token ) );
+					// translators: %s Klarna recurring token.
 					$note = sprintf( __( 'Payment method changed via Klarna Checkout. New recurring token for subscription: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order_data->recurring_token ) );
 					$order->add_order_note( $note );
 				}
@@ -321,5 +345,5 @@ class Klarna_Checkout_Subscription {
 		}
 	}
 }
-new Klarna_Checkout_Subscription();
+new Klarna_Checkout_For_WooCommerce_Subscription();
 
