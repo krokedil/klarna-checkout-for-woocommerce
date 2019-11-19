@@ -1,4 +1,10 @@
 <?php
+/**
+ * Class for Klarna Checkout gateway settings.
+ *
+ * @package Klarna_Checkout/Classes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
