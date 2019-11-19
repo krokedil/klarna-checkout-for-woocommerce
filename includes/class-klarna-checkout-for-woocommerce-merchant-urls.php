@@ -27,7 +27,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 			// 'country_change'         => $this->get_country_change_url(),         // HTTPS.
 		);
 
-		return apply_filters('kco_wc_merchant_urls', $merchant_urls);
+		return apply_filters( 'kco_wc_merchant_urls', $merchant_urls );
 
 	}
 
@@ -41,7 +41,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	private function get_terms_url() {
 		$terms_url = get_permalink( wc_get_page_id( 'terms' ) );
 
-		return apply_filters('kco_wc_terms_url', $terms_url);
+		return apply_filters( 'kco_wc_terms_url', $terms_url );
 	}
 
 	/**
@@ -53,7 +53,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 */
 	private function get_checkout_url() {
 		$checkout_url = wc_get_checkout_url();
-		return apply_filters('kco_wc_checkout_url', $checkout_url);
+		return apply_filters( 'kco_wc_checkout_url', $checkout_url );
 	}
 
 	/**
@@ -71,7 +71,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 			), wc_get_checkout_url()
 		);
 
-		return apply_filters('kco_wc_confirmation_url',$confirmation_url);
+		return apply_filters( 'kco_wc_confirmation_url', $confirmation_url );
 	}
 
 	/**
@@ -91,7 +91,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 			)
 		);
 
-		return apply_filters('kco_wc_push_url', $push_url);
+		return apply_filters( 'kco_wc_push_url', $push_url );
 	}
 
 	/**
@@ -102,7 +102,7 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_validation_url() {
-		$session_id     = $this->get_session_id();
+		$session_id = $this->get_session_id();
 
 		$validation_url = home_url(
 			sprintf(
@@ -110,10 +110,10 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 				$session_id
 			)
 		);
-		
+
 		$validation_url = str_replace( 'http:', 'https:', $validation_url );
 
-		return apply_filters('kco_wc_validation_url', $validation_url);
+		return apply_filters( 'kco_wc_validation_url', $validation_url );
 	}
 
 	/**
@@ -125,10 +125,10 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 */
 	private function get_shipping_option_update_url() {
 
-		$shipping_option_update_url = home_url('/wc-api/KCO_WC_Shipping_Option_Update/');
+		$shipping_option_update_url = home_url( '/wc-api/KCO_WC_Shipping_Option_Update/' );
 		$shipping_option_update_url = str_replace( 'http:', 'https:', $shipping_option_update_url );
-		
-		return apply_filters('kco_wc_shipping_option_update_url', $shipping_option_update_url);
+
+		return apply_filters( 'kco_wc_shipping_option_update_url', $shipping_option_update_url );
 
 	}
 
@@ -141,11 +141,11 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 */
 	private function get_address_update_url() {
 
-		$address_update_url = home_url('/wc-api/KCO_WC_Address_Update/?kco_wc_order_id={checkout.order.id}');
-		
+		$address_update_url = home_url( '/wc-api/KCO_WC_Address_Update/?kco_wc_order_id={checkout.order.id}' );
+
 		$address_update_url = str_replace( 'http:', 'https:', $address_update_url );
-		
-		return apply_filters('kco_wc_address_update_url', $address_update_url);
+
+		return apply_filters( 'kco_wc_address_update_url', $address_update_url );
 
 	}
 
@@ -157,8 +157,8 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_notification_url() {
-		$notification_url = home_url('/wc-api/KCO_WC_Notification/?kco_wc_order_id={checkout.order.id}');
-		return apply_filters('kco_wc_notification_url', $notification_url);
+		$notification_url = home_url( '/wc-api/KCO_WC_Notification/?kco_wc_order_id={checkout.order.id}' );
+		return apply_filters( 'kco_wc_notification_url', $notification_url );
 	}
 
 	/**
@@ -170,10 +170,10 @@ class Klarna_Checkout_For_WooCommerce_Merchant_URLs {
 	 */
 	private function get_country_change_url() {
 
-		$country_change_url = home_url('/wp-json/kcowc/v1/address/{checkout.order.id}');
+		$country_change_url = home_url( '/wp-json/kcowc/v1/address/{checkout.order.id}' );
 		$country_change_url = str_replace( 'http:', 'https:', $country_change_url );
-		
-		return apply_filters('kco_wc_country_change_url', $country_change_url);
+
+		return apply_filters( 'kco_wc_country_change_url', $country_change_url );
 	}
 
 	/**
