@@ -1,4 +1,9 @@
 <?php
+/**
+ * Class file for extra checkout fields handling.
+ *
+ * @package Klarna_Checkout/Classes
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
