@@ -244,14 +244,14 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-order-lines.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-merchant-urls.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-credentials.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-logging.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-logger.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-fields.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-confirmation.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-extra-checkout-fields.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-status.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-create-local-order-fallback.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gdpr.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-checkout-form-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-form-fields.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-subscription.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-order-lines-from-order.php';
 			if ( is_admin() ) {
@@ -259,6 +259,19 @@ if ( ! class_exists( 'KCO' ) ) {
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-wc-klarna-banners.php';
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-for-woocommerce-addons.php';
 			}
+
+			// Requests.
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/class-kco-request.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-create.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-update.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/get/class-kco-request-retrieve.php';
+
+			// Helpers
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-cart.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-countries.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-merchant-data.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-options.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-shipping-options.php';
 
 			// Includes.
 			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
@@ -269,7 +282,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			$this->merchant_urls          = new KCO_Merchant_URLs();
 			$this->order_lines            = new KCO_Order_Lines();
 			$this->credentials            = new KCO_Credentials();
-			$this->logger                 = new KCO_Logging();
+			$this->logger                 = new KCO_Logger();
 			$this->order_lines_from_order = new KCO_Order_Lines_From_Order();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );

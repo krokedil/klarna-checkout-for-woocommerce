@@ -16,6 +16,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class KCO_Request_Options {
 	/**
+	 * Class constructor.
+	 */
+	public function __construct() {
+		$this->settings = get_option( 'woocommerce_kco_settings' );
+	}
+
+	/**
 	 * Gets merchant data for Klarna purchase.
 	 *
 	 * @return array
@@ -188,5 +195,22 @@ class KCO_Request_Options {
 			$hex = '#' . $hex;
 		}
 		return $hex;
+	}
+
+	/**
+	 * Gets country for Klarna purchase.
+	 *
+	 * @return string
+	 */
+	private function get_purchase_country() {
+		// Try to use customer country if available.
+		if ( ! empty( WC()->customer->get_billing_country() ) && strlen( WC()->customer->get_billing_country() ) === 2 ) {
+			return WC()->customer->get_billing_country( 'edit' );
+		}
+
+		$base_location = wc_get_base_location();
+		$country       = $base_location['country'];
+
+		return $country;
 	}
 }

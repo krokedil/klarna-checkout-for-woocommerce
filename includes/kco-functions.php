@@ -13,9 +13,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Echoes Klarna Checkout iframe snippet.
  */
 function kco_wc_show_snippet() {
-	$klarna_order = KCO_WC()->api->get_order();
+	$request      = new KCO_Request_Create();
+	$klarna_order = $request->request();// KCO_WC()->api->get_order();
 	do_action( 'kco_wc_show_snippet', $klarna_order );
-	echo KCO_WC()->api->get_snippet( $klarna_order );
+	error_log( 'yay!' );
+	echo $klarna_order['html_snippet'];
 }
 
 /**

@@ -27,7 +27,7 @@ class KCO_Logger {
 	 */
 	public static function log( $data ) {
 		$settings = get_option( 'woocommerce_kco_settings' );
-		if ( 'yes' === $settings['debug'] ) {
+		if ( 'yes' === $settings['logging'] ) {
 			$message = self::format_data( $data );
 			if ( empty( self::$log ) ) {
 				self::$log = new WC_Logger();

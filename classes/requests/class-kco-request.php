@@ -26,7 +26,7 @@ class KCO_Request {
 	/**
 	 * Class constructor.
 	 */
-	protected function __construct() {
+	public function __construct() {
 		$this->settings = get_option( 'woocommerce_kco_settings' );
 
 		$base_location      = wc_get_base_location();

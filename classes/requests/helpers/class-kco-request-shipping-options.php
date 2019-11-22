@@ -18,7 +18,7 @@ class KCO_Request_Shipping_Options {
 	 *
 	 * @return array
 	 */
-	public static function get_shipping_options() {
+	public static function get_shipping_options( $separate_sales_tax ) {
 		if ( WC()->cart->needs_shipping() ) {
 			$shipping_options = array();
 			$packages         = WC()->shipping->get_packages();
@@ -30,13 +30,13 @@ class KCO_Request_Shipping_Options {
 					$method_id   = $method->id;
 					$method_name = $method->label;
 
-					if ( $this->separate_sales_tax || 'excl' === $tax_display ) {
+					if ( $separate_sales_tax || 'excl' === $tax_display ) {
 						$method_price = intval( round( $method->cost, 2 ) * 100 );
 					} else {
 						$method_price = intval( round( $method->cost + array_sum( $method->taxes ), 2 ) * 100 );
 					}
 
-					if ( array_sum( $method->taxes ) > 0 && ( ! $this->separate_sales_tax && 'excl' !== $tax_display ) ) {
+					if ( array_sum( $method->taxes ) > 0 && ( ! $separate_sales_tax && 'excl' !== $tax_display ) ) {
 						$method_tax_amount = intval( round( array_sum( $method->taxes ), 2 ) * 100 );
 						$method_tax_rate   = intval( round( ( array_sum( $method->taxes ) / $method->cost ) * 100, 2 ) * 100 );
 					} else {

@@ -41,6 +41,8 @@ class KCO_Request_Update extends KCO_Request {
 		$cart_data = new KCO_Request_Cart();
 		$cart_data->process_data();
 
+		$request_options = new KCO_Request_Options();
+
 		$request_body = array(
 			'purchase_country'   => $this->get_purchase_country(),
 			'purchase_currency'  => get_woocommerce_currency(),
@@ -52,7 +54,7 @@ class KCO_Request_Update extends KCO_Request {
 			'billing_countries'  => KCO_Request_Countries::get_billing_countries(),
 			'shipping_countries' => KCO_Request_Countries::get_shipping_countries(),
 			'merchant_data'      => KCO_Request_Merchant_Data::get_merchant_data(),
-			'options'            => KCO_Request_Options::get_options(),
+			'options'            => $request_options->get_options(),
 		);
 
 		if ( kco_wc_prefill_allowed() ) {
@@ -71,7 +73,7 @@ class KCO_Request_Update extends KCO_Request {
 		}
 
 		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {
-			$request_body['shipping_options'] = KCO_Request_Shipping_Options::get_shipping_options();
+			$request_body['shipping_options'] = KCO_Request_Shipping_Options::get_shipping_options( $this->separate_sales_tax );
 		}
 
 		return $request_body;
