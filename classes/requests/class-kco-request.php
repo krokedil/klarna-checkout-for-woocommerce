@@ -128,10 +128,13 @@ class KCO_Request {
 			$error_message = '';
 			// Get the error messages.
 			if ( null !== json_decode( $response['body'], true ) ) {
-				$error         = json_decode( $response['body'], true );
-				$error_message = $error_message . ' ' . $error['message'];
+				$errors = json_decode( $response['body'], true );
+				error_log( var_export( $errors, true ) );
+				foreach ( $errors['error_messages'] as $error ) {
+					$error_message = $error_message . ' ' . $error;
+				}
 			}
-			return new WP_Error( wp_remote_retrieve_response_code( $response ), $response['response']['message'] . $error_message, $data );
+			return new WP_Error( wp_remote_retrieve_response_code( $response ), $response['body'] . $error_message, $data );
 		}
 		return json_decode( wp_remote_retrieve_body( $response ), true );
 	}

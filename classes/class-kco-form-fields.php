@@ -69,7 +69,9 @@ class KCO_Checkout_Form_Fields {
 			if ( empty( WC()->session->get( 'kco_wc_order_id' ) ) ) {
 				self::$klarna_order = null;
 			} else {
-				self::$klarna_order = KCO_WC()->api->request_pre_get_order( WC()->session->get( 'kco_wc_order_id', true ) );
+				$request            = new KCO_Request_Retrieve();
+				$response           = $request->request( WC()->session->get( 'kco_wc_order_id', true ) );
+				self::$klarna_order = $response;
 			}
 		}
 		return self::$klarna_order;
@@ -86,8 +88,7 @@ class KCO_Checkout_Form_Fields {
 		if ( empty( $klarna_order ) || is_wp_error( $klarna_order ) ) {
 			$email = null;
 		} else {
-			$klarna_order = json_decode( $klarna_order['body'] );
-			$email        = $klarna_order->billing_address->email;
+			$email = $klarna_order['billing_address']['email'];
 			WC()->customer->set_billing_email( $email );
 		}
 		return $email;
@@ -109,8 +110,8 @@ class KCO_Checkout_Form_Fields {
 				$shipping_state = null;
 			} else {
 				$klarna_order   = json_decode( $klarna_order['body'] );
-				$billing_state  = $klarna_order->billing_address->region;
-				$shipping_state = $klarna_order->shipping_address->region;
+				$billing_state  = $klarna_order['billing_address']['region'];
+				$shipping_state = $klarna_order['shipping_address']['region'];
 				WC()->customer->set_billing_state( $billing_state );
 				WC()->customer->set_shipping_state( $shipping_state );
 			}

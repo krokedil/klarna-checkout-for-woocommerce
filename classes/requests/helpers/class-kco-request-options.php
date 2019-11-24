@@ -34,7 +34,7 @@ class KCO_Request_Options {
 			'date_of_birth_mandatory'                  => $this->get_dob_mandatory(),
 			'national_identification_number_mandatory' => $this->get_dob_mandatory(),
 			'allowed_customer_types'                   => $this->get_allowed_customer_types(),
-			'require_validate_callback_success'        => false,
+			'require_client_validation'                => true,
 			'phone_mandatory'                          => 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ),
 		);
 

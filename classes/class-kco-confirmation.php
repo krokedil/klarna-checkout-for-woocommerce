@@ -218,20 +218,6 @@ class KCO_Confirmation {
 	}
 
 	/**
-	 * Checks if in KCO confirmation page.
-	 *
-	 * @return bool
-	 * @todo Remove.
-	 */
-	private function is_kco_confirmation() {
-		if ( isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] && isset( $_GET['kco_wc_order_id'] ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Saves customer data from Klarna order into WC()->customer.
 	 *
 	 * @param array $klarna_order Klarna order.

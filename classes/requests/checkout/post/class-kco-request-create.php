@@ -25,7 +25,7 @@ class KCO_Request_Create extends KCO_Request {
 		$code              = wp_remote_retrieve_response_code( $response );
 		$formated_response = $this->process_response( $response, $request_args, $request_url );
 
-		$klarna_order_id = $formated_response['order_id'];
+		$klarna_order_id = is_wp_error( $formated_response ) ? null : $formated_response['order_id'];
 
 		// Log the request.
 		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO create order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code );

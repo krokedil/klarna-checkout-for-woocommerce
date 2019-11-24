@@ -570,6 +570,10 @@ jQuery(function($) {
 						},
 						'can_not_complete_order': function(data) {
 							kco_wc.log('can_not_complete_order', data);
+						},
+						'validation_callback': function(data, callback) {
+							console.log( 'In validation event' );
+							callback({ should_proceed: true });
 						}
 					});
 				});

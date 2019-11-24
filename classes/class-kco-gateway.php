@@ -231,7 +231,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 
 		wp_register_script(
 			'kco',
-			plugins_url( 'assets/js/klarna-checkout-for-woocommerce' . $suffix . '.js', KCO_WC_MAIN_FILE ),
+			plugins_url( 'assets/js/klarna-checkout-for-woocommerce.js', KCO_WC_MAIN_FILE ),
 			array( 'jquery', 'wc-cart' ),
 			KCO_WC_VERSION,
 			true

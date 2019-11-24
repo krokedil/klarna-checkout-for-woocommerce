@@ -10,13 +10,50 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Gets a Klarna order. Either creates or updates existing order.
+ *
+ * @param int $order_id The WooCommerce order id.
+ * @return array
+ */
+function kco_create_order_update_order( $order_id = null ) {
+	// Need to calculate these here, because WooCommerce hasn't done it yet.
+	WC()->cart->calculate_fees();
+	WC()->cart->calculate_shipping();
+	WC()->cart->calculate_totals();
+	if ( WC()->session->get( 'kco_wc_order_id' ) ) { // Check if we have an order id.
+		// Try to update the order, if it fails try to create new order.
+		$request  = new KCO_Request_Update();
+		$response = $request->request( WC()->session->get( 'kco_wc_order_id' ) );
+		if ( is_wp_error( $response ) ) {
+			// If update order failed try to create new order.
+			$request  = new KCO_Request_Create();
+			$response = $request->request();
+			if ( is_wp_error( $response ) ) {
+				// If failed then print error message.
+				return kco_extract_error_message( $response );
+			}
+			WC()->session->set( 'kco_wc_order_id', $response['order_id'] );
+			return $response;
+		}
+		return $response;
+	} else {
+		// Create new order, since we dont have one.
+		$request  = new KCO_Request_Create();
+		$response = $request->request();
+		if ( is_wp_error( $response ) ) {
+			return kco_extract_error_message( $response );
+		}
+		WC()->session->set( 'kco_wc_order_id', $response['order_id'] );
+		return $response;
+	}
+}
+
+/**
  * Echoes Klarna Checkout iframe snippet.
  */
 function kco_wc_show_snippet() {
-	$request      = new KCO_Request_Create();
-	$klarna_order = $request->request();// KCO_WC()->api->get_order();
+	$klarna_order = kco_create_order_update_order();
 	do_action( 'kco_wc_show_snippet', $klarna_order );
-	error_log( 'yay!' );
 	echo $klarna_order['html_snippet'];
 }
 
@@ -508,15 +545,6 @@ function kco_wc_print_notices() {
 }
 
 /**
- * Save cart hash to KCO session.
- */
-function kco_wc_save_cart_hash() {
-	WC()->cart->calculate_totals();
-	$cart_hash = md5( wp_json_encode( wc_clean( WC()->cart->get_cart_for_session() ) ) . WC()->cart->total );
-	WC()->session->set( 'kco_cart_hash', $cart_hash );
-}
-
-/**
  * Checks if the current page is the confirmation page.
  *
  * @return boolean
@@ -527,4 +555,14 @@ function is_kco_confirmation() {
 	}
 
 	return false;
+}
+
+/**
+ * Prints error message as notices.
+ *
+ * @param WP_Error $wp_error A WordPress error object.
+ * @return void
+ */
+function kco_extract_error_message( $wp_error ) {
+	wc_print_notice( $wp_error->get_error_message(), 'error' );
 }
