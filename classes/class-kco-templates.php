@@ -41,14 +41,11 @@ class KCO_Templates {
 		add_action( 'wp_footer', array( $this, 'check_that_kco_template_has_loaded' ) );
 
 		// Template hooks.
-		add_action( 'kco_wc_before_checkout_form', 'kco_wc_print_notices' );
-		add_action( 'kco_wc_before_checkout_form', 'kco_wc_calculate_totals', 1 );
 		add_action( 'kco_wc_before_checkout_form', 'woocommerce_checkout_login_form', 10 );
 		add_action( 'kco_wc_before_checkout_form', 'woocommerce_checkout_coupon_form', 20 );
-		add_action( 'kco_wc_after_order_review', 'kco_wc_show_extra_fields', 10 );
 		add_action( 'kco_wc_after_order_review', 'kco_wc_show_another_gateway_button', 20 );
 		add_action( 'kco_wc_before_snippet', 'kco_wc_prefill_consent', 10 );
-		add_action( 'kco_wc_after_snippet', 'kco_wc_show_payment_method_field', 10 );
+		add_action( 'kco_wc_after_wrapper', array( $this, 'add_wc_form' ), 10 );
 	}
 
 	/**
@@ -148,6 +145,23 @@ class KCO_Templates {
 			wp_safe_redirect( $url );
 			exit;
 		}
+	}
+
+	/**
+	 * Adds the WC form and other fields to the checkout page.
+	 *
+	 * @return void
+	 */
+	public function add_wc_form() {
+		?>
+		<div aria-hidden="true" id="kco-wc-form" style="position:absolute; top:0; left:-99999px;">
+			<?php do_action( 'woocommerce_checkout_billing' ); ?>
+			<?php do_action( 'woocommerce_checkout_shipping' ); ?>
+			<div id="kco-nonce-wrapper">
+				<?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
+			</div>
+			<input id="payment_method_kco" type="radio" class="input-radio" name="payment_method" value="kco" checked="checked" />		</div>
+		<?php
 	}
 }
 

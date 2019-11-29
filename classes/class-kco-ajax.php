@@ -35,8 +35,8 @@ class KCO_AJAX extends WC_AJAX {
 			'kco_wc_change_payment_method'          => true,
 			'kco_wc_update_klarna_order'            => true,
 			'kco_wc_iframe_shipping_address_change' => true,
-			'kco_wc_checkout_error'                 => true,
 			'kco_wc_set_session_value'              => true,
+			'kco_wc_get_klarna_order'               => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -333,81 +333,6 @@ class KCO_AJAX extends WC_AJAX {
 	}
 
 	/**
-	 * Handles WooCommerce checkout error, after Klarna order has already been created.
-	 */
-	public static function kco_wc_checkout_error() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_checkout_error' ) ) { // Input var okay.
-			wp_send_json_error( 'bad_nonce' );
-			exit;
-		}
-		if ( ! empty( $_POST['error_message'] ) ) { // Input var okay.
-			$error_message = 'Error message: ' . sanitize_text_field( trim( $_POST['error_message'] ) );
-		} else {
-			$error_message = 'Error message could not be retrieved';
-		}
-
-		KCO_WC()->logger->log( 'Checkout form submission failed. ' . $error_message );
-		krokedil_log_events( null, 'Checkout form submission failed', $error_message );
-
-		if ( ! empty( $_GET['kco_wc_order_id'] ) ) { // Input var okay.
-			$klarna_order_id = $_GET['kco_wc_order_id'];
-		} else {
-			$klarna_order_id = KCO_WC()->api->get_order_id_from_session();
-		}
-
-		// Check if we have items in cart. If not return redirect URL.
-		if ( WC()->cart->is_empty() && ! is_customize_preview() && apply_filters( 'woocommerce_checkout_redirect_empty_cart', true ) ) {
-			wp_send_json_success( array( 'redirect' => wc_get_page_permalink( 'cart' ) ) );
-			wp_die();
-		}
-
-		// Check if Woo order with Klarna order ID already exist.
-		$query_args = array(
-			'fields'      => 'ids',
-			'post_type'   => wc_get_order_types(),
-			'post_status' => array_keys( wc_get_order_statuses() ),
-			'meta_key'    => '_wc_klarna_order_id',
-			'meta_value'  => $klarna_order_id,
-		);
-		$orders     = get_posts( $query_args );
-
-		if ( empty( $orders ) ) {
-			// No order found. Create order via fallback sequence.
-			KCO_WC()->logger->log( 'Starting Fallback order creation.' );
-			krokedil_log_events( null, 'Starting Fallback order creation.', '' );
-			$order = KCO_Create_Local_Order_Fallback::create( $klarna_order_id, $error_message );
-
-			if ( is_object( $order ) ) {
-				KCO_WC()->logger->log( 'Fallback order creation done. Redirecting customer to thank you page.' );
-				krokedil_log_events( $order->get_id(), 'Fallback order creation done. Redirecting customer to thank you page.', '' );
-				// translators: %s: Error message from Klarna.
-				$note = sprintf( __( 'This order was made as a fallback due to an error in the checkout (%s). Please verify the order with Klarna.', 'klarna-checkout-for-woocommerce' ), $error_message );
-				$order->add_order_note( $note );
-				$order->payment_complete( $klarna_order_id );
-				$order->update_status( 'on-hold' );
-				$redirect_url = $order->get_checkout_order_received_url();
-			} else {
-				KCO_WC()->logger->log( 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.' . json_decode( $order ) );
-				krokedil_log_events( null, 'Fallback order creation ERROR. Redirecting customer to simplified thank you page.', $order );
-				$redirect_url = wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) );
-				$redirect_url = add_query_arg( 'kco_checkout_error', 'true', $redirect_url );
-			}
-
-			wp_send_json_success( array( 'redirect' => $redirect_url ) );
-			wp_die();
-		} else {
-			// Order already exist in Woo. Redirect customer to the corresponding order received page.
-			$order_id     = $orders[0];
-			$order        = wc_get_order( $order_id );
-			$redirect_url = $order->get_checkout_order_received_url();
-			KCO_WC()->logger->log( 'Order already exist in Woo. Redirecting customer to thank you page. ' . json_decode( $redirect_url ) );
-			krokedil_log_events( $order_id, 'Order already exist in Woo. Redirecting customer to thank you page. ', $redirect_url );
-			wp_send_json_success( array( 'redirect' => $redirect_url ) );
-			wp_die();
-		}
-	}
-
-	/**
 	 * Sets validation session value.
 	 */
 	public static function kco_wc_set_session_value() {
@@ -419,6 +344,34 @@ class KCO_AJAX extends WC_AJAX {
 
 		wp_send_json_success();
 		wp_die();
+	}
+
+	/**
+	 * Gets the klarna order from session.
+	 *
+	 * @return void
+	 */
+	public static function kco_wc_get_klarna_order() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_get_klarna_order' ) ) { // Input var okay.
+			wp_send_json_error( 'bad_nonce' );
+			exit;
+		}
+
+		$request  = new KCO_Request_Retrieve();
+		$response = $request->request( WC()->session->get( 'kco_wc_order_id' ) );
+		if ( is_wp_error( $response ) ) {
+			kco_extract_error_message( $response );
+			wp_send_json_error( $response );
+			wp_die();
+		}
+		wp_send_json_success(
+			array(
+				'billing_address'  => $response['billing_address'],
+				'shipping_address' => $response['shipping_address'],
+			)
+		);
+		wp_die();
+
 	}
 }
 

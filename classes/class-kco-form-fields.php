@@ -25,7 +25,7 @@ class KCO_Checkout_Form_Fields {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		add_action( 'kco_wc_after_snippet', array( $this, 'add_woocommerce_checkout_form_fields' ) );
+		// add_action( 'kco_wc_after_snippet', array( $this, 'add_woocommerce_checkout_form_fields' ) );
 	}
 
 	/**
