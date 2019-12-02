@@ -248,7 +248,6 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gdpr.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-form-fields.php'; // move to includes.
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-subscription.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-merchant-urls.php';
 			if ( is_admin() ) {
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-kco-admin-notices.php';
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-wc-klarna-banners.php';
@@ -260,6 +259,8 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-create.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-update.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/get/class-kco-request-retrieve.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/order-management/patch/class-kco-request-set-merchant-reference.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/order-management/post/class-kco-request-acknowledge-order.php';
 
 			// Helpers.
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-cart.php';
@@ -267,6 +268,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-merchant-data.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-options.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-shipping-options.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-merchant-urls.php';
 
 			// Includes.
 			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';

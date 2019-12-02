@@ -6,7 +6,7 @@ jQuery(function($) {
 	}
 	var kco_wc = {
 		bodyEl: $('body'),
-		checkoutFormSelector: 'form.checkout',
+		checkoutFormSelector: $( 'form.checkout' ),
 
 		// Order notes
 		orderNotesValue: '',
@@ -273,10 +273,12 @@ jQuery(function($) {
 				success: function(data) {
 				},
 				error: function(data) {
+					return false;
 				},
 				complete: function(data) {
 					kco_wc.setCustomerData( data.responseJSON.data );
 					$('form.checkout').submit();
+					return true;
 				}
 			});
 		},
@@ -299,14 +301,33 @@ jQuery(function($) {
 			$('#shipping_postcode').val( data.shipping_address.postal_code );
 		},
 
+		observer: new MutationObserver(function(mutationsList) {
+			for ( var mutation of mutationsList ) {
+				if ( mutation.type == 'childList' ) {
+					if( mutation.addedNodes[0] ) {
+						if ( mutation.addedNodes[0].querySelector("#kco-order-success") ) { // Success.
+							$( 'body' ).trigger( 'kco_order_validation', true );
+						} else if( mutation.addedNodes[0].querySelector("#kco-order-failed") ) { // Not used now, but potential error from us.
+							$( 'body' ).trigger( 'kco_order_validation', false );
+						} else if ( mutation.addedNodes[0].querySelector(".woocommerce-error") ) { // WooCommerce error.
+							$( 'body' ).trigger( 'kco_order_validation', false );
+						}
+					}
+				}
+			}
+		}),
+		
+		config: {
+			childList: true,
+		},
+
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
-
+			kco_wc.observer.observe( kco_wc.checkoutFormSelector[0], kco_wc.config );
 			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend( true ) );
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybePrintValidationMessage);
-			//kco_wc.bodyEl.on('checkout_error', kco_wc.checkoutError);
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
@@ -419,9 +440,10 @@ jQuery(function($) {
 							kco_wc.log('can_not_complete_order', data);
 						},
 						'validation_callback': function(data, callback) {
-							console.log( 'In validation event' );
 							kco_wc.getKlarnaOrder();
-							callback({ shouldProceed: false });
+							$( 'body' ).on( 'kco_order_validation', function( event, bool ) {
+								callback({ shouldProceed: bool });
+							} );
 						}
 					});
 				});
@@ -430,7 +452,6 @@ jQuery(function($) {
 	};
 
 	kco_wc.init();
-	$('body').on('blur', kco_wc.checkFormData );
 	$(document).on("keypress", "#kco-order-review .qty", function(event) {
 		if (event.keyCode == 13) {
 			event.preventDefault();
