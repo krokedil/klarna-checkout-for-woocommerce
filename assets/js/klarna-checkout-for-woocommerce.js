@@ -237,34 +237,36 @@ jQuery(function($) {
 
 		// When payment method is changed to KCO in regular WC Checkout page.
 		maybeChangeToKco: function() {
-			kco_wc.log($(this).val());
+			if ( 'yes' !== kco_params.is_confirmation_page ) {
+				kco_wc.log($(this).val());
 
-			if ( 'kco' === $(this).val() ) {
-				$('.woocommerce-info').remove();
+				if ( 'kco' === $(this).val() ) {
+					$('.woocommerce-info').remove();
 
-				$(kco_wc.checkoutFormSelector).block({
-					message: null,
-					overlayCSS: {
-						background: '#fff',
-						opacity: 0.6
-					}
-				});
+					$(kco_wc.checkoutFormSelector).block({
+						message: null,
+						overlayCSS: {
+							background: '#fff',
+							opacity: 0.6
+						}
+					});
 
-				$.ajax({
-					type: 'POST',
-					data: {
-						kco: true,
-						nonce: kco_params.change_payment_method_nonce
-					},
-					dataType: 'json',
-					url: kco_params.change_payment_method_url,
-					success: function (data) {},
-					error: function (data) {},
-					complete: function (data) {
-						kco_wc.log(data.responseJSON);
-						window.location.href = data.responseJSON.data.redirect;
-					}
-				});
+					$.ajax({
+						type: 'POST',
+						data: {
+							kco: true,
+							nonce: kco_params.change_payment_method_nonce
+						},
+						dataType: 'json',
+						url: kco_params.change_payment_method_url,
+						success: function (data) {},
+						error: function (data) {},
+						complete: function (data) {
+							kco_wc.log(data.responseJSON);
+							window.location.href = data.responseJSON.data.redirect;
+						}
+					});
+				}
 			}
 		},
 
