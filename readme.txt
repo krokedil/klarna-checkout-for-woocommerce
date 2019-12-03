@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2019.11.11    - version 1.11.5 =
+* Fix           - Fixed issue for order_tax_amount not being set as correct amount when bulk renewal subscription is triggered.
+
 = 2019.10.02    - version 1.11.4 =
 * Fix           - Made recurring payments more compatible with new WooCommerce subscription flow.
 * Fix           - Added merchant references to renewal orders.

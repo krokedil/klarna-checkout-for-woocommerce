@@ -19,7 +19,7 @@ class Klarna_Checkout_Subscription {
 	public function __construct() {
 		// add_filter( 'kco_wc_api_request_args', array( $this, 'create_extra_merchant_data' ) );
 		add_filter( 'kco_wc_api_request_args', array( $this, 'set_recurring' ) );
-		add_action( 'woocommerce_thankyou_kco', array( $this, 'set_recurring_token_for_order' ) );
+		add_action( 'kco_wc_process_payment', array( $this, 'set_recurring_token_for_order' ), 10, 2 );
 		add_action( 'woocommerce_scheduled_subscription_payment_kco', array( $this, 'trigger_scheduled_payment' ), 10, 2 );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'show_recurring_token' ) );
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'save_kco_recurring_token_update' ), 45, 2 );
@@ -176,23 +176,24 @@ class Klarna_Checkout_Subscription {
 	/**
 	 * Sets the recurring token for the subscription order
 	 *
+	 * @param string $order_id WooCommerce order ID.
+	 * @param object $klarna_order Klarna order.
+	 *
 	 * @return void
 	 */
-	public function set_recurring_token_for_order( $order_id = null ) {
+	public function set_recurring_token_for_order( $order_id = null, $klarna_order ) {
 		$wc_order = wc_get_order( $order_id );
-		if ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
-			$subcriptions    = wcs_get_subscriptions_for_order( $order_id );
-			$klarna_order_id = $wc_order->get_transaction_id();
-			$response        = KCO_WC()->api->request_pre_get_order( $klarna_order_id, $order_id );
-			$klarna_order    = json_decode( $response['body'] );
-			if ( isset( $klarna_order->recurring_token ) ) {
-				$recurring_token = $klarna_order->recurring_token;
+		if ( isset( $klarna_order->recurring_token ) ) {
+			// Store recurring token in the order.
+			update_post_meta( $order_id, '_kco_recurring_token', $klarna_order->recurring_token );
+
+			// This function is run after WCS has created the subscription order.
+			// Let's add the _kco_recurring_token to the subscription(s) as well.
+			if ( class_exists( 'WC_Subscriptions' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
+				$subcriptions = wcs_get_subscriptions_for_order( $order_id, array( 'order_type' => 'any' ) );
 				foreach ( $subcriptions as $subcription ) {
-					// Store the recurring order in the subscription.
-					update_post_meta( $subcription->get_id(), '_kco_recurring_token', $recurring_token );
+					update_post_meta( $subcription->get_id(), '_kco_recurring_token', $klarna_order->recurring_token );
 				}
-				// Store recurring token in the order.
-				update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
 			}
 		}
 	}
