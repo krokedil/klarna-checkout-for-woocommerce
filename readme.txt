@@ -62,6 +62,10 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2019.12.03    - version 1.11.6 =
+* Fix           - Prevent function for changing to Klarna Checkout payment method from running on the confirmation page. Caused an issue with Google Tag Manager for WordPress by Thomas Geiger
+* Fix           - Changed where we set the recurring token for a Subscription order.
+
 = 2019.11.11    - version 1.11.5 =
 * Fix           - Fixed issue for order_tax_amount not being set as correct amount when bulk renewal subscription is triggered.
 

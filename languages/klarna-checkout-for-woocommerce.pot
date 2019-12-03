@@ -16,24 +16,36 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:176, ../includes/admin/class-klarna-for-woocommerce-addons.php:375
+#: ../includes/admin/class-klarna-for-woocommerce-addons.php:59, ../includes/admin/class-klarna-for-woocommerce-addons.php:59, ../includes/admin/class-klarna-for-woocommerce-addons.php:73, ../includes/admin/class-klarna-for-woocommerce-addons.php:374
+msgid "Klarna Add-ons"
+msgstr ""
+
+#: ../includes/admin/class-klarna-for-woocommerce-addons.php:122
+msgid "Please install an add-on to be able to see the settings."
+msgstr ""
+
+#: ../includes/admin/class-klarna-for-woocommerce-addons.php:174
+msgid "Install"
+msgstr ""
+
+#: ../includes/admin/class-klarna-for-woocommerce-addons.php:174
+msgid "Not installed"
+msgstr ""
+
+#: ../includes/admin/class-klarna-for-woocommerce-addons.php:177
+msgid "Activated"
+msgstr ""
+
+#: ../includes/admin/class-klarna-for-woocommerce-addons.php:180
+msgid "Deactivated"
+msgstr ""
+
+#: ../includes/admin/class-klarna-for-woocommerce-addons.php:375, ../klarna-checkout-for-woocommerce.php:176
 msgid "Settings"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:177
-msgid "Support"
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:214
-msgid "Klarna Checkout error (%s)."
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:216
-msgid "Klarna Checkout error. Please try again."
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:221
-msgid "An error occurred during communication with Klarna (Klarna order ID is missing). Please try again."
+#: ../includes/admin/class-klarna-for-woocommerce-skin.php:84
+msgid "There was an error installing the addon. Please try again."
 msgstr ""
 
 #: ../includes/class-klarna-checkout-for-woocommerce-admin-notices.php:86
@@ -75,26 +87,26 @@ msgstr ""
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:148, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:660, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:447
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:148, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:696, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:447
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:151, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:663, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:450
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:151, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:699, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:450
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:154, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:666, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:453
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:154, ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:702, ../includes/class-klarna-checkout-for-woocommerce-gateway.php:453
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:655
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:691
 msgid "Order created via Klarna Checkout API callback. Please verify the order in Klarnas system."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:679
+#: ../includes/class-klarna-checkout-for-woocommerce-api-callbacks.php:715
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
@@ -418,9 +430,6 @@ msgstr ""
 msgid "An account is already registered with your email address. Please log in."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-gdpr.php:31
-msgstr ""
-
 #: ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:216, ../includes/class-klarna-checkout-for-woocommerce-order-lines.php:217
 msgid "Sales Tax"
 msgstr ""
@@ -437,23 +446,23 @@ msgstr ""
 msgid "Shipping"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-subscription.php:225
+#: ../includes/class-klarna-checkout-for-woocommerce-subscription.php:223
 msgid "Subscription payment made with Klarna. Klarna order id: %s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-subscription.php:234
+#: ../includes/class-klarna-checkout-for-woocommerce-subscription.php:233
 msgid "Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-subscription.php:287
+#: ../includes/class-klarna-checkout-for-woocommerce-subscription.php:289
 msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-subscription.php:294
+#: ../includes/class-klarna-checkout-for-woocommerce-subscription.php:296
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../includes/class-klarna-checkout-for-woocommerce-subscription.php:319
+#: ../includes/class-klarna-checkout-for-woocommerce-subscription.php:321
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -497,30 +506,18 @@ msgstr ""
 msgid "Displays the number of orders created via the API callback feature during the last month."
 msgstr ""
 
-#: ../includes/admin/class-klarna-for-woocommerce-addons.php:59, ../includes/admin/class-klarna-for-woocommerce-addons.php:59, ../includes/admin/class-klarna-for-woocommerce-addons.php:73, ../includes/admin/class-klarna-for-woocommerce-addons.php:374
-msgid "Klarna Add-ons"
+#: ../klarna-checkout-for-woocommerce.php:177
+msgid "Support"
 msgstr ""
 
-#: ../includes/admin/class-klarna-for-woocommerce-addons.php:122
-msgid "Please install an add-on to be able to see the settings."
+#: ../klarna-checkout-for-woocommerce.php:214
+msgid "Klarna Checkout error (%s)."
 msgstr ""
 
-#: ../includes/admin/class-klarna-for-woocommerce-addons.php:174
-msgid "Install"
+#: ../klarna-checkout-for-woocommerce.php:216
+msgid "Klarna Checkout error. Please try again."
 msgstr ""
 
-#: ../includes/admin/class-klarna-for-woocommerce-addons.php:174
-msgid "Not installed"
-msgstr ""
-
-#: ../includes/admin/class-klarna-for-woocommerce-addons.php:177
-msgid "Activated"
-msgstr ""
-
-#: ../includes/admin/class-klarna-for-woocommerce-addons.php:180
-msgid "Deactivated"
-msgstr ""
-
-#: ../includes/admin/class-klarna-for-woocommerce-skin.php:84
-msgid "There was an error installing the addon. Please try again."
+#: ../klarna-checkout-for-woocommerce.php:221
+msgid "An error occurred during communication with Klarna (Klarna order ID is missing). Please try again."
 msgstr ""
