@@ -129,7 +129,6 @@ class KCO_Request {
 			// Get the error messages.
 			if ( null !== json_decode( $response['body'], true ) ) {
 				$errors = json_decode( $response['body'], true );
-				error_log( var_export( $errors, true ) );
 				foreach ( $errors['error_messages'] as $error ) {
 					$error_message = $error_message . ' ' . $error;
 				}

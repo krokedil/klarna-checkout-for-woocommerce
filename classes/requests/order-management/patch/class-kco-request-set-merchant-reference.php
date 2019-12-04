@@ -27,7 +27,7 @@ class KCO_Request_Set_Merchant_Reference extends KCO_Request {
 		$formated_response = $this->process_response( $response, $request_args, $request_url );
 
 		// Log the request.
-		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO set merchant reference', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code );
+		$log = KCO_Logger::format_log( $klarna_order_id, 'PATCH', 'KCO set merchant reference', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code );
 		KCO_Logger::log( $log );
 		return $formated_response;
 	}
@@ -49,13 +49,14 @@ class KCO_Request_Set_Merchant_Reference extends KCO_Request {
 	/**
 	 * Gets the request args for the API call.
 	 *
+	 * @param int $order_id The WooCommerce order id.
 	 * @return array
 	 */
-	protected function get_request_args() {
+	protected function get_request_args( $order_id ) {
 		return array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
-			'method'     => 'POST',
+			'method'     => 'PATCH',
 			'body'       => wp_json_encode( $this->get_body( $order_id ) ),
 		);
 	}

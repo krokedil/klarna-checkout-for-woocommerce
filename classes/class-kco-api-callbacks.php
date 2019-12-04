@@ -50,7 +50,6 @@ class KCO_API_Callbacks {
 	public function __construct() {
 		add_action( 'woocommerce_api_kco_wc_push', array( $this, 'push_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_notification', array( $this, 'notification_cb' ) );
-		add_action( 'woocommerce_api_kco_wc_validation', array( $this, 'validation_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_shipping_option_update', array( $this, 'shipping_option_update_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
 		add_action( 'kco_wc_punted_notification', array( $this, 'kco_wc_punted_notification_cb' ), 10, 2 );
@@ -140,39 +139,36 @@ class KCO_API_Callbacks {
 
 		if ( $order ) {
 			// Get the Klarna order data.
-			$response     = KCO_WC()->api->request_post_get_order( $klarna_order_id );
-			$klarna_order = apply_filters( 'kco_wc_api_callbacks_push_klarna_order', json_decode( $response['body'] ) );
+			$klarna_order = apply_filters(
+				'kco_wc_api_callbacks_push_klarna_order',
+				KCO_WC()->api->get_klarna_order( $klarna_order_id )
+			);
 
 			// The Woo order was already created. Check if order status was set (in process_payment_handler).
 			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
 
 				krokedil_log_events( $order_id, 'Klarna push callback. Updating order status.', $klarna_order );
 
-				if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
+				if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
 					$order->payment_complete( $klarna_order_id );
 					// translators: Klarna order ID.
-					$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+					$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
 					$order->add_order_note( $note );
-				} elseif ( 'REJECTED' === $klarna_order->fraud_status ) {
+				} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
 					$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
-				} elseif ( 'PENDING' === $klarna_order->fraud_status ) {
+				} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
 					// translators: Klarna order ID.
-					$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order->order_id ) );
+					$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
 					$order->update_status( 'on-hold', $note );
 				}
-			} else {
-				krokedil_log_events( $order_id, 'Klarna push callback. Order status already set to On hold/Processing/Completed.', $klarna_order );
 			}
 
 			// Acknowledge order in Klarna.
-			KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
-			KCO_WC()->api->request_post_set_merchant_reference(
-				$klarna_order_id,
-				array(
-					'merchant_reference1' => $order->get_order_number(),
-					'merchant_reference2' => $order->get_id(),
-				)
-			);
+			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+
+			// Set the merchant references for the order.
+			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
+
 		} else {
 			// Backup order creation.
 			$this->backup_order_creation( $klarna_order_id );
@@ -219,7 +215,6 @@ class KCO_API_Callbacks {
 		} else {
 			$post_body = file_get_contents( 'php://input' );
 			$data      = json_decode( $post_body, true );
-			krokedil_log_events( $order_id, 'Klarna notification callback data', $data );
 			wp_schedule_single_event( time() + 300, 'kco_wc_punted_notification', array( $klarna_order_id, $data ) );
 		}
 	}
@@ -232,203 +227,6 @@ class KCO_API_Callbacks {
 	 */
 	public function kco_wc_punted_notification_cb( $klarna_order_id, $data ) {
 		do_action( 'wc_klarna_notification_listener', $klarna_order_id, $data );
-	}
-
-	/**
-	 * Order validation callback function.
-	 * Response must be sent to Klarna API.
-	 *
-	 * @link https://developers.klarna.com/api/#checkout-api-callbacks-order-validation
-	 */
-	public function validation_cb() {
-		$post_body = file_get_contents( 'php://input' );
-		$data      = json_decode( $post_body, true );
-		$checkout  = WC()->checkout();
-
-		// Set currency if multi currency plugins needs this when calculating cart.
-		$this->klarna_purchase_currency = sanitize_text_field( $data['purchase_currency'] );
-
-		if ( is_array( $data ) ) {
-			$log_order                 = $data;
-			$log_order['html_snippet'] = '';
-			krokedil_log_events( null, 'Klarna validation callback data', $log_order );
-			KCO_WC()->logger->log( 'Klarna validation callback data: ' . stripslashes_deep( json_encode( $log_order ) ) );
-		}
-
-		// Country.
-		WC()->customer->set_billing_country( strtoupper( sanitize_text_field( $data['billing_address']['country'] ) ) );
-		WC()->customer->set_shipping_country( strtoupper( sanitize_text_field( $data['shipping_address']['country'] ) ) );
-
-		// County/State.
-		if ( isset( $data['billing_address']['region'] ) ) {
-			WC()->customer->set_billing_state( sanitize_text_field( $data['billing_address']['region'] ) );
-			WC()->customer->set_shipping_state( sanitize_text_field( $data['shipping_address']['region'] ) );
-		}
-
-		// Postcode.
-		WC()->customer->set_billing_postcode( sanitize_text_field( $data['billing_address']['postal_code'] ) );
-		WC()->customer->set_shipping_postcode( sanitize_text_field( $data['shipping_address']['postal_code'] ) );
-
-		WC()->cart->calculate_totals();
-
-		$all_in_stock     = true;
-		$shipping_valid   = true;
-		$shipping_chosen  = false;
-		$needs_shipping   = false;
-		$coupon_valid     = true;
-		$has_subscription = false;
-		$needs_login      = false;
-		$email_exists     = false;
-		$totals_match     = true;
-
-		$session_id = $_GET['kco_session_id'];
-		$session    = $this->get_session_from_id( $session_id );
-		if ( is_array( $data ) ) {
-			$log_session                             = $session;
-			$log_session['_krokedil_events_session'] = '';
-			krokedil_log_events( null, 'Klarna validation callback session data', $log_session );
-			KCO_WC()->logger->log( 'Klarna validation callback session data: ' . stripslashes_deep( json_encode( $log_session ) ) );
-		}
-
-		// Check stock for each item and shipping method and if subscription.
-		$cart_items = $data['order_lines'];
-		foreach ( $cart_items as $cart_item ) {
-			if ( 'physical' === $cart_item['type'] || 'digital' === $cart_item['type'] ) {
-
-				// Get product by SKU or ID.
-				if ( wc_get_product_id_by_sku( $cart_item['reference'] ) ) {
-					$cart_item_product = wc_get_product( wc_get_product_id_by_sku( $cart_item['reference'] ) );
-				} else {
-					$cart_item_product = wc_get_product( $cart_item['reference'] );
-				}
-
-				if ( $cart_item_product ) {
-					if ( ! $cart_item_product->has_enough_stock( $cart_item['quantity'] ) || 'outofstock' === $cart_item_product->get_stock_status() ) {
-						$all_in_stock = false;
-					}
-					if ( ! $cart_item_product->is_virtual() ) {
-						if ( class_exists( 'WC_Subscriptions_Product' ) && WC_Subscriptions_Product::is_subscription( $cart_item_product ) ) {
-							if ( 0 === WC_Subscriptions_Product::get_trial_length( $cart_item_product ) ) {
-								$needs_shipping = true;
-							} else {
-								$needs_shipping = false;
-							}
-						} else {
-							$needs_shipping = true;
-						}
-					}
-				}
-
-				if ( class_exists( 'WC_Subscriptions_Cart' ) ) {
-					$has_subscription = ( WC_Subscriptions_Product::is_subscription( $cart_item_product ) === true ) ? true : $has_subscription;
-				}
-			} elseif ( 'shipping_fee' === $cart_item['type'] ) {
-				$shipping_chosen = true;
-			}
-		}
-
-		if ( $needs_shipping ) {
-			$shipping_valid = $shipping_chosen;
-		}
-
-		// Validate any potential coupons.
-		if ( ! empty( json_decode( $data['merchant_data'] )->coupons ) ) {
-			$coupons  = json_decode( $data['merchant_data'] )->coupons;
-			$emails[] = $data['billing_address']['email'];
-			foreach ( $coupons as $coupon ) {
-				$wc_coupon = new WC_Coupon( $coupon );
-
-				$limit_per_user = $wc_coupon->get_usage_limit_per_user();
-				if ( 0 < $limit_per_user ) {
-					$used_by         = $wc_coupon->get_used_by();
-					$usage_count     = 0;
-					$user_id_matches = array( get_current_user_id() );
-					// Check usage against emails.
-					foreach ( $emails as $email ) {
-						WC()->customer->set_email( $email );
-						$usage_count      += count( array_keys( $used_by, $email, true ) );
-						$user              = get_user_by( 'email', $email );
-						$user_id_matches[] = $user ? $user->ID : 0;
-					}
-					// Check against billing emails of existing users.
-					$users_query     = new WP_User_Query(
-						array(
-							'fields'     => 'ID',
-							'meta_query' => array(
-								array(
-									'key'     => '_billing_email',
-									'value'   => $email,
-									'compare' => 'IN',
-								),
-							),
-						)
-					); // WPCS: slow query ok.
-					$user_id_matches = array_unique( array_filter( array_merge( $user_id_matches, $users_query->get_results() ) ) );
-					foreach ( $user_id_matches as $user_id ) {
-						$usage_count += count( array_keys( $used_by, (string) $user_id, true ) );
-					}
-					if ( $usage_count >= $wc_coupon->get_usage_limit_per_user() ) {
-						$coupon_valid = false;
-					}
-				}
-			}
-		}
-
-		if ( ! empty( json_decode( $data['merchant_data'] )->is_user_logged_in ) ) {
-			$is_user_logged_in = json_decode( $data['merchant_data'] )->is_user_logged_in;
-		}
-		// Check if any product is subscription product.
-		if ( class_exists( 'WC_Subscriptions_Cart' ) && $has_subscription ) {
-			if ( ! $checkout->is_registration_enabled() && ! $is_user_logged_in ) {
-				$needs_login = true;
-			}
-			// If customer has account but isn't logged in - tell them to login.
-			if ( email_exists( $data['billing_address']['email'] ) && ! $is_user_logged_in ) {
-				$email_exists = true;
-			}
-		}
-
-		// Check if registration is required, customer is not logged in but have an existing account.
-		if ( $checkout->is_registration_required() && ! $is_user_logged_in && email_exists( $data['billing_address']['email'] ) ) {
-			$needs_login = true;
-		}
-
-		// Check cart totals.
-		$klarna_total = $data['order_amount'];
-		$wc_total     = intval( round( WC()->cart->get_total( 'edit' ) * 100 ) );
-		if ( $klarna_total !== $wc_total ) {
-			// Do another check against raw session data if the first fails.
-			$wc_total = intval( round( maybe_unserialize( $session['cart_totals'] )['total'] * 100 ) );
-			if ( $klarna_total !== $wc_total ) {
-				$totals_match = false;
-				KCO_WC()->logger->log( 'Cart totals does not match in validation callback. Klarna_total: ' . $klarna_total . ' WC_total: ' . $wc_total . ' Cart Totals: ' . maybe_unserialize( $session['cart_totals'] ) );
-			}
-		}
-
-		do_action( 'kco_validate_checkout', $data, $all_in_stock, $shipping_chosen );
-
-		if ( $all_in_stock && $shipping_valid && $coupon_valid && $totals_match && ! $needs_login && ! $email_exists ) {
-			header( 'HTTP/1.0 200 OK' );
-		} else {
-			header( 'HTTP/1.0 303 See Other' );
-			if ( ! $all_in_stock ) {
-				$logger = new WC_Logger();
-				$logger->add( 'klarna-checkout-for-woocommerce', 'Stock validation failed for SKU ' . $cart_item['reference'] );
-				header( 'Location: ' . wc_get_cart_url() . '?stock_validate_failed' );
-			} elseif ( ! $shipping_valid ) {
-				header( 'Location: ' . wc_get_checkout_url() . '?no_shipping' );
-			} elseif ( ! $coupon_valid ) {
-				header( 'Location: ' . wc_get_checkout_url() . '?invalid_coupon' );
-			} elseif ( $needs_login ) {
-				header( 'Location: ' . wc_get_checkout_url() . '?needs_login' );
-			} elseif ( $email_exists ) {
-				header( 'Location: ' . wc_get_checkout_url() . '?email_exists' );
-			} elseif ( ! $totals_match ) {
-				header( 'Location: ' . wc_get_checkout_url() . '?totals_dont_match' );
-			} else {
-				header( 'Location: ' . wc_get_checkout_url() . '?unable_to_process' );
-			}
-		}
 	}
 
 	/**
@@ -467,7 +265,6 @@ class KCO_API_Callbacks {
 	 * @throws Exception WC_Data_Exception.
 	 */
 	public function backup_order_creation( $klarna_order_id ) {
-		KCO_WC()->logger->log( 'Starting backup order creation for Klarna order ID ' . $klarna_order_id );
 		$response = KCO_WC()->api->request_post_get_order( $klarna_order_id );
 
 		if ( ! is_wp_error( $response ) && ( $response['response']['code'] >= 200 && $response['response']['code'] <= 299 ) ) {
@@ -482,8 +279,6 @@ class KCO_API_Callbacks {
 
 		} else {
 			// Retrieve error.
-			$error = KCO_WC()->api->extract_error_messages( $response );
-			KCO_WC()->logger->log( 'ERROR when requesting Klarna order in backup_order_creation (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response ) ) );
 			return false;
 		}
 	}

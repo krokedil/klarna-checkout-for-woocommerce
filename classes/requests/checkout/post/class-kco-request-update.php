@@ -17,11 +17,12 @@ class KCO_Request_Update extends KCO_Request {
 	 * Makes the request.
 	 *
 	 * @param string $klarna_order_id The Klarna order id.
+	 * @param int    $order_id The WooCommerce order id.
 	 * @return array
 	 */
-	public function request( $klarna_order_id ) {
+	public function request( $klarna_order_id, $order_id = null ) {
 		$request_url       = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
-		$request_args      = apply_filters( 'kco_wc_update_order', $this->get_request_args() );
+		$request_args      = apply_filters( 'kco_wc_update_order', $this->get_request_args( $order_id ) );
 		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
 		$formated_response = $this->process_response( $response, $request_args, $request_url );
@@ -35,9 +36,10 @@ class KCO_Request_Update extends KCO_Request {
 	/**
 	 * Gets the request body.
 	 *
+	 * @param string $order_id The WooCommerce order id.
 	 * @return array
 	 */
-	public function get_body() {
+	public function get_body( $order_id ) {
 		$cart_data = new KCO_Request_Cart();
 		$cart_data->process_data();
 
@@ -47,7 +49,7 @@ class KCO_Request_Update extends KCO_Request {
 			'purchase_country'   => $this->get_purchase_country(),
 			'purchase_currency'  => get_woocommerce_currency(),
 			'locale'             => substr( str_replace( '_', '-', get_locale() ), 0, 5 ),
-			'merchant_urls'      => KCO_WC()->merchant_urls->get_urls(),
+			'merchant_urls'      => KCO_WC()->merchant_urls->get_urls( $order_id ),
 			'order_amount'       => $cart_data->get_order_amount(),
 			'order_lines'        => $cart_data->get_order_lines(),
 			'order_tax_amount'   => $cart_data->get_order_tax_amount( $cart_data->get_order_lines() ),
@@ -82,14 +84,15 @@ class KCO_Request_Update extends KCO_Request {
 	/**
 	 * Gets the request args for the API call.
 	 *
+	 * @param string $order_id The WooCommerce order id.
 	 * @return array
 	 */
-	protected function get_request_args() {
+	protected function get_request_args( $order_id ) {
 		return array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'method'     => 'POST',
-			'body'       => wp_json_encode( $this->get_body() ),
+			'body'       => wp_json_encode( $this->get_body( $order_id ) ),
 		);
 	}
 }

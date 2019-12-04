@@ -18,21 +18,21 @@ class KCO_Merchant_URLs {
 	/**
 	 * Gets formatted merchant URLs array.
 	 *
+	 * @param string $order_id The WooCommerce order id.
 	 * @return array
 	 */
-	public function get_urls() {
+	public function get_urls( $order_id = null ) {
 		$merchant_urls = array(
-			'terms'                  => $this->get_terms_url(),                  // Required.
-			'checkout'               => $this->get_checkout_url(),               // Required.
-			'confirmation'           => $this->get_confirmation_url(),           // Required.
-			'push'                   => $this->get_push_url(),                   // Required.
-			'validation'             => $this->get_validation_url(),             // HTTPS.
-			'shipping_option_update' => $this->get_shipping_option_update_url(), // HTTPS.
+			'terms'                  => $this->get_terms_url(),                   // Required.
+			'checkout'               => $this->get_checkout_url(),                // Required.
+			'confirmation'           => $this->get_confirmation_url( $order_id ), // Required.
+			'push'                   => $this->get_push_url(),                    // Required.
+			'validation'             => $this->get_validation_url(),              // HTTPS.
+			'shipping_option_update' => $this->get_shipping_option_update_url(),  // HTTPS.
 			'notification'           => $this->get_notification_url(),
 		);
 
 		return apply_filters( 'kco_wc_merchant_urls', $merchant_urls );
-
 	}
 
 	/**
@@ -65,17 +65,17 @@ class KCO_Merchant_URLs {
 	 *
 	 * Required. URL of merchant confirmation page. Should be different than checkout and confirmation URLs.
 	 *
+	 * @param string $order_id The WooCommerce order id.
 	 * @return string
 	 */
-	private function get_confirmation_url() {
-		$confirmation_url = add_query_arg(
-			array(
-				'confirm'         => 'yes',
-				'kco_wc_order_id' => '{checkout.order.id}',
-			), wc_get_checkout_url()
+	private function get_confirmation_url( $order_id ) {
+		if ( null !== $order_id ) {
+			$order = wc_get_order( $order_id );
+			return apply_filters( 'kco_wc_confirmation_url', $order->get_checkout_order_received_url() );
+		}
+		return apply_filters(
+			'kco_wc_confirmation_url', wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) )
 		);
-
-		return apply_filters( 'kco_wc_confirmation_url', $confirmation_url );
 	}
 
 	/**

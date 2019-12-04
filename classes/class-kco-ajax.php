@@ -72,11 +72,10 @@ class KCO_AJAX extends WC_AJAX {
 		WC()->cart->calculate_totals();
 
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
-		$request         = new KCO_Request_Update();
-		$response        = $request->request( $klarna_order_id );
+		$klarna_order    = KCO_WC()->api->update_klarna_order( $klarna_order_id );
+
 		// If the update failed - reload the checkout page and display the error.
-		if ( is_wp_error( $response ) ) {
-			kco_extract_error_message( $response );
+		if ( ! $klarna_order ) {
 			wp_send_json_error();
 			wp_die();
 		}
@@ -103,11 +102,13 @@ class KCO_AJAX extends WC_AJAX {
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_fees();
 		WC()->cart->calculate_totals();
-		$request  = new KCO_Request_Update();
-		$response = $request->request( $klarna_order_id );
+
+		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+
+		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
+
 		// If the update failed - reload the checkout page and display the error.
-		if ( is_wp_error( $response ) ) {
-			kco_extract_error_message( $response );
+		if ( ! $klarna_order ) {
 			wp_send_json_error();
 			wp_die();
 		}
@@ -170,17 +171,15 @@ class KCO_AJAX extends WC_AJAX {
 
 			// Check if we have a klarna order id.
 			if ( empty( $klarna_order_id ) ) {
-				// $klarna_order_id is missing, redirect the customer to cart page (to avoid infinite reloading of checkout page).
-				$return['redirect_url'] = add_query_arg( 'kco-order', 'missing-id', wc_get_cart_url() );
-				wp_send_json_error( $return );
+				wc_add_notice( 'Klarna order id is missing.', 'error' );
+				wp_send_json_error();
 				wp_die();
 			} else {
 				// Get the Klarna order from Klarna.
-				$request      = new KCO_Request_Retrieve();
-				$klarna_order = $request->request( $klarna_order_id );
+				$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
 				// Check if we got a wp_error.
-				if ( is_wp_error( $klarna_order ) ) {
+				if ( ! $klarna_order ) {
 					kco_extract_error_message( $klarna_order );
 					wp_send_json_error();
 					wp_die();
@@ -203,11 +202,10 @@ class KCO_AJAX extends WC_AJAX {
 				// Check if payment status is checkout_incomplete.
 				if ( 'checkout_incomplete' === $klarna_order['status'] ) {
 					// If it is, update order.
-					$request  = new KCO_Request_Update();
-					$response = $request->request( $klarna_order_id );
+					$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
+
 					// If the update failed - reload the checkout page and display the error.
-					if ( is_wp_error( $response ) ) {
-						kco_extract_error_message( $response );
+					if ( ! $klarna_order ) {
 						wp_send_json_error();
 						wp_die();
 					}
@@ -236,12 +234,8 @@ class KCO_AJAX extends WC_AJAX {
 
 		// Check if we have a klarna order id.
 		if ( empty( $klarna_order_id ) ) {
-			// $klarna_order_id is missing, redirect the customer to cart page (to avoid infinite reloading of checkout page).
-			KCO_WC()->logger->log( 'ERROR. Klarna Checkout order ID missing in kco_wc_iframe_shipping_address_change function. Redirecting customer to cart page.' );
-			krokedil_log_events( null, 'ERROR. Klarna Checkout order ID missing in kco_wc_iframe_shipping_address_change function. Redirecting customer to cart page.', '' );
-			$return                 = array();
-			$return['redirect_url'] = add_query_arg( 'kco-order', 'missing-id', wc_get_cart_url() );
-			wp_send_json_error( $return );
+			wc_add_notice( 'Klarna order id is missing.', 'error' );
+			wp_send_json_error();
 			wp_die();
 		}
 
@@ -255,10 +249,6 @@ class KCO_AJAX extends WC_AJAX {
 		}
 
 		$customer_data = array();
-
-		// Send customer data to frontend.
-		$email  = KCO_Checkout_Form_Fields::maybe_set_customer_email();
-		$states = KCO_Checkout_Form_Fields::maybe_set_customer_state();
 
 		if ( isset( $email ) ) {
 			$customer_data['billing_email'] = $email;
@@ -290,59 +280,24 @@ class KCO_AJAX extends WC_AJAX {
 			$customer_data['shipping_country'] = $country;
 		}
 
-		// If customer is not logged in and this is a subscription purchase.
-		$must_login         = 'no';
-		$must_login_message = apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) );
-		if ( ! is_user_logged_in() && ( ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) || 'no' === get_option( 'woocommerce_enable_guest_checkout' ) || '1' === $_POST['createaccount'] ) ) {
-			if ( email_exists( $email ) ) {
-				// Email exist in a user account, customer must login.
-				$must_login = 'yes';
-			}
-		}
-
-		// Check if email exist in a user account.
-		if ( email_exists( $email ) ) {
-			$email_exists = 'yes';
-		} else {
-			$email_exists = 'no';
-		}
-
 		WC()->customer->set_props( $customer_data );
 		WC()->customer->save();
 
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_totals();
 
-		$request  = new KCO_Request_Update();
-		$response = $request->request( $klarna_order_id );
-		if ( is_wp_error( $response ) ) {
-			kco_extract_error_message( $response );
+		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
+
+		if ( $klarna_order ) {
 			wp_send_json_error();
 			wp_die();
 		}
 
 		wp_send_json_success(
 			array(
-				'customer_data'      => $customer_data,
-				'must_login'         => $must_login,
-				'must_login_message' => $must_login_message,
-				'email_exists'       => $email_exists,
+				'customer_data' => $customer_data,
 			)
 		);
-		wp_die();
-	}
-
-	/**
-	 * Sets validation session value.
-	 */
-	public static function kco_wc_set_session_value() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_set_session_value' ) ) { // Input var okay.
-			wp_send_json_error( 'bad_nonce' );
-			exit;
-		}
-		WC()->session->set( 'kco_valid_checkout', $_POST['bool'] );
-
-		wp_send_json_success();
 		wp_die();
 	}
 
@@ -357,17 +312,15 @@ class KCO_AJAX extends WC_AJAX {
 			exit;
 		}
 
-		$request  = new KCO_Request_Retrieve();
-		$response = $request->request( WC()->session->get( 'kco_wc_order_id' ) );
-		if ( is_wp_error( $response ) ) {
-			kco_extract_error_message( $response );
-			wp_send_json_error( $response );
+		$klarna_order = KCO_WC()->api->get_klarna_order( WC()->session->get( 'kco_wc_order_id' ) );
+		if ( ! $klarna_order ) {
+			wp_send_json_error( $klarna_order );
 			wp_die();
 		}
 		wp_send_json_success(
 			array(
-				'billing_address'  => $response['billing_address'],
-				'shipping_address' => $response['shipping_address'],
+				'billing_address'  => $klarna_order['billing_address'],
+				'shipping_address' => $klarna_order['shipping_address'],
 			)
 		);
 		wp_die();

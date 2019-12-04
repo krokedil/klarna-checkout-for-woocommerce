@@ -15,36 +15,33 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param int $order_id The WooCommerce order id.
  * @return array
  */
-function kco_create_order_update_order( $order_id = null ) {
+function kco_create_or_update_order( $order_id = null ) {
 	// Need to calculate these here, because WooCommerce hasn't done it yet.
 	WC()->cart->calculate_fees();
 	WC()->cart->calculate_shipping();
 	WC()->cart->calculate_totals();
 	if ( WC()->session->get( 'kco_wc_order_id' ) ) { // Check if we have an order id.
 		// Try to update the order, if it fails try to create new order.
-		$request  = new KCO_Request_Update();
-		$response = $request->request( WC()->session->get( 'kco_wc_order_id' ) );
-		if ( is_wp_error( $response ) ) {
+		$klarna_order = KCO_WC()->api->update_klarna_order( WC()->session->get( 'kco_wc_order_id' ) );
+		if ( ! $klarna_order ) {
 			// If update order failed try to create new order.
-			$request  = new KCO_Request_Create();
-			$response = $request->request();
-			if ( is_wp_error( $response ) ) {
-				// If failed then print error message.
-				return kco_extract_error_message( $response );
+			$klarna_order = KCO_WC()->api->create_klarna_order();
+			if ( ! $klarna_order ) {
+				// If failed then bail.
+				return;
 			}
-			WC()->session->set( 'kco_wc_order_id', $response['order_id'] );
-			return $response;
+			WC()->session->set( 'kco_wc_order_id', $klarna_order['order_id'] );
+			return $klarna_order;
 		}
-		return $response;
+		return $klarna_order;
 	} else {
 		// Create new order, since we dont have one.
-		$request  = new KCO_Request_Create();
-		$response = $request->request();
-		if ( is_wp_error( $response ) ) {
-			return kco_extract_error_message( $response );
+		$klarna_order = KCO_WC()->api->create_klarna_order();
+		if ( ! $klarna_order ) {
+			return;
 		}
-		WC()->session->set( 'kco_wc_order_id', $response['order_id'] );
-		return $response;
+		WC()->session->set( 'kco_wc_order_id', $klarna_order['order_id'] );
+		return $klarna_order;
 	}
 }
 
@@ -52,7 +49,7 @@ function kco_create_order_update_order( $order_id = null ) {
  * Echoes Klarna Checkout iframe snippet.
  */
 function kco_wc_show_snippet() {
-	$klarna_order = kco_create_order_update_order();
+	$klarna_order = kco_create_or_update_order();
 	do_action( 'kco_wc_show_snippet', $klarna_order );
 	echo $klarna_order['html_snippet'];
 }
@@ -475,4 +472,15 @@ function is_kco_confirmation() {
  */
 function kco_extract_error_message( $wp_error ) {
 	wc_print_notice( $wp_error->get_error_message(), 'error' );
+}
+
+/**
+ * Unsets the sessions used by the plguin.
+ *
+ * @return void
+ */
+function kco_unset_sessions() {
+	WC()->session->__unset( 'kco_valid_checkout' );
+	WC()->session->__unset( 'kco_wc_prefill_consent' );
+	WC()->session->__unset( 'kco_wc_order_id' );
 }

@@ -236,22 +236,24 @@ if ( ! class_exists( 'KCO' ) ) {
 			}
 
 			// Classes.
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gateway.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api-callbacks.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-templates.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-ajax.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api-callbacks.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-credentials.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-logger.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-fields.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-extra-checkout-fields.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-status.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gateway.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gdpr.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-form-fields.php'; // move to includes.
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-logger.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-status.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-subscription.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-templates.php';
+
+			// Admin includes.
 			if ( is_admin() ) {
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-kco-admin-notices.php';
-				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-wc-klarna-banners.php';
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-for-woocommerce-addons.php';
+				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-wc-klarna-banners.php';
 			}
 
 			// Requests.
@@ -272,12 +274,12 @@ if ( ! class_exists( 'KCO' ) ) {
 
 			// Includes.
 			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
-			include_once KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
 
 			// Set class variables.
-			$this->merchant_urls = new KCO_Merchant_URLs();
 			$this->credentials   = new KCO_Credentials();
+			$this->merchant_urls = new KCO_Merchant_URLs();
 			$this->logger        = new KCO_Logger();
+			$this->api           = new KCO_API();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );

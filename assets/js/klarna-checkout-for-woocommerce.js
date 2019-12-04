@@ -8,27 +8,45 @@ jQuery(function($) {
 		bodyEl: $('body'),
 		checkoutFormSelector: $( 'form.checkout' ),
 
-		// Order notes
+		// Order notes.
 		orderNotesValue: '',
 		orderNotesSelector: 'textarea#order_comments',
 		orderNotesEl: $('textarea#order_comments'),
-
-		// Order notes
-		extraFieldsValues: {},
-		extraFieldsSelectorText: 'div#kco-extra-fields input[type="text"], div#kco-extra-fields input[type="password"], div#kco-extra-fields textarea, div#kco-extra-fields input[type="email"], div#kco-extra-fields input[type="tel"]',
-		extraFieldsSelectorNonText: 'div#kco-extra-fields select, div#kco-extra-fields input[type="radio"], div#kco-extra-fields input[type="checkbox"], div#kco-extra-fields input.checkout-date-picker, input#terms input[type="checkbox"]',
-
-		// Payment method
+				
+		// Payment method.
 		paymentMethodEl: $('input[name="payment_method"]'),
 		paymentMethod: '',
 		selectAnotherSelector: '#klarna-checkout-select-other',
-
-		// Form fields
+		
+		// Form fields.
 		shippingUpdated: false,
 		blocked: false,
-
-		// Email exist
+		
+		// Email exist.
 		emailExists: kco_params.email_exists,
+
+		preventPaymentMethodChange: false,
+		
+		// Mutation observer.
+		observer: new MutationObserver(function(mutationsList) {
+			for ( var mutation of mutationsList ) {
+				if ( mutation.type == 'childList' ) {
+					if( mutation.addedNodes[0] ) {
+						if ( mutation.addedNodes[0].querySelector("#kco-order-success") ) { // Success.
+							$( 'body' ).trigger( 'kco_order_validation', true );
+						} else if( mutation.addedNodes[0].querySelector("#kco-order-failed") ) { // Not used now, but potential error from us.
+							$( 'body' ).trigger( 'kco_order_validation', false );
+						} else if ( mutation.addedNodes[0].querySelector(".woocommerce-error") ) { // WooCommerce error.
+							$( 'body' ).trigger( 'kco_order_validation', false );
+						}
+					}
+				}
+			}
+		}),
+		
+		config: {
+			childList: true,
+		},
 
 		documentReady: function() {
 			kco_wc.log(kco_params);
@@ -37,7 +55,7 @@ jQuery(function($) {
 			} else {
 				kco_wc.paymentMethod = 'kco';
 			}
-
+			kco_wc.moveExtraCheckoutFields();
 			kco_wc.confirmLoading();
 		},
 
@@ -182,6 +200,7 @@ jQuery(function($) {
 
 		// When payment method is changed to KCO in regular WC Checkout page.
 		maybeChangeToKco: function() {
+			if( ! kco_wc.preventPaymentMethodChange ) {
 			kco_wc.log($(this).val());
 
 			if ( 'kco' === $(this).val() ) {
@@ -211,6 +230,7 @@ jQuery(function($) {
 					}
 				});
 			}
+		}
 		},
 
 		log: function(message) {
@@ -235,27 +255,28 @@ jQuery(function($) {
 			}
 		},
 
-		// Set Woo address field values when shipping address change event has triggered.
-		setFieldValues: function( data ) {
-			// Billing fields
-			$('#billing_email').val(data.customer_data.billing_email);
-			$('#billing_postcode').val(data.customer_data.billing_postcode);
-			$('#billing_state').val(data.customer_data.billing_state);
-			$('#billing_country').val(data.customer_data.billing_country);
+		/**
+		 * Moves all non standard fields to the extra checkout fields.
+		 */
+		moveExtraCheckoutFields: function() {
+			console.log( '?!' );
+			// Move order comments.
+			$('.woocommerce-additional-fields').appendTo('#kco-extra-checkout-fields');
 
-			// Shipping fields
-			$('#shipping_postcode').val(data.customer_data.shipping_postcode);
-			$('#shipping_state').val(data.customer_data.shipping_state);
-			$('#shipping_country').val(data.customer_data.billing_country);
-
-			// Trigger changes
-			$('#billing_email').change();
-			$('#billing_email').blur();
+			let form = $('form[name="checkout"] input, form[name="checkout"] select, textarea');
+			for ( i = 0; i < form.length; i++ ) {
+				let name = form[i]['name'];
+				// Check if this is a standard field.
+				if ( $.inArray( name, kco_params.standard_woo_checkout_fields ) === -1 ) {
+					// This is not a standard Woo field, move to our div.
+					$('p#' + name + '_field').appendTo('#kco-extra-checkout-fields');
+				}
+			}
 		},
 
 		getKlarnaOrder: function() {
-			console.log( 'get order' );
 			kco_wc.kcoSuspend();
+			kco_wc.preventPaymentMethodChange = true;
 			$('.woocommerce-checkout-review-order-table').block({
 				message: null,
 				overlayCSS: {
@@ -301,26 +322,6 @@ jQuery(function($) {
 			$('#shipping_postcode').val( data.shipping_address.postal_code );
 		},
 
-		observer: new MutationObserver(function(mutationsList) {
-			for ( var mutation of mutationsList ) {
-				if ( mutation.type == 'childList' ) {
-					if( mutation.addedNodes[0] ) {
-						if ( mutation.addedNodes[0].querySelector("#kco-order-success") ) { // Success.
-							$( 'body' ).trigger( 'kco_order_validation', true );
-						} else if( mutation.addedNodes[0].querySelector("#kco-order-failed") ) { // Not used now, but potential error from us.
-							$( 'body' ).trigger( 'kco_order_validation', false );
-						} else if ( mutation.addedNodes[0].querySelector(".woocommerce-error") ) { // WooCommerce error.
-							$( 'body' ).trigger( 'kco_order_validation', false );
-						}
-					}
-				}
-			}
-		}),
-		
-		config: {
-			childList: true,
-		},
-
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
 			kco_wc.observer.observe( kco_wc.checkoutFormSelector[0], kco_wc.config );
@@ -340,7 +341,6 @@ jQuery(function($) {
 						'shipping_address_change': function(data) {
 							kco_wc.log('shipping_address_change');
 							kco_wc.log(data);
-							var form_data = JSON.parse( sessionStorage.getItem( 'KCOFieldData' ) );
 							$('.woocommerce-checkout-review-order-table').block({
 								message: null,
 								overlayCSS: {
@@ -362,26 +362,10 @@ jQuery(function($) {
 									},
 									success: function (response) {
 										kco_wc.log(response);
-										// Set emailExists variable. Used if customers clicks the create account checkbox.
-										kco_wc.emailExists = response.data.email_exists;
-
-										if( 'yes' == response.data.must_login ) {
-											// Customer might need to login. Inform customer and freeze KCO checkout.
-											kco_wc.kcoSuspend( false );
-											var $form = $( 'form.checkout' );
-											$form.prepend( '<div id="kco-login-notice" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' + response.data.must_login_message + '</li></ul></div>' );
-											
-											var etop = $('form.checkout').offset().top;
-											$('html, body').animate({
-												scrollTop: etop
-											  }, 1000);
-										} else {
-											// All good release checkout and trigger update_checkout event
-											kco_wc.kcoResume();
-											kco_wc.validateRequiredFields();
-											kco_wc.setFieldValues( response.data );
-											$('body').trigger('update_checkout');	
-										}
+										// All good release checkout and trigger update_checkout event
+										kco_wc.kcoResume();
+										kco_wc.setFieldValues( response.data );
+										$('body').trigger('update_checkout');	
 									},
 									error: function (response) {
 										kco_wc.log(response);

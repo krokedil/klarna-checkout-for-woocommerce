@@ -66,9 +66,8 @@ class KCO_Gateway extends WC_Payment_Gateway {
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'address_notice' ) );
 
 		add_action( 'woocommerce_checkout_init', array( $this, 'prefill_consent' ) );
-		add_action( 'woocommerce_checkout_init', array( $this, 'show_log_in_notice' ) );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'show_thank_you_snippet' ) );
-		add_action( 'woocommerce_thankyou', array( $this, 'maybe_delete_klarna_sessions' ), 100, 1 );
+		add_action( 'woocommerce_thankyou', 'kco_unset_sessions', 100, 1 );
 
 		// Remove WooCommerce footer text from our settings page.
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ), 999 );
@@ -100,7 +99,6 @@ class KCO_Gateway extends WC_Payment_Gateway {
 	 */
 	public function process_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
-		krokedil_set_order_gateway_version( $order_id, KCO_WC_VERSION );
 
 		// Order-pay purchase (or subscription payment method change)
 		// 1. Redirect to receipt page.
@@ -256,7 +254,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 			}
 		}
 
-		$standard_woo_checkout_fields = array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'terms', 'account_username', 'account_password' );
+		$standard_woo_checkout_fields = array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'terms', 'account_username', 'account_password' );
 
 		$checkout_localize_params = array(
 			'update_cart_url'                      => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
@@ -269,8 +267,6 @@ class KCO_Gateway extends WC_Payment_Gateway {
 			'update_klarna_order_nonce'            => wp_create_nonce( 'kco_wc_update_klarna_order' ),
 			'iframe_shipping_address_change_url'   => WC_AJAX::get_endpoint( 'kco_wc_iframe_shipping_address_change' ),
 			'iframe_shipping_address_change_nonce' => wp_create_nonce( 'kco_wc_iframe_shipping_address_change' ),
-			'set_session_value_url'                => WC_AJAX::get_endpoint( 'kco_wc_set_session_value' ),
-			'set_session_value_nonce'              => wp_create_nonce( 'kco_wc_set_session_value' ),
 			'get_klarna_order_url'                 => WC_AJAX::get_endpoint( 'kco_wc_get_klarna_order' ),
 			'get_klarna_order_nonce'               => wp_create_nonce( 'kco_wc_get_klarna_order' ),
 			'logging'                              => $this->logging,
@@ -393,7 +389,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 	 *
 	 * @param  int $order_id WooCommerce order ID.
 	 *
-	 * @return void
+	 * @return mixed
 	 */
 	public function process_payment_handler( $order_id ) {
 		// Get the Klarna order ID.
@@ -404,20 +400,19 @@ class KCO_Gateway extends WC_Payment_Gateway {
 			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 		}
 
-		$request  = new KCO_Request_Retrieve();
-		$response = $request->request( $klarna_order_id );
-		if ( is_wp_error( $response ) ) {
-			kco_extract_error_message( $response );
+		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+		if ( ! $klarna_order ) {
+			return false;
 		}
 
-		if ( $order_id && ! is_wp_error( $response ) ) {
+		if ( $order_id && $klarna_order ) {
 
 			// Maybe set WC order transaction ID.
 			if ( empty( get_post_meta( $order_id, '_wc_klarna_order_id' ) ) ) {
-				update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $response['order_id'] ) );
+				update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
 			}
 			if ( empty( get_post_meta( $order_id, '_transaction_id' ) ) ) {
-				update_post_meta( $order_id, '_transaction_id', sanitize_key( $response['order_id'] ) );
+				update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order['order_id'] ) );
 			}
 
 			$environment = $this->testmode ? 'test' : 'live';
@@ -427,26 +422,16 @@ class KCO_Gateway extends WC_Payment_Gateway {
 			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
 
 			// Set shipping phone and email.
-			update_post_meta( $order_id, '_shipping_phone', sanitize_text_field( $response['shipping_address']['phone'] ) );
-			update_post_meta( $order_id, '_shipping_email', sanitize_text_field( $response['shipping_address']['email'] ) );
+			update_post_meta( $order_id, '_shipping_phone', sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+			update_post_meta( $order_id, '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
+
+			// Update the order with new confirmation page url.
+			$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id, $order_id );
 
 			// Let other plugins hook into this sequence.
-			do_action( 'kco_wc_process_payment', $order_id, $response );
-			/*
-			// Acknowledge order in Klarna.
-			$request  = new KCO_Request_Acknowledge_Order();
-			$response = $request->request( $klarna_order_id );
-			if ( is_wp_error( $response ) ) {
-				kco_extract_error_message( $response );
-			}
+			do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
 
-			// Set the merchant references for the order.
-			$request  = new KCO_Request_Set_Merchant_Reference();
-			$response = $request->request( $klarna_order_id, $order_id );
-			if ( is_wp_error( $response ) ) {
-				kco_extract_error_message( $response );
-			}
-			*/
+			$order->payment_complete( $klarna_order_id );
 		}
 	}
 
@@ -462,10 +447,16 @@ class KCO_Gateway extends WC_Payment_Gateway {
 
 			if ( is_object( $order ) && $order->get_transaction_id() ) {
 				$klarna_order_id = $order->get_transaction_id();
-				$request         = new KCO_Request_Retrieve();
-				$response        = $request->request( $klarna_order_id );
-				if ( ! is_wp_error( $response ) ) {
-					echo $response['html_snippet'];
+
+				// Acknowledge order in Klarna.
+				KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+
+				// Set the merchant references for the order.
+				KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
+
+				$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+				if ( $klarna_order ) {
+					echo $klarna_order['html_snippet'];
 				}
 			}
 
@@ -509,23 +500,6 @@ class KCO_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Show notice that tells customers they need to log in.
-	 */
-	public function show_log_in_notice() {
-		if ( isset( $_GET['login_required'] ) && 'yes' === $_GET['login_required'] ) {
-			wc_add_notice(
-				sanitize_textarea_field(
-					__(
-						'An account is already registered with your email address. Please log in.',
-						'klarna-checkout-for-woocommerce'
-					)
-				),
-				'error'
-			);
-		}
-	}
-
-	/**
 	 * Adds prefill consent to WC session.
 	 */
 	public function prefill_consent() {
@@ -563,14 +537,5 @@ class KCO_Gateway extends WC_Payment_Gateway {
 			}
 		}
 		return $class;
-	}
-
-	/**
-	 * Unsets Klarna specific WC sessions.
-	 *
-	 * @param string $order_id WC Order id.
-	 */
-	public function maybe_delete_klarna_sessions( $order_id ) {
-		KCO_WC()->api->maybe_clear_session_values();
 	}
 }
