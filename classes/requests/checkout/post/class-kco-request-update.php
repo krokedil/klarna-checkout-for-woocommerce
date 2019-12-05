@@ -59,6 +59,15 @@ class KCO_Request_Update extends KCO_Request {
 			'options'            => $request_options->get_options(),
 		);
 
+		// If we have an order id, set the merchant references.
+		if ( ! empty( $order_id ) ) {
+			$order = wc_get_order( $order_id );
+			// Set the merchant references to the order.
+			$request_body['merchant_reference1'] = $order_id;
+			$request_body['merchant_reference2'] = $order->get_order_number();
+			);
+		}
+
 		if ( kco_wc_prefill_allowed() ) {
 			$request_body['billing_address'] = array(
 				'email'           => WC()->checkout()->get_value( 'billing_email' ),
