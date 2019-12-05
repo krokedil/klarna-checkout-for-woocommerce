@@ -180,7 +180,6 @@ class KCO_AJAX extends WC_AJAX {
 
 				// Check if we got a wp_error.
 				if ( ! $klarna_order ) {
-					kco_extract_error_message( $klarna_order );
 					wp_send_json_error();
 					wp_die();
 				}
