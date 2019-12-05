@@ -21,14 +21,20 @@ class KCO_Request_Update extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $klarna_order_id, $order_id = null ) {
-		$request_url       = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
-		$request_args      = apply_filters( 'kco_wc_update_order', $this->get_request_args( $order_id ) );
+		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
+		$request_args = apply_filters( 'kco_wc_update_order', $this->get_request_args( $order_id ) );
+		// Check if we need to update.
+		if ( WC()->session->get( 'kco_update_md5' ) && WC()->session->get( 'kco_update_md5' ) === md5( wp_json_encode( $request_args ) ) ) {
+			// Return true, no update needed and prevents issues.
+			return true;
+		}
+		WC()->session->set( 'kco_update_md5', md5( wp_json_encode( $request_args ) ) );
 		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
 		$formated_response = $this->process_response( $response, $request_args, $request_url );
 
 		// Log the request.
-		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO create order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code );
+		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO update order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code );
 		KCO_Logger::log( $log );
 		return $formated_response;
 	}

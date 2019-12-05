@@ -19,8 +19,9 @@ class KCO_Request_Create extends KCO_Request {
 	 * @return array
 	 */
 	public function request() {
-		$request_url       = $this->get_api_url_base() . 'checkout/v3/orders';
-		$request_args      = apply_filters( 'kco_wc_create_order', $this->get_request_args() );
+		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders';
+		$request_args = apply_filters( 'kco_wc_create_order', $this->get_request_args() );
+		WC()->session->set( 'kco_update_md5', md5( wp_json_encode( $request_args ) ) );
 		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
 		$formated_response = $this->process_response( $response, $request_args, $request_url );
