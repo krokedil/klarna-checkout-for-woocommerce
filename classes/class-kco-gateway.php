@@ -451,9 +451,6 @@ class KCO_Gateway extends WC_Payment_Gateway {
 				// Acknowledge order in Klarna.
 				KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
 
-				// Set the merchant references for the order.
-				KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
-
 				$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 				if ( $klarna_order ) {
 					echo $klarna_order['html_snippet'];
