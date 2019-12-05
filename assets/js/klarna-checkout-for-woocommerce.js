@@ -259,7 +259,6 @@ jQuery(function($) {
 		 * Moves all non standard fields to the extra checkout fields.
 		 */
 		moveExtraCheckoutFields: function() {
-			console.log( '?!' );
 			// Move order comments.
 			$('.woocommerce-additional-fields').appendTo('#kco-extra-checkout-fields');
 
@@ -426,7 +425,7 @@ jQuery(function($) {
 						'validation_callback': function(data, callback) {
 							kco_wc.getKlarnaOrder();
 							$( 'body' ).on( 'kco_order_validation', function( event, bool ) {
-								callback({ shouldProceed: bool });
+								callback({ should_proceed: bool });
 							} );
 						}
 					});
