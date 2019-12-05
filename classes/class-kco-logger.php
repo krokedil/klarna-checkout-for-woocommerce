@@ -82,8 +82,25 @@ class KCO_Logger {
 				'code' => $code,
 			),
 			'timestamp'      => date( 'Y-m-d H:i:s' ),
+			'stack'          => self::get_stack(),
 			'plugin_version' => KCO_WC_VERSION,
 		);
+	}
+
+	/**
+	 * Gets the stack for the request.
+	 *
+	 * @return array
+	 */
+	public static function get_stack() {
+		$debug_data = debug_backtrace();
+		$stack      = array();
+		foreach ( $debug_data as $data ) {
+			if ( ! in_array( $data['function'], array( 'get_stack', 'format_log' ) ) ) {
+				$stack[] = $data['function'];
+			}
+		}
+		return $stack;
 	}
 
 }
