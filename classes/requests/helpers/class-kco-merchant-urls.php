@@ -73,9 +73,15 @@ class KCO_Merchant_URLs {
 			$order = wc_get_order( $order_id );
 			return apply_filters( 'kco_wc_confirmation_url', $order->get_checkout_order_received_url() );
 		}
-		return apply_filters(
-			'kco_wc_confirmation_url', wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) )
+
+		$confirmation_url = add_query_arg(
+			array(
+				'kco_confirm'  => 'yes',
+				'kco_order_id' => '{checkout.order.id}',
+			), wc_get_endpoint_url( 'order-received', '', wc_get_page_permalink( 'checkout' ) )
 		);
+
+		return apply_filters( 'kco_wc_confirmation_url', $confirmation_url );
 	}
 
 	/**

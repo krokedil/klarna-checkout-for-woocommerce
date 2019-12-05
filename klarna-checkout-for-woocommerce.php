@@ -144,7 +144,8 @@ if ( ! class_exists( 'KCO' ) ) {
 		protected function __construct() {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
-			add_action( 'template_redirect', array( $this, 'maybe_display_kco_order_error_message' ) );
+			// "Fallback" redirection to proper order thank you page if we have one.
+			add_action( 'init', array( $this, 'redirect_to_thankyou' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
@@ -201,27 +202,6 @@ if ( ! class_exists( 'KCO' ) ) {
 				echo "<div class='" . esc_attr( $notice['class'] ) . "'><p>";
 				echo wp_kses( $notice['message'], array( 'a' => array( 'href' => array() ) ) );
 				echo '</p></div>';
-			}
-		}
-
-		/**
-		 * Display Klarna order error in cart page if customer have been redirected to cart because of a communication issue.
-		 */
-		public function maybe_display_kco_order_error_message() {
-			if ( class_exists( 'WooCommerce' ) ) {
-				if ( is_cart() && isset( $_GET['kco-order'] ) && 'error' === $_GET['kco-order'] ) {
-					if ( isset( $_GET['reason'] ) ) {
-						$reason  = sanitize_textarea_field( base64_decode( $_GET['reason'] ) );
-						$text    = __( 'Klarna Checkout error', 'klarna-checkout-for-woocommerce' ) . ' %s.';
-						$message = sprintf( $text, $reason );
-					} else {
-						$message = __( 'Klarna Checkout error. Please try again.', 'klarna-checkout-for-woocommerce' );
-					}
-					wc_add_notice( $message, 'error' );
-				}
-				if ( is_cart() && isset( $_GET['kco-order'] ) && 'missing-id' === $_GET['kco-order'] ) {
-					wc_add_notice( __( 'An error occurred during communication with Klarna (Klarna order ID is missing). Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
-				}
 			}
 		}
 
@@ -335,6 +315,39 @@ if ( ! class_exists( 'KCO' ) ) {
 			}
 
 			return $output;
+		}
+
+		/**
+		 * Redirects the customer to the proper thank you page.
+		 *
+		 * @return void
+		 */
+		public function redirect_to_thankyou() {
+			if ( isset( $_GET['kco_confirm'] ) && isset( $_GET['kco_order_id'] ) ) {
+				$klarna_order_id = $_GET['kco_order_id'];
+
+				// Find relevant order in Woo.
+				$query_args = array(
+					'fields'      => 'ids',
+					'post_type'   => wc_get_order_types(),
+					'post_status' => array_keys( wc_get_order_statuses() ),
+					'meta_key'    => '_wc_klarna_order_id',
+					'meta_value'  => $klarna_order_id,
+				);
+
+				$orders = get_posts( $query_args );
+				if ( ! $orders ) {
+					// If no order is found, bail. @TODO Add a fallback order creation here?
+					wc_add_notice( __( 'Something went wrong in the checkout process. Please contact the store.', 'error' ) );
+					return;
+				}
+				$order_id = $orders[0];
+				$order    = wc_get_order( $order_id );
+
+				// Redirect and kill PHP.
+				header( 'Location:' . $order->get_checkout_order_received_url() );
+				die();
+			}
 		}
 
 	}
