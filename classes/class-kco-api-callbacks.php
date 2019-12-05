@@ -146,9 +146,6 @@ class KCO_API_Callbacks {
 
 			// The Woo order was already created. Check if order status was set (in process_payment_handler).
 			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
-
-				krokedil_log_events( $order_id, 'Klarna push callback. Updating order status.', $klarna_order );
-
 				if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
 					$order->payment_complete( $klarna_order_id );
 					// translators: Klarna order ID.
@@ -423,8 +420,6 @@ class KCO_API_Callbacks {
 				$order->set_shipping_tax( WC()->cart->get_shipping_tax() );
 				$order->set_total( WC()->cart->get_total( 'edit' ) );
 
-				KCO_WC()->logger->log( 'Processing order lines (from WC cart) during backup order creation for Klarna order ID ' . $klarna_order->order_id );
-				krokedil_log_events( $order->get_id(), 'Processing order lines (from WC cart) during backup order creation.', array() );
 				WC()->checkout()->create_order_line_items( $order, WC()->cart );
 				WC()->checkout()->create_order_fee_lines( $order, WC()->cart );
 				WC()->checkout()->create_order_shipping_lines( $order, WC()->session->get( 'chosen_shipping_methods' ), WC()->shipping()->get_packages() );
@@ -496,8 +491,6 @@ class KCO_API_Callbacks {
 	 * @throws Exception WC_Data_Exception.
 	 */
 	private function process_order_lines( $klarna_order, $order ) {
-		KCO_WC()->logger->log( 'Processing order lines (from Klarna order) during backup order creation for Klarna order ID ' . $klarna_order->order_id );
-		krokedil_log_events( $order->get_id(), 'Processing order lines (from Klarna order) during backup order creation.', array() );
 		foreach ( $klarna_order->order_lines as $cart_item ) {
 			if ( 'physical' === $cart_item->type || 'digital' === $cart_item->type ) {
 				if ( wc_get_product_id_by_sku( $cart_item->reference ) ) {
@@ -612,8 +605,6 @@ class KCO_API_Callbacks {
 		$order->calculate_totals();
 
 		$note = 'Order lines adjusted for order id ' . $order->get_id() . ' (KCO order ' . $klarna_order->order_id . '). Old order total: ' . $old_order_total . '. New order total: ' . $order->get_total();
-		KCO_WC()->logger->log( $note );
-		krokedil_log_events( $order->get_id(), 'Order line prices adjusted during backup order creation', $note );
 	}
 
 	/**
