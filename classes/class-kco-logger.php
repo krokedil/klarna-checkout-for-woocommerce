@@ -96,9 +96,17 @@ class KCO_Logger {
 		$debug_data = debug_backtrace();
 		$stack      = array();
 		foreach ( $debug_data as $data ) {
+			$extra_data = '';
 			if ( ! in_array( $data['function'], array( 'get_stack', 'format_log' ) ) ) {
-				$stack[] = $data['function'];
+				if ( in_array( $data['function'], array( 'do_action', 'apply_filters' ) ) ) {
+					if ( isset( $data['object'] ) ) {
+						$priority   = $data['object']->current_priority();
+						$name       = key( $data['object']->current() );
+						$extra_data = $name . ' : ' . $priority;
+					}
+				}
 			}
+			$stack[] = $data['function'] . $extra_data;
 		}
 		return $stack;
 	}
