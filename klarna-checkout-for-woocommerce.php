@@ -220,7 +220,6 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api-callbacks.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-credentials.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-extra-checkout-fields.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-fields.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gateway.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gdpr.php';
