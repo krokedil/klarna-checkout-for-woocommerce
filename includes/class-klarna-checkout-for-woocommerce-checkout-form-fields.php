@@ -17,7 +17,7 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 		$billing_fields = WC()->checkout()->get_checkout_fields( 'billing' );
 		foreach ( $billing_fields as $key => $field ) {
 			if ( in_array( $key, array( 'billing_country', 'billing_email', 'billing_state', 'billing_postcode' ) ) ) {
-				if ( isset( $field['country_field'], $fields[ $field['country_field'] ] ) ) {
+				if ( isset( $field['country_field'], $billing_fields[ $field['country_field'] ] ) ) {
 					$field['country'] = WC()->checkout->get_value( $field['country_field'] );
 				}
 				woocommerce_form_field( $key, $field, WC()->checkout->get_value( $key ) );
@@ -28,7 +28,7 @@ class Klarna_Checkout_For_Woocommerce_Checkout_Form_Fields {
 		$shipping_fields = WC()->checkout()->get_checkout_fields( 'shipping' );
 		foreach ( $shipping_fields as $key => $field ) {
 			if ( in_array( $key, array( 'shipping_country', 'shipping_state', 'shipping_postcode' ) ) ) {
-				if ( isset( $field['country_field'], $fields[ $field['country_field'] ] ) ) {
+				if ( isset( $field['country_field'], $shipping_fields[ $field['country_field'] ] ) ) {
 					$field['country'] = WC()->checkout->get_value( $field['country_field'] );
 				}
 				woocommerce_form_field( $key, $field, WC()->checkout->get_value( $key ) );
