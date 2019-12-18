@@ -16,11 +16,12 @@ class KCO_Request_Create extends KCO_Request {
 	/**
 	 * Makes the request.
 	 *
+	 * @param int $order_id The WooCommerce order id.
 	 * @return array
 	 */
-	public function request() {
+	public function request( $order_id = null ) {
 		$request_url       = $this->get_api_url_base() . 'checkout/v3/orders';
-		$request_args      = apply_filters( 'kco_wc_create_order', $this->get_request_args() );
+		$request_args      = apply_filters( 'kco_wc_create_order', $this->get_request_args( $order_id ) );
 		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
 		$formated_response = $this->process_response( $response, $request_args, $request_url );
@@ -36,22 +37,16 @@ class KCO_Request_Create extends KCO_Request {
 	/**
 	 * Gets the request body.
 	 *
+	 * @param int $order_id The WooCommerce order id.
 	 * @return array
 	 */
-	public function get_body() {
-		$cart_data = new KCO_Request_Cart();
-		$cart_data->process_data();
-
+	public function get_body( $order_id ) {
 		$request_options = new KCO_Request_Options();
 
 		$request_body = array(
 			'purchase_country'   => $this->get_purchase_country(),
-			'purchase_currency'  => get_woocommerce_currency(),
 			'locale'             => substr( str_replace( '_', '-', get_locale() ), 0, 5 ),
 			'merchant_urls'      => KCO_WC()->merchant_urls->get_urls(),
-			'order_amount'       => $cart_data->get_order_amount(),
-			'order_lines'        => $cart_data->get_order_lines(),
-			'order_tax_amount'   => $cart_data->get_order_tax_amount( $cart_data->get_order_lines() ),
 			'billing_countries'  => KCO_Request_Countries::get_billing_countries(),
 			'shipping_countries' => KCO_Request_Countries::get_shipping_countries(),
 			'merchant_data'      => KCO_Request_Merchant_Data::get_merchant_data(),
@@ -60,6 +55,26 @@ class KCO_Request_Create extends KCO_Request {
 				'type' => ( in_array( $this->settings['allowed_customer_types'], array( 'B2B', 'B2BC' ) ) ) ? 'organization' : 'person',
 			),
 		);
+
+		if ( empty( $order_id ) ) {
+			// If no order id, get order data from the cart.
+			$cart_data = new KCO_Request_Cart();
+			$cart_data->process_data();
+
+			$request_body['purchase_currency'] = get_woocommerce_currency();
+			$request_body['order_amount']      = $cart_data->get_order_amount();
+			$request_body['order_lines']       = $cart_data->get_order_lines();
+			$request_body['order_tax_amount']  = $cart_data->get_order_tax_amount( $cart_data->get_order_lines() );
+		} else {
+			// Else get it from the order.
+			$order_data = new KCO_Request_Order();
+			$order      = wc_get_order( $order_id );
+
+			$request_body['purchase_currency'] = $order->get_currency();
+			$request_body['order_amount']      = $order_data->get_order_amount( $order_id );
+			$request_body['order_lines']       = $order_data->get_order_lines( $order_id );
+			$request_body['order_tax_amount']  = $order_data->get_total_tax( $order_id );
+		}
 
 		if ( kco_wc_prefill_allowed() ) {
 			$request_body['billing_address'] = array(
@@ -86,14 +101,15 @@ class KCO_Request_Create extends KCO_Request {
 	/**
 	 * Gets the request args for the API call.
 	 *
+	 * @param int $order_id The WooCommerce order id.
 	 * @return array
 	 */
-	protected function get_request_args() {
+	protected function get_request_args( $order_id ) {
 		return array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'method'     => 'POST',
-			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body() ) ),
+			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id ) ) ),
 		);
 	}
 }

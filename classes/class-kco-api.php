@@ -82,6 +82,20 @@ class KCO_API {
 	}
 
 	/**
+	 * Acknowledges the order with Klarna. Goes to the order management API.
+	 *
+	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $recurring_token The Klarna recurring token.
+	 * @return mixed
+	 */
+	public function create_recurring_order( $order_id, $recurring_token ) {
+		$request  = new KCO_Request_Create_Recurring();
+		$response = $request->request( $order_id, $recurring_token );
+
+		return $response;
+	}
+
+	/**
 	 * Checks for WP Errors and returns either the response as array or a false.
 	 *
 	 * @param array $response The response from the request.

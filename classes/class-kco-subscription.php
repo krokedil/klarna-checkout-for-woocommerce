@@ -190,10 +190,9 @@ class KCO_Subscription {
 		if ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
 			$subcriptions    = wcs_get_subscriptions_for_order( $order_id );
 			$klarna_order_id = $wc_order->get_transaction_id();
-			$response        = KCO_WC()->api->request_pre_get_order( $klarna_order_id, $order_id );
-			$klarna_order    = json_decode( $response['body'] );
-			if ( isset( $klarna_order->recurring_token ) ) {
-				$recurring_token = $klarna_order->recurring_token;
+			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+			if ( isset( $klarna_order['recurring_token'] ) ) {
+				$recurring_token = $klarna_order['recurring_token'];
 				foreach ( $subcriptions as $subcription ) {
 					// Store the recurring order in the subscription.
 					update_post_meta( $subcription->get_id(), '_kco_recurring_token', $recurring_token );
@@ -223,10 +222,9 @@ class KCO_Subscription {
 			update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
 		}
 
-		$create_order_response = new KCO_API();
-		$create_order_response = $create_order_response->request_create_recurring_order( $renewal_order, $recurring_token );
-		if ( 200 === $create_order_response['response']['code'] ) {
-			$klarna_order_id = json_decode( $create_order_response['body'] )->order_id;
+		$create_order_response = KCO_WC()->api->create_recurring_order( $order_id, $recurring_token );
+		if ( ! is_wp_error( $create_order_response ) ) {
+			$klarna_order_id = $create_order_response['order_id'];
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Klarna. Klarna order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
 			foreach ( $subscriptions as $subscription ) {
 				$subscription->payment_complete( $klarna_order_id );
@@ -256,7 +254,7 @@ class KCO_Subscription {
 			<div class="order_data_column" style="clear:both; float:none; width:100%;">
 				<div class="address">
 					<?php
-						echo '<p><strong>' . __( 'Klarna recurring token' ) . ':</strong>' . get_post_meta( $order->id, '_kco_recurring_token', true ) . '</p>';
+						echo '<p><strong>' . __( 'Klarna recurring token' ) . ':</strong>' . get_post_meta( $order->get_id(), '_kco_recurring_token', true ) . '</p>';
 					?>
 				</div>
 				<div class="edit_address">

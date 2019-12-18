@@ -238,6 +238,7 @@ if ( ! class_exists( 'KCO' ) ) {
 
 			// Requests.
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/class-kco-request.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-create-recurring.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-create.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-update.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/get/class-kco-request-retrieve.php';
@@ -245,12 +246,13 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/order-management/post/class-kco-request-acknowledge-order.php';
 
 			// Helpers.
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-merchant-urls.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-cart.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-countries.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-merchant-data.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-options.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-order.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-shipping-options.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-merchant-urls.php';
 
 			// Includes.
 			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
