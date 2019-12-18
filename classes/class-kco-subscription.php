@@ -227,20 +227,20 @@ class KCO_Subscription {
 		$create_order_response = $create_order_response->request_create_recurring_order( $renewal_order, $recurring_token );
 		if ( 200 === $create_order_response['response']['code'] ) {
 			$klarna_order_id = json_decode( $create_order_response['body'] )->order_id;
-			WC_Subscriptions_Manager::process_subscription_payments_on_order( $renewal_order );
-			// translators: %s Klarna order id.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Klarna. Klarna order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
-			$renewal_order->payment_complete( $klarna_order_id );
+			foreach ( $subscriptions as $subscription ) {
+				$subscription->payment_complete( $klarna_order_id );
+			}
 		} else {
 			$error_message = ' ';
 			$errors        = json_decode( $create_order_response['body'], true );
 			foreach ( $errors['error_messages'] as $error ) {
 				$error_message = $error_message . $error . '. ';
 			}
-			$subscriptions[ $subscription_id ]->payment_failed();
-			do_action( 'processed_subscription_payment_failure_for_order', $renewal_order );
-			// translators: %1$s Error code %2$s Error message.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s', 'klarna-checkout-for-woocommerce' ), $create_order_response['response']['code'], $error_message ) );
+			foreach ( $subscriptions as $subscription ) {
+				$subscription->payment_failed();
+			}
 		}
 	}
 
@@ -314,20 +314,14 @@ class KCO_Subscription {
 			} else {
 				// Retrieve error.
 				$error = KCO_WC()->api->extract_error_messages( $response_data );
-				KCO_WC()->logger->log( 'ERROR when requesting Klarna order via Checkout API (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response_data ) ) );
-				$note = sprintf( __( 'Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order_data->recurring_token ) );
+				$note  = sprintf( __( 'Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order_data->recurring_token ) );
 				$order->add_order_note( $note );
 			}
 
 			// Acknowledge order in Klarna.
-			KCO_WC()->api->request_post_acknowledge_order( $klarna_order_id );
-			KCO_WC()->api->request_post_set_merchant_reference(
-				$klarna_order_id,
-				array(
-					'merchant_reference1' => $order->get_order_number(),
-					'merchant_reference2' => $order->get_id(),
-				)
-			);
+			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
+
 			exit;
 		}
 	}
@@ -341,7 +335,7 @@ class KCO_Subscription {
 	public function display_thankyou_message_for_payment_method_change() {
 		if ( isset( $_GET['kco-action'] ) && 'subs-payment-changed' === $_GET['kco-action'] ) {
 			wc_add_notice( __( 'Thank you, your subscription payment method is now updated.', 'klarna-checkout-for-woocommerce' ), 'success' );
-			KCO_WC()->api->maybe_clear_session_values();
+			kco_unset_sessions();
 		}
 	}
 }
