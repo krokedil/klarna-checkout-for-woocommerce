@@ -144,6 +144,7 @@ if ( ! class_exists( 'KCO' ) ) {
 		protected function __construct() {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
+			add_action( 'woocommerce_after_register_post_type', array( $this, 'check_if_external_payment' ) );
 			// "Fallback" redirection to proper order thank you page if we have one.
 			add_action( 'init', array( $this, 'redirect_to_thankyou' ) );
 
@@ -278,6 +279,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			return $methods;
 		}
 
+
 		/**
 		 * Filters cart item quantity output.
 		 *
@@ -347,6 +349,51 @@ if ( ! class_exists( 'KCO' ) ) {
 				header( 'Location:' . $order->get_checkout_order_received_url() );
 				die();
 			}
+		}
+
+		/**
+		 * Checks if we have an external payment method on page load.
+		 *
+		 * @return void
+		 */
+		public function check_if_external_payment() {
+			if ( isset( $_GET['kco-external-payment'] ) ) {
+				$this->run_kepm( $_GET );
+			}
+		}
+
+		/**
+		 * Initiates a Klarna External Payment Method payment.
+		 *
+		 * @param array $get_data The get data from the server request.
+		 * @return void
+		 */
+		public function run_kepm( $get_data ) {
+			$epm      = $get_data['kco-external-payment'];
+			$order_id = $get_data['order_id'];
+			$order    = wc_get_order( $order_id );
+			// Check if we have a order.
+			if ( ! $order ) {
+				wc_print_notice( __( 'Failed getting the order for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
+				return;
+			}
+			$payment_methods = WC()->payment_gateways->get_available_payment_gateways();
+			// Check if the payment method is available.
+			if ( ! isset( $payment_methods[ $epm ] ) ) {
+				wc_print_notice( __( 'Failed to find the payment method for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
+				return;
+			}
+			$result = $payment_methods[ $epm ]->process_payment( $order_id );
+			// Check if the result is good.
+			if ( ! isset( $result['result'] ) || 'success' !== $result['result'] ) {
+				wc_print_notice( __( 'Something went wrong with the external payment. Please try again', 'klarna-checkout-for-woocommerce' ), 'error' );
+				return;
+			}
+			// Everything is fine, redirect to the URL specified by the gateway.
+			$order->set_payment_method( $payment_methods[ $epm ] );
+			$order->save();
+			wp_redirect( $result['redirect'] );
+			exit;
 		}
 
 	}

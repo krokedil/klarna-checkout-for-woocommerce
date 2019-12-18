@@ -93,7 +93,7 @@ class KCO_Request_Create extends KCO_Request {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'method'     => 'POST',
-			'body'       => wp_json_encode( $this->get_body() ),
+			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body() ) ),
 		);
 	}
 }
