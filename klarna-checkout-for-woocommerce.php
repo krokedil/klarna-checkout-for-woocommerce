@@ -144,9 +144,10 @@ if ( ! class_exists( 'KCO' ) ) {
 		protected function __construct() {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
-			add_action( 'woocommerce_after_register_post_type', array( $this, 'check_if_external_payment' ) );
+			add_action( 'wp_head', array( $this, 'check_if_external_payment' ) );
+
 			// "Fallback" redirection to proper order thank you page if we have one.
-			add_action( 'init', array( $this, 'redirect_to_thankyou' ) );
+			add_action( 'wp_head', array( $this, 'redirect_to_thankyou' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
@@ -242,6 +243,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-create.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-update.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/get/class-kco-request-retrieve.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/order-management/get/class-kco-request-get-order.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/order-management/patch/class-kco-request-set-merchant-reference.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/order-management/post/class-kco-request-acknowledge-order.php';
 
@@ -346,10 +348,10 @@ if ( ! class_exists( 'KCO' ) ) {
 				}
 				$order_id = $orders[0];
 				$order    = wc_get_order( $order_id );
-
-				// Redirect and kill PHP.
+				// Confirm, redirect and exit.
+				kco_confirm_klarna_order( $order_id, $klarna_order_id );
 				header( 'Location:' . $order->get_checkout_order_received_url() );
-				die();
+				exit;
 			}
 		}
 

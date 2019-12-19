@@ -66,7 +66,6 @@ class KCO_Gateway extends WC_Payment_Gateway {
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'address_notice' ) );
 
 		add_action( 'woocommerce_checkout_init', array( $this, 'prefill_consent' ) );
-		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'confirm_klarna_order' ), 1, 1 );
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'show_thank_you_snippet' ) );
 		add_action( 'woocommerce_thankyou', 'kco_unset_sessions', 100, 1 );
 
@@ -439,7 +438,6 @@ class KCO_Gateway extends WC_Payment_Gateway {
 	 * @param int $order_id WooCommerce order ID.
 	 */
 	public function show_thank_you_snippet( $order_id = null ) {
-
 		if ( $order_id ) {
 			$order = wc_get_order( $order_id );
 
@@ -450,38 +448,13 @@ class KCO_Gateway extends WC_Payment_Gateway {
 				if ( $klarna_order ) {
 					echo $klarna_order['html_snippet'];
 				}
+
+				// Check if we need to finalize purchase here. Should already been done in process_payment.
+				if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
+					kco_confirm_klarna_order( $order_id, $klarna_order_id );
+					WC()->cart->empty_cart();
+				}
 			}
-
-			// Check if we need to finalize purchase here. Should already been done in process_payment.
-			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
-				$this->confirm_klarna_order( $order_id );
-				WC()->cart->empty_cart();
-			}
-		}
-	}
-
-	/**
-	 * Confirms and finishes the Klarna Order for processing.
-	 *
-	 * @param int $order_id The WooCommerce Order id.
-	 * @return void
-	 */
-	public function confirm_klarna_order( $order_id = null ) {
-		if ( $order_id ) {
-			$order           = wc_get_order( $order_id );
-			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
-			if ( $klarna_order_id ) {
-				// Acknowledge order in Klarna.
-				KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
-
-				// Set the merchant references for the order.
-				KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
-
-				// Payment complete and set transaction id.
-				$order->payment_complete( $klarna_order_id );
-			}
-			// Empty cart to be safe.
-			WC()->cart->empty_cart();
 		}
 	}
 

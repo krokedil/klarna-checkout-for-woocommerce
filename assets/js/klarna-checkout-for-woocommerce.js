@@ -304,6 +304,7 @@ jQuery(function($) {
 		},
 
 		setCustomerData: function ( data ) {
+			console.log( data );
 			// Billing fields.
 			$('#billing_first_name').val( data.billing_address.given_name );
 			$('#billing_last_name').val( data.billing_address.family_name );
@@ -312,6 +313,7 @@ jQuery(function($) {
 			$('#billing_postcode').val( data.billing_address.postal_code );
 			$('#billing_phone').val( data.billing_address.phone )
 			$('#billing_email').val( data.billing_address.email );
+			$('#billing_country').val( data.billing_address.country.toUpperCase() );
 
 			// Shipping fields.
 			$('#shipping_first_name').val( data.shipping_address.given_name );
@@ -319,6 +321,7 @@ jQuery(function($) {
 			$('#shipping_address_1').val( data.shipping_address.street_address );
 			$('#shipping_city').val( data.shipping_address.city );
 			$('#shipping_postcode').val( data.shipping_address.postal_code );
+			$('#shipping_country').val( data.shipping_address.country.toUpperCase() );
 		},
 
 		init: function () {
@@ -363,7 +366,6 @@ jQuery(function($) {
 										kco_wc.log(response);
 										// All good release checkout and trigger update_checkout event
 										kco_wc.kcoResume();
-										kco_wc.setFieldValues( response.data );
 										$('body').trigger('update_checkout');	
 									},
 									error: function (response) {

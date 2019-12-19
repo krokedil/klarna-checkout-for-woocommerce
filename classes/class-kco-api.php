@@ -96,6 +96,19 @@ class KCO_API {
 	}
 
 	/**
+	 * Acknowledges the order with Klarna. Goes to the order management API.
+	 *
+	 * @param string $klarna_order_id The Klarna Checkout order id.
+	 * @return mixed
+	 */
+	public function get_klarna_om_order( $klarna_order_id ) {
+		$request  = new KCO_Request_Get_Order();
+		$response = $request->request( $klarna_order_id );
+
+		return $this->check_for_api_error( $response );
+	}
+
+	/**
 	 * Checks for WP Errors and returns either the response as array or a false.
 	 *
 	 * @param array $response The response from the request.
