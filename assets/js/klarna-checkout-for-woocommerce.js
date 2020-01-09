@@ -309,6 +309,7 @@ jQuery(function($) {
 			$('#billing_first_name').val( data.billing_address.given_name );
 			$('#billing_last_name').val( data.billing_address.family_name );
 			$('#billing_address_1').val( data.billing_address.street_address );
+			$('#billing_address_2').val( data.billing_address.street_address2 );
 			$('#billing_city').val( data.billing_address.city );
 			$('#billing_postcode').val( data.billing_address.postal_code );
 			$('#billing_phone').val( data.billing_address.phone );
@@ -320,6 +321,7 @@ jQuery(function($) {
 			$('#shipping_first_name').val( data.shipping_address.given_name );
 			$('#shipping_last_name').val( data.shipping_address.family_name );
 			$('#shipping_address_1').val( data.shipping_address.street_address );
+			$('#shipping_address_2').val( data.shipping_address.street_address2 );
 			$('#shipping_city').val( data.shipping_address.city );
 			$('#shipping_postcode').val( data.shipping_address.postal_code );
 			$('#shipping_country').val( data.shipping_address.country.toUpperCase() );
