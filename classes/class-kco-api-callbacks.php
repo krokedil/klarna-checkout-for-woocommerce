@@ -64,7 +64,7 @@ class KCO_API_Callbacks {
 	 * We do this to be able to retrieve WC()->cart in backend.
 	 */
 	public function maybe_prepare_wc_session_for_server_side_callback() {
-		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' == $_GET['kco-action'] || 'push' == $_GET['kco-action'] ) ) ) {
+		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' === $_GET['kco-action'] || 'push' === $_GET['kco-action'] ) ) ) {
 			$session_id       = sanitize_key( $_GET['kco_session_id'] );
 			$sessions_handler = new WC_Session_Handler();
 			$session_data     = $sessions_handler->get_session( $session_id );
@@ -86,7 +86,7 @@ class KCO_API_Callbacks {
 	 * @param WC_Cart $cart WooCommerce cart.
 	 */
 	public function maybe_prepare_wc_cart_for_server_side_callback( $cart ) {
-		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' == $_GET['kco-action'] || 'push' == $_GET['kco-action'] ) ) ) {
+		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' === $_GET['kco-action'] || 'push' === $_GET['kco-action'] ) ) ) {
 			WC()->cart = $cart;
 
 			// If Aelia Currency Switcher plugin is used - set correct currency.

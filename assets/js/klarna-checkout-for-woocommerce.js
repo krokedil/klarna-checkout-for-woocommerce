@@ -311,9 +311,10 @@ jQuery(function($) {
 			$('#billing_address_1').val( data.billing_address.street_address );
 			$('#billing_city').val( data.billing_address.city );
 			$('#billing_postcode').val( data.billing_address.postal_code );
-			$('#billing_phone').val( data.billing_address.phone )
+			$('#billing_phone').val( data.billing_address.phone );
 			$('#billing_email').val( data.billing_address.email );
 			$('#billing_country').val( data.billing_address.country.toUpperCase() );
+			$('#billing_state').val( data.billing_address.region );
 
 			// Shipping fields.
 			$('#shipping_first_name').val( data.shipping_address.given_name );
@@ -322,6 +323,7 @@ jQuery(function($) {
 			$('#shipping_city').val( data.shipping_address.city );
 			$('#shipping_postcode').val( data.shipping_address.postal_code );
 			$('#shipping_country').val( data.shipping_address.country.toUpperCase() );
+			$('#shipping_state').val( data.shipping_address.region );
 		},
 
 		init: function () {
@@ -351,7 +353,6 @@ jQuery(function($) {
 								}
 							});
 							kco_wc.kcoSuspend( true );
-
 							$.ajax(
 								{
 									url: kco_params.iframe_shipping_address_change_url,
@@ -359,14 +360,15 @@ jQuery(function($) {
 									dataType: 'json',
 									data: {
 										data: data,
-										createaccount: form_data.createaccount,
 										nonce: kco_params.iframe_shipping_address_change_nonce
 									},
 									success: function (response) {
 										kco_wc.log(response);
 										// All good release checkout and trigger update_checkout event
+										kco_wc.setCustomerData( response.data );
 										kco_wc.kcoResume();
-										$('body').trigger('update_checkout');	
+
+										$('body').trigger('update_checkout');
 									},
 									error: function (response) {
 										kco_wc.log(response);

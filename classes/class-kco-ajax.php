@@ -249,8 +249,10 @@ class KCO_AJAX extends WC_AJAX {
 
 		$customer_data = array();
 
-		if ( isset( $email ) ) {
-			$customer_data['billing_email'] = $email;
+		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+
+		if ( isset( $address['email'] ) ) {
+			$customer_data['billing_email'] = $address['email'];
 		}
 
 		if ( isset( $address['postal_code'] ) ) {
@@ -268,9 +270,9 @@ class KCO_AJAX extends WC_AJAX {
 			$customer_data['shipping_last_name'] = $address['family_name'];
 		}
 
-		if ( isset( $states['billing_state'] ) ) {
-			$customer_data['billing_state']  = $states['billing_state'];
-			$customer_data['shipping_state'] = $states['shipping_state'];
+		if ( isset( $klarna_order['billing_address']['region'] ) ) {
+			$customer_data['billing_state']  = $klarna_order['billing_address']['region'];
+			$customer_data['shipping_state'] = $klarna_order['shipping_address']['region'];
 		}
 
 		if ( isset( $address['country'] ) && kco_wc_country_code_converter( $address['country'] ) ) {
@@ -287,14 +289,15 @@ class KCO_AJAX extends WC_AJAX {
 
 		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 
-		if ( $klarna_order ) {
+		if ( ! $klarna_order ) {
 			wp_send_json_error();
 			wp_die();
 		}
 
 		wp_send_json_success(
 			array(
-				'customer_data' => $customer_data,
+				'billing_address'  => $klarna_order['billing_address'],
+				'shipping_address' => $klarna_order['shipping_address'],
 			)
 		);
 		wp_die();
