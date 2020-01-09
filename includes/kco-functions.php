@@ -136,7 +136,7 @@ function kco_wc_calculate_totals() {
 function kco_wc_prefill_consent() {
 	if ( ! kco_wc_prefill_allowed() && is_user_logged_in() ) {
 		$consent_url = add_query_arg(
-			[ 'prefill_consent' => 'yes' ],
+			array( 'prefill_consent' => 'yes' ),
 			wc_get_checkout_url()
 		);
 
@@ -488,7 +488,8 @@ function kco_unset_sessions() {
 /**
  * Confirms and finishes the Klarna Order for processing.
  *
- * @param int $order_id The WooCommerce Order id.
+ * @param int    $order_id The WooCommerce Order id.
+ * @param string $klarna_order_id The Klarna Order id.
  * @return void
  */
 function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
@@ -514,6 +515,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
 				// Payment complete and set transaction id.
 				// translators: Klarna order ID.
 				$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+				$order->add_order_note( $note );
 				$order->payment_complete( $klarna_order_id );
 			} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
 				// Set status to on-hold.
