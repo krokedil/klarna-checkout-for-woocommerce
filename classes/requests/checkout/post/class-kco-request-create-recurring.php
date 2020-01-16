@@ -49,7 +49,7 @@ class KCO_Request_Create_Recurring extends KCO_Request {
 			'purchase_currency'   => $order->get_currency(),
 			'order_amount'        => $order_data->get_order_amount( $order_id ),
 			'order_lines'         => $order_data->get_order_lines( $order_id ),
-			'order_tax_amount'    => $order_data->get_total_tax( $order_id ),
+			'order_tax_amount'    => $order_data->get_total_tax(),
 			'merchant_reference1' => $order->get_order_number(),
 			'merchant_reference2' => $order->get_id(),
 		);
