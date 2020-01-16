@@ -36,9 +36,9 @@ class KCO_API {
 	public function get_klarna_order( $klarna_order_id ) {
 		$request  = new KCO_Request_Retrieve();
 		$response = $request->request( $klarna_order_id );
-
 		return $this->check_for_api_error( $response );
 	}
+
 
 	/**
 	 * Updates a Klarna Checkout order.
@@ -120,5 +120,95 @@ class KCO_API {
 			return false;
 		}
 		return $response;
+	}
+
+	// Deprecated functions.
+	/**
+	 * Deprecated function, adds support for the get_order function.
+	 *
+	 * @return object
+	 */
+	public function get_order() {
+		wc_deprecated_function( 'get_order', '2.0.0', 'get_klarna_order' );
+		$klarna_order = $this->get_klarna_order( WC()->session->get( 'kco_wc_order_id' ) );
+
+		// Make Klarna order an object.
+		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		return $klarna_order;
+	}
+
+	/**
+	 * Deprecated function, adds support for the request_pre_get_order function.
+	 *
+	 * @param  string $klarna_order_id Klarna order ID.
+	 * @param  string $order_id WooCommerce order ID. Passed if request happens after WooCommerce has been created.
+	 * @return object
+	 */
+	public function request_pre_get_order( $klarna_order_id, $order_id = null ) {
+		wc_deprecated_function( 'request_pre_get_order', '2.0.0', 'get_klarna_order' );
+		$klarna_order = $this->get_klarna_order( $klarna_order_id );
+
+		// Make Klarna order an object.
+		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		return $klarna_order;
+	}
+
+	/**
+	 * Deprecated function, adds support for the request_post_get_order function.
+	 *
+	 * @param  string $klarna_order_id Klarna order ID.
+	 * @param  string $order_id WooCommerce order ID. Passed if request happens after WooCommerce has been created.
+	 * @return object
+	 */
+	public function request_post_get_order( $klarna_order_id, $order_id = null ) {
+		wc_deprecated_function( 'request_post_get_order', '2.0.0', 'get_klarna_order' );
+		$klarna_order = $this->get_klarna_order( $klarna_order_id );
+
+		// Make Klarna order an object.
+		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		return $klarna_order;
+	}
+
+	/**
+	 * Deprecated function, adds support for the request_pre_create_order function.
+	 *
+	 * @return object
+	 */
+	public function request_pre_create_order() {
+		wc_deprecated_function( 'request_post_get_order', '2.0.0', 'create_klarna_order' );
+		$klarna_order = $this->create_klarna_order();
+
+		// Make Klarna order an object.
+		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		return $klarna_order;
+	}
+
+	/**
+	 * Deprecated function, adds support for the request_pre_update_order function.
+	 *
+	 * @return object
+	 */
+	public function request_pre_update_order() {
+		wc_deprecated_function( 'request_pre_update_order', '2.0.0', 'update_klarna_order' );
+		$klarna_order = $this->create_klarna_order();
+
+		// Make Klarna order an object.
+		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		return $klarna_order;
+	}
+
+	/**
+	 * Deprecated function, adds support for the get_snippet function.
+	 *
+	 * @param array $klarna_order The Klarna checkout order.
+	 * @return object
+	 */
+	public function get_snippet( $klarna_order ) {
+		// Make Klarna order an object.
+		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		if ( ! is_wp_error( $klarna_order ) ) {
+			return $klarna_order->html_snippet;
+		}
+		return $klarna_order->get_error_message();
 	}
 }

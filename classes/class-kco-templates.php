@@ -46,7 +46,7 @@ class KCO_Templates {
 		add_action( 'kco_wc_after_order_review', 'kco_wc_show_another_gateway_button', 20 );
 		add_action( 'kco_wc_after_order_review', array( $this, 'add_extra_checkout_fields' ), 10 );
 		add_action( 'kco_wc_before_snippet', 'kco_wc_prefill_consent', 10 );
-		add_action( 'kco_wc_after_wrapper', array( $this, 'add_wc_form' ), 10 );
+		add_action( 'kco_wc_before_snippet', array( $this, 'add_wc_form' ), 10 ); // @TODO Look into changing this to kco_wc_after_wrapper later.
 	}
 
 	/**
