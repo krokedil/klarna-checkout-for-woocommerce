@@ -40,6 +40,11 @@ jQuery(function($) {
 				kco_wc.paymentMethod = 'kco';
 			}
 
+			if( kco_params.force_update ) {
+				console.log( 'force update' );
+				kco_wc.updateKlarnaOrder();
+			}
+
 			kco_wc.confirmLoading();
 		},
 

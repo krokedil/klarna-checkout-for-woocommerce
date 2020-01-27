@@ -277,6 +277,9 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			'must_login_message'                   => apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) ),
 		);
 
+		if ( version_compare( WC_VERSION, '3.9', '>=' ) ) {
+			$checkout_localize_params['force_update'] = true;
+		}
 		wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );
 
 		wp_enqueue_script( 'kco' );
