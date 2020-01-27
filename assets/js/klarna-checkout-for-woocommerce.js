@@ -40,9 +40,9 @@ jQuery(function($) {
 				kco_wc.paymentMethod = 'kco';
 			}
 
-			if( kco_params.force_update ) {
+			if( kco_params.force_update && 'kco' === kco_wc.paymentMethod ) {
 				console.log( 'force update' );
-				kco_wc.updateKlarnaOrder();
+				$('body').trigger('update_checkout');
 			}
 
 			kco_wc.confirmLoading();
