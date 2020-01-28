@@ -168,7 +168,7 @@ class KCO_API_Callbacks {
 
 		} else {
 			// Backup order creation.
-			$this->backup_order_creation( $klarna_order_id );
+			// $this->backup_order_creation( $klarna_order_id );
 		}
 	}
 
