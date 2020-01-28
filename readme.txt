@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.2.3
+Tested up to: 5.3.2
 Requires PHP: 5.6
 WC requires at least: 3.2.0
-WC tested up to: 3.7.0
+WC tested up to: 3.9.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,11 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.01.28    - version 1.11.7 =
+* Fix           - Force update_checkout on checkout page load (if WC version 3.9+) to keep KCO iframe in sync with WooCommerce cart.
+* Fix           - Don't try to run process_payment_handler function if KCO order status is checkout_incomplete.
+* Fix           - Don't try to change WC order status to On hold in process_payment_handler function if order status is Pending.
+
 = 2019.12.03    - version 1.11.6 =
 * Fix           - Prevent function for changing to Klarna Checkout payment method from running on the confirmation page. Caused an issue with Google Tag Manager for WordPress by Thomas Geiger
 * Fix           - Changed where we set the recurring token for a Subscription order.
