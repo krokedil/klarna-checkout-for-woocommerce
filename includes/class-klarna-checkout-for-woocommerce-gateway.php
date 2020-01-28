@@ -409,6 +409,12 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 
 			$klarna_order = json_decode( $response['body'] );
 
+			// Don't proceed if the purchase isnt finalized in Klarnas system.
+			if( 'checkout_incomplete' === $klarna_order->status ) {
+				KCO_WC()->logger->log( 'Process payment handler function triggered but Klarna order status is checkout_incomplete. Order ID ' . $order_id . '.' );
+				return;
+			}
+
 			// Maybe set WC order transaction ID.
 			if ( empty( get_post_meta( $order_id, '_wc_klarna_order_id' ) ) ) {
 				update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order->order_id ) );
