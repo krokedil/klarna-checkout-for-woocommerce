@@ -435,8 +435,16 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 				// Request error. Set order status to On hold and print the error message as a note.
 				$error = KCO_WC()->api->extract_error_messages( $response );
 				$note  = sprintf( __( 'Klarna post_order request in process_payment_handler failed. Error message: %s.', 'klarna-checkout-for-woocommerce' ), stripslashes_deep( json_encode( $error ) ) );
-				$order->update_status( 'on-hold', $note );
+				if ( $order->has_status( 'pending' ) ) {
+					$order->add_order_note( $note );
+				} else {
+					$order->update_status( 'on-hold', $note );
+				}
 			} else {
+				// Add this here if we are on thank you page.
+				if ( is_checkout() && ! empty( is_wc_endpoint_url( 'order-received' ) ) ) {
+					$order->add_order_note( __( 'Order finalized in thankyou page.', 'klarna-checkout-for-woocommerce' ) );
+				}
 				$klarna_post_order = json_decode( $response['body'] );
 
 				// Remove html_snippet from what we're logging.
@@ -492,7 +500,6 @@ class Klarna_Checkout_For_WooCommerce_Gateway extends WC_Payment_Gateway {
 			// Check if we need to finalize purchase here. Should already been done in process_payment.
 			if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
 				$this->process_payment_handler( $order_id );
-				$order->add_order_note( __( 'Order finalized in thankyou page.', 'klarna-checkout-for-woocommerce' ) );
 				WC()->cart->empty_cart();
 			}
 		}
