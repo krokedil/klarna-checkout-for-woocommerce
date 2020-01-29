@@ -264,9 +264,9 @@ jQuery(function($) {
 			// Move order comments.
 			$('.woocommerce-additional-fields').appendTo('#kco-extra-checkout-fields');
 
-			let form = $('form[name="checkout"] input, form[name="checkout"] select, textarea');
+			var form = $('form[name="checkout"] input, form[name="checkout"] select, textarea');
 			for ( i = 0; i < form.length; i++ ) {
-				let name = form[i]['name'];
+				var name = form[i]['name'];
 				// Check if this is a standard field.
 				if ( $.inArray( name, kco_params.standard_woo_checkout_fields ) === -1 ) {
 					// This is not a standard Woo field, move to our div.

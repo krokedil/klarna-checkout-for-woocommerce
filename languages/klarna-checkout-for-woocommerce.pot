@@ -1,4 +1,4 @@
-# Copyright (C) 2019 klarna-checkout-for-woocommerce
+# Copyright (C) 2020 klarna-checkout-for-woocommerce
 # This file is distributed under the same license as the klarna-checkout-for-woocommerce package.
 msgid ""
 msgstr ""
@@ -76,7 +76,7 @@ msgstr ""
 msgid "Deactivated"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:390, ../klarna-checkout-for-woocommerce.php:176
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:390, ../klarna-checkout-for-woocommerce.php:179
 msgid "Settings"
 msgstr ""
 
@@ -86,26 +86,28 @@ msgstr ""
 
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:153, ../classes/class-kco-api-callbacks.php:666
+#. translators: Klarna order ID.
+#: ../classes/class-kco-api-callbacks.php:152, ../classes/class-kco-api-callbacks.php:458, ../includes/kco-functions.php:517
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:156, ../classes/class-kco-api-callbacks.php:669
+#: ../classes/class-kco-api-callbacks.php:155, ../classes/class-kco-api-callbacks.php:461
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:159, ../classes/class-kco-api-callbacks.php:672
+#. translators: Klarna order ID.
+#: ../classes/class-kco-api-callbacks.php:158, ../classes/class-kco-api-callbacks.php:464, ../includes/kco-functions.php:523
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:661
+#: ../classes/class-kco-api-callbacks.php:453
 msgid "Order created via Klarna Checkout API callback. Please verify the order in Klarnas system."
 msgstr ""
 
 #. translators: %s: Klarna order amount.
-#: ../classes/class-kco-api-callbacks.php:686
+#: ../classes/class-kco-api-callbacks.php:478
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
@@ -397,42 +399,36 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:125
+#: ../classes/class-kco-gateway.php:124
 msgid "Please wait while we process your order..."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:277
+#: ../classes/class-kco-gateway.php:276
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:467
-msgid "Order finalized in thankyou page."
-msgstr ""
-
-#: ../classes/class-kco-gateway.php:498
+#: ../classes/class-kco-gateway.php:486
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#. translators: %s Klarna order id.
-#: ../classes/class-kco-subscription.php:232
+#: ../classes/class-kco-subscription.php:228
 msgid "Subscription payment made with Klarna. Klarna order id: %s"
 msgstr ""
 
-#. translators: %1$s Error code %2$s Error message.
-#: ../classes/class-kco-subscription.php:243
+#: ../classes/class-kco-subscription.php:238
 msgid "Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s"
 msgstr ""
 
 #. translators: %s Klarna recurring token.
-#: ../classes/class-kco-subscription.php:311
+#: ../classes/class-kco-subscription.php:309
 msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:318
+#: ../classes/class-kco-subscription.php:315
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:343
+#: ../classes/class-kco-subscription.php:335
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -476,6 +472,14 @@ msgstr ""
 msgid "A mismatch in order totals between WooCommerce and Klarna was detected. Please try again."
 msgstr ""
 
+#: ../includes/kco-functions.php:527
+msgid "Klarna Checkout order was rejected"
+msgstr ""
+
+#: ../includes/kco-functions.php:532
+msgid "Something went wrong with processing the order. Please try again."
+msgstr ""
+
 #: ../includes/kco-status-report.php:17
 msgid "Klarna Checkout System Status."
 msgstr ""
@@ -488,18 +492,18 @@ msgstr ""
 msgid "Displays the number of orders created via the API callback feature during the last month."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:177
+#: ../klarna-checkout-for-woocommerce.php:180
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:215
-msgid "Klarna Checkout error"
+#: ../klarna-checkout-for-woocommerce.php:381
+msgid "Failed getting the order for the external payment."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:218
-msgid "Klarna Checkout error. Please try again."
+#: ../klarna-checkout-for-woocommerce.php:387
+msgid "Failed to find the payment method for the external payment."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:223
-msgid "An error occurred during communication with Klarna (Klarna order ID is missing). Please try again."
+#: ../klarna-checkout-for-woocommerce.php:393
+msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
