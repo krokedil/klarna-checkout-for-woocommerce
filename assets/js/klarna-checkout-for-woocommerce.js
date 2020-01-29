@@ -29,7 +29,8 @@ jQuery(function($) {
 		
 		// Mutation observer.
 		observer: new MutationObserver(function(mutationsList) {
-			for ( var mutation of mutationsList ) {
+			for ( i = 0; i < mutationsList.length; i++ ) {
+				var mutation = mutationsList[i]
 				if ( mutation.type == 'childList' ) {
 					if( mutation.addedNodes[0] ) {
 						if ( mutation.addedNodes[0].querySelector("#kco-order-success") ) { // Success.
@@ -57,6 +58,7 @@ jQuery(function($) {
 			}
 			kco_wc.moveExtraCheckoutFields();
 			kco_wc.confirmLoading();
+			kco_wc.kcoResume();
 		},
 
 		kcoSuspend: function ( autoResumeBool ) {
