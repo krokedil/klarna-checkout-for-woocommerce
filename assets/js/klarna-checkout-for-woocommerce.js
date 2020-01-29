@@ -338,8 +338,6 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
-			kco_wc.bodyEl.on('change', 'input[name="createaccount"]', kco_wc.maybePrintLoginMessage);
-			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybePrintLoginMessage);
 
 			if (typeof window._klarnaCheckout === 'function') {
 				window._klarnaCheckout(function (api) {
