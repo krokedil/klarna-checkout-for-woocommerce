@@ -429,6 +429,7 @@ jQuery(function($) {
 							kco_wc.log('can_not_complete_order', data);
 						},
 						'validation_callback': function(data, callback) {
+							$(document.body).off( 'checkout_error' );
 							kco_wc.getKlarnaOrder();
 							$( 'body' ).on( 'kco_order_validation', function( event, bool ) {
 								callback({ should_proceed: bool });
