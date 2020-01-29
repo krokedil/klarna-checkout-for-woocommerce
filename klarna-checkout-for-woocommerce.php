@@ -373,9 +373,27 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @return void
 		 */
 		public function run_kepm( $get_data ) {
-			$epm      = $get_data['kco-external-payment'];
-			$order_id = $get_data['order_id'];
-			$order    = wc_get_order( $order_id );
+			$epm             = $get_data['kco-external-payment'];
+			$order_id        = ( isset( $get_data['order_id'] ) ) ? $get_data['order_id'] : '';
+			$klarna_order_id = ( isset( $get_data['kco_order_id'] ) ) ? $get_data['kco_order_id'] : '';
+			$order           = wc_get_order( $order_id );
+			// Check if we have a KCO order id.
+			if ( ! empty( $klarna_order_id ) ) {
+				// Do a database lookup for the WooCommerce order.
+				$query_args = array(
+					'fields'      => 'ids',
+					'post_type'   => wc_get_order_types(),
+					'post_status' => array_keys( wc_get_order_statuses() ),
+					'meta_key'    => '_wc_klarna_order_id',
+					'meta_value'  => $klarna_order_id,
+				);
+				$orders     = get_posts( $query_args );
+				// Set the order from the first order id returned.
+				if ( ! empty( $orders ) ) {
+					$order_id = $orders[0];
+					$order    = wc_get_order( $order_id );
+				}
+			}
 			// Check if we have a order.
 			if ( ! $order ) {
 				wc_print_notice( __( 'Failed getting the order for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
