@@ -116,15 +116,16 @@ class KCO_Gateway extends WC_Payment_Gateway {
 				'redirect' => $pay_url,
 			);
 		}
-
 		// Regular purchase.
 		// 1. Process the payment.
 		// 2. Redirect to order received page.
 		$this->process_payment_handler( $order_id );
-		$notice_string  = __( 'Please wait while we process your order...', 'klarna-checkout-for-woocommerce' );
-		$notice_string .= '<div id="kco-order-success" style="display:none" data-success="' . $this->get_return_url( $order ) . '"></div>';
-		wc_add_notice( $notice_string, 'success' );
-		return;
+
+		return array(
+			'result'   => 'success',
+			'redirect' => '#klarna-success',
+		);
+
 	}
 
 	/**

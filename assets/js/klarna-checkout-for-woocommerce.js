@@ -26,28 +26,6 @@ jQuery(function($) {
 		emailExists: kco_params.email_exists,
 
 		preventPaymentMethodChange: false,
-		
-		// Mutation observer.
-		observer: new MutationObserver(function(mutationsList) {
-			for ( i = 0; i < mutationsList.length; i++ ) {
-				var mutation = mutationsList[i]
-				if ( mutation.type == 'childList' ) {
-					if( mutation.addedNodes[0] ) {
-						if ( mutation.addedNodes[0].querySelector("#kco-order-success") ) { // Success.
-							$( 'body' ).trigger( 'kco_order_validation', true );
-						} else if( mutation.addedNodes[0].querySelector("#kco-order-failed") ) { // Not used now, but potential error from us.
-							$( 'body' ).trigger( 'kco_order_validation', false );
-						} else if ( mutation.addedNodes[0].querySelector(".woocommerce-error") ) { // WooCommerce error.
-							$( 'body' ).trigger( 'kco_order_validation', false );
-						}
-					}
-				}
-			}
-		}),
-		
-		config: {
-			childList: true,
-		},
 
 		documentReady: function() {
 			kco_wc.log(kco_params);
@@ -305,6 +283,17 @@ jQuery(function($) {
 			});
 		},
 
+		hashChange: function() {
+			var currentHash = location.hash;
+			if( '#klarna-success' === currentHash ) {
+				$( 'body' ).trigger( 'kco_order_validation', true );
+			}
+		},
+
+		errorDetected: function() {
+			$( 'body' ).trigger( 'kco_order_validation', false );
+		},
+
 		setCustomerData: function ( data ) {
 			console.log( data );
 			// Billing fields.
@@ -332,7 +321,6 @@ jQuery(function($) {
 
 		init: function () {
 			$(document).ready(kco_wc.documentReady);
-			kco_wc.observer.observe( kco_wc.checkoutFormSelector[0], kco_wc.config );
 			kco_wc.bodyEl.on('update_checkout', kco_wc.kcoSuspend( true ) );
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
@@ -340,6 +328,8 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
+			$( window ).on('hashchange', kco_wc.hashChange);
+			$( document.body ).on( 'checkout_error', kco_wc.errorDetected );
 
 			if (typeof window._klarnaCheckout === 'function') {
 				window._klarnaCheckout(function (api) {
@@ -429,7 +419,6 @@ jQuery(function($) {
 							kco_wc.log('can_not_complete_order', data);
 						},
 						'validation_callback': function(data, callback) {
-							$(document.body).off( 'checkout_error' );
 							kco_wc.getKlarnaOrder();
 							$( 'body' ).on( 'kco_order_validation', function( event, bool ) {
 								callback({ should_proceed: bool });

@@ -399,15 +399,11 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:124
-msgid "Please wait while we process your order..."
-msgstr ""
-
-#: ../classes/class-kco-gateway.php:276
+#: ../classes/class-kco-gateway.php:277
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:486
+#: ../classes/class-kco-gateway.php:487
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
@@ -496,14 +492,14 @@ msgstr ""
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:381
+#: ../klarna-checkout-for-woocommerce.php:399
 msgid "Failed getting the order for the external payment."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:387
+#: ../klarna-checkout-for-woocommerce.php:405
 msgid "Failed to find the payment method for the external payment."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:393
+#: ../klarna-checkout-for-woocommerce.php:411
 msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
