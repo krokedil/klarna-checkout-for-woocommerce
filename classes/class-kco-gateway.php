@@ -123,7 +123,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 
 		return array(
 			'result'   => 'success',
-			'redirect' => '#klarna-success',
+			'redirect' => '#klarna-success=' . base64_encode( microtime() ), // Base64 encoded timestamp to always have a fresh URL for on hash change event.
 		);
 
 	}
@@ -461,8 +461,6 @@ class KCO_Gateway extends WC_Payment_Gateway {
 
 	/**
 	 * Changes footer text in KCO settings page.
-	 *
-	 * @TODO: Get a URL to link to.
 	 *
 	 * @param string $text Footer text.
 	 *

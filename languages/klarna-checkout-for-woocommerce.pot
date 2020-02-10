@@ -403,7 +403,7 @@ msgstr ""
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:487
+#: ../classes/class-kco-gateway.php:485
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 

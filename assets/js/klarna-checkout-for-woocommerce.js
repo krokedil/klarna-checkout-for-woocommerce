@@ -285,7 +285,8 @@ jQuery(function($) {
 
 		hashChange: function() {
 			var currentHash = location.hash;
-			if( '#klarna-success' === currentHash ) {
+
+			if( currentHash.indexOf( '#klarna-success' ) > -1 ) {
 				$( 'body' ).trigger( 'kco_order_validation', true );
 			}
 		},
