@@ -327,7 +327,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			}
 
 			if ( ! class_exists( 'Klarna_Skin', false ) ) {
-				include_once KCO_WC_PLUGIN_PATH . '/includes/admin/class-klarna-skin.php';
+				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-skin.php';
 			}
 			$skin      = new Klarna_Skin();
 			$installer = new Plugin_Upgrader( $skin );

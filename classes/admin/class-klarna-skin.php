@@ -97,8 +97,11 @@ class Klarna_Skin extends WP_Upgrader_Skin {
 	 * @since 1.9.0
 	 *
 	 * @param string $string The feedback string.
+	 * @param array  ...$args Arguments.
+	 *
+	 * @return void
 	 */
-	function feedback( $string ) {
+	function feedback( $string, ...$args ) {
 
 	}
 
