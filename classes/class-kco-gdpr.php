@@ -53,9 +53,9 @@ class KCO_GDPR {
 		$settings                    = get_option( 'woocommerce_kco_settings' );
 		$display_privacy_policy_text = ( isset( $settings['display_privacy_policy_text'] ) ) ? $settings['display_privacy_policy_text'] : 'no';
 
-		if ( 'above' == $display_privacy_policy_text ) {
+		if ( 'above' === $display_privacy_policy_text ) {
 			add_action( 'kco_wc_before_snippet', array( $this, 'kco_wc_display_privacy_policy_text' ) );
-		} elseif ( 'below' == $display_privacy_policy_text ) {
+		} elseif ( 'below' === $display_privacy_policy_text ) {
 			add_action( 'kco_wc_after_snippet', array( $this, 'kco_wc_display_privacy_policy_text' ) );
 		}
 	}

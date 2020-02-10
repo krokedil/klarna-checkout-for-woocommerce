@@ -407,24 +407,26 @@ msgstr ""
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:228
+#. translators: Klarna order id.
+#: ../classes/class-kco-subscription.php:229
 msgid "Subscription payment made with Klarna. Klarna order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:238
+#. translators: Error code, error message.
+#: ../classes/class-kco-subscription.php:240
 msgid "Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s"
 msgstr ""
 
 #. translators: %s Klarna recurring token.
-#: ../classes/class-kco-subscription.php:309
+#: ../classes/class-kco-subscription.php:311
 msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:315
+#: ../classes/class-kco-subscription.php:317
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:335
+#: ../classes/class-kco-subscription.php:337
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 

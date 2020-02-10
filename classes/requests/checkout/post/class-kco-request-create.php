@@ -52,7 +52,7 @@ class KCO_Request_Create extends KCO_Request {
 			'merchant_data'      => KCO_Request_Merchant_Data::get_merchant_data(),
 			'options'            => $request_options->get_options(),
 			'customer'           => array(
-				'type' => ( in_array( $this->settings['allowed_customer_types'], array( 'B2B', 'B2BC' ) ) ) ? 'organization' : 'person',
+				'type' => ( in_array( $this->settings['allowed_customer_types'], array( 'B2B', 'B2BC' ), true ) ) ? 'organization' : 'person',
 			),
 		);
 

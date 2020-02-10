@@ -83,7 +83,6 @@ class KCO_Request {
 		return $credentials['shared_secret'];
 	}
 
-
 	/**
 	 * Gets Klarna API request headers.
 	 *

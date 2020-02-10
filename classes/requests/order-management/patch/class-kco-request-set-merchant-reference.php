@@ -17,6 +17,7 @@ class KCO_Request_Set_Merchant_Reference extends KCO_Request {
 	 * Makes the request.
 	 *
 	 * @param string $klarna_order_id The Klarna order id.
+	 * @param string $order_id The WooCommerce order id.
 	 * @return array
 	 */
 	public function request( $klarna_order_id, $order_id ) {

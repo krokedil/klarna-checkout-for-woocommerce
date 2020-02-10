@@ -73,7 +73,8 @@ class KCO_Merchant_URLs {
 			array(
 				'kco_confirm'  => 'yes',
 				'kco_order_id' => '{checkout.order.id}',
-			), wc_get_checkout_url()
+			),
+			wc_get_checkout_url()
 		);
 
 		return apply_filters( 'kco_wc_confirmation_url', $confirmation_url );

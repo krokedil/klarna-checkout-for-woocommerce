@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$amont_of_api_callback_orders = 0;
 				foreach ( $orders as $order_id ) {
 
-					if ( 'klarna_checkout_backup_order_creation' == get_post_meta( $order_id, '_created_via', true ) ) {
+					if ( 'klarna_checkout_backup_order_creation' === get_post_meta( $order_id, '_created_via', true ) ) {
 						$amont_of_api_callback_orders++;
 					}
 				}
@@ -56,7 +56,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				echo '<strong><mark class="' . $status . '">' . $percent_of_orders . '% (' . $amont_of_api_callback_orders . ' of ' . $amont_of_klarna_orders . ')</mark></strong> of all orders paid via Klarna Checkout were created via API callback during the last month. This is a fallback order creation feature. You should aim for 0%.';
 
-			?>
+				?>
 		</td>
 	</tr>
 	</tbody>

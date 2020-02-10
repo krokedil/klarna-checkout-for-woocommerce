@@ -190,7 +190,7 @@ class KCO_Request_Options {
 	 * @return string
 	 */
 	private static function add_hash_to_color( $hex ) {
-		if ( '' != $hex ) {
+		if ( '' !== $hex ) {
 			$hex = str_replace( '#', '', $hex );
 			$hex = '#' . $hex;
 		}

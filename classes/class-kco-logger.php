@@ -81,7 +81,7 @@ class KCO_Logger {
 				'body' => $response,
 				'code' => $code,
 			),
-			'timestamp'      => date( 'Y-m-d H:i:s' ),
+			'timestamp'      => date( 'Y-m-d H:i:s' ), // phpcs:ignore
 			'stack'          => self::get_stack(),
 			'plugin_version' => KCO_WC_VERSION,
 		);
@@ -97,8 +97,8 @@ class KCO_Logger {
 		$stack      = array();
 		foreach ( $debug_data as $data ) {
 			$extra_data = '';
-			if ( ! in_array( $data['function'], array( 'get_stack', 'format_log' ) ) ) {
-				if ( in_array( $data['function'], array( 'do_action', 'apply_filters' ) ) ) {
+			if ( ! in_array( $data['function'], array( 'get_stack', 'format_log' ), true ) ) {
+				if ( in_array( $data['function'], array( 'do_action', 'apply_filters' ), true ) ) {
 					if ( isset( $data['object'] ) ) {
 						$priority   = $data['object']->current_priority();
 						$name       = key( $data['object']->current() );

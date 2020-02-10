@@ -81,14 +81,14 @@ class KCO_Subscription {
 			if ( $subscription_product_id ) {
 				$subscription_expiration_time = WC_Subscriptions_Product::get_expiration_date( $subscription_product_id );
 				if ( 0 !== $subscription_expiration_time ) {
-					$end_time = date( 'Y-m-d\TH:i', strtotime( $subscription_expiration_time ) );
+					$end_time = date( 'Y-m-d\TH:i', strtotime( $subscription_expiration_time ) ); // phpcs:ignore
 				} else {
-					$end_time = date( 'Y-m-d\TH:i', strtotime( '+50 year' ) );
+					$end_time = date( 'Y-m-d\TH:i', strtotime( '+50 year' ) ); // phpcs:ignore
 				}
 
 				$emd_subscription = array(
 					'subscription_name'            => 'Subscription: ' . get_the_title( $subscription_product_id ),
-					'start_time'                   => date( 'Y-m-d\TH:i' ),
+					'start_time'                   => date( 'Y-m-d\TH:i' ), // phpcs:ignore
 					'end_time'                     => $end_time,
 					'auto_renewal_of_subscription' => false,
 				);
@@ -99,8 +99,8 @@ class KCO_Subscription {
 
 					$emd_account = array(
 						'unique_account_identifier' => $current_user->user_login,
-						'account_registration_date' => date( 'Y-m-d\TH:i', strtotime( $current_user->user_registered ) ),
-						'account_last_modified'     => date( 'Y-m-d\TH:i' ),
+						'account_registration_date' => date( 'Y-m-d\TH:i', strtotime( $current_user->user_registered ) ), // phpcs:ignore
+						'account_last_modified'     => date( 'Y-m-d\TH:i' ), // phpcs:ignore
 					);
 				} else {
 					// User is not logged in - send empty params.
@@ -225,6 +225,7 @@ class KCO_Subscription {
 		$create_order_response = KCO_WC()->api->create_recurring_order( $order_id, $recurring_token );
 		if ( ! is_wp_error( $create_order_response ) ) {
 			$klarna_order_id = $create_order_response['order_id'];
+			// Translators: Klarna order id.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Klarna. Klarna order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
 			foreach ( $subscriptions as $subscription ) {
 				$subscription->payment_complete( $klarna_order_id );
@@ -235,6 +236,7 @@ class KCO_Subscription {
 			foreach ( $errors['error_messages'] as $error ) {
 				$error_message = $error_message . $error . '. ';
 			}
+			// Translators: Error code, error message.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s', 'klarna-checkout-for-woocommerce' ), $create_order_response['response']['code'], $error_message ) );
 			foreach ( $subscriptions as $subscription ) {
 				$subscription->payment_failed();

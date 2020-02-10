@@ -168,7 +168,7 @@ class KCO_API_Callbacks {
 
 		} else {
 			// Backup order creation.
-			// $this->backup_order_creation( $klarna_order_id );
+			// $this->backup_order_creation( $klarna_order_id );.
 			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Klarna order ID ' . stripslashes_deep( json_encode( $klarna_order_id ) ) );
 		}
 	}

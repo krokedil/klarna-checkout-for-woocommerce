@@ -52,7 +52,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		 * @param string $hook The hook.
 		 **/
 		public function enqueue_css( $hook ) {
-			if ( 'woocommerce_page_checkout-addons' == $hook || 'settings_page_specter-admin' == $hook ) {
+			if ( 'woocommerce_page_checkout-addons' === $hook || 'settings_page_specter-admin' === $hook ) {
 				wp_register_style( 'klarna-checkout-addons', KCO_WC_PLUGIN_URL . '/assets/css/checkout-addons.css', false, KCO_WC_VERSION );
 				wp_enqueue_style( 'klarna-checkout-addons' );
 				wp_register_script( 'klarna-checkout-addons', KCO_WC_PLUGIN_URL . '/assets/js/klarna-for-woocommerce-addons.js', true, KCO_WC_VERSION );
@@ -95,7 +95,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			<div id="checkout-addons-body" class="checkout-addons-body checkout-addons-wrap wrap">
 				<?php if ( $addon_content->sections ) : ?>
 					<?php foreach ( $addon_content->sections as $section ) : ?>
-						<?php if ( isset( $section->plugin_id ) && in_array( $section->plugin_id, array( 'kco', 'both' ) ) ) : ?>
+						<?php if ( isset( $section->plugin_id ) && in_array( $section->plugin_id, array( 'kco', 'both' ), true ) ) : ?>
 							<div id="<?php echo esc_html( $section->class ); ?>" class="<?php echo esc_html( $section->class ); ?>">
 								<div class="list">
 									<?php foreach ( $section->items as $item ) : ?>
@@ -391,7 +391,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			);
 			$html = '<h2 class="nav-tab-wrapper">';
 			foreach ( $tabs as $tab => $name ) {
-				$class = ( $tab == $current ) ? 'nav-tab-active' : '';
+				$class = ( $tab === $current ) ? 'nav-tab-active' : '';
 				$html .= '<a class="nav-tab ' . $class . '" href="?page=checkout-addons&tab=' . $tab . '">' . $name . '</a>';
 			}
 			$html .= '</h2>';

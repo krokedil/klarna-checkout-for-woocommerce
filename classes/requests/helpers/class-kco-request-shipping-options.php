@@ -16,6 +16,7 @@ class KCO_Request_Shipping_Options {
 	/**
 	 * Gets shipping options formatted for Klarna.
 	 *
+	 * @param bool $separate_sales_tax True if the sales tax should be seperate.
 	 * @return array
 	 */
 	public static function get_shipping_options( $separate_sales_tax ) {

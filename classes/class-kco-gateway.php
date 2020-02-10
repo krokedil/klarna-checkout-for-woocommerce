@@ -180,7 +180,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 		// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE or AT, disable KCO.
 		if ( is_checkout() && class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
 			$available_recurring_countries = array( 'SE', 'NO', 'FI', 'DE', 'AT' );
-			if ( ! in_array( WC()->customer->get_billing_country(), $available_recurring_countries ) ) {
+			if ( ! in_array( WC()->customer->get_billing_country(), $available_recurring_countries, true ) ) {
 				return false;
 			}
 		}
@@ -378,7 +378,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 			'VA',
 		);
 
-		if ( in_array( $store_base_location, $eu_countries ) ) {
+		if ( in_array( $store_base_location, $eu_countries, true ) ) {
 			return 'EU';
 		} else {
 			return '';
@@ -520,7 +520,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 				reset( $available_payment_gateways );
 				$first_gateway = key( $available_payment_gateways );
 			}
-			if ( 'kco' == $first_gateway ) {
+			if ( 'kco' === $first_gateway ) {
 				$class[] = 'kco-shipping-display';
 			}
 		}

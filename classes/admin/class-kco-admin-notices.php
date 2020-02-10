@@ -224,7 +224,7 @@ class KCO_Admin_Notices {
 				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'kco-hide-notice', $current_message_version ), 'kco_hide_notices_nonce', '_kco_notice_nonce' ) ); ?>"><?php _e( 'Dismiss', 'woocommerce' ); ?></a>
 				<?php echo wp_kses_post( wpautop( '<p>' . $message . '</p>' ) ); ?>
 				</div>
-			<?php
+				<?php
 			}
 		}
 	}
