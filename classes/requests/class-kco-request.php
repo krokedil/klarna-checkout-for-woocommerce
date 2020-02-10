@@ -122,7 +122,12 @@ class KCO_Request {
 	 * @return object|array
 	 */
 	public function process_response( $response, $request_args = array(), $request_url = '' ) {
-		// Check the status code.
+		// Check if response is a WP_Error, and return it back if it is.
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		// Check the status code, if its not between 200 and 299 then its an error.
 		if ( wp_remote_retrieve_response_code( $response ) < 200 || wp_remote_retrieve_response_code( $response ) > 299 ) {
 			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $request_args );
 			$error_message = '';
