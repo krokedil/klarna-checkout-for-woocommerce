@@ -30,7 +30,6 @@ class KCO_AJAX extends WC_AJAX {
 	 */
 	public static function add_ajax_events() {
 		$ajax_events = array(
-			'kco_wc_update_cart'                    => true,
 			'kco_wc_update_shipping'                => true,
 			'kco_wc_change_payment_method'          => true,
 			'kco_wc_update_klarna_order'            => true,
@@ -47,39 +46,6 @@ class KCO_AJAX extends WC_AJAX {
 				add_action( 'wc_ajax_' . $ajax_event, array( __CLASS__, $ajax_event ) );
 			}
 		}
-	}
-
-	/**
-	 * Cart quantity update function.
-	 */
-	public static function kco_wc_update_cart() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_update_cart' ) ) {
-			wp_send_json_error( 'bad_nonce' );
-			exit;
-		}
-
-		wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
-
-		$values = array();
-		parse_str( $_POST['checkout'], $values );
-		$cart = $values['cart'];
-
-		foreach ( $cart as $cart_key => $cart_value ) {
-			$new_quantity = (int) $cart_value['qty'];
-			WC()->cart->set_quantity( $cart_key, $new_quantity, false );
-		}
-		WC()->cart->calculate_fees();
-		WC()->cart->calculate_totals();
-
-		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
-		$klarna_order    = KCO_WC()->api->update_klarna_order( $klarna_order_id );
-
-		// If the update failed - reload the checkout page and display the error.
-		if ( ! $klarna_order ) {
-			wp_send_json_error();
-			wp_die();
-		}
-		wp_die();
 	}
 
 	/**
