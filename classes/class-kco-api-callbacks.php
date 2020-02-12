@@ -101,7 +101,6 @@ class KCO_API_Callbacks {
 		/**
 		 * 1. Handle POST request
 		 * 2. Request the order from Klarna
-		 * 3. Backup order creation
 		 * 4. Acknowledge the order
 		 * 5. Send merchant_reference1
 		 */
@@ -110,6 +109,8 @@ class KCO_API_Callbacks {
 		if ( ! $_GET['kco_wc_order_id'] ) {
 			return;
 		}
+
+		KCO_WC()->logger->log( 'Push callback hitt for order: ' . $_GET['kco_wc_order_id'] );
 
 		$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
 
@@ -130,7 +131,8 @@ class KCO_API_Callbacks {
 		// If zero matching orders were found, create backup order.
 		if ( empty( $orders ) ) {
 			// Backup order creation.
-			$this->backup_order_creation( $klarna_order_id );
+			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Klarna order ID ' . stripslashes_deep( json_encode( $klarna_order_id ) ) );
+			// $this->backup_order_creation( $klarna_order_id );
 			return;
 		}
 
