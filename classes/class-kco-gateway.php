@@ -167,7 +167,6 @@ class KCO_Gateway extends WC_Payment_Gateway {
 	 * @return bool
 	 */
 	public function is_available() {
-		return true;
 		if ( 'yes' !== $this->enabled ) {
 			return false;
 		}
