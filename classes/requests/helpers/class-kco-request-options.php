@@ -29,13 +29,14 @@ class KCO_Request_Options {
 	 */
 	public function get_options() {
 		$options = array(
-			'title_mandatory'                          => $this->get_title_mandatory(),
-			'allow_separate_shipping_address'          => $this->get_allow_separate_shipping_address(),
-			'date_of_birth_mandatory'                  => $this->get_dob_mandatory(),
-			'national_identification_number_mandatory' => $this->get_dob_mandatory(),
-			'allowed_customer_types'                   => $this->get_allowed_customer_types(),
-			'require_client_validation'                => true,
-			'phone_mandatory'                          => 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ),
+			'title_mandatory'                             => $this->get_title_mandatory(),
+			'allow_separate_shipping_address'             => $this->get_allow_separate_shipping_address(),
+			'date_of_birth_mandatory'                     => $this->get_dob_mandatory(),
+			'national_identification_number_mandatory'    => $this->get_dob_mandatory(),
+			'allowed_customer_types'                      => $this->get_allowed_customer_types(),
+			'require_client_validation'                   => true,
+			'require_client_validation_callback_response' => true,
+			'phone_mandatory'                             => 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ),
 		);
 
 		if ( $this->get_iframe_colors() ) {
