@@ -73,6 +73,27 @@ jQuery(function($) {
 				});
 		},
 
+		updateCart: function () {
+			kco_wc.kcoSuspend( true );
+			$.ajax({
+				type: 'POST',
+				url: kco_params.update_cart_url,
+				data: {
+					checkout: $('form.checkout').serialize(),
+					nonce: kco_params.update_cart_nonce
+				},
+				dataType: 'json',
+				success: function(data) {
+				},
+				error: function(data) {
+				},
+				complete: function(data) {
+					$('body').trigger('update_checkout');
+					kco_wc.kcoResume();
+				}
+			});
+		},
+
 		updateKlarnaOrder: function() {
 			if ( 'kco' === kco_wc.paymentMethod && kco_params.is_confirmation_page === 'no' ) {
 				kco_wc.kcoSuspend();
@@ -305,6 +326,7 @@ jQuery(function($) {
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.updateKlarnaOrder);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybeDisplayShippingPrice);
 			kco_wc.bodyEl.on('updated_checkout', kco_wc.maybePrintValidationMessage);
+			kco_wc.bodyEl.on('change', 'input.qty', kco_wc.updateCart);
 			kco_wc.bodyEl.on('change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco);
 			kco_wc.bodyEl.on('click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco);
 			$( window ).on('hashchange', kco_wc.hashChange);

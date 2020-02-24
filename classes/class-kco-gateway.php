@@ -257,6 +257,8 @@ class KCO_Gateway extends WC_Payment_Gateway {
 		$standard_woo_checkout_fields = array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'terms', 'account_username', 'account_password' );
 
 		$checkout_localize_params = array(
+			'update_cart_url'                      => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
+			'update_cart_nonce'                    => wp_create_nonce( 'kco_wc_update_cart' ),
 			'update_shipping_url'                  => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
 			'update_shipping_nonce'                => wp_create_nonce( 'kco_wc_update_shipping' ),
 			'change_payment_method_url'            => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),

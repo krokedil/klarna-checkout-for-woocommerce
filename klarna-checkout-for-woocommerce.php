@@ -149,6 +149,8 @@ if ( ! class_exists( 'KCO' ) ) {
 			// "Fallback" redirection to proper order thank you page if we have one.
 			add_action( 'wp_head', array( $this, 'redirect_to_thankyou' ) );
 
+			// Add quantity button in woocommerce_order_review() function.
+			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
 			$kco_options = get_option( 'woocommerce_kco_settings' );
 			if ( 'yes' === $kco_options['logging'] ) {
 				define( 'KROKEDIL_LOGGER_ON', true );
@@ -279,6 +281,45 @@ if ( ! class_exists( 'KCO' ) ) {
 			$methods[] = 'KCO_Gateway';
 
 			return $methods;
+		}
+
+
+		/**
+		 * Filters cart item quantity output.
+		 *
+		 * @param string $output HTML output.
+		 * @param array  $cart_item Cart item.
+		 * @param string $cart_item_key Cart item key.
+		 *
+		 * @return string $output
+		 */
+		public function add_quantity_field( $output, $cart_item, $cart_item_key ) {
+			if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
+				foreach ( WC()->cart->get_cart() as $cart_key => $cart_value ) {
+					if ( $cart_key === $cart_item_key ) {
+						$_product = $cart_item['data'];
+
+						if ( $_product->is_sold_individually() ) {
+							$return_value = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1" />', $cart_key );
+						} else {
+							$return_value = woocommerce_quantity_input(
+								array(
+									'input_name'  => 'cart[' . $cart_key . '][qty]',
+									'input_value' => $cart_item['quantity'],
+									'max_value'   => $_product->backorders_allowed() ? '' : $_product->get_stock_quantity(),
+									'min_value'   => '1',
+								),
+								$_product,
+								false
+							);
+						}
+
+						$output = $return_value;
+					}
+				}
+			}
+
+			return $output;
 		}
 
 		/**
