@@ -214,15 +214,15 @@ class KCO_Admin_Notices {
 	 * @return void
 	 */
 	public function version_warning_message() {
-		$current_message_version = '1.10.2';
+		$current_message_version = null;
 		$dismissed_version       = get_user_meta( get_current_user_id(), 'dismissed_kco_version_number', true );
-		$message                 = __( '<h3>Klarna Checkout 1.10.2 notice</h3><p>With version 1.10.2 we have added a control to make sure that validation requests from Klarna gets a valid response. This might mean that orders are not going through if your store is blocking these signals. Please test and see that everything is working correctly, and verify that no firewalls or security plugins are blocking Klarnas request.</p>', 'klarna-checkout-for-woocommerce' );
+		$message                 = null;
 		if ( null !== $current_message_version ) {
-			if ( ! $dismissed_version || ! version_compare( $dismissed_version, $current_message_version, '>=' ) ) {
+			if ( ! $dismissed_version || ! version_compare( $dismissed_version, $current_message_version, ' >= ' ) ) {
 				?>
 				<div class="kco-message notice woocommerce-message notice-error">
-				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'kco-hide-notice', $current_message_version ), 'kco_hide_notices_nonce', '_kco_notice_nonce' ) ); ?>"><?php _e( 'Dismiss', 'woocommerce' ); ?></a>
-				<?php echo wp_kses_post( wpautop( '<p>' . $message . '</p>' ) ); ?>
+				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'kco - hide - notice', $current_message_version ), 'kco_hide_notices_nonce', '_kco_notice_nonce' ) ); ?>"><?php _e( 'Dismiss', 'woocommerce' ); ?></a>
+				<?php echo wp_kses_post( wpautop( ' < p > ' . $message . ' < / p > ' ) ); ?>
 				</div>
 				<?php
 			}
@@ -236,11 +236,11 @@ class KCO_Admin_Notices {
 	 */
 	public function check_hide_action() {
 
-		if ( isset( $_GET['kco-hide-notice'] ) ) {
+		if ( isset( $_GET['kco - hide - notice'] ) ) {
 			if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_kco_notice_nonce'] ) ), 'kco_hide_notices_nonce' ) ) { // WPCS: input var ok, CSRF ok.
-				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'woocommerce' ) );
+				wp_die( esc_html__( 'Action failed . Please refresh the page and retry . ', 'woocommerce' ) );
 			}
-			update_user_meta( get_current_user_id(), 'dismissed_kco_version_number', $_GET['kco-hide-notice'] ); // WPCS: input var ok, CSRF ok.
+			update_user_meta( get_current_user_id(), 'dismissed_kco_version_number', $_GET['kco - hide - notice'] ); // WPCS: input var ok, CSRF ok.
 		}
 	}
 }
