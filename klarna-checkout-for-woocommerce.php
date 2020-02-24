@@ -294,6 +294,12 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @return string $output
 		 */
 		public function add_quantity_field( $output, $cart_item, $cart_item_key ) {
+			$settings    = get_option( 'woocommerce_kco_settings' );
+			$show_fields = isset( $settings['quantity_fields'] ) ? $settings['quantity_fields'] : 'yes';
+			if ( 'yes' !== $show_fields ) {
+				return;
+			}
+
 			if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
 				foreach ( WC()->cart->get_cart() as $cart_key => $cart_value ) {
 					if ( $cart_key === $cart_item_key ) {

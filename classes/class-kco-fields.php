@@ -207,6 +207,14 @@ class KCO_Fields {
 				'type'    => 'checkbox',
 				'default' => 'yes',
 			),
+			'quantity_fields'            => array(
+				'title'       => __( 'Display quantity fields', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Display the quantity selection fields on the checkout page', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If this option is checked, the customer will be able to change the quantity of a product purchased on the checkout page as they would on the cart page.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
 			// Checkout iframe settings.
 			'color_settings_title'       => array(
 				'title' => __( 'Color Settings', 'klarna-checkout-for-woocommerce' ),
