@@ -23,7 +23,7 @@ class KCO_Subscription {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		// add_filter( 'kco_wc_api_request_args', array( $this, 'create_extra_merchant_data' ) );.
+		add_filter( 'kco_wc_api_request_args', array( $this, 'create_extra_merchant_data' ) ); .
 		add_filter( 'kco_wc_api_request_args', array( $this, 'set_recurring' ) );
 		add_action( 'woocommerce_thankyou_kco', array( $this, 'set_recurring_token_for_order' ) );
 		add_action( 'woocommerce_scheduled_subscription_payment_kco', array( $this, 'trigger_scheduled_payment' ), 10, 2 );
