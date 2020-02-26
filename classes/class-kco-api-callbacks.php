@@ -143,7 +143,7 @@ class KCO_API_Callbacks {
 			// Get the Klarna order data.
 			$klarna_order = apply_filters(
 				'kco_wc_api_callbacks_push_klarna_order',
-				KCO_WC()->api->get_klarna_order( $klarna_order_id )
+				KCO_WC()->api->get_klarna_om_order( $klarna_order_id )
 			);
 
 			// The Woo order was already created. Check if order status was set (in process_payment_handler).
