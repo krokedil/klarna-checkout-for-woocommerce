@@ -281,6 +281,10 @@ jQuery(function($) {
 				},
 				complete: function(data) {
 					kco_wc.setCustomerData( data.responseJSON.data );
+					// Check Terms checkbox, if it exists.
+					if ($("form.checkout #terms").length > 0) {
+						$("form.checkout #terms").prop("checked", true);
+					}
 					$('form.checkout').submit();
 					return true;
 				}

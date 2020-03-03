@@ -167,7 +167,14 @@ class KCO_Templates {
 			<?php do_action( 'woocommerce_checkout_billing' ); ?>
 			<?php do_action( 'woocommerce_checkout_shipping' ); ?>
 			<div id="kco-nonce-wrapper">
-				<?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
+				<?php
+				if ( version_compare( WOOCOMMERCE_VERSION, '3.4', '<' ) ) {
+					wp_nonce_field( 'woocommerce-process_checkout' );
+					wc_get_template( 'checkout/terms.php' );
+				} else {
+					wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); 
+				}
+				?>
 			</div>
 			<input id="payment_method_kco" type="radio" class="input-radio" name="payment_method" value="kco" checked="checked" />		</div>
 		<?php
