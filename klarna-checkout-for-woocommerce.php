@@ -297,7 +297,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			$settings    = get_option( 'woocommerce_kco_settings' );
 			$show_fields = isset( $settings['quantity_fields'] ) ? $settings['quantity_fields'] : 'yes';
 			if ( 'yes' !== $show_fields ) {
-				return;
+				return $output;
 			}
 
 			if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
