@@ -17,3 +17,4 @@ nightwatch.conf.js
 
 # OS X metadata
 .DS_Store
+.vscode/settings.json

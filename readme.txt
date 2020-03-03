@@ -5,8 +5,8 @@ Donate link: https://klarna.com
 Requires at least: 4.0
 Tested up to: 5.3.2
 Requires PHP: 5.6
-WC requires at least: 3.2.0
-WC tested up to: 3.9.0
+WC requires at least: 3.4.0
+WC tested up to: 3.9.2
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,19 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.03.03    - version 2.0.0 =
+* Feature       - Implemented Klarnas frontend validation event.
+* Feature       - Subscription EMD is automatically added to the Klarna order.
+* Tweak	        - Complete rewrite of plugin.
+* Tweak         - Major update to the flow of the checkout. Follows the WooCommerce flow more closely now. Orders are now created on the checkout page and validated by WooCommerce.
+* Enhancement   - Removed validation callbacks. We now rely on the WooCommerce validation for extra checkout fields, and other validation steps.
+* Enhancement   - Removed the old debug logging that was saved to the database.
+* Enhancement   - Improved the logging. Requests and responses are now logged together. Added a stacktrace to the logs for easier debugging.
+* Enhancement   - API errors between WooCommerce and Klarna are now always logged, independent on what your debug setting is. With debug on every request is logged.
+* Enhancement   - Reduced the amount of requests to Klarna needed per order.
+* Enhancement   - Better handling of external payment methods.
+* Enhancement   - Better support for extra checkout fields.
+
 = 2020.01.28    - version 1.11.7 =
 * Fix           - Force update_checkout on checkout page load (if WC version 3.9+) to keep KCO iframe in sync with WooCommerce cart.
 * Fix           - Don't try to run process_payment_handler function if KCO order status is checkout_incomplete.
