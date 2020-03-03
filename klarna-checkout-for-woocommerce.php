@@ -5,7 +5,7 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 2.0.0
+ * Version: 2.0.1
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.0.0' );
+define( 'KCO_WC_VERSION', '2.0.1' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -151,10 +151,6 @@ if ( ! class_exists( 'KCO' ) ) {
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
-			$kco_options = get_option( 'woocommerce_kco_settings' );
-			if ( 'yes' === $kco_options['logging'] ) {
-				define( 'KROKEDIL_LOGGER_ON', true );
-			}
 		}
 
 		/**
@@ -297,7 +293,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			$settings    = get_option( 'woocommerce_kco_settings' );
 			$show_fields = isset( $settings['quantity_fields'] ) ? $settings['quantity_fields'] : 'yes';
 			if ( 'yes' !== $show_fields ) {
-				return;
+				return $output;
 			}
 
 			if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
