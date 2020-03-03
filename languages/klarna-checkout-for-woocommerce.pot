@@ -83,27 +83,27 @@ msgstr ""
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:154, ../classes/class-kco-api-callbacks.php:460, ../includes/kco-functions.php:517
+#: ../classes/class-kco-api-callbacks.php:154, ../classes/class-kco-api-callbacks.php:496, ../includes/kco-functions.php:517
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:157, ../classes/class-kco-api-callbacks.php:463
+#: ../classes/class-kco-api-callbacks.php:157, ../classes/class-kco-api-callbacks.php:499
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:160, ../classes/class-kco-api-callbacks.php:466, ../includes/kco-functions.php:523
+#: ../classes/class-kco-api-callbacks.php:160, ../classes/class-kco-api-callbacks.php:502, ../includes/kco-functions.php:523
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:455
+#: ../classes/class-kco-api-callbacks.php:491
 msgid "Order created via Klarna Checkout API callback. Please verify the order in Klarnas system."
 msgstr ""
 
 #. translators: %s: Klarna order amount.
-#: ../classes/class-kco-api-callbacks.php:480
+#: ../classes/class-kco-api-callbacks.php:516
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
@@ -411,30 +411,30 @@ msgstr ""
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:494
+#: ../classes/class-kco-gateway.php:497
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
 #. translators: Klarna order id.
-#: ../classes/class-kco-subscription.php:229
+#: ../classes/class-kco-subscription.php:224
 msgid "Subscription payment made with Klarna. Klarna order id: %s"
 msgstr ""
 
 #. translators: Error code, error message.
-#: ../classes/class-kco-subscription.php:240
+#: ../classes/class-kco-subscription.php:235
 msgid "Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s"
 msgstr ""
 
 #. translators: %s Klarna recurring token.
-#: ../classes/class-kco-subscription.php:311
+#: ../classes/class-kco-subscription.php:306
 msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:317
+#: ../classes/class-kco-subscription.php:312
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:337
+#: ../classes/class-kco-subscription.php:332
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
