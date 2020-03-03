@@ -151,10 +151,6 @@ if ( ! class_exists( 'KCO' ) ) {
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
-			$kco_options = get_option( 'woocommerce_kco_settings' );
-			if ( 'yes' === $kco_options['logging'] ) {
-				define( 'KROKEDIL_LOGGER_ON', true );
-			}
 		}
 
 		/**
