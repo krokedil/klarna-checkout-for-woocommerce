@@ -172,7 +172,7 @@ class KCO_Templates {
 					wp_nonce_field( 'woocommerce-process_checkout' );
 					wc_get_template( 'checkout/terms.php' );
 				} else {
-					wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); 
+					wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' );
 				}
 				?>
 			</div>
