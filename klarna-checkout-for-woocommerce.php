@@ -1,16 +1,16 @@
-<?php
-/*
+<?php // phpcs:ignore
+/**
  * Plugin Name: Klarna Checkout for WooCommerce
  * Plugin URI: https://krokedil.com/klarna/
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 1.11.7
+ * Version: 2.0.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 3.2.0
- * WC tested up to: 3.9.0
+ * WC tested up to: 3.9.2
  *
  * Copyright (c) 2017-2020 Krokedil
  *
@@ -26,7 +26,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,18 +35,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '1.11.7' );
+define( 'KCO_WC_VERSION', '2.0.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
 define( 'KCO_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'KCO_WC_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 define( 'KROKEDIL_LOGGER_GATEWAY', 'kco' );
-if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
+if ( ! class_exists( 'KCO' ) ) {
 	/**
-	 * Class Klarna_Checkout_For_WooCommerce
+	 * Class KCO
 	 */
-	class Klarna_Checkout_For_WooCommerce {
+	class KCO {
 
 		/**
 		 * The reference the *Singleton* instance of this class.
@@ -144,12 +144,15 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		protected function __construct() {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
-			add_action( 'template_redirect', array( $this, 'maybe_display_kco_order_error_message' ) );
+			add_action( 'wp_head', array( $this, 'check_if_external_payment' ) );
+
+			// "Fallback" redirection to proper order thank you page if we have one.
+			add_action( 'wp_head', array( $this, 'redirect_to_thankyou' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
-			$KCO_options = get_option( 'woocommerce_kco_settings' );
-			if ( 'yes' === $KCO_options['logging'] ) {
+			$kco_options = get_option( 'woocommerce_kco_settings' );
+			if ( 'yes' === $kco_options['logging'] ) {
 				define( 'KROKEDIL_LOGGER_ON', true );
 			}
 		}
@@ -205,25 +208,6 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		}
 
 		/**
-		 * Display Klarna order error in cart page if customer have been redirected to cart because of a communication issue.
-		 */
-		public function maybe_display_kco_order_error_message() {
-			if ( class_exists( 'WooCommerce' ) ) {
-				if ( is_cart() && isset( $_GET['kco-order'] ) && 'error' === $_GET['kco-order'] ) {
-					if ( isset( $_GET['reason'] ) ) {
-						$message = sprintf( __( 'Klarna Checkout error (%s).', 'klarna-checkout-for-woocommerce' ), sanitize_textarea_field( base64_decode( $_GET['reason'] ) ) );
-					} else {
-						$message = __( 'Klarna Checkout error. Please try again.', 'klarna-checkout-for-woocommerce' );
-					}
-					wc_add_notice( $message, 'error' );
-				}
-				if ( is_cart() && isset( $_GET['kco-order'] ) && 'missing-id' === $_GET['kco-order'] ) {
-					wc_add_notice( __( 'An error occurred during communication with Klarna (Klarna order ID is missing). Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
-				}
-			}
-		}
-
-		/**
 		 * Initialize the gateway. Called very early - in the context of the plugins_loaded action
 		 *
 		 * @since 1.0.0
@@ -233,39 +217,53 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 				return;
 			}
 
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-gateway.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-api-callbacks.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-templates.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-ajax.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-merchant-urls.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-credentials.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-logging.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-fields.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-confirmation.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-extra-checkout-fields.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-status.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-create-local-order-fallback.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-gdpr.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-checkout-form-fields.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-subscription.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-order-lines-from-order.php';
-			include_once KCO_WC_PLUGIN_PATH . '/includes/klarna-checkout-for-woocommerce-functions.php';
-			include_once KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
+			// Classes.
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-ajax.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api-callbacks.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-credentials.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-fields.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gateway.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gdpr.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-logger.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-status.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-subscription.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-templates.php';
 
+			// Admin includes.
 			if ( is_admin() ) {
-				include_once KCO_WC_PLUGIN_PATH . '/includes/class-klarna-checkout-for-woocommerce-admin-notices.php';
-				include_once KCO_WC_PLUGIN_PATH . '/includes/class-wc-klarna-banners.php';
-				include_once KCO_WC_PLUGIN_PATH . '/includes/admin/class-klarna-for-woocommerce-addons.php';
+				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-kco-admin-notices.php';
+				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-for-woocommerce-addons.php';
+				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-wc-klarna-banners.php';
 			}
 
-			$this->api                    = new Klarna_Checkout_For_WooCommerce_API();
-			$this->merchant_urls          = new Klarna_Checkout_For_WooCommerce_Merchant_URLs();
-			$this->order_lines            = new Klarna_Checkout_For_WooCommerce_Order_Lines();
-			$this->credentials            = new Klarna_Checkout_For_WooCommerce_Credentials();
-			$this->logger                 = new Klarna_Checkout_For_WooCommerce_Logging();
-			$this->order_lines_from_order = new Klarna_Checkout_For_Woocommerce_Order_Lines_From_Order();
+			// Requests.
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/class-kco-request.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-create-recurring.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-create.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-update.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/get/class-kco-request-retrieve.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/order-management/get/class-kco-request-get-order.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/order-management/patch/class-kco-request-set-merchant-reference.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/order-management/post/class-kco-request-acknowledge-order.php';
+
+			// Helpers.
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-merchant-urls.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-cart.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-countries.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-merchant-data.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-options.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-order.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/helpers/class-kco-request-shipping-options.php';
+
+			// Includes.
+			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
+
+			// Set class variables.
+			$this->credentials   = new KCO_Credentials();
+			$this->merchant_urls = new KCO_Merchant_URLs();
+			$this->logger        = new KCO_Logger();
+			$this->api           = new KCO_API();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
@@ -280,10 +278,11 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * @since  1.0.0
 		 */
 		public function add_gateways( $methods ) {
-			$methods[] = 'Klarna_Checkout_For_WooCommerce_Gateway';
+			$methods[] = 'KCO_Gateway';
 
 			return $methods;
 		}
+
 
 		/**
 		 * Filters cart item quantity output.
@@ -295,6 +294,12 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 		 * @return string $output
 		 */
 		public function add_quantity_field( $output, $cart_item, $cart_item_key ) {
+			$settings    = get_option( 'woocommerce_kco_settings' );
+			$show_fields = isset( $settings['quantity_fields'] ) ? $settings['quantity_fields'] : 'yes';
+			if ( 'yes' !== $show_fields ) {
+				return;
+			}
+
 			if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
 				foreach ( WC()->cart->get_cart() as $cart_key => $cart_value ) {
 					if ( $cart_key === $cart_item_key ) {
@@ -323,17 +328,113 @@ if ( ! class_exists( 'Klarna_Checkout_For_WooCommerce' ) ) {
 			return $output;
 		}
 
+		/**
+		 * Redirects the customer to the proper thank you page.
+		 *
+		 * @return void
+		 */
+		public function redirect_to_thankyou() {
+			if ( isset( $_GET['kco_confirm'] ) && isset( $_GET['kco_order_id'] ) ) {
+				$klarna_order_id = $_GET['kco_order_id'];
+
+				// Find relevant order in Woo.
+				$query_args = array(
+					'fields'      => 'ids',
+					'post_type'   => wc_get_order_types(),
+					'post_status' => array_keys( wc_get_order_statuses() ),
+					'meta_key'    => '_wc_klarna_order_id',
+					'meta_value'  => $klarna_order_id,
+				);
+
+				$orders = get_posts( $query_args );
+				if ( ! $orders ) {
+					// If no order is found, bail. @TODO Add a fallback order creation here?
+					wc_add_notice( __( 'Something went wrong in the checkout process. Please contact the store.', 'error' ) );
+					return;
+				}
+				$order_id = $orders[0];
+				$order    = wc_get_order( $order_id );
+				// Confirm, redirect and exit.
+				kco_confirm_klarna_order( $order_id, $klarna_order_id );
+				header( 'Location:' . $order->get_checkout_order_received_url() );
+				exit;
+			}
+		}
+
+		/**
+		 * Checks if we have an external payment method on page load.
+		 *
+		 * @return void
+		 */
+		public function check_if_external_payment() {
+			if ( isset( $_GET['kco-external-payment'] ) ) {
+				$this->run_kepm( $_GET );
+			}
+		}
+
+		/**
+		 * Initiates a Klarna External Payment Method payment.
+		 *
+		 * @param array $get_data The get data from the server request.
+		 * @return void
+		 */
+		public function run_kepm( $get_data ) {
+			$epm             = $get_data['kco-external-payment'];
+			$order_id        = ( isset( $get_data['order_id'] ) ) ? $get_data['order_id'] : '';
+			$klarna_order_id = ( isset( $get_data['kco_order_id'] ) ) ? $get_data['kco_order_id'] : '';
+			$order           = wc_get_order( $order_id );
+			// Check if we have a KCO order id.
+			if ( ! empty( $klarna_order_id ) ) {
+				// Do a database lookup for the WooCommerce order.
+				$query_args = array(
+					'fields'      => 'ids',
+					'post_type'   => wc_get_order_types(),
+					'post_status' => array_keys( wc_get_order_statuses() ),
+					'meta_key'    => '_wc_klarna_order_id',
+					'meta_value'  => $klarna_order_id,
+				);
+				$orders     = get_posts( $query_args );
+				// Set the order from the first order id returned.
+				if ( ! empty( $orders ) ) {
+					$order_id = $orders[0];
+					$order    = wc_get_order( $order_id );
+				}
+			}
+			// Check if we have a order.
+			if ( ! $order ) {
+				wc_print_notice( __( 'Failed getting the order for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
+				return;
+			}
+			$payment_methods = WC()->payment_gateways->get_available_payment_gateways();
+			// Check if the payment method is available.
+			if ( ! isset( $payment_methods[ $epm ] ) ) {
+				wc_print_notice( __( 'Failed to find the payment method for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
+				return;
+			}
+			$result = $payment_methods[ $epm ]->process_payment( $order_id );
+			// Check if the result is good.
+			if ( ! isset( $result['result'] ) || 'success' !== $result['result'] ) {
+				wc_print_notice( __( 'Something went wrong with the external payment. Please try again', 'klarna-checkout-for-woocommerce' ), 'error' );
+				return;
+			}
+			// Everything is fine, redirect to the URL specified by the gateway.
+			$order->set_payment_method( $payment_methods[ $epm ] );
+			$order->save();
+			wp_redirect( $result['redirect'] );
+			exit;
+		}
+
 	}
-	Klarna_Checkout_For_WooCommerce::get_instance();
+	KCO::get_instance();
 }
 
 /**
- * Main instance Klarna_Checkout_For_WooCommerce WooCommerce.
+ * Main instance KCO WooCommerce.
  *
- * Returns the main instance of Klarna_Checkout_For_WooCommerce.
+ * Returns the main instance of KCO.
  *
- * @return Klarna_Checkout_For_WooCommerce
+ * @return KCO
  */
-function KCO_WC() {
-	return Klarna_Checkout_For_WooCommerce::get_instance();
+function KCO_WC() { // phpcs:ignore
+	return KCO::get_instance();
 }
