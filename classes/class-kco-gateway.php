@@ -119,12 +119,16 @@ class KCO_Gateway extends WC_Payment_Gateway {
 		// Regular purchase.
 		// 1. Process the payment.
 		// 2. Redirect to order received page.
-		$this->process_payment_handler( $order_id );
-
-		return array(
-			'result'   => 'success',
-			'redirect' => '#klarna-success=' . base64_encode( microtime() ), // Base64 encoded timestamp to always have a fresh URL for on hash change event.
-		);
+		if ( $this->process_payment_handler( $order_id ) ) {
+			return array(
+				'result'   => 'success',
+				'redirect' => '#klarna-success=' . base64_encode( microtime() ), // Base64 encoded timestamp to always have a fresh URL for on hash change event.
+			);
+		} else {
+			return array(
+				'result' => 'error',
+			);
+		}
 
 	}
 
@@ -407,13 +411,10 @@ class KCO_Gateway extends WC_Payment_Gateway {
 
 		if ( $order_id && $klarna_order ) {
 
-			// Maybe set WC order transaction ID.
-			if ( empty( get_post_meta( $order_id, '_wc_klarna_order_id' ) ) ) {
-				update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
-			}
-			if ( empty( get_post_meta( $order_id, '_transaction_id' ) ) ) {
-				update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order['order_id'] ) );
-			}
+			// Set WC order transaction ID.
+			update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
+
+			update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order['order_id'] ) );
 
 			$environment = $this->testmode ? 'test' : 'live';
 			update_post_meta( $order_id, '_wc_klarna_environment', $environment );
@@ -427,9 +428,18 @@ class KCO_Gateway extends WC_Payment_Gateway {
 
 			// Update the order with new confirmation page url.
 			$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id, $order_id );
+
+			$order->save();
 			// Let other plugins hook into this sequence.
 			do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
+
+			// Check that the transaction id got set correctly.
+			if ( get_post_meta( $order_id, '_transaction_id', true ) === $klarna_order_id ) {
+				return true;
+			}
 		}
+		// Return false if we get here. Something went wrong.
+		return false;
 	}
 
 	/**

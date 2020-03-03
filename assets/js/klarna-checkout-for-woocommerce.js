@@ -248,7 +248,11 @@ jQuery(function($) {
 				// Check if this is a standard field.
 				if ( $.inArray( name, kco_params.standard_woo_checkout_fields ) === -1 ) {
 					// This is not a standard Woo field, move to our div.
-					$('p#' + name + '_field').appendTo('#kco-extra-checkout-fields');
+					if( $('p#' + name + '_field').length > 0 ) {
+						$('p#' + name + '_field').appendTo('#kco-extra-checkout-fields');
+					} else {
+						$('input[name="' + name + '"]').closest( 'p' ).appendTo( '#kco-extra-checkout-fields' );
+					}
 				}
 			}
 		},
