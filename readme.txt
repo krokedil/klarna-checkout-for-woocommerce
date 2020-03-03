@@ -5,8 +5,8 @@ Donate link: https://klarna.com
 Requires at least: 4.0
 Tested up to: 5.2.3
 Requires PHP: 5.6
-WC requires at least: 3.2.0
-WC tested up to: 3.7.0
+WC requires at least: 3.4.0
+WC tested up to: 3.9.2
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,39 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.03.03    - version 2.0.0 =
+* Feature       - Implemented Klarnas frontend validation event.
+* Feature       - Subscription EMD is automatically added to the Klarna order.
+* Tweak	        - Complete rewrite of plugin.
+* Tweak         - Major update to the flow of the checkout. Follows the WooCommerce flow more closely now. Orders are now created on the checkout page and validated by WooCommerce.
+* Enhancement   - Removed validation callbacks. We now rely on the WooCommerce validation for extra checkout fields, and other validation steps.
+* Enhancement   - Removed the old debug logging that was saved to the database.
+* Enhancement   - Improved the logging. Requests and responses are now logged together. Added a stacktrace to the logs for easier debugging.
+* Enhancement   - API errors between WooCommerce and Klarna are now always logged, independent on what your debug setting is. With debug on every request is logged.
+* Enhancement   - Reduced the amount of requests to Klarna needed per order.
+* Enhancement   - Better handling of external payment methods.
+* Enhancement   - Better support for extra checkout fields.
+
+= 2020.01.28    - version 1.11.7 =
+* Fix           - Force update_checkout on checkout page load (if WC version 3.9+) to keep KCO iframe in sync with WooCommerce cart.
+* Fix           - Don't try to run process_payment_handler function if KCO order status is checkout_incomplete.
+* Fix           - Don't try to change WC order status to On hold in process_payment_handler function if order status is Pending.
+
+= 2019.12.03    - version 1.11.6 =
+* Fix           - Prevent function for changing to Klarna Checkout payment method from running on the confirmation page. Caused an issue with Google Tag Manager for WordPress by Thomas Geiger
+* Fix           - Changed where we set the recurring token for a Subscription order.
+
+= 2019.11.11    - version 1.11.5 =
+* Fix           - Fixed issue for order_tax_amount not being set as correct amount when bulk renewal subscription is triggered.
+
+= 2019.10.02    - version 1.11.4 =
+* Fix           - Made recurring payments more compatible with new WooCommerce subscription flow.
+* Fix           - Added merchant references to renewal orders.
+* Fix           - Fixed an issue where some orders failed with zero decimals for subscriptions.
+* Fix           - B2B purchases are now saved correctly on backup order creation.
+* Enhancement   - Added filters to merchant URLs. ( Thank you Hampus Alstermo )
+* Enhancement   - Changed from get_home_url to home_url function. ( Thank you Hampus Alstermo )
+
 = 2019.10.02    - version 1.11.3 =
 * Fix           - IE support in logic for checking if kco-external-payment exist in url during order confirmation process.
 * Fix           - Request order from checkout API (instead of Order Management API) for address field population during confirmation process in Woo to avoid 404-responses from Klarna. 
