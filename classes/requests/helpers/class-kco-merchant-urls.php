@@ -27,7 +27,6 @@ class KCO_Merchant_URLs {
 			'checkout'               => $this->get_checkout_url(),                // Required.
 			'confirmation'           => $this->get_confirmation_url( $order_id ), // Required.
 			'push'                   => $this->get_push_url(),                    // Required.
-			'validation'             => $this->get_validation_url(),              // HTTPS.
 			'shipping_option_update' => $this->get_shipping_option_update_url(),  // HTTPS.
 			'notification'           => $this->get_notification_url(),
 		);
@@ -98,28 +97,6 @@ class KCO_Merchant_URLs {
 		);
 
 		return apply_filters( 'kco_wc_push_url', $push_url );
-	}
-
-	/**
-	 * Validation URL.
-	 *
-	 * URL that will be requested for final merchant validation, must be https.
-	 *
-	 * @return string
-	 */
-	private function get_validation_url() {
-		$session_id = $this->get_session_id();
-
-		$validation_url = home_url(
-			sprintf(
-				'/wc-api/KCO_WC_Validation/?kco-action=validation&kco_wc_order_id={checkout.order.id}&kco_session_id=%s',
-				$session_id
-			)
-		);
-
-		$validation_url = str_replace( 'http:', 'https:', $validation_url );
-
-		return apply_filters( 'kco_wc_validation_url', $validation_url );
 	}
 
 	/**
