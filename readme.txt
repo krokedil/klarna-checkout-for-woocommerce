@@ -62,10 +62,14 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.03.04    - version 2.0.2 =
+* Fix			- Fixed an issue that caused the login button to be moved on the checkout page if you allowed for users to login during the checkout.
+* Enhancement   - Removed some old code relating to the validation callback url being passed to Klarna.
+
 = 2020.03.03    - version 2.0.1 =
 * Fix			- Fixed an issue where we did not return the default from the filter woocommerce_checkout_cart_item_quantity.
 * Fix           - Removed some old code related to our old logging function.
-* Enhnacement   - Removed old code that showed the amount orders created on fallback from the old flow. Could cause long pageload times on sites with a lot of orders.
+* Enhancement   - Removed old code that showed the amount orders created on fallback from the old flow. Could cause long pageload times on sites with a lot of orders.
 
 = 2020.03.03    - version 2.0.0 =
 * Feature       - Implemented Klarnas frontend validation event.
