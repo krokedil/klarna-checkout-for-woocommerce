@@ -25,7 +25,7 @@ class KCO_Subscription {
 	public function __construct() {
 		add_filter( 'kco_wc_api_request_args', array( $this, 'create_extra_merchant_data' ) );
 		add_filter( 'kco_wc_api_request_args', array( $this, 'set_recurring' ) );
-		add_action( 'kco_wc_process_payment', array( $this, 'set_recurring_token_for_order' ), 10, 2 );
+		add_action( 'kco_wc_payment_complete', array( $this, 'set_recurring_token_for_order' ), 10, 2 );
 		add_action( 'woocommerce_scheduled_subscription_payment_kco', array( $this, 'trigger_scheduled_payment' ), 10, 2 );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'show_recurring_token' ) );
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'save_kco_recurring_token_update' ), 45, 2 );
@@ -182,7 +182,8 @@ class KCO_Subscription {
 	/**
 	 * Sets the recurring token for the subscription order
 	 *
-	 * @param int $order_id The WooCommerce order id.
+	 * @param int   $order_id The WooCommerce order id.
+	 * @param array $klarna_order The Klarna order.
 	 * @return void
 	 */
 	public function set_recurring_token_for_order( $order_id = null, $klarna_order ) {
@@ -194,7 +195,7 @@ class KCO_Subscription {
 			if ( isset( $klarna_order['recurring_token'] ) ) {
 				$recurring_token = $klarna_order['recurring_token'];
 				foreach ( $subcriptions as $subcription ) {
-					update_post_meta( $subcription->get_id(), '_kco_recurring_token', $klarna_order->recurring_token );
+					update_post_meta( $subcription->get_id(), '_kco_recurring_token', $recurring_token );
 				}
 			}
 		}
