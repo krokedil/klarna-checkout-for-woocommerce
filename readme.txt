@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.03.06    - version 2.0.3 =
+* Fix			- Fixed an issue that caused the recurring token to not be saved to the subscription order.
+
 = 2020.03.04    - version 2.0.2 =
 * Fix			- Fixed an issue that caused the login button to be moved on the checkout page if you allowed for users to login during the checkout.
 * Enhancement   - Removed some old code relating to the validation callback url being passed to Klarna.
