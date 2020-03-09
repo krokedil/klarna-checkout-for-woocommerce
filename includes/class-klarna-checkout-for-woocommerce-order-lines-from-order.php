@@ -162,7 +162,7 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines_From_Order {
 			$item_total_amount     = number_format( ( $order_item->get_total() ) * ( 1 + ( $this->get_order_line_tax_rate( $order, $order_item ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
 			$max_order_line_amount = ( number_format( ( $order_item->get_total() + $order_item->get_total_tax() ) * 100, wc_get_price_decimals(), '.', '' ) * $order_item->get_quantity() ) * 100;
 		} else {
-			$item_total_amount     = number_format( ( $order_item->get_total() ) * ( 1 + ( $this->get_order_line_tax_rate( $order, $order_item ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
+			$item_total_amount     = ( number_format( $order_item->get_total(), wc_get_price_decimals(), '.', '' ) + number_format( $order_item->get_total_tax(), wc_get_price_decimals(), '.', '' ) ) * 100;
 			$max_order_line_amount = ( number_format( ( $order_item->get_total() + $order_item->get_total_tax() ) * 100, wc_get_price_decimals(), '.', '' ) * $order_item->get_quantity() ) * 100;
 		}
 		// Check so the line_total isn't greater than product price x quantity.
@@ -184,10 +184,9 @@ class Klarna_Checkout_For_WooCommerce_Order_Lines_From_Order {
 		if ( $this->separate_sales_tax ) {
 			$item_subtotal = $order_item->get_total() / $order_item->get_quantity();
 		} else {
-			$item_subtotal = ( $order_item->get_total() + $order_item->get_total_tax() ) / $order_item->get_quantity();
+			$item_subtotal = ( ( number_format( $order_item->get_total(), wc_get_price_decimals(), '.', '' ) + number_format( $order_item->get_total_tax(), wc_get_price_decimals(), '.', '' ) ) / $order_item->get_quantity() ) * 100;
 		}
-		$item_price = number_format( $item_subtotal, wc_get_price_decimals(), '.', '' ) * 100;
-		return round( $item_price );
+		return round( $item_subtotal );
 	}
 
 	/**
