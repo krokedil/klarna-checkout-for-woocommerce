@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.03.10    - version 2.0.4 =
+* Fix			- Readded kco_wc_before_extra_fields and kco_wc_before_extra_fields actions. Should renable support for the germanized plugin using the snippet we have: https://gist.github.com/krokedilgists/7fab7cf5d6a7b3c52fdd6bbc641592d0
+* Fix           - Better error handling for subscription renewals.
+* Fix			- We now save the company name to the WooCommerce order.
+* Enhancement   - Added better support for extra checkboxes added to the terms Template.
+* Enhancement	- Changed how we read the change in URL for the hashtag change. Should be able to handle JavaScript errors and be able to respond to the callback.
+
 = 2020.03.06    - version 2.0.3 =
 * Fix			- Fixed an issue that caused the recurring token to not be saved to the subscription order.
 
