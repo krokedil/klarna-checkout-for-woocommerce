@@ -419,8 +419,7 @@ class KCO_API_Callbacks {
 					update_post_meta( $order->get_id(), '_kco_recurring_token', $recurring_token );
 				}
 			} else {
-				// Retrieve error.
-				$error = KCO_WC()->api->extract_error_messages( $response_data );
+				$error = $response_data->get_error_message();
 				KCO_WC()->logger->log( 'ERROR when requesting Klarna order via Checkout API (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response_data ) ) );
 			}
 
