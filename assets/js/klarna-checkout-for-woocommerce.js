@@ -307,6 +307,7 @@ jQuery( function( $ ) {
 			// Billing fields.
 			$( '#billing_first_name' ).val( data.billing_address.given_name );
 			$( '#billing_last_name' ).val( data.billing_address.family_name );
+			$( '#billing_company' ).val( ( data.billing_address.organization_name ? data.billing_address.organization_name : '' ) );
 			$( '#billing_address_1' ).val( data.billing_address.street_address );
 			$( '#billing_address_2' ).val( ( data.billing_address.street_address2 ? data.billing_address.street_address2 : '' ) );
 			$( '#billing_city' ).val( data.billing_address.city );
@@ -319,6 +320,7 @@ jQuery( function( $ ) {
 			// Shipping fields.
 			$( '#shipping_first_name' ).val( data.shipping_address.given_name );
 			$( '#shipping_last_name' ).val( data.shipping_address.family_name );
+			$( '#shipping_company' ).val( ( data.billing_address.organization_name ? data.billing_address.organization_name : '' ) );
 			$( '#shipping_address_1' ).val( data.shipping_address.street_address );
 			$( '#shipping_address_2' ).val( ( data.shipping_address.street_address2 ? data.shipping_address.street_address2 : '' ) );
 			$( '#shipping_city' ).val( data.shipping_address.city );
