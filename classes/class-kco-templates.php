@@ -170,10 +170,10 @@ class KCO_Templates {
 				<?php
 				if ( version_compare( WOOCOMMERCE_VERSION, '3.4', '<' ) ) {
 					wp_nonce_field( 'woocommerce-process_checkout' );
-					wc_get_template( 'checkout/terms.php' );
 				} else {
 					wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' );
 				}
+				wc_get_template( 'checkout/terms.php' );
 				?>
 			</div>
 			<input id="payment_method_kco" type="radio" class="input-radio" name="payment_method" value="kco" checked="checked" />		</div>
@@ -186,10 +186,12 @@ class KCO_Templates {
 	 * @return void
 	 */
 	public function add_extra_checkout_fields() {
+		do_action( 'kco_wc_before_extra_fields' );
 		?>
 		<div id="kco-extra-checkout-fields">
 		</div>
 		<?php
+		do_action( 'kco_wc_after_extra_fields' );
 	}
 }
 

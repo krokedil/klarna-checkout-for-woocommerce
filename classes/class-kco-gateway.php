@@ -258,7 +258,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 			}
 		}
 
-		$standard_woo_checkout_fields = array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'terms', 'account_username', 'account_password', '_wp_http_referer' );
+		$standard_woo_checkout_fields = array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'terms', 'terms-field', 'account_username', 'account_password', '_wp_http_referer' );
 
 		$checkout_localize_params = array(
 			'update_cart_url'                      => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
@@ -280,6 +280,8 @@ class KCO_Gateway extends WC_Payment_Gateway {
 			'required_fields_text'                 => __( 'Please fill in all required checkout fields.', 'klarna-checkout-for-woocommerce' ),
 			'email_exists'                         => $email_exists,
 			'must_login_message'                   => apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) ),
+			'timeout_message'                      => __( 'Please try again, something went wrong with processing your order.', 'klarna-checkout-for-woocommerce' ),
+			'timeout_time'                         => apply_filters( 'kco_checkout_timeout_duration', 10 ),
 		);
 
 		if ( version_compare( WC_VERSION, '3.9', '>=' ) ) {
