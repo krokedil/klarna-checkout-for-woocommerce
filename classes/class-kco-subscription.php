@@ -229,7 +229,7 @@ class KCO_Subscription {
 		} else {
 			$error_message = $create_order_response->get_error_message();
 			// Translators: Error message.
-			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Message: %2$s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
+			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Message: %1$s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
 			foreach ( $subscriptions as $subscription ) {
 				$subscription->payment_failed();
 			}
@@ -305,8 +305,7 @@ class KCO_Subscription {
 				}
 			} else {
 				// Retrieve error.
-				$error = KCO_WC()->api->extract_error_messages( $response_data );
-				$note  = sprintf( __( 'Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order_data->recurring_token ) );
+				$note = sprintf( __( 'Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order_data->recurring_token ) );
 				$order->add_order_note( $note );
 			}
 
