@@ -100,7 +100,7 @@ jQuery( function( $ ) {
 
 		updateKlarnaOrder: function() {
 			if ( 'kco' === kco_wc.paymentMethod && 'no' === kco_params.is_confirmation_page ) {
-				kco_wc.kcoSuspend();
+				kco_wc.kcoSuspend( true );
 				$( '.woocommerce-checkout-review-order-table' ).block({
 					message: null,
 					overlayCSS: {
@@ -267,7 +267,6 @@ jQuery( function( $ ) {
 		},
 
 		getKlarnaOrder: function() {
-			kco_wc.kcoSuspend();
 			kco_wc.preventPaymentMethodChange = true;
 			$( '.woocommerce-checkout-review-order-table' ).block({
 				message: null,
@@ -452,8 +451,8 @@ jQuery( function( $ ) {
 					clearInterval(kco_wc.interval);
 					// Remove the timeout.
 					clearTimeout( kco_wc.timeout );
-					// Unblock incase there is a error. Klarna keeps it blocked for happy path anyway.
-					kco_wc.kcoResume();
+					// Remove the processing class from the form.
+					kco_wc.checkoutFormSelector.removeClass( 'processing' );
 					$( '.woocommerce-checkout-review-order-table' ).unblock();
 					$( kco_wc.checkoutFormSelector ).unblock();
 				}
@@ -469,6 +468,7 @@ jQuery( function( $ ) {
 			clearTimeout( kco_wc.timeout );
 			// Renable the form.
 			$( 'body' ).trigger( 'updated_checkout' );
+			kco_wc.checkoutFormSelector.removeClass( 'processing' );
 			$( kco_wc.checkoutFormSelector ).unblock();
 			if ( 'timeout' === event ) {
 				$('#kco-timeout').remove();
