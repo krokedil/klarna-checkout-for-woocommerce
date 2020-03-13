@@ -83,27 +83,27 @@ msgstr ""
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:154, ../classes/class-kco-api-callbacks.php:496, ../includes/kco-functions.php:517
+#: ../classes/class-kco-api-callbacks.php:154, ../classes/class-kco-api-callbacks.php:495, ../includes/kco-functions.php:511
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:157, ../classes/class-kco-api-callbacks.php:499
+#: ../classes/class-kco-api-callbacks.php:157, ../classes/class-kco-api-callbacks.php:498
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:160, ../classes/class-kco-api-callbacks.php:502, ../includes/kco-functions.php:524
+#: ../classes/class-kco-api-callbacks.php:160, ../classes/class-kco-api-callbacks.php:501, ../includes/kco-functions.php:518
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:491
+#: ../classes/class-kco-api-callbacks.php:490
 msgid "Order created via Klarna Checkout API callback. Please verify the order in Klarnas system."
 msgstr ""
 
 #. translators: %s: Klarna order amount.
-#: ../classes/class-kco-api-callbacks.php:516
+#: ../classes/class-kco-api-callbacks.php:515
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
@@ -424,21 +424,21 @@ msgstr ""
 msgid "Subscription payment made with Klarna. Klarna order id: %s"
 msgstr ""
 
-#. translators: Error code, error message.
-#: ../classes/class-kco-subscription.php:236
-msgid "Subscription payment failed with Klarna. Error code: %1$s. Message: %2$s"
+#. translators: Error message.
+#: ../classes/class-kco-subscription.php:232
+msgid "Subscription payment failed with Klarna. Message: %1$s"
 msgstr ""
 
 #. translators: %s Klarna recurring token.
-#: ../classes/class-kco-subscription.php:307
+#: ../classes/class-kco-subscription.php:303
 msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:313
+#: ../classes/class-kco-subscription.php:308
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:333
+#: ../classes/class-kco-subscription.php:328
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -482,12 +482,8 @@ msgstr ""
 msgid "A mismatch in order totals between WooCommerce and Klarna was detected. Please try again."
 msgstr ""
 
-#: ../includes/kco-functions.php:528
+#: ../includes/kco-functions.php:523
 msgid "Klarna Checkout order was rejected"
-msgstr ""
-
-#: ../includes/kco-functions.php:533
-msgid "Something went wrong with processing the order. Please try again."
 msgstr ""
 
 #: ../includes/kco-status-report.php:17
