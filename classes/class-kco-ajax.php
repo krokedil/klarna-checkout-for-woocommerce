@@ -37,6 +37,7 @@ class KCO_AJAX extends WC_AJAX {
 			'kco_wc_iframe_shipping_address_change' => true,
 			'kco_wc_set_session_value'              => true,
 			'kco_wc_get_klarna_order'               => true,
+			'kco_wc_log_js'                         => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -327,6 +328,23 @@ class KCO_AJAX extends WC_AJAX {
 		);
 		wp_die();
 
+	}
+
+	/**
+	 * Logs messages from the JavaScript to the server log.
+	 *
+	 * @return void
+	 */
+	public static function kco_wc_log_js() {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_log_js' ) ) { // Input var okay.
+			wp_send_json_error( 'bad_nonce' );
+			exit;
+		}
+		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+		$message         = 'Frontend JS ' . $klarna_order_id . ': ' . $_POST['message']; // phpcs:ignore
+		KCO_Logger::log( $message );
+		wp_send_json_success();
+		wp_die();
 	}
 }
 
