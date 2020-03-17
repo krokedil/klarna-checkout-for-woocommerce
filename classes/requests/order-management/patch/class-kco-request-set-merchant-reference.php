@@ -42,8 +42,8 @@ class KCO_Request_Set_Merchant_Reference extends KCO_Request {
 	public function get_body( $order_id ) {
 		$order = wc_get_order( $order_id );
 		return array(
-			'merchant_reference1' => $order_id,
-			'merchant_reference2' => $order->get_order_number(),
+			'merchant_reference1' => $order->get_order_number(),
+			'merchant_reference2' => $order_id,
 		);
 	}
 
