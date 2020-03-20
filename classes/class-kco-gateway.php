@@ -273,6 +273,8 @@ class KCO_Gateway extends WC_Payment_Gateway {
 			'iframe_shipping_address_change_nonce' => wp_create_nonce( 'kco_wc_iframe_shipping_address_change' ),
 			'get_klarna_order_url'                 => WC_AJAX::get_endpoint( 'kco_wc_get_klarna_order' ),
 			'get_klarna_order_nonce'               => wp_create_nonce( 'kco_wc_get_klarna_order' ),
+			'log_to_file_url'                      => WC_AJAX::get_endpoint( 'kco_wc_log_js' ),
+			'log_to_file_nonce'                    => wp_create_nonce( 'kco_wc_log_js' ),
 			'logging'                              => $this->logging,
 			'standard_woo_checkout_fields'         => $standard_woo_checkout_fields,
 			'is_confirmation_page'                 => ( is_kco_confirmation() ) ? 'yes' : 'no',
