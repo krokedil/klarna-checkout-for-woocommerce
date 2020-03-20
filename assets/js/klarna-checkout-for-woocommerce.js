@@ -427,6 +427,7 @@ jQuery( function( $ ) {
 							kco_wc.log( 'can_not_complete_order', data );
 						},
 						'validation_callback': function( data, callback ) {
+							kco_wc.logToFile( 'validation_callback from Klarna triggered' );
 							// Empty current hash.
 							window.location.hash = '';
 							// Check for any errors.
@@ -446,6 +447,7 @@ jQuery( function( $ ) {
 			if ( window.location.hash ) {
 				var currentHash = window.location.hash;
 				if ( -1 < currentHash.indexOf( '#klarna-success' ) ) {
+					kco_wc.logToFile( 'klarna-success hashtag detected in URL.' );
 					callback({ should_proceed: true });
 					// Clear the interval.
 					clearInterval(kco_wc.interval);
@@ -460,6 +462,7 @@ jQuery( function( $ ) {
 		},
 
 		failOrder: function( callback, event ) {
+			kco_wc.logToFile( 'Timeout for validation_callback triggered.' );
 			// Send false and cancel 
 			callback({ should_proceed: false });
 			// Clear the interval.
@@ -478,6 +481,20 @@ jQuery( function( $ ) {
 					+ '</li></ul></div>'
 				);
 			}
+		},
+
+		logToFile: function( message ) {
+			$.ajax(
+				{
+					url: kco_params.log_to_file_url,
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						message: message,
+						nonce: kco_params.log_to_file_nonce
+					}
+				}
+			);
 		}
 	};
 

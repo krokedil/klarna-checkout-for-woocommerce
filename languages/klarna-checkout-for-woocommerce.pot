@@ -407,15 +407,15 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:280
+#: ../classes/class-kco-gateway.php:282
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:283
+#: ../classes/class-kco-gateway.php:285
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:499
+#: ../classes/class-kco-gateway.php:501
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
@@ -484,6 +484,10 @@ msgstr ""
 
 #: ../includes/kco-functions.php:523
 msgid "Klarna Checkout order was rejected"
+msgstr ""
+
+#: ../includes/kco-functions.php:527
+msgid "Waiting for verification from Klarnas push notification"
 msgstr ""
 
 #: ../includes/kco-status-report.php:17
