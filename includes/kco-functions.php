@@ -497,30 +497,34 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
 		$order = wc_get_order( $order_id );
 		// Get the Klarna OM order.
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
-
-		// Acknowledge order in Klarna.
-		KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
-		// Set the merchant references for the order.
-		KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
-		// Empty cart to be safe.
-		WC()->cart->empty_cart();
-		// Check fraud status.
-		if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
-			// Payment complete and set transaction id.
-			// translators: Klarna order ID.
-			$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
-			$order->add_order_note( $note );
-			$order->payment_complete( $klarna_order_id );
-			do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
-		} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
-			// Set status to on-hold.
-			// translators: Klarna order ID.
-			$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
-			$order->set_status( 'on-hold', $note );
-			$order->save();
-		} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
-			// Cancel the order.
-			$order->set_status( 'canceled', __( 'Klarna Checkout order was rejected', 'klarna-checkout-for-woocommerce' ) );
+		if ( ! is_wp_error( $klarna_order ) ) {
+			// Acknowledge order in Klarna.
+			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+			// Set the merchant references for the order.
+			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
+			// Empty cart to be safe.
+			WC()->cart->empty_cart();
+			// Check fraud status.
+			if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
+				// Payment complete and set transaction id.
+				// translators: Klarna order ID.
+				$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+				$order->add_order_note( $note );
+				$order->payment_complete( $klarna_order_id );
+				do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
+			} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
+				// Set status to on-hold.
+				// translators: Klarna order ID.
+				$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+				$order->set_status( 'on-hold', $note );
+				$order->save();
+			} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
+				// Cancel the order.
+				$order->set_status( 'canceled', __( 'Klarna Checkout order was rejected', 'klarna-checkout-for-woocommerce' ) );
+				$order->save();
+			}
+		} else {
+			$order->set_status( 'on-hold', __( 'Waiting for verification from Klarnas push notification', 'klarna-checkout-for-woocommerce' ) );
 			$order->save();
 		}
 	}
