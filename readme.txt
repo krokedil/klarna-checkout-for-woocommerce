@@ -62,6 +62,11 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.03.20    - version 2.0.6 =
+* Fix           - Changed so the merchant references are now the same as they were before.
+* Enhancement   - Added logging from the frontend JavaScript. Will make debugging easier.
+* Enhancement   - Orders that can not be found in order management during the confirmation page will now end up as on-hold instead of pending.
+
 = 2020.03.10    - version 2.0.5 =
 * Fix			- Fixed an issue with card payments, where resuming the iFrame caused the payment to not go through in some cases. ( Updates in both the plugin and in Klarnas system )
 * Fix			- Removed a get request to Klarnas checkout endpoint during the confirmation stages. Could cause an error to be shown to the customer.
