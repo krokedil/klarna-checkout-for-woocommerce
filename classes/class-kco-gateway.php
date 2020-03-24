@@ -283,7 +283,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 			'email_exists'                         => $email_exists,
 			'must_login_message'                   => apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) ),
 			'timeout_message'                      => __( 'Please try again, something went wrong with processing your order.', 'klarna-checkout-for-woocommerce' ),
-			'timeout_time'                         => apply_filters( 'kco_checkout_timeout_duration', 10 ),
+			'timeout_time'                         => apply_filters( 'kco_checkout_timeout_duration', 20 ),
 		);
 
 		if ( version_compare( WC_VERSION, '3.9', '>=' ) ) {

@@ -349,7 +349,7 @@ class KCO_API_Callbacks {
 		$billing_last_name   = isset( $klarna_order->billing_address->family_name ) ? $klarna_order->billing_address->family_name : '.';
 		$billing_address     = isset( $klarna_order->billing_address->street_address ) ? $klarna_order->billing_address->street_address : '.';
 		$billing_address2    = isset( $klarna_order->billing_address->street_address2 ) ? $klarna_order->billing_address->street_address2 : '';
-		$billing_postal_code = isset( $klarna_order->billing_address->postal_code ) ? $klarna_order->billing_address->postal_code : $fallback_postcode;
+		$billing_postal_code = isset( $klarna_order->billing_address->postal_code ) ? $klarna_order->billing_address->postal_code : '';
 		$billing_city        = isset( $klarna_order->billing_address->city ) ? $klarna_order->billing_address->city : '.';
 		$billing_region      = isset( $klarna_order->billing_address->region ) ? $klarna_order->billing_address->region : '';
 		$billing_country     = isset( $klarna_order->billing_address->country ) ? $klarna_order->billing_address->country : WC()->countries->get_base_country();
@@ -399,7 +399,6 @@ class KCO_API_Callbacks {
 			if ( 'organization' === $klarna_order->customer->type ) {
 				$order->set_billing_company( sanitize_text_field( $billing_company ) );
 				$order->set_shipping_company( sanitize_text_field( $shipping_company ) );
-				// update_post_meta( $order->get_id(), '_kco_org_nr', $org_nr );
 			}
 
 			$order->set_created_via( 'klarna_checkout_backup_order_creation' );
