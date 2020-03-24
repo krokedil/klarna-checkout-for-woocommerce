@@ -83,27 +83,27 @@ msgstr ""
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:154, ../classes/class-kco-api-callbacks.php:495, ../includes/kco-functions.php:511
+#: ../classes/class-kco-api-callbacks.php:154, ../classes/class-kco-api-callbacks.php:494, ../includes/kco-functions.php:511
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:157, ../classes/class-kco-api-callbacks.php:498
+#: ../classes/class-kco-api-callbacks.php:157, ../classes/class-kco-api-callbacks.php:497
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:160, ../classes/class-kco-api-callbacks.php:501, ../includes/kco-functions.php:518
+#: ../classes/class-kco-api-callbacks.php:160, ../classes/class-kco-api-callbacks.php:500, ../includes/kco-functions.php:518
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:490
+#: ../classes/class-kco-api-callbacks.php:489
 msgid "Order created via Klarna Checkout API callback. Please verify the order in Klarnas system."
 msgstr ""
 
 #. translators: %s: Klarna order amount.
-#: ../classes/class-kco-api-callbacks.php:515
+#: ../classes/class-kco-api-callbacks.php:514
 msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
