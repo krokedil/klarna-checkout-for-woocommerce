@@ -63,8 +63,8 @@ class KCO_Request_Update extends KCO_Request {
 		if ( ! empty( $order_id ) ) {
 			$order = wc_get_order( $order_id );
 			// Set the merchant references to the order.
-			$request_body['merchant_reference1'] = $order_id;
-			$request_body['merchant_reference2'] = $order->get_order_number();
+			$request_body['merchant_reference1'] = $order->get_order_number();
+			$request_body['merchant_reference2'] = $order_id;
 		}
 
 		if ( kco_wc_prefill_allowed() ) {
