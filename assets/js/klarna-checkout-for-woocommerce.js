@@ -316,6 +316,8 @@ jQuery( function( $ ) {
 			$( '#billing_country' ).val( data.billing_address.country.toUpperCase() );
 			$( '#billing_state' ).val( ( data.billing_address.region ? data.billing_address.region : '' ) );
 
+			$( '#ship-to-different-address-checkbox' ).prop( 'checked', true);
+
 			// Shipping fields.
 			$( '#shipping_first_name' ).val( data.shipping_address.given_name );
 			$( '#shipping_last_name' ).val( data.shipping_address.family_name );
