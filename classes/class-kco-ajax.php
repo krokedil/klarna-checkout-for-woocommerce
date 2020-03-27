@@ -320,6 +320,21 @@ class KCO_AJAX extends WC_AJAX {
 			wp_send_json_error( $klarna_order );
 			wp_die();
 		}
+
+		// Convert the billing region to unicode format.
+		if ( isset( $klarna_order['billing_address']['region'] ) ) {
+			$region                                    = $klarna_order['billing_address']['region'];
+			$country                                   = $klarna_order['billing_address']['country'];
+			$klarna_order['billing_address']['region'] = kco_convert_region( $region, $country );
+		}
+
+		// Convert the shipping region to unicode format.
+		if ( isset( $klarna_order['shipping_address']['region'] ) ) {
+			$region                                     = $klarna_order['shipping_address']['region'];
+			$country                                    = $klarna_order['shipping_address']['country'];
+			$klarna_order['shipping_address']['region'] = kco_convert_region( $region, $country );
+		}
+
 		wp_send_json_success(
 			array(
 				'billing_address'  => $klarna_order['billing_address'],

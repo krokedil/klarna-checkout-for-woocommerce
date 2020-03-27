@@ -529,3 +529,18 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
 		}
 	}
 }
+
+/**
+ * Converts a region string to the expected country code format for WooCommerce.
+ *
+ * @param string $region_string The region string from Klarna.
+ * @param string $country_code The country code from Klarna.
+ * @return string
+ */
+function kco_convert_region( $region_string, $country_code ) {
+	$region_string = ucfirst( strtolower( $region_string ) );
+	$states        = include WC()->plugin_path() . '/i18n/states.php';
+	$region_code   = array_keys( $states[ strtoupper( $country_code ) ], $region_string, false );
+
+	return $region_code[0];
+}
