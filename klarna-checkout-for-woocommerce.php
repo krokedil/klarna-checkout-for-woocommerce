@@ -414,6 +414,7 @@ if ( ! class_exists( 'KCO' ) ) {
 				return;
 			}
 			// Everything is fine, redirect to the URL specified by the gateway.
+			WC()->session->set( 'chosen_payment_method', $epm );
 			$order->set_payment_method( $payment_methods[ $epm ] );
 			$order->save();
 			wp_redirect( $result['redirect'] );
