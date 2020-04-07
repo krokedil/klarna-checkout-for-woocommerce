@@ -543,7 +543,7 @@ function kco_convert_region( $region_string, $country_code ) {
 	if ( key_exists( strtoupper( $country_code ), $states ) ) {
 		// Check if the region is already unicode format.
 		if ( key_exists( strtoupper( $region_string ), $states[ strtoupper( $country_code ) ] ) ) {
-			return $region_string;
+			return strtoupper( $region_string );
 		}
 
 		// Get the code by region name.

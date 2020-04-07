@@ -63,8 +63,8 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 
 == Changelog ==
 = 2020.03.30    - version 2.0.8 =
-* Fix			- Fixed an issue with regions not being processed corectly for some countries.
-* Fix			- Fixed compatability with some external payment methods. ( Thank you Christopher Hedqvist)
+* Fix			- Fixed an issue with regions not being processed correctly for some countries.
+* Fix			- Fixed compatibility with some external payment methods. ( Thank you Christopher Hedqvist)
 
 = 2020.03.20    - version 2.0.7 =
 * Fix           - Fixed the merchant reference on order updates as well.
