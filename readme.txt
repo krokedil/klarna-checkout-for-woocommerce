@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.04.09    - version 2.0.10 =
+* Fix			- Added security checks to the Klarna Addons page to prevent unauthorized changes to plugins.
+
 = 2020.04.07    - version 2.0.9 =
 * Fix			- Fixed an issue with states for US orders.
 
