@@ -56,6 +56,12 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 				wp_register_style( 'klarna-checkout-addons', KCO_WC_PLUGIN_URL . '/assets/css/checkout-addons.css', false, KCO_WC_VERSION );
 				wp_enqueue_style( 'klarna-checkout-addons' );
 				wp_register_script( 'klarna-checkout-addons', KCO_WC_PLUGIN_URL . '/assets/js/klarna-for-woocommerce-addons.js', true, KCO_WC_VERSION );
+
+				$params = array(
+					'change_addon_status_nonce' => wp_create_nonce( 'change_klarna_addon_status' ),
+				);
+
+				wp_localize_script( 'klarna-checkout-addons', 'kco_addons_params', $params );
 				wp_enqueue_script( 'klarna-checkout-addons' );
 			}
 		}
@@ -219,9 +225,23 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		 * Ajax request callback function
 		 */
 		public function change_klarna_addon_status() {
+			// Check nonce.
+			if ( ! wp_verify_nonce( $_REQUEST['nonce'], 'change_klarna_addon_status' ) ) {
+				wp_send_json_error( 'bad_nonce' );
+				exit;
+			}
+
 			$status      = $_REQUEST['plugin_status'];
 			$action      = $_REQUEST['plugin_action'];
 			$plugin_slug = $_REQUEST['plugin_slug'];
+
+			// Check if the user can install plugins or manage plugins.
+			if ( ( ! current_user_can( 'install_plugins' ) && 'install' === $action )
+				|| ( ! current_user_can( 'update_plugins' ) && in_array( $action, array( 'activate', 'deactivate' ), true ) )
+			) {
+				wp_send_json_error( "You are not allowed to $action plugins" );
+				exit;
+			}
 			// $plugin_folder_and_filename = $plugin_slug . '/' . $plugin_slug . '.php';
 			$plugin = WP_PLUGIN_DIR . '/' . $plugin_slug;
 
