@@ -196,3 +196,8 @@ span.checkout-addon-status {
 .notice { 
     display: none; 
 }
+
+.addon-error {
+	color: red;
+	margin-left: 20px;
+}
