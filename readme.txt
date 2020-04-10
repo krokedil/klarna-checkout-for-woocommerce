@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.04.10    - version 1.11.8 =
+* Fix			- Added security checks to the Klarna Addons page to prevent unauthorized changes to plugins.
+
 = 2020.01.28    - version 1.11.7 =
 * Fix           - Force update_checkout on checkout page load (if WC version 3.9+) to keep KCO iframe in sync with WooCommerce cart.
 * Fix           - Don't try to run process_payment_handler function if KCO order status is checkout_incomplete.
