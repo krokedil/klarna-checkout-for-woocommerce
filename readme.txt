@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.04.16    - version 2.0.12 =
+* Fix			- Reverted change from 2.0.11 "Better calculations for product unit price..." due to an issue with some tax settings.
+
 = 2020.04.16    - version 2.0.11 =
 * Fix			- Better calculations for product unit price and total amount. Fixes issues regarding subscriptions with a starting fee.
 * Fix			- Better handling of region special characters. Fixes issues were some regions could not complete and order.
