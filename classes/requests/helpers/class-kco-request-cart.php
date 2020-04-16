@@ -460,14 +460,10 @@ class KCO_Request_Cart {
 	 * @return integer $item_price Cart item price.
 	 */
 	public function get_item_price( $cart_item ) {
-		$args = array(
-			'qty'   => 1,
-			'price' => $cart_item['line_total'] / $cart_item['quantity'],
-		);
 		if ( $this->separate_sales_tax ) {
-			$item_subtotal = wc_get_price_excluding_tax( $cart_item['data'], $args );
+			$item_subtotal = wc_get_price_excluding_tax( $cart_item['data'] );
 		} else {
-			$item_subtotal = wc_get_price_including_tax( $cart_item['data'], $args );
+			$item_subtotal = wc_get_price_including_tax( $cart_item['data'] );
 		}
 		$item_price = number_format( $item_subtotal, wc_get_price_decimals(), '.', '' ) * 100;
 		return round( $item_price );
@@ -592,16 +588,13 @@ class KCO_Request_Cart {
 	 * @return integer $item_total_amount Cart item total amount.
 	 */
 	public function get_item_total_amount( $cart_item, $product ) {
-		$args = array(
-			'qty'   => 1,
-			'price' => $cart_item['line_total'] / $cart_item['quantity'],
-		);
+
 		if ( $this->separate_sales_tax ) {
 			$item_total_amount     = number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->get_item_tax_rate( $cart_item, $product ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
-			$max_order_line_amount = ( number_format( wc_get_price_including_tax( $cart_item['data'], $args ), wc_get_price_decimals(), '.', '' ) * $cart_item['quantity'] ) * 100;
+			$max_order_line_amount = ( number_format( wc_get_price_including_tax( $cart_item['data'] ), wc_get_price_decimals(), '.', '' ) * $cart_item['quantity'] ) * 100;
 		} else {
 			$item_total_amount     = number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->get_item_tax_rate( $cart_item, $product ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
-			$max_order_line_amount = ( number_format( wc_get_price_including_tax( $cart_item['data'], $args ), wc_get_price_decimals(), '.', '' ) * $cart_item['quantity'] ) * 100;
+			$max_order_line_amount = ( number_format( wc_get_price_including_tax( $cart_item['data'] ), wc_get_price_decimals(), '.', '' ) * $cart_item['quantity'] ) * 100;
 		}
 		// Check so the line_total isn't greater than product price x quantity.
 		// This can happen when having price display set to 0 decimals.
