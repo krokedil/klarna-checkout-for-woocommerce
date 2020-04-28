@@ -352,6 +352,7 @@ if ( ! class_exists( 'KCO' ) ) {
 				$order    = wc_get_order( $order_id );
 				// Confirm, redirect and exit.
 				kco_confirm_klarna_order( $order_id, $klarna_order_id );
+				kco_unset_sessions();
 				header( 'Location:' . $order->get_checkout_order_received_url() );
 				exit;
 			}
@@ -417,6 +418,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			WC()->session->set( 'chosen_payment_method', $epm );
 			$order->set_payment_method( $payment_methods[ $epm ] );
 			$order->save();
+			kco_unset_sessions();
 			wp_redirect( $result['redirect'] );
 			exit;
 		}
