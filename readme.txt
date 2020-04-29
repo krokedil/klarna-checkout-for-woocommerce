@@ -62,6 +62,11 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.04.29    - version 2.0.13 =
+* Enhancement	- Added custom attribute to stop password and text fields in settings to be autofilled with incorrect data.
+* Enhancement	- Added clearing of KCO sessions after finalizing the purchase on the confirmation page. Better support for things like custom thank you pages
+* Fix			- Added jQuery Block UI as a prerequisite for our checkout Javascript. Prevents JavaScript errors incase the checkout JavaScripts are loaded in a different order then normal.
+
 = 2020.04.16    - version 2.0.12 =
 * Fix			- Reverted change from 2.0.11 "Better calculations for product unit price..." due to an issue with some tax settings.
 
