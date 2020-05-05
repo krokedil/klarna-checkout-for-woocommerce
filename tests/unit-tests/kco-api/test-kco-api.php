@@ -5,7 +5,6 @@
  *
  * @package category
  */
-// docker-compose -f docker-compose.phpunit.yml run --rm wordpress_phpunit phpunit -c /app/wp-content/plugins/klarna-checkout-for-woocommerce/phpunit.xml
 /**
  * Undocumented class
  */
