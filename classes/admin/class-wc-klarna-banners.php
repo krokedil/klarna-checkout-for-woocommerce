@@ -71,26 +71,48 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			if ( $show_banner && false === get_transient( 'klarna_hide_banner' ) ) {
 				?>
 				<div id="kb-spacer"></div>
-				<div id="klarna-banner">
-					<div id="kb-left">
-						<h1>Go live</h1>
-						<p>Before you can start to sell with Klarna you need your store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will need to verify the integration. Then you can go live with your store! If you wish to switch Klarna products then you’ll need the Klarna team to approve your store again.</p>
-						<a class="kb-button"
-							href="<?php echo self::get_go_live_url(); ?>"
-							target="_blank">Go live with Klarna</a>
+
+				<div class="kb-new-container">
+
+					<!-- Left group -->
+					<div class="kb-left-group">
+						<div id="kb-left" class="kb-small-container">
+							<h1 id="left-main-title" class="container-title">Go live.</h1>
+							<p id="left-main-text" class="container-main-text">Before you can start to sell with Klarna you need your store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will need to verify the integration. Then you can go live with your store! If you wish to switch Klarna products then you’ll need the Klarna team to approve your store again.</p>
+						</div>
 					</div>
-					<div id="kb-right">
-						<h1>Currently using Klarna?</h1>
-						<p>Pay now, Pay later and Slice it. Klarna is entering a new world of smoooth. We would love for you to join us on the ride and to do so, you will need to upgrade your Klarna products to a new integration. You will then always get the latest features that Klarna develops and you’ll keep your current agreement along with your price settings.</p>
-						<a class="kb-button"
-							href="https://hello.klarna.com/product-upgrade?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=banner"
-							target="_blank">Upgrade your contract with Klarna</a>
+
+					<!-- Middle group -->
+					<div class="kb-middle-group">
+						<div id="kb-button-left-frame">
+							<a id="kb-button-left" class="kb-dismiss kb-button"
+								href="<?php echo self::get_go_live_url(); ?>"
+								target="_blank">Go live now
+							</a>
+						</div>
+						<div id="kb-button-go-live-frame">
+							<a id="kb-button-go-live" class="kb-button"
+								href="<?php echo self::get_go_live_url(); ?>"
+								target="_blank">Get playground credentials
+							</a>
+						</div>
 					</div>
-					<img id="kb-image"
-						src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_white.png"
-						alt="Klarna logo" width="110"/>
-					<span class="kb-dismiss dashicons dashicons-dismiss"></span>
+
+
+					<!-- Right group -->
+					<div class="kb-right-group">
+						<div id="klarna-logo-left-frame">
+							<img id="klarna-logo-left" class="klarna-logo-img"
+							src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png">
+						</div>
+					</div>
+
 				</div>
+
+
+
+					<span id="kb-dismiss-close-icon" class="kb-dismiss dashicons dashicons-dismiss"></span>
+
 				<script type="text/javascript">
 
 				jQuery(document).ready(function($){
@@ -104,9 +126,9 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 								_wpnonce	: '<?php echo wp_create_nonce( 'hide-klarna-banner' ); ?>',
 							},
 							function(response){
-								console.log('Success hide kco banner');	
+								console.log('Success hide KCO banner');
 							}
-						);				
+						);
 					});
 				});
 				</script>
@@ -129,7 +151,37 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 					<?php echo $parent_options; ?>
 				</div>
 				<div id="klarna-sidebar">
-					<div class="kb-sidebar-section">
+
+					<div class="kb-sidebar-section" >
+						<h1 id="kb-sidebar-title">The future proof integration</h1>
+							<div class="kb-sidebar-content">
+								<p id="kb-sidebar-main-text">
+									Klarna is entering the new world of smooth. We would love for you to join us on the ride and to do so you'll need
+									to upgrade your Klarna integration to the latest one.
+								<br>
+								<br>
+									By upgrading your current version to Klarna's latest platform you will always get the
+									latest features that Klarna develops
+								</p>
+								<div id="sidebar-link-holder">
+								<a id="kb-sidebar-button-left" class="kb-sidebar-button"
+									href="<?php echo self::get_go_live_url(); ?>"
+									target="_blank">Get started
+								</a>
+								</div>
+							</div>
+
+								<div id="kb-sidebar-bottom-holder">
+									<p id="kb-sidebar-logo-follow-up-text">
+										Pay later with
+									</p>
+									<img id="kb-sidebar-klarna-logo-left"
+									src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_white.png">
+								</div>
+					</div>
+
+				</div>
+					<!-- <div class="kb-sidebar-section">
 						<img src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/icon_reminder.png" width="64"/>
 						<h3>Go live</h3>
 						<p>Before you can start to sell with Klarna you need your store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will need to verify the integration. Then you can go live with your store! If you wish to switch Klarna products then you’ll need the Klarna team to approve your store again.</p>
@@ -148,7 +200,8 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 						<a class="kb-button"
 							href="https://hello.klarna.com/product-upgrade?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=kco"
 							target="_blank">Upgrade your contract with Klarna</a>
-					</div>
+					</div> -->
+
 				</div>
 			</div>
 
@@ -159,7 +212,8 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		 * Hide Klarna banner in admin pages for.
 		 */
 		public function hide_klarna_banner() {
-			set_transient( 'klarna_hide_banner', '1', 5 * DAY_IN_SECONDS );
+			// set_transient( 'klarna_hide_banner', '1', 5 * DAY_IN_SECONDS );
+			set_transient( 'klarna_hide_banner', '1', 10 );
 			wp_send_json_success( 'Hide Klarna banner.' );
 			wp_die();
 		}
@@ -188,4 +242,3 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 
 	new WC_Klarna_Banners();
 }
-
