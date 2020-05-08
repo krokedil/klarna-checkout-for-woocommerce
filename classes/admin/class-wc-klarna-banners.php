@@ -36,6 +36,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			);
 		}
 
+
 		/**
 		 * Loads Klarna banner in admin pages.
 		 */
