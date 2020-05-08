@@ -25,7 +25,6 @@
 	width: 50%;
 }
 .kb-middle-group{
-	/* background-color: orange; */
 	width:25%;
 	display:grid;
 	grid-template-rows: 25% 25% 25% 25%;
@@ -121,13 +120,10 @@ justify-content: flex-end;
 .kb-sidebar-section{
 	padding:25px;
 	background-color: #FFB3C7;
-	/* height:35vw; */
 	width:20vw;
 	display:flex;
 	flex-direction: column;
 }
-
-
 
 #kb-sidebar-title{
 	font-size: 32px !important;
@@ -181,51 +177,32 @@ font: 1em sans-serif;
 }
 
 #kb-sidebar-klarna-logo-left{
-	/* justify-self: flex-start; */
 	margin:0px !important;
 	height:20px;
 	width:auto;
 }
 
-
-			/* FIX THE FOOTERS !!!! */
-			/* #footer-upgrade{
-				display:none;}
-			#footer-left{
-				display:none;} */
-
-
-#wpfooter{
-	position: unset !important;
+#klarna-sidebar h3 {
+	font-family: KlarnaHeadline, sans-serif;
+	font-size: 24px;
+	line-height: 1.2;
 }
 
-			/* ************* */
+#klarna-sidebar p {
+	margin-bottom: 1.5em;
+}
 
-/* a.kb-button {
+#klarna-sidebar img {
 	display: inline-block;
-	background: #eb6f93;
-	color: #fff;
-	text-decoration: none;
-	padding: 0.75em 2em;
-	-webkit-border-radius: 0.5em;
-	-moz-border-radius: 0.5em;
-	border-radius: 0.5em;
-	-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-} */
-
-/* .kb-dismiss {
-	position: absolute;
-	top: 25px;
-	right: 20px;
+	margin: 0 5px;
 }
 
-.kb-dismiss:hover {
-	color: #eb6f93;
-	cursor: pointer;
-} */
+.kb-sidebar-section {
+	margin-bottom: 40px;
+}
 
+
+/*--- Dismiss button -----*/
 
 #kb-dismiss-close-icon {
 	position: absolute;
@@ -239,17 +216,7 @@ font: 1em sans-serif;
 }
 
 
-
-
-
-
-
-
-/* -------------------------------- */
 /* ---------- MOBILE VIEW --------- */
-/* -------------------------------- */
-
-
 
 @media (max-width: 800px) {
 
@@ -259,14 +226,13 @@ font: 1em sans-serif;
 	}
 
 /*Mobile view Sidebar */
-.kb-sidebar-section  {
-	padding:25px;
-	background-color: #FFB3C7;
-	/* height:35vw; */
-	width: unset !important;
-	display:flex;
-	flex-direction: column;
-}
+	.kb-sidebar-section  {
+		padding:25px;
+		background-color: #FFB3C7;
+		width: unset !important;
+		display:flex;
+		flex-direction: column;
+	}
 
 
 	.kb-new-container{
@@ -391,33 +357,6 @@ font: 1em sans-serif;
 }
 
 
-/* -------------------------------- */
-
-
-
-/* @media (min-width: 800px) {
-	#klarna-banner {
-		overflow: hidden;
-	}
-
-	#klarna-banner > div {
-		float: left;
-		width: 50%;
-	}
-
-	#klarna-banner > div > * {
-		margin-left: auto;
-		margin-right: auto;
-		max-width: 500px;
-	}
-}
-
-@media (max-width: 799px) {
-	#klarna-banner > div {
-		margin-bottom: 40px;
-	}
-} */
-
 
 /* Sidebar */
 @media (min-width: 880px) {
@@ -451,24 +390,7 @@ font: 1em sans-serif;
 	margin: 20px 0;
 }
 
-#klarna-sidebar h3 {
-	font-family: KlarnaHeadline, sans-serif;
-	font-size: 24px;
-	line-height: 1.2;
-}
 
-#klarna-sidebar p {
-	margin-bottom: 1.5em;
-}
-
-#klarna-sidebar img {
-	display: inline-block;
-	margin: 0 5px;
-}
-
-.kb-sidebar-section {
-	margin-bottom: 40px;
-}
 
 .wc-settings-sub-title a, .wc-settings-sub-title a:hover, .wc-settings-sub-title a:click, .wc-settings-sub-title a:visited, .wc-settings-sub-title a:focus {
 	border:none;
@@ -485,4 +407,9 @@ div.kco-message.notice {
 
 input.bad_credential {
 	border-color: #bb2525!important;
+}
+
+/* fix for the footer */
+#wpfooter{
+	position: unset !important;
 }
