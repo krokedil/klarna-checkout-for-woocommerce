@@ -212,8 +212,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		 * Hide Klarna banner in admin pages for.
 		 */
 		public function hide_klarna_banner() {
-			// set_transient( 'klarna_hide_banner', '1', 5 * DAY_IN_SECONDS );
-			set_transient( 'klarna_hide_banner', '1', 10 );
+			set_transient( 'klarna_hide_banner', '1', 5 * DAY_IN_SECONDS );
 			wp_send_json_success( 'Hide Klarna banner.' );
 			wp_die();
 		}
