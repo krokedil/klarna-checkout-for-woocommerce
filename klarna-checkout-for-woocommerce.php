@@ -331,6 +331,7 @@ if ( ! class_exists( 'KCO' ) ) {
 		 */
 		public function redirect_to_thankyou() {
 			if ( isset( $_GET['kco_confirm'] ) && isset( $_GET['kco_order_id'] ) ) {
+				KCO_Logger::log( $_GET['kco_order_id'] . ': Confirmation endpoint hit for order.' );
 				$klarna_order_id = $_GET['kco_order_id'];
 
 				// Find relevant order in Woo.
@@ -351,6 +352,7 @@ if ( ! class_exists( 'KCO' ) ) {
 				$order_id = $orders[0];
 				$order    = wc_get_order( $order_id );
 				// Confirm, redirect and exit.
+				KCO_Logger::log( $_GET['kco_order_id'] . ': Confirm the klarna order from the confirmation page.' );
 				kco_confirm_klarna_order( $order_id, $klarna_order_id );
 				kco_unset_sessions();
 				header( 'Location:' . $order->get_checkout_order_received_url() );
