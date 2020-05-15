@@ -181,7 +181,7 @@ class KCO_Request_Cart {
 				}
 
 				// Add images.
-				$klarna_checkout_settings = get_option( 'woocommerce_kco_settings' );
+				$klarna_checkout_settings = get_option( 'woocommerce_kco_settings', array() );
 				if ( array_key_exists( 'send_product_urls', $klarna_checkout_settings ) && 'yes' === $klarna_checkout_settings['send_product_urls'] ) {
 					$klarna_item['product_url'] = $this->get_item_product_url( $product );
 					if ( $this->get_item_image_url( $product ) ) {
