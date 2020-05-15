@@ -890,7 +890,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		$this->tax_rate_ids = null;
 
 		// Assertions.
-		$this->assertEquals( 1250, $shipping_amount_25_inc, 'get_shipping_amount 25% inc tax' );
+		$this->assertEquals( 1000, $shipping_amount_25_inc, 'get_shipping_amount 25% inc tax' );
 		$this->assertEquals( 1120, $shipping_amount_12_inc, 'get_shipping_amount 12% inc tax' );
 		$this->assertEquals( 1060, $shipping_amount_6_inc, 'get_shipping_amount 6% inc tax' );
 		$this->assertEquals( 1000, $shipping_amount_0_inc, 'get_shipping_amount 0% inc tax' );
