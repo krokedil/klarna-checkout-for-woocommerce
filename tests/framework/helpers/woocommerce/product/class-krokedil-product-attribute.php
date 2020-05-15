@@ -34,7 +34,7 @@ class Krokedil_Product_Attribute {
 	 *
 	 * @var array $attribute_data
 	 */
-	protected $attribute_data = [];
+	protected $attribute_data = array();
 
 
 	/**
@@ -95,7 +95,9 @@ class Krokedil_Product_Attribute {
 
 		// Make sure caches are clean.
 		delete_transient( 'wc_attribute_taxonomies' );
-		WC_Cache_Helper::invalidate_cache_group( 'woocommerce-attributes' );
+		if ( method_exists( 'WC_Cache_Helper', 'invalidate_cache_group' ) ) {
+			WC_Cache_Helper::invalidate_cache_group( 'woocommerce-attributes' );
+		}
 
 		// These are exported as labels, so convert the label to a name if possible first.
 		$attribute_labels = wp_list_pluck( wc_get_attribute_taxonomies(), 'attribute_label', 'attribute_name' );
@@ -142,7 +144,7 @@ class Krokedil_Product_Attribute {
 			);
 
 			// Set product attributes global.
-			$wc_product_attributes = [];
+			$wc_product_attributes = array();
 
 			foreach ( wc_get_attribute_taxonomies() as $taxonomy ) {
 				$wc_product_attributes[ wc_attribute_taxonomy_name( $taxonomy->attribute_name ) ] = $taxonomy;
@@ -154,7 +156,7 @@ class Krokedil_Product_Attribute {
 			'attribute_name'     => $attribute->name,
 			'attribute_taxonomy' => $attribute->slug,
 			'attribute_id'       => $attribute_id,
-			'term_ids'           => [],
+			'term_ids'           => array(),
 		);
 
 		foreach ( $terms as $term ) {
