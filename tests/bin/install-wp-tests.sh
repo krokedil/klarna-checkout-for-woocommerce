@@ -54,6 +54,7 @@ fi
 set -ex
 
 install_wp() {
+
 	if [ -d $WP_CORE_DIR ]; then
 		return;
 	fi
@@ -144,8 +145,9 @@ install_db() {
 			EXTRA=" --host=$DB_HOSTNAME --protocol=tcp"
 		fi
 	fi
+
 	# create database
-	mysqladmin create $DB_NAME --user="$DB_USER" $EXTRA
+	mysqladmin create $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
 }
 
 install_wp
