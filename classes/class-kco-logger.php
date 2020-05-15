@@ -93,7 +93,7 @@ class KCO_Logger {
 	 * @return array
 	 */
 	public static function get_stack() {
-		$debug_data = debug_backtrace();
+		$debug_data = debug_backtrace(); // phpcs:ignore
 		$stack      = array();
 		foreach ( $debug_data as $data ) {
 			$extra_data = '';

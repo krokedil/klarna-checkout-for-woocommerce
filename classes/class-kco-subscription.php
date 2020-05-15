@@ -53,7 +53,7 @@ class KCO_Subscription {
 	 * @return bool
 	 */
 	public function is_kco_subs_change_payment_method() {
-		if ( isset( $_GET['key'] ) && ( isset( $_GET['kco-action'] ) && 'change-subs-payment' === $_GET['kco-action'] ) ) {
+		if ( isset( $_GET['key'] ) && ( isset( $_GET['kco-action'] ) && 'change-subs-payment' === $_GET['kco-action'] ) ) { // phpcs:ignore
 
 			return true;
 		}
@@ -113,7 +113,7 @@ class KCO_Subscription {
 					'customer_account_info' => array( $emd_account ),
 				);
 				$request_args['attachment']['content_type'] = 'application/vnd.klarna.internal.emd-v2+json';
-				$request_args['attachment']['body']         = json_encode( $emd );
+				$request_args['attachment']['body']         = wp_json_encode( $emd );
 			}
 		}
 		return $request_args;
@@ -134,7 +134,7 @@ class KCO_Subscription {
 
 		// If this is a change payment method request.
 		if ( $this->is_kco_subs_change_payment_method() ) {
-			$order_id = wc_get_order_id_by_order_key( sanitize_key( $_GET['key'] ) );
+			$order_id = wc_get_order_id_by_order_key( sanitize_key( $_GET['key'] ) ); // phpcs:ignore
 			if ( $order_id ) {
 				$wc_order = wc_get_order( $order_id );
 				if ( is_object( $wc_order ) && function_exists( 'wcs_order_contains_subscription' ) && function_exists( 'wcs_is_subscription' ) ) {
@@ -156,12 +156,12 @@ class KCO_Subscription {
 
 						// Modify merchant url's.
 						global $wp;
-						$current_url      = add_query_arg( $_SERVER['QUERY_STRING'], '', home_url( $wp->request ) );
+						$current_url      = add_query_arg( $_SERVER['QUERY_STRING'], '', home_url( $wp->request ) ); // phpcs:ignore
 						$confirmation_url = add_query_arg( 'kco-action', 'subs-payment-changed', $wc_order->get_view_order_url() );
 						$push_url         = add_query_arg(
 							array(
 								'kco-action' => 'subs-payment-changed',
-								'key'        => sanitize_key( $_GET['key'] ),
+								'key'        => sanitize_key( $order_id ),
 							),
 							$request_args['merchant_urls']['push']
 						);
@@ -248,7 +248,7 @@ class KCO_Subscription {
 			<div class="order_data_column" style="clear:both; float:none; width:100%;">
 				<div class="address">
 					<?php
-						echo '<p><strong>' . __( 'Klarna recurring token' ) . ':</strong>' . get_post_meta( $order->get_id(), '_kco_recurring_token', true ) . '</p>';
+						echo '<p><strong>' . __( 'Klarna recurring token' ) . ':</strong>' . get_post_meta( $order->get_id(), '_kco_recurring_token', true ) . '</p>'; // phpcs:ignore
 					?>
 				</div>
 				<div class="edit_address">
@@ -277,7 +277,7 @@ class KCO_Subscription {
 	public function save_kco_recurring_token_update( $post_id, $post ) {
 		$order = wc_get_order( $post_id );
 		if ( 'shop_subscription' === $order->get_type() && get_post_meta( $post_id, '_kco_recurring_token' ) ) {
-			update_post_meta( $post_id, '_kco_recurring_token', wc_clean( $_POST['_kco_recurring_token'] ) );
+			update_post_meta( $post_id, '_kco_recurring_token', wc_clean( $_POST['_kco_recurring_token'] ) ); // phpcs:ignore
 		}
 
 	}
@@ -289,8 +289,8 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function handle_push_cb_for_payment_method_change( $klarna_order_id ) {
-		if ( isset( $_GET['key'] ) && ( isset( $_GET['kco-action'] ) && 'subs-payment-changed' === $_GET['kco-action'] ) ) {
-			$order_id = wc_get_order_id_by_order_key( sanitize_key( $_GET['key'] ) );
+		if ( isset( $_GET['key'] ) && ( isset( $_GET['kco-action'] ) && 'subs-payment-changed' === $_GET['kco-action'] ) ) { // phpcs:ignore
+			$order_id = wc_get_order_id_by_order_key( sanitize_key( $_GET['key'] ) ); // phpcs:ignore
 			$order    = wc_get_order( $order_id );
 
 			// Add recurring token to order via Checkout API.
@@ -324,7 +324,7 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function display_thankyou_message_for_payment_method_change() {
-		if ( isset( $_GET['kco-action'] ) && 'subs-payment-changed' === $_GET['kco-action'] ) {
+		if ( isset( $_GET['kco-action'] ) && 'subs-payment-changed' === $_GET['kco-action'] ) { // phpcs:ignore
 			wc_add_notice( __( 'Thank you, your subscription payment method is now updated.', 'klarna-checkout-for-woocommerce' ), 'success' );
 			kco_unset_sessions();
 		}

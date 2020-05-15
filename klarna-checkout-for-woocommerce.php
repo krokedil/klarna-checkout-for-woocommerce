@@ -330,17 +330,17 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @return void
 		 */
 		public function redirect_to_thankyou() {
-			if ( isset( $_GET['kco_confirm'] ) && isset( $_GET['kco_order_id'] ) ) {
-				KCO_Logger::log( $_GET['kco_order_id'] . ': Confirmation endpoint hit for order.' );
-				$klarna_order_id = $_GET['kco_order_id'];
+			if ( isset( $_GET['kco_confirm'] ) && isset( $_GET['kco_order_id'] ) ) { // phpcs:ignore
+				$klarna_order_id = sanitize_text_field( wp_unslash( $_GET['kco_order_id'] ) ); // phpcs:ignore
+				KCO_Logger::log( $klarna_order_id . ': Confirmation endpoint hit for order.' );
 
 				// Find relevant order in Woo.
 				$query_args = array(
 					'fields'      => 'ids',
 					'post_type'   => wc_get_order_types(),
 					'post_status' => array_keys( wc_get_order_statuses() ),
-					'meta_key'    => '_wc_klarna_order_id',
-					'meta_value'  => $klarna_order_id,
+					'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore
+					'meta_value'  => $klarna_order_id, // phpcs:ignore
 				);
 
 				$orders = get_posts( $query_args );
@@ -352,7 +352,7 @@ if ( ! class_exists( 'KCO' ) ) {
 				$order_id = $orders[0];
 				$order    = wc_get_order( $order_id );
 				// Confirm, redirect and exit.
-				KCO_Logger::log( $_GET['kco_order_id'] . ': Confirm the klarna order from the confirmation page.' );
+				KCO_Logger::log( $klarna_order_id . ': Confirm the klarna order from the confirmation page.' );
 				kco_confirm_klarna_order( $order_id, $klarna_order_id );
 				kco_unset_sessions();
 				header( 'Location:' . $order->get_checkout_order_received_url() );
@@ -366,8 +366,8 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @return void
 		 */
 		public function check_if_external_payment() {
-			if ( isset( $_GET['kco-external-payment'] ) ) {
-				$this->run_kepm( $_GET );
+			if ( isset( $_GET['kco-external-payment'] ) ) { // phpcs:ignore
+				$this->run_kepm( $_GET ); // phpcs:ignore
 			}
 		}
 
@@ -389,8 +389,8 @@ if ( ! class_exists( 'KCO' ) ) {
 					'fields'      => 'ids',
 					'post_type'   => wc_get_order_types(),
 					'post_status' => array_keys( wc_get_order_statuses() ),
-					'meta_key'    => '_wc_klarna_order_id',
-					'meta_value'  => $klarna_order_id,
+					'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore
+					'meta_value'  => $klarna_order_id, // phpcs:ignore
 				);
 				$orders     = get_posts( $query_args );
 				// Set the order from the first order id returned.
@@ -420,8 +420,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			WC()->session->set( 'chosen_payment_method', $epm );
 			$order->set_payment_method( $payment_methods[ $epm ] );
 			$order->save();
-			kco_unset_sessions();
-			wp_redirect( $result['redirect'] );
+			wp_redirect( $result['redirect'] ); // phpcs:ignore
 			exit;
 		}
 

@@ -64,8 +64,8 @@ class KCO_API_Callbacks {
 	 * We do this to be able to retrieve WC()->cart in backend.
 	 */
 	public function maybe_prepare_wc_session_for_server_side_callback() {
-		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' === $_GET['kco-action'] || 'push' === $_GET['kco-action'] ) ) ) {
-			$session_id       = sanitize_key( $_GET['kco_session_id'] );
+		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' === $_GET['kco-action'] || 'push' === $_GET['kco-action'] ) ) ) { // phpcs:ignore
+			$session_id       = sanitize_key( $_GET['kco_session_id'] ); // phpcs:ignore
 			$sessions_handler = new WC_Session_Handler();
 			$session_data     = $sessions_handler->get_session( $session_id );
 
@@ -86,7 +86,7 @@ class KCO_API_Callbacks {
 	 * @param WC_Cart $cart WooCommerce cart.
 	 */
 	public function maybe_prepare_wc_cart_for_server_side_callback( $cart ) {
-		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' === $_GET['kco-action'] || 'push' === $_GET['kco-action'] ) ) ) {
+		if ( isset( $_GET['kco_session_id'] ) && ( isset( $_GET['kco-action'] ) && ( 'validation' === $_GET['kco-action'] || 'push' === $_GET['kco-action'] ) ) ) { // phpcs:ignore
 			WC()->cart = $cart;
 
 			// If Aelia Currency Switcher plugin is used - set correct currency.
@@ -106,13 +106,13 @@ class KCO_API_Callbacks {
 		 */
 
 		// Do nothing if there's no Klarna Checkout order ID.
-		if ( ! $_GET['kco_wc_order_id'] ) {
+		if ( ! $_GET['kco_wc_order_id'] ) { // phpcs:ignore
 			return;
 		}
 
-		KCO_WC()->logger->log( 'Push callback hitt for order: ' . $_GET['kco_wc_order_id'] );
+		$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] ); // phpcs:ignore
 
-		$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
+		KCO_WC()->logger->log( 'Push callback hit for order: ' . $klarna_order_id );
 
 		// Let other plugins hook into the push notification.
 		// Used by Klarna_Checkout_Subscription::handle_push_cb_for_payment_method_change().
@@ -122,8 +122,8 @@ class KCO_API_Callbacks {
 			'fields'      => 'ids',
 			'post_type'   => wc_get_order_types(),
 			'post_status' => array_keys( wc_get_order_statuses() ),
-			'meta_key'    => '_wc_klarna_order_id',
-			'meta_value'  => $klarna_order_id,
+			'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore
+			'meta_value'  => $klarna_order_id, // phpcs:ignore
 		);
 
 		$orders = get_posts( $query_args );
@@ -131,8 +131,7 @@ class KCO_API_Callbacks {
 		// If zero matching orders were found, create backup order.
 		if ( empty( $orders ) ) {
 			// Backup order creation.
-			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Klarna order ID ' . stripslashes_deep( json_encode( $klarna_order_id ) ) );
-			// $this->backup_order_creation( $klarna_order_id );
+			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Klarna order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 			return;
 		}
 
@@ -171,7 +170,7 @@ class KCO_API_Callbacks {
 		} else {
 			// Backup order creation.
 			// $this->backup_order_creation( $klarna_order_id );.
-			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Klarna order ID ' . stripslashes_deep( json_encode( $klarna_order_id ) ) );
+			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Klarna order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 		}
 	}
 
@@ -192,14 +191,14 @@ class KCO_API_Callbacks {
 
 		$order_id = '';
 
-		if ( $_GET['kco_wc_order_id'] ) { // KCO.
-			$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] );
+		if ( $_GET['kco_wc_order_id'] ) { // phpcs:ignore
+			$klarna_order_id = sanitize_key( $_GET['kco_wc_order_id'] ); // phpcs:ignore
 			$query_args      = array(
 				'fields'      => 'ids',
 				'post_type'   => wc_get_order_types(),
 				'post_status' => array_keys( wc_get_order_statuses() ),
-				'meta_key'    => '_wc_klarna_order_id',
-				'meta_value'  => $klarna_order_id,
+				'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore
+				'meta_value'  => $klarna_order_id, // phpcs:ignore
 			);
 
 			$orders = get_posts( $query_args );
@@ -419,7 +418,7 @@ class KCO_API_Callbacks {
 				}
 			} else {
 				$error = $response_data->get_error_message();
-				KCO_WC()->logger->log( 'ERROR when requesting Klarna order via Checkout API (' . stripslashes_deep( json_encode( $error ) ) . ') ' . stripslashes_deep( json_encode( $response_data ) ) );
+				KCO_WC()->logger->log( 'ERROR when requesting Klarna order via Checkout API (' . stripslashes_deep( wp_json_encode( $error ) ) . ') ' . stripslashes_deep( wp_json_encode( $response_data ) ) );
 			}
 
 			// Process cart with data from Klarna.

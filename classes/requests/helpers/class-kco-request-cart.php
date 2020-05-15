@@ -181,7 +181,7 @@ class KCO_Request_Cart {
 				}
 
 				// Add images.
-				$klarna_checkout_settings = get_option( 'woocommerce_kco_settings' );
+				$klarna_checkout_settings = get_option( 'woocommerce_kco_settings', array() );
 				if ( array_key_exists( 'send_product_urls', $klarna_checkout_settings ) && 'yes' === $klarna_checkout_settings['send_product_urls'] ) {
 					$klarna_item['product_url'] = $this->get_item_product_url( $product );
 					if ( $this->get_item_image_url( $product ) ) {
@@ -368,7 +368,7 @@ class KCO_Request_Cart {
 					'total_amount'          => $fee_amount,
 					'total_discount_amount' => 0,
 					'total_tax_amount'      => $fee_tax_amount,
-					'merchant_data'         => json_encode(
+					'merchant_data'         => wp_json_encode(
 						array(
 							'tax_class' => $fee->tax_class,
 						)
@@ -393,7 +393,7 @@ class KCO_Request_Cart {
 		$cart_item_data = $cart_item['data'];
 		$item_name      = $cart_item_data->get_name();
 
-		return strip_tags( $item_name );
+		return wp_strip_all_tags( $item_name );
 	}
 
 	/**

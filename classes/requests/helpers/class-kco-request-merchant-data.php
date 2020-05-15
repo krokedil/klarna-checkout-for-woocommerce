@@ -31,6 +31,6 @@ class KCO_Request_Merchant_Data {
 		// Is user logged in.
 		$merchant_data['is_user_logged_in'] = is_user_logged_in();
 
-		return json_encode( $merchant_data );
+		return wp_json_encode( $merchant_data );
 	}
 }
