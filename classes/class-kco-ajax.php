@@ -75,8 +75,8 @@ class KCO_AJAX extends WC_AJAX {
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 		$klarna_order    = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 
-		// If the update failed - reload the checkout page and display the error.
-		if ( ! $klarna_order ) {
+		// If the update failed return error.
+		if ( is_wp_error( $klarna_order ) ) {
 			wp_send_json_error();
 			wp_die();
 		}
@@ -108,8 +108,8 @@ class KCO_AJAX extends WC_AJAX {
 
 		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 
-		// If the update failed - reload the checkout page and display the error.
-		if ( ! $klarna_order ) {
+		// If the update failed return error
+		if ( is_wp_error( $klarna_order ) ) {
 			wp_send_json_error();
 			wp_die();
 		}
@@ -180,7 +180,7 @@ class KCO_AJAX extends WC_AJAX {
 				$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
 				// Check if we got a wp_error.
-				if ( ! $klarna_order ) {
+				if ( is_wp_error( $klarna_order ) ) {
 					wp_send_json_error();
 					wp_die();
 				}
@@ -204,8 +204,8 @@ class KCO_AJAX extends WC_AJAX {
 					// If it is, update order.
 					$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 
-					// If the update failed - reload the checkout page and display the error.
-					if ( ! $klarna_order ) {
+					// If is wp_error return error.
+					if ( is_wp_error( $klarna_order ) ) {
 						wp_send_json_error();
 						wp_die();
 					}
@@ -290,7 +290,7 @@ class KCO_AJAX extends WC_AJAX {
 
 		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 
-		if ( ! $klarna_order ) {
+		if ( is_wp_error( $klarna_order ) ) {
 			wp_send_json_error();
 			wp_die();
 		}
