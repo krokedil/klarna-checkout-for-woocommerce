@@ -108,7 +108,7 @@ class KCO_AJAX extends WC_AJAX {
 
 		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 
-		// If the update failed return error
+		// If the update failed return error.
 		if ( is_wp_error( $klarna_order ) ) {
 			wp_send_json_error();
 			wp_die();

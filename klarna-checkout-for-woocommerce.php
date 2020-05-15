@@ -332,7 +332,7 @@ if ( ! class_exists( 'KCO' ) ) {
 		public function redirect_to_thankyou() {
 			if ( isset( $_GET['kco_confirm'] ) && isset( $_GET['kco_order_id'] ) ) {
 				$klarna_order_id = sanitize_text_field( wp_unslash( $_GET['kco_order_id'] ) ); // phpcs:ignore;
-        KCO_Logger::log( $klarna_order_id . ': Confirmation endpoint hit for order.' );
+				KCO_Logger::log( $klarna_order_id . ': Confirmation endpoint hit for order.' );
 
 				// Find relevant order in Woo.
 				$query_args = array(

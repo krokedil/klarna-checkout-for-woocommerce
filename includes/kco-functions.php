@@ -551,7 +551,7 @@ function kco_convert_region( $region_string, $country_code ) {
 		}
 
 		// Get the code by region name.
-		$region_code = array_keys( $states[ strtoupper( $country_code ) ], $region_string, false );
+		$region_code = array_keys( $states[ strtoupper( $country_code ) ], $region_string, false ); //phpcs:ignore
 		if ( ! empty( $region_code ) ) {
 			return $region_code[0];
 		}
