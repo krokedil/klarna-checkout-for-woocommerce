@@ -461,11 +461,10 @@ class KCO_Request_Cart {
 	 */
 	public function get_item_price( $cart_item ) {
 		if ( $this->separate_sales_tax ) {
-			$item_subtotal = $cart_item['line_total'] / $cart_item['quantity'];
+			$item_subtotal = wc_get_price_excluding_tax( $cart_item['data'] );
 		} else {
-			$item_subtotal = ( $cart_item['line_total'] + $cart_item['line_tax'] ) / $cart_item['quantity'];
+			$item_subtotal = wc_get_price_including_tax( $cart_item['data'] );
 		}
-
 		$item_price = number_format( $item_subtotal, wc_get_price_decimals(), '.', '' ) * 100;
 		return round( $item_price );
 	}
@@ -584,18 +583,26 @@ class KCO_Request_Cart {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array $cart_item Cart item.
+	 * @param  array      $cart_item Cart item.
+	 * @param  WC_Product $product WooCommerce product.
 	 * @return integer $item_total_amount Cart item total amount.
 	 */
-	public function get_item_total_amount( $cart_item ) {
+	public function get_item_total_amount( $cart_item, $product ) {
 
 		if ( $this->separate_sales_tax ) {
-			$item_subtotal = $cart_item['line_total'] / $cart_item['quantity'];
+			$item_total_amount     = number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->get_item_tax_rate( $cart_item, $product ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
+			$max_order_line_amount = ( number_format( wc_get_price_including_tax( $cart_item['data'] ), wc_get_price_decimals(), '.', '' ) * $cart_item['quantity'] ) * 100;
 		} else {
-			$item_subtotal = ( $cart_item['line_total'] + $cart_item['line_tax'] ) / $cart_item['quantity'];
+			$item_total_amount     = number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->get_item_tax_rate( $cart_item, $product ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
+			$max_order_line_amount = ( number_format( wc_get_price_including_tax( $cart_item['data'] ), wc_get_price_decimals(), '.', '' ) * $cart_item['quantity'] ) * 100;
+		}
+		// Check so the line_total isn't greater than product price x quantity.
+		// This can happen when having price display set to 0 decimals.
+		if ( $item_total_amount > $max_order_line_amount ) {
+			$item_total_amount = $max_order_line_amount;
 		}
 
-		return number_format( $item_subtotal, wc_get_price_decimals(), '.', '' ) * 100 * $cart_item['quantity'];
+		return round( $item_total_amount );
 	}
 
 	/**
