@@ -368,7 +368,7 @@ class KCO_Request_Cart {
 					'total_amount'          => $fee_amount,
 					'total_discount_amount' => 0,
 					'total_tax_amount'      => $fee_tax_amount,
-					'merchant_data'         => json_encode(
+					'merchant_data'         => wp_json_encode(
 						array(
 							'tax_class' => $fee->tax_class,
 						)
@@ -393,7 +393,7 @@ class KCO_Request_Cart {
 		$cart_item_data = $cart_item['data'];
 		$item_name      = $cart_item_data->get_name();
 
-		return strip_tags( $item_name );
+		return wp_strip_all_tags( $item_name );
 	}
 
 	/**
@@ -461,10 +461,8 @@ class KCO_Request_Cart {
 	 */
 	public function get_item_price( $cart_item ) {
 		if ( $this->separate_sales_tax ) {
-			// $item_subtotal = wc_get_price_excluding_tax( $cart_item['data'] );
 			$item_subtotal = $cart_item['line_total'] / $cart_item['quantity'];
 		} else {
-			// $item_subtotal = wc_get_price_including_tax( $cart_item['data'] );
 			$item_subtotal = ( $cart_item['line_total'] + $cart_item['line_tax'] ) / $cart_item['quantity'];
 		}
 

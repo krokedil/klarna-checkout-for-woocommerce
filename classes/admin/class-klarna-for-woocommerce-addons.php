@@ -55,7 +55,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			if ( 'woocommerce_page_checkout-addons' === $hook || 'settings_page_specter-admin' === $hook ) {
 				wp_register_style( 'klarna-checkout-addons', KCO_WC_PLUGIN_URL . '/assets/css/checkout-addons.css', false, KCO_WC_VERSION );
 				wp_enqueue_style( 'klarna-checkout-addons' );
-				wp_register_script( 'klarna-checkout-addons', KCO_WC_PLUGIN_URL . '/assets/js/klarna-for-woocommerce-addons.js', true, KCO_WC_VERSION );
+				wp_register_script( 'klarna-checkout-addons', KCO_WC_PLUGIN_URL . '/assets/js/klarna-for-woocommerce-addons.js', true, KCO_WC_VERSION, false );
 
 				$params = array(
 					'change_addon_status_nonce' => wp_create_nonce( 'change_klarna_addon_status' ),
@@ -77,9 +77,9 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		 * Add the Addons options page to WooCommerce.
 		 **/
 		public function options_page() {
-			$tab = ( isset( $_GET['tab'] ) ) ? $_GET['tab'] : 'addons'; // phpcs: ignore.
+			$tab = ( isset( $_GET['tab'] ) ) ? $_GET['tab'] : 'addons'; // phpcs:ignore
 			$this->add_page_tabs( $tab );
-			if ( ! isset( $_GET['tab'] ) || 'addons' === $_GET['tab'] ) {
+			if ( ! isset( $_GET['tab'] ) || 'addons' === $_GET['tab'] ) { // phpcs:ignore
 				$addon_content = self::get_addons();
 				?>
 				<div id="checkout-addons-heading" class="checkout-addons-heading">
@@ -92,7 +92,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 						<?php if ( isset( $start->plugin_id ) && 'kco' === $start->plugin_id ) : ?>
 						<div class="checkout-addons-banner-block checkout-addons-wrap wrap <?php echo esc_html( $start->class ); ?>">
 							<h2><?php echo esc_html( $start->title ); ?></h2>
-							<?php echo self::get_dynamic_content( $start->content ); ?>
+							<?php echo self::get_dynamic_content( $start->content ); // phpcs:ignore ?>
 						</div>
 					<?php endif; ?>
 				<?php endforeach; ?>
@@ -114,10 +114,10 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 											<div class="checkout-addon-footer">
 												<div class="inside-wrapper">
 													<?php if ( $item->href ) : ?>
-														<button class="checkout-addon-action"><?php echo self::get_addon_action_button( $item ); ?></button>
+														<button class="checkout-addon-action"><?php echo self::get_addon_action_button( $item ); // phpcs:ignore?></button>
 													<?php else : ?>
 														<span class="checkout-addon-status"></span>
-														<span class="checkout-addon-action"><?php echo self::get_addon_action_button( $item ); ?></span>
+														<span class="checkout-addon-action"><?php echo self::get_addon_action_button( $item ); // phpcs:ignore?></span>
 													<?php endif; ?>	
 												</div>
 											</div>
@@ -130,10 +130,10 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 				<?php endif; ?>
 			</div>
 				<?php
-			} elseif ( isset( $_GET['tab'] ) && 'settings' === $_GET['tab'] ) {
-				do_action( 'klarna_addons_settings_tab', ( isset( $_GET['section'] ) ) ? $_GET['section'] : null );
+			} elseif ( isset( $_GET['tab'] ) && 'settings' === $_GET['tab'] ) { // phpcs:ignore
+				do_action( 'klarna_addons_settings_tab', ( isset( $_GET['section'] ) ) ? $_GET['section'] : null ); // phpcs:ignore
 				?>
-				<p><?php _e( 'Please install an add-on to be able to see the settings.', 'klarna-checkout-for-woocommerce' ); ?></p>
+				<p><?php _e( 'Please install an add-on to be able to see the settings.', 'klarna-checkout-for-woocommerce' ); // phpcs:ignore?></p>
 				<?php
 			}
 		}
@@ -226,14 +226,14 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		 */
 		public function change_klarna_addon_status() {
 			// Check nonce.
-			if ( ! wp_verify_nonce( $_REQUEST['nonce'], 'change_klarna_addon_status' ) ) {
+			if ( ! wp_verify_nonce( $_REQUEST['nonce'], 'change_klarna_addon_status' ) ) { // phpcs:ignore
 				wp_send_json_error( 'bad_nonce' );
 				exit;
 			}
 
-			$status      = $_REQUEST['plugin_status'];
-			$action      = $_REQUEST['plugin_action'];
-			$plugin_slug = $_REQUEST['plugin_slug'];
+			$status      = $_REQUEST['plugin_status']; // phpcs:ignore
+			$action      = $_REQUEST['plugin_action']; // phpcs:ignore
+			$plugin_slug = $_REQUEST['plugin_slug']; // phpcs:ignore
 
 			// Check if the user can install plugins or manage plugins.
 			if ( ( ! current_user_can( 'install_plugins' ) && 'install' === $action )
@@ -287,7 +287,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 
 				$all_plugins = get_plugins();
 				if ( ! array_key_exists( $plugin_slug, $all_plugins ) ) {
-					$plugin_url = $_REQUEST['plugin_url'];
+					$plugin_url = $_REQUEST['plugin_url']; // phpcs:ignore
 					$result     = self::install_plugin( $plugin_url );
 
 					if ( is_wp_error( $result ) || 'error' === $result['status'] ) {
@@ -415,7 +415,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 				$html .= '<a class="nav-tab ' . $class . '" href="?page=checkout-addons&tab=' . $tab . '">' . $name . '</a>';
 			}
 			$html .= '</h2>';
-			echo $html;
+			echo $html; // phpcs:ignore
 		}
 	}
 }

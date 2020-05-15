@@ -54,7 +54,7 @@ class KCO_AJAX extends WC_AJAX {
 	 * Cart quantity update function.
 	 */
 	public static function kco_wc_update_cart() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_update_cart' ) ) {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_update_cart' ) ) { // phpcs:ignore
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
@@ -62,7 +62,7 @@ class KCO_AJAX extends WC_AJAX {
 		wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
 
 		$values = array();
-		parse_str( $_POST['checkout'], $values );
+		parse_str( $_POST['checkout'], $values ); // phpcs:ignore
 		$cart = $values['cart'];
 
 		foreach ( $cart as $cart_key => $cart_value ) {
@@ -87,7 +87,7 @@ class KCO_AJAX extends WC_AJAX {
 	 * Update shipping method function.
 	 */
 	public static function kco_wc_update_shipping() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_update_shipping' ) ) {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_update_shipping' ) ) { // phpcs:ignore
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
@@ -95,7 +95,7 @@ class KCO_AJAX extends WC_AJAX {
 		wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
 
 		if ( isset( $_POST['data'] ) && is_array( $_POST['data'] ) ) {
-			$shipping_option           = $_POST['data'];
+			$shipping_option           = $_POST['data']; // phpcs:ignore
 			$chosen_shipping_methods   = array();
 			$chosen_shipping_methods[] = wc_clean( $shipping_option['id'] );
 			WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
@@ -125,14 +125,14 @@ class KCO_AJAX extends WC_AJAX {
 	 * Refresh checkout fragment.
 	 */
 	public static function kco_wc_change_payment_method() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_change_payment_method' ) ) {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_change_payment_method' ) ) { // phpcs:ignore
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
 
 		$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 
-		if ( 'false' === $_POST['kco'] ) {
+		if ( 'false' === $_POST['kco'] ) { // phpcs:ignore
 			// Set chosen payment method to first gateway that is not Klarna Checkout for WooCommerce.
 			$first_gateway = reset( $available_gateways );
 			if ( 'kco' !== $first_gateway->id ) {
@@ -239,13 +239,13 @@ class KCO_AJAX extends WC_AJAX {
 			wp_die();
 		}
 
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_iframe_shipping_address_change' ) ) {
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_iframe_shipping_address_change' ) ) { // phpcs:ignore
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
 
 		if ( isset( $_REQUEST['data'] ) && is_array( $_REQUEST['data'] ) ) {
-			$address = array_map( 'sanitize_text_field', $_REQUEST['data'] );
+			$address = array_map( 'sanitize_text_field', $_REQUEST['data'] ); // phpcs:ignore
 		}
 
 		$customer_data = array();
@@ -310,7 +310,7 @@ class KCO_AJAX extends WC_AJAX {
 	 * @return void
 	 */
 	public static function kco_wc_get_klarna_order() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_get_klarna_order' ) ) { // Input var okay.
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_get_klarna_order' ) ) { // phpcs:ignore
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
@@ -351,7 +351,7 @@ class KCO_AJAX extends WC_AJAX {
 	 * @return void
 	 */
 	public static function kco_wc_log_js() {
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_log_js' ) ) { // Input var okay.
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'kco_wc_log_js' ) ) { // phpcs:ignore
 			wp_send_json_error( 'bad_nonce' );
 			exit;
 		}
