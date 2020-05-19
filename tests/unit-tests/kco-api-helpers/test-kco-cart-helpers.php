@@ -38,34 +38,22 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '25' );
 		$order_amount_25_inc = ( new KCO_Request_Cart() )->get_order_amount();
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '12' );
 		$order_amount_12_inc = ( new KCO_Request_Cart() )->get_order_amount();
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '6' );
 		$order_amount_6_inc = ( new KCO_Request_Cart() )->get_order_amount();
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '0' );
 		$order_amount_0_inc = ( new KCO_Request_Cart() )->get_order_amount();
 		WC()->cart->empty_cart();
 
@@ -73,34 +61,22 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 
 		// 25% exc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '25' );
 		$order_amount_25_exc = ( new KCO_Request_Cart() )->get_order_amount();
 		WC()->cart->empty_cart();
 
 		// 12% exc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '12' );
 		$order_amount_12_exc = ( new KCO_Request_Cart() )->get_order_amount();
 		WC()->cart->empty_cart();
 
 		// 6% exc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '6' );
 		$order_amount_6_exc = ( new KCO_Request_Cart() )->get_order_amount();
 		WC()->cart->empty_cart();
 
 		// 0% exc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '0' );
 		$order_amount_0_exc = ( new KCO_Request_Cart() )->get_order_amount();
 		WC()->cart->empty_cart();
 
@@ -135,84 +111,44 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-
+		$this->settup_cart( '25' );
 		$order_tax_amount_25_inc = $this->get_order_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-
+		$this->settup_cart( '12' );
 		$order_tax_amount_12_inc = $this->get_order_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-
+		$this->settup_cart( '6' );
 		$order_tax_amount_6_inc = $this->get_order_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-
+		$this->settup_cart( '0' );
 		$order_tax_amount_0_inc = $this->get_order_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 		// 25% inc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-
+		$this->settup_cart( '25' );
 		$order_tax_amount_25_exc = $this->get_order_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-
+		$this->settup_cart( '12' );
 		$order_tax_amount_12_exc = $this->get_order_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-
+		$this->settup_cart( '6' );
 		$order_tax_amount_6_exc = $this->get_order_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-
+		$this->settup_cart( '0' );
 		$order_tax_amount_0_exc = $this->get_order_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// Clear data.
@@ -278,10 +214,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '25' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$item_price_25_inc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
@@ -289,10 +222,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '12' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$item_price_12_inc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
@@ -300,10 +230,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '6' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$item_price_6_inc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
@@ -311,10 +238,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '0' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$item_price_0_inc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
@@ -323,10 +247,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 		// 25% exc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '25' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$item_price_25_exc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
@@ -334,10 +255,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 12% exc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '12' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$item_price_12_exc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
@@ -345,10 +263,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 6% exc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '6' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$item_price_6_exc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
@@ -356,10 +271,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 0% exc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '0' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$item_price_0_exc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
@@ -397,10 +309,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '25' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product              = $this->get_product( $cart_item );
@@ -409,10 +318,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '12' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product              = $this->get_product( $cart_item );
@@ -421,10 +327,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '6' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product             = $this->get_product( $cart_item );
@@ -433,10 +336,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '0' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product             = $this->get_product( $cart_item );
@@ -446,10 +346,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 		// 25% exc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '25' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product              = $this->get_product( $cart_item );
@@ -458,10 +355,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 12% exc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '12' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product              = $this->get_product( $cart_item );
@@ -470,10 +364,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 6% exc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '6' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product             = $this->get_product( $cart_item );
@@ -482,10 +373,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 0% exc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '0' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product             = $this->get_product( $cart_item );
@@ -525,10 +413,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '25' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                  = $this->get_product( $cart_item );
@@ -537,10 +422,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '12' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                  = $this->get_product( $cart_item );
@@ -549,10 +431,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '6' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                 = $this->get_product( $cart_item );
@@ -561,10 +440,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '0' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                 = $this->get_product( $cart_item );
@@ -574,10 +450,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 		// 25% exc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '25' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                  = $this->get_product( $cart_item );
@@ -586,10 +459,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 12% exc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '12' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                  = $this->get_product( $cart_item );
@@ -598,10 +468,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 6% exc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '6' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                 = $this->get_product( $cart_item );
@@ -610,10 +477,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 0% exc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '0' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                 = $this->get_product( $cart_item );
@@ -653,10 +517,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '25' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                = $this->get_product( $cart_item );
@@ -665,10 +526,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '12' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                = $this->get_product( $cart_item );
@@ -677,10 +535,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '6' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product               = $this->get_product( $cart_item );
@@ -689,10 +544,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '0' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product               = $this->get_product( $cart_item );
@@ -702,10 +554,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 		// 25% exc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '25' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                = $this->get_product( $cart_item );
@@ -714,10 +563,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 12% exc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '12' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                = $this->get_product( $cart_item );
@@ -726,10 +572,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 6% exc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '6' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product               = $this->get_product( $cart_item );
@@ -738,10 +581,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		WC()->cart->empty_cart();
 
 		// 0% exc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
+		$this->settup_cart( '0' );
 		$cart_items = WC()->cart->get_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product               = $this->get_product( $cart_item );
@@ -803,84 +643,44 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '25', 'flat_rate' );
 		$shipping_amount_25_inc = ( new KCO_Request_Cart() )->get_shipping_amount();
-
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '12', 'flat_rate' );
 		$shipping_amount_12_inc = ( new KCO_Request_Cart() )->get_shipping_amount();
-
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '6', 'flat_rate' );
 		$shipping_amount_6_inc = ( new KCO_Request_Cart() )->get_shipping_amount();
-
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '0', 'flat_rate' );
 		$shipping_amount_0_inc = ( new KCO_Request_Cart() )->get_shipping_amount();
-
 		WC()->cart->empty_cart();
 
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 		// 25% exc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '25', 'flat_rate' );
 		$shipping_amount_25_exc = ( new KCO_Request_Cart() )->get_shipping_amount();
-
 		WC()->cart->empty_cart();
 
 		// 12% exc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '12', 'flat_rate' );
 		$shipping_amount_12_exc = ( new KCO_Request_Cart() )->get_shipping_amount();
-
 		WC()->cart->empty_cart();
 
 		// 6% exc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '6', 'flat_rate' );
 		$shipping_amount_6_exc = ( new KCO_Request_Cart() )->get_shipping_amount();
-
 		WC()->cart->empty_cart();
 
 		// 0% exc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '0', 'flat_rate' );
 		$shipping_amount_0_exc = ( new KCO_Request_Cart() )->get_shipping_amount();
-
 		WC()->cart->empty_cart();
 
 		// Clear data.
@@ -890,7 +690,7 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		$this->tax_rate_ids = null;
 
 		// Assertions.
-		$this->assertEquals( 1000, $shipping_amount_25_inc, 'get_shipping_amount 25% inc tax' );
+		$this->assertEquals( 1250, $shipping_amount_25_inc, 'get_shipping_amount 25% inc tax' );
 		$this->assertEquals( 1120, $shipping_amount_12_inc, 'get_shipping_amount 12% inc tax' );
 		$this->assertEquals( 1060, $shipping_amount_6_inc, 'get_shipping_amount 6% inc tax' );
 		$this->assertEquals( 1000, $shipping_amount_0_inc, 'get_shipping_amount 0% inc tax' );
@@ -917,84 +717,44 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '25', 'flat_rate' );
 		$shipping_tax_amount_25_inc = ( new KCO_Request_Cart() )->get_shipping_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '12', 'flat_rate' );
 		$shipping_tax_amount_12_inc = ( new KCO_Request_Cart() )->get_shipping_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '6', 'flat_rate' );
 		$shipping_tax_amount_6_inc = ( new KCO_Request_Cart() )->get_shipping_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '0', 'flat_rate' );
 		$shipping_tax_amount_0_inc = ( new KCO_Request_Cart() )->get_shipping_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 		// 25% exc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '25', 'flat_rate' );
 		$shipping_tax_amount_25_exc = ( new KCO_Request_Cart() )->get_shipping_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 12% exc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '12', 'flat_rate' );
 		$shipping_tax_amount_12_exc = ( new KCO_Request_Cart() )->get_shipping_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 6% exc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '6', 'flat_rate' );
 		$shipping_tax_amount_6_exc = ( new KCO_Request_Cart() )->get_shipping_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// 0% exc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '0', 'flat_rate' );
 		$shipping_tax_amount_0_exc = ( new KCO_Request_Cart() )->get_shipping_tax_amount();
-
 		WC()->cart->empty_cart();
 
 		// Clear data.
@@ -1031,84 +791,44 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '25', 'flat_rate' );
 		$shipping_tax_rate_25_inc = ( new KCO_Request_Cart() )->get_shipping_tax_rate();
-
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '12', 'flat_rate' );
 		$shipping_tax_rate_12_inc = ( new KCO_Request_Cart() )->get_shipping_tax_rate();
-
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '6', 'flat_rate' );
 		$shipping_tax_rate_6_inc = ( new KCO_Request_Cart() )->get_shipping_tax_rate();
-
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '0', 'flat_rate' );
 		$shipping_tax_rate_0_inc = ( new KCO_Request_Cart() )->get_shipping_tax_rate();
-
 		WC()->cart->empty_cart();
 
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 		// 25% exc tax.
-		$this->simple_product->set_tax_class( '25percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '25', 'flat_rate' );
 		$shipping_tax_rate_25_exc = ( new KCO_Request_Cart() )->get_shipping_tax_rate();
-
 		WC()->cart->empty_cart();
 
 		// 12% exc tax.
-		$this->simple_product->set_tax_class( '12percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '12', 'flat_rate' );
 		$shipping_tax_rate_12_exc = ( new KCO_Request_Cart() )->get_shipping_tax_rate();
-
 		WC()->cart->empty_cart();
 
 		// 6% exc tax.
-		$this->simple_product->set_tax_class( '6percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '6', 'flat_rate' );
 		$shipping_tax_rate_6_exc = ( new KCO_Request_Cart() )->get_shipping_tax_rate();
-
 		WC()->cart->empty_cart();
 
 		// 0% exc tax.
-		$this->simple_product->set_tax_class( '0percent' );
-		$this->simple_product->save();
-		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
-		WC()->cart->calculate_totals();
-		WC()->session->set( 'chosen_shipping_methods', array( 'flat_rate' ) );
+		$this->settup_cart( '0', 'flat_rate' );
 		$shipping_tax_rate_0_exc = ( new KCO_Request_Cart() )->get_shipping_tax_rate();
-
 		WC()->cart->empty_cart();
 
 		// Clear data.
@@ -1310,5 +1030,22 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		}
 
 		return $product;
+	}
+
+	/**
+	 * Sets up the cart for the test.
+	 *
+	 * @param string      $tax_rate The tax rate to be used.
+	 * @param string|bool $shipping The shipping to be used.
+	 * @return void
+	 */
+	public function settup_cart( $tax_rate, $shipping = false ) {
+		$this->simple_product->set_tax_class( $tax_rate . 'percent' );
+		$this->simple_product->save();
+		WC()->cart->add_to_cart( $this->simple_product->get_id(), 1 );
+		if ( false !== $shipping ) {
+			WC()->session->set( 'chosen_shipping_methods', array( $shipping ) );
+		}
+		WC()->cart->calculate_totals();
 	}
 }
