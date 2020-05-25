@@ -140,6 +140,7 @@ class KCO_Templates {
 			|| did_action( 'kco_wc_show_snippet' )
 			|| ( ! $checkout->is_registration_enabled() && $checkout->is_registration_required() && ! is_user_logged_in() )
 			|| did_action( 'woocommerce_cart_has_errors' )
+			|| isset( $_GET['change_payment_method'] ) // phpcs:ignore
 			|| ! $enabled ) {
 				return;
 			}
