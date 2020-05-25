@@ -52,7 +52,7 @@ class KCO_Admin_Notices {
 	 */
 	public function __construct() {
 		$settings      = get_option( 'woocommerce_kco_settings' );
-		$this->enabled = $settings['enabled'];
+		$this->enabled = isset( $settings['enabled'] ) ? $settings['enabled'] : 'no';
 
 		add_action( 'admin_init', array( $this, 'check_settings' ) );
 		add_action( 'admin_init', array( $this, 'check_hide_action' ) );

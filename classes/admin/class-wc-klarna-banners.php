@@ -58,11 +58,14 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			}
 
 			// Go through countries and check if at least one has credentials configured.
-			$countries   = array( 'eu', 'us' );
 			$country_set = false;
-			foreach ( $countries as $country ) {
-				if ( '' !== $kco_settings[ 'merchant_id_' . $country ] && '' !== $kco_settings[ 'shared_secret_' . $country ] ) {
-					$country_set = true;
+
+			if ( is_array( $kco_settings ) ) { // Check for the country credentials only if the setting is present.
+				$countries = array( 'eu', 'us' );
+				foreach ( $countries as $country ) {
+					if ( '' !== $kco_settings[ 'merchant_id_' . $country ] && '' !== $kco_settings[ 'shared_secret_' . $country ] ) {
+						$country_set = true;
+					}
 				}
 			}
 
