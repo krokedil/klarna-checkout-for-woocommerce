@@ -1,0 +1,48 @@
+#!/usr/bin/env php
+<?php 
+/**
+ * Script thats generate plugin config file.
+ */
+echo 'Krokedil development tool for PHPUnit' . PHP_EOL;
+
+$params = $argv;
+array_shift($params );
+if (!empty($params)) {
+	if (in_array($params[0], array('--help', '-h'))) {
+		$usage = <<<EOD
+    Usage:
+    ./script
+    or
+    php script
+
+EOD;
+echo $usage;
+	}
+	exit();
+}
+echo 'Enter the plugin name:' . PHP_EOL . 'e.g. krokedil-plugin.php' . PHP_EOL;
+$handle = fopen ("php://stdin","r" );
+$input = fgets($handle,128);
+$input = rtrim($input);
+fclose ($handle);
+
+$filename = 'config.php';
+$config = fopen("$filename", "w");
+$content = "<?php\n
+/**
+ * Plugin configuration file.
+ *
+ * @author Krokedil
+ * @since 1.0.0
+ */
+return array(
+	'name'    => '$input',
+	'version' => '1.0.0',
+);
+";
+fwrite($config, $content);
+fclose($config);
+
+if (file_exists($filename)) {
+	echo 'Successfully generated file' . PHP_EOL;
+}

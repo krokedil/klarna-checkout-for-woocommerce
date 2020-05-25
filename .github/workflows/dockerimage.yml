@@ -1,0 +1,212 @@
+name: KCO CI
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  WC_4-1-0:
+    name: Latest WP - 4.1.0 WC
+    strategy:
+      matrix:
+        wordpress: [latest]
+        woocommerce: [4.1.0]
+    runs-on: ubuntu-latest
+    container:
+      image: chriszarate/wordpress-phpunit:6.0.6
+      volumes:
+        - "testsuite:/tmp"
+    services:
+      mysql:
+        image: mariadb:10.2
+        env:
+          MYSQL_DATABASE: "wordpress_test"
+          MYSQL_ROOT_PASSWORD: "password"
+    steps:
+    - name: Settup repo
+      uses: actions/checkout@v2
+      with:
+        path: main
+    - name: Settup WooCommerce
+      uses: actions/checkout@v2
+      with:
+        repository: woocommerce/woocommerce
+        ref: ${{ matrix.woocommerce }}
+        path: woocommerce
+    - name: Install WP Testsuite
+      run: |
+        chmod +x main/tests/bin/install-wp-tests.sh
+        ./main/tests/bin/install-wp-tests.sh wordpress_test root password mysql ${{ matrix.wordpress }} true
+    - name: Run PHPUnit
+      run: |
+        phpunit -c main/phpunit.xml
+  WC_4-0-0:
+    name: Latest WP - 4.0.0 WC
+    strategy:
+      matrix:
+        wordpress: [latest]
+        woocommerce: [4.0.0]
+    runs-on: ubuntu-latest
+    container:
+      image: chriszarate/wordpress-phpunit:6.0.6
+      volumes:
+        - "testsuite:/tmp"
+    services:
+      mysql:
+        image: mariadb:10.2
+        env:
+          MYSQL_DATABASE: "wordpress_test"
+          MYSQL_ROOT_PASSWORD: "password"
+    steps:
+    - name: Settup repo
+      uses: actions/checkout@v2
+      with:
+        path: main
+    - name: Settup WooCommerce
+      uses: actions/checkout@v2
+      with:
+        repository: woocommerce/woocommerce
+        ref: ${{ matrix.woocommerce }}
+        path: woocommerce
+    - name: Install WP Testsuite
+      run: |
+        chmod +x main/tests/bin/install-wp-tests.sh
+        ./main/tests/bin/install-wp-tests.sh wordpress_test root password mysql ${{ matrix.wordpress }} true
+    - name: Run PHPUnit
+      run: |
+        phpunit -c main/phpunit.xml
+  WC_3-9-0:
+    name: Latest WP - 3.9.0 WC
+    strategy:
+      matrix:
+        wordpress: [latest]
+        woocommerce: [3.9.0]
+    runs-on: ubuntu-latest
+    container:
+      image: chriszarate/wordpress-phpunit:6.0.6
+      volumes:
+        - "testsuite:/tmp"
+    services:
+      mysql:
+        image: mariadb:10.2
+        env:
+          MYSQL_DATABASE: "wordpress_test"
+          MYSQL_ROOT_PASSWORD: "password"
+    steps:
+    - name: Settup repo
+      uses: actions/checkout@v2
+      with:
+        path: main
+    - name: Settup WooCommerce
+      uses: actions/checkout@v2
+      with:
+        repository: woocommerce/woocommerce
+        ref: ${{ matrix.woocommerce }}
+        path: woocommerce
+    - name: Install WP Testsuite
+      run: |
+        chmod +x main/tests/bin/install-wp-tests.sh
+        ./main/tests/bin/install-wp-tests.sh wordpress_test root password mysql ${{ matrix.wordpress }} true
+    - name: Run PHPUnit
+      run: |
+        phpunit -c main/phpunit.xml
+  WC_3-8-0:
+    name: Latest WP - 3.8.0 WC
+    strategy:
+      matrix:
+        wordpress: [latest]
+        woocommerce: [3.8.0]
+    runs-on: ubuntu-latest
+    container:
+      image: chriszarate/wordpress-phpunit:6.0.6
+      volumes:
+        - "testsuite:/tmp"
+    services:
+      mysql:
+        image: mariadb:10.2
+        env:
+          MYSQL_DATABASE: "wordpress_test"
+          MYSQL_ROOT_PASSWORD: "password"
+    steps:
+    - name: Settup repo
+      uses: actions/checkout@v2
+      with:
+        path: main
+    - name: Settup WooCommerce
+      uses: actions/checkout@v2
+      with:
+        repository: woocommerce/woocommerce
+        ref: ${{ matrix.woocommerce }}
+        path: woocommerce
+    - name: Install WP Testsuite
+      run: |
+        chmod +x main/tests/bin/install-wp-tests.sh
+        ./main/tests/bin/install-wp-tests.sh wordpress_test root password mysql ${{ matrix.wordpress }} true
+    - name: Run PHPUnit
+      run: |
+        phpunit -c main/phpunit.xml
+  WC_3-7-0:
+    name: Latest WP - 3.7.0 WC
+    strategy:
+      matrix:
+        wordpress: [latest]
+        woocommerce: [3.7.0]
+    runs-on: ubuntu-latest
+    container:
+      image: chriszarate/wordpress-phpunit:6.0.6
+      volumes:
+        - "testsuite:/tmp"
+    services:
+      mysql:
+        image: mariadb:10.2
+        env:
+          MYSQL_DATABASE: "wordpress_test"
+          MYSQL_ROOT_PASSWORD: "password"
+    steps:
+    - name: Settup repo
+      uses: actions/checkout@v2
+      with:
+        path: main
+    - name: Settup WooCommerce
+      uses: actions/checkout@v2
+      with:
+        repository: woocommerce/woocommerce
+        ref: ${{ matrix.woocommerce }}
+        path: woocommerce
+    - name: Install WP Testsuite
+      run: |
+        chmod +x main/tests/bin/install-wp-tests.sh
+        ./main/tests/bin/install-wp-tests.sh wordpress_test root password mysql ${{ matrix.wordpress }} true
+    - name: Run PHPUnit
+      run: |
+        phpunit -c main/phpunit.xml
+  PHPCS:
+    name: PHPCS
+    runs-on: ubuntu-latest
+    container:
+      image: php:7.0.0-apache
+    steps:
+    - name: Settup repo
+      uses: actions/checkout@v2
+      with:
+        path: main
+    - name: Install Packages
+      run: |
+        echo "Update package lists."
+        apt-get update
+        echo "Install base packages."
+        apt-get install -y build-essential libssl-dev gnupg libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev libicu-dev libxml2-dev vim wget unzip
+    - name: Install Composer
+      run: |
+        echo "Install composer."
+        curl -sS https://getcomposer.org/installer | php 
+        mv composer.phar /usr/local/bin/composer
+    - name: Install PHPCS with WordPress Coding Standards
+      run: |
+        composer global require woocommerce/woocommerce-sniffs
+    - name: Run PHPCS Coding Standards
+      run: |
+          ~/.composer/vendor/bin/phpcs main --standard=WordPress --extensions=php --ignore=/tests

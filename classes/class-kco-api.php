@@ -133,7 +133,7 @@ class KCO_API {
 		$klarna_order = $this->get_klarna_order( WC()->session->get( 'kco_wc_order_id' ) );
 
 		// Make Klarna order an object.
-		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		return $klarna_order;
 	}
 
@@ -149,7 +149,7 @@ class KCO_API {
 		$klarna_order = $this->get_klarna_order( $klarna_order_id );
 
 		// Make Klarna order an object.
-		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		return $klarna_order;
 	}
 
@@ -165,7 +165,7 @@ class KCO_API {
 		$klarna_order = $this->get_klarna_order( $klarna_order_id );
 
 		// Make Klarna order an object.
-		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		return $klarna_order;
 	}
 
@@ -179,7 +179,7 @@ class KCO_API {
 		$klarna_order = $this->create_klarna_order();
 
 		// Make Klarna order an object.
-		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		return $klarna_order;
 	}
 
@@ -193,7 +193,7 @@ class KCO_API {
 		$klarna_order = $this->create_klarna_order();
 
 		// Make Klarna order an object.
-		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		return $klarna_order;
 	}
 
@@ -205,7 +205,7 @@ class KCO_API {
 	 */
 	public function get_snippet( $klarna_order ) {
 		// Make Klarna order an object.
-		$klarna_order = json_decode( json_encode( $klarna_order ) );
+		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		if ( ! is_wp_error( $klarna_order ) ) {
 			return $klarna_order->html_snippet;
 		}

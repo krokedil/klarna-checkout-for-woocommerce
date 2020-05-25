@@ -61,7 +61,7 @@ class KCO_Templates {
 		if ( is_checkout() ) {
 			// Fallback Klarna Order Received, used when WooCommerce checkout form submission fails.
 			if ( 'checkout/thankyou.php' === $template_name ) {
-				if ( isset( $_GET['kco_checkout_error'] ) && 'true' === $_GET['kco_checkout_error'] ) {
+				if ( isset( $_GET['kco_checkout_error'] ) && 'true' === $_GET['kco_checkout_error'] ) { // phpcs:ignore
 					$template = KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout-order-received.php';
 				}
 			}
@@ -87,7 +87,7 @@ class KCO_Templates {
 				if ( array_key_exists( 'kco', $available_gateways ) ) {
 					// If chosen payment method exists.
 					if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
-						if ( ! isset( $_GET['confirm'] ) ) {
+						if ( ! isset( $_GET['confirm'] ) ) { //phpcs:ignore
 							$template = $klarna_checkout_template;
 						}
 					}
@@ -97,7 +97,7 @@ class KCO_Templates {
 						reset( $available_gateways );
 
 						if ( 'kco' === key( $available_gateways ) ) {
-							if ( ! isset( $_GET['confirm'] ) ) {
+							if ( ! isset( $_GET['confirm'] ) ) { // phpcs:ignore
 								$template = $klarna_checkout_template;
 							}
 						}
@@ -109,7 +109,7 @@ class KCO_Templates {
 							reset( $available_gateways );
 
 							if ( 'kco' === key( $available_gateways ) ) {
-								if ( ! isset( $_GET['confirm'] ) ) {
+								if ( ! isset( $_GET['confirm'] ) ) { // phpcs:ignore
 									$template = $klarna_checkout_template;
 								}
 							}
@@ -140,6 +140,7 @@ class KCO_Templates {
 			|| did_action( 'kco_wc_show_snippet' )
 			|| ( ! $checkout->is_registration_enabled() && $checkout->is_registration_required() && ! is_user_logged_in() )
 			|| did_action( 'woocommerce_cart_has_errors' )
+			|| isset( $_GET['change_payment_method'] ) // phpcs:ignore
 			|| ! $enabled ) {
 				return;
 			}
@@ -147,7 +148,7 @@ class KCO_Templates {
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',
-					'reason'    => base64_encode( __( 'Failed to load Klarna Checkout template file.', 'klarna-checkout-for-woocommerce' ) ),
+					'reason'    => base64_encode( __( 'Failed to load Klarna Checkout template file.', 'klarna-checkout-for-woocommerce' ) ), // phpcs:ignore
 				),
 				wc_get_cart_url()
 			);

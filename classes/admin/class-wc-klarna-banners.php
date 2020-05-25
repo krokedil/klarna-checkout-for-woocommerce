@@ -32,7 +32,9 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		public function load_admin_css() {
 			wp_enqueue_style(
 				'klarna_payments_admin',
-				plugins_url( 'assets/css/klarna-checkout-admin.css?v=120320182113', KCO_WC_MAIN_FILE )
+				plugins_url( 'assets/css/klarna-checkout-admin.css?v=120320182113', KCO_WC_MAIN_FILE ),
+				array(),
+				KCO_WC_VERSION
 			);
 		}
 
@@ -43,7 +45,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			global $pagenow;
 
 			// Only display the banner on WP admin dashboard page or KCO settings page.
-			if ( 'index.php' !== $pagenow && ! ( isset( $_GET['section'] ) && 'kco' === $_GET['section'] ) ) {
+			if ( 'index.php' !== $pagenow && ! ( isset( $_GET['section'] ) && 'kco' === $_GET['section'] ) ) { // phpcs:ignore
 				return;
 			}
 
@@ -56,11 +58,14 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			}
 
 			// Go through countries and check if at least one has credentials configured.
-			$countries   = array( 'eu', 'us' );
 			$country_set = false;
-			foreach ( $countries as $country ) {
-				if ( '' !== $kco_settings[ 'merchant_id_' . $country ] && '' !== $kco_settings[ 'shared_secret_' . $country ] ) {
-					$country_set = true;
+
+			if ( is_array( $kco_settings ) ) { // Check for the country credentials only if the setting is present.
+				$countries = array( 'eu', 'us' );
+				foreach ( $countries as $country ) {
+					if ( '' !== $kco_settings[ 'merchant_id_' . $country ] && '' !== $kco_settings[ 'shared_secret_' . $country ] ) {
+						$country_set = true;
+					}
 				}
 			}
 
@@ -76,7 +81,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 						<h1>Go live</h1>
 						<p>Before you can start to sell with Klarna you need your store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will need to verify the integration. Then you can go live with your store! If you wish to switch Klarna products then you’ll need the Klarna team to approve your store again.</p>
 						<a class="kb-button"
-							href="<?php echo self::get_go_live_url(); ?>"
+							href="<?php echo self::get_go_live_url(); // phpcs:ignore?>"
 							target="_blank">Go live with Klarna</a>
 					</div>
 					<div id="kb-right">
@@ -101,7 +106,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 							ajaxurl,
 							{
 								action		: 'hide_klarna_banner',
-								_wpnonce	: '<?php echo wp_create_nonce( 'hide-klarna-banner' ); ?>',
+								_wpnonce	: '<?php echo wp_create_nonce( 'hide-klarna-banner' ); // phpcs:ignore?>',
 							},
 							function(response){
 								console.log('Success hide kco banner');	
@@ -126,7 +131,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 
 			<div id="klarna-wrapper">
 				<div id="klarna-main">
-					<?php echo $parent_options; ?>
+					<?php echo $parent_options; // phpcs:ignore?>
 				</div>
 				<div id="klarna-sidebar">
 					<div class="kb-sidebar-section">
@@ -134,7 +139,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 						<h3>Go live</h3>
 						<p>Before you can start to sell with Klarna you need your store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will need to verify the integration. Then you can go live with your store! If you wish to switch Klarna products then you’ll need the Klarna team to approve your store again.</p>
 						<a class="kb-button"
-							href="<?php echo self::get_go_live_url(); ?>"
+							href="<?php echo self::get_go_live_url(); // phpcs:ignore?>"
 							target="_blank">Go live with Klarna</a>
 					</div>
 

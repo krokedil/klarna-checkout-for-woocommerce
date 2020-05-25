@@ -56,7 +56,7 @@ class KCO_Request {
 	 */
 	protected function get_request_headers() {
 		return array(
-			'Authorization' => 'Basic ' . base64_encode( $this->get_merchant_id() . ':' . $this->get_shared_secret() ),
+			'Authorization' => 'Basic ' . base64_encode( $this->get_merchant_id() . ':' . $this->get_shared_secret() ), //phpcs:ignore
 			'Content-Type'  => 'application/json',
 		);
 	}
