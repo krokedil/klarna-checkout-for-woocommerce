@@ -330,8 +330,9 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @return void
 		 */
 		public function redirect_to_thankyou() {
-			if ( isset( $_GET['kco_confirm'] ) && isset( $_GET['kco_order_id'] ) ) { // phpcs:ignore
-				$klarna_order_id = sanitize_text_field( wp_unslash( $_GET['kco_order_id'] ) ); // phpcs:ignore
+			$kco_confirm     = filter_input( INPUT_GET, 'kco_confirm', FILTER_SANITIZE_STRING );
+			$klarna_order_id = filter_input( INPUT_GET, 'kco_order_id', FILTER_SANITIZE_STRING );
+			if ( ! empty( $kco_confirm ) ) {
 				KCO_Logger::log( $klarna_order_id . ': Confirmation endpoint hit for order.' );
 
 				// Find relevant order in Woo.
@@ -339,13 +340,12 @@ if ( ! class_exists( 'KCO' ) ) {
 					'fields'      => 'ids',
 					'post_type'   => wc_get_order_types(),
 					'post_status' => array_keys( wc_get_order_statuses() ),
-					'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore
-					'meta_value'  => $klarna_order_id, // phpcs:ignore
+					'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
+					'meta_value'  => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
 				);
 
 				$orders = get_posts( $query_args );
 				if ( ! $orders ) {
-					// If no order is found, bail. @TODO Add a fallback order creation here?
 					wc_add_notice( __( 'Something went wrong in the checkout process. Please contact the store.', 'error' ) );
 					return;
 				}
@@ -366,22 +366,24 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @return void
 		 */
 		public function check_if_external_payment() {
-			if ( isset( $_GET['kco-external-payment'] ) ) { // phpcs:ignore
-				$this->run_kepm( $_GET ); // phpcs:ignore
+			$epm             = filter_input( INPUT_GET, 'kco-external-payment', FILTER_SANITIZE_STRING );
+			$order_id        = filter_input( INPUT_GET, 'order_id', FILTER_SANITIZE_STRING );
+			$klarna_order_id = filter_input( INPUT_GET, 'kco_order_id', FILTER_SANITIZE_STRING );
+			if ( ! empty( $epm ) ) {
+				$this->run_kepm( $epm, $order_id, $klarna_order_id );
 			}
 		}
 
 		/**
 		 * Initiates a Klarna External Payment Method payment.
 		 *
-		 * @param array $get_data The get data from the server request.
+		 * @param string $epm The name of the external payment method.
+		 * @param string $order_id The WooCommerce order id.
+		 * @param string $klarna_order_id The Klarna order id.
 		 * @return void
 		 */
-		public function run_kepm( $get_data ) {
-			$epm             = $get_data['kco-external-payment'];
-			$order_id        = ( isset( $get_data['order_id'] ) ) ? $get_data['order_id'] : '';
-			$klarna_order_id = ( isset( $get_data['kco_order_id'] ) ) ? $get_data['kco_order_id'] : '';
-			$order           = wc_get_order( $order_id );
+		public function run_kepm( $epm, $order_id, $klarna_order_id ) {
+			$order = wc_get_order( $order_id );
 			// Check if we have a KCO order id.
 			if ( ! empty( $klarna_order_id ) ) {
 				// Do a database lookup for the WooCommerce order.
@@ -389,8 +391,8 @@ if ( ! class_exists( 'KCO' ) ) {
 					'fields'      => 'ids',
 					'post_type'   => wc_get_order_types(),
 					'post_status' => array_keys( wc_get_order_statuses() ),
-					'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore
-					'meta_value'  => $klarna_order_id, // phpcs:ignore
+					'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
+					'meta_value'  => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
 				);
 				$orders     = get_posts( $query_args );
 				// Set the order from the first order id returned.
@@ -420,7 +422,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			WC()->session->set( 'chosen_payment_method', $epm );
 			$order->set_payment_method( $payment_methods[ $epm ] );
 			$order->save();
-			wp_redirect( $result['redirect'] ); // phpcs:ignore
+			wp_safe_redirect( $result['redirect'] );
 			exit;
 		}
 
@@ -435,6 +437,6 @@ if ( ! class_exists( 'KCO' ) ) {
  *
  * @return KCO
  */
-function KCO_WC() { // phpcs:ignore
+function KCO_WC() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
 	return KCO::get_instance();
 }

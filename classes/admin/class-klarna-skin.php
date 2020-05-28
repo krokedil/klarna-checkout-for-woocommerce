@@ -71,7 +71,7 @@ class Klarna_Skin extends WP_Upgrader_Skin {
 	 *
 	 * @since 1.9.0
 	 */
-	function footer() {} // phpcs:ignore
+	public function footer() {}
 
 	/**
 	 * Instead of outputting HTML for errors, json_encode the errors and send them
@@ -81,7 +81,7 @@ class Klarna_Skin extends WP_Upgrader_Skin {
 	 *
 	 * @param array $errors Array of errors with the install process.
 	 */
-	function error( $errors ) { // phpcs:ignore
+	public function error( $errors ) {
 
 		if ( ! empty( $errors ) ) {
 			echo wp_json_encode( array( 'error' => esc_html__( 'There was an error installing the addon. Please try again.', 'klarna-checkout-for-woocommerce' ) ) );
@@ -101,7 +101,7 @@ class Klarna_Skin extends WP_Upgrader_Skin {
 	 *
 	 * @return void
 	 */
-	function feedback( $string, ...$args ) { // phpcs:ignore
+	public function feedback( $string, ...$args ) {
 
 	}
 

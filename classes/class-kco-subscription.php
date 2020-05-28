@@ -53,8 +53,10 @@ class KCO_Subscription {
 	 * @return bool
 	 */
 	public function is_kco_subs_change_payment_method() {
-		if ( isset( $_GET['key'] ) && ( isset( $_GET['kco-action'] ) && 'change-subs-payment' === $_GET['kco-action'] ) ) { // phpcs:ignore
+		$key        = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_STRING );
+		$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_STRING );
 
+		if ( ! empty( $key ) && ( ! empty( $kco_action ) && 'change-subs-payment' === $kco_action ) ) {
 			return true;
 		}
 		return false;
@@ -81,14 +83,14 @@ class KCO_Subscription {
 			if ( $subscription_product_id ) {
 				$subscription_expiration_time = WC_Subscriptions_Product::get_expiration_date( $subscription_product_id );
 				if ( 0 !== $subscription_expiration_time ) {
-					$end_time = date( 'Y-m-d\TH:i', strtotime( $subscription_expiration_time ) ); // phpcs:ignore
+					$end_time = date( 'Y-m-d\TH:i', strtotime( $subscription_expiration_time ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions -- Date is not used for display.
 				} else {
-					$end_time = date( 'Y-m-d\TH:i', strtotime( '+50 year' ) ); // phpcs:ignore
+					$end_time = date( 'Y-m-d\TH:i', strtotime( '+50 year' ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions -- Date is not used for display.
 				}
 
 				$emd_subscription = array(
 					'subscription_name'            => 'Subscription: ' . get_the_title( $subscription_product_id ),
-					'start_time'                   => date( 'Y-m-d\TH:i' ), // phpcs:ignore
+					'start_time'                   => date( 'Y-m-d\TH:i' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions -- Date is not used for display.
 					'end_time'                     => $end_time,
 					'auto_renewal_of_subscription' => false,
 				);
@@ -99,8 +101,8 @@ class KCO_Subscription {
 
 					$emd_account = array(
 						'unique_account_identifier' => $current_user->user_login,
-						'account_registration_date' => date( 'Y-m-d\TH:i', strtotime( $current_user->user_registered ) ), // phpcs:ignore
-						'account_last_modified'     => date( 'Y-m-d\TH:i' ), // phpcs:ignore
+						'account_registration_date' => date( 'Y-m-d\TH:i', strtotime( $current_user->user_registered ) ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions -- Date is not used for display.
+						'account_last_modified'     => date( 'Y-m-d\TH:i' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions -- Date is not used for display.
 					);
 				} else {
 					// User is not logged in - send empty params.
@@ -134,7 +136,8 @@ class KCO_Subscription {
 
 		// If this is a change payment method request.
 		if ( $this->is_kco_subs_change_payment_method() ) {
-			$order_id = wc_get_order_id_by_order_key( sanitize_key( $_GET['key'] ) ); // phpcs:ignore
+			$key      = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_STRING );
+			$order_id = wc_get_order_id_by_order_key( $key );
 			if ( $order_id ) {
 				$wc_order = wc_get_order( $order_id );
 				if ( is_object( $wc_order ) && function_exists( 'wcs_order_contains_subscription' ) && function_exists( 'wcs_is_subscription' ) ) {
@@ -156,7 +159,9 @@ class KCO_Subscription {
 
 						// Modify merchant url's.
 						global $wp;
-						$current_url      = add_query_arg( $_SERVER['QUERY_STRING'], '', home_url( $wp->request ) ); // phpcs:ignore
+						$query_string     = filter_input( INPUT_SERVER, 'QUERY_STRING', FILTER_SANITIZE_URL );
+						$query_string     = $query_string;
+						$current_url      = add_query_arg( $query_string, '', home_url( $wp->request ) );
 						$confirmation_url = add_query_arg( 'kco-action', 'subs-payment-changed', $wc_order->get_view_order_url() );
 						$push_url         = add_query_arg(
 							array(
@@ -247,9 +252,9 @@ class KCO_Subscription {
 			?>
 			<div class="order_data_column" style="clear:both; float:none; width:100%;">
 				<div class="address">
-					<?php
-						echo '<p><strong>' . __( 'Klarna recurring token' ) . ':</strong>' . get_post_meta( $order->get_id(), '_kco_recurring_token', true ) . '</p>'; // phpcs:ignore
-					?>
+					<p>
+						<strong><?php echo esc_html( 'Klarna recurring token' ); ?>:</strong><?php echo esc_html( get_post_meta( $order->get_id(), '_kco_recurring_token', true ) ); ?>
+					</p>
 				</div>
 				<div class="edit_address">
 					<?php
@@ -275,9 +280,10 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function save_kco_recurring_token_update( $post_id, $post ) {
-		$order = wc_get_order( $post_id );
+		$klarna_recurring_token = filter_input( INPUT_POST, '_kco_recurring_token', FILTER_SANITIZE_STRING );
+		$order                  = wc_get_order( $post_id );
 		if ( 'shop_subscription' === $order->get_type() && get_post_meta( $post_id, '_kco_recurring_token' ) ) {
-			update_post_meta( $post_id, '_kco_recurring_token', wc_clean( $_POST['_kco_recurring_token'] ) ); // phpcs:ignore
+			update_post_meta( $post_id, '_kco_recurring_token', $klarna_recurring_token );
 		}
 
 	}
@@ -289,8 +295,10 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function handle_push_cb_for_payment_method_change( $klarna_order_id ) {
-		if ( isset( $_GET['key'] ) && ( isset( $_GET['kco-action'] ) && 'subs-payment-changed' === $_GET['kco-action'] ) ) { // phpcs:ignore
-			$order_id = wc_get_order_id_by_order_key( sanitize_key( $_GET['key'] ) ); // phpcs:ignore
+		$key        = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_STRING );
+		$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_STRING );
+		if ( ! empty( $key ) && ( ! empty( $kco_action ) && 'subs-payment-changed' === $kco_action ) ) {
+			$order_id = wc_get_order_id_by_order_key( sanitize_key( $key ) );
 			$order    = wc_get_order( $order_id );
 
 			// Add recurring token to order via Checkout API.
@@ -324,7 +332,8 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function display_thankyou_message_for_payment_method_change() {
-		if ( isset( $_GET['kco-action'] ) && 'subs-payment-changed' === $_GET['kco-action'] ) { // phpcs:ignore
+		$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_STRING );
+		if ( ! empty( $kco_action ) && 'subs-payment-changed' === $kco_action ) {
 			wc_add_notice( __( 'Thank you, your subscription payment method is now updated.', 'klarna-checkout-for-woocommerce' ), 'success' );
 			kco_unset_sessions();
 		}

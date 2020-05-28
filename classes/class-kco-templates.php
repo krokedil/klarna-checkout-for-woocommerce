@@ -59,13 +59,7 @@ class KCO_Templates {
 	 */
 	public function override_template( $template, $template_name ) {
 		if ( is_checkout() ) {
-			// Fallback Klarna Order Received, used when WooCommerce checkout form submission fails.
-			if ( 'checkout/thankyou.php' === $template_name ) {
-				if ( isset( $_GET['kco_checkout_error'] ) && 'true' === $_GET['kco_checkout_error'] ) { // phpcs:ignore
-					$template = KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout-order-received.php';
-				}
-			}
-
+			$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_STRING );
 			// Don't display KCO template if we have a cart that doesn't needs payment.
 			if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
 				if ( ! WC()->cart->needs_payment() ) {
@@ -87,7 +81,7 @@ class KCO_Templates {
 				if ( array_key_exists( 'kco', $available_gateways ) ) {
 					// If chosen payment method exists.
 					if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
-						if ( ! isset( $_GET['confirm'] ) ) { //phpcs:ignore
+						if ( empty( $confirm ) ) {
 							$template = $klarna_checkout_template;
 						}
 					}
@@ -97,7 +91,7 @@ class KCO_Templates {
 						reset( $available_gateways );
 
 						if ( 'kco' === key( $available_gateways ) ) {
-							if ( ! isset( $_GET['confirm'] ) ) { // phpcs:ignore
+							if ( empty( $confirm ) ) {
 								$template = $klarna_checkout_template;
 							}
 						}
@@ -109,7 +103,7 @@ class KCO_Templates {
 							reset( $available_gateways );
 
 							if ( 'kco' === key( $available_gateways ) ) {
-								if ( ! isset( $_GET['confirm'] ) ) { // phpcs:ignore
+								if ( empty( $confirm ) ) {
 									$template = $klarna_checkout_template;
 								}
 							}
@@ -147,7 +141,7 @@ class KCO_Templates {
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',
-					'reason'    => base64_encode( __( 'Failed to load Klarna Checkout template file.', 'klarna-checkout-for-woocommerce' ) ), // phpcs:ignore
+					'reason'    => base64_encode( __( 'Failed to load Klarna Checkout template file.', 'klarna-checkout-for-woocommerce' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
 				),
 				wc_get_cart_url()
 			);

@@ -45,7 +45,8 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			global $pagenow;
 
 			// Only display the banner on WP admin dashboard page or KCO settings page.
-			if ( 'index.php' !== $pagenow && ! ( isset( $_GET['section'] ) && 'kco' === $_GET['section'] ) ) { // phpcs:ignore
+			$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_STRING );
+			if ( 'index.php' !== $pagenow && ! ( ! empty( $section ) && 'kco' === $section ) ) {
 				return;
 			}
 

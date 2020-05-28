@@ -98,12 +98,12 @@ class KCO_Gateway extends WC_Payment_Gateway {
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
-		$order = wc_get_order( $order_id );
-
+		$order                 = wc_get_order( $order_id );
+		$change_payment_method = filter_input( INPUT_GET, 'change_payment_method', FILTER_SANITIZE_STRING );
 		// Order-pay purchase (or subscription payment method change)
 		// 1. Redirect to receipt page.
 		// 2. Process the payment by displaying the KCO iframe via woocommerce_receipt_kco hook.
-		if ( isset( $_GET['change_payment_method'] ) ) { // phpcs:ignore
+		if ( ! empty( $change_payment_method ) ) {
 			$pay_url = add_query_arg(
 				array(
 					'kco-action' => 'change-subs-payment',
@@ -123,7 +123,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 			// Base64 encoded timestamp to always have a fresh URL for on hash change event.
 			return array(
 				'result'   => 'success',
-				'redirect' => '#klarna-success=' . base64_encode( microtime() ), // phpcs:ignore
+				'redirect' => '#klarna-success=' . base64_encode( microtime() ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Base64 used to give a unique nondescript string.
 			);
 		} else {
 			return array(
@@ -140,7 +140,8 @@ class KCO_Gateway extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	public function receipt_page( $order ) {
-		if ( isset( $_GET['kco-action'] ) && 'change-subs-payment' === $_GET['kco-action'] ) { // phpcs:ignore
+		$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_STRING );
+		if ( ! empty( $kco_action ) && 'change-subs-payment' === $kco_action ) {
 			kco_wc_show_snippet();
 		}
 	}
@@ -308,8 +309,9 @@ class KCO_Gateway extends WC_Payment_Gateway {
 		if ( 'woocommerce_page_wc-settings' !== $hook ) {
 			return;
 		}
+		$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_STRING );
 
-		if ( ! isset( $_GET['section'] ) || 'kco' !== $_GET['section'] ) { // phpcs:ignore
+		if ( empty( $section ) || 'kco' !== $section ) {
 			return;
 		}
 
@@ -465,7 +467,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 
 				$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 				if ( $klarna_order ) {
-					echo $klarna_order['html_snippet']; // phpcs:ignore
+					echo $klarna_order['html_snippet']; // phpcs:ignore WordPress.Security.EscapeOutput -- Cant escape since this is the iframe snippet.
 				}
 
 				// Check if we need to finalize purchase here. Should already been done in process_payment.
@@ -486,7 +488,8 @@ class KCO_Gateway extends WC_Payment_Gateway {
 	 * @return string
 	 */
 	public function admin_footer_text( $text ) {
-		if ( isset( $_GET['section'] ) && 'kco' === $_GET['section'] ) { // phpcs:ignore
+		$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_STRING );
+		if ( ! empty( $section ) && 'kco' === $section ) {
 			$text = 'If you like Klarna Checkout for WooCommerce, please consider <strong>assigning Krokedil as your integration partner.</strong>.';
 		}
 
@@ -510,8 +513,9 @@ class KCO_Gateway extends WC_Payment_Gateway {
 	 * Adds prefill consent to WC session.
 	 */
 	public function prefill_consent() {
-		if ( isset( $_GET['prefill_consent'] ) ) { // phpcs:ignore
-			if ( 'yes' === sanitize_text_field( $_GET['prefill_consent'] ) ) { // phpcs:ignore
+		$prefill_consent = filter_input( INPUT_GET, 'prefill_consent', FILTER_SANITIZE_STRING );
+		if ( ! empty( $prefill_consent ) ) {
+			if ( 'yes' === $prefill_consent ) {
 				WC()->session->set( 'kco_wc_prefill_consent', true );
 			}
 		}
