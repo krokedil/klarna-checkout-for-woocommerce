@@ -155,7 +155,9 @@ class KCO_Subscription {
 								'tax_rate'         => 0,
 							);
 						}
-						$request_args['order_lines'] = $order_lines;
+						$request_args['order_lines']      = $order_lines;
+						$request_args['order_tax_amount'] = 0;
+						$request_args['order_amount']     = 0;
 
 						// Modify merchant url's.
 						global $wp;
