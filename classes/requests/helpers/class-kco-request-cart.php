@@ -391,7 +391,7 @@ class KCO_Request_Cart {
 	 */
 	public function get_item_name( $cart_item ) {
 		$cart_item_data = $cart_item['data'];
-		$item_name      = $cart_item_data->get_name();
+		$item_name      = substr( $cart_item_data->get_name(), 0, 254 );
 
 		return strip_tags( $item_name );
 	}
