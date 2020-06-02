@@ -181,7 +181,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 								</div>
 					</div>
 			</div>
-
+			<div class="save-separator"></div>
 			<?php
 		}
 

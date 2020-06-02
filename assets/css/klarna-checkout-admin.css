@@ -202,6 +202,9 @@ font: 1em sans-serif;
 	margin-bottom: 40px;
 }
 
+.save-separator {
+	clear: both;
+}
 
 /*--- Dismiss button -----*/
 
