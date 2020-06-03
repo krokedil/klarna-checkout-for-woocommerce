@@ -47,6 +47,10 @@ class KCO_Templates {
 		add_action( 'kco_wc_after_order_review', array( $this, 'add_extra_checkout_fields' ), 10 );
 		add_action( 'kco_wc_before_snippet', 'kco_wc_prefill_consent', 10 );
 		add_action( 'kco_wc_before_snippet', array( $this, 'add_wc_form' ), 10 ); // @TODO Look into changing this to kco_wc_after_wrapper later.
+
+		// Unrequire WooCommerce State field.
+		add_filter( 'woocommerce_billing_fields', array( $this, 'kco_wc_unrequire_wc_state_field' ) );
+		add_filter( 'woocommerce_shipping_fields', array( $this, 'kco_wc_unrequire_wc_state_field' ) );
 	}
 
 	/**
@@ -187,6 +191,20 @@ class KCO_Templates {
 		</div>
 		<?php
 		do_action( 'kco_wc_after_extra_fields' );
+	}
+
+	/**
+	 * Unrequire WC state field.
+	 *
+	 * @return array $fields WC fields.
+	 */
+	public function kco_wc_unrequire_wc_state_field( $fields ) {
+		// Unrequire if chosen payment method is Klarna Checkout.
+		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
+			$fields['billing_state']['required']  = false;
+			$fields['shipping_state']['required'] = false;
+		}
+		return $fields;
 	}
 }
 
