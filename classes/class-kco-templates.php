@@ -48,9 +48,10 @@ class KCO_Templates {
 		add_action( 'kco_wc_before_snippet', 'kco_wc_prefill_consent', 10 );
 		add_action( 'kco_wc_before_snippet', array( $this, 'add_wc_form' ), 10 ); // @TODO Look into changing this to kco_wc_after_wrapper later.
 
-		// Unrequire WooCommerce State field.
-		add_filter( 'woocommerce_billing_fields', array( $this, 'kco_wc_unrequire_wc_state_field' ) );
-		add_filter( 'woocommerce_shipping_fields', array( $this, 'kco_wc_unrequire_wc_state_field' ) );
+		// Unrequire WooCommerce Billing State field.
+		add_filter( 'woocommerce_billing_fields', array( $this, 'kco_wc_unrequire_wc_billing_state_field' ) );
+		// Unrequire WooCommerce Shipping State field.
+		add_filter( 'woocommerce_shipping_fields', array( $this, 'kco_wc_unrequire_wc_shipping_state_field' ) );
 	}
 
 	/**
@@ -194,16 +195,32 @@ class KCO_Templates {
 	}
 
 	/**
-	 * Unrequire WC state field.
+	 * Unrequire WC billing state field.
 	 *
-	 * @return array $fields WC fields.
+	 * @param array $fields WC billing fields.
+	 * @return array $fields WC billing fields.
 	 */
-	public function kco_wc_unrequire_wc_state_field( $fields ) {
+	public function kco_wc_unrequire_wc_billing_state_field( $fields ) {
 		// Unrequire if chosen payment method is Klarna Checkout.
 		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
-			$fields['billing_state']['required']  = false;
+			$fields['billing_state']['required'] = false;
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Unrequire WC shipping state field.
+	 *
+	 * @param array $fields WC shipping fields.
+	 * @return array $fields WC shipping fields.
+	 */
+	public function kco_wc_unrequire_wc_shipping_state_field( $fields ) {
+		// Unrequire if chosen payment method is Klarna Checkout.
+		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
 			$fields['shipping_state']['required'] = false;
 		}
+
 		return $fields;
 	}
 }
