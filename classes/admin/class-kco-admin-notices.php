@@ -51,7 +51,7 @@ class KCO_Admin_Notices {
 	 * Klarna_Checkout_Admin_Notices constructor.
 	 */
 	public function __construct() {
-		$settings      = get_option( 'woocommerce_kco_settings' );
+		$settings      = get_option( 'woocommerce_kco_settings', array() );
 		$this->enabled = isset( $settings['enabled'] ) ? $settings['enabled'] : 'no';
 
 		add_action( 'admin_init', array( $this, 'check_settings' ) );
