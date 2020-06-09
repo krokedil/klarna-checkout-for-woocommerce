@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.3.2
+Tested up to: 5.4
 Requires PHP: 5.6
 WC requires at least: 3.4.0
-WC tested up to: 4.0.0
+WC tested up to: 4.2.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,44 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.05.25    - version 2.0.14 =
+* Enhancement   - Make sure that order amount is zero for subscription payment method change.
+* Enhancement   - Improved JavaScript to support missing address data from Klarna. Supports a coming update to Klarnas system.
+* Fix           - Prevent trying to access empty array in some cases. ( Thank you Sarang Shahane )
+
+= 2020.04.29    - version 2.0.13 =
+* Enhancement	- Added custom attribute to stop password and text fields in settings to be autofilled with incorrect data.
+* Enhancement	- Added clearing of KCO sessions after finalizing the purchase on the confirmation page. Better support for things like custom thank you pages.
+* Fix			- Added jQuery Block UI as a prerequisite for our checkout Javascript. Prevents JavaScript errors in case the checkout JavaScripts are loaded in a different order than normal.
+
+= 2020.04.16    - version 2.0.12 =
+* Fix			- Reverted change from 2.0.11 "Better calculations for product unit price..." due to an issue with some tax settings.
+
+= 2020.04.16    - version 2.0.11 =
+* Fix			- Better calculations for product unit price and total amount. Fixes issues regarding subscriptions with a starting fee.
+* Fix			- Better handling of region special characters. Fixes issues were some regions could not complete and order.
+* Enhancement	- Better support for zero decimals for subscription renewals.
+
+= 2020.04.09    - version 2.0.10 =
+* Fix			- Added security checks to the Klarna Addons page to prevent unauthorized changes to plugins.
+
+= 2020.04.07    - version 2.0.9 =
+* Fix			- Fixed an issue with states for US orders.
+
+= 2020.03.30    - version 2.0.8 =
+* Fix			- Fixed an issue with regions not being processed correctly for some countries.
+* Fix			- Fixed compatibility with some external payment methods. ( Thank you Christopher Hedqvist)
+
+= 2020.03.20    - version 2.0.7 =
+* Fix           - Fixed the merchant reference on order updates as well.
+* Fix           - Fixed separate shipping address compatibility for WooCommerce 4.x.
+* Enhancement   - Increased the default timeout time from 10 seconds to 20.
+
+= 2020.03.20    - version 2.0.6 =
+* Fix           - Changed so the merchant references are now the same as they were before.
+* Enhancement   - Added logging from the frontend JavaScript. Will make debugging easier.
+* Enhancement   - Orders that can not be found in order management during the confirmation page will now end up as on-hold instead of pending.
+
 = 2020.03.10    - version 2.0.5 =
 * Fix			- Fixed an issue with card payments, where resuming the iFrame caused the payment to not go through in some cases. ( Updates in both the plugin and in Klarnas system )
 * Fix			- Removed a get request to Klarnas checkout endpoint during the confirmation stages. Could cause an error to be shown to the customer.

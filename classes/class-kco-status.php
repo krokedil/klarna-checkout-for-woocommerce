@@ -29,7 +29,6 @@ class KCO_Status {
 	 * @return void
 	 */
 	public function add_status_page_box() {
-		// include_once KCO_WC_PLUGIN_PATH . '/includes/kco-status-report.php';
 	}
 }
 $wc_collector_checkout_status = new KCO_Status();

@@ -32,7 +32,9 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		public function load_admin_css() {
 			wp_enqueue_style(
 				'klarna_payments_admin',
-				plugins_url( 'assets/css/klarna-checkout-admin.css?v=120320182113', KCO_WC_MAIN_FILE )
+				plugins_url( 'assets/css/klarna-checkout-admin.css?v=120320182113', KCO_WC_MAIN_FILE ),
+				array(),
+				KCO_WC_VERSION
 			);
 		}
 
@@ -44,7 +46,8 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			global $pagenow;
 
 			// Only display the banner on WP admin dashboard page or KCO settings page.
-			if ( 'index.php' !== $pagenow && ! ( isset( $_GET['section'] ) && 'kco' === $_GET['section'] ) ) {
+			$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_STRING );
+			if ( 'index.php' !== $pagenow && ! ( ! empty( $section ) && 'kco' === $section ) ) {
 				return;
 			}
 
@@ -57,11 +60,14 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			}
 
 			// Go through countries and check if at least one has credentials configured.
-			$countries   = array( 'eu', 'us' );
 			$country_set = false;
-			foreach ( $countries as $country ) {
-				if ( '' !== $kco_settings[ 'merchant_id_' . $country ] && '' !== $kco_settings[ 'shared_secret_' . $country ] ) {
-					$country_set = true;
+
+			if ( is_array( $kco_settings ) ) { // Check for the country credentials only if the setting is present.
+				$countries = array( 'eu', 'us' );
+				foreach ( $countries as $country ) {
+					if ( '' !== $kco_settings[ 'merchant_id_' . $country ] && '' !== $kco_settings[ 'shared_secret_' . $country ] ) {
+						$country_set = true;
+					}
 				}
 			}
 
@@ -124,7 +130,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 							ajaxurl,
 							{
 								action		: 'hide_klarna_banner',
-								_wpnonce	: '<?php echo wp_create_nonce( 'hide-klarna-banner' ); ?>',
+								_wpnonce	: '<?php echo wp_create_nonce( 'hide-klarna-banner' ); // phpcs:ignore?>',
 							},
 							function(response){
 								console.log('Success hide KCO banner');
@@ -149,7 +155,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 
 			<div id="klarna-wrapper">
 				<div id="klarna-main">
-					<?php echo $parent_options; ?>
+					<?php echo $parent_options; // phpcs:ignore?>
 				</div>
 				<div id="klarna-sidebar">
 
