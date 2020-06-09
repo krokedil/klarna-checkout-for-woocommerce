@@ -81,7 +81,7 @@ class KCO_Logger {
 				'body' => $response,
 				'code' => $code,
 			),
-			'timestamp'      => date( 'Y-m-d H:i:s' ), // phpcs:ignore
+			'timestamp'      => date( 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions -- Date is not used for display.
 			'stack'          => self::get_stack(),
 			'plugin_version' => KCO_WC_VERSION,
 		);
@@ -93,7 +93,7 @@ class KCO_Logger {
 	 * @return array
 	 */
 	public static function get_stack() {
-		$debug_data = debug_backtrace();
+		$debug_data = debug_backtrace(); // phpcs:ignore WordPress.PHP.DevelopmentFunctions -- Data is not used for display.
 		$stack      = array();
 		foreach ( $debug_data as $data ) {
 			$extra_data = '';

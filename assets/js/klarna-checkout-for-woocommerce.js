@@ -302,30 +302,35 @@ jQuery( function( $ ) {
 
 		setCustomerData: function( data ) {
 			console.log( data );
+			if ( 'billing_address' in data && data.billing_address !== null ) {
+				// Billing fields.
+				$( '#billing_first_name' ).val( ( ( 'given_name' in data.billing_address ) ? data.billing_address.given_name : '' ) );
+				$( '#billing_last_name' ).val( ( ( 'family_name' in data.billing_address ) ? data.billing_address.family_name : '' ) );
+				$( '#billing_company' ).val( ( ( 'organization_name' in data.billing_address ) ? data.billing_address.organization_name : '' ) );
+				$( '#billing_address_1' ).val( ( ( 'street_address' in data.billing_address ) ? data.billing_address.street_address : '' ) );
+				$( '#billing_address_2' ).val( ( ( 'street_address2' in data.billing_address ) ? data.billing_address.street_address2 : '' ) );
+				$( '#billing_city' ).val( ( ( 'city' in data.billing_address ) ? data.billing_address.city : '' ) );
+				$( '#billing_postcode' ).val( ( ( 'postal_code' in data.billing_address ) ? data.billing_address.postal_code : '' ) );
+				$( '#billing_phone' ).val( ( ( 'phone' in data.billing_address ) ? data.billing_address.phone : '' ) );
+				$( '#billing_email' ).val( ( ( 'email' in data.billing_address ) ? data.billing_address.email : '' ) );
+				$( '#billing_country' ).val( ( ( 'country' in data.billing_address ) ? data.billing_address.country.toUpperCase() : '' ) );
+				$( '#billing_state' ).val( ( ( 'region' in data.billing_address ) ? data.billing_address.region : '' ) );
+			}
+			
+			if ( 'shipping_address' in data && data.shipping_address !== null ) {
+				$( '#ship-to-different-address-checkbox' ).prop( 'checked', true);
 
-			// Billing fields.
-			$( '#billing_first_name' ).val( data.billing_address.given_name );
-			$( '#billing_last_name' ).val( data.billing_address.family_name );
-			$( '#billing_company' ).val( ( data.billing_address.organization_name ? data.billing_address.organization_name : '' ) );
-			$( '#billing_address_1' ).val( data.billing_address.street_address );
-			$( '#billing_address_2' ).val( ( data.billing_address.street_address2 ? data.billing_address.street_address2 : '' ) );
-			$( '#billing_city' ).val( data.billing_address.city );
-			$( '#billing_postcode' ).val( data.billing_address.postal_code );
-			$( '#billing_phone' ).val( data.billing_address.phone );
-			$( '#billing_email' ).val( data.billing_address.email );
-			$( '#billing_country' ).val( data.billing_address.country.toUpperCase() );
-			$( '#billing_state' ).val( ( data.billing_address.region ? data.billing_address.region : '' ) );
-
-			// Shipping fields.
-			$( '#shipping_first_name' ).val( data.shipping_address.given_name );
-			$( '#shipping_last_name' ).val( data.shipping_address.family_name );
-			$( '#shipping_company' ).val( ( data.billing_address.organization_name ? data.billing_address.organization_name : '' ) );
-			$( '#shipping_address_1' ).val( data.shipping_address.street_address );
-			$( '#shipping_address_2' ).val( ( data.shipping_address.street_address2 ? data.shipping_address.street_address2 : '' ) );
-			$( '#shipping_city' ).val( data.shipping_address.city );
-			$( '#shipping_postcode' ).val( data.shipping_address.postal_code );
-			$( '#shipping_country' ).val( data.shipping_address.country.toUpperCase() );
-			$( '#shipping_state' ).val( ( data.shipping_address.region ? data.shipping_address.region : '' ) );
+				// Shipping fields.
+				$( '#shipping_first_name' ).val( ( ( 'given_name' in data.shipping_address ) ? data.shipping_address.given_name : '' ) );
+				$( '#shipping_last_name' ).val( ( ( 'family_name' in data.shipping_address ) ? data.shipping_address.family_name : '' ) );
+				$( '#shipping_company' ).val( ( ( 'organization_name' in data.shipping_address ) ? data.billing_address.organization_name : '' ) );
+				$( '#shipping_address_1' ).val( ( ( 'street_address' in data.shipping_address ) ? data.shipping_address.street_address : '' ) );
+				$( '#shipping_address_2' ).val( ( ( 'street_address2' in data.shipping_address ) ? data.shipping_address.street_address2 : '' ) );
+				$( '#shipping_city' ).val( ( ( 'city' in data.shipping_address ) ? data.shipping_address.city : '' ) );
+				$( '#shipping_postcode' ).val( ( ( 'postal_code' in data.shipping_address ) ? data.shipping_address.postal_code : '' ) );
+				$( '#shipping_country' ).val( ( ( 'country' in data.shipping_address ) ? data.shipping_address.country.toUpperCase() : '' ) );
+				$( '#shipping_state' ).val( ( ( 'region' in data.shipping_address ) ? data.shipping_address.region : '' ) );
+			}
 		},
 
 		init: function() {
@@ -427,6 +432,7 @@ jQuery( function( $ ) {
 							kco_wc.log( 'can_not_complete_order', data );
 						},
 						'validation_callback': function( data, callback ) {
+							kco_wc.logToFile( 'validation_callback from Klarna triggered' );
 							// Empty current hash.
 							window.location.hash = '';
 							// Check for any errors.
@@ -446,6 +452,7 @@ jQuery( function( $ ) {
 			if ( window.location.hash ) {
 				var currentHash = window.location.hash;
 				if ( -1 < currentHash.indexOf( '#klarna-success' ) ) {
+					kco_wc.logToFile( 'klarna-success hashtag detected in URL.' );
 					callback({ should_proceed: true });
 					// Clear the interval.
 					clearInterval(kco_wc.interval);
@@ -460,6 +467,7 @@ jQuery( function( $ ) {
 		},
 
 		failOrder: function( callback, event ) {
+			kco_wc.logToFile( 'Timeout for validation_callback triggered.' );
 			// Send false and cancel 
 			callback({ should_proceed: false });
 			// Clear the interval.
@@ -478,6 +486,20 @@ jQuery( function( $ ) {
 					+ '</li></ul></div>'
 				);
 			}
+		},
+
+		logToFile: function( message ) {
+			$.ajax(
+				{
+					url: kco_params.log_to_file_url,
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						message: message,
+						nonce: kco_params.log_to_file_nonce
+					}
+				}
+			);
 		}
 	};
 

@@ -24,12 +24,12 @@ jQuery( function($) {
 			url: ajaxurl,
 			data: {
 				action: 'change_klarna_addon_status',
+				nonce: kco_addons_params.change_addon_status_nonce,
 				plugin_status: pluginStatus,
 				plugin_action: pluginAction,
 				plugin_id: pluginId,
 				plugin_slug: pluginSlug,
 				plugin_url: pluginUrl,
-				nonce: 'deactivate_klarna_addon_nonce'
 			},
 			dataType: 'json',
 			success: function(data) {
@@ -55,8 +55,7 @@ jQuery( function($) {
 						$( '.checkout-addon.' + pluginId + ' .button .switch .round' ).removeClass('dashicons').removeClass('dashicons-download').addClass('slider');
 					}
 				} else {
-					
-					$( '.checkout-addon.' + pluginId ).append( '<p>' + data.responseJSON.error + '</p>' );
+					$( '.checkout-addon.' + pluginId ).append( '<p class="addon-error">' + data.responseJSON.data + '</p>' );
 				}
 				$(button).removeAttr('disabled');
 				$(button).children().removeAttr('disabled');

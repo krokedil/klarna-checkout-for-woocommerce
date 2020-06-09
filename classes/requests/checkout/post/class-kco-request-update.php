@@ -21,8 +21,15 @@ class KCO_Request_Update extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $klarna_order_id, $order_id = null ) {
-		$request_url       = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
-		$request_args      = apply_filters( 'kco_wc_update_order', $this->get_request_args( $order_id ) );
+		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
+		$request_args = apply_filters( 'kco_wc_update_order', $this->get_request_args( $order_id ) );
+
+		// Check if we need to update.
+		if ( WC()->session->get( 'kco_update_md5' ) && WC()->session->get( 'kco_update_md5' ) === md5( wp_json_encode( $request_args ) ) ) {
+			return false;
+		}
+		WC()->session->set( 'kco_update_md5', md5( wp_json_encode( $request_args ) ) );
+
 		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
 		$formated_response = $this->process_response( $response, $request_args, $request_url );
@@ -63,8 +70,8 @@ class KCO_Request_Update extends KCO_Request {
 		if ( ! empty( $order_id ) ) {
 			$order = wc_get_order( $order_id );
 			// Set the merchant references to the order.
-			$request_body['merchant_reference1'] = $order_id;
-			$request_body['merchant_reference2'] = $order->get_order_number();
+			$request_body['merchant_reference1'] = $order->get_order_number();
+			$request_body['merchant_reference2'] = $order_id;
 		}
 
 		if ( kco_wc_prefill_allowed() ) {
