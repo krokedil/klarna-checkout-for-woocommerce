@@ -87,18 +87,17 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 					<div class="kb-middle-group">
 						<div id="kb-button-left-frame">
 							<a id="kb-button-left" class="kb-dismiss kb-button"
-								href="<?php echo self::get_go_live_url(); ?>"
+								href="<?php echo esc_attr( self::get_go_live_url() ); ?>"
 								target="_blank">Go live now
 							</a>
 						</div>
 						<div id="kb-button-go-live-frame">
 							<a id="kb-button-go-live" class="kb-button"
-								href="<?php echo self::get_go_live_url(); ?>"
+								href="<?php echo esc_attr( self::get_go_live_url() ); ?>"
 								target="_blank">Get playground credentials
 							</a>
 						</div>
 					</div>
-
 
 					<!-- Right group -->
 					<div class="kb-right-group">
@@ -166,7 +165,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 								</p>
 								<div id="sidebar-link-holder">
 								<a id="kb-sidebar-button-left" class="kb-sidebar-button"
-									href="<?php echo self::get_go_live_url(); ?>"
+									href="<?php echo esc_attr( self::get_go_live_url() ); ?>"
 									target="_blank">Get started
 								</a>
 								</div>
