@@ -201,7 +201,7 @@ class KCO_Gateway extends WC_Payment_Gateway {
 		parent::admin_options();
 		$parent_options = ob_get_contents();
 		ob_end_clean();
-
+		KCO_Settings_Saved::maybe_show_errors();
 		WC_Klarna_Banners::settings_sidebar( $parent_options );
 	}
 
