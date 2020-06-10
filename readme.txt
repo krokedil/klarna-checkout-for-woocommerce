@@ -62,6 +62,16 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.06.11    - version 2.0.15 =
+* Enhancement   - Added a limit to only get orders for 2 days back to confirmation page database queries.
+* Enhancement   - Added order id to the confirmation page parameters to prevent the need to get an order from the database. Should improve speed of the checkout process.
+* Enhancement   - Added function to validate credentials when saving settings. Will display an error if your credentials are not valid.
+* Enhancement   - Changed the API settings name and description.
+* Enhancement   - Updated the Klarna banners shown on the admin pages.
+* Fix           - Limit product names to max 255 characters.
+* Fix           - Made region field not required when using KCO. This prevents issues for countries that have region fields in WooCommerce, but none is provided by Klarna.
+* Fix           - Fixed an issue where we attempted to access our settings before they were saved.
+
 = 2020.05.25    - version 2.0.14 =
 * Enhancement   - Make sure that order amount is zero for subscription payment method change.
 * Enhancement   - Improved JavaScript to support missing address data from Klarna. Supports a coming update to Klarnas system.
