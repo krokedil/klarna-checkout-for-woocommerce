@@ -89,7 +89,7 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	 * @param string $endpoint The endpoint for the request.
 	 */
 	public function get_test_endpoint( $testmode, $endpoint ) {
-		$country_string = 'NA' === $endpoint ? '-na' : '';
+		$country_string = 'US' === $endpoint ? '-na' : '';
 		$test_string    = $testmode ? '.playground' : '';
 
 		return 'https://api' . $country_string . $test_string . '.klarna.com/';
