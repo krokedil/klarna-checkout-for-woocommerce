@@ -332,10 +332,17 @@ if ( ! class_exists( 'KCO' ) ) {
 		public function redirect_to_thankyou() {
 			$kco_confirm     = filter_input( INPUT_GET, 'kco_confirm', FILTER_SANITIZE_STRING );
 			$klarna_order_id = filter_input( INPUT_GET, 'kco_order_id', FILTER_SANITIZE_STRING );
-			if ( ! empty( $kco_confirm ) ) {
-				KCO_Logger::log( $klarna_order_id . ': Confirmation endpoint hit for order.' );
+			$order_id        = filter_input( INPUT_GET, 'wc_order_id', FILTER_SANITIZE_STRING );
 
-				// Find relevant order in Woo.
+			if ( empty( $kco_confirm ) ) {
+				return;
+			}
+
+			KCO_Logger::log( $klarna_order_id . ': Confirmation endpoint hit for order.' );
+			$order = wc_get_order( $order_id );
+			if ( empty( $order_id ) || 'null' === $order_id || ! $order ) {
+				KCO_Logger::log( $klarna_order_id . ': Order ID not found or is invalid on confirmation page. Running Database query.' );
+				// Find relevant order in Woo if we do not have a valid order id.
 				$query_args = array(
 					'fields'      => 'ids',
 					'post_type'   => wc_get_order_types(),
@@ -356,13 +363,13 @@ if ( ! class_exists( 'KCO' ) ) {
 				}
 				$order_id = $orders[0];
 				$order    = wc_get_order( $order_id );
-				// Confirm, redirect and exit.
-				KCO_Logger::log( $klarna_order_id . ': Confirm the klarna order from the confirmation page.' );
-				kco_confirm_klarna_order( $order_id, $klarna_order_id );
-				kco_unset_sessions();
-				header( 'Location:' . $order->get_checkout_order_received_url() );
-				exit;
 			}
+			// Confirm, redirect and exit.
+			KCO_Logger::log( $klarna_order_id . ': Confirm the klarna order from the confirmation page.' );
+			kco_confirm_klarna_order( $order_id, $klarna_order_id );
+			kco_unset_sessions();
+			header( 'Location:' . $order->get_checkout_order_received_url() );
+			exit;
 		}
 
 		/**
