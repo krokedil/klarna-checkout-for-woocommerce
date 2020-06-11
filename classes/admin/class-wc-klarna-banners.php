@@ -79,7 +79,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 				?>
 				<div id="kb-spacer"></div>
 
-				<div class="kb-new-container">
+				<div id="klarna-banner" class="kb-new-container">
 
 					<!-- Left group -->
 					<div class="kb-left-group">
