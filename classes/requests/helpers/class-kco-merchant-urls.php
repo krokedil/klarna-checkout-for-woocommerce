@@ -72,6 +72,7 @@ class KCO_Merchant_URLs {
 			array(
 				'kco_confirm'  => 'yes',
 				'kco_order_id' => '{checkout.order.id}',
+				'wc_order_id'  => ! empty( $order_id ) ? $order_id : 'null',
 			),
 			wc_get_checkout_url()
 		);

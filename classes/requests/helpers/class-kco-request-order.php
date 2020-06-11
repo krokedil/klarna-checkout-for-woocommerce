@@ -117,7 +117,7 @@ class KCO_Request_Order {
 		$order_id = $order_fee->get_order_id();
 		$order    = wc_get_order( $order_id );
 		return array(
-			'name'             => $order_fee->get_name(),
+			'name'             => substr( $order_fee->get_name(), 0, 254 ),
 			'quantity'         => $order_fee->get_quantity(),
 			'total_amount'     => $this->get_fee_total_amount( $order, $order_fee ),
 			'unit_price'       => $this->get_fee_unit_price( $order, $order_fee ),

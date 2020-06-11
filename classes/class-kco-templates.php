@@ -47,6 +47,11 @@ class KCO_Templates {
 		add_action( 'kco_wc_after_order_review', array( $this, 'add_extra_checkout_fields' ), 10 );
 		add_action( 'kco_wc_before_snippet', 'kco_wc_prefill_consent', 10 );
 		add_action( 'kco_wc_before_snippet', array( $this, 'add_wc_form' ), 10 ); // @TODO Look into changing this to kco_wc_after_wrapper later.
+
+		// Unrequire WooCommerce Billing State field.
+		add_filter( 'woocommerce_billing_fields', array( $this, 'kco_wc_unrequire_wc_billing_state_field' ) );
+		// Unrequire WooCommerce Shipping State field.
+		add_filter( 'woocommerce_shipping_fields', array( $this, 'kco_wc_unrequire_wc_shipping_state_field' ) );
 	}
 
 	/**
@@ -59,13 +64,7 @@ class KCO_Templates {
 	 */
 	public function override_template( $template, $template_name ) {
 		if ( is_checkout() ) {
-			// Fallback Klarna Order Received, used when WooCommerce checkout form submission fails.
-			if ( 'checkout/thankyou.php' === $template_name ) {
-				if ( isset( $_GET['kco_checkout_error'] ) && 'true' === $_GET['kco_checkout_error'] ) { // phpcs:ignore
-					$template = KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout-order-received.php';
-				}
-			}
-
+			$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_STRING );
 			// Don't display KCO template if we have a cart that doesn't needs payment.
 			if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
 				if ( ! WC()->cart->needs_payment() ) {
@@ -87,7 +86,7 @@ class KCO_Templates {
 				if ( array_key_exists( 'kco', $available_gateways ) ) {
 					// If chosen payment method exists.
 					if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
-						if ( ! isset( $_GET['confirm'] ) ) { //phpcs:ignore
+						if ( empty( $confirm ) ) {
 							$template = $klarna_checkout_template;
 						}
 					}
@@ -97,7 +96,7 @@ class KCO_Templates {
 						reset( $available_gateways );
 
 						if ( 'kco' === key( $available_gateways ) ) {
-							if ( ! isset( $_GET['confirm'] ) ) { // phpcs:ignore
+							if ( empty( $confirm ) ) {
 								$template = $klarna_checkout_template;
 							}
 						}
@@ -109,7 +108,7 @@ class KCO_Templates {
 							reset( $available_gateways );
 
 							if ( 'kco' === key( $available_gateways ) ) {
-								if ( ! isset( $_GET['confirm'] ) ) { // phpcs:ignore
+								if ( empty( $confirm ) ) {
 									$template = $klarna_checkout_template;
 								}
 							}
@@ -148,7 +147,7 @@ class KCO_Templates {
 			$url = add_query_arg(
 				array(
 					'kco-order' => 'error',
-					'reason'    => base64_encode( __( 'Failed to load Klarna Checkout template file.', 'klarna-checkout-for-woocommerce' ) ), // phpcs:ignore
+					'reason'    => base64_encode( __( 'Failed to load Klarna Checkout template file.', 'klarna-checkout-for-woocommerce' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
 				),
 				wc_get_cart_url()
 			);
@@ -193,6 +192,42 @@ class KCO_Templates {
 		</div>
 		<?php
 		do_action( 'kco_wc_after_extra_fields' );
+	}
+
+	/**
+	 * Unrequire WC billing state field.
+	 *
+	 * @param array $fields WC billing fields.
+	 * @return array $fields WC billing fields.
+	 */
+	public function kco_wc_unrequire_wc_billing_state_field( $fields ) {
+		// Unrequire if chosen payment method is Klarna Checkout.
+		if ( method_exists( WC()->session, 'get' ) &&
+			WC()->session->get( 'chosen_payment_method' ) &&
+			'kco' === WC()->session->get( 'chosen_payment_method' )
+			) {
+			$fields['billing_state']['required'] = false;
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Unrequire WC shipping state field.
+	 *
+	 * @param array $fields WC shipping fields.
+	 * @return array $fields WC shipping fields.
+	 */
+	public function kco_wc_unrequire_wc_shipping_state_field( $fields ) {
+		// Unrequire if chosen payment method is Klarna Checkout.
+		if ( method_exists( WC()->session, 'get' ) &&
+			WC()->session->get( 'chosen_payment_method' ) &&
+			'kco' === WC()->session->get( 'chosen_payment_method' )
+			) {
+			$fields['shipping_state']['required'] = false;
+		}
+
+		return $fields;
 	}
 }
 

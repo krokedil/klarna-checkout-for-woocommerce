@@ -51,7 +51,7 @@ function kco_create_or_update_order( $order_id = null ) {
 function kco_wc_show_snippet() {
 	$klarna_order = kco_create_or_update_order();
 	do_action( 'kco_wc_show_snippet', $klarna_order );
-	echo $klarna_order['html_snippet']; // phpcs:ignore
+	echo $klarna_order['html_snippet']; // phpcs:ignore WordPress -- Can not escape this, since its the iframe snippet.
 }
 
 /**
@@ -436,7 +436,7 @@ function kco_wc_country_code_converter( $country ) {
  * @return boolean
  */
 function is_kco_confirmation() {
-	if ( isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] && isset( $_GET['kco_wc_order_id'] ) ) { //phpcs:ignore
+	if ( isset( $_GET['confirm'] ) && 'yes' === $_GET['confirm'] && isset( $_GET['kco_wc_order_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- No nonce possible on this page.
 		return true;
 	}
 
@@ -530,7 +530,7 @@ function kco_convert_region( $region_string, $country_code ) {
 		}
 
 		// Get the code by region name.
-		$region_code = array_keys( $states[ strtoupper( $country_code ) ], $region_string, false ); //phpcs:ignore
+		$region_code = array_keys( $states[ strtoupper( $country_code ) ], $region_string, false ); //phpcs:ignore WordPress.PHP.StrictInArray -- We need to pass false here
 		if ( ! empty( $region_code ) ) {
 			return $region_code[0];
 		}

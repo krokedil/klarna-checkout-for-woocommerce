@@ -56,7 +56,7 @@ class KCO_Request {
 	 */
 	protected function get_request_headers() {
 		return array(
-			'Authorization' => 'Basic ' . base64_encode( $this->get_merchant_id() . ':' . $this->get_shared_secret() ), //phpcs:ignore
+			'Authorization' => 'Basic ' . base64_encode( $this->get_merchant_id() . ':' . $this->get_shared_secret() ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Base64 used to calculate auth header.
 			'Content-Type'  => 'application/json',
 		);
 	}
@@ -102,7 +102,10 @@ class KCO_Request {
 	 */
 	protected function get_purchase_country() {
 		// Try to use customer country if available.
-		if ( ! empty( WC()->customer->get_billing_country() ) && strlen( WC()->customer->get_billing_country() ) === 2 ) {
+		if ( method_exists( WC()->customer, 'get_billing_country' ) &&
+			! empty( WC()->customer->get_billing_country() ) &&
+			strlen( WC()->customer->get_billing_country() ) === 2
+			) {
 			return WC()->customer->get_billing_country( 'edit' );
 		}
 

@@ -74,9 +74,9 @@ class KCO_Fields {
 				'type'  => 'title',
 			),
 			'merchant_id_eu'             => array(
-				'title'             => __( 'Production Username (UID)', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Production Klarna API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
-				'description'       => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => true,
 				'custom_attributes' => array(
@@ -84,9 +84,9 @@ class KCO_Fields {
 				),
 			),
 			'shared_secret_eu'           => array(
-				'title'             => __( 'Production Password', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Production Klarna API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
-				'description'       => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => true,
 				'custom_attributes' => array(
@@ -94,9 +94,9 @@ class KCO_Fields {
 				),
 			),
 			'test_merchant_id_eu'        => array(
-				'title'             => __( 'Test Username (UID)', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Test Klarna API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
-				'description'       => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => true,
 				'custom_attributes' => array(
@@ -104,9 +104,9 @@ class KCO_Fields {
 				),
 			),
 			'test_shared_secret_eu'      => array(
-				'title'             => __( 'Test Password', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Test Klarna API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
-				'description'       => __( 'Get your API keys from your Klarna Checkout merchant account for Europe.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => true,
 				'custom_attributes' => array(
@@ -119,9 +119,9 @@ class KCO_Fields {
 				'type'  => 'title',
 			),
 			'merchant_id_us'             => array(
-				'title'             => __( 'Production Username (UID)', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Production Klarna API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
-				'description'       => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => true,
 				'custom_attributes' => array(
@@ -129,9 +129,9 @@ class KCO_Fields {
 				),
 			),
 			'shared_secret_us'           => array(
-				'title'             => __( 'Production Password', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Production Klarna API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
-				'description'       => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => true,
 				'custom_attributes' => array(
@@ -139,9 +139,9 @@ class KCO_Fields {
 				),
 			),
 			'test_merchant_id_us'        => array(
-				'title'             => __( 'Test Username (UID)', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Test Klarna API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
-				'description'       => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => true,
 				'custom_attributes' => array(
@@ -149,9 +149,9 @@ class KCO_Fields {
 				),
 			),
 			'test_shared_secret_us'      => array(
-				'title'             => __( 'Test Password', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Test Klarna API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
-				'description'       => __( 'Get your API keys from your Klarna Checkout merchant account for US.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => true,
 				'custom_attributes' => array(
