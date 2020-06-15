@@ -48,31 +48,31 @@ msgstr ""
 msgid "The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href=\"%s\">Klarna Add-ons page</a>.."
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:73, ../classes/admin/class-klarna-for-woocommerce-addons.php:73, ../classes/admin/class-klarna-for-woocommerce-addons.php:87, ../classes/admin/class-klarna-for-woocommerce-addons.php:409
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:81, ../classes/admin/class-klarna-for-woocommerce-addons.php:399
 msgid "Klarna Add-ons"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:136
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:130
 msgid "Please install an add-on to be able to see the settings."
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:194
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:186
 msgid "Install"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:194
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:186
 msgid "Not installed"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:197
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:189
 msgid "Activated"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:200
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:192
 msgid "Deactivated"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:410, ../klarna-checkout-for-woocommerce.php:175
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:400, ../klarna-checkout-for-woocommerce.php:175
 msgid "Settings"
 msgstr ""
 
@@ -81,26 +81,16 @@ msgid "There was an error installing the addon. Please try again."
 msgstr ""
 
 #. translators: Klarna order ID.
-#. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:160, ../classes/class-kco-api-callbacks.php:500, ../includes/kco-functions.php:519
+#: ../classes/class-kco-api-callbacks.php:118, ../includes/kco-functions.php:498
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:157, ../classes/class-kco-api-callbacks.php:497
+#: ../classes/class-kco-api-callbacks.php:115
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:154, ../classes/class-kco-api-callbacks.php:494, ../includes/kco-functions.php:511
+#: ../classes/class-kco-api-callbacks.php:112, ../includes/kco-functions.php:490
 msgid "Payment via Klarna Checkout, order ID: %s"
-msgstr ""
-
-#: ../classes/class-kco-api-callbacks.php:489
-msgid "Order created via Klarna Checkout API callback. Please verify the order in Klarnas system."
-msgstr ""
-
-#. translators: %s: Klarna order amount.
-#: ../classes/class-kco-api-callbacks.php:514
-msgid "Order needs manual review, WooCommerce total and Klarna total do not match. Klarna order total: %s."
 msgstr ""
 
 #: ../classes/class-kco-fields.php:25
@@ -160,27 +150,23 @@ msgid "Save debug messages to the WooCommerce System Status log."
 msgstr ""
 
 #: ../classes/class-kco-fields.php:77, ../classes/class-kco-fields.php:122
-msgid "Production Username (UID)"
+msgid "Production Klarna API Username"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:79, ../classes/class-kco-fields.php:89, ../classes/class-kco-fields.php:99, ../classes/class-kco-fields.php:109
-msgid "Get your API keys from your Klarna Checkout merchant account for Europe."
+#: ../classes/class-kco-fields.php:79, ../classes/class-kco-fields.php:89, ../classes/class-kco-fields.php:99, ../classes/class-kco-fields.php:109, ../classes/class-kco-fields.php:124, ../classes/class-kco-fields.php:134, ../classes/class-kco-fields.php:144, ../classes/class-kco-fields.php:154
+msgid "Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address."
 msgstr ""
 
 #: ../classes/class-kco-fields.php:87, ../classes/class-kco-fields.php:132
-msgid "Production Password"
+msgid "Production Klarna API Password"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:97, ../classes/class-kco-fields.php:142
-msgid "Test Username (UID)"
+msgid "Test Klarna API Username"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:107, ../classes/class-kco-fields.php:152
-msgid "Test Password"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:124, ../classes/class-kco-fields.php:134, ../classes/class-kco-fields.php:144, ../classes/class-kco-fields.php:154
-msgid "Get your API keys from your Klarna Checkout merchant account for US."
+msgid "Test Klarna API Password"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:163
@@ -403,36 +389,36 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:282
+#: ../classes/class-kco-gateway.php:284
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:285
+#: ../classes/class-kco-gateway.php:287
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:502
+#: ../classes/class-kco-gateway.php:507
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
 #. translators: Error message.
-#: ../classes/class-kco-subscription.php:232
+#: ../classes/class-kco-subscription.php:239
 msgid "Subscription payment failed with Klarna. Message: %1$s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:225
+#: ../classes/class-kco-subscription.php:232
 msgid "Subscription payment made with Klarna. Klarna order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:308
+#: ../classes/class-kco-subscription.php:318
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:303
+#: ../classes/class-kco-subscription.php:313
 msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:328
+#: ../classes/class-kco-subscription.php:339
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -456,27 +442,15 @@ msgstr ""
 msgid "Shipping"
 msgstr ""
 
-#: ../includes/kco-functions.php:448
-msgid "A mismatch in order totals between WooCommerce and Klarna was detected. Please try again."
+#: ../includes/kco-functions.php:77
+msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:442
-msgid "Invalid coupon."
-msgstr ""
-
-#: ../includes/kco-functions.php:440
-msgid "No shipping was selected."
-msgstr ""
-
-#: ../includes/kco-functions.php:438
-msgid "Not all products are in stock."
-msgstr ""
-
-#: ../includes/kco-functions.php:530
+#: ../includes/kco-functions.php:509
 msgid "Waiting for verification from Klarnas push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:525
+#: ../includes/kco-functions.php:504
 msgid "Klarna Checkout order was rejected"
 msgstr ""
 
@@ -488,14 +462,14 @@ msgstr ""
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:404
+#: ../klarna-checkout-for-woocommerce.php:425
 msgid "Failed getting the order for the external payment."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:410
+#: ../klarna-checkout-for-woocommerce.php:431
 msgid "Failed to find the payment method for the external payment."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:416
+#: ../klarna-checkout-for-woocommerce.php:437
 msgid "Something went wrong with the external payment. Please try again"
 msgstr ""

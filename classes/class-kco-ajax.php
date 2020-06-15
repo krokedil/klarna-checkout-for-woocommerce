@@ -165,7 +165,6 @@ class KCO_AJAX extends WC_AJAX {
 	 * Updates Klarna order.
 	 */
 	public static function kco_wc_update_klarna_order() {
-
 		wc_maybe_define_constant( 'WOOCOMMERCE_CHECKOUT', true );
 
 		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {

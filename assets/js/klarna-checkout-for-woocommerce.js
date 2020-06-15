@@ -100,7 +100,6 @@ jQuery( function( $ ) {
 
 		updateKlarnaOrder: function() {
 			if ( 'kco' === kco_wc.paymentMethod && 'no' === kco_params.is_confirmation_page ) {
-				kco_wc.kcoSuspend( true );
 				$( '.woocommerce-checkout-review-order-table' ).block({
 					message: null,
 					overlayCSS: {
@@ -123,11 +122,6 @@ jQuery( function( $ ) {
 						if ( true === data.responseJSON.success ) {
 							kco_wc.kcoResume();
 							$( '.woocommerce-checkout-review-order-table' ).unblock();
-						} else {
-							if ( '' !== data.responseJSON.data.redirect_url ) {
-								console.log( 'Cart do not need payment. Reloading checkout.' );
-								window.location.href = data.responseJSON.data.redirect_url;
-							}
 						}
 					}
 				});
@@ -222,22 +216,6 @@ jQuery( function( $ ) {
 		log: function( message ) {
 			if ( kco_params.logging ) {
 				console.log( message );
-			}
-		},
-
-		maybeSuspendIframe: function( allValid ) {
-			if ( true === allValid ) {
-				kco_wc.blocked = false;
-				$( '#kco-required-fields-notice' ).remove();
-				kco_wc.kcoResume();
-			} else 	if ( ! $( '#kco-required-fields-notice' ).length ) { // Only if we dont have an error message already.
-				kco_wc.blocked = true;
-				$( 'form.checkout' ).prepend( '<div id="kco-required-fields-notice" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>' +  kco_params.required_fields_text + '</li></ul></div>' );
-				var etop = $( 'form.checkout' ).offset().top;
-				$( 'html, body' ).animate({
-					scrollTop: etop
-					}, 1000 );
-				kco_wc.kcoSuspend( false );
 			}
 		},
 
@@ -369,9 +347,8 @@ jQuery( function( $ ) {
 									success: function( response ) {
 										kco_wc.log( response );
 
-										// All good release checkout and trigger update_checkout event
+										// All good trigger update_checkout event
 										kco_wc.setCustomerData( response.data );
-										kco_wc.kcoResume();
 
 										$( 'body' ).trigger( 'update_checkout' );
 									},
