@@ -189,7 +189,7 @@ class KCO_Request_Cart {
 					}
 				}
 
-				$this->order_lines[] = $klarna_item;
+				$this->order_lines[] = apply_filters( 'kco_wc_cart_line_item', $klarna_item, $cart_item );
 			}
 		}
 	}
