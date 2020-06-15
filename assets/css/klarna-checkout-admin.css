@@ -9,6 +9,12 @@
 	src: url("../fonts/KlarnaHeadline-Bold.otf") format("opentype");
 }
 
+
+
+
+
+
+
 /* Banner */
 
 #kb-spacer {
@@ -38,9 +44,6 @@
 	justify-content: flex-end;
 }
 
-
-.kb-small-container{
-}
 
 
 /*Left*/
@@ -113,16 +116,43 @@ justify-content: flex-end;
 	height: 40px;
 }
 
-/* Sidebar */
-.klarna-sidebar{
+/* Main content */
+
+#klarna-wrapper:after {
+	content: '';
+	display: block;
+	clear: both;
 }
 
-.kb-sidebar-section{
-	padding:25px;
+#klarna-main {
+	width: 70%;
+	float: left;
+	padding: 0 2% 0 0;
+	border-right: 1px solid #ccc;
+	box-sizing: border-box;
+}
+
+/* Sidebar  */
+
+#klarna-sidebar {
+	width:  350px;
+	margin-left: 20px;
+	float: left;
+	box-sizing: border-box;
+	text-align: center;
+	font-family: Klarna, sans-serif;
 	background-color: #FFB3C7;
-	width:20vw;
+	display: flex;
+	justify-content: center;
+	padding: 20px 0px;
+}
+
+
+.kb-sidebar-section{
+	max-width: 85%;
 	display:flex;
 	flex-direction: column;
+
 }
 
 #kb-sidebar-title{
@@ -144,7 +174,7 @@ justify-content: flex-end;
 	text-align: start;
 	font-size: 20px !important;
 	letter-spacing:0.2px;
-	width:80%;
+	width:95%;
 	line-height: 1.4;
 }
 #sidebar-link-holder{
@@ -163,7 +193,7 @@ justify-content: flex-end;
 #kb-sidebar-bottom-holder{
 	background-color: #000000;
 	padding: 5px 10px 10px 10px;
-	margin-top: 10vh;
+	margin-top: 80px;
 	display:flex;
 	align-self:flex-end;
 	flex-direction: column;
@@ -198,13 +228,14 @@ font: 1em sans-serif;
 	margin: 0 5px;
 }
 
-.kb-sidebar-section {
-	margin-bottom: 40px;
-}
 
 .save-separator {
 	clear: both;
 }
+
+
+
+
 
 /*--- Dismiss button -----*/
 
@@ -220,117 +251,207 @@ font: 1em sans-serif;
 }
 
 
-/* ---------- MOBILE VIEW --------- */
+#klarna-settings-logo {
+	display: block;
+	margin: 20px 0;
+}
 
-@media (max-width: 800px) {
+/* MOBILE VIEW */
+
+@media (hover: none) {
+
 
 /* Main container */
+.kb-spacer{
+	display:none;
+}
+
+.kb-new-container{
+	display: grid;
+	margin-left: -10px !important;
+	padding: 30px 0px !important;
+	height: 90vh;
+}
+
+.kb-left-group{
+	width: 100%;
+}
+
+.kb-right-group{
+	width:100%;
+	display:flex;
+	flex-direction: row;
+	justify-content: flex-end;
+}
+
+
+.kb-small-container{
+	padding: 0px 30px;
+}
+
+
+/*Left*/
+.container-title {
+	font-size: 56px;
+	font-weight: bold;
+	width:100%;
+	margin-bottom:10vh;
+}
+
+.container-main-text{
+	font-size: 17px;
+	font-weight:300;
+	letter-spacing:0.5px;
+	width:100%;
+
+}
+
+
+
+.kb-button{
+	font-size: 22px;
+	letter-spacing:0.9px;
+	text-decoration: none;
+	white-space: nowrap;
+	overflow: hidden;
+	margin-left: 30px !important;
+}
+
+#kb-button-left{
+	background-color: black;
+	color: white;
+	padding:10px 25px 10px 25px;
+}
+
+#kb-button-go-live{
+	font-size: 18px;
+	font-weight: 700;
+	color: black;
+	background-color: unset !important;
+	padding: 0px !important;
+	margin-left: 5px;
+	border-bottom: 3px solid black !important;
+}
+
+#klarna-logo-left-frame{
+display:unset;
+align-self: center;
+margin-top: 40px;
+margin-right:20px;
+}
+
+
+/* Other */
+.klarna-logo-img{
+	z-index: 1;
+}
+
+#klarna-logo-left{
+	height: 30px;
+}
+
+
+
+
+	/* Mobile Sidebar */
+	
+
+	#klarna-sidebar {
+		width: 95vw !important;
+		max-width: unset;
+		margin-left: 0px;
+		float: none;
+		box-sizing: border-box;
+		text-align: unset;
+		font-family: Klarna, sans-serif;
+		background-color: #FFB3C7;
+		display: flex;
+		justify-content: unset;
+		padding: 20px 0px;
+	}
+	
+	
+	.kb-sidebar-section{
+		/* padding:30px; */
+	
+		width:unset;
+		max-width: unset;
+		display:flex;
+		flex-direction: column;
+		margin: 0px 10px;
+	
+	}
+
+}
+/* --- END --- Mobile View*/
+
+
+/* Narrow view */
+
+@media (max-width:1500px) {
+	#klarna-main{
+		border-right:none !important;
+	}
+}
+
+@media (max-width: 750px)  {
+
+
 	.kb-spacer{
 		display:none;
 	}
-
-/*Mobile view Sidebar */
-	.kb-sidebar-section  {
-		padding:25px;
-		background-color: #FFB3C7;
-		width: unset !important;
-		display:flex;
-		flex-direction: column;
-	}
-
-
+	
 	.kb-new-container{
-		background-color: #FFB3C7;
+		width: 95vw;
 		display: grid;
-		margin-left: -10px !important;
-		padding: 30px 0px !important;
-		height: 90vh;
+		margin: unset !important;
+		padding: 20px 10px !important;
+		height: auto;
 	}
-
+	
 	.kb-left-group{
-		/* background-color: purple; */
 		width: 100%;
 	}
-	.kb-middle-group{
-		/* background-color: orange; */
-		width:100%;
-		display:grid;
-		/* flex-direction: column; */
-	}
-
+	
 	.kb-right-group{
-		/* background-color: blue; */
 		width:100%;
 		display:flex;
 		flex-direction: row;
 		justify-content: flex-end;
 	}
 
-
-	.kb-small-container{
-		padding: 0px 30px;
-	}
-
-
+	
 	/*Left*/
 	.container-title {
 		font-size: 56px;
 		font-weight: bold;
-		font-family: KlarnaHeadline, sans-serif;
 		width:100%;
-		margin-bottom:10vh;
 	}
-
+	
 	.container-main-text{
 		font-size: 17px;
 		font-weight:300;
 		letter-spacing:0.5px;
-		width:100%;
-		line-height: 1.3;
-		color: black;
-		margin-bottom: 0px;
+		width:95%;
+	
 	}
-
-
-	/* Middle */
-
-	.kb-middle-group{
-
-		margin: 0px;
-		padding: 0px;
-	}
-
-
+	
+	
 	.kb-button{
 		font-size: 22px;
 		letter-spacing:0.9px;
-		/* padding:10px 25px 10px 25px; */
 		text-decoration: none;
 		white-space: nowrap;
 		overflow: hidden;
 		margin-left: 30px !important;
 	}
-
-	#left-main-title{
-		color: #000000;
-	}
-
-	#kb-button-left-frame{
-		/* margin-top: 20px !important; */
-
-
-	}
-	#kb-button-go-live-frame{
-		margin-top: 50px !important;
-	}
-
-
+	
 	#kb-button-left{
 		background-color: black;
 		color: white;
 		padding:10px 25px 10px 25px;
-
 	}
+	
 	#kb-button-go-live{
 		font-size: 18px;
 		font-weight: 700;
@@ -340,60 +461,56 @@ font: 1em sans-serif;
 		margin-left: 5px;
 		border-bottom: 3px solid black !important;
 	}
-
+	
 	#klarna-logo-left-frame{
 	display:unset;
 	align-self: center;
 	margin-top: 40px;
 	margin-right:20px;
 	}
-
-
+	
+	
 	/* Other */
 	.klarna-logo-img{
 		z-index: 1;
 	}
-
+	
 	#klarna-logo-left{
 		height: 30px;
 	}
-
-}
-
-
-
-/* Sidebar */
-@media (min-width: 880px) {
-	#klarna-wrapper:after {
-		content: '';
-		display: block;
-		clear: both;
-	}
-
-	#klarna-main {
-		width: 70%;
-		float: left;
-		padding: 0 2% 0 0;
-		border-right: 1px solid #ccc;
-		box-sizing: border-box;
-	}
+	
+	
+	
+	
+	/* Narrow Sidebar */
+	
 
 	#klarna-sidebar {
-		width: 28%;
-		max-width: 350px;
-		margin-left: 2%;
-		float: left;
-		box-sizing: border-box;
-		text-align: center;
+		float: none;
+		text-align: unset;
 		font-family: Klarna, sans-serif;
+		background-color: #FFB3C7;
+		display: flex;
+		justify-content: unset;
+		padding: 20px 0px;
 	}
+	
+	
+	.kb-sidebar-section{
+		/* padding:30px; */
+	
+		width:unset;
+		max-width: unset;
+		display:flex;
+		flex-direction: column;
+		margin: 0px 10px;
+	
+	}
+	
+	
 }
 
-#klarna-settings-logo {
-	display: block;
-	margin: 20px 0;
-}
-
+/* ---END--- Narrow View*/
 
 
 .wc-settings-sub-title a, .wc-settings-sub-title a:hover, .wc-settings-sub-title a:click, .wc-settings-sub-title a:visited, .wc-settings-sub-title a:focus {
