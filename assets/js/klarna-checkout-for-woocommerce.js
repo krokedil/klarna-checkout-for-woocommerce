@@ -130,21 +130,26 @@ jQuery( function( $ ) {
 
 		// Display Shipping Price in order review if Display shipping methods in iframe settings is active.
 		maybeDisplayShippingPrice: function() {
+			// Check if we already have set the price. If we have, return.
+			if( $('.kco-shipping').length ) {
+				return;
+			}
+			
 			if ( 'kco' === kco_wc.paymentMethod && 'yes' === kco_params.shipping_methods_in_iframe && 'no' === kco_params.is_confirmation_page ) {
-				if ( jQuery( '#shipping_method input[type=\'radio\']' ).length ) {
-
+				if ( $( '#shipping_method input[type=\'radio\']' ).length ) {
 					// Multiple shipping options available.
 					$( '#shipping_method input[type=\'radio\']:checked' ).each( function() {
 						var idVal = $( this ).attr( 'id' );
 						var shippingPrice = $( 'label[for=\'' + idVal + '\']' ).text();
 						$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
+						$( '.woocommerce-shipping-totals td' ).addClass( 'kco-shipping' );
 					});
 				} else {
-
 					// Only one shipping option available.
 					var idVal = $( '#shipping_method input[name=\'shipping_method[0]\']' ).attr( 'id' );
 					var shippingPrice = $( 'label[for=\'' + idVal + '\']' ).text();
 					$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
+					$( '.woocommerce-shipping-totals td' ).addClass( 'kco-shipping' );
 				}
 			}
 		},
