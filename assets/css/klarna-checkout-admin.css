@@ -9,12 +9,6 @@
 	src: url("../fonts/KlarnaHeadline-Bold.otf") format("opentype");
 }
 
-
-
-
-
-
-
 /* Banner */
 
 #kb-spacer {
@@ -44,8 +38,6 @@
 	justify-content: flex-end;
 }
 
-
-
 /*Left*/
 .container-title {
 	font-size: 94px;
@@ -63,7 +55,6 @@
 	line-height: 1.3;
 	color: black;
 }
-
 
 /* Middle */
 .kb-button{
@@ -105,7 +96,6 @@
 	display: flex;
 justify-content: flex-end;
 }
-
 
 /* Other */
 .klarna-logo-img{
@@ -228,14 +218,9 @@ font: 1em sans-serif;
 	margin: 0 5px;
 }
 
-
 .save-separator {
 	clear: both;
 }
-
-
-
-
 
 /*--- Dismiss button -----*/
 
@@ -249,7 +234,6 @@ font: 1em sans-serif;
 	color: #eb6f93;
 	cursor: pointer;
 }
-
 
 #klarna-settings-logo {
 	display: block;
@@ -288,7 +272,6 @@ font: 1em sans-serif;
 	padding: 0px 30px;
 }
 
-
 /*Left*/
 .container-title {
 	font-size: 56px;
@@ -302,10 +285,7 @@ font: 1em sans-serif;
 	font-weight:300;
 	letter-spacing:0.5px;
 	width:100%;
-
 }
-
-
 
 .kb-button{
 	font-size: 22px;
@@ -339,7 +319,6 @@ margin-top: 40px;
 margin-right:20px;
 }
 
-
 /* Other */
 .klarna-logo-img{
 	z-index: 1;
@@ -353,7 +332,6 @@ margin-right:20px;
 	border: none;
 	margin-bottom:30px !important;
 }
-
 
 	/* Mobile Sidebar */
 	
@@ -384,13 +362,10 @@ margin-right:20px;
 		margin: 0px 10px;
 	
 	}
-
 }
 /* --- END --- Mobile View*/
 
-
 /* Narrow view */
-
 @media (max-width:1500px) and (hover:hover){
 	#klarna-main{
 		border-right:none !important;
@@ -398,8 +373,6 @@ margin-right:20px;
 }
 
 @media (max-width: 750px) and (hover:hover)  {
-
-
 	.kb-spacer{
 		display:none;
 	}
@@ -471,8 +444,7 @@ margin-right:20px;
 	margin-top: 40px;
 	margin-right:20px;
 	}
-	
-	
+		
 	/* Other */
 	.klarna-logo-img{
 		z-index: 1;
@@ -482,13 +454,8 @@ margin-right:20px;
 		height: 30px;
 	}
 	
-	
-	
-	
 	/* Narrow Sidebar */
-	
-
-	#klarna-sidebar {
+		#klarna-sidebar {
 		float: none;
 		text-align: unset;
 		font-family: Klarna, sans-serif;
@@ -497,8 +464,7 @@ margin-right:20px;
 		justify-content: unset;
 		padding: 20px 0px;
 	}
-	
-	
+		
 	.kb-sidebar-section{
 		/* padding:30px; */
 	
@@ -507,14 +473,10 @@ margin-right:20px;
 		display:flex;
 		flex-direction: column;
 		margin: 0px 10px;
-	
 	}
-	
-	
 }
 
 /* ---END--- Narrow View*/
-
 
 .wc-settings-sub-title a, .wc-settings-sub-title a:hover, .wc-settings-sub-title a:click, .wc-settings-sub-title a:visited, .wc-settings-sub-title a:focus {
 	border:none;
