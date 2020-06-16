@@ -226,12 +226,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			$wc_version     = defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
 			$url_queries    = '?country=' . $country . '&products=kco&plugin=' . $plugin . '&pluginVersion=' . $plugin_version . '&platform=woocommerce&platformVersion=' . $wc_version;
 
-			if ( 'US' !== $country ) {
-				$url_base = 'https://developers.klarna.com/documentation/testing-environment/';
-				$url      = $url_base . $url_queries;
-			} else {
-				$url = 'https://www.klarna.com/international/business/woocommerce/?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=banner';
-			}
+			$url = 'https://developers.klarna.com/documentation/testing-environment/';
 
 			return $url;
 		}
