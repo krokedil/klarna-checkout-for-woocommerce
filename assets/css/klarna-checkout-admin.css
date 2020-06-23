@@ -68,6 +68,12 @@
 
 #left-main-title{
 	color: #000000;
+	font-size: 4em;;
+	margin:15px 0px 30px 0px;
+}
+
+#left-main-text {
+	font-size: 1rem;
 }
 
 #kb-button-left-frame{
@@ -85,11 +91,12 @@
 #kb-button-left{
 	background-color: black;
 	color: white;
-
+	font-size: 1.5em;
 }
 #kb-button-go-live{
 	color: black;
 	background-color: white;
+	font-size: 1.5em;
 }
 
 #klarna-logo-left-frame{
@@ -146,7 +153,7 @@ justify-content: flex-end;
 }
 
 #kb-sidebar-title{
-	font-size: 32px !important;
+	font-size: 2em !important;
 	font-weight: bold;
 	font-family: KlarnaHeadline, sans-serif;
 	text-align: start;
@@ -162,7 +169,7 @@ justify-content: flex-end;
 
 #kb-sidebar-main-text{
 	text-align: start;
-	font-size: 20px !important;
+	font-size: 1.5em !important;
 	letter-spacing:0.2px;
 	width:95%;
 	line-height: 1.4;
