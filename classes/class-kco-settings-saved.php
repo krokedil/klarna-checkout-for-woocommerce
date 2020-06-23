@@ -101,9 +101,20 @@ class KCO_Settings_Saved {
 			return;
 		}
 
-		$code = $test_response->get_error_code();
-		if ( 401 === $code ) {
-			$this->message[] = "It seems like your Klarna $test credentials are incorrect, please verify or remove these credentials and save again.";
+		$code          = $test_response->get_error_code();
+		$error         = json_decode( $test_response->get_error_message(), true );
+		$error_message = $error['message'];
+		if ( 401 === $code || 403 === $code ) {
+			switch ( $code ) {
+				case 401:
+					$message = "It seems like your Klarna $test credentials are incorrect, please verify or remove these credentials and save again. ";
+					break;
+				case 403:
+					$message = "It seems like your Klarna $test API credentials are not working for the Klarna Checkout plugin, please verify your Klarna contract is for the Klarna Checkout solution.  If your Klarna contract is for standalone payment methods, please instead use the <a href='https://docs.woocommerce.com/document/klarna-payments/'>Klarna Payments for WooCommerce</a> plugin. ";
+					break;
+			}
+			$message        .= "API error code: $code, Klarna API error message: $error_message";
+			$this->message[] = $message;
 			$this->error     = true;
 		}
 	}
@@ -138,7 +149,7 @@ class KCO_Settings_Saved {
 				<?php
 				foreach ( $error_messages as $error_message ) {
 					?>
-					<p><?php echo esc_html( $error_message ); ?></p>
+					<p><?php echo wp_kses_post( $error_message ); ?></p>
 				<?php } ?>
 				</div>
 			<?php
