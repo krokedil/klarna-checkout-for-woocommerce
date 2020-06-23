@@ -441,7 +441,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			WC()->session->set( 'chosen_payment_method', $epm );
 			$order->set_payment_method( $payment_methods[ $epm ] );
 			$order->save();
-			wp_safe_redirect( $result['redirect'] );
+			wp_redirect( $result['redirect'] ); // phpcs:ignore
 			exit;
 		}
 
