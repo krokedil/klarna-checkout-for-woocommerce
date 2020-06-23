@@ -68,14 +68,24 @@ class KCO_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_confirmation_url( $order_id ) {
-		$confirmation_url = add_query_arg(
-			array(
-				'kco_confirm'  => 'yes',
-				'kco_order_id' => '{checkout.order.id}',
-				'wc_order_id'  => ! empty( $order_id ) ? $order_id : 'null',
-			),
-			wc_get_checkout_url()
-		);
+		if ( empty( $order_id ) ) {
+			$confirmation_url = add_query_arg(
+				array(
+					'kco_confirm'  => 'yes',
+					'kco_order_id' => '{checkout.order.id}',
+				),
+				wc_get_checkout_url()
+			);
+		} else {
+			$order            = wc_get_order( $order_id );
+			$confirmation_url = add_query_arg(
+				array(
+					'kco_confirm'  => 'yes',
+					'kco_order_id' => '{checkout.order.id}',
+				),
+				$order->get_checkout_order_received_url()
+			);
+		}
 
 		return apply_filters( 'kco_wc_confirmation_url', $confirmation_url );
 	}
