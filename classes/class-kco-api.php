@@ -45,11 +45,12 @@ class KCO_API {
 	 *
 	 * @param string $klarna_order_id The Klarna Checkout order id.
 	 * @param int    $order_id The WooCommerce order id.
+	 * @param bool   $force If true always update the order, even if not needed.
 	 * @return mixed
 	 */
-	public function update_klarna_order( $klarna_order_id, $order_id = null ) {
+	public function update_klarna_order( $klarna_order_id, $order_id = null, $force = false ) {
 		$request  = new KCO_Request_Update();
-		$response = $request->request( $klarna_order_id, $order_id );
+		$response = $request->request( $klarna_order_id, $order_id, $force );
 
 		return $this->check_for_api_error( $response );
 	}

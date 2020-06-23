@@ -94,4 +94,26 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 
 		return 'https://api' . $country_string . $test_string . '.klarna.com/';
 	}
+
+	/**
+	 * Checks response for any error.
+	 *
+	 * @param object $response The response.
+	 * @param array  $request_args The request args.
+	 * @param string $request_url The request URL.
+	 * @return object|array
+	 */
+	public function process_response( $response, $request_args = array(), $request_url = '' ) {
+		// Check if response is a WP_Error, and return it back if it is.
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		// Check the status code, if its not between 200 and 299 then its an error.
+		if ( wp_remote_retrieve_response_code( $response ) < 200 || wp_remote_retrieve_response_code( $response ) > 299 ) {
+			$error_message = wp_json_encode( $response['response'] );
+			return new WP_Error( wp_remote_retrieve_response_code( $response ), $error_message );
+		}
+		return json_decode( wp_remote_retrieve_body( $response ), true );
+	}
 }

@@ -22,7 +22,7 @@ function kco_create_or_update_order( $order_id = null ) {
 	WC()->cart->calculate_totals();
 	if ( WC()->session->get( 'kco_wc_order_id' ) ) { // Check if we have an order id.
 		// Try to update the order, if it fails try to create new order.
-		$klarna_order = KCO_WC()->api->update_klarna_order( WC()->session->get( 'kco_wc_order_id' ) );
+		$klarna_order = KCO_WC()->api->update_klarna_order( WC()->session->get( 'kco_wc_order_id' ), null, true );
 		if ( ! $klarna_order ) {
 			// If update order failed try to create new order.
 			$klarna_order = KCO_WC()->api->create_klarna_order();
