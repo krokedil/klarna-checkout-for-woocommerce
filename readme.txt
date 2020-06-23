@@ -66,7 +66,7 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * Enhancement   - Changed so we always force an update of the Klarna order on the pageload for the checkout.
 * Enhancement   - Added a filter ( kco_wc_cart_line_item ) to Klarna line items.
 * Enhancement   - We now catch 403 errors for the credentials verification when saving the plugin settings. Also added more text to further help in this issue.
-* Fix           - Changed redirect for EMP to use wp_redirect as wp_safe_redirect caused an error.
+* Fix           - Changed redirect for EPM to use wp_redirect as wp_safe_redirect caused an error.
 * Fix           - Fixed the checkout page product amount input fields no longer working.
 * Fix           - Fixed the naming of a parameter for the push and notification callbacks from Klarna.
 
