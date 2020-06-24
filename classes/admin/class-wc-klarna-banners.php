@@ -203,20 +203,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		 * Return correct Go live url depending on the store country.
 		 */
 		public static function get_go_live_url() {
-			// Set args for the URL.
-			$country        = wc_get_base_location()['country'];
-			$plugin         = 'klarna-checkout-for-woocommerce';
-			$plugin_version = KCO_WC_VERSION;
-			$wc_version     = defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
-			$url_queries    = '?country=' . $country . '&products=kco&plugin=' . $plugin . '&pluginVersion=' . $plugin_version . '&platform=woocommerce&platformVersion=' . $wc_version;
-
-			if ( 'US' !== $country ) {
-				$url_base = 'https://eu.portal.klarna.com/signup/';
-				$url      = $url_base . $url_queries;
-			} else {
-				$url = 'https://www.klarna.com/international/business/woocommerce/?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=banner';
-			}
-
+			$url = 'https://developers.klarna.com/documentation/testing-environment/';
 			return $url;
 		}
 	}
