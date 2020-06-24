@@ -249,7 +249,7 @@ font: 1em sans-serif;
 
 /* ----- MOBILE VIEW ----- */
 
-@media (hover: none) {
+@media (hover: none) and (max-width:700px) {
 
 /* Main container */
 .kb-spacer{
@@ -260,7 +260,7 @@ font: 1em sans-serif;
 	display: grid;
 	height: auto !important;
 	width:calc(100% - 25px) !important;
-
+	padding-top:30px !important;
 }
 
 .kb-left-group{
@@ -342,7 +342,6 @@ margin-right:20px;
 
 	/* Mobile Sidebar */
 	
-
 	#klarna-sidebar {
 		width: 95vw !important;
 		max-width: unset;
@@ -371,119 +370,6 @@ margin-right:20px;
 	}
 }
 /* --- END --- Mobile View*/
-
-/* Narrow view */
-@media (max-width:1500px) and (hover:hover){
-	#klarna-main{
-		border-right:none !important;
-	}
-}
-
-@media (max-width: 750px) and (hover:hover)  {
-	.kb-spacer{
-		display:none;
-	}
-	
-	.kb-new-container{
-		width: 95vw;
-		display: grid;
-		margin: unset !important;
-		padding: 20px 10px !important;
-		height: auto;
-	}
-	
-	.kb-left-group{
-		width: 100%;
-	}
-	
-	.kb-right-group{
-		width:100%;
-		display:flex;
-		flex-direction: row;
-		justify-content: flex-end;
-	}
-
-	
-	/*Left*/
-	.container-title {
-		font-size: 56px;
-		font-weight: bold;
-		width:100%;
-	}
-	
-	.container-main-text{
-		font-size: 17px;
-		font-weight:300;
-		letter-spacing:0.5px;
-		width:95%;
-	
-	}
-	
-	
-	.kb-button{
-		font-size: 22px;
-		letter-spacing:0.9px;
-		text-decoration: none;
-		white-space: nowrap;
-		overflow: hidden;
-		margin-left: 30px !important;
-	}
-	
-	#kb-button-left{
-		background-color: black;
-		color: white;
-		padding:10px 25px 10px 25px;
-	}
-	
-	#kb-button-go-live{
-		font-size: 18px;
-		font-weight: 700;
-		color: black;
-		background-color: unset !important;
-		padding: 0px !important;
-		margin-left: 5px;
-		border-bottom: 3px solid black !important;
-	}
-	
-	#klarna-logo-left-frame{
-	display:unset;
-	align-self: center;
-	margin-top: 40px;
-	margin-right:20px;
-	}
-		
-	/* Other */
-	.klarna-logo-img{
-		z-index: 1;
-	}
-	
-	#klarna-logo-left{
-		height: 30px;
-	}
-	
-	/* Narrow Sidebar */
-		#klarna-sidebar {
-		float: none;
-		text-align: unset;
-		font-family: Klarna, sans-serif;
-		background-color: #FFB3C7;
-		display: flex;
-		justify-content: unset;
-		padding: 20px 0px;
-	}
-		
-	.kb-sidebar-section{
-		/* padding:30px; */
-	
-		width:unset;
-		max-width: unset;
-		display:flex;
-		flex-direction: column;
-		margin: 0px 10px;
-	}
-}
-
-/* ---END--- Narrow View*/
 
 .wc-settings-sub-title a, .wc-settings-sub-title a:hover, .wc-settings-sub-title a:click, .wc-settings-sub-title a:visited, .wc-settings-sub-title a:focus {
 	border:none;
