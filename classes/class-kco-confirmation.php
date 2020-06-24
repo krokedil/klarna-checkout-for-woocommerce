@@ -38,8 +38,8 @@ class KCO_Confirmation {
 	 * Class constructor
 	 */
 	public function __construct() {
-		add_action( 'wp_head', array( $this, 'confirm_order' ), 1 );
-		add_action( 'wp_head', array( $this, 'check_if_external_payment' ) );
+		add_action( 'init', array( $this, 'confirm_order' ) );
+		add_action( 'init', array( $this, 'check_if_external_payment' ) );
 	}
 
 	/**
