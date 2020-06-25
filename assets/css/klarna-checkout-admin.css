@@ -12,7 +12,7 @@
 /* Banner */
 
 #kb-spacer {
-	height: 20px;
+	height: 60px;
 }
 
 .kb-new-container{
@@ -57,6 +57,8 @@
 }
 
 /* Middle */
+
+
 .kb-button{
 	font-size: 24px;
 	letter-spacing:0.9px;
@@ -79,7 +81,7 @@
 #kb-button-left-frame{
 	grid-row: 2;
 		align-self:center;
-		margin-bottom: 10px !important;
+		margin-bottom: 20px !important;
 }
 #kb-button-go-live-frame{
 	grid-row: 3;
