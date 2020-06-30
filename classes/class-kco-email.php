@@ -9,9 +9,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'KP_Email' ) ) {
+if ( ! class_exists( 'KCO_Email' ) ) {
 	/**
-	 * The class for email handling for KP.
+	 * The class for email handling for KCO.
 	 */
 	class KCO_Email {
 		/**
