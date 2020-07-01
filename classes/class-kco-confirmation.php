@@ -68,7 +68,6 @@ class KCO_Confirmation {
 		KCO_Logger::log( $klarna_order_id . ': Confirm the klarna order from the confirmation page.' );
 		kco_confirm_klarna_order( $order_id, $klarna_order_id );
 		kco_unset_sessions();
-		return;
 	}
 
 	/**
