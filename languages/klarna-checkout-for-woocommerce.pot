@@ -72,7 +72,7 @@ msgstr ""
 msgid "Deactivated"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:400, ../klarna-checkout-for-woocommerce.php:175
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:400, ../klarna-checkout-for-woocommerce.php:171
 msgid "Settings"
 msgstr ""
 
@@ -81,7 +81,7 @@ msgid "There was an error installing the addon. Please try again."
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:118, ../includes/kco-functions.php:498
+#: ../classes/class-kco-api-callbacks.php:118, ../includes/kco-functions.php:503
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
@@ -89,8 +89,20 @@ msgstr ""
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:112, ../includes/kco-functions.php:490
+#: ../classes/class-kco-api-callbacks.php:112, ../includes/kco-functions.php:495
 msgid "Payment via Klarna Checkout, order ID: %s"
+msgstr ""
+
+#: ../classes/class-kco-confirmation.php:121
+msgid "Failed getting the order for the external payment."
+msgstr ""
+
+#: ../classes/class-kco-confirmation.php:127
+msgid "Failed to find the payment method for the external payment."
+msgstr ""
+
+#: ../classes/class-kco-confirmation.php:133
+msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
 
 #: ../classes/class-kco-email.php:36
@@ -174,24 +186,23 @@ msgstr ""
 msgid "Save debug messages to the WooCommerce System Status log."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:77, ../classes/class-kco-fields.php:122
+#: ../classes/class-kco-fields.php:84, ../classes/class-kco-fields.php:129
 msgid "Production Klarna API Username"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:79, ../classes/class-kco-fields.php:89, ../classes/class-kco-fields.php:99, ../classes/class-kco-fields.php:109, ../classes/class-kco-fields.php:124, ../classes/class-kco-fields.php:134, ../classes/class-kco-fields.php:144, ../classes/class-kco-fields.php:154
+#: ../classes/class-kco-fields.php:86, ../classes/class-kco-fields.php:96, ../classes/class-kco-fields.php:106, ../classes/class-kco-fields.php:116, ../classes/class-kco-fields.php:131, ../classes/class-kco-fields.php:141, ../classes/class-kco-fields.php:151, ../classes/class-kco-fields.php:161
 msgid "Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:87, ../classes/class-kco-fields.php:132
+#: ../classes/class-kco-fields.php:94, ../classes/class-kco-fields.php:139
 msgid "Production Klarna API Password"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:97, ../classes/class-kco-fields.php:142
+#: ../classes/class-kco-fields.php:104, ../classes/class-kco-fields.php:149
 msgid "Test Klarna API Username"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:107, ../classes/class-kco-fields.php:152
-
+#: ../classes/class-kco-fields.php:114, ../classes/class-kco-fields.php:159
 msgid "Test Klarna API Password"
 msgstr ""
 
@@ -472,11 +483,11 @@ msgstr ""
 msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:509
+#: ../includes/kco-functions.php:514
 msgid "Waiting for verification from Klarnas push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:504
+#: ../includes/kco-functions.php:509
 msgid "Klarna Checkout order was rejected"
 msgstr ""
 
@@ -484,18 +495,6 @@ msgstr ""
 msgid "Klarna Checkout System Status."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:176
+#: ../klarna-checkout-for-woocommerce.php:172
 msgid "Support"
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:425
-msgid "Failed getting the order for the external payment."
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:431
-msgid "Failed to find the payment method for the external payment."
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:437
-msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
