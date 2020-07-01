@@ -72,7 +72,7 @@ msgstr ""
 msgid "Deactivated"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:400, ../klarna-checkout-for-woocommerce.php:171
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:400, ../klarna-checkout-for-woocommerce.php:175
 msgid "Settings"
 msgstr ""
 
@@ -81,7 +81,7 @@ msgid "There was an error installing the addon. Please try again."
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:118, ../includes/kco-functions.php:503
+#: ../classes/class-kco-api-callbacks.php:118, ../includes/kco-functions.php:498
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
@@ -89,20 +89,8 @@ msgstr ""
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:112, ../includes/kco-functions.php:495
+#: ../classes/class-kco-api-callbacks.php:112, ../includes/kco-functions.php:490
 msgid "Payment via Klarna Checkout, order ID: %s"
-msgstr ""
-
-#: ../classes/class-kco-confirmation.php:121
-msgid "Failed getting the order for the external payment."
-msgstr ""
-
-#: ../classes/class-kco-confirmation.php:127
-msgid "Failed to find the payment method for the external payment."
-msgstr ""
-
-#: ../classes/class-kco-confirmation.php:133
-msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
 
 #: ../classes/class-kco-email.php:36
@@ -483,11 +471,11 @@ msgstr ""
 msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:514
+#: ../includes/kco-functions.php:509
 msgid "Waiting for verification from Klarnas push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:509
+#: ../includes/kco-functions.php:504
 msgid "Klarna Checkout order was rejected"
 msgstr ""
 
@@ -495,6 +483,18 @@ msgstr ""
 msgid "Klarna Checkout System Status."
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:172
+#: ../klarna-checkout-for-woocommerce.php:176
 msgid "Support"
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:433
+msgid "Failed getting the order for the external payment."
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:439
+msgid "Failed to find the payment method for the external payment."
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:445
+msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
