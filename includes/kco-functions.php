@@ -474,6 +474,11 @@ function kco_unset_sessions() {
 function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
 	if ( $order_id ) {
 		$order = wc_get_order( $order_id );
+		// If the order is already completed, return.
+		if ( ! empty( $order->get_date_paid() ) ) {
+			return;
+		}
+
 		// Get the Klarna OM order.
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 		if ( ! is_wp_error( $klarna_order ) ) {
