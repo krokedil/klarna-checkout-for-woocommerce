@@ -5,7 +5,7 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 2.0.16
+ * Version: 2.1.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
@@ -35,13 +35,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.0.16' );
+define( 'KCO_WC_VERSION', '2.1.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
 define( 'KCO_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'KCO_WC_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
-define( 'KROKEDIL_LOGGER_GATEWAY', 'kco' );
+
 if ( ! class_exists( 'KCO' ) ) {
 	/**
 	 * Class KCO
@@ -144,10 +144,6 @@ if ( ! class_exists( 'KCO' ) ) {
 		protected function __construct() {
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
-			add_action( 'wp_head', array( $this, 'check_if_external_payment' ) );
-
-			// "Fallback" redirection to proper order thank you page if we have one.
-			add_action( 'wp_head', array( $this, 'redirect_to_thankyou' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
@@ -217,7 +213,9 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-ajax.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api-callbacks.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-confirmation.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-credentials.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-email.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-fields.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gateway.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gdpr.php';
@@ -324,125 +322,6 @@ if ( ! class_exists( 'KCO' ) ) {
 			}
 
 			return $output;
-		}
-
-		/**
-		 * Redirects the customer to the proper thank you page.
-		 *
-		 * @return void
-		 */
-		public function redirect_to_thankyou() {
-			$kco_confirm     = filter_input( INPUT_GET, 'kco_confirm', FILTER_SANITIZE_STRING );
-			$klarna_order_id = filter_input( INPUT_GET, 'kco_order_id', FILTER_SANITIZE_STRING );
-			$order_id        = filter_input( INPUT_GET, 'wc_order_id', FILTER_SANITIZE_STRING );
-
-			if ( empty( $kco_confirm ) ) {
-				return;
-			}
-
-			KCO_Logger::log( $klarna_order_id . ': Confirmation endpoint hit for order.' );
-			$order = wc_get_order( $order_id );
-			if ( empty( $order_id ) || 'null' === $order_id || ! $order ) {
-				KCO_Logger::log( $klarna_order_id . ': Order ID not found or is invalid on confirmation page. Running Database query.' );
-				// Find relevant order in Woo if we do not have a valid order id.
-				$query_args = array(
-					'fields'      => 'ids',
-					'post_type'   => wc_get_order_types(),
-					'post_status' => array_keys( wc_get_order_statuses() ),
-					'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-					'meta_value'  => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-					'date_query'  => array(
-						array(
-							'after' => '2 day ago',
-						),
-					),
-				);
-
-				$orders = get_posts( $query_args );
-				if ( ! $orders ) {
-					wc_add_notice( __( 'Something went wrong in the checkout process. Please contact the store.', 'error' ) );
-					return;
-				}
-				$order_id = $orders[0];
-				$order    = wc_get_order( $order_id );
-			}
-			// Confirm, redirect and exit.
-			KCO_Logger::log( $klarna_order_id . ': Confirm the klarna order from the confirmation page.' );
-			kco_confirm_klarna_order( $order_id, $klarna_order_id );
-			kco_unset_sessions();
-			header( 'Location:' . $order->get_checkout_order_received_url() );
-			exit;
-		}
-
-		/**
-		 * Checks if we have an external payment method on page load.
-		 *
-		 * @return void
-		 */
-		public function check_if_external_payment() {
-			$epm             = filter_input( INPUT_GET, 'kco-external-payment', FILTER_SANITIZE_STRING );
-			$order_id        = filter_input( INPUT_GET, 'order_id', FILTER_SANITIZE_STRING );
-			$klarna_order_id = filter_input( INPUT_GET, 'kco_order_id', FILTER_SANITIZE_STRING );
-			if ( ! empty( $epm ) ) {
-				$this->run_kepm( $epm, $order_id, $klarna_order_id );
-			}
-		}
-
-		/**
-		 * Initiates a Klarna External Payment Method payment.
-		 *
-		 * @param string $epm The name of the external payment method.
-		 * @param string $order_id The WooCommerce order id.
-		 * @param string $klarna_order_id The Klarna order id.
-		 * @return void
-		 */
-		public function run_kepm( $epm, $order_id, $klarna_order_id ) {
-			$order = wc_get_order( $order_id );
-			// Check if we have a KCO order id.
-			if ( ! empty( $klarna_order_id ) ) {
-				// Do a database lookup for the WooCommerce order.
-				$query_args = array(
-					'fields'      => 'ids',
-					'post_type'   => wc_get_order_types(),
-					'post_status' => array_keys( wc_get_order_statuses() ),
-					'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-					'meta_value'  => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-					'date_query'  => array(
-						array(
-							'after' => '2 day ago',
-						),
-					),
-				);
-				$orders     = get_posts( $query_args );
-				// Set the order from the first order id returned.
-				if ( ! empty( $orders ) ) {
-					$order_id = $orders[0];
-					$order    = wc_get_order( $order_id );
-				}
-			}
-			// Check if we have a order.
-			if ( ! $order ) {
-				wc_print_notice( __( 'Failed getting the order for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
-				return;
-			}
-			$payment_methods = WC()->payment_gateways->get_available_payment_gateways();
-			// Check if the payment method is available.
-			if ( ! isset( $payment_methods[ $epm ] ) ) {
-				wc_print_notice( __( 'Failed to find the payment method for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
-				return;
-			}
-			$result = $payment_methods[ $epm ]->process_payment( $order_id );
-			// Check if the result is good.
-			if ( ! isset( $result['result'] ) || 'success' !== $result['result'] ) {
-				wc_print_notice( __( 'Something went wrong with the external payment. Please try again', 'klarna-checkout-for-woocommerce' ), 'error' );
-				return;
-			}
-			// Everything is fine, redirect to the URL specified by the gateway.
-			WC()->session->set( 'chosen_payment_method', $epm );
-			$order->set_payment_method( $payment_methods[ $epm ] );
-			$order->save();
-			wp_redirect( $result['redirect'] ); // phpcs:ignore
-			exit;
 		}
 
 	}

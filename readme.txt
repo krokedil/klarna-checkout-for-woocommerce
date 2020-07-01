@@ -62,6 +62,14 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.07.01    - version 2.1.0 =
+* Feature       - Added post-purchase information to emails being sent to the customer with links to Klarna support and the Klarna app. Can be enabled in the settings for the plugin.
+* Enhancement   - Improved the confirmation page. We now redirect directly to the thankyou page to improve speed and reduce the risk of any error. Also removes the need to do any database queries in this step.
+* Enhancement   - Limited the "flickering" of the iFrame on the checkout page.
+* Enhancement   - Improvements to the Klarna banner on the admin pages.
+* Fix           - Fixed an issue with the selected shipping method not being displayed properly when showing shipping in the iFrame.
+* Fix           - Removed an unused old definition used by our old logging. Should prevent issues when using the old plugin at the same time as the current plugin
+
 = 2020.06.23    - version 2.0.16 =
 * Enhancement   - Changed so we always force an update of the Klarna order on the pageload for the checkout.
 * Enhancement   - Added a filter ( kco_wc_cart_line_item ) to Klarna line items.
