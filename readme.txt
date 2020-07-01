@@ -62,6 +62,14 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.06.23    - version 2.0.16 =
+* Enhancement   - Changed so we always force an update of the Klarna order on the pageload for the checkout.
+* Enhancement   - Added a filter ( kco_wc_cart_line_item ) to Klarna line items.
+* Enhancement   - We now catch 403 errors for the credentials verification when saving the plugin settings. Also added more text to further help in this issue.
+* Fix           - Changed redirect for EPM to use wp_redirect as wp_safe_redirect caused an error.
+* Fix           - Fixed the checkout page product amount input fields no longer working.
+* Fix           - Fixed the naming of a parameter for the push and notification callbacks from Klarna.
+
 = 2020.06.11    - version 2.0.15 =
 * Enhancement   - Added a limit to only get orders for 2 days back to confirmation page database queries.
 * Enhancement   - Added order id to the confirmation page parameters to prevent the need to get an order from the database. Should improve speed of the checkout process.

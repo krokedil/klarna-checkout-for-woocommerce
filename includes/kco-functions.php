@@ -22,7 +22,7 @@ function kco_create_or_update_order( $order_id = null ) {
 	WC()->cart->calculate_totals();
 	if ( WC()->session->get( 'kco_wc_order_id' ) ) { // Check if we have an order id.
 		// Try to update the order, if it fails try to create new order.
-		$klarna_order = KCO_WC()->api->update_klarna_order( WC()->session->get( 'kco_wc_order_id' ) );
+		$klarna_order = KCO_WC()->api->update_klarna_order( WC()->session->get( 'kco_wc_order_id' ), null, true );
 		if ( ! $klarna_order ) {
 			// If update order failed try to create new order.
 			$klarna_order = KCO_WC()->api->create_klarna_order();
@@ -474,6 +474,11 @@ function kco_unset_sessions() {
 function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
 	if ( $order_id ) {
 		$order = wc_get_order( $order_id );
+		// If the order is already completed, return.
+		if ( ! empty( $order->get_date_paid() ) ) {
+			return;
+		}
+
 		// Get the Klarna OM order.
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 		if ( ! is_wp_error( $klarna_order ) ) {

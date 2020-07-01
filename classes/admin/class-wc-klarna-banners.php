@@ -99,7 +99,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 						</div>
 						<div id="kb-button-go-live-frame">
 							<a id="kb-button-go-live" class="kb-button"
-								href="<?php echo esc_attr( self::get_go_live_url() ); ?>"
+								href="<?php echo esc_attr( self::get_playground_credentials_url() ); ?>"
 								target="_blank">Get playground credentials
 							</a>
 						</div>
@@ -216,8 +216,16 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			} else {
 				$url = 'https://www.klarna.com/international/business/woocommerce/?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=banner';
 			}
-
 			return $url;
+		}
+
+		/**
+		 * Returns the URL to the Klarna developers page for getting test credentials.
+		 *
+		 * @return string
+		 */
+		public static function get_playground_credentials_url() {
+			return 'https://developers.klarna.com/documentation/testing-environment/';
 		}
 	}
 

@@ -18,14 +18,15 @@ class KCO_Request_Update extends KCO_Request {
 	 *
 	 * @param string $klarna_order_id The Klarna order id.
 	 * @param int    $order_id The WooCommerce order id.
+	 * @param bool   $force If true always update the order, even if not needed.
 	 * @return array
 	 */
-	public function request( $klarna_order_id, $order_id = null ) {
+	public function request( $klarna_order_id, $order_id = null, $force = false ) {
 		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
 		$request_args = apply_filters( 'kco_wc_update_order', $this->get_request_args( $order_id ) );
 
 		// Check if we need to update.
-		if ( WC()->session->get( 'kco_update_md5' ) && WC()->session->get( 'kco_update_md5' ) === md5( wp_json_encode( $request_args ) ) ) {
+		if ( WC()->session->get( 'kco_update_md5' ) && WC()->session->get( 'kco_update_md5' ) === md5( wp_json_encode( $request_args ) ) && ! $force ) {
 			return false;
 		}
 		WC()->session->set( 'kco_update_md5', md5( wp_json_encode( $request_args ) ) );
