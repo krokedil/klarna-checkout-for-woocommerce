@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.07.03    - version 2.1.1 =
+* Fix           - Fixed an issue that made the iFrame to not be suspended on update_checkout event. Caused the iFrame to not update to display the proper information.
+
 = 2020.07.01    - version 2.1.0 =
 * Feature       - Added post-purchase information to emails being sent to the customer with links to Klarna support and the Klarna app. Can be enabled in the settings for the plugin.
 * Enhancement   - Improved the confirmation page. We now redirect directly to the thankyou page to improve speed and reduce the risk of any error. Also removes the need to do any database queries in this step.
