@@ -318,10 +318,9 @@ jQuery( function( $ ) {
 
 		init: function() {
 			$( document ).ready( kco_wc.documentReady );
-			kco_wc.bodyEl.on( 'update_checkout', kco_wc.kcoSuspend( true ) );
+			kco_wc.bodyEl.on( 'update_checkout', function() { kco_wc.kcoSuspend( true ) } );
 			kco_wc.bodyEl.on( 'updated_checkout', kco_wc.updateKlarnaOrder );
 			kco_wc.bodyEl.on( 'updated_checkout', kco_wc.maybeDisplayShippingPrice );
-			kco_wc.bodyEl.on( 'updated_checkout', kco_wc.maybePrintValidationMessage );
 			kco_wc.bodyEl.on( 'change', 'input.qty', kco_wc.updateCart );
 			kco_wc.bodyEl.on( 'change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco );
 			kco_wc.bodyEl.on( 'click', kco_wc.selectAnotherSelector, kco_wc.changeFromKco );
