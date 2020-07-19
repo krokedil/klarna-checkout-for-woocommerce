@@ -461,11 +461,12 @@ class KCO_Request_Cart {
 	 */
 	public function get_item_price( $cart_item ) {
 		if ( $this->separate_sales_tax ) {
-			$item_subtotal = wc_get_price_excluding_tax( $cart_item['data'] );
+			$item_subtotal = $cart_item['line_total'] / $cart_item['quantity'];
 		} else {
-			$item_subtotal = wc_get_price_including_tax( $cart_item['data'] );
+			$item_subtotal = ( $cart_item['line_total'] / $cart_item['quantity'] ) + ( array_sum( $cart_item['line_tax_data']['total'] ) / $cart_item['quantity'] );
 		}
-		$item_price = number_format( $item_subtotal, wc_get_price_decimals(), '.', '' ) * 100;
+		$item_price = intval( round( $item_subtotal * 100 ) );
+
 		return round( $item_price );
 	}
 
@@ -590,19 +591,12 @@ class KCO_Request_Cart {
 	public function get_item_total_amount( $cart_item, $product ) {
 
 		if ( $this->separate_sales_tax ) {
-			$item_total_amount     = number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->get_item_tax_rate( $cart_item, $product ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
-			$max_order_line_amount = ( number_format( wc_get_price_including_tax( $cart_item['data'] ), wc_get_price_decimals(), '.', '' ) * $cart_item['quantity'] ) * 100;
+			$item_total_amount = $cart_item['line_total'];
 		} else {
-			$item_total_amount     = number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->get_item_tax_rate( $cart_item, $product ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
-			$max_order_line_amount = ( number_format( wc_get_price_including_tax( $cart_item['data'] ), wc_get_price_decimals(), '.', '' ) * $cart_item['quantity'] ) * 100;
-		}
-		// Check so the line_total isn't greater than product price x quantity.
-		// This can happen when having price display set to 0 decimals.
-		if ( $item_total_amount > $max_order_line_amount ) {
-			$item_total_amount = $max_order_line_amount;
+			$item_total_amount = ( $cart_item['line_total'] + array_sum( $cart_item['line_tax_data']['total'] ) );
 		}
 
-		return round( $item_total_amount );
+		return intval( round( $item_total_amount * 100 ) );
 	}
 
 	/**
@@ -670,12 +664,12 @@ class KCO_Request_Cart {
 	 */
 	public function get_shipping_amount() {
 		if ( $this->separate_sales_tax ) {
-			$shipping_amount = (int) number_format( WC()->cart->shipping_total * 100, 0, '', '' );
+			$shipping_amount = WC()->cart->shipping_total;
 		} else {
-			$shipping_amount = number_format( WC()->cart->shipping_total + WC()->cart->shipping_tax_total, wc_get_price_decimals(), '.', '' ) * 100;
+			$shipping_amount = WC()->cart->shipping_total + WC()->cart->shipping_tax_total;
 		}
 
-		return $shipping_amount;
+		return intval( round( $shipping_amount * 100 ) );
 	}
 
 	/**
@@ -700,7 +694,7 @@ class KCO_Request_Cart {
 			$shipping_tax_rate = 0;
 		}
 
-		return round( $shipping_tax_rate );
+		return intval( round( $shipping_tax_rate ) );
 	}
 
 	/**
@@ -719,30 +713,6 @@ class KCO_Request_Cart {
 			$shipping_total_exluding_tax = $shiping_total_amount / ( 1 + ( $this->get_shipping_tax_rate() / 10000 ) );
 			$shipping_tax_amount         = $shiping_total_amount - $shipping_total_exluding_tax;
 		}
-		return round( $shipping_tax_amount );
+		return intval( round( $shipping_tax_amount ) );
 	}
-
-	/**
-	 * Get unrounded order tax amount.
-	 *
-	 * @since  1.8
-	 * @access public
-	 *
-	 * @return integer $total_order_tax unrounded tax amount for entire order.
-	 */
-	public function get_unrounded_order_tax_amount() {
-		$total_order_tax = 0;
-		foreach ( WC()->cart->get_cart() as $cart_item ) {
-			if ( $cart_item['quantity'] ) {
-				if ( $cart_item['variation_id'] ) {
-					$product = wc_get_product( $cart_item['variation_id'] );
-				} else {
-					$product = wc_get_product( $cart_item['product_id'] );
-				}
-				$total_order_tax += $this->get_item_tax_amount( $cart_item, $product );
-			}
-		}
-		return $total_order_tax;
-	}
-
 }
