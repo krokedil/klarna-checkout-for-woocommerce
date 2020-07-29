@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.07.29    - version 2.1.2 =
+* Fix           - Fixed an issue with regions for Ireland.
+
 = 2020.07.03    - version 2.1.1 =
 * Fix           - Fixed an issue that made the iFrame to not be suspended on update_checkout event. Caused the iFrame to not update to display the proper information.
 
