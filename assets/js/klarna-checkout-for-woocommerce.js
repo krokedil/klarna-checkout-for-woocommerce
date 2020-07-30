@@ -395,7 +395,6 @@ jQuery( function( $ ) {
 									},
 									success: function( response ) {
 										kco_wc.log( response );
-										$( 'body' ).trigger( 'update_checkout' );
 									},
 									error: function( response ) {
 										kco_wc.log( response );
@@ -403,8 +402,8 @@ jQuery( function( $ ) {
 									complete: function( response ) {
 										$( '#shipping_method #' + response.responseJSON.data.shipping_option_name ).prop( 'checked', true );
 										$( 'body' ).trigger( 'kco_shipping_option_changed', [ data ]);
+										$( 'body' ).trigger( 'update_checkout' );
 										$( '.woocommerce-checkout-review-order-table' ).unblock();
-										kco_wc.kcoResume();
 									}
 								}
 							);

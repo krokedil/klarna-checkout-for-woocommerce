@@ -16,81 +16,28 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../classes/admin/class-kco-admin-notices.php:92
-msgid "You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout."
-msgstr ""
-
-#: ../classes/admin/class-kco-admin-notices.php:109
-msgid "You need to enable and configure https to be able to use Klarna Checkout."
-msgstr ""
-
-#. translators: %s: URL.
-#: ../classes/admin/class-kco-admin-notices.php:129
-msgid "You need to tick the checkbox <i>When creating an account, automatically generate a username from the customer's email address</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href=\"%s\">Accounts & Privacy tab"
-msgstr ""
-
-#. translators: %s: URL.
-#: ../classes/admin/class-kco-admin-notices.php:139
-msgid "You need to tick the checkbox <i>When creating an account, automatically generate an account password</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href=\"%s\">Accounts & Privacy tab"
-msgstr ""
-
-#. translators: %s: URL.
-#: ../classes/admin/class-kco-admin-notices.php:158
-msgid "It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href=\"%s\">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>)."
-msgstr ""
-
-#: ../classes/admin/class-kco-admin-notices.php:177
-msgid "It looks as if you have a Optimizing or Caching plugin installed. Please make sure to not enable these features on the checkout page, as this can cause issues with Klarna Checkout. The checkout page should never be minified, concatenated, or cached"
-msgstr ""
-
-#. translators: %s: URL.
-#: ../classes/admin/class-kco-admin-notices.php:199
-msgid "The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href=\"%s\">Klarna Add-ons page</a>.."
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:81, ../classes/admin/class-klarna-for-woocommerce-addons.php:399
-msgid "Klarna Add-ons"
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:130
-msgid "Please install an add-on to be able to see the settings."
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:186
-msgid "Install"
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:186
-msgid "Not installed"
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:189
-msgid "Activated"
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:192
-msgid "Deactivated"
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:400, ../klarna-checkout-for-woocommerce.php:171
+#: ../klarna-checkout-for-woocommerce.php:171, ../classes/admin/class-klarna-for-woocommerce-addons.php:400
 msgid "Settings"
 msgstr ""
 
-#: ../classes/admin/class-klarna-skin.php:87
-msgid "There was an error installing the addon. Please try again."
+#: ../klarna-checkout-for-woocommerce.php:172
+msgid "Support"
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:118, ../includes/kco-functions.php:503
-msgid "Klarna order is under review, order ID: %s."
+#. translators: Klarna order ID.
+#: ../classes/class-kco-api-callbacks.php:112, ../includes/kco-functions.php:495
+msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
 #: ../classes/class-kco-api-callbacks.php:115
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:112, ../includes/kco-functions.php:495
-msgid "Payment via Klarna Checkout, order ID: %s"
+#. translators: Klarna order ID.
+#. translators: Klarna order ID.
+#: ../classes/class-kco-api-callbacks.php:118, ../includes/kco-functions.php:503
+msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
 #: ../classes/class-kco-confirmation.php:121
@@ -438,21 +385,23 @@ msgstr ""
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
+#. translators: Klarna order id.
+#: ../classes/class-kco-subscription.php:232
+msgid "Subscription payment made with Klarna. Klarna order id: %s"
+msgstr ""
+
 #. translators: Error message.
 #: ../classes/class-kco-subscription.php:239
 msgid "Subscription payment failed with Klarna. Message: %1$s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:232
-msgid "Subscription payment made with Klarna. Klarna order id: %s"
+#. translators: %s Klarna recurring token.
+#: ../classes/class-kco-subscription.php:313
+msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
 #: ../classes/class-kco-subscription.php:318
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
-msgstr ""
-
-#: ../classes/class-kco-subscription.php:313
-msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
 #: ../classes/class-kco-subscription.php:339
@@ -463,11 +412,87 @@ msgstr ""
 msgid "Failed to load Klarna Checkout template file."
 msgstr ""
 
+#: ../includes/kco-functions.php:77
+msgid "Select another payment method"
+msgstr ""
+
+#: ../includes/kco-functions.php:509
+msgid "Klarna Checkout order was rejected"
+msgstr ""
+
+#: ../includes/kco-functions.php:514
+msgid "Waiting for verification from Klarnas push notification"
+msgstr ""
+
+#: ../includes/kco-status-report.php:17
+msgid "Klarna Checkout System Status."
+msgstr ""
+
+#: ../classes/admin/class-kco-admin-notices.php:92
+msgid "You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout."
+msgstr ""
+
+#: ../classes/admin/class-kco-admin-notices.php:109
+msgid "You need to enable and configure https to be able to use Klarna Checkout."
+msgstr ""
+
+#. translators: %s: URL.
+#: ../classes/admin/class-kco-admin-notices.php:129
+msgid "You need to tick the checkbox <i>When creating an account, automatically generate a username from the customer's email address</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href=\"%s\">Accounts & Privacy tab"
+msgstr ""
+
+#. translators: %s: URL.
+#: ../classes/admin/class-kco-admin-notices.php:139
+msgid "You need to tick the checkbox <i>When creating an account, automatically generate an account password</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href=\"%s\">Accounts & Privacy tab"
+msgstr ""
+
+#. translators: %s: URL.
+#: ../classes/admin/class-kco-admin-notices.php:158
+msgid "It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href=\"%s\">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>)."
+msgstr ""
+
+#: ../classes/admin/class-kco-admin-notices.php:177
+msgid "It looks as if you have a Optimizing or Caching plugin installed. Please make sure to not enable these features on the checkout page, as this can cause issues with Klarna Checkout. The checkout page should never be minified, concatenated, or cached"
+msgstr ""
+
+#. translators: %s: URL.
+#: ../classes/admin/class-kco-admin-notices.php:199
+msgid "The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href=\"%s\">Klarna Add-ons page</a>.."
+msgstr ""
+
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:81, ../classes/admin/class-klarna-for-woocommerce-addons.php:399
+msgid "Klarna Add-ons"
+msgstr ""
+
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:130
+msgid "Please install an add-on to be able to see the settings."
+msgstr ""
+
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:186
+msgid "Install"
+msgstr ""
+
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:186
+msgid "Not installed"
+msgstr ""
+
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:189
+msgid "Activated"
+msgstr ""
+
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:192
+msgid "Deactivated"
+msgstr ""
+
+#: ../classes/admin/class-klarna-skin.php:87
+msgid "There was an error installing the addon. Please try again."
+msgstr ""
+
 #: ../classes/requests/helpers/class-kco-request-cart.php:225, ../classes/requests/helpers/class-kco-request-cart.php:226
 msgid "Sales Tax"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:258, ../classes/requests/helpers/class-kco-request-cart.php:255
+#: ../classes/requests/helpers/class-kco-request-cart.php:255, ../classes/requests/helpers/class-kco-request-cart.php:258
 msgid "Gift card"
 msgstr ""
 
@@ -477,24 +502,4 @@ msgstr ""
 
 #: ../classes/requests/helpers/class-kco-request-cart.php:630, ../classes/requests/helpers/class-kco-request-cart.php:658
 msgid "Shipping"
-msgstr ""
-
-#: ../includes/kco-functions.php:77
-msgid "Select another payment method"
-msgstr ""
-
-#: ../includes/kco-functions.php:514
-msgid "Waiting for verification from Klarnas push notification"
-msgstr ""
-
-#: ../includes/kco-functions.php:509
-msgid "Klarna Checkout order was rejected"
-msgstr ""
-
-#: ../includes/kco-status-report.php:17
-msgid "Klarna Checkout System Status."
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:172
-msgid "Support"
 msgstr ""
