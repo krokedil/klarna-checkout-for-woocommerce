@@ -482,6 +482,10 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
 		// Get the Klarna OM order.
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 		if ( ! is_wp_error( $klarna_order ) ) {
+
+			// Let other plugins hook into this sequence.
+			do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
+
 			// Acknowledge order in Klarna.
 			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
 			// Set the merchant references for the order.
