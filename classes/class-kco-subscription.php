@@ -217,12 +217,21 @@ class KCO_Subscription {
 	public function trigger_scheduled_payment( $renewal_total, $renewal_order ) {
 		$order_id = $renewal_order->get_id();
 
-		$subscriptions = wcs_get_subscriptions_for_renewal_order( $renewal_order->get_id() );
-
+		$subscriptions   = wcs_get_subscriptions_for_renewal_order( $renewal_order->get_id() );
 		$recurring_token = get_post_meta( $order_id, '_kco_recurring_token', true );
+
 		if ( empty( $recurring_token ) ) {
+			// Try getting it from parent order.
 			$recurring_token = get_post_meta( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ), '_kco_recurring_token', true );
 			update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
+		}
+
+		if ( empty( $recurring_token ) ) {
+			// Try getting it from _klarna_recurring_token (the old Klarna plugin).
+			$recurring_token = get_post_meta( $order_id, '_klarna_recurring_token', true );
+			if ( ! empty( $recurring_token ) ) {
+				update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
+			}
 		}
 
 		$create_order_response = KCO_WC()->api->create_recurring_order( $order_id, $recurring_token );
