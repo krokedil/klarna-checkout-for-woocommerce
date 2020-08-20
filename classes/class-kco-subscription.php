@@ -231,6 +231,9 @@ class KCO_Subscription {
 			$recurring_token = get_post_meta( $order_id, '_klarna_recurring_token', true );
 			if ( ! empty( $recurring_token ) ) {
 				update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
+				foreach ( $subscriptions as $subscription ) {
+					update_post_meta( $subcription->get_id(), '_kco_recurring_token', $recurring_token );
+				}
 			}
 		}
 
