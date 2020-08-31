@@ -175,6 +175,8 @@ class KCO_Subscription {
 
 						unset( $request_args['merchant_urls']['validation'] );
 						unset( $request_args['merchant_urls']['shipping_option_update'] );
+						unset( $request_args['options']['require_client_validation'] );
+						unset( $request_args['options']['require_client_validation_callback_response'] );
 						$request_args['merchant_urls']['checkout']     = $current_url;
 						$request_args['merchant_urls']['confirmation'] = $confirmation_url;
 						$request_args['merchant_urls']['push']         = $push_url;
@@ -297,31 +299,33 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function handle_push_cb_for_payment_method_change( $klarna_order_id ) {
-		$key        = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_STRING );
-		$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_STRING );
-		if ( ! empty( $key ) && ( ! empty( $kco_action ) && 'subs-payment-changed' === $kco_action ) ) {
-			$order_id = wc_get_order_id_by_order_key( sanitize_key( $key ) );
-			$order    = wc_get_order( $order_id );
+		$subscription_id = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_STRING );
+		$kco_action      = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_STRING );
+		if ( ! empty( $subscription_id ) && ( ! empty( $kco_action ) && 'subs-payment-changed' === $kco_action ) ) {
+			// $order_id = wc_get_order_id_by_order_key( sanitize_key( $key ) );
+			// $order    = wc_get_order( $order_id );
+			$subscription = wcs_get_subscription( $subscription_id );
 
 			// Add recurring token to order via Checkout API.
-			$response_data = KCO_WC()->api->request_pre_get_order( $klarna_order_id );
-			if ( ! is_wp_error( $response_data ) && ( $response_data['response']['code'] >= 200 && $response_data['response']['code'] <= 299 ) ) {
-				$klarna_order_data = json_decode( $response_data['body'] );
-				if ( isset( $klarna_order_data->recurring_token ) && ! empty( $klarna_order_data->recurring_token ) ) {
-					update_post_meta( $order->get_id(), '_kco_recurring_token', sanitize_key( $klarna_order_data->recurring_token ) );
+			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+			if ( ! is_wp_error( $klarna_order ) ) {
+
+				if ( isset( $klarna_order['recurring_token'] ) && ! empty( $klarna_order['recurring_token'] ) ) {
+					update_post_meta( $subscription_id, '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
 					// translators: %s Klarna recurring token.
-					$note = sprintf( __( 'Payment method changed via Klarna Checkout. New recurring token for subscription: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order_data->recurring_token ) );
-					$order->add_order_note( $note );
+					$note = sprintf( __( 'Payment method changed via Klarna Checkout. New recurring token for subscription: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['recurring_token'] ) );
+					$subscription->add_order_note( $note );
 				}
 			} else {
 				// Retrieve error.
-				$note = sprintf( __( 'Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order_data->recurring_token ) );
-				$order->add_order_note( $note );
+				$error_message = $klarna_order->get_error_message();
+				$note          = sprintf( __( 'Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information.', 'klarna-checkout-for-woocommerce' ), $error_message );
+				$subscription->add_order_note( $note );
 			}
 
 			// Acknowledge order in Klarna.
 			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
-			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
+			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $subscription_id );
 
 			exit;
 		}
