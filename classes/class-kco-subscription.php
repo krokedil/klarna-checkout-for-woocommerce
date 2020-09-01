@@ -293,7 +293,7 @@ class KCO_Subscription {
 	}
 
 	/**
-	 * Handle pus callback from Klarna if this is a KCO subscription payment method change.
+	 * Handle push callback from Klarna if this is a KCO subscription payment method change.
 	 *
 	 * @param string $klarna_order_id The order id for the Klarna order.
 	 * @return void
@@ -302,14 +302,12 @@ class KCO_Subscription {
 		$subscription_id = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_STRING );
 		$kco_action      = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_STRING );
 		if ( ! empty( $subscription_id ) && ( ! empty( $kco_action ) && 'subs-payment-changed' === $kco_action ) ) {
-			// $order_id = wc_get_order_id_by_order_key( sanitize_key( $key ) );
-			// $order    = wc_get_order( $order_id );
+
 			$subscription = wcs_get_subscription( $subscription_id );
 
 			// Add recurring token to order via Checkout API.
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( ! is_wp_error( $klarna_order ) ) {
-
 				if ( isset( $klarna_order['recurring_token'] ) && ! empty( $klarna_order['recurring_token'] ) ) {
 					update_post_meta( $subscription_id, '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
 					// translators: %s Klarna recurring token.
