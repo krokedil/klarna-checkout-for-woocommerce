@@ -305,6 +305,36 @@ class KCO_Request_Cart {
 			}
 		}
 
+		// WC Gift Card compatibilty check.
+		if ( class_exists( 'WC_GC_Gift_Cards' ) ) {
+			/**
+			 * @var WC_GC_Gift_Card_Data $wc_gc_gift_card_data
+			 */
+			foreach ( WC_GC()->giftcards->get_applied_giftcards_from_session() as $wc_gc_gift_card_data ) {
+
+				$gift_card_code = $wc_gc_gift_card_data->get_data()['code'];
+
+				$gift_card_amount = - $wc_gc_gift_card_data->get_data()['balance'] * 100;
+
+				$gift_card = array(
+					'type'                  => 'gift_card',
+					'reference'             => $gift_card_code,
+					'name'                  => 'Gift Card',
+					'quantity'              => 1,
+					'tax_rate'              => 0,
+					'total_discount_amount' => 0,
+					'total_tax_amount'      => 0,
+
+					'unit_price'            => $gift_card_amount,
+					'total_amount'          => $gift_card_amount,
+
+				);
+
+				$this->order_lines[] = $gift_card;
+
+			}
+		}
+
 		// YITH Gift Cards.
 		if ( ! empty( WC()->cart->applied_gift_cards ) ) {
 			foreach ( WC()->cart->applied_gift_cards as $coupon_key => $code ) {
