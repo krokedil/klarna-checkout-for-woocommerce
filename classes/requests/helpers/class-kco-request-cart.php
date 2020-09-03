@@ -163,7 +163,6 @@ class KCO_Request_Cart {
 					$product = wc_get_product( $cart_item['product_id'] );
 				}
 
-				error_log( $this->get_item_name( $cart_item ) );
 				$klarna_item = array(
 					'reference'             => $this->get_item_reference( $product ),
 					'name'                  => $this->get_item_name( $cart_item ),
