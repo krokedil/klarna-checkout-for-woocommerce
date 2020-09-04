@@ -43,8 +43,7 @@ class KCO_Logger {
 	 */
 	public static function format_data( $data ) {
 		if ( isset( $data['request']['body'] ) ) {
-			$request_body            = json_decode( $data['request']['body'], true );
-			$data['request']['body'] = $request_body;
+			$data['request']['body'] = json_decode( $data['request']['body'], true );
 		}
 		return $data;
 	}
