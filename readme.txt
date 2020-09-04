@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.4
+Tested up to: 5.5
 Requires PHP: 5.6
 WC requires at least: 3.4.0
-WC tested up to: 4.2.0
+WC tested up to: 4.4.1
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,17 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.09.01    - version 2.1.4 =
+* Tweak         - Added action kco_wc_confirm_klarna_order so other plugins can hook into the confirm order process.
+* Fix           - Redirect customer to thankyou page if response to an update request returns a READ_ONLY message from Klarna.
+* Fix           - Updated subscription payment method change to work properly with KCO v2.x.
+
+= 2020.07.30    - version 2.1.3 =
+* Fix           - Remove kcoResume in shipping_option_change to avoid issues with order total not being displayed correct when changing shipping options with KSS (Klarna Shipping Service).
+
+= 2020.07.29    - version 2.1.2 =
+* Fix           - Fixed an issue with regions for Ireland.
+
 = 2020.07.03    - version 2.1.1 =
 * Fix           - Fixed an issue that made the iFrame to not be suspended on update_checkout event. Caused the iFrame to not update to display the proper information.
 
