@@ -56,7 +56,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_title_mandatory() {
-		$title_mandatory = array_key_exists( 'title_mandatory', $this->settings ) && 'yes' === $this->settings['title_mandatory'];
+		$title_mandatory = isset( $this->settings ) && 'yes' === $this->settings['title_mandatory'];
 
 		return $title_mandatory;
 	}
@@ -67,7 +67,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_allow_separate_shipping_address() {
-		$allow_separate_shipping = array_key_exists( 'allow_separate_shipping', $this->settings ) && 'yes' === $this->settings['allow_separate_shipping'];
+		$allow_separate_shipping = isset( $this->settings ) && 'yes' === $this->settings['allow_separate_shipping'];
 
 		return $allow_separate_shipping;
 	}
@@ -78,7 +78,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_dob_mandatory() {
-		$dob_mandatory = array_key_exists( 'dob_mandatory', $this->settings ) && 'yes' === $this->settings['dob_mandatory'];
+		$dob_mandatory = isset( $this->settings ) && 'yes' === $this->settings['dob_mandatory'];
 
 		return $dob_mandatory;
 	}
@@ -163,7 +163,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_shipping_details() {
-		if ( array_key_exists( 'shipping_details', $this->settings ) ) {
+		if ( isset( $this->settings ) ) {
 			return $this->settings['shipping_details'];
 		}
 
@@ -177,7 +177,7 @@ class KCO_Request_Options {
 	 * @return array|bool
 	 */
 	private function check_option_field( $field ) {
-		if ( array_key_exists( $field, $this->settings ) && '' !== $this->settings[ $field ] ) {
+		if ( isset( $this->settings ) && '' !== $this->settings[ $field ] ) {
 			return $this->settings[ $field ];
 		}
 
