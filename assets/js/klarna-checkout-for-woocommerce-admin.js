@@ -45,7 +45,6 @@ jQuery( function($) {
 
 	function testCredentail() {
 		var field = $(this);
-		var regex = /[A-Za-z]{1,2}[0-9]{5}/;
 
 		// Remove any old blocks at this point.
 		field.removeClass( 'bad_credential' );
@@ -56,7 +55,9 @@ jQuery( function($) {
 			return;
 		}
 
-		if ( ! regex.test( field.val() ) ) {
+		var regex = /[A-Za-z]{1,2}[0-9]{5}/;
+		
+		if ( !regex.test( field.val() ) ) {
 			field.addClass( 'bad_credential' );
 			$('button[name="save"]').attr( 'disabled', 'disabled' );
 			window.alert('Please verify your Klarna Credentials.');
