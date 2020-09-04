@@ -389,8 +389,7 @@ class KCO_Request_Cart {
 	 * @return string $item_name Cart item name.
 	 */
 	public function get_item_name( $cart_item ) {
-		$cart_item_data = $cart_item['data'];
-		$item_name      = substr( $cart_item_data->get_name(), 0, 254 );
+		$item_name = substr( $cart_item['data']->get_name(), 0, 254 );
 
 		return wp_strip_all_tags( $item_name );
 	}
