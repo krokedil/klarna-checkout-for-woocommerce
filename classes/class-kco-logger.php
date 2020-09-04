@@ -18,7 +18,7 @@ class KCO_Logger {
 	 *
 	 * @var $log
 	 */
-	public static $log;
+	private static $log;
 
 	/**
 	 * Logs an event.
