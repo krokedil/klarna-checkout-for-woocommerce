@@ -52,6 +52,38 @@ class KCO_API {
 		$request  = new KCO_Request_Update();
 		$response = $request->request( $klarna_order_id, $order_id, $force );
 
+		// If the update results in a READ_ONLY_ORDER response, let's try to redirect the customer to thank you page.
+		if ( is_wp_error( $response ) ) {
+
+			// Data is returned as both json and string. Let's try to grab only the json data.
+			$extracted_response = strstr( $response->get_error_message(), '}', true ) . '}';
+			$extracted_response = json_decode( $extracted_response );
+			if ( 'READ_ONLY_ORDER' === $extracted_response->error_code ) {
+
+				$query_args = array(
+					'fields'      => 'ids',
+					'post_type'   => wc_get_order_types(),
+					'post_status' => array_keys( wc_get_order_statuses() ),
+					'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
+					'meta_value'  => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
+					'date_query'  => array(
+						array(
+							'after' => '2 day ago',
+						),
+					),
+				);
+
+				$orders   = get_posts( $query_args );
+				$order_id = $orders[0];
+				$order    = wc_get_order( $order_id );
+
+				if ( $order ) {
+					wp_safe_redirect( $order->get_checkout_order_received_url() );
+					exit;
+				}
+			}
+		}
+
 		return $this->check_for_api_error( $response );
 	}
 

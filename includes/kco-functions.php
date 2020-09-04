@@ -482,6 +482,10 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
 		// Get the Klarna OM order.
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 		if ( ! is_wp_error( $klarna_order ) ) {
+
+			// Let other plugins hook into this sequence.
+			do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
+
 			// Acknowledge order in Klarna.
 			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
 			// Set the merchant references for the order.
@@ -526,6 +530,16 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
  * @return string
  */
 function kco_convert_region( $region_string, $country_code ) {
+	// Country specific formatting.
+	switch ( $country_code ) {
+		case 'ie':
+			// If ireland, then remove "CO. " from the region string.
+			$region_string = str_replace( 'CO. ', '', $region_string );
+			break;
+		default:
+			break;
+	}
+
 	$region_string = htmlentities( mb_convert_case( $region_string, MB_CASE_TITLE, 'UTF-8' ), ENT_XHTML, 'UTF-8' );
 	$states        = include WC()->plugin_path() . '/i18n/states.php';
 	if ( key_exists( strtoupper( $country_code ), $states ) ) {
