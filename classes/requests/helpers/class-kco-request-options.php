@@ -89,28 +89,24 @@ class KCO_Request_Options {
 	 * @return string
 	 */
 	private function get_allowed_customer_types() {
-		// Allow external payment method plugin to do its thing.
-		// @TODO: Extract this into a hooked function.
-		if ( in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) ) {
-			if ( isset( $this->settings['allowed_customer_types'] ) ) {
-				$customer_types_setting = $this->settings['allowed_customer_types'];
 
-				switch ( $customer_types_setting ) {
-					case 'B2B':
-						$allowed_customer_types = array( 'organization' );
-						break;
-					case 'B2BC':
-						$allowed_customer_types = array( 'person', 'organization' );
-						break;
-					case 'B2CB':
-						$allowed_customer_types = array( 'person', 'organization' );
-						break;
-					default:
-						$allowed_customer_types = array( 'person' );
-				}
+		if ( null !== in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) && isset( $this->settings['allowed_customer_types'] ) ) {
+			$customer_types_setting = $this->settings['allowed_customer_types'];
 
-				return $allowed_customer_types;
+			switch ( $customer_types_setting ) {
+				case 'B2B':
+					$allowed_customer_types = array( 'organization' );
+					break;
+				case 'B2BC':
+					$allowed_customer_types = array( 'person', 'organization' );
+					break;
+				case 'B2CB':
+					$allowed_customer_types = array( 'person', 'organization' );
+					break;
+				default:
+					$allowed_customer_types = array( 'person' );
 			}
+				return $allowed_customer_types;
 		}
 	}
 
