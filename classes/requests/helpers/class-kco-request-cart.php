@@ -92,7 +92,6 @@ class KCO_Request_Cart {
 	/**
 	 * Gets order amount for Klarna API.
 	 *
-	 * @param array $order_lines Order lines from cart.
 	 * @return int
 	 */
 	public function get_order_lines_total_amount() {
@@ -498,10 +497,8 @@ class KCO_Request_Cart {
 	 */
 	public function get_item_price( $cart_item ) {
 		if ( $this->separate_sales_tax ) {
-			// $item_subtotal = $cart_item['line_subtotal'] / $cart_item['quantity'];
 			$item_subtotal = $this->subtotal_amount / $this->quantity;
 		} else {
-			// $item_subtotal = ( $cart_item['line_subtotal'] / $cart_item['quantity'] ) + ( array_sum( $cart_item['line_tax_data']['subtotal'] ) / $cart_item['quantity'] );
 			$item_subtotal = ( $this->subtotal_amount / $this->quantity ) + ( $this->subtotal_tax_amount / $this->quantity );
 		}
 
