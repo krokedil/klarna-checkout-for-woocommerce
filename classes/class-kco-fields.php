@@ -77,7 +77,7 @@ class KCO_Fields {
 			),
 			// EU.
 			'credentials_eu'             => array(
-				'title' => '<img src="' . plugins_url( 'assets/img/flags/eu.svg', KCO_WC_MAIN_FILE ) . '" height="12" /> API Credentials Europe',
+				'title' => '<img src="' . KCO_WC_PLUGIN_URL . '/assets/img/flags/eu.svg' . '" height="12" /> API Credentials Europe',
 				'type'  => 'title',
 			),
 			'merchant_id_eu'             => array(
@@ -122,7 +122,7 @@ class KCO_Fields {
 			),
 			// US.
 			'credentials_us'             => array(
-				'title' => '<img src="' . plugins_url( 'assets/img/flags/us.svg', KCO_WC_MAIN_FILE ) . '" height="12" /> API Credentials United States',
+				'title' => '<img src="' . KCO_WC_PLUGIN_URL . '/assets/img/flags/us.svg' . '" height="12" /> API Credentials United States',
 				'type'  => 'title',
 			),
 			'merchant_id_us'             => array(
