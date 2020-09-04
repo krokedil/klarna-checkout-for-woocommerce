@@ -258,19 +258,18 @@ class KCO_Request_Cart {
 						$coupon_reference = __( 'Gift card', 'klarna-checkout-for-woocommerce' );
 					}
 					$coupon_tax_amount = - WC()->cart->get_coupon_discount_tax_amount( $coupon_key ) * 100;
-				} else {
-					if ( 'US' === $this->shop_country ) {
+				} elseif ( 'US' === $this->shop_country ) {
 						$coupon_amount     = 0;
 						$coupon_tax_amount = 0;
-						if ( $coupon->is_type( 'fixed_cart' ) || $coupon->is_type( 'percent' ) ) {
-							$coupon_type = 'Cart discount';
-						} elseif ( $coupon->is_type( 'fixed_product' ) || $coupon->is_type( 'percent_product' ) ) {
-							$coupon_type = 'Product discount';
-						} else {
-							$coupon_type = 'Discount';
-						}
-						$coupon_reference = $coupon_type . ' (amount: ' . WC()->cart->get_coupon_discount_amount( $coupon_key ) . ', tax amount: ' . WC()->cart->get_coupon_discount_tax_amount( $coupon_key ) . ')';
+					if ( $coupon->is_type( 'fixed_cart' ) || $coupon->is_type( 'percent' ) ) {
+						$coupon_type = 'Cart discount';
+					} elseif ( $coupon->is_type( 'fixed_product' ) || $coupon->is_type( 'percent_product' ) ) {
+						$coupon_type = 'Product discount';
+					} else {
+						$coupon_type = 'Discount';
 					}
+						$coupon_reference = $coupon_type . ' (amount: ' . WC()->cart->get_coupon_discount_amount( $coupon_key ) . ', tax amount: ' . WC()->cart->get_coupon_discount_tax_amount( $coupon_key ) . ')';
+
 				}
 				// Add separate discount line item, but only if it's a smart coupon or country is US.
 				if ( 'US' === $this->shop_country && 'smart_coupon' !== $coupon->get_discount_type() ) {
