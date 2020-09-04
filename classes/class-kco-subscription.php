@@ -263,7 +263,7 @@ class KCO_Subscription {
 						woocommerce_wp_text_input(
 							array(
 								'id'            => '_kco_recurring_token',
-								'label'         => __( 'Klarna recurring token' ),
+								'label'         => __( 'Klarna recurring token', 'klarna-checkout-for-woocommerce' ),
 								'wrapper_class' => '_billing_company_field',
 							)
 						);
