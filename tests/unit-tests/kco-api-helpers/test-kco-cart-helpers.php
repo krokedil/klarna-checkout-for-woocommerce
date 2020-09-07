@@ -215,67 +215,91 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
 		$this->settup_cart( '25' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
-			$item_price_25_inc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
+			$item_price_25_inc = $cart_helper->get_item_price( $cart_item );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
 		$this->settup_cart( '12' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
-			$item_price_12_inc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
+			$item_price_12_inc = $cart_helper->get_item_price( $cart_item );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
 		$this->settup_cart( '6' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
-			$item_price_6_inc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
+			$item_price_6_inc = $cart_helper->get_item_price( $cart_item );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
 		$this->settup_cart( '0' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
-			$item_price_0_inc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
+			$item_price_0_inc = $cart_helper->get_item_price( $cart_item );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 		// 25% exc tax.
 		$this->settup_cart( '25' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
-			$item_price_25_exc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
+			$item_price_25_exc = $cart_helper->get_item_price( $cart_item );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 12% exc tax.
 		$this->settup_cart( '12' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
-			$item_price_12_exc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
+			$item_price_12_exc = $cart_helper->get_item_price( $cart_item );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 6% exc tax.
 		$this->settup_cart( '6' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
-			$item_price_6_exc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
+			$item_price_6_exc = $cart_helper->get_item_price( $cart_item );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 0% exc tax.
 		$this->settup_cart( '0' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
-			$item_price_0_exc = ( new KCO_Request_Cart() )->get_item_price( $cart_item );
+			$item_price_0_exc = $cart_helper->get_item_price( $cart_item );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// Clear data.
@@ -414,75 +438,99 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
 		$this->settup_cart( '25' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                  = $this->get_product( $cart_item );
-			$item_total_amount_25_inc = ( new KCO_Request_Cart() )->get_item_total_amount( $cart_item, $product );
+			$item_total_amount_25_inc = $cart_helper->get_item_total_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
 		$this->settup_cart( '12' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                  = $this->get_product( $cart_item );
-			$item_total_amount_12_inc = ( new KCO_Request_Cart() )->get_item_total_amount( $cart_item, $product );
+			$item_total_amount_12_inc = $cart_helper->get_item_total_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
 		$this->settup_cart( '6' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                 = $this->get_product( $cart_item );
-			$item_total_amount_6_inc = ( new KCO_Request_Cart() )->get_item_total_amount( $cart_item, $product );
+			$item_total_amount_6_inc = $cart_helper->get_item_total_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
 		$this->settup_cart( '0' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                 = $this->get_product( $cart_item );
-			$item_total_amount_0_inc = ( new KCO_Request_Cart() )->get_item_total_amount( $cart_item, $product );
+			$item_total_amount_0_inc = $cart_helper->get_item_total_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 		// 25% exc tax.
 		$this->settup_cart( '25' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                  = $this->get_product( $cart_item );
-			$item_total_amount_25_exc = ( new KCO_Request_Cart() )->get_item_total_amount( $cart_item, $product );
+			$item_total_amount_25_exc = $cart_helper->get_item_total_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 12% exc tax.
 		$this->settup_cart( '12' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                  = $this->get_product( $cart_item );
-			$item_total_amount_12_exc = ( new KCO_Request_Cart() )->get_item_total_amount( $cart_item, $product );
+			$item_total_amount_12_exc = $cart_helper->get_item_total_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 6% exc tax.
 		$this->settup_cart( '6' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                 = $this->get_product( $cart_item );
-			$item_total_amount_6_exc = ( new KCO_Request_Cart() )->get_item_total_amount( $cart_item, $product );
+			$item_total_amount_6_exc = $cart_helper->get_item_total_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 0% exc tax.
 		$this->settup_cart( '0' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                 = $this->get_product( $cart_item );
-			$item_total_amount_0_exc = ( new KCO_Request_Cart() )->get_item_total_amount( $cart_item, $product );
+			$item_total_amount_0_exc = $cart_helper->get_item_total_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// Clear data.
@@ -518,75 +566,99 @@ class Test_KCO_Cart_Helpers extends AKrokedil_Unit_Test_Case {
 		update_option( 'woocommerce_prices_include_tax', 'yes' );
 		// 25% inc tax.
 		$this->settup_cart( '25' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                = $this->get_product( $cart_item );
-			$item_tax_amount_25_inc = ( new KCO_Request_Cart() )->get_item_tax_amount( $cart_item, $product );
+			$item_tax_amount_25_inc = $cart_helper->get_item_tax_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 12% inc tax.
 		$this->settup_cart( '12' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                = $this->get_product( $cart_item );
-			$item_tax_amount_12_inc = ( new KCO_Request_Cart() )->get_item_tax_amount( $cart_item, $product );
+			$item_tax_amount_12_inc = $cart_helper->get_item_tax_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 6% inc tax.
 		$this->settup_cart( '6' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product               = $this->get_product( $cart_item );
-			$item_tax_amount_6_inc = ( new KCO_Request_Cart() )->get_item_tax_amount( $cart_item, $product );
+			$item_tax_amount_6_inc = $cart_helper->get_item_tax_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 0% inc tax.
 		$this->settup_cart( '0' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product               = $this->get_product( $cart_item );
-			$item_tax_amount_0_inc = ( new KCO_Request_Cart() )->get_item_tax_amount( $cart_item, $product );
+			$item_tax_amount_0_inc = $cart_helper->get_item_tax_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		update_option( 'woocommerce_prices_include_tax', 'no' );
 		// 25% exc tax.
 		$this->settup_cart( '25' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                = $this->get_product( $cart_item );
-			$item_tax_amount_25_exc = ( new KCO_Request_Cart() )->get_item_tax_amount( $cart_item, $product );
+			$item_tax_amount_25_exc = $cart_helper->get_item_tax_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 12% exc tax.
 		$this->settup_cart( '12' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product                = $this->get_product( $cart_item );
-			$item_tax_amount_12_exc = ( new KCO_Request_Cart() )->get_item_tax_amount( $cart_item, $product );
+			$item_tax_amount_12_exc = $cart_helper->get_item_tax_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 6% exc tax.
 		$this->settup_cart( '6' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product               = $this->get_product( $cart_item );
-			$item_tax_amount_6_exc = ( new KCO_Request_Cart() )->get_item_tax_amount( $cart_item, $product );
+			$item_tax_amount_6_exc = $cart_helper->get_item_tax_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// 0% exc tax.
 		$this->settup_cart( '0' );
-		$cart_items = WC()->cart->get_cart();
+		$cart_items  = WC()->cart->get_cart();
+		$cart_helper = new KCO_Request_Cart();
+		$cart_helper->process_cart();
 		foreach ( $cart_items as $cart_item ) {
 			$product               = $this->get_product( $cart_item );
-			$item_tax_amount_0_exc = ( new KCO_Request_Cart() )->get_item_tax_amount( $cart_item, $product );
+			$item_tax_amount_0_exc = $cart_helper->get_item_tax_amount( $cart_item, $product );
 		}
+		$cart_helper = null;
 		WC()->cart->empty_cart();
 
 		// Clear data.

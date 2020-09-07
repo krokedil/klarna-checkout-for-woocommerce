@@ -62,6 +62,14 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.09.07    - version 2.2.0 =
+* Enhancement   - Improvement to how we calculate taxes for the Klarna orders. This should improve compatibility with other plugins and adds better support for things like zero decimals.
+* Enhancement   - Added compatibility with the plugin WooCommerce Gift Cards. https://woocommerce.com/products/gift-cards/
+* Enhancement   - Added the action 'woocommerce_review_order_before_submit' to our template. It is added before the iFrame.
+* Enhancement   - Added compatibility for the WP GDPR Compliance plugin.
+* Fix           - Fixed an issue with zero decimals.
+* Fix           - Fixed an issue with WooCommerce subscription when using a startup fee for the subscriptions parent order.
+
 = 2020.09.01    - version 2.1.4 =
 * Tweak         - Added action kco_wc_confirm_klarna_order so other plugins can hook into the confirm order process.
 * Fix           - Redirect customer to thankyou page if response to an update request returns a READ_ONLY message from Klarna.
