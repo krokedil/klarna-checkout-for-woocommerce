@@ -127,16 +127,16 @@ class KCO_Confirmation {
 			wc_print_notice( __( 'Failed to find the payment method for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
 			return;
 		}
+		// Everything is fine, redirect to the URL specified by the gateway.
+		WC()->session->set( 'chosen_payment_method', $epm );
+		$order->set_payment_method( $payment_methods[ $epm ] );
+		$order->save();
 		$result = $payment_methods[ $epm ]->process_payment( $order_id );
 		// Check if the result is good.
 		if ( ! isset( $result['result'] ) || 'success' !== $result['result'] ) {
 			wc_print_notice( __( 'Something went wrong with the external payment. Please try again', 'klarna-checkout-for-woocommerce' ), 'error' );
 			return;
 		}
-		// Everything is fine, redirect to the URL specified by the gateway.
-		WC()->session->set( 'chosen_payment_method', $epm );
-		$order->set_payment_method( $payment_methods[ $epm ] );
-		$order->save();
 		wp_redirect( $result['redirect'] ); // phpcs:ignore
 		exit;
 	}
