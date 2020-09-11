@@ -64,5 +64,62 @@ jQuery( function($) {
 		}
 	}
 
+	//Checkbox
+	const testCheckBox = $('#woocommerce_kco_testmode');
+	//EU
+	const EUmerchantIdField = $('#woocommerce_kco_test_merchant_id_eu');
+	const EUmerchantPasswordField = $('#woocommerce_kco_test_shared_secret_eu');
+	//US
+	const USmerchantIdField = $('#woocommerce_kco_test_merchant_id_eu');
+	const USmerchantPasswordField = $('#woocommerce_kco_test_shared_secret_eu');
+	//Save Changes
+	const saveChangesButton = $('.button-primary, .woocommerce-save-button');
+
+	function checkEmptyFields(){
+		if (testCheckBox.prop('checked')) {
+			if(location==='EU') {
+				saveChangesButton.prop('disabled', true);
+				if(!EUmerchantIdField.val() && !EUmerchantPasswordField.val()) {
+					alert('Please enter valid Test Merchant information');
+					EUmerchantIdField.focus();
+				} else if (!EUmerchantPasswordField.val()) {
+					alert('Please enter a valid Test Merchant Password');
+					EUmerchantPasswordField.focus();
+				} else if (!EUmerchantIdField.val()) {
+					alert('Please enter a valid Test Merchant ID');
+					EUmerchantIdField.focus();
+				}else {
+					saveChangesButton.prop('disabled', false);
+				}
+			} else if (location==='US') {
+				saveChangesButton.prop('disabled', true);
+				if(!USmerchantIdField.val() && !USmerchantPasswordField.val()) {
+					alert('Please enter valid Test Merchant information');
+					USmerchantIdField.focus();
+				} else if (!USmerchantPasswordField.val()) {
+					alert('Please enter a valid Test Merchant Password');
+					USmerchantPasswordField.focus();
+				} else if (!USmerchantIdField.val()) {
+					alert('Please enter a valid Test Merchant ID');
+					USmerchantIdField.focus();
+				}else {
+					saveChangesButton.prop('disabled', false);
+				}
+			}
+		} else {
+			saveChangesButton.prop('disabled', false);
+		}
+	}
+
+	checkEmptyFields();
+
+	testCheckBox.click(function() {
+		checkEmptyFields();
+	})
+
 	$('body').on('change', credentialsFields, testCredentail);
 });
+
+
+
+

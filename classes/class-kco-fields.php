@@ -109,6 +109,7 @@ class KCO_Fields {
 				'custom_attributes' => array(
 					'autocomplete' => 'off',
 				),
+				'placeholder'       => 'Enter a valid test merchant ID',
 			),
 			'test_shared_secret_eu'      => array(
 				'title'             => __( 'Test Klarna API Password', 'klarna-checkout-for-woocommerce' ),
@@ -119,6 +120,7 @@ class KCO_Fields {
 				'custom_attributes' => array(
 					'autocomplete' => 'new-password',
 				),
+				'placeholder'       => 'Enter a valid test merchant password',
 			),
 			// US.
 			'credentials_us'             => array(
@@ -134,6 +136,7 @@ class KCO_Fields {
 				'custom_attributes' => array(
 					'autocomplete' => 'off',
 				),
+				'placeholder'       => 'Enter a valid test merchant ID',
 			),
 			'shared_secret_us'           => array(
 				'title'             => __( 'Production Klarna API Password', 'klarna-checkout-for-woocommerce' ),
@@ -144,6 +147,7 @@ class KCO_Fields {
 				'custom_attributes' => array(
 					'autocomplete' => 'new-password',
 				),
+				'placeholder'       => 'Enter a valid test merchant password',
 			),
 			'test_merchant_id_us'        => array(
 				'title'             => __( 'Test Klarna API Username', 'klarna-checkout-for-woocommerce' ),
