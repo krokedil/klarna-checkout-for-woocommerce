@@ -67,6 +67,8 @@ class KCO_Request_Cart {
 		$this->process_sales_tax();
 		$this->process_coupons();
 		$this->process_fees();
+
+		$this->adjust_order_lines();
 	}
 
 	/**
@@ -90,12 +92,11 @@ class KCO_Request_Cart {
 	/**
 	 * Gets order amount for Klarna API.
 	 *
-	 * @param array $order_lines Order lines from cart.
 	 * @return int
 	 */
-	public function get_order_lines_total_amount( $order_lines ) {
+	public function get_order_lines_total_amount() {
 		$total_amount = 0;
-		foreach ( $order_lines as $order_line ) {
+		foreach ( $this->order_lines as $order_line ) {
 			if ( 'sales_tax' === $order_line['type'] && ! $this->separate_sales_tax ) {
 				continue;
 			}
@@ -107,11 +108,10 @@ class KCO_Request_Cart {
 	/**
 	 * Adjust order lines if there is a mismatch with cart total.
 	 *
-	 * @param array $order_lines Order lines from cart.
-	 * @return int
+	 * @return array
 	 */
-	public function adjust_order_lines( $order_lines ) {
-		$amount_to_adjust = $this->get_order_amount() - $this->get_order_lines_total_amount( $order_lines );
+	public function adjust_order_lines() {
+		$amount_to_adjust = $this->get_order_amount() - $this->get_order_lines_total_amount( $this->order_lines );
 
 		$adjust_item = array(
 			'type'                  => 'surcharge',
@@ -125,8 +125,8 @@ class KCO_Request_Cart {
 			'total_tax_amount'      => 0,
 		);
 
-		$order_lines[] = $adjust_item;
-		return $order_lines;
+		$this->order_lines[] = $adjust_item;
+		return $this->order_lines;
 	}
 
 	/**
@@ -162,6 +162,13 @@ class KCO_Request_Cart {
 				} else {
 					$product = wc_get_product( $cart_item['product_id'] );
 				}
+
+				$this->total_amount        = self::format_number( $cart_item['line_total'] );
+				$this->subtotal_amount     = self::format_number( $cart_item['line_subtotal'] );
+				$this->total_tax_amount    = self::format_number( array_sum( $cart_item['line_tax_data']['total'] ) );
+				$this->subtotal_tax_amount = self::format_number( array_sum( $cart_item['line_tax_data']['subtotal'] ) );
+				$this->quantity            = $cart_item['quantity'];
+
 				$klarna_item = array(
 					'reference'             => $this->get_item_reference( $product ),
 					'name'                  => $this->get_item_name( $cart_item ),
@@ -188,7 +195,6 @@ class KCO_Request_Cart {
 						$klarna_item['image_url'] = $this->get_item_image_url( $product );
 					}
 				}
-
 				$this->order_lines[] = apply_filters( 'kco_wc_cart_line_item', $klarna_item, $cart_item );
 			}
 		}
@@ -301,6 +307,36 @@ class KCO_Request_Cart {
 					);
 					$this->order_lines[] = $discount;
 				}
+			}
+		}
+
+		/**
+		 * WooCommerce Gift Cards compatibility.
+		 */
+		if ( class_exists( 'WC_GC_Gift_Cards' ) ) {
+			/**
+			 * Use the applied giftcards.
+			 *
+			 * @var WC_GC_Gift_Card_Data $wc_gc_gift_card_data
+			 */
+			foreach ( WC_GC()->giftcards->get_applied_giftcards_from_session() as $wc_gc_gift_card_data ) {
+				$gift_card_code   = $wc_gc_gift_card_data->get_data()['code'];
+				$gift_card_amount = - $wc_gc_gift_card_data->get_data()['balance'] * 100;
+
+				$gift_card = array(
+					'type'                  => 'gift_card',
+					'reference'             => $gift_card_code,
+					'name'                  => __( 'Gift card', 'klarna-checkout-for-woocommerce' ),
+					'quantity'              => 1,
+					'tax_rate'              => 0,
+					'total_discount_amount' => 0,
+					'total_tax_amount'      => 0,
+					'unit_price'            => $gift_card_amount,
+					'total_amount'          => $gift_card_amount,
+				);
+
+				$this->order_lines[] = $gift_card;
+
 			}
 		}
 
@@ -459,12 +495,12 @@ class KCO_Request_Cart {
 	 */
 	public function get_item_price( $cart_item ) {
 		if ( $this->separate_sales_tax ) {
-			$item_subtotal = wc_get_price_excluding_tax( $cart_item['data'] );
+			$item_subtotal = $this->subtotal_amount / $this->quantity;
 		} else {
-			$item_subtotal = wc_get_price_including_tax( $cart_item['data'] );
+			$item_subtotal = ( $this->subtotal_amount / $this->quantity ) + ( $this->subtotal_tax_amount / $this->quantity );
 		}
-		$item_price = number_format( $item_subtotal, wc_get_price_decimals(), '.', '' ) * 100;
-		return round( $item_price );
+
+		return $item_subtotal;
 	}
 
 	/**
@@ -513,10 +549,10 @@ class KCO_Request_Cart {
 	 */
 	public function get_item_discount_amount( $cart_item, $product ) {
 
-		$order_line_max_amount = ( number_format( wc_get_price_including_tax( $cart_item['data'] ), wc_get_price_decimals(), '.', '' ) * $cart_item['quantity'] ) * 100;
-		$order_line_amount     = number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->get_item_tax_rate( $cart_item, $product ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
+		$order_line_max_amount = $this->subtotal_amount + $this->subtotal_tax_amount;
+		$order_line_amount     = $this->total_amount + $this->total_tax_amount;
 		if ( $this->separate_sales_tax ) {
-			$item_discount_amount = number_format( $cart_item['line_subtotal'] - $cart_item['line_total'], wc_get_price_decimals(), '.', '' ) * 100;
+			$item_discount_amount = $this->subtotal_amount - $this->total_amount;
 		} else {
 			if ( $order_line_amount < $order_line_max_amount ) {
 				$item_discount_amount = $order_line_max_amount - $order_line_amount;
@@ -588,19 +624,12 @@ class KCO_Request_Cart {
 	public function get_item_total_amount( $cart_item, $product ) {
 
 		if ( $this->separate_sales_tax ) {
-			$item_total_amount     = number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->get_item_tax_rate( $cart_item, $product ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
-			$max_order_line_amount = ( number_format( wc_get_price_including_tax( $cart_item['data'] ), wc_get_price_decimals(), '.', '' ) * $cart_item['quantity'] ) * 100;
+			$item_total_amount = $this->total_amount;
 		} else {
-			$item_total_amount     = number_format( ( $cart_item['line_total'] ) * ( 1 + ( $this->get_item_tax_rate( $cart_item, $product ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
-			$max_order_line_amount = ( number_format( wc_get_price_including_tax( $cart_item['data'] ), wc_get_price_decimals(), '.', '' ) * $cart_item['quantity'] ) * 100;
-		}
-		// Check so the line_total isn't greater than product price x quantity.
-		// This can happen when having price display set to 0 decimals.
-		if ( $item_total_amount > $max_order_line_amount ) {
-			$item_total_amount = $max_order_line_amount;
+			$item_total_amount = ( $this->total_amount + $this->total_tax_amount );
 		}
 
-		return round( $item_total_amount );
+		return $item_total_amount;
 	}
 
 	/**
@@ -668,12 +697,12 @@ class KCO_Request_Cart {
 	 */
 	public function get_shipping_amount() {
 		if ( $this->separate_sales_tax ) {
-			$shipping_amount = (int) number_format( WC()->cart->shipping_total * 100, 0, '', '' );
+			$shipping_amount = WC()->cart->shipping_total;
 		} else {
-			$shipping_amount = number_format( WC()->cart->shipping_total + WC()->cart->shipping_tax_total, wc_get_price_decimals(), '.', '' ) * 100;
+			$shipping_amount = WC()->cart->shipping_total + WC()->cart->shipping_tax_total;
 		}
 
-		return $shipping_amount;
+		return self::format_number( $shipping_amount );
 	}
 
 	/**
@@ -698,7 +727,7 @@ class KCO_Request_Cart {
 			$shipping_tax_rate = 0;
 		}
 
-		return round( $shipping_tax_rate );
+		return intval( round( $shipping_tax_rate ) );
 	}
 
 	/**
@@ -717,30 +746,16 @@ class KCO_Request_Cart {
 			$shipping_total_exluding_tax = $shiping_total_amount / ( 1 + ( $this->get_shipping_tax_rate() / 10000 ) );
 			$shipping_tax_amount         = $shiping_total_amount - $shipping_total_exluding_tax;
 		}
-		return round( $shipping_tax_amount );
+		return intval( round( $shipping_tax_amount ) );
 	}
 
 	/**
-	 * Get unrounded order tax amount.
+	 * Format the value as needed for the Klarna plugin.
 	 *
-	 * @since  1.8
-	 * @access public
-	 *
-	 * @return integer $total_order_tax unrounded tax amount for entire order.
+	 * @param int|float $value The unformated value.
+	 * @return int
 	 */
-	public function get_unrounded_order_tax_amount() {
-		$total_order_tax = 0;
-		foreach ( WC()->cart->get_cart() as $cart_item ) {
-			if ( $cart_item['quantity'] ) {
-				if ( $cart_item['variation_id'] ) {
-					$product = wc_get_product( $cart_item['variation_id'] );
-				} else {
-					$product = wc_get_product( $cart_item['product_id'] );
-				}
-				$total_order_tax += $this->get_item_tax_amount( $cart_item, $product );
-			}
-		}
-		return $total_order_tax;
+	public static function format_number( $value ) {
+		return intval( round( round( $value, wc_get_price_decimals() ) * 100 ) );
 	}
-
 }
