@@ -147,6 +147,7 @@ if ( ! class_exists( 'KCO' ) ) {
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
+			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
 		}
 
 		/**
@@ -155,7 +156,6 @@ if ( ! class_exists( 'KCO' ) ) {
 		public function init() {
 			// Init the gateway itself.
 			$this->init_gateways();
-			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
 		}
 
 		/**
@@ -204,6 +204,7 @@ if ( ! class_exists( 'KCO' ) ) {
 				echo wp_kses( $notice['message'], array( 'a' => array( 'href' => array() ) ) );
 				echo '</p></div>';
 			}
+
 		}
 
 		/**
