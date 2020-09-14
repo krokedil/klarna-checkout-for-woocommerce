@@ -65,15 +65,15 @@ jQuery( function($) {
 	}
 
 	//Checkbox
-	const testCheckBox = $('#woocommerce_kco_testmode');
+	var testCheckBox = $('#woocommerce_kco_testmode');
 	//EU
-	const EUmerchantIdField = $('#woocommerce_kco_test_merchant_id_eu');
-	const EUmerchantPasswordField = $('#woocommerce_kco_test_shared_secret_eu');
+	var EUmerchantIdField = $('#woocommerce_kco_test_merchant_id_eu');
+	var EUmerchantPasswordField = $('#woocommerce_kco_test_shared_secret_eu');
 	//US
-	const USmerchantIdField = $('#woocommerce_kco_test_merchant_id_eu');
-	const USmerchantPasswordField = $('#woocommerce_kco_test_shared_secret_eu');
+	var USmerchantIdField = $('#woocommerce_kco_test_merchant_id_eu');
+	var USmerchantPasswordField = $('#woocommerce_kco_test_shared_secret_eu');
 	//Save Changes
-	const saveChangesButton = $('.button-primary, .woocommerce-save-button');
+	var saveChangesButton = $('.button-primary, .woocommerce-save-button');
 
 	function checkEmptyFields(){
 		if (testCheckBox.prop('checked')) {
