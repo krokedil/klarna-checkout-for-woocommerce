@@ -53,7 +53,7 @@ if ( ! class_exists( 'KCO' ) ) {
 		 *
 		 * @var KCO $instance
 		 */
-		protected static $instance;
+		private static $instance;
 
 		/**
 		 * Reference to API class.
