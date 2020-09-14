@@ -9,7 +9,7 @@ var cleanCSS = require('gulp-clean-css');
 var wpPot = require('gulp-wp-pot');
 
 var cssFiles = 'assets/css/klarna-checkout-for-woocommerce.css';
-var jsFiles = 'assets/js/klarna-checkout-for-woocommerce.js';
+var jsFiles = ['assets/js/klarna-checkout-for-woocommerce.js', 'assets/js/klarna-checkout-for-woocommerce-admin.js'];
 var translateFiles = '**/*.php';
 
 gulp.task('makePOT', function () {
