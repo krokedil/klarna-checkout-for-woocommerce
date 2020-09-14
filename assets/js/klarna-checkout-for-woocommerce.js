@@ -50,7 +50,7 @@ jQuery( function( $ ) {
 						autoResume: {
 						  enabled: autoResumeBool
 						}
-					  });
+					});
 				});
 			}
 		},
