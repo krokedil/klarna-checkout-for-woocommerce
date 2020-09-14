@@ -203,6 +203,10 @@ class KCO_Subscription {
 			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( isset( $klarna_order['recurring_token'] ) ) {
 				$recurring_token = $klarna_order['recurring_token'];
+				// translators: %s Klarna recurring token.
+				$note = sprintf( __( 'Recurring token for subscription: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $recurring_token ) );
+				$wc_order->add_order_note( $note );
+
 				foreach ( $subcriptions as $subcription ) {
 					update_post_meta( $subcription->get_id(), '_kco_recurring_token', $recurring_token );
 				}
