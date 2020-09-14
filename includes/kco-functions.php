@@ -110,7 +110,7 @@ function kco_wc_prefill_allowed() {
 
 	if ( 'DE' === $base_location['country'] || 'AT' === $base_location['country'] ) {
 		$settings                = get_option( 'woocommerce_kco_settings' );
-		$consent_setting_checked = ( isset( $settings['prefill_consent'] ) && 'yes' === $settings['prefill_consent'] );
+		$consent_setting_checked = ( in_array( 'prefill_consent', $settings, true ) && 'yes' === $settings['prefill_consent'] );
 
 		if ( $consent_setting_checked && is_user_logged_in() && WC()->session->get( 'kco_wc_prefill_consent', false ) ) {
 			return true;
