@@ -110,9 +110,7 @@ jQuery( function($) {
 			saveChangesButton.prop('disabled', false);
 		}
 	}
-
-	checkEmptyFields();
-
+	
 	testCheckBox.click(function() {
 		checkEmptyFields();
 	})
