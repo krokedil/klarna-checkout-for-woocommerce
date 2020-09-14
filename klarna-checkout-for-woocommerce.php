@@ -5,12 +5,12 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 2.2.0
+ * Version: 2.1.3
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 3.2.0
- * WC tested up to: 4.4.1
+ * WC tested up to: 4.3.1
  *
  * Copyright (c) 2017-2020 Krokedil
  *
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.2.0' );
+define( 'KCO_WC_VERSION', '2.1.3' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -51,49 +51,49 @@ if ( ! class_exists( 'KCO' ) ) {
 		/**
 		 * The reference the *Singleton* instance of this class.
 		 *
-		 * @var $instance
+		 * @var KCO $instance
 		 */
 		protected static $instance;
 
 		/**
 		 * Reference to API class.
 		 *
-		 * @var $api
+		 * @var KCO_API $api
 		 */
 		public $api;
 
 		/**
 		 * Reference to merchant URLs class.
 		 *
-		 * @var $merchant_urls
+		 * @var KCO_Merchant_URLs $merchant_urls
 		 */
 		public $merchant_urls;
 
 		/**
 		 * Reference to order lines class.
 		 *
-		 * @var $order_lines
+		 * @var array $order_lines
 		 */
 		public $order_lines;
 
 		/**
 		 * Reference to credentials class.
 		 *
-		 * @var $credentials
+		 * @var KCO_Credentials $credentials
 		 */
 		public $credentials;
 
 		/**
 		 * Reference to logging class.
 		 *
-		 * @var $log
+		 * @var KCO_Logger $logger
 		 */
 		public $logger;
 
 		/**
 		 * Reference to order lines from order class.
 		 *
-		 * @var $log
+		 * @var array $order_lines_from_order
 		 */
 		public $order_lines_from_order;
 
