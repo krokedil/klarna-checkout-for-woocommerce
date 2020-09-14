@@ -35,6 +35,7 @@ class KCO_Logger {
 			self::$log->add( 'klarna-checkout-for-woocommerce', wp_json_encode( $message ) );
 		}
 	}
+
 	/**
 	 * Formats the log data to prevent json error.
 	 *
@@ -47,6 +48,7 @@ class KCO_Logger {
 		}
 		return $data;
 	}
+
 	/**
 	 * Formats the log data to be logged.
 	 *
