@@ -230,10 +230,10 @@ class KCO_Request_Order {
 		if ( $this->separate_sales_tax ) {
 			$shipping_tax_amount = 0;
 		} else {
-			$shiping_total_amount        = $this->get_shipping_total_amount( $order );
+			$shipping_total_amount       = $this->get_shipping_total_amount( $order );
 			$shipping_tax_rate           = ( '0' !== $order->get_shipping_tax() ) ? $this->get_order_line_tax_rate( $order, current( $order->get_items( 'shipping' ) ) ) : 0;
-			$shipping_total_exluding_tax = $shiping_total_amount / ( 1 + ( $shipping_tax_rate / 10000 ) );
-			$shipping_tax_amount         = $shiping_total_amount - $shipping_total_exluding_tax;
+			$shipping_total_exluding_tax = $shipping_total_amount / ( 1 + ( $shipping_tax_rate / 10000 ) );
+			$shipping_tax_amount         = $shipping_total_amount - $shipping_total_exluding_tax;
 		}
 		$this->total_tax += round( $shipping_tax_amount );
 		return round( $shipping_tax_amount );
@@ -265,11 +265,10 @@ class KCO_Request_Order {
 	/**
 	 * Get fee unit price.
 	 *
-	 * @param WC_Order       $order WC order.
 	 * @param boolean|object $order_fee Order fee.
 	 * @return int
 	 */
-	public function get_fee_unit_price( $order, $order_fee ) {
+	public function get_fee_unit_price( $order_fee ) {
 		if ( $this->separate_sales_tax ) {
 			$fee_subtotal = $order_fee->get_total() / $order_fee->get_quantity();
 		} else {
