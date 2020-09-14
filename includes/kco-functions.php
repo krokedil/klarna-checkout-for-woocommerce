@@ -449,7 +449,7 @@ function is_kco_confirmation() {
  * @param WP_Error $wp_error A WordPress error object.
  * @return void
  */
-function kco_extract_error_message( $wp_error ) {
+function kco_print_error_message( $wp_error ) {
 	wc_print_notice( $wp_error->get_error_message(), 'error' );
 }
 
