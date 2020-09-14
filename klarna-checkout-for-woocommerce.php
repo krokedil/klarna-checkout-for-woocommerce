@@ -100,7 +100,7 @@ if ( ! class_exists( 'KCO' ) ) {
 		/**
 		 * Returns the *Singleton* instance of this class.
 		 *
-		 * @return self::$instance The *Singleton* instance.
+		 * @return KCO The *Singleton* instance.
 		 */
 		public static function get_instance() {
 			if ( null === self::$instance ) {
@@ -185,7 +185,14 @@ if ( ! class_exists( 'KCO' ) ) {
 		public function get_setting_link() {
 			$section_slug = 'kco';
 
-			return admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . $section_slug );
+			$params = array(
+				'page'    => 'wc-settings',
+				'tab'     => 'checkout',
+				'section' => $section_slug,
+			);
+
+			$admin_url = add_query_arg( $params, 'admin.php' );
+			return $admin_url;
 		}
 
 		/**
