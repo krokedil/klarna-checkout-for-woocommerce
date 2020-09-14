@@ -29,7 +29,7 @@ class KCO_API_Callbacks {
 	 *
 	 * @var $instance
 	 */
-	protected static $instance;
+	private static $instance;
 
 	/**
 	 * Returns the *Singleton* instance of this class.
