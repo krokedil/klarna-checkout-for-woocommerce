@@ -43,7 +43,7 @@ jQuery( function($) {
 	titles.before('<hr style="margin-top:2em;margin-bottom:2em" />');
 	submit.before('<hr style="margin-top:2em;margin-bottom:2em" />');
 
-	function testCredentail() {
+	function testCredential() {
 		var field = $(this);
 
 		// Remove any old blocks at this point.
@@ -65,5 +65,5 @@ jQuery( function($) {
 		}
 	}
 
-	$('body').on('change', credentialsFields, testCredentail);
+	$('body').on('change', credentialsFields, testCredential);
 });
