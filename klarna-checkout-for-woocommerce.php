@@ -131,13 +131,6 @@ if ( ! class_exists( 'KCO' ) ) {
 		}
 
 		/**
-		 * Notices (array)
-		 *
-		 * @var array
-		 */
-		public $notices = array();
-
-		/**
 		 * Protected constructor to prevent creating a new instance of the
 		 * *Singleton* via the `new` operator from outside of this class.
 		 */
@@ -193,18 +186,6 @@ if ( ! class_exists( 'KCO' ) ) {
 
 			$admin_url = add_query_arg( $params, 'admin.php' );
 			return $admin_url;
-		}
-
-		/**
-		 * Display any notices we've collected thus far (e.g. for connection, disconnection)
-		 */
-		public function admin_notices() {
-			foreach ( (array) $this->notices as $notice_key => $notice ) {
-				echo "<div class='" . esc_attr( $notice['class'] ) . "'><p>";
-				echo wp_kses( $notice['message'], array( 'a' => array( 'href' => array() ) ) );
-				echo '</p></div>';
-			}
-
 		}
 
 		/**
