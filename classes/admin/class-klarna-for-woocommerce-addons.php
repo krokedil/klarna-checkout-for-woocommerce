@@ -63,7 +63,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		 * Add the Addons menu to WooCommerce
 		 **/
 		public function add_menu() {
-			$submenu = add_submenu_page( 'woocommerce', __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ), __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ), 'manage_woocommerce', 'checkout-addons', array( $this, 'options_page' ) );
+			add_submenu_page( 'woocommerce', __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ), __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ), 'manage_woocommerce', 'checkout-addons', array( $this, 'options_page' ) );
 		}
 
 		/**
