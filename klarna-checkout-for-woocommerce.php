@@ -135,7 +135,6 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * *Singleton* via the `new` operator from outside of this class.
 		 */
 		protected function __construct() {
-			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
