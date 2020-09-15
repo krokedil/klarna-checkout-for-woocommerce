@@ -17,14 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class KCO_API_Callbacks {
 
 	/**
-	 * Klarna purchase currency.
-	 * Used for multi currency calculation in callbacks if Aelia plugin is installed.
-	 *
-	 * @var bool
-	 */
-	public $klarna_purchase_currency = false;
-
-	/**
 	 * The reference the *Singleton* instance of this class.
 	 *
 	 * @var $instance
@@ -34,7 +26,7 @@ class KCO_API_Callbacks {
 	/**
 	 * Returns the *Singleton* instance of this class.
 	 *
-	 * @return self::$instance The *Singleton* instance.
+	 * @return KCO_API_Callbacks The *Singleton* instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
