@@ -90,7 +90,7 @@ class KCO_Request_Options {
 	 */
 	private function get_allowed_customer_types() {
 
-		if ( null !== in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) && isset( $this->settings['allowed_customer_types'] ) ) {
+		if ( in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) && isset( $this->settings['allowed_customer_types'] ) ) {
 			$customer_types_setting = $this->settings['allowed_customer_types'];
 
 			switch ( $customer_types_setting ) {
