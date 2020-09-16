@@ -324,7 +324,6 @@ class KCO_Subscription {
 			// Add recurring token to order via Checkout API.
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( ! is_wp_error( $klarna_order ) ) {
-				// if ( isset( $klarna_order['recurring_token'] ) && ! empty( $klarna_order['recurring_token'] ) ) {
 				if ( in_array( 'recurring_token', $klarna_order, true ) && in_array( 'recurring_token', $klarna_order, true ) ) {
 					update_post_meta( $subscription_id, '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
 					// translators: %s Klarna recurring token.
