@@ -46,12 +46,12 @@ services:
     command: >
       /bin/sh -c '
       wp core install --url=http://localhost --title="Example" --admin_user=admin --admin_password=password --admin_email=info@example.com --path=/var/www/html --skip-email;
-      wp site empty --yes;
       wp rewrite structure /%postname%/;
+      wp plugin install wordpress-importer --activate;
       wp plugin install woocommerce --activate;
       wp theme install storefront --activate;
       wp wc tool run install_pages --user=1;
-      wp wc product create --name="Test Product" --type=simple --sku=TEST_PROD --regular_price=100 --user=1
+      wp import wp-content/plugins/woocommerce/sample-data/sample_products.xml --authors=create;
       '
     volumes:
       - "./:/var/www/html/wp-content/plugins/test"
