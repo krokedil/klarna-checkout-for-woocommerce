@@ -145,6 +145,8 @@ class KCO_Request_Order {
 				}
 			}
 		}
+		// If we get here, there is no tax set for the order item. Return zero.
+		return 0;
 	}
 
 	/**
