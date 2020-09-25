@@ -18,7 +18,7 @@ class KCO_Logger {
 	 *
 	 * @var $log
 	 */
-	public static $log;
+	private static $log;
 
 	/**
 	 * Logs an event.
@@ -35,6 +35,7 @@ class KCO_Logger {
 			self::$log->add( 'klarna-checkout-for-woocommerce', wp_json_encode( $message ) );
 		}
 	}
+
 	/**
 	 * Formats the log data to prevent json error.
 	 *
@@ -43,11 +44,11 @@ class KCO_Logger {
 	 */
 	public static function format_data( $data ) {
 		if ( isset( $data['request']['body'] ) ) {
-			$request_body            = json_decode( $data['request']['body'], true );
-			$data['request']['body'] = $request_body;
+			$data['request']['body'] = json_decode( $data['request']['body'], true );
 		}
 		return $data;
 	}
+
 	/**
 	 * Formats the log data to be logged.
 	 *
