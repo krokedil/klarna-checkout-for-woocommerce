@@ -31,7 +31,7 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 		public function add_klarna_data_to_mail( $order ) {
 			$gateway_used = $order->get_payment_method();
 			$settings     = get_option( 'woocommerce_kco_settings' );
-			$add_to_email = 'yes' === $settings['add_to_email'] ? true : false;
+			$add_to_email = isset( $settings['add_to_email'] ) && 'yes' === $settings['add_to_email'] ? true : false;
 			if ( 'kco' === $gateway_used && $add_to_email ) {
 				$klarna_cs_url  = '<a href="https://www.klarna.com/customer-service">' . esc_html__( 'Klarna', 'klarna-checkout-for-woocommerce' ) . '</a>';
 				$klarna_app_url = '<a href="https://app.klarna.com/">' . esc_html__( 'Klarna App', 'klarna-checkout-for-woocommerce' ) . '</a>';
