@@ -268,12 +268,12 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function show_recurring_token( $order ) {
-		if ( 'shop_subscription' === $order->get_type() && get_post_meta( $order->get_id(), '_kco_recurring_token' ) ) {
+		if ( 'shop_subscription' === $order->get_type() && $order->get_meta( '_kco_recurring_token' ) ) {
 			?>
 			<div class="order_data_column" style="clear:both; float:none; width:100%;">
 				<div class="address">
 					<p>
-						<strong><?php echo esc_html( 'Klarna recurring token' ); ?>:</strong><?php echo esc_html( get_post_meta( $order->get_id(), '_kco_recurring_token', true ) ); ?>
+						<strong><?php echo esc_html( 'Klarna recurring token' ); ?>:</strong><?php echo esc_html( $order->get_meta( '_kco_recurring_token', true ) ); ?>
 					</p>
 				</div>
 				<div class="edit_address">
@@ -281,7 +281,7 @@ class KCO_Subscription {
 						woocommerce_wp_text_input(
 							array(
 								'id'            => '_kco_recurring_token',
-								'label'         => __( 'Klarna recurring token' ),
+								'label'         => __( 'Klarna recurring token', 'klarna-checkout-for-woocommerce' ),
 								'wrapper_class' => '_billing_company_field',
 							)
 						);
@@ -324,7 +324,7 @@ class KCO_Subscription {
 			// Add recurring token to order via Checkout API.
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( ! is_wp_error( $klarna_order ) ) {
-				if ( isset( $klarna_order['recurring_token'] ) && ! empty( $klarna_order['recurring_token'] ) ) {
+				if ( in_array( 'recurring_token', $klarna_order, true ) && in_array( 'recurring_token', $klarna_order, true ) ) {
 					update_post_meta( $subscription_id, '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
 					// translators: %s Klarna recurring token.
 					$note = sprintf( __( 'Payment method changed via Klarna Checkout. New recurring token for subscription: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['recurring_token'] ) );

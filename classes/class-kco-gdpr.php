@@ -38,7 +38,7 @@ class KCO_GDPR {
 				);
 			// @codingStandardsIgnoreEnd
 			wp_add_privacy_policy_content(
-				'Klarna Checkout for WooCommerce',
+				__( 'Klarna Checkout for WooCommerce', 'klarna-checkout-for-woocommerce' ),
 				wp_kses_post( wpautop( $content ) )
 			);
 		}

@@ -149,7 +149,7 @@ class KCO_API {
 	 */
 	private function check_for_api_error( $response ) {
 		if ( is_wp_error( $response ) ) {
-			kco_extract_error_message( $response );
+			kco_print_error_message( $response );
 			return false;
 		}
 		return $response;
