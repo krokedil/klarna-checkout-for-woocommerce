@@ -113,6 +113,11 @@ class KCO_Request_Cart {
 	public function adjust_order_lines() {
 		$amount_to_adjust = $this->get_order_amount() - $this->get_order_lines_total_amount( $this->order_lines );
 
+		// If the amount to adjust is zero, return.
+		if ( 0 === $amount_to_adjust ) {
+			return $this->order_lines;
+		}
+
 		$adjust_item = array(
 			'type'                  => 'surcharge',
 			'reference'             => '',
