@@ -45,7 +45,7 @@ services:
     user: xfs
     command: >
       /bin/sh -c '
-      wp core install --url=http://localhost --title="Example" --admin_user=admin --admin_password=password --admin_email=info@example.com --path=/var/www/html --skip-email;
+      wp core install --url=http://localhost --title="Klarna Checkout" --admin_user=admin --admin_password=password --admin_email=info@example.com --path=/var/www/html --skip-email;
       wp rewrite structure /%postname%/;
       wp plugin install wordpress-importer --activate;
       wp plugin install woocommerce --activate;
