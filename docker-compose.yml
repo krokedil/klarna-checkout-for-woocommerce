@@ -54,7 +54,7 @@ services:
       wp import wp-content/plugins/woocommerce/sample-data/sample_products.xml --authors=create;
       '
     volumes:
-      - "./:/var/www/html/wp-content/plugins/test"
+      - "./:/var/www/html/wp-content/plugins/klarna-checkout-for-woocommerce"
       - ./wp:/var/www/html
 
 volumes:
