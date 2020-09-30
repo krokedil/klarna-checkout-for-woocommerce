@@ -62,6 +62,15 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.09.30    - version 2.3.0 =
+* Feature       - Added support for getting Klarna subscription ID from _klarna_recurring_token (support for KCO v2 to v3 subscription transfer).
+* Enhancement   - Updated the flow of the EPM process. Sets the payment method before processing the payment.
+* Enhancement   - Added 10 second timeout to all requests made to Klarna.
+* Fix           - Prevent issue by adding a default tax rate of zero if tax rate is missing.
+* Fix           - Prevent adding a surcharge with zero value.
+* Fix           - Fixed an issue with the setting for adding Klarna links in the email not being set generating error notices.
+* Fix           - Fixed an issue with missing address data from Klarna generating a error notice.
+
 = 2020.09.07    - version 2.2.0 =
 * Enhancement   - Improvement to how we calculate taxes for the Klarna orders. This should improve compatibility with other plugins and adds better support for things like zero decimals.
 * Enhancement   - Added compatibility with the plugin WooCommerce Gift Cards. https://woocommerce.com/products/gift-cards/
