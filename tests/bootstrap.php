@@ -139,7 +139,7 @@ class Krokedil_Unit_Tests_Bootstrap {
 		if ( ! empty( $this->dependencies ) ) {
 			foreach ( $this->dependencies as $dir => $plugin_file ) {
 				if ( $this->docker ) {
-					require_once $this->plugin_dir . DIRECTORY_SEPARATOR . 'wp' . DIRECTORY_SEPARATOR . 'wp-content' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . $plugin_file;
+					require_once $this->plugin_dir . DIRECTORY_SEPARATOR . '.wp' . DIRECTORY_SEPARATOR . 'wp-content' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . $plugin_file;
 				} else {
 					require_once $this->plugins_dir . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . $plugin_file;
 				}
