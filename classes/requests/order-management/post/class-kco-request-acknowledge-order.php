@@ -42,6 +42,7 @@ class KCO_Request_Acknowledge_Order extends KCO_Request {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'method'     => 'POST',
+			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
 		);
 	}
 }

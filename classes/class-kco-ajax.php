@@ -301,8 +301,8 @@ class KCO_AJAX extends WC_AJAX {
 
 		wp_send_json_success(
 			array(
-				'billing_address'  => $klarna_order['billing_address'],
-				'shipping_address' => $klarna_order['shipping_address'],
+				'billing_address'  => isset( $klarna_order['billing_address'] ) ? $klarna_order['billing_address'] : array(),
+				'shipping_address' => isset( $klarna_order['shipping_address'] ) ? $klarna_order['shipping_address'] : array(),
 			)
 		);
 		wp_die();

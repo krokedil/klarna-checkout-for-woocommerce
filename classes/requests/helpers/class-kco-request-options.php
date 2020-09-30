@@ -56,7 +56,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_title_mandatory() {
-		$title_mandatory = array_key_exists( 'title_mandatory', $this->settings ) && 'yes' === $this->settings['title_mandatory'];
+		$title_mandatory = isset( $this->settings ) && 'yes' === $this->settings['title_mandatory'];
 
 		return $title_mandatory;
 	}
@@ -67,7 +67,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_allow_separate_shipping_address() {
-		$allow_separate_shipping = array_key_exists( 'allow_separate_shipping', $this->settings ) && 'yes' === $this->settings['allow_separate_shipping'];
+		$allow_separate_shipping = isset( $this->settings ) && 'yes' === $this->settings['allow_separate_shipping'];
 
 		return $allow_separate_shipping;
 	}
@@ -78,7 +78,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_dob_mandatory() {
-		$dob_mandatory = array_key_exists( 'dob_mandatory', $this->settings ) && 'yes' === $this->settings['dob_mandatory'];
+		$dob_mandatory = isset( $this->settings ) && 'yes' === $this->settings['dob_mandatory'];
 
 		return $dob_mandatory;
 	}
@@ -89,28 +89,24 @@ class KCO_Request_Options {
 	 * @return string
 	 */
 	private function get_allowed_customer_types() {
-		// Allow external payment method plugin to do its thing.
-		// @TODO: Extract this into a hooked function.
-		if ( in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) ) {
-			if ( isset( $this->settings['allowed_customer_types'] ) ) {
-				$customer_types_setting = $this->settings['allowed_customer_types'];
 
-				switch ( $customer_types_setting ) {
-					case 'B2B':
-						$allowed_customer_types = array( 'organization' );
-						break;
-					case 'B2BC':
-						$allowed_customer_types = array( 'person', 'organization' );
-						break;
-					case 'B2CB':
-						$allowed_customer_types = array( 'person', 'organization' );
-						break;
-					default:
-						$allowed_customer_types = array( 'person' );
-				}
+		if ( in_array( $this->get_purchase_country(), array( 'SE', 'NO', 'FI' ), true ) && isset( $this->settings['allowed_customer_types'] ) ) {
+			$customer_types_setting = $this->settings['allowed_customer_types'];
 
-				return $allowed_customer_types;
+			switch ( $customer_types_setting ) {
+				case 'B2B':
+					$allowed_customer_types = array( 'organization' );
+					break;
+				case 'B2BC':
+					$allowed_customer_types = array( 'person', 'organization' );
+					break;
+				case 'B2CB':
+					$allowed_customer_types = array( 'person', 'organization' );
+					break;
+				default:
+					$allowed_customer_types = array( 'person' );
 			}
+				return $allowed_customer_types;
 		}
 	}
 
@@ -163,7 +159,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_shipping_details() {
-		if ( array_key_exists( 'shipping_details', $this->settings ) ) {
+		if ( isset( $this->settings ) ) {
 			return $this->settings['shipping_details'];
 		}
 
@@ -177,7 +173,7 @@ class KCO_Request_Options {
 	 * @return array|bool
 	 */
 	private function check_option_field( $field ) {
-		if ( array_key_exists( $field, $this->settings ) && '' !== $this->settings[ $field ] ) {
+		if ( isset( $this->settings ) && '' !== $this->settings[ $field ] ) {
 			return $this->settings[ $field ];
 		}
 

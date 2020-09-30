@@ -109,6 +109,7 @@ class KCO_Request_Update extends KCO_Request {
 			'user-agent' => $this->get_user_agent(),
 			'method'     => 'POST',
 			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id ) ) ),
+			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
 		);
 	}
 }

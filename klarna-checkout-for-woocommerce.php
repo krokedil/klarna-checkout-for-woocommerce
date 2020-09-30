@@ -5,12 +5,12 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 2.2.0
+ * Version: 2.3.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 3.2.0
- * WC tested up to: 4.4.1
+ * WC tested up to: 4.5.2
  *
  * Copyright (c) 2017-2020 Krokedil
  *
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.2.0' );
+define( 'KCO_WC_VERSION', '2.3.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -51,56 +51,56 @@ if ( ! class_exists( 'KCO' ) ) {
 		/**
 		 * The reference the *Singleton* instance of this class.
 		 *
-		 * @var $instance
+		 * @var KCO $instance
 		 */
-		protected static $instance;
+		private static $instance;
 
 		/**
 		 * Reference to API class.
 		 *
-		 * @var $api
+		 * @var KCO_API $api
 		 */
 		public $api;
 
 		/**
 		 * Reference to merchant URLs class.
 		 *
-		 * @var $merchant_urls
+		 * @var KCO_Merchant_URLs $merchant_urls
 		 */
 		public $merchant_urls;
 
 		/**
 		 * Reference to order lines class.
 		 *
-		 * @var $order_lines
+		 * @var array $order_lines
 		 */
 		public $order_lines;
 
 		/**
 		 * Reference to credentials class.
 		 *
-		 * @var $credentials
+		 * @var KCO_Credentials $credentials
 		 */
 		public $credentials;
 
 		/**
 		 * Reference to logging class.
 		 *
-		 * @var $log
+		 * @var KCO_Logger $logger
 		 */
 		public $logger;
 
 		/**
 		 * Reference to order lines from order class.
 		 *
-		 * @var $log
+		 * @var array $order_lines_from_order
 		 */
 		public $order_lines_from_order;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
 		 *
-		 * @return self::$instance The *Singleton* instance.
+		 * @return KCO The *Singleton* instance.
 		 */
 		public static function get_instance() {
 			if ( null === self::$instance ) {
@@ -131,22 +131,15 @@ if ( ! class_exists( 'KCO' ) ) {
 		}
 
 		/**
-		 * Notices (array)
-		 *
-		 * @var array
-		 */
-		public $notices = array();
-
-		/**
 		 * Protected constructor to prevent creating a new instance of the
 		 * *Singleton* via the `new` operator from outside of this class.
 		 */
 		protected function __construct() {
-			add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 			add_action( 'plugins_loaded', array( $this, 'init' ) );
 
 			// Add quantity button in woocommerce_order_review() function.
 			add_filter( 'woocommerce_checkout_cart_item_quantity', array( $this, 'add_quantity_field' ), 10, 3 );
+			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
 		}
 
 		/**
@@ -155,7 +148,6 @@ if ( ! class_exists( 'KCO' ) ) {
 		public function init() {
 			// Init the gateway itself.
 			$this->init_gateways();
-			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
 		}
 
 		/**
@@ -185,18 +177,14 @@ if ( ! class_exists( 'KCO' ) ) {
 		public function get_setting_link() {
 			$section_slug = 'kco';
 
-			return admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . $section_slug );
-		}
+			$params = array(
+				'page'    => 'wc-settings',
+				'tab'     => 'checkout',
+				'section' => $section_slug,
+			);
 
-		/**
-		 * Display any notices we've collected thus far (e.g. for connection, disconnection)
-		 */
-		public function admin_notices() {
-			foreach ( (array) $this->notices as $notice_key => $notice ) {
-				echo "<div class='" . esc_attr( $notice['class'] ) . "'><p>";
-				echo wp_kses( $notice['message'], array( 'a' => array( 'href' => array() ) ) );
-				echo '</p></div>';
-			}
+			$admin_url = add_query_arg( $params, 'admin.php' );
+			return $admin_url;
 		}
 
 		/**

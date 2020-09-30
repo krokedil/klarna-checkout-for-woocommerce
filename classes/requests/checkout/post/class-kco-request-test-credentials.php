@@ -79,6 +79,7 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 			'user-agent' => $this->get_user_agent(),
 			'method'     => 'POST',
 			'body'       => wp_json_encode( $this->get_body() ),
+			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
 		);
 	}
 

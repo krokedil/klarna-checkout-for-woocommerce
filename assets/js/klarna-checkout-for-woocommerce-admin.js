@@ -43,9 +43,8 @@ jQuery( function($) {
 	titles.before('<hr style="margin-top:2em;margin-bottom:2em" />');
 	submit.before('<hr style="margin-top:2em;margin-bottom:2em" />');
 
-	function testCredentail() {
+	function testCredential() {
 		var field = $(this);
-		var regex = /[A-Za-z]{1,2}[0-9]{5}/;
 
 		// Remove any old blocks at this point.
 		field.removeClass( 'bad_credential' );
@@ -56,7 +55,9 @@ jQuery( function($) {
 			return;
 		}
 
-		if ( ! regex.test( field.val() ) ) {
+		var regex = /[A-Za-z]{1,2}[0-9]{5}/;
+		
+		if ( !regex.test( field.val() ) ) {
 			field.addClass( 'bad_credential' );
 			$('button[name="save"]').attr( 'disabled', 'disabled' );
 			window.alert('Please verify your Klarna Credentials.');
@@ -64,5 +65,60 @@ jQuery( function($) {
 		}
 	}
 
-	$('body').on('change', credentialsFields, testCredentail);
+	//Checkbox
+	var testCheckBox = $('#woocommerce_kco_testmode');
+	//EU
+	var EUmerchantIdField = $('#woocommerce_kco_test_merchant_id_eu');
+	var EUmerchantPasswordField = $('#woocommerce_kco_test_shared_secret_eu');
+	//US
+	var USmerchantIdField = $('#woocommerce_kco_test_merchant_id_eu');
+	var USmerchantPasswordField = $('#woocommerce_kco_test_shared_secret_eu');
+	//Save Changes
+	var saveChangesButton = $('.button-primary, .woocommerce-save-button');
+
+	function checkEmptyFields(){
+		if (testCheckBox.prop('checked')) {
+			if(location==='EU') {
+				saveChangesButton.prop('disabled', true);
+				if(!EUmerchantIdField.val() && !EUmerchantPasswordField.val()) {
+					alert('Please enter valid Test Merchant information');
+					EUmerchantIdField.focus();
+				} else if (!EUmerchantPasswordField.val()) {
+					alert('Please enter a valid Test Merchant Password');
+					EUmerchantPasswordField.focus();
+				} else if (!EUmerchantIdField.val()) {
+					alert('Please enter a valid Test Merchant ID');
+					EUmerchantIdField.focus();
+				}else {
+					saveChangesButton.prop('disabled', false);
+				}
+			} else if (location==='US') {
+				saveChangesButton.prop('disabled', true);
+				if(!USmerchantIdField.val() && !USmerchantPasswordField.val()) {
+					alert('Please enter valid Test Merchant information');
+					USmerchantIdField.focus();
+				} else if (!USmerchantPasswordField.val()) {
+					alert('Please enter a valid Test Merchant Password');
+					USmerchantPasswordField.focus();
+				} else if (!USmerchantIdField.val()) {
+					alert('Please enter a valid Test Merchant ID');
+					USmerchantIdField.focus();
+				}else {
+					saveChangesButton.prop('disabled', false);
+				}
+			}
+		} else {
+			saveChangesButton.prop('disabled', false);
+		}
+	}
+	
+	testCheckBox.click(function() {
+		checkEmptyFields();
+	})
+
+	$('body').on('change', credentialsFields, testCredential);
 });
+
+
+
+

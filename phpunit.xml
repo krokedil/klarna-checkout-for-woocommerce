@@ -7,6 +7,9 @@
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
 	>
+	<php>
+		<env name="docker" value="false"/>
+	</php>
 	<testsuites>
 		<!-- <testsuite name="Krokedil Test Suite">
 			<directory prefix="class-">./framework/</directory>

@@ -113,6 +113,11 @@ class KCO_Request_Cart {
 	public function adjust_order_lines() {
 		$amount_to_adjust = $this->get_order_amount() - $this->get_order_lines_total_amount( $this->order_lines );
 
+		// If the amount to adjust is zero, return.
+		if ( 0 === $amount_to_adjust ) {
+			return $this->order_lines;
+		}
+
 		$adjust_item = array(
 			'type'                  => 'surcharge',
 			'reference'             => '',
@@ -189,7 +194,7 @@ class KCO_Request_Cart {
 
 				// Add images.
 				$klarna_checkout_settings = get_option( 'woocommerce_kco_settings', array() );
-				if ( array_key_exists( 'send_product_urls', $klarna_checkout_settings ) && 'yes' === $klarna_checkout_settings['send_product_urls'] ) {
+				if ( isset( $klarna_checkout_settings ) && 'yes' === $klarna_checkout_settings['send_product_urls'] ) {
 					$klarna_item['product_url'] = $this->get_item_product_url( $product );
 					if ( $this->get_item_image_url( $product ) ) {
 						$klarna_item['image_url'] = $this->get_item_image_url( $product );
@@ -204,7 +209,7 @@ class KCO_Request_Cart {
 	 * Process WooCommerce shipping to Klarna Payments order lines.
 	 */
 	public function process_shipping() {
-		if ( WC()->shipping->get_packages() && WC()->session->get( 'chosen_shipping_methods' )[0] ) {
+		if ( WC()->shipping->get_packages() && empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
 			$shipping            = array(
 				'type'             => 'shipping_fee',
 				'reference'        => $this->get_shipping_reference(),
@@ -264,19 +269,18 @@ class KCO_Request_Cart {
 						$coupon_reference = __( 'Gift card', 'klarna-checkout-for-woocommerce' );
 					}
 					$coupon_tax_amount = - WC()->cart->get_coupon_discount_tax_amount( $coupon_key ) * 100;
-				} else {
-					if ( 'US' === $this->shop_country ) {
+				} elseif ( 'US' === $this->shop_country ) {
 						$coupon_amount     = 0;
 						$coupon_tax_amount = 0;
-						if ( $coupon->is_type( 'fixed_cart' ) || $coupon->is_type( 'percent' ) ) {
-							$coupon_type = 'Cart discount';
-						} elseif ( $coupon->is_type( 'fixed_product' ) || $coupon->is_type( 'percent_product' ) ) {
-							$coupon_type = 'Product discount';
-						} else {
-							$coupon_type = 'Discount';
-						}
-						$coupon_reference = $coupon_type . ' (amount: ' . WC()->cart->get_coupon_discount_amount( $coupon_key ) . ', tax amount: ' . WC()->cart->get_coupon_discount_tax_amount( $coupon_key ) . ')';
+					if ( $coupon->is_type( 'fixed_cart' ) || $coupon->is_type( 'percent' ) ) {
+						$coupon_type = 'Cart discount';
+					} elseif ( $coupon->is_type( 'fixed_product' ) || $coupon->is_type( 'percent_product' ) ) {
+						$coupon_type = 'Product discount';
+					} else {
+						$coupon_type = 'Discount';
 					}
+						$coupon_reference = $coupon_type . ' (amount: ' . WC()->cart->get_coupon_discount_amount( $coupon_key ) . ', tax amount: ' . WC()->cart->get_coupon_discount_tax_amount( $coupon_key ) . ')';
+
 				}
 				// Add separate discount line item, but only if it's a smart coupon or country is US.
 				if ( 'US' === $this->shop_country && 'smart_coupon' !== $coupon->get_discount_type() ) {
@@ -426,8 +430,7 @@ class KCO_Request_Cart {
 	 * @return string $item_name Cart item name.
 	 */
 	public function get_item_name( $cart_item ) {
-		$cart_item_data = $cart_item['data'];
-		$item_name      = substr( $cart_item_data->get_name(), 0, 254 );
+		$item_name = substr( $cart_item['data']->get_name(), 0, 254 );
 
 		return wp_strip_all_tags( $item_name );
 	}

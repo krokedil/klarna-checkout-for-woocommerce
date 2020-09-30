@@ -63,7 +63,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		 * Add the Addons menu to WooCommerce
 		 **/
 		public function add_menu() {
-			$submenu = add_submenu_page( 'woocommerce', __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ), __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ), 'manage_woocommerce', 'checkout-addons', array( $this, 'options_page' ) );
+			add_submenu_page( 'woocommerce', __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ), __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ), 'manage_woocommerce', 'checkout-addons', array( $this, 'options_page' ) );
 		}
 
 		/**
@@ -224,7 +224,6 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 				exit;
 			}
 
-			$status      = isset( $_REQUEST['plugin_status'] ) ? sanitize_key( wp_unslash( $_REQUEST['plugin_status'] ) ) : '';
 			$action      = isset( $_REQUEST['plugin_action'] ) ? sanitize_key( wp_unslash( $_REQUEST['plugin_action'] ) ) : '';
 			$plugin_slug = isset( $_REQUEST['plugin_slug'] ) ? wp_unslash( $_REQUEST['plugin_slug'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- No way to sanitize without breaking the string.
 			$plugin_url  = isset( $_REQUEST['plugin_url'] ) ? esc_url_raw( wp_unslash( $_REQUEST['plugin_url'] ) ) : '';

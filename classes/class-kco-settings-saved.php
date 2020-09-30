@@ -32,6 +32,7 @@ class KCO_Settings_Saved {
 	 * Class constructor.
 	 */
 	public function __construct() {
+		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'check_if_test_credentials_exists' ), 10 );
 		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'check_api_credentials' ), 10 );
 	}
 
@@ -117,6 +118,39 @@ class KCO_Settings_Saved {
 			$this->message[] = $message;
 			$this->error     = true;
 		}
+	}
+
+	/**
+	 * Checks if the test mode is active and any of the test credentials are filled in.
+	 *
+	 * @return void
+	 */
+	public function check_if_test_credentials_exists() {
+		$options = get_option( 'woocommerce_kco_settings' );
+
+		// If not enabled bail.
+		if ( $options && 'yes' !== $options['enabled'] ) {
+			return;
+		}
+		// If testmode is not enabled, bail.
+		if ( ! isset( $options['testmode'] ) && 'yes' !== $options['testmode'] ) {
+			return;
+		}
+
+		// Check if EU credentials are set. If they are, bail.
+		if ( isset( $options['test_merchant_id_eu'], $options['test_shared_secret_eu'] )
+		&& ( ! empty( $options['test_merchant_id_eu'] ) || ! empty( $options['test_shared_secret_eu'] ) ) ) {
+			return;
+		}
+
+		// Check if US credentials are set. If they are, bail.
+		if ( isset( $options['test_merchant_id_us'], $options['test_shared_secret_us'] )
+		&& ( ! empty( $options['test_merchant_id_us'] ) || ! empty( $options['test_shared_secret_us'] ) ) ) {
+			return;
+		}
+		$this->message[] = 'It looks like you have test mode active but no test credentials added. Please either turn off test mode or add test credentials.';
+		$this->error     = true;
+
 	}
 
 	/**
