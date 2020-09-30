@@ -64,6 +64,7 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 == Changelog ==
 = 2020.09.30    - version 2.3.0 =
 * Feature       - Added support for getting Klarna subscription ID from _klarna_recurring_token (support for KCO v2 to v3 subscription transfer).
+* Feature       - Check if testmode is active that test credentials are added before saving settings.
 * Enhancement   - Updated the flow of the EPM process. Sets the payment method before processing the payment.
 * Enhancement   - Added 10 second timeout to all requests made to Klarna.
 * Fix           - Prevent issue by adding a default tax rate of zero if tax rate is missing.
