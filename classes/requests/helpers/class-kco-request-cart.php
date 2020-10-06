@@ -209,7 +209,7 @@ class KCO_Request_Cart {
 	 * Process WooCommerce shipping to Klarna Payments order lines.
 	 */
 	public function process_shipping() {
-		if ( WC()->shipping->get_packages() && empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
+		if ( WC()->shipping->get_packages() && ! empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
 			$shipping            = array(
 				'type'             => 'shipping_fee',
 				'reference'        => $this->get_shipping_reference(),
