@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.09.30    - version 2.3.1 =
+* Fix           - Fixed an issue with shipping not being added correctly.
+
 = 2020.09.30    - version 2.3.0 =
 * Feature       - Added support for getting Klarna subscription ID from _klarna_recurring_token (support for KCO v2 to v3 subscription transfer).
 * Feature       - Check if testmode is active that test credentials are added before saving settings.
