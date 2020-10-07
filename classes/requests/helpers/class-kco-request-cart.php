@@ -121,7 +121,7 @@ class KCO_Request_Cart {
 		$adjust_item = array(
 			'type'                  => 'surcharge',
 			'reference'             => '',
-			'name'                  => '.',
+			'name'                  => apply_filters( 'kco_wc_surcharge_name', __( 'Surcharge', 'klarna-checkout-for-woocommerce' ) ),
 			'quantity'              => 1,
 			'unit_price'            => $amount_to_adjust,
 			'tax_rate'              => 0,
