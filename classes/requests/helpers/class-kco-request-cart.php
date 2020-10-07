@@ -114,7 +114,7 @@ class KCO_Request_Cart {
 		$amount_to_adjust = $this->get_order_amount() - $this->get_order_lines_total_amount( $this->order_lines );
 
 		// If the amount to adjust is zero, return.
-		if ( 0 === $amount_to_adjust ) {
+		if ( 0 >= $amount_to_adjust ) {
 			return $this->order_lines;
 		}
 
