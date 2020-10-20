@@ -38,7 +38,7 @@ class KCO_Confirmation {
 	 * Class constructor
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'confirm_order' ) );
+		add_action( 'init', array( $this, 'confirm_order' ), 999 );
 		add_action( 'init', array( $this, 'check_if_external_payment' ) );
 	}
 
