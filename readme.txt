@@ -62,6 +62,14 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.10.21    - version 2.3.2 =
+* Enhancement   - Added a filter for the name of the extra surcharge used for rounding.
+* Enhancement   - Saved the added surcharge to the order so that it can be used by other plugins if needed.
+* Enhancement   - Delayed the priority for our confirmation step on the init action. It fixes some timing issues with other plugins that also run on priority 10.
+* Enhancement   - We now save the organisation number for B2B purchases and display them on the admin order page.
+* Fix           - Fixed logic for the rounding surcharge to only be applied when it should.
+* Fix           - Fixed logic when testing credentials, it should no longer give a error when not entering test credentials.
+
 = 2020.09.30    - version 2.3.1 =
 * Fix           - Fixed an issue with shipping not being added correctly.
 
