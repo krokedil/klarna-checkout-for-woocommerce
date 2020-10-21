@@ -64,6 +64,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			);
 			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+			add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'add_billing_org_nr' ) );
 			add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'address_notice' ) );
 
 			add_action( 'woocommerce_checkout_init', array( $this, 'prefill_consent' ) );
@@ -549,6 +550,27 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				}
 			}
 			return $class;
+		}
+
+		/**
+		 * Maybe adds the billing org number to the address in an order.
+		 *
+		 * @param WC_Order $order The WooCommerce order.
+		 * @return void
+		 */
+		public function add_billing_org_nr( $order ) {
+			if ( $this->id === $order->get_payment_method() ) {
+				$order_id = $order->get_id();
+				$org_nr   = get_post_meta( $order_id, '_billing_org_nr', true );
+				if ( $org_nr ) {
+					?>
+					<p>
+						<strong><?php esc_html_e( 'Organisation number:', 'klarna-checkout-for-woocommerce' ); ?></strong>
+						<?php echo esc_html( $org_nr ); ?>
+					</p>
+					<?php
+				}
+			}
 		}
 	}
 }

@@ -85,7 +85,7 @@ class KCO_Fields {
 				'type'              => 'text',
 				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
-				'desc_tip'          => true,
+				'desc_tip'          => false,
 				'custom_attributes' => array(
 					'autocomplete' => 'off',
 				),
@@ -95,7 +95,7 @@ class KCO_Fields {
 				'type'              => 'password',
 				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
-				'desc_tip'          => true,
+				'desc_tip'          => false,
 				'custom_attributes' => array(
 					'autocomplete' => 'new-password',
 				),
@@ -105,7 +105,7 @@ class KCO_Fields {
 				'type'              => 'text',
 				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
-				'desc_tip'          => true,
+				'desc_tip'          => false,
 				'custom_attributes' => array(
 					'autocomplete' => 'off',
 				),
@@ -115,7 +115,7 @@ class KCO_Fields {
 				'type'              => 'password',
 				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
-				'desc_tip'          => true,
+				'desc_tip'          => false,
 				'custom_attributes' => array(
 					'autocomplete' => 'new-password',
 				),
@@ -130,7 +130,7 @@ class KCO_Fields {
 				'type'              => 'text',
 				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
-				'desc_tip'          => true,
+				'desc_tip'          => false,
 				'custom_attributes' => array(
 					'autocomplete' => 'off',
 				),
@@ -140,7 +140,7 @@ class KCO_Fields {
 				'type'              => 'password',
 				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
-				'desc_tip'          => true,
+				'desc_tip'          => false,
 				'custom_attributes' => array(
 					'autocomplete' => 'new-password',
 				),
@@ -150,7 +150,7 @@ class KCO_Fields {
 				'type'              => 'text',
 				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
-				'desc_tip'          => true,
+				'desc_tip'          => false,
 				'custom_attributes' => array(
 					'autocomplete' => 'off',
 				),
@@ -160,7 +160,7 @@ class KCO_Fields {
 				'type'              => 'password',
 				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
-				'desc_tip'          => true,
+				'desc_tip'          => false,
 				'custom_attributes' => array(
 					'autocomplete' => 'new-password',
 				),

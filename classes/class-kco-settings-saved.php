@@ -127,13 +127,12 @@ class KCO_Settings_Saved {
 	 */
 	public function check_if_test_credentials_exists() {
 		$options = get_option( 'woocommerce_kco_settings' );
-
 		// If not enabled bail.
-		if ( $options && 'yes' !== $options['enabled'] ) {
+		if ( 'yes' !== $options['enabled'] ) {
 			return;
 		}
 		// If testmode is not enabled, bail.
-		if ( ! isset( $options['testmode'] ) && 'yes' !== $options['testmode'] ) {
+		if ( ! isset( $options['testmode'] ) || 'yes' !== $options['testmode'] ) {
 			return;
 		}
 

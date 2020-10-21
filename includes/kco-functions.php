@@ -481,7 +481,10 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
 
 		// Get the Klarna OM order.
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
+
 		if ( ! is_wp_error( $klarna_order ) ) {
+			kco_maybe_save_surcharge( $order_id, $klarna_order );
+			kco_maybe_save_org_nr( $order_id, $klarna_order );
 
 			// Let other plugins hook into this sequence.
 			do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
@@ -555,4 +558,37 @@ function kco_convert_region( $region_string, $country_code ) {
 		}
 	}
 	return $region_string;
+}
+
+/**
+ * Maybe saves the surcharge to the order so that it can be completed properly.
+ *
+ * @param int   $order_id The WooCommerce order id.
+ * @param array $klarna_order The Klarna order.
+ * @return void
+ */
+function kco_maybe_save_surcharge( $order_id, $klarna_order ) {
+	if ( isset( $klarna_order['order_lines'] ) ) {
+		foreach ( $klarna_order['order_lines'] as $order_line ) {
+			if ( 'added-surcharge' === $order_line['reference'] ) {
+				update_post_meta( $order_id, '_kco_added_surcharge', wp_json_encode( $order_line ) );
+			}
+		}
+	}
+}
+
+/**
+ * Maybe saves the org number for a B2B purchase to the WooCommerce order.
+ *
+ * @param int   $order_id The WooCommerce order id.
+ * @param array $klarna_order The Klarna order.
+ * @return void
+ */
+function kco_maybe_save_org_nr( $order_id, $klarna_order ) {
+	if ( 'organization' === $klarna_order['customer']['type'] ) {
+		$org_nr = isset( $klarna_order['customer']['organization_registration_id'] ) ? $klarna_order['customer']['organization_registration_id'] : null;
+		if ( ! empty( $org_nr ) ) {
+			update_post_meta( $order_id, '_billing_org_nr', $org_nr );
+		}
+	}
 }

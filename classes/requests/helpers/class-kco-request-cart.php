@@ -114,14 +114,14 @@ class KCO_Request_Cart {
 		$amount_to_adjust = $this->get_order_amount() - $this->get_order_lines_total_amount( $this->order_lines );
 
 		// If the amount to adjust is zero, return.
-		if ( 0 === $amount_to_adjust ) {
+		if ( 0 === intval( round( $amount_to_adjust * 100 ) ) ) {
 			return $this->order_lines;
 		}
 
 		$adjust_item = array(
 			'type'                  => 'surcharge',
-			'reference'             => '',
-			'name'                  => '.',
+			'reference'             => 'added-surcharge',
+			'name'                  => apply_filters( 'kco_wc_surcharge_name', __( 'Surcharge', 'klarna-checkout-for-woocommerce' ) ),
 			'quantity'              => 1,
 			'unit_price'            => $amount_to_adjust,
 			'tax_rate'              => 0,
