@@ -374,8 +374,8 @@ class KCO_Request_Cart {
 			$pw_gift_cards = WC()->session->get( 'pw-gift-card-data' );
 			foreach ( $pw_gift_cards['gift_cards'] as $code => $value ) {
 				$coupon_amount       = $value * 100 * -1;
-				$label               = esc_html( 'Gift card', 'pw-woocommerce-gift-cards' ) . ' ' . $code;
-				$giftcard_sku        = apply_filters( 'kco_pw_gift_card_sku', esc_html( __( 'giftcard', 'klarna-checkout-for-woocommerce' ) ), $code );
+				$label               = esc_html__( 'Gift card', 'pw-woocommerce-gift-cards' ) . ' ' . $code;
+				$giftcard_sku        = apply_filters( 'kco_pw_gift_card_sku', esc_html__( 'giftcard', 'klarna-checkout-for-woocommerce' ), $code );
 				$gift_card           = array(
 					'type'                  => 'gift_card',
 					'reference'             => $giftcard_sku,
