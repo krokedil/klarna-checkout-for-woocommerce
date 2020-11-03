@@ -231,14 +231,16 @@ jQuery( function( $ ) {
 
 			// Move order comments.
 			$( '.woocommerce-additional-fields' ).appendTo( '#kco-extra-checkout-fields' );
-
 			var form = $( 'form[name="checkout"] input, form[name="checkout"] select, textarea' );
 			for ( i = 0; i < form.length; i++ ) {
 				var name = form[i].name;
+				// Check if field is inside the order review.
+				if( $( 'table.woocommerce-checkout-review-order-table' ).find( form[i] ).length ) {
+					continue;
+				}
 
 				// Check if this is a standard field.
-				if ( -1 === $.inArray( name, kco_params.standard_woo_checkout_fields ) ) {
-
+				if ( -1 === $.inArray( name, kco_params.standard_woo_checkout_fields ) ) {					
 					// This is not a standard Woo field, move to our div.
 					if ( 0 < $( 'p#' + name + '_field' ).length ) {
 						$( 'p#' + name + '_field' ).appendTo( '#kco-extra-checkout-fields' );
