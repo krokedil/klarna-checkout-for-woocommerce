@@ -47,7 +47,6 @@ class KCO_Request_Options {
 		if ( $this->get_shipping_details() ) {
 			$options['shipping_details'] = $this->get_shipping_details();
 		}
-		error_log( var_export( $options, true ) );
 		return $options;
 	}
 
