@@ -33,6 +33,7 @@ class KCO_Request_Options {
 			'allow_separate_shipping_address'             => $this->get_allow_separate_shipping_address(),
 			'date_of_birth_mandatory'                     => $this->get_dob_mandatory(),
 			'national_identification_number_mandatory'    => $this->get_dob_mandatory(),
+			'verify_national_identification_number'       => $this->get_nin_validation_mandatory(),
 			'allowed_customer_types'                      => $this->get_allowed_customer_types(),
 			'require_client_validation'                   => true,
 			'require_client_validation_callback_response' => true,
@@ -46,7 +47,7 @@ class KCO_Request_Options {
 		if ( $this->get_shipping_details() ) {
 			$options['shipping_details'] = $this->get_shipping_details();
 		}
-
+		error_log( var_export( $options, true ) );
 		return $options;
 	}
 
@@ -81,6 +82,17 @@ class KCO_Request_Options {
 		$dob_mandatory = isset( $this->settings ) && 'yes' === $this->settings['dob_mandatory'];
 
 		return $dob_mandatory;
+	}
+
+	/**
+	 * Gets date of birth mandatory option.
+	 *
+	 * @return bool
+	 */
+	private function get_nin_validation_mandatory() {
+		$nin_validation_mandatory = isset( $this->settings ) && isset( $this->settings['nin_validation_mandatory'] ) && 'yes' === $this->settings['nin_validation_mandatory'];
+
+		return $nin_validation_mandatory;
 	}
 
 	/**
