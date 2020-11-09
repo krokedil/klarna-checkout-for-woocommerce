@@ -485,6 +485,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
 		if ( ! is_wp_error( $klarna_order ) ) {
 			kco_maybe_save_surcharge( $order_id, $klarna_order );
 			kco_maybe_save_org_nr( $order_id, $klarna_order );
+			kco_maybe_save_reference( $order_id, $klarna_order );
 
 			// Let other plugins hook into this sequence.
 			do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
@@ -589,6 +590,26 @@ function kco_maybe_save_org_nr( $order_id, $klarna_order ) {
 		$org_nr = isset( $klarna_order['customer']['organization_registration_id'] ) ? $klarna_order['customer']['organization_registration_id'] : null;
 		if ( ! empty( $org_nr ) ) {
 			update_post_meta( $order_id, '_billing_org_nr', $org_nr );
+		}
+	}
+}
+
+/**
+ * Maybe saves the references for a B2B purchase to the WooCommerce order.
+ *
+ * @param int   $order_id The WooCommerce order id.
+ * @param array $klarna_order The Klarna order.
+ * @return void
+ */
+function kco_maybe_save_reference( $order_id, $klarna_order ) {
+	if ( 'organization' === $klarna_order['customer']['type'] ) {
+		$billing_reference  = isset( $klarna_order['billing_address']['attention'] ) ? $klarna_order['billing_address']['attention'] : null;
+		$shipping_reference = isset( $klarna_order['shipping_address']['attention'] ) ? $klarna_order['shipping_address']['attention'] : null;
+		if ( ! empty( $billing_reference ) ) {
+			update_post_meta( $order_id, '_billing_reference', $billing_reference );
+		}
+		if ( ! empty( $shipping_reference ) ) {
+			update_post_meta( $order_id, '_shipping_reference', $shipping_reference );
 		}
 	}
 }
