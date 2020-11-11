@@ -300,6 +300,9 @@ jQuery( function( $ ) {
 				$( '#billing_email' ).val( ( ( 'email' in data.billing_address ) ? data.billing_address.email : '' ) );
 				$( '#billing_country' ).val( ( ( 'country' in data.billing_address ) ? data.billing_address.country.toUpperCase() : '' ) );
 				$( '#billing_state' ).val( ( ( 'region' in data.billing_address ) ? data.billing_address.region : '' ) );
+				// Trigger changes
+				$('#billing_email').change();
+				$('#billing_email').blur();
 			}
 			
 			if ( 'shipping_address' in data && data.shipping_address !== null ) {
