@@ -112,7 +112,8 @@ justify-content: flex-end;
 }
 
 #klarna-logo-left{
-	height: 40px;
+	max-height: 40px;
+	max-width: 180px;
 }
 
 /* Main content */
