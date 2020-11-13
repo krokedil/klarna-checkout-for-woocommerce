@@ -13,7 +13,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 == DESCRIPTION ==
 
-*A full checkout experience embedded on your site with Pay Now, Pay Later and Slice It. No credit card numbers, no passwords, no worries.*
+*Checkout is an embedded checkout solution and includes all popular payment methods (Pay Now, Pay Later, Financing, Installments). With Checkout, Klarna is your single payment provider.*
 
 https://www.youtube.com/watch?v=XayUzOUkyDQ
 
