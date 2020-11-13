@@ -217,6 +217,14 @@ class KCO_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
+			'nin_validation_mandatory'   => array(
+				'title'       => __( 'National identification number mandatory', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Makes the validation of national identification numbers mandatory for customers.', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If checked, the customer will have to complete a validation process for the national identification number ( SE, NO, FI and DK only ). This will also make national identification numbers mandatory.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
 			'allowed_customer_types'     => array(
 				'title'       => __( 'Allowed Customer Types', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'select',
@@ -313,7 +321,7 @@ class KCO_Fields {
 			$new_settings = array();
 			foreach ( $settings as $key => $value ) {
 				$new_settings[ $key ] = $value;
-				if ( 'dob_mandatory' === $key ) {
+				if ( 'nin_validation_mandatory' === $key ) {
 					$new_settings['display_privacy_policy_text']       = array(
 						'title'   => __( 'Checkout privacy policy text', 'klarna-checkout-for-woocommerce' ),
 						'label'   => __( 'Select if you want to show the <em>Checkout privacy policy</em> text on the checkout page, and where you want to display it.', 'klarna-checkout-for-woocommerce' ),

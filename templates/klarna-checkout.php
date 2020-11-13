@@ -9,7 +9,7 @@
 
 wc_print_notices();
 
-do_action( 'kco_wc_before_checkout_form' );
+do_action( 'woocommerce_before_checkout_form', WC()->checkout() );
 
 // If checkout registration is disabled and not logged in, the user cannot checkout.
 if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_required() && ! is_user_logged_in() ) {
@@ -36,4 +36,4 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 	<?php do_action( 'kco_wc_after_wrapper' ); ?>
 </form>
 
-<?php do_action( 'kco_wc_after_checkout_form' ); ?>
+<?php do_action( 'woocommerce_after_checkout_form', WC()->checkout() ); ?>

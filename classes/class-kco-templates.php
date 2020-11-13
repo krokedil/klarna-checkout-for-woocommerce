@@ -41,8 +41,6 @@ class KCO_Templates {
 		add_action( 'wp_footer', array( $this, 'check_that_kco_template_has_loaded' ) );
 
 		// Template hooks.
-		add_action( 'kco_wc_before_checkout_form', 'woocommerce_checkout_login_form', 10 );
-		add_action( 'kco_wc_before_checkout_form', 'woocommerce_checkout_coupon_form', 20 );
 		add_action( 'kco_wc_after_order_review', 'kco_wc_show_another_gateway_button', 20 );
 		add_action( 'kco_wc_after_order_review', array( $this, 'add_extra_checkout_fields' ), 10 );
 		add_action( 'kco_wc_before_snippet', 'kco_wc_prefill_consent', 10 );
