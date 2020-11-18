@@ -62,6 +62,18 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.11.18    - version 2.4.0 =
+* Feature       - Add setting to allow the store to force the validation of a national identification number. Only applicable for SE, NO, FI and DK.
+* Feature       - Add a filer for additional checkboxes. This allows for using the checkbox that we include in the settings allow with your own checkboxes as needed. The filter is "kco_additional_checkboxes". Please check Klarnas documentation for how to format the data.
+* Enhancement   - Add support for PW Gift Cards.
+* Enhancement   - Save the B2B reference field to the WooCommerce order and display if on the order page.
+* Enhancement   - Replace the action "kco_wc_before_checkout_form" with the WooCommerce standard action "woocommerce_before_checkout_form". This allows for more compatibility with other plugins.
+* Enhancement   - Add support for Mailchimp abandoned cart again.
+* Enhancement   - Add error message if pretty permalinks is not enabled on the admin page.
+* Tweak         - Update the go live link for the American market.
+* Fix           - Prevent fields from inside the order review table from being moved. For example some shipping method fields could be moved and duplicated.
+* Fix           - Limit the size of the Klarna logo on the admin page.
+
 = 2020.10.21    - version 2.3.2 =
 * Enhancement   - Added a filter for the name of the extra surcharge used for rounding.
 * Enhancement   - Saved the added surcharge to the order so that it can be used by other plugins if needed.
