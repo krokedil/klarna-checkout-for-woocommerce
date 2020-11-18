@@ -10,7 +10,7 @@
  * Domain Path: /languages
  *
  * WC requires at least: 3.2.0
- * WC tested up to: 4.5.2
+ * WC tested up to: 4.7.0
  *
  * Copyright (c) 2017-2020 Krokedil
  *
@@ -323,6 +323,7 @@ if ( ! class_exists( 'KCO' ) ) {
  *
  * @return KCO
  */
-function KCO_WC() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
+function KCO_WC() {
+ // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
 	return KCO::get_instance();
 }
