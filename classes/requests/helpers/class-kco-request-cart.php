@@ -368,6 +368,28 @@ class KCO_Request_Cart {
 				$this->order_lines[] = $gift_card;
 			}
 		}
+
+		// PW Gift Cards.
+		if ( ! empty( WC()->session->get( 'pw-gift-card-data' ) ) ) {
+			$pw_gift_cards = WC()->session->get( 'pw-gift-card-data' );
+			foreach ( $pw_gift_cards['gift_cards'] as $code => $value ) {
+				$coupon_amount       = $value * 100 * -1;
+				$label               = esc_html__( 'Gift card', 'pw-woocommerce-gift-cards' ) . ' ' . $code;
+				$giftcard_sku        = apply_filters( 'kco_pw_gift_card_sku', esc_html__( 'giftcard', 'klarna-checkout-for-woocommerce' ), $code );
+				$gift_card           = array(
+					'type'                  => 'gift_card',
+					'reference'             => $giftcard_sku,
+					'name'                  => $label,
+					'quantity'              => 1,
+					'unit_price'            => $coupon_amount,
+					'tax_rate'              => 0,
+					'total_amount'          => $coupon_amount,
+					'total_discount_amount' => 0,
+					'total_tax_amount'      => 0,
+				);
+				$this->order_lines[] = $gift_card;
+			}
+		}
 	}
 
 	/**

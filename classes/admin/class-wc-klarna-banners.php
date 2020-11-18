@@ -214,7 +214,8 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 				$url_base = 'https://eu.portal.klarna.com/signup/';
 				$url      = $url_base . $url_queries;
 			} else {
-				$url = 'https://www.klarna.com/international/business/woocommerce/?utm_source=woo-backend&utm_medium=referral&utm_campaign=woo&utm_content=banner';
+				$url_base = 'https://us.portal.klarna.com/signup/';
+				$url      = $url_base . $url_queries;
 			}
 			return $url;
 		}

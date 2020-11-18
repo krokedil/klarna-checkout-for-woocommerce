@@ -72,6 +72,7 @@ class KCO_Admin_Notices {
 			add_action( 'admin_notices', array( $this, 'check_account' ) );
 			add_action( 'admin_notices', array( $this, 'check_autoptimize' ) );
 			add_action( 'admin_notices', array( $this, 'check_optimize' ) );
+			add_action( 'admin_notices', array( $this, 'check_permalinks' ) );
 			add_action( 'admin_notices', array( $this, 'version_warning_message' ) );
 		}
 	}
@@ -242,6 +243,27 @@ class KCO_Admin_Notices {
 			}
 			$hide_notice = isset( $_GET['kco-hide-notice'] ) ? sanitize_key( wp_unslash( $_GET['kco-hide-notice'] ) ) : '';
 			update_user_meta( get_current_user_id(), 'dismissed_kco_version_number', $hide_notice );
+		}
+	}
+
+	/**
+	 * Check if Pretty permalinks is enabled
+	 */
+	public function check_permalinks() {
+		if ( 'yes' !== $this->enabled ) {
+			return;
+		}
+
+		if ( ! get_user_meta( get_current_user_id(), 'dismissed_kco_check_permalinks_notice', true ) ) {
+			$permalinks = get_option( 'permalink_structure' );
+			if ( empty( $permalinks ) ) {
+				?>
+				<div class="kco-message notice woocommerce-message notice-error">
+				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_permalinks' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
+				<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks as if you don\'t have pretty permalinks enabled in WordPress. For Klarna checkout for WooCommerce to function properly, this needs to be enabled.', 'klarna-checkout-for-woocommerce' ) . '</p>' ) ); ?>
+				</div>
+				<?php
+			}
 		}
 	}
 }

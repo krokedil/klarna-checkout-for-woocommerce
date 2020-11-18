@@ -231,14 +231,16 @@ jQuery( function( $ ) {
 
 			// Move order comments.
 			$( '.woocommerce-additional-fields' ).appendTo( '#kco-extra-checkout-fields' );
-
 			var form = $( 'form[name="checkout"] input, form[name="checkout"] select, textarea' );
 			for ( i = 0; i < form.length; i++ ) {
 				var name = form[i].name;
+				// Check if field is inside the order review.
+				if( $( 'table.woocommerce-checkout-review-order-table' ).find( form[i] ).length ) {
+					continue;
+				}
 
 				// Check if this is a standard field.
-				if ( -1 === $.inArray( name, kco_params.standard_woo_checkout_fields ) ) {
-
+				if ( -1 === $.inArray( name, kco_params.standard_woo_checkout_fields ) ) {					
 					// This is not a standard Woo field, move to our div.
 					if ( 0 < $( 'p#' + name + '_field' ).length ) {
 						$( 'p#' + name + '_field' ).appendTo( '#kco-extra-checkout-fields' );
@@ -298,6 +300,9 @@ jQuery( function( $ ) {
 				$( '#billing_email' ).val( ( ( 'email' in data.billing_address ) ? data.billing_address.email : '' ) );
 				$( '#billing_country' ).val( ( ( 'country' in data.billing_address ) ? data.billing_address.country.toUpperCase() : '' ) );
 				$( '#billing_state' ).val( ( ( 'region' in data.billing_address ) ? data.billing_address.region : '' ) );
+				// Trigger changes
+				$('#billing_email').change();
+				$('#billing_email').blur();
 			}
 			
 			if ( 'shipping_address' in data && data.shipping_address !== null ) {
