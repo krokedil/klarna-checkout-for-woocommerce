@@ -9,11 +9,6 @@ jQuery( function( $ ) {
 		bodyEl: $( 'body' ),
 		checkoutFormSelector: $( 'form.checkout' ),
 
-		// Order notes.
-		orderNotesValue: '',
-		orderNotesSelector: 'textarea#order_comments',
-		orderNotesEl: $( 'textarea#order_comments' ),
-
 		// Payment method.
 		paymentMethodEl: $( 'input[name="payment_method"]' ),
 		paymentMethod: '',
@@ -23,14 +18,17 @@ jQuery( function( $ ) {
 		shippingUpdated: false,
 		blocked: false,
 
-		// Email exist.
-		emailExists: kco_params.email_exists,
-
 		preventPaymentMethodChange: false,
 
 		timeout: null,
 		interval: null,
 
+		// True or false if we need to update the Klarna order. Set to false on initial page load.
+		klarnaUpdateNeeded: false,
+
+		/**
+		 * Triggers on document ready.
+		 */
 		documentReady: function() {
 			kco_wc.log( kco_params );
 			if ( 0 < kco_wc.paymentMethodEl.length ) {
@@ -39,10 +37,13 @@ jQuery( function( $ ) {
 				kco_wc.paymentMethod = 'kco';
 			}
 			kco_wc.moveExtraCheckoutFields();
-			kco_wc.confirmLoading();
 			kco_wc.kcoResume();
 		},
 
+		/**
+		 * Resumes the Klarna Iframe
+		 * @param {boolean} autoResumeBool 
+		 */
 		kcoSuspend: function( autoResumeBool ) {
 			if ( window._klarnaCheckout ) {
 				window._klarnaCheckout( function( api ) {
@@ -55,6 +56,9 @@ jQuery( function( $ ) {
 			}
 		},
 
+		/**
+		 * Resumes the KCO Iframe
+		 */
 		kcoResume: function() {
 			if ( window._klarnaCheckout ) {
 				window._klarnaCheckout( function( api ) {
@@ -65,96 +69,10 @@ jQuery( function( $ ) {
 			}
 		},
 
-		confirmLoading: function() {
-			$( '#kco-confirm-loading' )
-				.css( 'minHeight', '300px' )
-				.block({
-					message: null,
-					overlayCSS: {
-						background: '#fff',
-						opacity: 0.6
-					}
-				});
-		},
-
-		updateCart: function() {
-			kco_wc.kcoSuspend( true );
-			$.ajax({
-				type: 'POST',
-				url: kco_params.update_cart_url,
-				data: {
-					checkout: $( 'form.checkout' ).serialize(),
-					nonce: kco_params.update_cart_nonce
-				},
-				dataType: 'json',
-				success: function( data ) {
-				},
-				error: function( data ) {
-				},
-				complete: function( data ) {
-					$( 'body' ).trigger( 'update_checkout' );
-					kco_wc.kcoResume();
-				}
-			});
-		},
-
-		updateKlarnaOrder: function() {
-			if ( 'kco' === kco_wc.paymentMethod && 'no' === kco_params.is_confirmation_page ) {
-				$( '.woocommerce-checkout-review-order-table' ).block({
-					message: null,
-					overlayCSS: {
-						background: '#fff',
-						opacity: 0.6
-					}
-				});
-				$.ajax({
-					type: 'POST',
-					url: kco_params.update_klarna_order_url,
-					data: {
-						nonce: kco_params.update_klarna_order_nonce
-					},
-					dataType: 'json',
-					success: function( data ) {
-					},
-					error: function( data ) {
-					},
-					complete: function( data ) {
-						if ( true === data.responseJSON.success ) {
-							kco_wc.kcoResume();
-							$( '.woocommerce-checkout-review-order-table' ).unblock();
-						}
-					}
-				});
-			}
-		},
-
-		// Display Shipping Price in order review if Display shipping methods in iframe settings is active.
-		maybeDisplayShippingPrice: function() {
-			// Check if we already have set the price. If we have, return.
-			if( $('.kco-shipping').length ) {
-				return;
-			}
-			
-			if ( 'kco' === kco_wc.paymentMethod && 'yes' === kco_params.shipping_methods_in_iframe && 'no' === kco_params.is_confirmation_page ) {
-				if ( $( '#shipping_method input[type=\'radio\']' ).length ) {
-					// Multiple shipping options available.
-					$( '#shipping_method input[type=\'radio\']:checked' ).each( function() {
-						var idVal = $( this ).attr( 'id' );
-						var shippingPrice = $( 'label[for=\'' + idVal + '\']' ).text();
-						$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
-						$( '.woocommerce-shipping-totals td' ).addClass( 'kco-shipping' );
-					});
-				} else {
-					// Only one shipping option available.
-					var idVal = $( '#shipping_method input[name=\'shipping_method[0]\']' ).attr( 'id' );
-					var shippingPrice = $( 'label[for=\'' + idVal + '\']' ).text();
-					$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
-					$( '.woocommerce-shipping-totals td' ).addClass( 'kco-shipping' );
-				}
-			}
-		},
-
-		// When "Change to another payment method" is clicked.
+		/**
+		 * When the customer changes from KCO to other payment methods.
+		 * @param {Event} e 
+		 */
 		changeFromKco: function( e ) {
 			e.preventDefault();
 
@@ -183,7 +101,9 @@ jQuery( function( $ ) {
 			});
 		},
 
-		// When payment method is changed to KCO in regular WC Checkout page.
+		/**
+		 * When the customer changes to KCO from other payment methods.
+		 */
 		maybeChangeToKco: function() {
 			if ( ! kco_wc.preventPaymentMethodChange ) {
 			kco_wc.log( $( this ).val() );
@@ -218,12 +138,6 @@ jQuery( function( $ ) {
 		}
 		},
 
-		log: function( message ) {
-			if ( kco_params.logging ) {
-				console.log( message );
-			}
-		},
-
 		/**
 		 * Moves all non standard fields to the extra checkout fields.
 		 */
@@ -251,6 +165,91 @@ jQuery( function( $ ) {
 			}
 		},
 
+		/**
+		 * Display Shipping Price in order review if Display shipping methods in iframe settings is active.
+		 */
+		maybeDisplayShippingPrice: function() {
+			// Check if we already have set the price. If we have, return.
+			if( $('.kco-shipping').length ) {
+				return;
+			}
+			
+			if ( 'kco' === kco_wc.paymentMethod && 'yes' === kco_params.shipping_methods_in_iframe && 'no' === kco_params.is_confirmation_page ) {
+				if ( $( '#shipping_method input[type=\'radio\']' ).length ) {
+					// Multiple shipping options available.
+					$( '#shipping_method input[type=\'radio\']:checked' ).each( function() {
+						var idVal = $( this ).attr( 'id' );
+						var shippingPrice = $( 'label[for=\'' + idVal + '\']' ).text();
+						$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
+						$( '.woocommerce-shipping-totals td' ).addClass( 'kco-shipping' );
+					});
+				} else {
+					// Only one shipping option available.
+					var idVal = $( '#shipping_method input[name=\'shipping_method[0]\']' ).attr( 'id' );
+					var shippingPrice = $( 'label[for=\'' + idVal + '\']' ).text();
+					$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
+					$( '.woocommerce-shipping-totals td' ).addClass( 'kco-shipping' );
+				}
+			}
+		},
+
+		/**
+		 * Updates the cart in case of a change in product quantity.
+		 */
+		updateCart: function() {
+			kco_wc.kcoSuspend( true );
+			$.ajax({
+				type: 'POST',
+				url: kco_params.update_cart_url,
+				data: {
+					checkout: $( 'form.checkout' ).serialize(),
+					nonce: kco_params.update_cart_nonce
+				},
+				dataType: 'json',
+				success: function( data ) {
+				},
+				error: function( data ) {
+				},
+				complete: function( data ) {
+					$( 'body' ).trigger( 'update_checkout' );
+					kco_wc.kcoResume();
+				}
+			});
+		},
+
+		/**
+		 * Update the Klarna order on updated_checkout events.
+		 */
+		updateKlarnaOrder: function() {
+			if ( 'kco' === kco_wc.paymentMethod && 'no' === kco_params.is_confirmation_page ) {
+				if( ! kco_wc.klarnaUpdateNeeded ) {
+					kco_wc.klarnaUpdateNeeded = true;
+					return;
+				}
+				$.ajax({
+					type: 'POST',
+					url: kco_params.update_klarna_order_url,
+					data: {
+						nonce: kco_params.update_klarna_order_nonce
+					},
+					dataType: 'json',
+					success: function( data ) {
+					},
+					error: function( data ) {
+					},
+					complete: function( data ) {
+						if ( true === data.responseJSON.success ) {
+							kco_wc.kcoResume();
+							$( '.woocommerce-checkout-review-order-table' ).unblock();
+						}
+					}
+				});
+			}
+		},
+
+		/**
+		 * Gets the Klarna order and starts the order submission
+		 */
 		getKlarnaOrder: function() {
 			kco_wc.preventPaymentMethodChange = true;
 			$( '.woocommerce-checkout-review-order-table' ).block({
@@ -285,8 +284,12 @@ jQuery( function( $ ) {
 			});
 		},
 
+		/**
+		 * Sets the customer data.
+		 * @param {array} data 
+		 */
 		setCustomerData: function( data ) {
-			console.log( data );
+			kco_wc.log( data );
 			if ( 'billing_address' in data && data.billing_address !== null ) {
 				// Billing fields.
 				$( '#billing_first_name' ).val( ( ( 'given_name' in data.billing_address ) ? data.billing_address.given_name : '' ) );
@@ -321,9 +324,89 @@ jQuery( function( $ ) {
 			}
 		},
 
+		/**
+		 * Checks the URL for the hashtag.
+		 * @param {function} callback 
+		 */
+		checkUrl: function( callback ) {
+			if ( window.location.hash ) {
+				var currentHash = window.location.hash;
+				if ( -1 < currentHash.indexOf( '#klarna-success' ) ) {
+					kco_wc.logToFile( 'klarna-success hashtag detected in URL.' );
+					callback({ should_proceed: true });
+					// Clear the interval.
+					clearInterval(kco_wc.interval);
+					// Remove the timeout.
+					clearTimeout( kco_wc.timeout );
+					// Remove the processing class from the form.
+					kco_wc.checkoutFormSelector.removeClass( 'processing' );
+					$( '.woocommerce-checkout-review-order-table' ).unblock();
+					$( kco_wc.checkoutFormSelector ).unblock();
+				}
+			} 
+		},
+
+		/**
+		 * Fails the order with Klarna on a checkout error and timeout.
+		 * @param {function} callback 
+		 * @param {string} event 
+		 */
+		failOrder: function( callback, event ) {
+			kco_wc.logToFile( 'Timeout for validation_callback triggered.' );
+			// Send false and cancel 
+			callback({ should_proceed: false });
+			// Clear the interval.
+			clearInterval(kco_wc.interval);
+			// Remove the timeout.
+			clearTimeout( kco_wc.timeout );
+			// Renable the form.
+			$( 'body' ).trigger( 'updated_checkout' );
+			kco_wc.checkoutFormSelector.removeClass( 'processing' );
+			$( kco_wc.checkoutFormSelector ).unblock();
+			if ( 'timeout' === event ) {
+				$('#kco-timeout').remove();
+				$('form.checkout').prepend(
+					'<div id="kco-timeout" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>'
+					+  kco_params.timeout_message
+					+ '</li></ul></div>'
+				);
+			}
+		},
+
+		/**
+		 * Logs the message to the klarna checkout log in WooCommerce.
+		 * @param {string} message 
+		 */
+		logToFile: function( message ) {
+			$.ajax(
+				{
+					url: kco_params.log_to_file_url,
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						message: message,
+						nonce: kco_params.log_to_file_nonce
+					}
+				}
+			);
+		},
+
+		/**
+		 * Logs messages to the console.
+		 * @param {string} message 
+		 */
+		log: function( message ) {
+			if ( kco_params.logging ) {
+				console.log( message );
+			}
+		},
+
+		/**
+		 * Initiates the script.
+		 */
 		init: function() {
 			$( document ).ready( kco_wc.documentReady );
-			kco_wc.bodyEl.on( 'update_checkout', function() { kco_wc.kcoSuspend( true ) } );
+			kco_wc.bodyEl.on( 'update_checkout', function() {  if( kco_wc.klarnaUpdateNeeded ) { kco_wc.kcoSuspend( true ) } } );
 			kco_wc.bodyEl.on( 'updated_checkout', kco_wc.updateKlarnaOrder );
 			kco_wc.bodyEl.on( 'updated_checkout', kco_wc.maybeDisplayShippingPrice );
 			kco_wc.bodyEl.on( 'change', 'input.qty', kco_wc.updateCart );
@@ -381,13 +464,6 @@ jQuery( function( $ ) {
 						'shipping_option_change': function( data ) {
 							kco_wc.log( 'shipping_option_change', data );
 							kco_wc.log( data );
-							$( '.woocommerce-checkout-review-order-table' ).block({
-								message: null,
-								overlayCSS: {
-									background: '#fff',
-									opacity: 0.6
-								}
-							});
 							kco_wc.kcoSuspend( true );
 							$.ajax(
 								{
@@ -405,10 +481,11 @@ jQuery( function( $ ) {
 										kco_wc.log( response );
 									},
 									complete: function( response ) {
+										kco_wc.klarnaUpdateNeeded = false;
 										$( '#shipping_method #' + response.responseJSON.data.shipping_option_name ).prop( 'checked', true );
 										$( 'body' ).trigger( 'kco_shipping_option_changed', [ data ]);
 										$( 'body' ).trigger( 'update_checkout' );
-										$( '.woocommerce-checkout-review-order-table' ).unblock();
+										kco_wc.kcoResume();
 									}
 								}
 							);
@@ -432,66 +509,7 @@ jQuery( function( $ ) {
 				});
 			}
 		},
-
-		checkUrl: function( callback ) {
-			if ( window.location.hash ) {
-				var currentHash = window.location.hash;
-				if ( -1 < currentHash.indexOf( '#klarna-success' ) ) {
-					kco_wc.logToFile( 'klarna-success hashtag detected in URL.' );
-					callback({ should_proceed: true });
-					// Clear the interval.
-					clearInterval(kco_wc.interval);
-					// Remove the timeout.
-					clearTimeout( kco_wc.timeout );
-					// Remove the processing class from the form.
-					kco_wc.checkoutFormSelector.removeClass( 'processing' );
-					$( '.woocommerce-checkout-review-order-table' ).unblock();
-					$( kco_wc.checkoutFormSelector ).unblock();
-				}
-			} 
-		},
-
-		failOrder: function( callback, event ) {
-			kco_wc.logToFile( 'Timeout for validation_callback triggered.' );
-			// Send false and cancel 
-			callback({ should_proceed: false });
-			// Clear the interval.
-			clearInterval(kco_wc.interval);
-			// Remove the timeout.
-			clearTimeout( kco_wc.timeout );
-			// Renable the form.
-			$( 'body' ).trigger( 'updated_checkout' );
-			kco_wc.checkoutFormSelector.removeClass( 'processing' );
-			$( kco_wc.checkoutFormSelector ).unblock();
-			if ( 'timeout' === event ) {
-				$('#kco-timeout').remove();
-				$('form.checkout').prepend(
-					'<div id="kco-timeout" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>'
-					+  kco_params.timeout_message
-					+ '</li></ul></div>'
-				);
-			}
-		},
-
-		logToFile: function( message ) {
-			$.ajax(
-				{
-					url: kco_params.log_to_file_url,
-					type: 'POST',
-					dataType: 'json',
-					data: {
-						message: message,
-						nonce: kco_params.log_to_file_nonce
-					}
-				}
-			);
-		}
-	};
+	}
 
 	kco_wc.init();
-	$( document ).on( 'keypress', '#kco-order-review .qty', function( event ) {
-		if ( 13 == event.keyCode ) {
-			event.preventDefault();
-		}
-	});
 });
