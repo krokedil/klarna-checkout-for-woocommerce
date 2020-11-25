@@ -53,7 +53,7 @@ __Klarna Payments__ removes the headaches of payments, for both consumers and me
 Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria, the Netherlands, UK and United States.
 
 = Where can I find Klarna Checkout for WooCommerce documentation? =
-For help setting up and configuring Klarna Payments for WooCommerce please refer to our [documentation](https://docs.krokedil.com/collection/121-klarna-checkout/).
+For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/collection/121-klarna-checkout/).
 
 = Are there any specific requirements? =
 * WooCommerce 3.0 or newer is required.
