@@ -64,12 +64,10 @@ class KCO_Admin_Notices {
 	public function check_settings() {
 		if ( ! empty( $_POST ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 			add_action( 'woocommerce_settings_saved', array( $this, 'check_terms' ) );
-			add_action( 'woocommerce_settings_saved', array( $this, 'check_account' ) );
 			add_action( 'admin_notices', array( $this, 'check_autoptimize' ) );
 		} else {
 			add_action( 'admin_notices', array( $this, 'check_https' ) );
 			add_action( 'admin_notices', array( $this, 'check_terms' ) );
-			add_action( 'admin_notices', array( $this, 'check_account' ) );
 			add_action( 'admin_notices', array( $this, 'check_autoptimize' ) );
 			add_action( 'admin_notices', array( $this, 'check_optimize' ) );
 			add_action( 'admin_notices', array( $this, 'check_permalinks' ) );
@@ -113,35 +111,6 @@ class KCO_Admin_Notices {
 		}
 	}
 
-	/**
-	 * Check how account creation is set.
-	 */
-	public function check_account() {
-		if ( 'yes' !== $this->enabled ) {
-			return;
-		}
-
-		// Account page - username.
-		if ( 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) && 'no' === get_option( 'woocommerce_registration_generate_username' ) && ! get_user_meta( get_current_user_id(), 'dismissed_kco_check_username_notice', true ) ) {
-			?>
-			<div class="kco-message notice woocommerce-message notice-error">
-			<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_username' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
-			<?php // translators: %s: URL. ?>
-			<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'You need to tick the checkbox <i>When creating an account, automatically generate a username from the customer\'s email address</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href="%s">Accounts & Privacy tab.', 'klarna-checkout-for-woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=account' ) ) . '</p>' ) ); ?>
-			</div>
-			<?php
-		}
-		// Account page - password.
-		if ( 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) && 'no' === get_option( 'woocommerce_registration_generate_password' ) && ! get_user_meta( get_current_user_id(), 'dismissed_kco_check_password_notice', true ) ) {
-			?>
-			<div class="kco-message notice woocommerce-message notice-error">
-			<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_password' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
-			<?php // translators: %s: URL. ?>
-			<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'You need to tick the checkbox <i>When creating an account, automatically generate an account password</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href="%s">Accounts & Privacy tab', 'klarna-checkout-for-woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=account' ) ) . '</p>' ) ); ?>
-			</div>
-			<?php
-		}
-	}
 
 	/**
 	 * Check Autoptimize plugin checkout settings if they exist.
