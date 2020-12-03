@@ -90,7 +90,7 @@ class KCO_Admin_Notices {
 			?>
 			<div class="kco-message notice woocommerce-message notice-error">
 			<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_terms' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
-			<?php echo wp_kses_post( wpautop( '<p>' . __( 'You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout.', 'klarna-checkout-for-woocommerce' ) . '</p>' ) ); ?>
+			<?php echo wp_kses_post( wpautop( '<p>' . __( 'You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout. ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.woocommerce.com/document/configuring-woocommerce-settings/#section-24">' . __('Read more here. ', 'klarna-checkout-for-woocommerce') . '</a>' . '</p>' ) ); ?>
 			</div>
 			<?php
 		}
@@ -107,7 +107,7 @@ class KCO_Admin_Notices {
 			?>
 			<div class="kco-message notice woocommerce-message notice-error">
 			<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_https' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
-			<?php echo wp_kses_post( wpautop( '<p>' . __( 'You need to enable and configure https to be able to use Klarna Checkout.', 'klarna-checkout-for-woocommerce' ) . '</p>' ) ); ?>
+			<?php echo wp_kses_post( wpautop( '<p>' . __( 'You need to enable and configure https to be able to use Klarna Checkout. ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.woocommerce.com/document/ssl-and-https">' . __('Read more here. ', 'klarna-checkout-for-woocommerce') . '</a>' . '</p>' ) ); ?>
 			</div>
 			<?php
 		}
@@ -127,7 +127,7 @@ class KCO_Admin_Notices {
 			<div class="kco-message notice woocommerce-message notice-error">
 			<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_username' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
 			<?php // translators: %s: URL. ?>
-			<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'You need to tick the checkbox <i>When creating an account, automatically generate a username from the customer\'s email address</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href="%s">Accounts & Privacy tab', 'klarna-checkout-for-woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=account' ) ) . '</p>' ) ); ?>
+			<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'You need to tick the checkbox <i>When creating an account, automatically generate a username from the customer\'s email address</i> when having the <i>Allow customers to create an account during checkout</i> setting activated. This can be changed in the <a href="%s">Accounts & Privacy tab.', 'klarna-checkout-for-woocommerce' ), admin_url( 'admin.php?page=wc-settings&tab=account' ) ) . '</p>' ) ); ?>
 			</div>
 			<?php
 		}
@@ -156,7 +156,7 @@ class KCO_Admin_Notices {
 			<div class="kco-message notice woocommerce-message notice-error">
 			<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_autoptimize' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
 			<?php // translators: %s: URL. ?>
-			<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href="%s">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>).', 'klarna-checkout-for-woocommerce' ) . '</p>' ) ); ?>
+			<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href="%s">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>). ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.krokedil.com/article/301-klarna-checkout-optimizing-your-woocommerce-cart-checkout-when-using-an-iframe-based-checkout">' . __('Read more here. ', 'klarna-checkout-for-woocommerce') . '</a>' . '</p>' ) ); ?>
 			</div>
 			<?php
 		}
@@ -175,7 +175,7 @@ class KCO_Admin_Notices {
 				?>
 				<div class="kco-message notice woocommerce-message notice-error">
 				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_optimize' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
-				<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks as if you have a Optimizing or Caching plugin installed. Please make sure to not enable these features on the checkout page, as this can cause issues with Klarna Checkout. The checkout page should never be minified, concatenated, or cached', 'klarna-checkout-for-woocommerce' ) . '</p>' ) ); ?>
+				<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks as if you have a Optimizing or Caching plugin installed. Please make sure to not enable these features on the checkout page, as this can cause issues with Klarna Checkout. The checkout page should never be minified, concatenated, or cached. ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.krokedil.com/article/301-klarna-checkout-optimizing-your-woocommerce-cart-checkout-when-using-an-iframe-based-checkout">' . __('Read more here. ', 'klarna-checkout-for-woocommerce') . '</a>' . '</p>' ) ); ?>
 				</div>
 				<?php
 			}
@@ -183,7 +183,7 @@ class KCO_Admin_Notices {
 	}
 
 	/**
-	 * Show admin notice if old Klarna Upstream plugin is installed..
+	 * Show admin notice if old Klarna Upstream plugin is installed.
 	 */
 	public function check_klarna_upstream() {
 
@@ -197,7 +197,7 @@ class KCO_Admin_Notices {
 				<div class="kco-message notice woocommerce-message notice-error">
 				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_upstream' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
 				<?php // translators: %s: URL. ?>
-				<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href="%s">Klarna Add-ons page</a>..', 'klarna-checkout-for-woocommerce' ), admin_url( '/admin.php?page=checkout-addons' ) ) . '</p>' ) ); ?>
+				<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href="%s">Klarna Add-ons page</a>. ', 'klarna-checkout-for-woocommerce' ), admin_url( '/admin.php?page=checkout-addons' ) ) . '<a href="https://docs.krokedil.com/article/259-klarna-on-site-messaging"> ' . __('Read more here. ', 'klarna-checkout-for-woocommerce') . '</a>' . '</p>' ) ); ?>
 				</div>
 				<?php
 			}
@@ -260,7 +260,7 @@ class KCO_Admin_Notices {
 				?>
 				<div class="kco-message notice woocommerce-message notice-error">
 				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_permalinks' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
-				<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks as if you don\'t have pretty permalinks enabled in WordPress. For Klarna checkout for WooCommerce to function properly, this needs to be enabled.', 'klarna-checkout-for-woocommerce' ) . '</p>' ) ); ?>
+				<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks as if you don\'t have pretty permalinks enabled in WordPress. For Klarna checkout for WooCommerce to function properly, this needs to be enabled. ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://wordpress.org/support/article/using-permalinks">' . __('Read more here. ', 'klarna-checkout-for-woocommerce') . '</a>' .'</p>' ) ); ?>
 				</div>
 				<?php
 			}
