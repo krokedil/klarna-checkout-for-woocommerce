@@ -37,7 +37,7 @@ jQuery( function( $ ) {
 				kco_wc.paymentMethod = 'kco';
 			}
 			kco_wc.moveExtraCheckoutFields();
-			kco_wc.kcoResume();
+			kco_wc.updateShipping( false );
 		},
 
 		/**
@@ -401,6 +401,34 @@ jQuery( function( $ ) {
 			}
 		},
 
+		updateShipping: function( data ) {
+			kco_wc.kcoSuspend( true );
+			$.ajax(
+				{
+					url: kco_params.update_shipping_url,
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						data: data,
+						nonce: kco_params.update_shipping_nonce
+					},
+					success: function( response ) {
+						kco_wc.log( response );
+					},
+					error: function( response ) {
+						kco_wc.log( response );
+					},
+					complete: function( response ) {
+						kco_wc.klarnaUpdateNeeded = false;
+						$( '#shipping_method #' + response.responseJSON.data.shipping_option_name ).prop( 'checked', true );
+						$( 'body' ).trigger( 'kco_shipping_option_changed', [ data ]);
+						$( 'body' ).trigger( 'update_checkout' );
+						kco_wc.kcoResume();
+					}
+				}
+			);
+		},
+
 		/**
 		 * Initiates the script.
 		 */
@@ -464,31 +492,7 @@ jQuery( function( $ ) {
 						'shipping_option_change': function( data ) {
 							kco_wc.log( 'shipping_option_change', data );
 							kco_wc.log( data );
-							kco_wc.kcoSuspend( true );
-							$.ajax(
-								{
-									url: kco_params.update_shipping_url,
-									type: 'POST',
-									dataType: 'json',
-									data: {
-										data: data,
-										nonce: kco_params.update_shipping_nonce
-									},
-									success: function( response ) {
-										kco_wc.log( response );
-									},
-									error: function( response ) {
-										kco_wc.log( response );
-									},
-									complete: function( response ) {
-										kco_wc.klarnaUpdateNeeded = false;
-										$( '#shipping_method #' + response.responseJSON.data.shipping_option_name ).prop( 'checked', true );
-										$( 'body' ).trigger( 'kco_shipping_option_changed', [ data ]);
-										$( 'body' ).trigger( 'update_checkout' );
-										kco_wc.kcoResume();
-									}
-								}
-							);
+							kco_wc.updateShipping( data )
 						},
 						'can_not_complete_order': function( data ) {
 							kco_wc.log( 'can_not_complete_order', data );

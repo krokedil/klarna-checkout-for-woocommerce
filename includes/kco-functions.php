@@ -613,3 +613,47 @@ function kco_maybe_save_reference( $order_id, $klarna_order ) {
 		}
 	}
 }
+
+/**
+ * Undocumented function
+ *
+ * @param array|bool $data The shipping data from Klarna. False if not set.
+ * @param array|bool $klarna_order The Klarna order if we have one already. False if we don't.
+ * @return array|WP_Error
+ */
+function kco_update_wc_shipping( $data, $klarna_order = false ) {
+	// Set cart definition.
+	wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
+
+	// Set the data to the session.
+	if ( $data ) {
+		WC()->session->set( 'kss_shipping_data', $data );
+	} elseif ( $klarna_order ) {
+		$data = isset( $klarna_order['selected_shipping_option'] ) ? $klarna_order['selected_shipping_option'] : false;
+		WC()->session->set( 'kss_shipping_data', $data );
+	} else {
+		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+		$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+		$data            = isset( $klarna_order['selected_shipping_option'] ) ? $klarna_order['selected_shipping_option'] : false;
+		WC()->session->set( 'kss_shipping_data', $data );
+	}
+
+	// If the data is empty, return void.
+	if ( empty( $data ) ) {
+		return;
+	}
+
+	$chosen_shipping_methods   = array();
+	$chosen_shipping_methods[] = wc_clean( $data['id'] );
+	WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
+
+	WC()->cart->calculate_shipping();
+	WC()->cart->calculate_fees();
+	WC()->cart->calculate_totals();
+
+	$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+
+	$shipping_option_name = 'shipping_method_0_' . str_replace( ':', '', $data['id'] );
+
+	return $shipping_option_name;
+}

@@ -96,32 +96,11 @@ class KCO_AJAX extends WC_AJAX {
 			exit;
 		}
 
-		wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
+		$return                         = array();
+		$data                           = ( isset( $_POST['data'] ) && 'false' !== $_POST['data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['data'] ) ) : false;
+		$return['shipping_option_name'] = kco_update_wc_shipping( $data );
 
-		if ( isset( $_POST['data'] ) && is_array( $_POST['data'] ) ) {
-			$shipping_option           = array_map( 'sanitize_text_field', wp_unslash( $_POST['data'] ) );
-			$chosen_shipping_methods   = array();
-			$chosen_shipping_methods[] = wc_clean( $shipping_option['id'] );
-			WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
-		}
-		WC()->cart->calculate_shipping();
-		WC()->cart->calculate_fees();
-		WC()->cart->calculate_totals();
-
-		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
-
-		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
-
-		// If the update failed return error.
-		if ( is_wp_error( $klarna_order ) ) {
-			wp_send_json_error();
-			wp_die();
-		}
-		$shipping_option_name = 'shipping_method_0_' . str_replace( ':', '', $shipping_option['id'] );
-		$data                 = array(
-			'shipping_option_name' => $shipping_option_name,
-		);
-		wp_send_json_success( $data );
+		wp_send_json_success( $return );
 		wp_die();
 	}
 
@@ -171,7 +150,7 @@ class KCO_AJAX extends WC_AJAX {
 
 			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
-			// Set empty return array for errors.
+			// Set empty return error array.
 			$return = array();
 
 			// Check if we have a klarna order id.
@@ -182,7 +161,6 @@ class KCO_AJAX extends WC_AJAX {
 			} else {
 				// Get the Klarna order from Klarna.
 				$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
-
 				// Check if we got a wp_error.
 				if ( is_wp_error( $klarna_order ) ) {
 					wp_send_json_error();
