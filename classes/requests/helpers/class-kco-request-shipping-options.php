@@ -24,12 +24,16 @@ class KCO_Request_Shipping_Options {
 			$shipping_options = array();
 			$packages         = WC()->shipping->get_packages();
 			$tax_display      = get_option( 'woocommerce_tax_display_cart' );
-
 			foreach ( $packages as $i => $package ) {
 				$chosen_method = isset( WC()->session->chosen_shipping_methods[ $i ] ) ? WC()->session->chosen_shipping_methods[ $i ] : '';
 				foreach ( $package['rates'] as $method ) {
 					$method_id   = $method->id;
 					$method_name = $method->label;
+
+					// Don't add the KSS shipping method as a shipping option. It should not be a valid fallback if it exists and the store uses a TMS system.
+					if ( false !== strpos( $method_id, 'klarna_kss' ) ) {
+						continue;
+					}
 
 					if ( $separate_sales_tax || 'excl' === $tax_display ) {
 						$method_price = intval( round( $method->cost, 2 ) * 100 );
