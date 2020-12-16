@@ -323,6 +323,7 @@ if ( ! class_exists( 'KCO' ) ) {
  *
  * @return KCO
  */
-function KCO_WC() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
+function KCO_WC() {
+ // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
 	return KCO::get_instance();
 }
