@@ -26,7 +26,7 @@ const submitBillingForm = async (frame, data) => {
 		postalCode,
 		submitSelector,
 	} = data;
-	if (await frame.$("#email")) {
+	if (await frame.$("#billing-email")) {
 		await frame.type(emailSelector, String(email));
 		await frame.type(postalCodeSelector, String(postalCode));
 		await frame.click(submitSelector);
