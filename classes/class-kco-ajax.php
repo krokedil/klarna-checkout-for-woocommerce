@@ -277,6 +277,12 @@ class KCO_AJAX extends WC_AJAX {
 			wp_die();
 		}
 
+		// If the Klarna order was false, there was no update needed. Don't change any address data.
+		if ( ! $klarna_order ) {
+			wp_send_json_success( false );
+			wp_die();
+		}
+
 		wp_send_json_success(
 			array(
 				'billing_address'  => isset( $klarna_order['billing_address'] ) ? $klarna_order['billing_address'] : array(),

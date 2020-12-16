@@ -359,7 +359,7 @@ jQuery( function( $ ) {
 			clearInterval(kco_wc.interval);
 			// Remove the timeout.
 			clearTimeout( kco_wc.timeout );
-			// Renable the form.
+			// Re-enable the form.
 			$( 'body' ).trigger( 'updated_checkout' );
 			kco_wc.checkoutFormSelector.removeClass( 'processing' );
 			$( kco_wc.checkoutFormSelector ).unblock();
@@ -467,8 +467,11 @@ jQuery( function( $ ) {
 									success: function( response ) {
 										kco_wc.log( response );
 
-										// All good trigger update_checkout event
-										kco_wc.setCustomerData( response.data );
+										// Check if we have new address data to apply to the form.
+										if( response.data ) {
+											// All good trigger update_checkout event
+											kco_wc.setCustomerData( response.data );
+										}
 
 										$( 'body' ).trigger( 'update_checkout' );
 									},
