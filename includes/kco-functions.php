@@ -626,6 +626,11 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 	wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
 	$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
+	// If we don't have a Klarna order, return void.
+	if ( empty( $klarna_order_id ) ) {
+		return;
+	}
+
 	// Set the data to the session.
 	if ( ! $data && $klarna_order ) {
 		$data = isset( $klarna_order['selected_shipping_option'] ) ? $klarna_order['selected_shipping_option'] : false;
