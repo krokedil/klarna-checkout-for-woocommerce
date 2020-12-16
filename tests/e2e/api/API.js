@@ -1,5 +1,6 @@
 import axios from "axios";
 import woocommerce from "./woocommerce";
+import { klarnaAuth } from "../config/config";
 
 /**
  * @param page
@@ -8,9 +9,11 @@ import woocommerce from "./woocommerce";
  * @returns {Promise<AxiosResponse<any>>}
  */
 const getKlarnaOrderById = async (page, endpoint, id) => {
-	const encodedKey = await page.evaluate(() => {
-		return btoa("PK08164_dbc5171dedd2:e7kG49n1SCJRh1rJ");
-	});
+	const encodedKey = await page.evaluate((auth) => {
+		const merchant = auth.test_merchant_id_eu;
+		const secret = auth.test_shared_secret_eu;
+		return btoa(`${merchant}:${secret}`);
+	}, klarnaAuth);
 
 	return axios.get(`${endpoint}/${id}`, {
 		headers: {
