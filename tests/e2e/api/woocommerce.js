@@ -34,6 +34,9 @@ const getProducts = () => {
 const getProductById = (id) => {
 	return createRequest(`${API_PRODUCTS_ENDPOINT}${id}`);
 };
+const getOrders = () => {
+	return createRequest(API_ORDER_ENDPOINT);
+};
 const getOrderById = (id) => {
 	return createRequest(`${API_ORDER_ENDPOINT}${id}`);
 };
@@ -42,4 +45,5 @@ export default {
 	getProducts,
 	getProductById,
 	getOrderById,
+	getOrders,
 };
