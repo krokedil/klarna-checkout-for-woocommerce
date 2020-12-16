@@ -3,7 +3,7 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.5
+Tested up to: 5.5.6
 Requires PHP: 5.6
 WC requires at least: 3.4.0
 WC tested up to: 4.7.0
@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Payments for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2020.12.16    - version 2.4.1 =
+* Enhancement   - Several improvements to our JavaScript, making the checkout experience faster and smoother.
+* Enhancement   - Added links to our documentation for the admin notices that we can print to make it easier to find a solution.
+* Enhancement   - Changed the way data is stored for the Klarna Shipping Assistance ( previously Klarna Shipping Service ) plugin. We now save it as a transient named kss_data_{klarna_order_id}.
+* Fix           - Removed the account fields ( account name and password ) from our ignored fields list. This will allow for account creation with custom password and username on the checkout page when placing an order.
+* Fix           - Fixed an issue were changing only the address line for the shipping address in Klarna Checkout would cause the postcode to be cleared from shipping calculations.
+
 = 2020.11.18    - version 2.4.0 =
 * Feature       - Add setting to allow the store to force the validation of a national identification number. Only applicable for SE, NO, FI and DK.
 * Feature       - Add a filer for additional checkboxes. This allows for using the checkbox that we include in the settings allow with your own checkboxes as needed. The filter is "kco_additional_checkboxes". Please check Klarnas documentation for how to format the data.
