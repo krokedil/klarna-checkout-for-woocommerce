@@ -5,7 +5,7 @@
  * @returns {Promise<*|Frame>}
  */
 const loadIFrame = async (page, name) =>
-    page.frames().find((frame) => frame.name() === name);
+	page.frames().find((frame) => frame.name() === name);
 
 /**
  *

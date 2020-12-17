@@ -28,15 +28,13 @@ const acceptTerms = async (page, selector) => {
  * Check for selector - continue if false
  */
 const expectSelector = async (frame, page, selector, time) => {
-
-	try {		
-		await page.waitForTimeout(2*time);
+	try {
+		await page.waitForTimeout(2 * time);
 		await frame.click(selector);
 	} catch {
 		console.log("Proceed from expectation");
 	}
 };
-
 
 /**
  * Check for input - continue if false
@@ -47,7 +45,6 @@ const expectInput = async (frame, page, inputValue, selector, time) => {
 		await frame.type(selector, inputValue);
 	} catch {
 		console.log("Proceed from expectation");
-
 	}
 };
 
