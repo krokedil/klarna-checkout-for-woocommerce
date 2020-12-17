@@ -1,3 +1,4 @@
+
 import puppeteer from "puppeteer";
 import kcoURLS from "../helpers/kcoURLS";
 import user from "../helpers/kcoUser";
@@ -5,7 +6,7 @@ import cart from "../helpers/kcoCart";
 import kcoFrame from "../helpers/kcoFrame";
 import kcoUtils from "../helpers/kcoUtils";
 import API from "../api/API";
-// import config from "../config/config";
+
 import {
 	klarnaAuth,
 	freeShippingMethod,
@@ -24,24 +25,6 @@ import {
 let page;
 let browser;
 let context;
-
-// const billingData = {
-// 	emailSelector: "#billing-email",
-// 	email: "test@krokedil.se",
-// 	postalCodeSelector: "#billing-postal_code",
-// 	postalCode: 12600,
-// 	submitSelector: 'button[id="button-primary"]',
-// };
-
-// const userCredentials = {
-// 	username: "admin",
-// 	password: "password",
-// };
-
-// const selectors = {
-// 	username: "#username",
-// 	password: "#password",
-// };
 
 /**
  * Shipping method
