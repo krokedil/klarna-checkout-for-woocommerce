@@ -4,13 +4,8 @@
  * @param name
  * @returns {Promise<*|Frame>}
  */
-const loadIFrame = async (page, name) => {
-	const selector = `iframe[name="${name}"]`;
-	await page.waitForSelector(selector);
-	const elementHandle = await page.$(selector);
-	const frame = await elementHandle.contentFrame();
-	return frame;
-};
+const loadIFrame = async (page, name) =>
+    page.frames().find((frame) => frame.name() === name);
 
 /**
  *
