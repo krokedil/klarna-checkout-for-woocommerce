@@ -15,8 +15,7 @@ This repository is not suitable for support. Please don't use our issue tracker 
 
 * The documentation on [docs.krokedil.com](https://docs.krokedil.com/collection/121-klarna-checkout) have a number of articles describing plugin configuration, compatibility issues and troubleshooting guides.
 * Other users might have experienced similar issues and gotten a reply in the [wp.org community forum](https://wordpress.org/support/plugin/klarna-checkout-for-woocommerce/). 
-* If you can't find an answer to your question you van also [create a support ticket](http://krokedil.com/support/).
+* If you can't find an answer to your question you can also [create a support ticket](http://krokedil.com/support/).
 
-##
-Contributing to Klarna Checkout for WooCommerce
+## Contributing to Klarna Checkout for WooCommerce
 If you have a patch or have stumbled upon an issue with Klarna Checkout for WooCommerce core, you can contribute this back to the code. Please submit a PR to the *Develop* branch and we will review it closer.
