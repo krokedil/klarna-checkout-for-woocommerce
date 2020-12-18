@@ -4,7 +4,12 @@ import crypto from "crypto";
 import kcoURLS from "../helpers/kcoURLS";
 import { customerKey, customerSecret } from "../config/config";
 
-const { API_BASE_URL, API_ORDER_ENDPOINT, API_PRODUCTS_ENDPOINT } = kcoURLS;
+const {
+	API_BASE_URL,
+	API_ORDER_ENDPOINT,
+	API_PRODUCTS_ENDPOINT,
+	API_CUSTOMER_ENDPOINT,
+} = kcoURLS;
 
 const oauth = Oauth({
 	consumer: {
@@ -55,9 +60,18 @@ const getOrderById = (id) => {
 	return createRequest(`${API_ORDER_ENDPOINT}${id}`);
 };
 
+const createCustomer = async (data) => {
+	return createPostRequest(`${API_CUSTOMER_ENDPOINT}`, data, "POST");
+};
+const getCustomers = async () => {
+	return createRequest(API_CUSTOMER_ENDPOINT);
+};
+
 export default {
 	getProducts,
 	getProductById,
 	getOrderById,
 	getOrders,
+	getCustomers,
+	createCustomer,
 };
