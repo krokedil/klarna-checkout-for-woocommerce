@@ -28,6 +28,20 @@ const createRequest = (endpoint, method = "GET") => {
 	};
 	return axios.get(requestData.url, { params: oauth.authorize(requestData) });
 };
+const createPostRequest = (endpoint, data, method = "POST") => {
+	const headers = {
+		"Access-Control-Allow-Origin": "*",
+		"Content-Type": "application/json",
+	};
+	const requestData = {
+		url: API_BASE_URL + endpoint,
+		method,
+	};
+	return axios.post(requestData.url, data, {
+		params: oauth.authorize(requestData),
+		headers,
+	});
+};
 const getProducts = () => {
 	return createRequest(API_ORDER_ENDPOINT);
 };
