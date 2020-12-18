@@ -23,8 +23,8 @@ export const customerLastname = customerData.last_name;
 export const customerEmail = customerData.email;
 export const customerUsername = customerData.username;
 
-export const { pinNumber } = config.users.customer;
-export const { cardNumber } = config.users.customer;
+export const { pinNumber } = customerData;
+export const { cardNumber } = customerData;
 
 export const timeOutTime = config.timeoutTime;
 export const { billingData } = config.users.customer;
