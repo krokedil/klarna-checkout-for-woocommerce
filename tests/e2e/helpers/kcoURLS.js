@@ -12,6 +12,8 @@ const API_ORDER_ENDPOINT = "/wc/v3/orders/";
 
 const API_PRODUCTS_ENDPOINT = "/wc/v3/products/";
 
+const API_CUSTOMER_ENDPOINT = "/wc/v3/customers";
+
 export default {
 	BASE_URL,
 	CHECKOUT,
@@ -20,4 +22,5 @@ export default {
 	API_BASE_URL,
 	API_ORDER_ENDPOINT,
 	API_PRODUCTS_ENDPOINT,
+	API_CUSTOMER_ENDPOINT,
 };
