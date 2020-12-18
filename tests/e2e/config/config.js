@@ -27,6 +27,16 @@ export const { pinNumber } = customerData;
 export const { cardNumber } = customerData;
 
 export const timeOutTime = config.timeoutTime;
+export const { billingDataAPI } = customerData;
+export const { shippingDataAPI } = customerData;
+export const customerAPIData = {
+	email: customerEmail,
+	first_name: customerName,
+	last_name: customerLastname,
+	username: customerUsername,
+	billingDataAPI,
+	shippingDataAPI,
+};
 export const { billingData } = config.users.customer;
 
 export const userCredentials = config.users.customer.credentialsAndSelectors;
