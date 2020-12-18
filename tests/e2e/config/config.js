@@ -37,8 +37,8 @@ export const customerAPIData = {
 	billingDataAPI,
 	shippingDataAPI,
 };
-export const { billingData } = config.users.customer;
+export const { billingData } = customerData;
 
-export const userCredentials = config.users.customer.credentialsAndSelectors;
+export const userCredentials = customerData.credentialsAndSelectors;
 
-export const { klarnaOrderEndpoint } = config.users.admin;
+export const { klarnaOrderEndpoint } = adminData;
