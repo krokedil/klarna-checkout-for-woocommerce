@@ -8,9 +8,8 @@ export const customerKey = customerData.api.consumerKey;
 export const customerSecret = customerData.api.consumerSecret;
 export const klarnaAuth = customerData.klarnaCredentials;
 
-export const freeShippingMethod =
-	config.users.customer.shipping.methods.freeShipping;
-export const flatRateMethod = config.users.customer.shipping.methods.flatRate;
+export const freeShippingMethod = customerData.shipping.methods.freeShipping;
+export const flatRateMethod = customerData.shipping.methods.flatRate;
 
 export const freeShippingMethodTarget =
 	config.users.customer.shipping.targets.freeShippingTarget;
