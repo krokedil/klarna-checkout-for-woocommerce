@@ -18,6 +18,11 @@ export const creditPaymentMethod = paymentSelectedMethod.creditMethod;
 export const debitPaymentMethod = paymentSelectedMethod.debitMethod;
 export const invoicePaymentMethod = paymentSelectedMethod.invoiceMethod;
 
+export const customerName = customerData.first_name;
+export const customerLastname = customerData.last_name;
+export const customerEmail = customerData.email;
+export const customerUsername = customerData.username;
+
 export const { pinNumber } = config.users.customer;
 export const { cardNumber } = config.users.customer;
 
