@@ -11,7 +11,6 @@ export const freeShippingMethod =
 	config.users.customer.shipping.methods.freeShipping;
 export const flatRateMethod = config.users.customer.shipping.methods.flatRate;
 
-
 export const freeShippingMethodTarget =
 	config.users.customer.shipping.targets.freeShippingTarget;
 export const flatRateMethodTarget =
@@ -32,4 +31,4 @@ export const { billingData } = config.users.customer;
 
 export const userCredentials = config.users.customer.credentialsAndSelectors;
 
-export const klarnaOrderEndpoint = config.users.admin.klarnaOrderEndpoint;
+export const { klarnaOrderEndpoint } = config.users.admin;
