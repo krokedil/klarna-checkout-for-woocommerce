@@ -42,3 +42,4 @@ export const { billingData } = customerData;
 export const userCredentials = customerData.credentialsAndSelectors;
 
 export const { klarnaOrderEndpoint } = adminData;
+export const { puppeteerOptions } = config;
