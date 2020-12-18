@@ -11,10 +11,8 @@ export const klarnaAuth = customerData.klarnaCredentials;
 export const freeShippingMethod = customerData.shipping.methods.freeShipping;
 export const flatRateMethod = customerData.shipping.methods.flatRate;
 
-export const freeShippingMethodTarget =
-	config.users.customer.shipping.targets.freeShippingTarget;
-export const flatRateMethodTarget =
-	config.users.customer.shipping.targets.flatRateTarget;
+export const freeShippingMethodTarget = shippingTargets.freeShippingTarget;
+export const flatRateMethodTarget = shippingTargets.flatRateTarget;
 
 export const creditPaymentMethod =
 	config.users.customer.payment.selectedMethod.creditMethod;
