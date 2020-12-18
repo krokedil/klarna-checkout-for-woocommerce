@@ -4,9 +4,9 @@ export const adminData = config?.users?.admin;
 export const customerData = config.users.customer;
 export const shippingTargets = customerData.shipping.targets;
 export const paymentSelectedMethod = customerData.payment.selectedMethod;
-export const customerKey = config.users.customer.api.consumerKey;
-export const customerSecret = config.users.customer.api.consumerSecret;
-export const klarnaAuth = config.users.customer.klarnaCredentials;
+export const customerKey = customerData.api.consumerKey;
+export const customerSecret = customerData.api.consumerSecret;
+export const klarnaAuth = customerData.klarnaCredentials;
 
 export const freeShippingMethod =
 	config.users.customer.shipping.methods.freeShipping;
