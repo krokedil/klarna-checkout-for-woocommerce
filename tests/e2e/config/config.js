@@ -14,12 +14,9 @@ export const flatRateMethod = customerData.shipping.methods.flatRate;
 export const freeShippingMethodTarget = shippingTargets.freeShippingTarget;
 export const flatRateMethodTarget = shippingTargets.flatRateTarget;
 
-export const creditPaymentMethod =
-	config.users.customer.payment.selectedMethod.creditMethod;
-export const debitPaymentMethod =
-	config.users.customer.payment.selectedMethod.debitMethod;
-export const invoicePaymentMethod =
-	config.users.customer.payment.selectedMethod.invoiceMethod;
+export const creditPaymentMethod = paymentSelectedMethod.creditMethod;
+export const debitPaymentMethod = paymentSelectedMethod.debitMethod;
+export const invoicePaymentMethod = paymentSelectedMethod.invoiceMethod;
 
 export const { pinNumber } = config.users.customer;
 export const { cardNumber } = config.users.customer;
