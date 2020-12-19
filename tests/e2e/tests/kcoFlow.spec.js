@@ -17,6 +17,7 @@ import {
 	pinNumber,
 	puppeteerOptions as options,
 	customerAPIData,
+	klarnaOrderEndpoint,
 } from "../config/config";
 import API from "../api/API";
 
@@ -223,6 +224,26 @@ describe("KCO", () => {
 			'[id="confirm_bank_account_dialog__footer-button-wrapper"]',
 			timeOutTime
 		);
+		await page.waitForTimeout(3 * timeOutTime);
+		const currentURL = await page.url();
+		const currentKCOId = currentURL.split("kco_order_id=")[1];
+		const response = await API.getKlarnaOrderById(
+			page,
+			klarnaOrderEndpoint,
+			currentKCOId
+		);
+		console.dir(response, { depth: null });
+
+		const orderId = currentURL
+			.split("/")
+			.filter((urlPart) => /^\d+$/.test(urlPart))[0];
+
+		try {
+			const wooCommerceOrder = await API.getWCOrderById(orderId);
+			console.dir(wooCommerceOrder, { depth: null });
+		} catch (error) {
+			console.log(error);
+		}
 		await page.waitForTimeout(5 * timeOutTime);
 		const value = await page.$eval(".entry-title", (e) => e.textContent);
 		await page.screenshot({ path: "./order", type: "png" });
