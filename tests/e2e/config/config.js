@@ -7,12 +7,12 @@ export const paymentSelectedMethod = customerData.payment.selectedMethod;
 export const customerKey = customerData.api.consumerKey;
 export const customerSecret = customerData.api.consumerSecret;
 export const klarnaAuth = customerData.klarnaCredentials;
+export const shippingSel = customerData.shippingSelectors;
+export const freeShippingMethod = shippingSel.methods.freeShipping;
+export const flatRateMethod = shippingSel.methods.flatRate;
 
-export const freeShippingMethod = customerData.shipping.methods.freeShipping;
-export const flatRateMethod = customerData.shipping.methods.flatRate;
-
-export const freeShippingMethodTarget = shippingTargets.freeShippingTarget;
-export const flatRateMethodTarget = shippingTargets.flatRateTarget;
+export const freeShippingMethodTarget = shippingSel.targets.freeShippingTarget;
+export const flatRateMethodTarget = shippingSel.targets.flatRateTarget;
 
 export const creditPaymentMethod = paymentSelectedMethod.creditMethod;
 export const debitPaymentMethod = paymentSelectedMethod.debitMethod;
@@ -27,15 +27,15 @@ export const { pinNumber } = customerData;
 export const { cardNumber } = customerData;
 
 export const timeOutTime = config.timeoutTime;
-export const { billingDataAPI } = customerData;
-export const { shippingDataAPI } = customerData;
+export const { billing } = customerData;
+export const { shipping } = customerData;
 export const customerAPIData = {
 	email: customerEmail,
 	first_name: customerName,
 	last_name: customerLastname,
 	username: customerUsername,
-	billingDataAPI,
-	shippingDataAPI,
+	billing,
+	shipping,
 };
 export const { billingData } = customerData;
 
