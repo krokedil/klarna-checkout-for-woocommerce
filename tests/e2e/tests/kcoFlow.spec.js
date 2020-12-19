@@ -15,6 +15,7 @@ import {
 	timeOutTime,
 	cardNumber,
 	pinNumber,
+	puppeteerOptions as options,
 } from "../config/config";
 
 let page;
@@ -40,15 +41,7 @@ const selectedPaymentMethod = invoicePaymentMethod;
 
 describe("KCO", () => {
 	beforeAll(async () => {
-		browser = await puppeteer.launch({
-			headless: false,
-			defaultViewport: null,
-			args: [
-				"--disable-infobars",
-				"--disable-web-security",
-				"--disable-features=IsolateOrigins,site-per-process",
-			],
-		});
+		browser = await puppeteer.launch(options);
 		context = await browser.createIncognitoBrowserContext();
 		page = await context.newPage();
 
