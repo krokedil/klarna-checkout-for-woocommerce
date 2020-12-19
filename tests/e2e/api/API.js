@@ -22,9 +22,13 @@ const getKlarnaOrderById = async (page, endpoint, id) => {
 	});
 };
 
-const getWoocommerceOrderById = async (id) => woocommerce.getOrderById(id);
+const getWCOrderById = async (id) => woocommerce.getOrderById(id);
+const createWCCustomer = async (data) => woocommerce.createCustomer(data);
+const getWCCustomers = async () => woocommerce.getCustomers();
 
 export default {
 	getKlarnaOrderById,
-	getWoocommerceOrderById,
+	getWCOrderById,
+	getWCCustomers,
+	createWCCustomer,
 };
