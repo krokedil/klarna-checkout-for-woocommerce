@@ -16,7 +16,9 @@ import {
 	cardNumber,
 	pinNumber,
 	puppeteerOptions as options,
+	customerAPIData,
 } from "../config/config";
+import API from "../api/API";
 
 let page;
 let browser;
@@ -44,7 +46,20 @@ describe("KCO", () => {
 		browser = await puppeteer.launch(options);
 		context = await browser.createIncognitoBrowserContext();
 		page = await context.newPage();
-
+		try {
+			const customerResponse = await API.getWCCustomers();
+			const { data } = customerResponse;
+			console.log("customer exists");
+			if (parseInt(data.length, 10) < 1) {
+				try {
+					await API.createWCCustomer(customerAPIData);
+				} catch (error) {
+					console.log(error);
+				}
+			}
+		} catch (error) {
+			console.log(error);
+		}
 		await page.goto(kcoURLS.MY_ACCOUNT);
 		await user.login(userCredentials, { page });
 		await page.goto(kcoURLS.SHOP);
