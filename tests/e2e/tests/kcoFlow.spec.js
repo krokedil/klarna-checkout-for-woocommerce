@@ -101,7 +101,7 @@ describe("KCO", () => {
 			page,
 			"klarna-checkout-iframe"
 		);
-		kcoFrame.submitBillingForm(originalFrame, billingData);
+		await kcoFrame.submitBillingForm(originalFrame, billingData);
 
 		await page.waitForTimeout(timeOutTime);
 		await kcoUtils.expectSelector(
