@@ -110,7 +110,7 @@ describe("KCO", () => {
 		try {
 			const customerResponse = await API.getWCCustomers();
 			const { data } = customerResponse;
-			console.log("customer exists");
+			console.log("Customer exists");
 			if (parseInt(data.length, 10) < 1) {
 				try {
 					await API.createWCCustomer(customerAPIData);
@@ -124,9 +124,6 @@ describe("KCO", () => {
 		await page.goto(kcoURLS.MY_ACCOUNT);
 		await user.login(userCredentials, { page });
 		await page.goto(kcoURLS.SHOP);
-		// await cart.addSingleProductToCart(page, 1538);
-		// await cart.addSingleProductToCart(page, 1538);
-		// await cart.addSingleProductToCart(page, 1538);
 
 		await cart.addMultipleProductsToCart(page, [1538, 1538, 1547]);
 
@@ -304,27 +301,6 @@ describe("KCO", () => {
 
 		const wooCommerceOrder = await API.getWCOrderById(orderId);
 
-		//---------- LOG RESPONSE -------------
-
-			// -- STEP 1 ---
-
-			// console.log ('---- KLARNA ----- OOO')
-			// console.log(response.data)
-			// console.log ('---- KLARNA ----- XXX')
-
-			// console.log ('---- WOOCOMMERCE ----- OOO')
-			// console.log(wooCommerceOrder.data)
-			// console.log ('---- WOOCOMMERCE ----- XXX')
-
-			// let klarnaPoligon = response.data.order_lines.filter(x => x.reference === 'test-product-simple-product-12-tax')[0];
-			// let wooPoligon = wooCommerceOrder.data.line_items.filter(x => x.sku === 'test-product-simple-product-12-tax')[0];
-
-			// console.log( klarnaPoligon);
-			// console.log( wooPoligon);
-
-
-
-			// -- STEP 2 ---
 			let klarnaOrderLinesContainer = [];
 			let wooOrderLinesContainer = [];
 
@@ -340,9 +316,6 @@ describe("KCO", () => {
 					wooOrderLinesContainer.push(wooOrderLinesItemType)
 				}
 			});
-
-			// console.log(klarnaOrderLinesContainer)
-			// console.log(wooOrderLinesContainer)
 
 			for (let i=0; i<klarnaOrderLinesContainer.length; i++){
 
@@ -441,43 +414,6 @@ describe("KCO", () => {
 			klarnaPhone = response.data.shipping_address.phone;
 			wooPhone = wooCommerceOrder.data.billing.phone.replace(/\s/g, '');
 		}
-
-		// if(parseFloat(response.data.order_lines[0].total_amount) === parseInt(Math.round((parseFloat(wooCommerceOrder.data.line_items[0].total) + parseFloat(wooCommerceOrder.data.line_items[0].total_tax)) * 100).toFixed(2))) {
-		// 	klarnaTotalAmount = response.data.order_lines[0].total_amount;
-		// 	wooTotalAmount = parseInt(Math.round((parseFloat(wooCommerceOrder.data.line_items[0].total) + parseFloat(wooCommerceOrder.data.line_items[0].total_tax)) * 100).toFixed(2));
-		// }
-
-
-		// if(response.data.order_lines[1].name === wooCommerceOrder.data.shipping_lines[0].method_title ) {
-		// 	klarnaShippingMethod = response.data.order_lines[1].name;
-		// 	wooShippingMethod = wooCommerceOrder.data.shipping_lines[0].method_title;
-		// }
-
-
-		// if(response.data.order_lines[0].total_tax_amount === wooCommerceOrder.data.tax_lines[0].rate_percent ) {
-		// 	klarnaTotalTax = response.data.order_lines[0].total_tax_amount;
-		// 	wooTotalTax = wooCommerceOrder.data.tax_lines[0].rate_percent;
-		// }
-
-		// if(response.data.order_lines[0].quantity === wooCommerceOrder.data.line_items[0].quantity ) {
-		// 	klarnaQuantity = response.data.order_lines[0].quantity;
-		// 	wooQuantity = wooCommerceOrder.data.line_items[0].quantity;
-		// }
-
-		// if(response.data.order_lines[0].name === wooCommerceOrder.data.line_items[0].name ) {
-		// 	klarnaProductName = response.data.order_lines[0].name;
-		// 	wooProductName = wooCommerceOrder.data.line_items[0].name;
-		// }
-
-		// if(response.data.order_lines[0].reference === wooCommerceOrder.data.line_items[0].sku ) {
-		// 	klarnaSKU = response.data.order_lines[0].reference;
-		// 	wooSKU = wooCommerceOrder.data.line_items[0].sku;
-		// }
-
-		// if(response.data.order_id === wooCommerceOrder.data.transaction_id ) {
-		// 	klarnaOrderId = response.data.order_id;
-		// 	wooOrderId = wooCommerceOrder.data.transaction_id;
-		// }
 
 		if(response.data.purchase_currency === wooCommerceOrder.data.currency ) {
 			klarnaCurrency = response.data.purchase_currency;
