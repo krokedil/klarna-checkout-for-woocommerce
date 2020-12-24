@@ -422,8 +422,6 @@ describe("KCO", () => {
 
 		await page.waitForTimeout(5 * timeOutTime);
 		const value = await page.$eval(".entry-title", (e) => e.textContent);
-		await page.screenshot({ path: "./order", type: "png" });
-
 		expect(value).toBe("Order received")
 		;
 	}, 190000);
