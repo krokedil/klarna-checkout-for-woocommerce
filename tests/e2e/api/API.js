@@ -26,6 +26,7 @@ const getWCOrderById = async (id) => woocommerce.getOrderById(id);
 const createWCCustomer = async (data) => woocommerce.createCustomer(data);
 const getWCCustomers = async () => woocommerce.getCustomers();
 const clearWCSession = async () => woocommerce.clearSession();
+const updateOptions = async (data) => woocommerce.updateOption(data);
 
 export default {
 	getKlarnaOrderById,
@@ -33,4 +34,5 @@ export default {
 	getWCCustomers,
 	createWCCustomer,
 	clearWCSession,
+	updateOptions,
 };

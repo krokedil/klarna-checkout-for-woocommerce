@@ -6,6 +6,7 @@ const {
 	API_PRODUCTS_ENDPOINT,
 	API_CUSTOMER_ENDPOINT,
 	API_SESSION_ENDPOINT,
+	API_WC_OPTIONS,
 } = kcoURLS;
 
 const getProducts = () => {
@@ -31,6 +32,9 @@ const clearSession = async () => {
 	return createRequest(API_SESSION_ENDPOINT, put, { confirm: true });
 };
 
+const updateOption = async (data) => {
+	return createRequest(API_WC_OPTIONS, post, JSON.stringify(data));
+};
 export default {
 	getProducts,
 	getProductById,
@@ -39,4 +43,5 @@ export default {
 	getCustomers,
 	createCustomer,
 	clearSession,
+	updateOption,
 };
