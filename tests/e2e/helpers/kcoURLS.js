@@ -16,6 +16,8 @@ const API_CUSTOMER_ENDPOINT = "/wc/v3/customers";
 
 const API_SESSION_ENDPOINT = "/wc/v3/system_status/tools/clear_sessions";
 
+const API_WC_OPTIONS = "/wc-admin/options";
+
 export default {
 	BASE_URL,
 	CHECKOUT,
@@ -26,4 +28,5 @@ export default {
 	API_PRODUCTS_ENDPOINT,
 	API_CUSTOMER_ENDPOINT,
 	API_SESSION_ENDPOINT,
+	API_WC_OPTIONS,
 };
