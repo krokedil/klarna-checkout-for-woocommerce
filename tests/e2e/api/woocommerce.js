@@ -1,5 +1,5 @@
 import kcoURLS from "../helpers/kcoURLS";
-import { createRequest, createPostRequest } from "./index";
+import { createRequest, post } from "./index";
 
 const {
 	API_ORDER_ENDPOINT,
@@ -21,7 +21,7 @@ const getOrderById = (id) => {
 };
 
 const createCustomer = async (data) => {
-	return createPostRequest(`${API_CUSTOMER_ENDPOINT}`, data, "POST");
+	return createRequest(`${API_CUSTOMER_ENDPOINT}`, post, data);
 };
 const getCustomers = async () => {
 	return createRequest(API_CUSTOMER_ENDPOINT);
