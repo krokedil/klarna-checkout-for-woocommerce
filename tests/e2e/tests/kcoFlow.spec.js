@@ -18,7 +18,6 @@ import {
 	puppeteerOptions as options,
 	customerAPIData,
 	klarnaOrderEndpoint,
-
 } from "../config/config";
 import API from "../api/API";
 
@@ -26,69 +25,67 @@ let page;
 let browser;
 let context;
 
+const klarnaOrderId = [];
+const wooOrderId = [];
 
-let klarnaOrderId = [];
-let wooOrderId = [];
+let klarnaFirstName = "klarna";
+let wooFirstName = "woo";
 
-let klarnaFirstName = 'klarna';
-let wooFirstName = 'woo';
+let klarnaLastName = "klarna";
+let wooLastName = "woo";
 
-let klarnaLastName = 'klarna';
-let wooLastName = 'woo';
+let klarnaCompany = "klarna";
+let wooCompany = "woo";
 
-let klarnaCompany = 'klarna';
-let wooCompany = 'woo';
+let klarnaCurrency = "klarna";
+let wooCurrency = "woo";
 
-let klarnaCurrency = 'klarna';
-let wooCurrency = 'woo';
+let klarnaAddressOne = "klarna";
+let wooAddressOne = "woo";
 
-let klarnaAddressOne = 'klarna';
-let wooAddressOne = 'woo';
+let klarnaAddressTwo = "klarna";
+let wooAddressTwo = "woo";
 
-let klarnaAddressTwo = 'klarna';
-let wooAddressTwo = 'woo';
+let klarnaCity = "klarna";
+let wooCity = "woo";
 
-let klarnaCity = 'klarna';
-let wooCity = 'woo';
+let klarnaRegion = "klarna";
+let wooRegion = "woo";
 
-let klarnaRegion = 'klarna';
-let wooRegion = 'woo';
+let klarnaPostcode = "klarna";
+let wooPostcode = "woo";
 
-let klarnaPostcode = 'klarna';
-let wooPostcode = 'woo';
+let klarnaCountry = "klarna";
+let wooCountry = "woo";
 
-let klarnaCountry = 'klarna';
-let wooCountry = 'woo';
+let klarnaEmail = "klarna";
+let wooEmail = "woo";
 
-let klarnaEmail = 'klarna';
-let wooEmail = 'woo';
-
-let klarnaSKU = [];
-let wooSKU = [];
+const klarnaSKU = [];
+const wooSKU = [];
 
 let klarnaTotalAmount = [];
 let wooTotalAmount = [];
 
-let klarnaShippingMethod = [];
-let wooShippingMethod = [];
+const klarnaShippingMethod = [];
+const wooShippingMethod = [];
 
-let klarnaQuantity = [];
-let wooQuantity = [];
+const klarnaQuantity = [];
+const wooQuantity = [];
 
-let klarnaPhone = 'klarna';
-let wooPhone = 'woo';
+let klarnaPhone = "klarna";
+let wooPhone = "woo";
 
-let klarnaTotalTax = [];
-let wooTotalTax = [];
+const klarnaTotalTax = [];
+const wooTotalTax = [];
 
-let klarnaProductName = [];
-let wooProductName = [];
-
+const klarnaProductName = [];
+const wooProductName = [];
 
 /**
  * Shipping method
  */
-const shippingMethod = freeShippingMethod;
+let shippingMethod = freeShippingMethod;
 let shippingMethodTarget = null;
 
 if (shippingMethod === "free") {
@@ -292,8 +289,8 @@ describe("KCO", () => {
 		const response = await API.getKlarnaOrderById(
 			page,
 			klarnaOrderEndpoint,
-			currentKCOId		);
-
+			currentKCOId
+		);
 
 		const orderId = currentURL
 			.split("/")
@@ -301,226 +298,287 @@ describe("KCO", () => {
 
 		const wooCommerceOrder = await API.getWCOrderById(orderId);
 
-			let klarnaOrderLinesContainer = [];
-			let wooOrderLinesContainer = [];
+		const klarnaOrderLinesContainer = [];
+		const wooOrderLinesContainer = [];
 
+		response.data.order_lines.forEach((klarnaOrderLinesItemType) => {
+			if (klarnaOrderLinesItemType.type !== "shipping_fee") {
+				klarnaOrderLinesContainer.push(klarnaOrderLinesItemType);
+			}
+		});
 
-			response.data.order_lines.forEach(klarnaOrderLinesItemType => {
-				if(klarnaOrderLinesItemType.type !== 'shipping_fee') {
-					klarnaOrderLinesContainer.push(klarnaOrderLinesItemType)
+		wooCommerceOrder.data.line_items.forEach((wooOrderLinesItemType) => {
+			if (wooOrderLinesItemType.type !== "shipping_fee") {
+				wooOrderLinesContainer.push(wooOrderLinesItemType);
+			}
+		});
+
+		for (let i = 0; i < klarnaOrderLinesContainer.length; i++) {
+			if (
+				klarnaOrderLinesContainer[i].reference ===
+				wooOrderLinesContainer[i].sku
+			) {
+				if (
+					parseFloat(klarnaOrderLinesContainer[i].total_amount) ===
+					parseInt(
+						Math.round(
+							(parseFloat(wooOrderLinesContainer[i].total) +
+								parseFloat(
+									wooOrderLinesContainer[i].total_tax
+								)) *
+								100
+						).toFixed(2),
+						10
+					)
+				) {
+					klarnaTotalAmount =
+						klarnaOrderLinesContainer[i].total_amount;
+					wooTotalAmount = parseInt(
+						Math.round(
+							(parseFloat(wooOrderLinesContainer[i].total) +
+								parseFloat(
+									wooOrderLinesContainer[i].total_tax
+								)) *
+								100
+						).toFixed(2),
+						10
+					);
 				}
-			});
 
-			wooCommerceOrder.data.line_items.forEach(wooOrderLinesItemType => {
-				if(wooOrderLinesItemType.type !== 'shipping_fee') {
-					wooOrderLinesContainer.push(wooOrderLinesItemType)
+				if (
+					klarnaOrderLinesContainer[i].quantity ===
+					wooOrderLinesContainer[i].quantity
+				) {
+					klarnaQuantity.push(klarnaOrderLinesContainer[i].quantity);
+					wooQuantity.push(wooOrderLinesContainer[i].quantity);
 				}
-			});
 
-			for (let i=0; i<klarnaOrderLinesContainer.length; i++){
+				if (
+					klarnaOrderLinesContainer[i].total_tax_amount ===
+					wooOrderLinesContainer[i].rate_percent
+				) {
+					klarnaTotalTax.push(
+						klarnaOrderLinesContainer[i].total_tax_amount
+					);
+					wooTotalTax.push(wooOrderLinesContainer[i].rate_percent);
+				}
 
-				if (klarnaOrderLinesContainer[i].reference === wooOrderLinesContainer[i].sku) {
+				if (
+					klarnaOrderLinesContainer[i].name ===
+					wooOrderLinesContainer[i].method_title
+				) {
+					klarnaShippingMethod.push(
+						klarnaOrderLinesContainer[i].name
+					);
+					wooShippingMethod.push(
+						wooOrderLinesContainer[i].method_title
+					);
+				}
 
-					if(parseFloat(klarnaOrderLinesContainer[i].total_amount) === parseInt(Math.round((parseFloat(wooOrderLinesContainer[i].total) + parseFloat(wooOrderLinesContainer[i].total_tax)) * 100).toFixed(2))) {
-						klarnaTotalAmount = klarnaOrderLinesContainer[i].total_amount;
-						wooTotalAmount = parseInt(Math.round((parseFloat(wooOrderLinesContainer[i].total) + parseFloat(wooOrderLinesContainer[i].total_tax)) * 100).toFixed(2));
-					}
+				if (
+					klarnaOrderLinesContainer[i].name ===
+					wooOrderLinesContainer[i].name
+				) {
+					klarnaProductName.push(klarnaOrderLinesContainer[i].name);
+					wooProductName.push(wooOrderLinesContainer[i].name);
+				}
 
-					if(klarnaOrderLinesContainer[i].quantity === wooOrderLinesContainer[i].quantity ) {
-						klarnaQuantity.push(klarnaOrderLinesContainer[i].quantity);
-						wooQuantity.push(wooOrderLinesContainer[i].quantity);
-					}
+				if (
+					klarnaOrderLinesContainer[i].reference ===
+					wooOrderLinesContainer[i].sku
+				) {
+					klarnaSKU.push(klarnaOrderLinesContainer[i].reference);
+					wooSKU.push(wooOrderLinesContainer[i].sku);
+				}
 
-					if(klarnaOrderLinesContainer[i].total_tax_amount === wooOrderLinesContainer[i].rate_percent ) {
-						klarnaTotalTax.push(klarnaOrderLinesContainer[i].total_tax_amount);
-						wooTotalTax.push(wooOrderLinesContainer[i].rate_percent);
-					}
-
-					if(klarnaOrderLinesContainer[i].name === wooOrderLinesContainer[i].method_title ) {
-						klarnaShippingMethod.push(klarnaOrderLinesContainer[i].name);
-						wooShippingMethod.push(wooOrderLinesContainer[i].method_title);
-					}
-
-					if(klarnaOrderLinesContainer[i].name === wooOrderLinesContainer[i].name ) {
-						klarnaProductName.push(klarnaOrderLinesContainer[i].name);
-						wooProductName.push(wooOrderLinesContainer[i].name);
-					}
-
-					if(klarnaOrderLinesContainer[i].reference === wooOrderLinesContainer[i].sku ) {
-						klarnaSKU.push(klarnaOrderLinesContainer[i].reference);
-						wooSKU.push(wooOrderLinesContainer[i].sku);
-					}
-
-					if(klarnaOrderLinesContainer[i].order_id === wooOrderLinesContainer[i].transaction_id ) {
-						klarnaOrderId.push(klarnaOrderLinesContainer[i].order_id);
-						wooOrderId.push(wooOrderLinesContainer[i].transaction_id);
-					}
+				if (
+					klarnaOrderLinesContainer[i].order_id ===
+					wooOrderLinesContainer[i].transaction_id
+				) {
+					klarnaOrderId.push(klarnaOrderLinesContainer[i].order_id);
+					wooOrderId.push(wooOrderLinesContainer[i].transaction_id);
 				}
 			}
+		}
 
-
-
-		if(response.data.shipping_address.given_name === wooCommerceOrder.data.billing.first_name ) {
+		if (
+			response.data.shipping_address.given_name ===
+			wooCommerceOrder.data.billing.first_name
+		) {
 			klarnaFirstName = response.data.shipping_address.given_name;
 			wooFirstName = wooCommerceOrder.data.billing.first_name;
 		}
 
-		if(response.data.shipping_address.family_name === wooCommerceOrder.data.billing.last_name ) {
+		if (
+			response.data.shipping_address.family_name ===
+			wooCommerceOrder.data.billing.last_name
+		) {
 			klarnaLastName = response.data.shipping_address.family_name;
 			wooLastName = wooCommerceOrder.data.billing.last_name;
 		}
 
-		if(response.data.shipping_address.title === wooCommerceOrder.data.billing.company ) {
+		if (
+			response.data.shipping_address.title ===
+			wooCommerceOrder.data.billing.company
+		) {
 			klarnaCompany = response.data.shipping_address.title;
 			wooCompany = wooCommerceOrder.data.billing.company;
 		}
 
-		if(response.data.shipping_address.street_address === wooCommerceOrder.data.billing.address_1 ) {
+		if (
+			response.data.shipping_address.street_address ===
+			wooCommerceOrder.data.billing.address_1
+		) {
 			klarnaAddressOne = response.data.shipping_address.street_address;
 			wooAddressOne = wooCommerceOrder.data.billing.address_1;
 		}
 
-		if(response.data.shipping_address.street_address2 === wooCommerceOrder.data.billing.address_2 ) {
+		if (
+			response.data.shipping_address.street_address2 ===
+			wooCommerceOrder.data.billing.address_2
+		) {
 			klarnaAddressTwo = response.data.shipping_address.street_address2;
 			wooAddressTwo = wooCommerceOrder.data.billing.address_2;
 		}
 
-		if(response.data.shipping_address.city === wooCommerceOrder.data.billing.city ) {
+		if (
+			response.data.shipping_address.city ===
+			wooCommerceOrder.data.billing.city
+		) {
 			klarnaCity = response.data.shipping_address.city;
 			wooCity = wooCommerceOrder.data.billing.city;
 		}
 
-		if(response.data.shipping_address.region === wooCommerceOrder.data.billing.state ) {
+		if (
+			response.data.shipping_address.region ===
+			wooCommerceOrder.data.billing.state
+		) {
 			klarnaRegion = response.data.shipping_address.region;
 			wooRegion = wooCommerceOrder.data.billing.state;
 		}
 
-		if(response.data.shipping_address.postal_code.replace(/\s/g, '') === wooCommerceOrder.data.billing.postcode ) {
-			klarnaPostcode = response.data.shipping_address.postal_code.replace(/\s/g, '');
+		if (
+			response.data.shipping_address.postal_code.replace(/\s/g, "") ===
+			wooCommerceOrder.data.billing.postcode
+		) {
+			klarnaPostcode = response.data.shipping_address.postal_code.replace(
+				/\s/g,
+				""
+			);
 			wooPostcode = wooCommerceOrder.data.billing.postcode;
 		}
 
-		if(response.data.shipping_address.country === wooCommerceOrder.data.billing.country ) {
+		if (
+			response.data.shipping_address.country ===
+			wooCommerceOrder.data.billing.country
+		) {
 			klarnaCountry = response.data.shipping_address.country;
 			wooCountry = wooCommerceOrder.data.billing.country;
 		}
 
-		if(response.data.shipping_address.email === wooCommerceOrder.data.billing.email ) {
+		if (
+			response.data.shipping_address.email ===
+			wooCommerceOrder.data.billing.email
+		) {
 			klarnaEmail = response.data.shipping_address.email;
 			wooEmail = wooCommerceOrder.data.billing.email;
 		}
 
-		if(response.data.shipping_address.phone === wooCommerceOrder.data.billing.phone.replace(/\s/g, '') ) {
+		if (
+			response.data.shipping_address.phone ===
+			wooCommerceOrder.data.billing.phone.replace(/\s/g, "")
+		) {
 			klarnaPhone = response.data.shipping_address.phone;
-			wooPhone = wooCommerceOrder.data.billing.phone.replace(/\s/g, '');
+			wooPhone = wooCommerceOrder.data.billing.phone.replace(/\s/g, "");
 		}
 
-		if(response.data.purchase_currency === wooCommerceOrder.data.currency ) {
+		if (
+			response.data.purchase_currency === wooCommerceOrder.data.currency
+		) {
 			klarnaCurrency = response.data.purchase_currency;
 			wooCurrency = wooCommerceOrder.data.currency;
 		}
 
 		await page.waitForTimeout(5 * timeOutTime);
 		const value = await page.$eval(".entry-title", (e) => e.textContent);
-		expect(value).toBe("Order received")
-		;
+		expect(value).toBe("Order received");
 	}, 190000);
 
-
-
 	test("Compare IDs", async () => {
-		expect(toString(klarnaOrderId)).toBe(toString(wooOrderId))
-		;
+		expect(toString(klarnaOrderId)).toBe(toString(wooOrderId));
 	}, 190000);
 
 	test("Compare names", async () => {
-		expect(klarnaFirstName).toBe(wooFirstName)
-		;
+		expect(klarnaFirstName).toBe(wooFirstName);
 	}, 190000);
 
 	test("Compare last names", async () => {
-		expect(klarnaLastName).toBe(wooLastName)
-		;
+		expect(klarnaLastName).toBe(wooLastName);
 	}, 190000);
 
 	test("Compare cities", async () => {
-		expect(klarnaCity).toBe(wooCity)
-		;
+		expect(klarnaCity).toBe(wooCity);
 	}, 190000);
 
 	test("Compare regions", async () => {
-		expect(klarnaRegion).toBe(wooRegion)
-		;
+		expect(klarnaRegion).toBe(wooRegion);
 	}, 190000);
 
 	test("Compare countries", async () => {
-		expect(klarnaCountry).toBe(wooCountry)
-		;
+		expect(klarnaCountry).toBe(wooCountry);
 	}, 190000);
 
 	test("Compare post codes", async () => {
-		expect(klarnaPostcode).toBe(wooPostcode)
-		;
+		expect(klarnaPostcode).toBe(wooPostcode);
 	}, 190000);
 
 	test("Compare companies", async () => {
-		expect(klarnaCompany).toBe(wooCompany)
-		;
+		expect(klarnaCompany).toBe(wooCompany);
 	}, 190000);
 
 	test("Compare first address", async () => {
-		expect(klarnaAddressOne).toBe(wooAddressOne)
-		;
+		expect(klarnaAddressOne).toBe(wooAddressOne);
 	}, 190000);
 
 	test("Compare second address", async () => {
-		expect(klarnaAddressTwo).toBe(wooAddressTwo)
-		;
+		expect(klarnaAddressTwo).toBe(wooAddressTwo);
 	}, 190000);
 
 	test("Compare emails", async () => {
-		expect(klarnaEmail).toBe(wooEmail)
-		;
+		expect(klarnaEmail).toBe(wooEmail);
 	}, 190000);
 
 	test("Compare telephones", async () => {
-		expect(klarnaPhone).toBe(wooPhone)
-		;
+		expect(klarnaPhone).toBe(wooPhone);
 	}, 190000);
 
 	test("Compare SKU-s", async () => {
-		expect(toString(klarnaSKU)).toBe(toString(wooSKU))
-		;
+		expect(toString(klarnaSKU)).toBe(toString(wooSKU));
 	}, 190000);
 
 	test("Compare total amounts", async () => {
-		expect(toString(klarnaTotalAmount)).toBe(toString(wooTotalAmount))
-		;
+		expect(toString(klarnaTotalAmount)).toBe(toString(wooTotalAmount));
 	}, 190000);
 
 	test("Compare total taxes", async () => {
-		expect(toString(klarnaTotalTax)).toBe(toString(wooTotalTax))
-		;
+		expect(toString(klarnaTotalTax)).toBe(toString(wooTotalTax));
 	}, 190000);
 
 	test("Compare product names", async () => {
-		expect(toString(klarnaProductName)).toBe(toString(wooProductName))
-		;
+		expect(toString(klarnaProductName)).toBe(toString(wooProductName));
 	}, 190000);
 
 	test("Compare Shipping methods", async () => {
-		expect(toString(klarnaShippingMethod)).toBe(toString(wooShippingMethod))
-		;
+		expect(toString(klarnaShippingMethod)).toBe(
+			toString(wooShippingMethod)
+		);
 	}, 190000);
 
 	test("Compare Quantities", async () => {
-		expect(toString(klarnaQuantity)).toBe(toString(wooQuantity))
-		;
+		expect(toString(klarnaQuantity)).toBe(toString(wooQuantity));
 	}, 190000);
 
 	test("Compare currencies", async () => {
-		expect(klarnaCurrency).toBe(wooCurrency)
-		;
+		expect(klarnaCurrency).toBe(wooCurrency);
 	}, 190000);
-
 });
