@@ -419,11 +419,11 @@ jQuery( function( $ ) {
 						kco_wc.log( response );
 					},
 					complete: function( response ) {
-						kco_wc.klarnaUpdateNeeded = false;
+						//kco_wc.klarnaUpdateNeeded = false;
 						$( '#shipping_method #' + response.responseJSON.data.shipping_option_name ).prop( 'checked', true );
 						$( 'body' ).trigger( 'kco_shipping_option_changed', [ data ]);
 						$( 'body' ).trigger( 'update_checkout' );
-						kco_wc.kcoResume();
+						//kco_wc.kcoResume();
 					}
 				}
 			);
@@ -507,7 +507,7 @@ jQuery( function( $ ) {
 							// Check for any errors.
 							kco_wc.timeout = setTimeout( function() { kco_wc.failOrder( callback, 'timeout' ); }, kco_params.timeout_time * 1000 );
 							$( document.body ).on( 'checkout_error', function() { kco_wc.failOrder( callback, 'checkout_error' ); } );
-							// Run interval untill we find a hashtag or timer runs out.
+							// Run interval until we find a hashtag or timer runs out.
 							kco_wc.interval = setInterval( function() { kco_wc.checkUrl( callback ); }, 500 );
 							// Start processing the order.
 							kco_wc.getKlarnaOrder();
