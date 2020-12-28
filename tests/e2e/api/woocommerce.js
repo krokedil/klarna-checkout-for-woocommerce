@@ -35,6 +35,10 @@ const clearSession = async () => {
 const updateOption = async (data) => {
 	return createRequest(API_WC_OPTIONS, post, JSON.stringify(data));
 };
+
+const createProduct = async (data) => {
+	return createRequest(API_PRODUCTS_ENDPOINT, post, data);
+};
 export default {
 	getProducts,
 	getProductById,
@@ -44,4 +48,5 @@ export default {
 	createCustomer,
 	clearSession,
 	updateOption,
+	createProduct,
 };
