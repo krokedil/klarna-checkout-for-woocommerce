@@ -1,10 +1,11 @@
 import kcoURLS from "../helpers/kcoURLS";
-import { createRequest, post } from "./index";
+import { createRequest, post, put } from "./index";
 
 const {
 	API_ORDER_ENDPOINT,
 	API_PRODUCTS_ENDPOINT,
 	API_CUSTOMER_ENDPOINT,
+	API_SESSION_ENDPOINT,
 } = kcoURLS;
 
 const getProducts = () => {
@@ -26,6 +27,9 @@ const createCustomer = async (data) => {
 const getCustomers = async () => {
 	return createRequest(API_CUSTOMER_ENDPOINT);
 };
+const clearSession = async () => {
+	return createRequest(API_SESSION_ENDPOINT, put, { confirm: true });
+};
 
 export default {
 	getProducts,
@@ -34,4 +38,5 @@ export default {
 	getOrders,
 	getCustomers,
 	createCustomer,
+	clearSession,
 };

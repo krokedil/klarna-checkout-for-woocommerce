@@ -25,10 +25,12 @@ const getKlarnaOrderById = async (page, endpoint, id) => {
 const getWCOrderById = async (id) => woocommerce.getOrderById(id);
 const createWCCustomer = async (data) => woocommerce.createCustomer(data);
 const getWCCustomers = async () => woocommerce.getCustomers();
+const clearWCSession = async () => woocommerce.clearSession();
 
 export default {
 	getKlarnaOrderById,
 	getWCOrderById,
 	getWCCustomers,
 	createWCCustomer,
+	clearWCSession,
 };
