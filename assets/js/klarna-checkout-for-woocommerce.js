@@ -354,7 +354,6 @@ jQuery( function( $ ) {
 		 * @param {string} event 
 		 */
 		failOrder: function( callback, event ) {
-			kco_wc.logToFile( 'Timeout for validation_callback triggered.' );
 			// Send false and cancel 
 			callback({ should_proceed: false });
 			// Clear the interval.
@@ -366,12 +365,16 @@ jQuery( function( $ ) {
 			kco_wc.checkoutFormSelector.removeClass( 'processing' );
 			$( kco_wc.checkoutFormSelector ).unblock();
 			if ( 'timeout' === event ) {
+				kco_wc.logToFile( 'Timeout for validation_callback triggered.' );
 				$('#kco-timeout').remove();
 				$('form.checkout').prepend(
 					'<div id="kco-timeout" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>'
 					+  kco_params.timeout_message
 					+ '</li></ul></div>'
 				);
+			} else {
+				var error_message = $( ".woocommerce-NoticeGroup-checkout" ).text();
+				kco_wc.logToFile( 'Checkout error - ' + error_message );
 			}
 		},
 
