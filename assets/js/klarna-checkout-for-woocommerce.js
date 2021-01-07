@@ -241,6 +241,8 @@ jQuery( function( $ ) {
 						if ( true === data.responseJSON.success ) {
 							kco_wc.kcoResume();
 							$( '.woocommerce-checkout-review-order-table' ).unblock();
+						} else if( ! data.responseJSON.success && data.responseJSON.data.redirect_url !== 'undefined' ) {
+							window.location = data.responseJSON.data.redirect_url;
 						}
 					}
 				});
