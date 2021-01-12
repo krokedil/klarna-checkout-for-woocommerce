@@ -32,6 +32,7 @@ class KCO_Subscription {
 
 		add_action( 'wc_klarna_push_cb', array( $this, 'handle_push_cb_for_payment_method_change' ) );
 		add_action( 'init', array( $this, 'display_thankyou_message_for_payment_method_change' ) );
+		add_action( 'woocommerce_account_view-subscription_endpoint', array( $this, 'maybe_confirm_change_payment_method' ) );
 
 	}
 
@@ -164,7 +165,13 @@ class KCO_Subscription {
 						$query_string     = filter_input( INPUT_SERVER, 'QUERY_STRING', FILTER_SANITIZE_URL );
 						$query_string     = $query_string;
 						$current_url      = add_query_arg( $query_string, '', home_url( $wp->request ) );
-						$confirmation_url = add_query_arg( 'kco-action', 'subs-payment-changed', $wc_order->get_view_order_url() );
+						$confirmation_url = add_query_arg(
+							array(
+								'kco-action'   => 'subs-payment-changed',
+								'kco-order-id' => '{checkout.order.id}',
+							),
+							$wc_order->get_view_order_url()
+						);
 						$push_url         = add_query_arg(
 							array(
 								'kco-action' => 'subs-payment-changed',
@@ -211,6 +218,20 @@ class KCO_Subscription {
 					update_post_meta( $subcription->get_id(), '_kco_recurring_token', $recurring_token );
 				}
 			}
+		}
+	}
+
+	/**
+	 * Sets the recurring token for a subscription
+	 *
+	 * @param int   $subscription_id The WooCommerce Subscription ID.
+	 * @param array $klarna_order The Klarna order.
+	 * @return void
+	 */
+	public function set_recurring_token_for_subscription( $subscription_id = null, $klarna_order ) {
+		if ( isset( $klarna_order['recurring_token'] ) ) {
+			$recurring_token = $klarna_order['recurring_token'];
+			update_post_meta( $subscription_id, '_kco_recurring_token', $recurring_token );
 		}
 	}
 
@@ -356,6 +377,20 @@ class KCO_Subscription {
 		if ( ! empty( $kco_action ) && 'subs-payment-changed' === $kco_action ) {
 			wc_add_notice( __( 'Thank you, your subscription payment method is now updated.', 'klarna-checkout-for-woocommerce' ), 'success' );
 			kco_unset_sessions();
+		}
+	}
+
+	/**
+	 * Maybe confirm the change payment method of a Klarna subscription.
+	 *
+	 * @param int $subscription_id The WooCommerce Subscription ID.
+	 * @return void
+	 */
+	public function maybe_confirm_change_payment_method( $subscription_id ) {
+		$klarna_order_id = filter_input( INPUT_GET, 'kco-order-id', FILTER_SANITIZE_STRING );
+		if ( ! empty( $klarna_order_id ) ) {
+			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+			$this->set_recurring_token_for_subscription( $subscription_id, $klarna_order );
 		}
 	}
 }
