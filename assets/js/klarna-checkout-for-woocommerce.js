@@ -241,6 +241,8 @@ jQuery( function( $ ) {
 						if ( true === data.responseJSON.success ) {
 							kco_wc.kcoResume();
 							$( '.woocommerce-checkout-review-order-table' ).unblock();
+						} else if( ! data.responseJSON.success && data.responseJSON.data.redirect_url !== 'undefined' ) {
+							window.location = data.responseJSON.data.redirect_url;
 						}
 					}
 				});
@@ -352,7 +354,6 @@ jQuery( function( $ ) {
 		 * @param {string} event 
 		 */
 		failOrder: function( callback, event ) {
-			kco_wc.logToFile( 'Timeout for validation_callback triggered.' );
 			// Send false and cancel 
 			callback({ should_proceed: false });
 			// Clear the interval.
@@ -364,12 +365,16 @@ jQuery( function( $ ) {
 			kco_wc.checkoutFormSelector.removeClass( 'processing' );
 			$( kco_wc.checkoutFormSelector ).unblock();
 			if ( 'timeout' === event ) {
+				kco_wc.logToFile( 'Timeout for validation_callback triggered.' );
 				$('#kco-timeout').remove();
 				$('form.checkout').prepend(
 					'<div id="kco-timeout" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>'
 					+  kco_params.timeout_message
 					+ '</li></ul></div>'
 				);
+			} else {
+				var error_message = $( ".woocommerce-NoticeGroup-checkout" ).text();
+				kco_wc.logToFile( 'Checkout error - ' + error_message );
 			}
 		},
 
@@ -419,11 +424,11 @@ jQuery( function( $ ) {
 						kco_wc.log( response );
 					},
 					complete: function( response ) {
-						kco_wc.klarnaUpdateNeeded = false;
+						//kco_wc.klarnaUpdateNeeded = false;
 						$( '#shipping_method #' + response.responseJSON.data.shipping_option_name ).prop( 'checked', true );
 						$( 'body' ).trigger( 'kco_shipping_option_changed', [ data ]);
 						$( 'body' ).trigger( 'update_checkout' );
-						kco_wc.kcoResume();
+						//kco_wc.kcoResume();
 					}
 				}
 			);
@@ -507,7 +512,7 @@ jQuery( function( $ ) {
 							// Check for any errors.
 							kco_wc.timeout = setTimeout( function() { kco_wc.failOrder( callback, 'timeout' ); }, kco_params.timeout_time * 1000 );
 							$( document.body ).on( 'checkout_error', function() { kco_wc.failOrder( callback, 'checkout_error' ); } );
-							// Run interval untill we find a hashtag or timer runs out.
+							// Run interval until we find a hashtag or timer runs out.
 							kco_wc.interval = setInterval( function() { kco_wc.checkUrl( callback ); }, 500 );
 							// Start processing the order.
 							kco_wc.getKlarnaOrder();

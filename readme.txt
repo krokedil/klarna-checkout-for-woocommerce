@@ -6,7 +6,7 @@ Requires at least: 4.0
 Tested up to: 5.5.6
 Requires PHP: 5.6
 WC requires at least: 3.4.0
-WC tested up to: 4.7.0
+WC tested up to: 4.9.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.01.12    - version 2.4.2 =
+* Enhancement   - Improved logging around checkout errors. The checkout error that stops the purchase is now being logged to make debugging easier.
+* Enhancement   - Payment method changes to subscriptions are now confirmed instantly when changing to Klarna or updating a expired card. The push is no longer required, but is still used as a backup.
+* Fix           - Fixed an issue with zero value orders not being completed properly when using Klarna.
+* Fix           - Fixed an issue were the page was not properly reloaded when not using Klarna for zero value orders.
+* Fix           - Fixed an issue were coupons and shipping prices did not register in the Klarna iFrame properly.
+
 = 2020.12.16    - version 2.4.1 =
 * Enhancement   - Several improvements to our JavaScript, making the checkout experience faster and smoother.
 * Enhancement   - Added links to our documentation for the admin notices that we can print to make it easier to find a solution.

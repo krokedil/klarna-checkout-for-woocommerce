@@ -80,6 +80,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			add_filter( 'body_class', array( $this, 'add_body_class' ) );
 
 			add_action( 'woocommerce_receipt_kco', array( $this, 'receipt_page' ) );
+
+			add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 3 );
 		}
 
 
@@ -615,6 +617,29 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					<?php
 				}
 			}
+		}
+
+
+		/**
+		 * Maybe change the needs payment for a WooCommerce order.
+		 *
+		 * @param bool     $wc_result The result WooCommerce had.
+		 * @param WC_Order $order The WooCommerce order.
+		 * @param array    $valid_order_statuses The valid order statuses.
+		 * @return bool
+		 */
+		public function maybe_change_needs_payment( $wc_result, $order, $valid_order_statuses ) {
+			// Only change for KCO orders.
+			if ( 'kco' !== $order->get_payment_method() ) {
+				return $wc_result;
+			}
+
+			// Only if our filter is active and is set to false.
+			if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
+				return $wc_result;
+			}
+
+			return true;
 		}
 	}
 }

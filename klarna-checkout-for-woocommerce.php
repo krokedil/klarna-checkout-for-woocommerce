@@ -5,14 +5,14 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Krokedil
  * Author URI: https://krokedil.com/
- * Version: 2.4.1
+ * Version: 2.4.2
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 3.2.0
- * WC tested up to: 4.8.0
+ * WC tested up to: 4.9.0
  *
- * Copyright (c) 2017-2020 Krokedil
+ * Copyright (c) 2017-2021 Krokedil
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.4.1' );
+define( 'KCO_WC_VERSION', '2.4.2' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
