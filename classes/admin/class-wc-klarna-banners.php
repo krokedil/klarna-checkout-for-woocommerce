@@ -156,10 +156,10 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 				<div id="klarna-main">
 					<?php echo $parent_options; // phpcs:ignore?>
 				</div>
-				
+
 				<div id="krokdocs-sidebar">
-					
-					<div class="krokdocs-sidebar-section" >
+
+					<div class="krokdocs-sidebar-section">
 						<h1 id="krokdocs-sidebar-title">Get started</h1>
 							<div class="krokdocs-sidebar-content">
 								<p id="krokdocs-sidebar-main-text">
@@ -186,7 +186,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 				</div>
 
 				<div id="klarna-sidebar">
-					
+
 					<div class="kb-sidebar-section" >
 						<h1 id="kb-sidebar-title">The future proof integration</h1>
 							<div class="kb-sidebar-content">
