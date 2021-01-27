@@ -146,6 +146,7 @@ jQuery( function( $ ) {
 			// Move order comments.
 			$( '.woocommerce-additional-fields' ).appendTo( '#kco-extra-checkout-fields' );
 			var form = $( 'form[name="checkout"] input, form[name="checkout"] select, textarea' );
+			var checkout_add_ons_moved = false;
 			for ( i = 0; i < form.length; i++ ) {
 				var name = form[i].name;
 				// Check if field is inside the order review.
@@ -154,9 +155,14 @@ jQuery( function( $ ) {
 				}
 
 				// Check if this is a standard field.
-				if ( -1 === $.inArray( name, kco_params.standard_woo_checkout_fields ) ) {					
+				if ( -1 === $.inArray( name, kco_params.standard_woo_checkout_fields ) ) {
 					// This is not a standard Woo field, move to our div.
-					if ( 0 < $( 'p#' + name + '_field' ).length ) {
+					if ( 'wc_checkout_add_ons' === $( 'p#' + name + '_field' ).parent().attr('id') ) { // Check if this is an add on field.
+						if( ! checkout_add_ons_moved ) {
+							checkout_add_ons_moved = true;
+							$( 'div#wc_checkout_add_ons' ).appendTo( '#kco-extra-checkout-fields' );
+						}
+					} else if ( 0 < $( 'p#' + name + '_field' ).length ) {
 						$( 'p#' + name + '_field' ).appendTo( '#kco-extra-checkout-fields' );
 					} else {
 						$( 'input[name="' + name + '"]' ).closest( 'p' ).appendTo( '#kco-extra-checkout-fields' );
@@ -316,7 +322,7 @@ jQuery( function( $ ) {
 				// Shipping fields.
 				$( '#shipping_first_name' ).val( ( ( 'given_name' in data.shipping_address ) ? data.shipping_address.given_name : '' ) );
 				$( '#shipping_last_name' ).val( ( ( 'family_name' in data.shipping_address ) ? data.shipping_address.family_name : '' ) );
-				$( '#shipping_company' ).val( ( ( 'organization_name' in data.shipping_address ) ? data.billing_address.organization_name : '' ) );
+				$( '#shipping_company' ).val( ( ( 'organization_name' in data.shipping_address ) ? data.shipping_address.organization_name : '' ) );
 				$( '#shipping_address_1' ).val( ( ( 'street_address' in data.shipping_address ) ? data.shipping_address.street_address : '' ) );
 				$( '#shipping_address_2' ).val( ( ( 'street_address2' in data.shipping_address ) ? data.shipping_address.street_address2 : '' ) );
 				$( '#shipping_city' ).val( ( ( 'city' in data.shipping_address ) ? data.shipping_address.city : '' ) );
