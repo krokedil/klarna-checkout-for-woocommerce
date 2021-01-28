@@ -18,12 +18,18 @@ import {
 	puppeteerOptions as options,
 	customerAPIData,
 	klarnaOrderEndpoint,
+
+	iframeShipping,
+	flatRateMethod,
+
 } from "../config/config";
 import API from "../api/API";
 
 let page;
 let browser;
 let context;
+
+let iframeShippingMethod = "";
 
 const klarnaOrderId = [];
 const wooOrderId = [];
@@ -85,14 +91,20 @@ const wooProductName = [];
 /**
  * Shipping method
  */
+
 let shippingMethod = freeShippingMethod;
+// let shippingMethod = flatRateMethod;
 let shippingMethodTarget = null;
 
-if (shippingMethod === "free") {
-	shippingMethodTarget = `[id*="${freeShippingMethodTarget}"]`;
-} else if (shippingMethod === "flat") {
-	shippingMethodTarget = `[id*="${flatRateMethodTarget}"]`;
-}
+	if (iframeShipping !== 'yes') {
+		if (shippingMethod === "free") {
+			shippingMethodTarget = `[id*="${freeShippingMethodTarget}"]`;
+		} else if (shippingMethod === "flat") {
+			shippingMethodTarget = `[id*="${flatRateMethodTarget}"]`;
+		}
+	} else {
+		iframeShippingMethod = shippingMethod;
+	}
 
 /**
  * Payment Method
@@ -148,12 +160,14 @@ describe("KCO", () => {
 			await page.$('input[id="terms"]')
 		);
 
-		if (shippingMethod !== "") {
-			await page.waitForTimeout(timeOutTime);
-			await page.waitForSelector(shippingMethodTarget).id;
-			await page.waitForTimeout(timeOutTime);
-			await page.click(shippingMethodTarget).id;
-			await page.waitForTimeout(timeOutTime);
+		if (iframeShipping !== 'yes') {
+			if (shippingMethod !== "") {
+				await page.waitForTimeout(timeOutTime);
+				await page.waitForSelector(shippingMethodTarget).id;
+				await page.waitForTimeout(timeOutTime);
+				await page.click(shippingMethodTarget).id;
+				await page.waitForTimeout(timeOutTime);
+			}
 		}
 
 		const originalFrame = await kcoFrame.loadIFrame(
@@ -176,6 +190,17 @@ describe("KCO", () => {
 			'input[id="payment-selector-pay_now"]',
 			timeOutTime
 		);
+
+	if (iframeShipping === 'yes') {
+
+		const frameShippingTab = await originalFrame.$$('[data-cid="SHIPMO-shipping-option-basic"]' );
+
+		if ( iframeShippingMethod === 'flat' ) {
+			await frameShippingTab[0].click();
+		} else if ( iframeShippingMethod === 'free' ) {
+			await frameShippingTab[1].click();
+		}
+	}
 
 		const frameNew = await kcoFrame.loadIFrame(
 			page,
