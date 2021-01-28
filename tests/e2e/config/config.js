@@ -11,6 +11,9 @@ export const shippingSel = customerData.shippingSelectors;
 export const freeShippingMethod = shippingSel.methods.freeShipping;
 export const flatRateMethod = shippingSel.methods.flatRate;
 
+
+export const iframeShipping = shippingSel.targets.iframeShipping;
+
 export const freeShippingMethodTarget = shippingSel.targets.freeShippingTarget;
 export const flatRateMethodTarget = shippingSel.targets.flatRateTarget;
 
