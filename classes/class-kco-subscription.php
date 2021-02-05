@@ -205,7 +205,7 @@ class KCO_Subscription {
 	public function set_recurring_token_for_order( $order_id = null, $klarna_order ) {
 		$wc_order = wc_get_order( $order_id );
 		if ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
-			$subcriptions    = wcs_get_subscriptions_for_order( $order_id );
+			$subscriptions   = wcs_get_subscriptions_for_order( $order_id );
 			$klarna_order_id = $wc_order->get_transaction_id();
 			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( isset( $klarna_order['recurring_token'] ) ) {
@@ -214,8 +214,15 @@ class KCO_Subscription {
 				$note = sprintf( __( 'Recurring token for subscription: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $recurring_token ) );
 				$wc_order->add_order_note( $note );
 
-				foreach ( $subcriptions as $subcription ) {
-					update_post_meta( $subcription->get_id(), '_kco_recurring_token', $recurring_token );
+				foreach ( $subscriptions as $subscription ) {
+					update_post_meta( $subscription->get_id(), '_kco_recurring_token', $recurring_token );
+				}
+			} else {
+				$wc_order->add_order_note( __( 'Recurring token was missing from the Klarna order during the checkout process. Please contact Klarna for help.', 'klarna-checkout-for-woocommerce' ) );
+				$wc_order->set_status( 'on-hold' );
+				$wc_order->save();
+				foreach ( $subscriptions as $subscription ) {
+					$subscription->set_status( 'on-hold' );
 				}
 			}
 		}
