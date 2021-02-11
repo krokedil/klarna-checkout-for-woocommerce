@@ -48,7 +48,7 @@ class KCO_Request_Order {
 			array_push( $order_lines, $this->get_order_line_shipping( $order ) );
 		}
 
-		return $order_lines;
+		return array_values( $order_lines );
 	}
 
 	/**
