@@ -433,6 +433,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 				update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order['order_id'] ) );
 
+				if ( isset( $klarna_order['recurring_token'] ) ) {
+					update_post_meta( $order_id, '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
+				}
+
 				$environment = $this->testmode ? 'test' : 'live';
 				update_post_meta( $order_id, '_wc_klarna_environment', $environment );
 
