@@ -272,9 +272,9 @@ class KCO_Request_Order {
 	 */
 	public function get_fee_unit_price( $order_fee ) {
 		if ( $this->separate_sales_tax ) {
-			$fee_subtotal = $order_fee->get_total() / $order_fee->get_quantity();
+			$fee_subtotal = $order_fee->get_total();
 		} else {
-			$fee_subtotal = ( $order_fee->get_total() + $order_fee->get_total_tax() ) / $order_fee->get_quantity();
+			$fee_subtotal = ( $order_fee->get_total() + $order_fee->get_total_tax() );
 		}
 		$fee_price = number_format( $fee_subtotal, wc_get_price_decimals(), '.', '' ) * 100;
 		return round( $fee_price );
