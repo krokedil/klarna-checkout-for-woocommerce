@@ -19,7 +19,7 @@ class KCO_Request_Cart {
 	/**
 	 * Formatted order lines.
 	 *
-	 * @var $order_lines
+	 * @var array $order_lines
 	 */
 	public $order_lines = array();
 
@@ -77,7 +77,7 @@ class KCO_Request_Cart {
 	 * @return array
 	 */
 	public function get_order_lines() {
-		return $this->order_lines;
+		return array_values( $this->order_lines );
 	}
 
 	/**

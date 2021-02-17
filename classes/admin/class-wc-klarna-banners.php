@@ -156,6 +156,35 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 				<div id="klarna-main">
 					<?php echo $parent_options; // phpcs:ignore?>
 				</div>
+
+				<div id="krokdocs-sidebar">
+
+					<div class="krokdocs-sidebar-section">
+						<h1 id="krokdocs-sidebar-title">Get started</h1>
+							<div class="krokdocs-sidebar-content">
+								<p id="krokdocs-sidebar-main-text">
+									<a href="https://docs.krokedil.com/category/139-get-started" target="_blank">Documentation</a> <br/>
+									<a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/" target="_blank">Plugin site</a>
+								</p>
+						<h1 id="krokdocs-sidebar-title">Support</h1>
+								<p id="krokdocs-sidebar-main-text">
+									If you have questions regarding a certain purchase you are welcome to contact <a href="http://klarna.com/merchant-support" target="_blank">Klarna</a>.
+								</p>
+								<p id="krokdocs-sidebar-main-text">
+									If you have technical questions or questions regarding the configuration of the plugin you are welcome to contact <a href="https://www.krokedil.com/support" target="_blank">Krokedil</a>.
+								</p>
+							</div>
+
+								<div id="krokdocs-sidebar-bottom-holder">
+									<p id="krokdocs-sidebar-logo-follow-up-text">
+										Developed by:
+									</p>
+									<img id="krokdocs-sidebar-krokedil-logo-right"
+									src="https://krokedil.se/wp-content/uploads/2020/05/webb_logo_400px.png">
+								</div>
+					</div>
+				</div>
+
 				<div id="klarna-sidebar">
 
 					<div class="kb-sidebar-section" >
