@@ -174,6 +174,17 @@ function kco_wc_prefill_consent() {
  * @param string $country Country code.
  */
 function kco_wc_country_code_converter( $country ) {
+	$countries = kco_get_country_codes();
+
+	return array_search( strtoupper( $country ), $countries, true );
+}
+
+/**
+ * Returns a list of country codes, 2-letter ISO => 3-letter ISO.
+ *
+ * @return array
+ */
+function kco_get_country_codes() {
 	$countries = array(
 		'AF' => 'AFG', // Afghanistan.
 		'AX' => 'ALA', // Aland Islands.
@@ -427,7 +438,7 @@ function kco_wc_country_code_converter( $country ) {
 		'ZW' => 'ZWE', // Zimbabwe.
 	);
 
-	return array_search( strtoupper( $country ), $countries, true );
+	return $countries;
 }
 
 /**

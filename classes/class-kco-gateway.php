@@ -267,31 +267,27 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			$standard_woo_checkout_fields = array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'terms', 'terms-field', '_wp_http_referer' );
-
-			$checkout_localize_params = array(
-				'update_cart_url'                      => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
-				'update_cart_nonce'                    => wp_create_nonce( 'kco_wc_update_cart' ),
-				'update_shipping_url'                  => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
-				'update_shipping_nonce'                => wp_create_nonce( 'kco_wc_update_shipping' ),
-				'change_payment_method_url'            => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
-				'change_payment_method_nonce'          => wp_create_nonce( 'kco_wc_change_payment_method' ),
-				'update_klarna_order_url'              => WC_AJAX::get_endpoint( 'kco_wc_update_klarna_order' ),
-				'update_klarna_order_nonce'            => wp_create_nonce( 'kco_wc_update_klarna_order' ),
-				'iframe_shipping_address_change_url'   => WC_AJAX::get_endpoint( 'kco_wc_iframe_shipping_address_change' ),
-				'iframe_shipping_address_change_nonce' => wp_create_nonce( 'kco_wc_iframe_shipping_address_change' ),
-				'get_klarna_order_url'                 => WC_AJAX::get_endpoint( 'kco_wc_get_klarna_order' ),
-				'get_klarna_order_nonce'               => wp_create_nonce( 'kco_wc_get_klarna_order' ),
-				'log_to_file_url'                      => WC_AJAX::get_endpoint( 'kco_wc_log_js' ),
-				'log_to_file_nonce'                    => wp_create_nonce( 'kco_wc_log_js' ),
-				'logging'                              => $this->logging,
-				'standard_woo_checkout_fields'         => $standard_woo_checkout_fields,
-				'is_confirmation_page'                 => ( is_kco_confirmation() ) ? 'yes' : 'no',
-				'shipping_methods_in_iframe'           => $this->shipping_methods_in_iframe,
-				'required_fields_text'                 => __( 'Please fill in all required checkout fields.', 'klarna-checkout-for-woocommerce' ),
-				'email_exists'                         => $email_exists,
-				'must_login_message'                   => apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) ),
-				'timeout_message'                      => __( 'Please try again, something went wrong with processing your order.', 'klarna-checkout-for-woocommerce' ),
-				'timeout_time'                         => apply_filters( 'kco_checkout_timeout_duration', 20 ),
+			$checkout_localize_params     = array(
+				'update_cart_url'              => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
+				'update_cart_nonce'            => wp_create_nonce( 'kco_wc_update_cart' ),
+				'update_shipping_url'          => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
+				'update_shipping_nonce'        => wp_create_nonce( 'kco_wc_update_shipping' ),
+				'change_payment_method_url'    => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
+				'change_payment_method_nonce'  => wp_create_nonce( 'kco_wc_change_payment_method' ),
+				'get_klarna_order_url'         => WC_AJAX::get_endpoint( 'kco_wc_get_klarna_order' ),
+				'get_klarna_order_nonce'       => wp_create_nonce( 'kco_wc_get_klarna_order' ),
+				'log_to_file_url'              => WC_AJAX::get_endpoint( 'kco_wc_log_js' ),
+				'log_to_file_nonce'            => wp_create_nonce( 'kco_wc_log_js' ),
+				'logging'                      => $this->logging,
+				'standard_woo_checkout_fields' => $standard_woo_checkout_fields,
+				'is_confirmation_page'         => ( is_kco_confirmation() ) ? 'yes' : 'no',
+				'shipping_methods_in_iframe'   => $this->shipping_methods_in_iframe,
+				'required_fields_text'         => __( 'Please fill in all required checkout fields.', 'klarna-checkout-for-woocommerce' ),
+				'email_exists'                 => $email_exists,
+				'must_login_message'           => apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) ),
+				'timeout_message'              => __( 'Please try again, something went wrong with processing your order.', 'klarna-checkout-for-woocommerce' ),
+				'timeout_time'                 => apply_filters( 'kco_checkout_timeout_duration', 20 ),
+				'countries'                    => kco_get_country_codes(),
 			);
 
 			if ( version_compare( WC_VERSION, '3.9', '>=' ) ) {

@@ -224,38 +224,6 @@ jQuery( function( $ ) {
 		},
 
 		/**
-		 * Update the Klarna order on updated_checkout events.
-		 */
-		updateKlarnaOrder: function() {
-			if ( 'kco' === kco_wc.paymentMethod && 'no' === kco_params.is_confirmation_page ) {
-				if( ! kco_wc.klarnaUpdateNeeded ) {
-					kco_wc.klarnaUpdateNeeded = true;
-					return;
-				}
-				$.ajax({
-					type: 'POST',
-					url: kco_params.update_klarna_order_url,
-					data: {
-						nonce: kco_params.update_klarna_order_nonce
-					},
-					dataType: 'json',
-					success: function( data ) {
-					},
-					error: function( data ) {
-					},
-					complete: function( data ) {
-						if ( true === data.responseJSON.success ) {
-							kco_wc.kcoResume();
-							$( '.woocommerce-checkout-review-order-table' ).unblock();
-						} else if( ! data.responseJSON.success && data.responseJSON.data.redirect_url !== 'undefined' ) {
-							window.location = data.responseJSON.data.redirect_url;
-						}
-					}
-				});
-			}
-		},
-
-		/**
 		 * Gets the Klarna order and starts the order submission
 		 */
 		getKlarnaOrder: function() {
@@ -430,14 +398,16 @@ jQuery( function( $ ) {
 						kco_wc.log( response );
 					},
 					complete: function( response ) {
-						//kco_wc.klarnaUpdateNeeded = false;
 						$( '#shipping_method #' + response.responseJSON.data.shipping_option_name ).prop( 'checked', true );
 						$( 'body' ).trigger( 'kco_shipping_option_changed', [ data ]);
 						$( 'body' ).trigger( 'update_checkout' );
-						//kco_wc.kcoResume();
 					}
 				}
 			);
+		},
+
+		convertCountry: function( country ) {
+			return Object.keys(kco_params.countries).find(key => kco_params.countries[key] === country);
 		},
 
 		/**
@@ -445,8 +415,8 @@ jQuery( function( $ ) {
 		 */
 		init: function() {
 			$( document ).ready( kco_wc.documentReady );
-			kco_wc.bodyEl.on( 'update_checkout', function() {  if( kco_wc.klarnaUpdateNeeded ) { kco_wc.kcoSuspend( true ) } } );
-			kco_wc.bodyEl.on( 'updated_checkout', kco_wc.updateKlarnaOrder );
+			kco_wc.bodyEl.on( 'update_checkout', function() {  kco_wc.kcoSuspend( true ) } );
+			kco_wc.bodyEl.on( 'updated_checkout', kco_wc.kcoResume );
 			kco_wc.bodyEl.on( 'updated_checkout', kco_wc.maybeDisplayShippingPrice );
 			kco_wc.bodyEl.on( 'change', 'input.qty', kco_wc.updateCart );
 			kco_wc.bodyEl.on( 'change', 'input[name="payment_method"]', kco_wc.maybeChangeToKco );
@@ -458,44 +428,29 @@ jQuery( function( $ ) {
 						'shipping_address_change': function( data ) {
 							kco_wc.log( 'shipping_address_change' );
 							kco_wc.log( data );
-							$( '.woocommerce-checkout-review-order-table' ).block({
-								message: null,
-								overlayCSS: {
-									background: '#fff',
-									opacity: 0.6
-								}
-							});
-							kco_wc.kcoSuspend( true );
-							$.ajax(
-								{
-									url: kco_params.iframe_shipping_address_change_url,
-									type: 'POST',
-									dataType: 'json',
-									data: {
-										data: data,
-										nonce: kco_params.iframe_shipping_address_change_nonce
-									},
-									success: function( response ) {
-										kco_wc.log( response );
+							
+							var country = kco_wc.convertCountry( data.country.toUpperCase() );
 
-										// Check if we have new address data to apply to the form.
-										if( response.data ) {
-											// All good trigger update_checkout event
-											kco_wc.setCustomerData( response.data );
-										}
+							// Check if shipping address is enabled.
+							if( $( '#shipping_first_name' ).length >= 0 ) {
+								$( '#ship-to-different-address-checkbox' ).prop( 'checked', true);
+								$( '#ship-to-different-address-checkbox' ).change();
+								$( '#ship-to-different-address-checkbox' ).blur();
+								$( '#shipping_first_name' ).val( ( ( 'given_name' in data ) ? data.given_name : '' ) );
+								$( '#shipping_last_name' ).val( ( ( 'family_name' in data ) ? data.family_name : '' ) );
+								$( '#shipping_postcode' ).val( ( ( 'postal_code' in data) ? data.postal_code : '' ) );
+								$( '#shipping_country' ).val( ( ( 'country' in data ) ? country : '' ) );
+							} else {
+								$( '#billing_first_name' ).val( ( ( 'given_name' in data ) ? data.given_name : '' ) );
+								$( '#billing_last_name' ).val( ( ( 'family_name' in data ) ? data.family_name : '' ) );
+								$( '#billing_postcode' ).val( ( ( 'postal_code' in data) ? data.postal_code : '' ) );
+								$( '#billing_country' ).val( ( ( 'country' in data ) ? country : '' ) );
+								$( '#billing_email' ).val( ( ( 'email' in data ) ? data.email : '' ) );
+								$( '#billing_email' ).change();
+								$( '#billing_email' ).blur();
+							}
 
-										$( 'body' ).trigger( 'update_checkout' );
-									},
-									error: function( response ) {
-										kco_wc.log( response );
-									},
-									complete: function( response ) {
-										$( '.woocommerce-checkout-review-order-table' ).unblock();
-										kco_wc.shippingUpdated = true;
-										kco_wc.bodyEl.trigger( 'kco_shipping_address_changed', response );
-									}
-								}
-							);
+							$( 'form.checkout' ).trigger( 'update_checkout' );
 						},
 						'change': function( data ) {
 							kco_wc.log( 'change', data );
