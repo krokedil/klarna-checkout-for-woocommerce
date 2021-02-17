@@ -263,6 +263,12 @@ class KCO_Subscription {
 		if ( empty( $recurring_token ) ) {
 			// Try getting it from _klarna_recurring_token (the old Klarna plugin).
 			$recurring_token = get_post_meta( $order_id, '_klarna_recurring_token', true );
+
+			if ( empty( $recurring_token ) ) {
+				$recurring_token = get_post_meta( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ), '_klarna_recurring_token', true );
+				update_post_meta( $order_id, '_klarna_recurring_token', $recurring_token );
+			}
+
 			if ( ! empty( $recurring_token ) ) {
 				update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
 				foreach ( $subscriptions as $subscription ) {
