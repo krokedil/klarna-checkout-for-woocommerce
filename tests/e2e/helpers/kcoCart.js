@@ -6,9 +6,13 @@
  * @returns {Promise<void>}
  */
 const addSingleProductToCart = async (page, productId) => {
-	const productSelector = `a[href="?add-to-cart=${productId}"]`;
+	const productSelector = productId;
+
 	try {
-		await page.click(productSelector);
+		await page.goto(
+			`http://localhost:8000/shop/?add-to-cart=${productSelector}`
+		);
+		await page.goto("http://localhost:8000/shop/");
 	} catch {
 		console.log("Proceed from expectation");
 	}
@@ -22,10 +26,15 @@ const addSingleProductToCart = async (page, productId) => {
  * @returns {Promise<void>}
  */
 const addMultipleProductsToCart = async (page, products) => {
-	products.forEach(async (product) => {
-		await addSingleProductToCart(page, product);
-	});
-	await page.waitForTimeout(2000);
+	const timer = products.length;
+
+	(async function addEachProduct() {
+		for (let i = 0; i < products.length + 1; i += 1) {
+			await addSingleProductToCart(page, products[i]);
+		}
+	})();
+
+	await page.waitForTimeout(timer * 800);
 };
 
 export default {
