@@ -38,7 +38,8 @@
     "docker:restart": "npm run docker:down && npm run docker:up",
     "docker:setup": "docker-compose run --rm wordpress-cli ./wp-content/plugins/klarna-checkout-for-woocommerce/tests/e2e/bin/setup.sh",
     "docker:import-data": "docker-compose run --rm wordpress-cli ./wp-content/plugins/klarna-checkout-for-woocommerce/tests/e2e/bin/import.sh",
-    "docker:site-init": "npm run docker:setup && npm run docker:import-data"
+    "docker:site-init": "npm run docker:setup && npm run docker:import-data",
+    "jettison":"jest --detectOpenHandles --forceExit"
   },
   "version": "1.0.0"
 }
