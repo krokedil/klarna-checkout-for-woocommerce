@@ -20,6 +20,4 @@ wp option update woocommerce_price_thousand_sep ','
 wp option update woocommerce_price_decimal_sep '.'
 wp option update woocommerce_price_num_decimals 2
 
-wp option update woocommerce_kco_settings < wp-content/plugins/klarna-checkout-for-woocommerce/tests/e2e/bin/settings.json  --format=json
 # create customer with wp cli command : for instance wp customer create ...
-
