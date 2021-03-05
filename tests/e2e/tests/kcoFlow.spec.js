@@ -6,29 +6,84 @@ import kcoFrame from "../helpers/kcoFrame";
 import kcoUtils from "../helpers/kcoUtils";
 
 import {
-	freeShippingMethod,
-	freeShippingMethodTarget,
-	flatRateMethodTarget,
-	invoicePaymentMethod,
+	puppeteerOptions as options,
+	customerAPIData,
+	klarnaOrderEndpoint,
+
+	/**
+	 * General data
+	 */
 	billingData,
 	userCredentials,
 	timeOutTime,
 	cardNumber,
 	pinNumber,
-	puppeteerOptions as options,
-	customerAPIData,
-	klarnaOrderEndpoint,
 
+	/**
+	 * Shipping methods
+	 */
 	iframeShipping,
+	freeShippingMethod,
+	freeShippingMethodTarget,
 	flatRateMethod,
+	flatRateMethodTarget,
 
+	/**
+	 * Payment methods
+	 */
+	invoicePaymentMethod,
+	debitPaymentMethod,
+	creditPaymentMethod,
+
+	/**
+	 * Coupons
+	 */
+	couponFixedCart,
+	couponFixedProduct,
+	couponPercent,
+	couponTotalFreeShipping,
+	couponTotalWithShipping,
+
+	/**
+	 * Products
+	 */
+	simpleProduct25,
+	simpleProduct12,
+	simpleProduct6,
+	simpleProduct0,
+	simpleProductSale25,
+	simpleProductSale12,
+	simpleProductSale6,
+	simpleProductSale0,
+	variableProduct25Black,
+	variableProduct25Blue,
+	variableProduct25Brown,
+	variableProduct25Green,
+	variableProductMixedBlackS,
+	variableProductMixedBlackM,
+	variableProductMixedBlackL,
+	variableProductMixedBlackXL,
+	variableProductMixedGreenS,
+	variableProductMixedGreenM,
+	variableProductMixedGreenL,
+	variableProductMixedGreenXL,
+	variableProductVirtualDownloadable25,
 } from "../config/config";
+
 import API from "../api/API";
 
+
+/**
+ * Main selectors
+ */
 let page;
 let browser;
 let context;
 
+
+/**
+ * Test comparison elements
+ */
 let iframeShippingMethod = "";
 
 const klarnaOrderId = [];
@@ -89,25 +144,23 @@ const klarnaProductName = [];
 const wooProductName = [];
 
 /**
- * Shipping method
+ * Shipping method selection
  */
-
-let shippingMethod = freeShippingMethod;
-// let shippingMethod = flatRateMethod;
+const shippingMethod = freeShippingMethod;
 let shippingMethodTarget = null;
 
-	if (iframeShipping !== 'yes') {
-		if (shippingMethod === "free") {
-			shippingMethodTarget = `[id*="${freeShippingMethodTarget}"]`;
-		} else if (shippingMethod === "flat") {
-			shippingMethodTarget = `[id*="${flatRateMethodTarget}"]`;
-		}
-	} else {
-		iframeShippingMethod = shippingMethod;
+if (iframeShipping !== "yes") {
+	if (shippingMethod === "free") {
+		shippingMethodTarget = `[id*="${freeShippingMethodTarget}"]`;
+	} else if (shippingMethod === "flat") {
+		shippingMethodTarget = `[id*="${flatRateMethodTarget}"]`;
 	}
+} else {
+	iframeShippingMethod = shippingMethod;
+}
 
 /**
- * Payment Method
+ * Payment method selection
  */
 const selectedPaymentMethod = invoicePaymentMethod;
 
@@ -134,7 +187,14 @@ describe("KCO", () => {
 		await user.login(userCredentials, { page });
 		await page.goto(kcoURLS.SHOP);
 
-		await cart.addMultipleProductsToCart(page, [1538, 1538, 1547]);
+		await page.waitForTimeout(timeOutTime);
+		await cart.addMultipleProductsToCart(page, [
+			variableProduct25Blue,
+			simpleProduct25,
+			variableProduct25Blue,
+		]);
+		await page.waitForTimeout(timeOutTime);
+
 
 		await page.goto(kcoURLS.CHECKOUT, { waitUntil: "networkidle0" });
 	}, 250000);
@@ -147,6 +207,7 @@ describe("KCO", () => {
 	}, 900000);
 
 	test("second flow should be on the my account page", async () => {
+
 		if (await page.$('input[id="payment_method_kco"]')) {
 			await page.evaluate(
 				(paymentMethod) => paymentMethod.click(),
@@ -155,12 +216,13 @@ describe("KCO", () => {
 		}
 
 		await page.waitForSelector('input[id="terms"]');
+;
 		await page.evaluate(
 			(cb) => cb.click(),
 			await page.$('input[id="terms"]')
 		);
 
-		if (iframeShipping !== 'yes') {
+		if (iframeShipping !== "yes") {
 			if (shippingMethod !== "") {
 				await page.waitForTimeout(timeOutTime);
 				await page.waitForSelector(shippingMethodTarget).id;
@@ -174,9 +236,22 @@ describe("KCO", () => {
 			page,
 			"klarna-checkout-iframe"
 		);
+
 		await kcoFrame.submitBillingForm(originalFrame, billingData);
 
 		await page.waitForTimeout(timeOutTime);
+
+		await page.$eval('[id="wpadminbar"]', (e) =>
+			e.setAttribute("style", "display:none")
+		);
+
+		await page.waitForTimeout(500);
+		await page.click('[class="showcoupon"]');
+		await page.waitForTimeout(500);
+		await page.type('[name="coupon_code"]', couponFixedProduct);
+		await page.waitForTimeout(500);
+		await page.click('[name="apply_coupon"]');
+
 		await kcoUtils.expectSelector(
 			originalFrame,
 			page,
@@ -191,16 +266,17 @@ describe("KCO", () => {
 			timeOutTime
 		);
 
-	if (iframeShipping === 'yes') {
+		if (iframeShipping === "yes") {
+			const frameShippingTab = await originalFrame.$$(
+				'[data-cid="SHIPMO-shipping-option-basic"]'
+			);
 
-		const frameShippingTab = await originalFrame.$$('[data-cid="SHIPMO-shipping-option-basic"]' );
-
-		if ( iframeShippingMethod === 'flat' ) {
-			await frameShippingTab[0].click();
-		} else if ( iframeShippingMethod === 'free' ) {
-			await frameShippingTab[1].click();
+			if (iframeShippingMethod === "flat") {
+				await frameShippingTab[0].click();
+			} else if (iframeShippingMethod === "free") {
+				await frameShippingTab[1].click();
+			}
 		}
-	}
 
 		const frameNew = await kcoFrame.loadIFrame(
 			page,
@@ -227,6 +303,7 @@ describe("KCO", () => {
 				page,
 				"pgw-iframe-paynow_card"
 			);
+
 			await kcoUtils.expectInput(
 				frameCreditCard,
 				page,
@@ -234,6 +311,7 @@ describe("KCO", () => {
 				'input[id="cardNumber"]',
 				0.25 * timeOutTime
 			);
+
 			await kcoUtils.expectInput(
 				frameCreditCard,
 				page,
@@ -241,6 +319,7 @@ describe("KCO", () => {
 				'input[id="expire"]',
 				0.25 * timeOutTime
 			);
+
 			await kcoUtils.expectInput(
 				frameCreditCard,
 				page,
@@ -270,6 +349,7 @@ describe("KCO", () => {
 			'[data-cid="button.buy_button"]',
 			timeOutTime
 		);
+
 		await kcoUtils.expectSelector(
 			frameNew,
 			page,
@@ -283,6 +363,7 @@ describe("KCO", () => {
 			'[id="nin"]',
 			timeOutTime
 		);
+
 		await kcoUtils.expectInput(
 			frameNew,
 			page,
@@ -290,6 +371,7 @@ describe("KCO", () => {
 			'[id="nin"]',
 			timeOutTime
 		);
+
 		await kcoUtils.expectSelector(
 			frameNew,
 			page,
@@ -308,6 +390,7 @@ describe("KCO", () => {
 			'[id="confirm_bank_account_dialog__footer-button-wrapper"]',
 			timeOutTime
 		);
+
 		await page.waitForTimeout(3 * timeOutTime);
 		const currentURL = await page.url();
 		const currentKCOId = currentURL.split("kco_order_id=")[1];
@@ -338,7 +421,7 @@ describe("KCO", () => {
 			}
 		});
 
-		for (let i = 0; i < klarnaOrderLinesContainer.length; i++) {
+		for (let i = 0; i < klarnaOrderLinesContainer.length; i += 1) {
 			if (
 				klarnaOrderLinesContainer[i].reference ===
 				wooOrderLinesContainer[i].sku
