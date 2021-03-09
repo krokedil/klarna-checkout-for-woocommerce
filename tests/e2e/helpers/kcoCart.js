@@ -5,16 +5,26 @@
  * @param productId
  * @returns {Promise<void>}
  */
+
+import kcoURLS from "../helpers/kcoURLS";
+
+
+/**
+ * 
+ * Adds single product to cart.
+ * 
+ * @param page 
+ * @param productId 
+ */
 const addSingleProductToCart = async (page, productId) => {
 	const productSelector = productId;
 
 	try {
 		await page.goto(
-			`http://localhost:8000/shop/?add-to-cart=${productSelector}`
+			kcoURLS.ADD_TO_CART + `${productSelector}`
 		);
-		await page.goto("http://localhost:8000/shop/");
+		await page.goto(kcoURLS.SHOP);
 	} catch {
-		console.log("Proceed from expectation");
 	}
 };
 
@@ -26,6 +36,9 @@ const addSingleProductToCart = async (page, productId) => {
  * @returns {Promise<void>}
  */
 const addMultipleProductsToCart = async (page, products) => {
+
+	await page.waitForTimeout(timer * 800);
+
 	const timer = products.length;
 
 	(async function addEachProduct() {
