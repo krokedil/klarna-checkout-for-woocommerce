@@ -72,18 +72,12 @@ import {
 
 import API from "../api/API";
 
-
-/**
- * Main selectors
- */
+// Main selectors
 let page;
 let browser;
 let context;
 
-
-/**
- * Test comparison elements
- */
+// Test comparison elements
 let iframeShippingMethod = "";
 
 const klarnaOrderId = [];
@@ -144,11 +138,22 @@ const klarnaProductName = [];
 const wooProductName = [];
 
 /**
- * Shipping method selection
+ * TEST ELEMENTS SELECTORS
+ * Input variables that are to be applied for the test
  */
-const shippingMethod = freeShippingMethod;
-let shippingMethodTarget = null;
 
+// Products selection
+const productsToCart = [
+	variableProduct25Blue,
+	simpleProduct25,
+	variableProduct25Green,
+	variableProductMixedBlackS,
+];
+
+// Shipping method selection
+const shippingMethod = freeShippingMethod;
+
+let shippingMethodTarget = null;
 if (iframeShipping !== "yes") {
 	if (shippingMethod === "free") {
 		shippingMethodTarget = `[id*="${freeShippingMethodTarget}"]`;
@@ -159,11 +164,15 @@ if (iframeShipping !== "yes") {
 	iframeShippingMethod = shippingMethod;
 }
 
-/**
- * Payment method selection
- */
+// Payment method selection
 const selectedPaymentMethod = invoicePaymentMethod;
 
+// Coupon selection
+const appliedCoupons = [couponPercent];
+
+/**
+ * Test Initialization
+ */
 describe("KCO", () => {
 	beforeAll(async () => {
 		browser = await puppeteer.launch(options);
@@ -172,7 +181,6 @@ describe("KCO", () => {
 		try {
 			const customerResponse = await API.getWCCustomers();
 			const { data } = customerResponse;
-			console.log("Customer exists");
 			if (parseInt(data.length, 10) < 1) {
 				try {
 					await API.createWCCustomer(customerAPIData);
@@ -183,31 +191,36 @@ describe("KCO", () => {
 		} catch (error) {
 			console.log(error);
 		}
+
+		// Login with User Credentials
 		await page.goto(kcoURLS.MY_ACCOUNT);
 		await user.login(userCredentials, { page });
-		await page.goto(kcoURLS.SHOP);
-
-		await page.waitForTimeout(timeOutTime);
-		await cart.addMultipleProductsToCart(page, [
-			variableProduct25Blue,
-			simpleProduct25,
-			variableProduct25Blue,
-		]);
-		await page.waitForTimeout(timeOutTime);
-
-
 		await page.goto(kcoURLS.CHECKOUT, { waitUntil: "networkidle0" });
+
 	}, 250000);
 
-	afterAll(() => {
-		if (!page.isClosed()) {
-			browser.close();
-			context.close();
-		}
-	}, 900000);
+	// Close Chromium on test end (will close on both success and fail)
+	// afterAll(() => {
+	// 	if (!page.isClosed()) {
+	// 		browser.close();
+	// 		context.close();
+	// 	}
+	// }, 900000);
 
+	/**
+	 * Begin test suite
+	 */
 	test("second flow should be on the my account page", async () => {
 
+		// Add products to Cart
+		await page.waitForTimeout(timeOutTime);
+		await cart.addMultipleProductsToCart(page, productsToCart);
+		await page.waitForTimeout(timeOutTime);
+
+		await page.goto(kcoURLS.CHECKOUT);
+		await page.waitForTimeout(timeOutTime);
+
+		// Choose Klarna as payment method
 		if (await page.$('input[id="payment_method_kco"]')) {
 			await page.evaluate(
 				(paymentMethod) => paymentMethod.click(),
@@ -216,12 +229,14 @@ describe("KCO", () => {
 		}
 
 		await page.waitForSelector('input[id="terms"]');
-;
 		await page.evaluate(
 			(cb) => cb.click(),
 			await page.$('input[id="terms"]')
 		);
 
+		await page.waitForTimeout(timeOutTime);
+
+		// Check for Klarna iFrame shipping
 		if (iframeShipping !== "yes") {
 			if (shippingMethod !== "") {
 				await page.waitForTimeout(timeOutTime);
@@ -232,25 +247,20 @@ describe("KCO", () => {
 			}
 		}
 
+		await page.waitForTimeout(timeOutTime);
+
 		const originalFrame = await kcoFrame.loadIFrame(
 			page,
 			"klarna-checkout-iframe"
 		);
 
-		await kcoFrame.submitBillingForm(originalFrame, billingData);
-
 		await page.waitForTimeout(timeOutTime);
 
-		await page.$eval('[id="wpadminbar"]', (e) =>
-			e.setAttribute("style", "display:none")
-		);
+		//Submit billing data
+		await kcoFrame.submitBillingForm(originalFrame, billingData);
 
-		await page.waitForTimeout(500);
-		await page.click('[class="showcoupon"]');
-		await page.waitForTimeout(500);
-		await page.type('[name="coupon_code"]', couponFixedProduct);
-		await page.waitForTimeout(500);
-		await page.click('[name="apply_coupon"]');
+		//Apply coupons
+		await kcoUtils.addCouponsOnCheckout(page, appliedCoupons);
 
 		await kcoUtils.expectSelector(
 			originalFrame,
@@ -391,7 +401,7 @@ describe("KCO", () => {
 			timeOutTime
 		);
 
-		await page.waitForTimeout(3 * timeOutTime);
+		await page.waitForTimeout(2 * timeOutTime);
 		const currentURL = await page.url();
 		const currentKCOId = currentURL.split("kco_order_id=")[1];
 		const response = await API.getKlarnaOrderById(
@@ -612,6 +622,9 @@ describe("KCO", () => {
 		expect(value).toBe("Order received");
 	}, 190000);
 
+	/**
+	 * Compare expected and received values
+	 */
 	test("Compare IDs", async () => {
 		expect(toString(klarnaOrderId)).toBe(toString(wooOrderId));
 	}, 190000);
