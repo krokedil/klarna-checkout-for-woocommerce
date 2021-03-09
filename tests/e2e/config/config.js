@@ -68,7 +68,8 @@ export const couponFixedCart = customerData.coupons.fixed_cart_30;
 export const couponFixedProduct = customerData.coupons.fixed_product_25;
 export const couponPercent = customerData.coupons.percent_50;
 export const couponTotalFreeShipping = customerData.coupons.free_shipping_100;
-export const couponTotalWithShipping = customerData.coupons.charged_shipping_100;
+export const couponTotalWithShipping =
+	customerData.coupons.charged_shipping_100;
 
 export const { pinNumber } = customerData;
 export const { cardNumber } = customerData;
