@@ -1,0 +1,43 @@
+export let klarnaValues = {
+    "orderId": [],
+    "firstName": "klarna",
+    "lastName": "klarna",
+    "company":"klarna",
+    "currency":"klarna",
+    "addressOne":"klarna",
+    "addressTwo":"klarna",
+    "city":"klarna",
+    "region":"klarna",
+    "postcode":"klarna",
+    "country":"klarna",
+    "email":"klarna",
+    "sku":[],
+    "totalAmount":[],
+    "shippingMethod":[],
+    "quantity":[],
+    "phone":"klarna",
+    "totalTax":[],
+    "productName":[]
+};
+
+export let wooValues = {
+    "orderId": [],
+    "firstName": "woo",
+    "lastName": "woo",
+    "company":"woo",
+    "currency":"woo",
+    "addressOne":"woo",
+    "addressTwo":"woo",
+    "city":"woo",
+    "region":"woo",
+    "postcode":"woo",
+    "country":"woo",
+    "email":"woo",
+    "sku":[],
+    "totalAmount":[],
+    "shippingMethod":[],
+    "quantity":[],
+    "phone":"woo",
+    "totalTax":[],
+    "productName":[]
+}
