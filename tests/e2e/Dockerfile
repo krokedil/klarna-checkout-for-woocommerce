@@ -1,1 +1,2 @@
-FROM wordpress:5.5.1
+ARG WP_TAG
+FROM wordpress:${WP_TAG}
