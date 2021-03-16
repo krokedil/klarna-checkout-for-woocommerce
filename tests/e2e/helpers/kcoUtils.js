@@ -49,11 +49,14 @@ const expectInput = async (frame, page, inputValue, selector, time) => {
 /**
  * Add coupons
  */
-const addCouponsOnCheckout = async (page, appliedCoupons) => {
+const addCouponsOnCheckout = async (page, isUserLoggedIn, appliedCoupons) => {
 	await page.waitForTimeout(1000);
-	await page.$eval('[id="wpadminbar"]', (adminBar) =>
-		adminBar.setAttribute("style", "display:none")
-	);
+
+	if(isUserLoggedIn) {
+		await page.$eval('[id="wpadminbar"]', (adminBar) =>
+			adminBar.setAttribute("style", "display:none")
+		);
+	}
 
 	if (appliedCoupons.length > 0) {
 		await appliedCoupons.forEach(async (singleCoupon) => {
@@ -68,6 +71,49 @@ const addCouponsOnCheckout = async (page, appliedCoupons) => {
 	}
 };
 
+
+const chooseKlarnaShippingMethod = async (
+	page,
+	frame,
+	iframeShipping,
+	shippingMethod,
+	freeShippingMethodTarget,
+	flatRateMethodTarget,
+	timeOutTime
+	) => {
+		let shippingMethodTarget;
+			
+		if (iframeShipping !== "yes") {
+			if (shippingMethod === "free") {
+				shippingMethodTarget = `[id*="${freeShippingMethodTarget}"]`;
+			} else if (shippingMethod === "flat") {
+				shippingMethodTarget = `[id*="${flatRateMethodTarget}"]`;
+			}
+
+			if (shippingMethod !== "") {
+				await page.waitForTimeout(timeOutTime);
+				await page.waitForSelector(shippingMethodTarget).id;
+				await page.waitForTimeout(timeOutTime);
+				await page.click(shippingMethodTarget).id;
+				await page.waitForTimeout(timeOutTime);
+			}
+		} else {
+
+			await page.waitForTimeout(timeOutTime);
+			let iframeShippingMethod = shippingMethod;
+
+				const frameShippingTab = await frame.$$(
+					'[data-cid="SHIPMO-shipping-option-basic"]'
+				);
+
+				if (iframeShippingMethod === "flat") {
+					await frameShippingTab[0].click();
+				} else if (iframeShippingMethod === "free") {
+					await frameShippingTab[1].click();
+				}
+		}
+}
+
 /**
  * Export data
  */
@@ -77,4 +123,5 @@ export default {
 	expectSelector,
 	expectInput,
 	addCouponsOnCheckout,
+	chooseKlarnaShippingMethod,
 };
