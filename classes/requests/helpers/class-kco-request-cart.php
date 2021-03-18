@@ -422,7 +422,7 @@ class KCO_Request_Cart {
 				// Add separate discount line item, but only if it's a smart coupon or country is US.
 				$fee_item            = array(
 					'type'                  => 'surcharge',
-					'reference'             => $fee->id,
+					'reference'             => substr( $fee->id, 0, 64 ),
 					'name'                  => $fee->name,
 					'quantity'              => 1,
 					'unit_price'            => $fee_amount,
