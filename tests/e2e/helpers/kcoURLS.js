@@ -6,7 +6,7 @@ const CHECKOUT = `${BASE_URL}/checkout`;
 
 const SHOP = `${BASE_URL}/shop`;
 
-const ADD_TO_CART = `${BASE_URL}/shop/?add-to-cart=`
+const ADD_TO_CART = `${BASE_URL}/shop/?add-to-cart=`;
 
 const MY_ACCOUNT = `${BASE_URL}/my-account`;
 
