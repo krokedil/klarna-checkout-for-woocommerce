@@ -1,3 +1,5 @@
+import API from "../api/API";
+
 /**
  *
  * @param page
@@ -32,27 +34,40 @@ const expectSelector = async (frame, page, selector, time) => {
 		await page.waitForTimeout(2 * time);
 		await frame.click(selector);
 	} catch {
+		// Proceed
 	}
 };
 
 /**
- * Check for input - continue if false
+ *
+ * Check for input - continue if flase
+ *
+ * @param {*} frame
+ * @param {*} page
+ * @param {*} inputValue
+ * @param {*} selector
+ * @param {*} time
  */
 const expectInput = async (frame, page, inputValue, selector, time) => {
 	try {
 		await page.waitForTimeout(2 * time);
 		await frame.type(selector, inputValue);
 	} catch {
+		// Proceed
 	}
 };
 
 /**
  * Add coupons
+ *
+ * @param {*} page
+ * @param {*} isUserLoggedIn
+ * @param {*} appliedCoupons
  */
 const addCouponsOnCheckout = async (page, isUserLoggedIn, appliedCoupons) => {
 	await page.waitForTimeout(1000);
 
-	if(isUserLoggedIn) {
+	if (isUserLoggedIn) {
 		await page.$eval('[id="wpadminbar"]', (adminBar) =>
 			adminBar.setAttribute("style", "display:none")
 		);
@@ -71,7 +86,17 @@ const addCouponsOnCheckout = async (page, isUserLoggedIn, appliedCoupons) => {
 	}
 };
 
-
+/**
+ * Select shipping method
+ *
+ * @param {*} page
+ * @param {*} frame
+ * @param {*} iframeShipping
+ * @param {*} shippingMethod
+ * @param {*} freeShippingMethodTarget
+ * @param {*} flatRateMethodTarget
+ * @param {*} timeOutTime
+ */
 const chooseKlarnaShippingMethod = async (
 	page,
 	frame,
@@ -80,39 +105,88 @@ const chooseKlarnaShippingMethod = async (
 	freeShippingMethodTarget,
 	flatRateMethodTarget,
 	timeOutTime
-	) => {
-		let shippingMethodTarget;
-			
-		if (iframeShipping !== "yes") {
-			if (shippingMethod === "free") {
-				shippingMethodTarget = `[id*="${freeShippingMethodTarget}"]`;
-			} else if (shippingMethod === "flat") {
-				shippingMethodTarget = `[id*="${flatRateMethodTarget}"]`;
-			}
+) => {
+	let shippingMethodTarget;
 
-			if (shippingMethod !== "") {
-				await page.waitForTimeout(timeOutTime);
-				await page.waitForSelector(shippingMethodTarget).id;
-				await page.waitForTimeout(timeOutTime);
-				await page.click(shippingMethodTarget).id;
-				await page.waitForTimeout(timeOutTime);
-			}
-		} else {
-
-			await page.waitForTimeout(timeOutTime);
-			let iframeShippingMethod = shippingMethod;
-
-				const frameShippingTab = await frame.$$(
-					'[data-cid="SHIPMO-shipping-option-basic"]'
-				);
-
-				if (iframeShippingMethod === "flat") {
-					await frameShippingTab[0].click();
-				} else if (iframeShippingMethod === "free") {
-					await frameShippingTab[1].click();
-				}
+	if (iframeShipping !== "yes") {
+		if (shippingMethod === "free") {
+			shippingMethodTarget = `[id*="${freeShippingMethodTarget}"]`;
+		} else if (shippingMethod === "flat") {
+			shippingMethodTarget = `[id*="${flatRateMethodTarget}"]`;
 		}
-}
+
+		if (shippingMethod !== "") {
+			await page.waitForTimeout(timeOutTime);
+			await page.waitForSelector(shippingMethodTarget).id;
+			await page.waitForTimeout(timeOutTime);
+			await page.click(shippingMethodTarget).id;
+			await page.waitForTimeout(timeOutTime);
+		}
+	} else {
+		await page.waitForTimeout(timeOutTime);
+		const iframeShippingMethod = shippingMethod;
+
+		const frameShippingTab = await frame.$$(
+			'[data-cid="SHIPMO-shipping-option-basic"]'
+		);
+
+		if (iframeShippingMethod === "flat") {
+			await frameShippingTab[0].click();
+		} else if (iframeShippingMethod === "free") {
+			await frameShippingTab[1].click();
+		}
+	}
+};
+
+/**
+ * Select shipping method through KCO iFrame or standard WC checkout selection
+ */
+const toggleIFrame = async (toggleSwitch) => {
+	const KCOSettingsArray = {
+		woocommerce_kco_settings: {
+			enabled: "yes",
+			title: "Klarna",
+			description: "Klarna Checkout for WooCommerce Test",
+			select_another_method_text: "",
+			testmode: "yes",
+			logging: "yes",
+			credentials_eu: "",
+			merchant_id_eu: "",
+			shared_secret_eu: "",
+			test_merchant_id_eu: "PK08164_dbc5171dedd2",
+			test_shared_secret_eu: "e7kG49n1SCJRh1rJ",
+			credentials_us: "",
+			merchant_id_us: "",
+			shared_secret_us: "",
+			test_merchant_id_us: "",
+			test_shared_secret_us: "",
+			shipping_section: "",
+			allow_separate_shipping: "no",
+			shipping_methods_in_iframe: toggleSwitch,
+			shipping_details: "",
+			checkout_section: "",
+			send_product_urls: "yes",
+			dob_mandatory: "no",
+			display_privacy_policy_text: "no",
+			add_terms_and_conditions_checkbox: "no",
+			allowed_customer_types: "B2C",
+			title_mandatory: "yes",
+			prefill_consent: "yes",
+			quantity_fields: "yes",
+			color_settings_title: "",
+			color_button: "",
+			color_button_text: "",
+			color_checkbox: "",
+			color_checkbox_checkmark: "",
+			color_header: "",
+			color_link: "",
+			radius_border: "",
+			add_to_email: "no",
+		},
+	};
+
+	await API.updateOptions(KCOSettingsArray);
+};
 
 /**
  * Export data
@@ -124,4 +198,5 @@ export default {
 	expectInput,
 	addCouponsOnCheckout,
 	chooseKlarnaShippingMethod,
+	toggleIFrame,
 };
