@@ -23,7 +23,6 @@ import {
 	/**
 	 * Shipping methods
 	 */
-	iframeShipping,
 	freeShippingMethod,
 	freeShippingMethodTarget,
 	flatRateMethod,
@@ -84,7 +83,7 @@ let context;
  */
 
 // User logged-in (true) / Guest (false)
-let isUserLoggedIn = true;
+const isUserLoggedIn = true;
 
 // Products selection
 const productsToCart = [
@@ -102,7 +101,8 @@ const selectedPaymentMethod = invoicePaymentMethod;
 // Coupon selection
 const appliedCoupons = [couponPercent];
 
-
+// Shipping in KCO iFrame ("yes") / Standard WC ("no")
+const iframeShipping = "yes";
 
 /**
  * TEST INITIALIZATION
@@ -127,18 +127,18 @@ describe("KCO", () => {
 		}
 
 		// Check for user logged in
-		if( isUserLoggedIn ){
-
-			//Login with User Credentials
+		if (isUserLoggedIn) {
+			// Login with User Credentials
 			await page.goto(kcoURLS.MY_ACCOUNT);
 			await user.login(userCredentials, { page });
 		}
-		await page.waitForTimeout(timeOutTime);
-		await page.goto(kcoURLS.CHECKOUT, { waitUntil: "networkidle0" });
 
+		await kcoUtils.toggleIFrame(iframeShipping);
+
+		await page.goto(kcoURLS.CHECKOUT, { waitUntil: "networkidle0" });
 	}, 250000);
 
-	//Close Chromium on test end (will close on both success and fail)
+	// Close Chromium on test end (will close on both success and fail)
 	afterAll(() => {
 		if (!page.isClosed()) {
 			browser.close();
@@ -150,7 +150,6 @@ describe("KCO", () => {
 	 * Begin test suite
 	 */
 	test("second flow should be on the my account page", async () => {
-
 		// Add products to Cart
 		await page.waitForTimeout(timeOutTime);
 		await cart.addMultipleProductsToCart(page, productsToCart);
@@ -182,11 +181,15 @@ describe("KCO", () => {
 
 		await page.waitForTimeout(2 * timeOutTime);
 
-		//Submit billing data
+		// Submit billing data
 		await kcoFrame.submitBillingForm(originalFrame, billingData);
 
-		//Apply coupons
-		await kcoUtils.addCouponsOnCheckout(page, isUserLoggedIn, appliedCoupons);
+		// Apply coupons
+		await kcoUtils.addCouponsOnCheckout(
+			page,
+			isUserLoggedIn,
+			appliedCoupons
+		);
 
 		await kcoUtils.expectSelector(
 			originalFrame,
@@ -211,7 +214,6 @@ describe("KCO", () => {
 			freeShippingMethodTarget,
 			flatRateMethodTarget,
 			timeOutTime
-
 		);
 
 		const frameNew = await kcoFrame.loadIFrame(
@@ -393,7 +395,9 @@ describe("KCO", () => {
 					klarnaOrderLinesContainer[i].quantity ===
 					wooOrderLinesContainer[i].quantity
 				) {
-					klarnaValues.quantity.push(klarnaOrderLinesContainer[i].quantity);
+					klarnaValues.quantity.push(
+						klarnaOrderLinesContainer[i].quantity
+					);
 					wooValues.quantity.push(wooOrderLinesContainer[i].quantity);
 				}
 
@@ -404,7 +408,9 @@ describe("KCO", () => {
 					klarnaValues.totalTax.push(
 						klarnaOrderLinesContainer[i].total_tax_amount
 					);
-					wooValues.totalTax.push(wooOrderLinesContainer[i].rate_percent);
+					wooValues.totalTax.push(
+						wooOrderLinesContainer[i].rate_percent
+					);
 				}
 
 				if (
@@ -423,7 +429,9 @@ describe("KCO", () => {
 					klarnaOrderLinesContainer[i].name ===
 					wooOrderLinesContainer[i].name
 				) {
-					klarnaValues.productName.push(klarnaOrderLinesContainer[i].name);
+					klarnaValues.productName.push(
+						klarnaOrderLinesContainer[i].name
+					);
 					wooValues.productName.push(wooOrderLinesContainer[i].name);
 				}
 
@@ -431,7 +439,9 @@ describe("KCO", () => {
 					klarnaOrderLinesContainer[i].reference ===
 					wooOrderLinesContainer[i].sku
 				) {
-					klarnaValues.sku.push(klarnaOrderLinesContainer[i].reference);
+					klarnaValues.sku.push(
+						klarnaOrderLinesContainer[i].reference
+					);
 					wooValues.sku.push(wooOrderLinesContainer[i].sku);
 				}
 
@@ -439,8 +449,12 @@ describe("KCO", () => {
 					klarnaOrderLinesContainer[i].order_id ===
 					wooOrderLinesContainer[i].transaction_id
 				) {
-					klarnaValues.orderId.push(klarnaOrderLinesContainer[i].order_id);
-					wooValues.orderId.push(wooOrderLinesContainer[i].transaction_id);
+					klarnaValues.orderId.push(
+						klarnaOrderLinesContainer[i].order_id
+					);
+					wooValues.orderId.push(
+						wooOrderLinesContainer[i].transaction_id
+					);
 				}
 			}
 		}
@@ -473,7 +487,8 @@ describe("KCO", () => {
 			response.data.shipping_address.street_address ===
 			wooCommerceOrder.data.billing.address_1
 		) {
-			klarnaValues.addressOne = response.data.shipping_address.street_address;
+			klarnaValues.addressOne =
+				response.data.shipping_address.street_address;
 			wooValues.addressOne = wooCommerceOrder.data.billing.address_1;
 		}
 
@@ -481,7 +496,8 @@ describe("KCO", () => {
 			response.data.shipping_address.street_address2 ===
 			wooCommerceOrder.data.billing.address_2
 		) {
-			klarnaValues.addressTwo = response.data.shipping_address.street_address2;
+			klarnaValues.addressTwo =
+				response.data.shipping_address.street_address2;
 			wooValues.addressTwo = wooCommerceOrder.data.billing.address_2;
 		}
 
@@ -533,7 +549,10 @@ describe("KCO", () => {
 			wooCommerceOrder.data.billing.phone.replace(/\s/g, "")
 		) {
 			klarnaValues.phone = response.data.shipping_address.phone;
-			wooValues.phone = wooCommerceOrder.data.billing.phone.replace(/\s/g, "");
+			wooValues.phone = wooCommerceOrder.data.billing.phone.replace(
+				/\s/g,
+				""
+			);
 		}
 
 		if (
@@ -552,7 +571,9 @@ describe("KCO", () => {
 	 * Compare expected and received values
 	 */
 	test("Compare IDs", async () => {
-		expect(toString(klarnaValues.orderId)).toBe(toString(wooValues.orderId));
+		expect(toString(klarnaValues.orderId)).toBe(
+			toString(wooValues.orderId)
+		);
 	}, 190000);
 
 	test("Compare names", async () => {
@@ -604,15 +625,21 @@ describe("KCO", () => {
 	}, 190000);
 
 	test("Compare total amounts", async () => {
-		expect(toString(klarnaValues.totalAmount)).toBe(toString(wooValues.totalAmount));
+		expect(toString(klarnaValues.totalAmount)).toBe(
+			toString(wooValues.totalAmount)
+		);
 	}, 190000);
 
 	test("Compare total taxes", async () => {
-		expect(toString(klarnaValues.totalTax)).toBe(toString(wooValues.totalTax));
+		expect(toString(klarnaValues.totalTax)).toBe(
+			toString(wooValues.totalTax)
+		);
 	}, 190000);
 
 	test("Compare product names", async () => {
-		expect(toString(klarnaValues.productName)).toBe(toString(wooValues.productName));
+		expect(toString(klarnaValues.productName)).toBe(
+			toString(wooValues.productName)
+		);
 	}, 190000);
 
 	test("Compare Shipping methods", async () => {
@@ -622,7 +649,9 @@ describe("KCO", () => {
 	}, 190000);
 
 	test("Compare Quantities", async () => {
-		expect(toString(klarnaValues.quantity)).toBe(toString(wooValues.quantity));
+		expect(toString(klarnaValues.quantity)).toBe(
+			toString(wooValues.quantity)
+		);
 	}, 190000);
 
 	test("Compare currencies", async () => {
