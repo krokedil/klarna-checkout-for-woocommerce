@@ -64,12 +64,11 @@ export const variableProductVirtualDownloadableSale6 =
 export const variableProductVirtualDownloadableSale0 =
 	productIdData.virtual_downloadable_0;
 
-export const couponFixedCart = customerData.coupons.fixed_cart_30;
-export const couponFixedProduct = customerData.coupons.fixed_product_25;
-export const couponPercent = customerData.coupons.percent_50;
-export const couponTotalFreeShipping = customerData.coupons.free_shipping_100;
-export const couponTotalWithShipping =
-	customerData.coupons.charged_shipping_100;
+export const couponFixedCart = customerData.coupons.fixed_cart;
+export const couponFixedProduct = customerData.coupons.fixed_product;
+export const couponPercent = customerData.coupons.percent;
+export const couponTotalFreeShipping = customerData.coupons.free_shipping;
+export const couponTotalWithShipping = customerData.coupons.charged_shipping;
 
 export const { pinNumber } = customerData;
 export const { cardNumber } = customerData;
