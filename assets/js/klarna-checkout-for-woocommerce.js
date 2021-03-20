@@ -227,6 +227,7 @@ jQuery( function( $ ) {
 		 * Gets the Klarna order and starts the order submission
 		 */
 		getKlarnaOrder: function() {
+			console.log( 'getKlarnaOrder' );
 			kco_wc.preventPaymentMethodChange = true;
 			$( '.woocommerce-checkout-review-order-table' ).block({
 				message: null,
@@ -235,7 +236,7 @@ jQuery( function( $ ) {
 					opacity: 0.6
 				}
 			});
-			$.ajax({
+			var ajax = $.ajax({
 				type: 'POST',
 				url: kco_params.get_klarna_order_url,
 				data: {
@@ -243,21 +244,22 @@ jQuery( function( $ ) {
 				},
 				dataType: 'json',
 				success: function( data ) {
-				},
-				error: function( data ) {
-					return false;
-				},
-				complete: function( data ) {
-					kco_wc.setCustomerData( data.responseJSON.data );
-
+					kco_wc.setCustomerData( data.data );
+					
 					// Check Terms checkbox, if it exists.
 					if ( 0 < $( 'form.checkout #terms' ).length ) {
 						$( 'form.checkout #terms' ).prop( 'checked', true );
 					}
-					$( 'form.checkout' ).submit();
-					return true;
+					console.log( 'success' );
+				},
+				error: function( data ) {
+					console.log( 'error' );
+				},
+				complete: function( data ) {
 				}
 			});
+
+			return ajax;
 		},
 
 		/**
@@ -327,29 +329,24 @@ jQuery( function( $ ) {
 		 * @param {function} callback 
 		 * @param {string} event 
 		 */
-		failOrder: function( callback, event ) {
-			// Send false and cancel 
+		failOrder: function( event, error_message, callback ) {
 			callback({ should_proceed: false });
-			// Clear the interval.
-			clearInterval(kco_wc.interval);
-			// Remove the timeout.
-			clearTimeout( kco_wc.timeout );
-			// Re-enable the form.
+		
+			// Renable the form.
 			$( 'body' ).trigger( 'updated_checkout' );
-			kco_wc.checkoutFormSelector.removeClass( 'processing' );
+			$( kco_wc.checkoutFormSelector ).removeClass( 'processing' );
 			$( kco_wc.checkoutFormSelector ).unblock();
-			if ( 'timeout' === event ) {
-				kco_wc.logToFile( 'Timeout for validation_callback triggered.' );
-				$('#kco-timeout').remove();
-				$('form.checkout').prepend(
-					'<div id="kco-timeout" class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview"><ul class="woocommerce-error" role="alert"><li>'
-					+  kco_params.timeout_message
-					+ '</li></ul></div>'
-				);
-			} else {
-				var error_message = $( ".woocommerce-NoticeGroup-checkout" ).text();
-				kco_wc.logToFile( 'Checkout error - ' + error_message );
-			}
+			$( '.woocommerce-checkout-review-order-table' ).unblock();
+
+			// Print error messages, and trigger checkout_error, and scroll to notices.
+			$( '.woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message' ).remove();
+			$( 'form.checkout' ).prepend( '<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' + error_message + '</div>' ); // eslint-disable-line max-len
+			$( 'form.checkout' ).removeClass( 'processing' ).unblock();
+			$( 'form.checkout' ).find( '.input-text, select, input:checkbox' ).trigger( 'validate' ).blur();
+			$( document.body ).trigger( 'checkout_error' , [ error_message ] );
+			$( 'html, body' ).animate( {
+				scrollTop: ( $( 'form.checkout' ).offset().top - 100 )
+			}, 1000 );
 		},
 
 		/**
@@ -382,32 +379,60 @@ jQuery( function( $ ) {
 
 		updateShipping: function( data ) {
 			kco_wc.kcoSuspend( true );
-			$.ajax(
-				{
-					url: kco_params.update_shipping_url,
-					type: 'POST',
-					dataType: 'json',
-					data: {
-						data: data,
-						nonce: kco_params.update_shipping_nonce
-					},
-					success: function( response ) {
-						kco_wc.log( response );
-					},
-					error: function( response ) {
-						kco_wc.log( response );
-					},
-					complete: function( response ) {
-						$( '#shipping_method #' + response.responseJSON.data.shipping_option_name ).prop( 'checked', true );
-						$( 'body' ).trigger( 'kco_shipping_option_changed', [ data ]);
-						$( 'body' ).trigger( 'update_checkout' );
-					}
-				}
-			);
+			$('#kco_shipping_data').val(JSON.stringify(data));
+			$( 'body' ).trigger( 'kco_shipping_option_changed', [ data ]);
+			$( 'body' ).trigger( 'update_checkout' );
 		},
 
 		convertCountry: function( country ) {
 			return Object.keys(kco_params.countries).find(key => kco_params.countries[key] === country);
+		},
+
+		placeKlarnaOrder: function(callback) {
+			console.log( 1 );
+			kco_wc.getKlarnaOrder().done( function(response) {
+				if(response.success) {
+					console.log( 2 );
+					$( '.woocommerce-checkout-review-order-table' ).block({
+						message: null,
+						overlayCSS: {
+							background: '#fff',
+							opacity: 0.6
+						}
+					});
+					$.ajax({
+						type: 'POST',
+						url: kco_params.submit_order,
+						data: $('form.checkout').serialize(),
+						dataType: 'json',
+						success: function( data ) {
+							try {
+								if ( 'success' === data.result ) {
+									kco_wc.logToFile( 'Successfully placed order. Sending "should_procede: true" to Klarna' );
+									callback({ should_proceed: true });
+								} else {
+									throw 'Result failed';
+								}
+							} catch ( err ) {
+								if ( data.messages )  {
+									kco_wc.logToFile( 'Checkout error | ' + data.messages );
+									kco_wc.failOrder( 'submission', data.messages, callback );
+								} else {
+									kco_wc.logToFile( 'Checkout error | No message' );
+									kco_wc.failOrder( 'submission', '<div class="woocommerce-error">' + 'Checkout error' + '</div>', callback );
+								}
+							}
+						},
+						error: function( data ) {
+							kco_wc.logToFile( 'AJAX error | ' + data );
+							kco_wc.failOrder( 'ajax-error', data );
+						}
+					});
+				} else {
+					console.log( 3 );
+					kco_wc.failOrder( 'get_order', '<div class="woocommerce-error">' + 'Failed to get the order from Klarna.' + '</div>', callback );
+				}
+			});
 		},
 
 		/**
@@ -468,15 +493,7 @@ jQuery( function( $ ) {
 						},
 						'validation_callback': function( data, callback ) {
 							kco_wc.logToFile( 'validation_callback from Klarna triggered' );
-							// Empty current hash.
-							window.location.hash = '';
-							// Check for any errors.
-							kco_wc.timeout = setTimeout( function() { kco_wc.failOrder( callback, 'timeout' ); }, kco_params.timeout_time * 1000 );
-							$( document.body ).on( 'checkout_error', function() { kco_wc.failOrder( callback, 'checkout_error' ); } );
-							// Run interval until we find a hashtag or timer runs out.
-							kco_wc.interval = setInterval( function() { kco_wc.checkUrl( callback ); }, 500 );
-							// Start processing the order.
-							kco_wc.getKlarnaOrder();
+							kco_wc.placeKlarnaOrder(callback);
 						}
 					});
 				});

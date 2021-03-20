@@ -33,7 +33,6 @@ class KCO_AJAX extends WC_AJAX {
 			'kco_wc_update_cart'                    => true,
 			'kco_wc_update_shipping'                => true,
 			'kco_wc_change_payment_method'          => true,
-			'kco_wc_update_klarna_order'            => true,
 			'kco_wc_iframe_shipping_address_change' => true,
 			'kco_wc_set_session_value'              => true,
 			'kco_wc_get_klarna_order'               => true,
@@ -83,24 +82,6 @@ class KCO_AJAX extends WC_AJAX {
 			wp_send_json_error();
 			wp_die();
 		}
-		wp_die();
-	}
-
-	/**
-	 * Update shipping method function.
-	 */
-	public static function kco_wc_update_shipping() {
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
-		if ( ! wp_verify_nonce( $nonce, 'kco_wc_update_shipping' ) ) {
-			wp_send_json_error( 'bad_nonce' );
-			exit;
-		}
-
-		$return                         = array();
-		$data                           = ( isset( $_POST['data'] ) && 'false' !== $_POST['data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['data'] ) ) : false;
-		$return['shipping_option_name'] = kco_update_wc_shipping( $data );
-
-		wp_send_json_success( $return );
 		wp_die();
 	}
 

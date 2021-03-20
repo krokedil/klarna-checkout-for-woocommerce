@@ -128,8 +128,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			if ( $this->process_payment_handler( $order_id ) ) {
 				// Base64 encoded timestamp to always have a fresh URL for on hash change event.
 				return array(
-					'result'   => 'success',
-					'redirect' => '#klarna-success=' . base64_encode( microtime() ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Base64 used to give a unique nondescript string.
+					'result' => 'success',
 				);
 			} else {
 				return array(
@@ -253,11 +252,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				KCO_WC_VERSION
 			);
 
-			$form = false;
-			if ( WC()->session->get( 'kco_checkout_form' ) ) {
-				$form = WC()->session->get( 'kco_checkout_form' );
-			}
-
 			$email_exists = 'no';
 			if ( method_exists( WC()->customer, 'get_billing_email' ) && ! empty( WC()->customer->get_billing_email() ) ) {
 				if ( email_exists( WC()->customer->get_billing_email() ) ) {
@@ -278,6 +272,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'get_klarna_order_nonce'       => wp_create_nonce( 'kco_wc_get_klarna_order' ),
 				'log_to_file_url'              => WC_AJAX::get_endpoint( 'kco_wc_log_js' ),
 				'log_to_file_nonce'            => wp_create_nonce( 'kco_wc_log_js' ),
+				'submit_order'                 => WC_AJAX::get_endpoint( 'checkout' ),
 				'logging'                      => $this->logging,
 				'standard_woo_checkout_fields' => $standard_woo_checkout_fields,
 				'is_confirmation_page'         => ( is_kco_confirmation() ) ? 'yes' : 'no',
