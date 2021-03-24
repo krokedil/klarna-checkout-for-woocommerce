@@ -34,7 +34,7 @@ class KCO_Checkout {
 		$fields['order']['kco_shipping_data'] = array(
 			'type'    => 'hidden',
 			'class'   => array( 'kco_shipping_data' ),
-			'default' => json_encode( $shipping_data ),
+			'default' => wp_json_encode( $shipping_data ),
 		);
 		return $fields;
 	}
@@ -48,8 +48,8 @@ class KCO_Checkout {
 		if ( ! is_checkout() ) {
 			return;
 		}
-		if ( isset( $_POST['post_data'] ) ) {
-			parse_str( $_POST['post_data'], $post_data );
+		if ( isset( $_POST['post_data'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			parse_str( $_POST['post_data'], $post_data ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			if ( isset( $post_data['kco_shipping_data'] ) ) {
 				WC()->session->set( 'kco_shipping_data', $post_data['kco_shipping_data'] );
 				$data = json_decode( $post_data['kco_shipping_data'], true );
