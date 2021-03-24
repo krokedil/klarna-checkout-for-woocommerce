@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.5.6
+Tested up to: 5.6.1
 Requires PHP: 5.6
 WC requires at least: 3.4.0
-WC tested up to: 4.9.0
+WC tested up to: 5.0.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,14 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.02.17    - version 2.4.3 =
+* Enhancement   - We now save the recurring token from Klarna to the parent subscription order. If the token fails to be set for the subscription we will then get it from the Parent order instead. Should help some in cases where renewals fail when getting a HTTP error from Klarna.
+* Enhancement   - When moving from Klarna V2 to V3, in some cases the recurring token was missing on the subscription. If this is the case we will now fetch it from the parent order.
+* Fix           - Fixed an issue with the additional checkboxes feature.
+* Fix           - Fixed an issue that could cause a malformed JSON object in the requests to Klarna. This would happen if an order line was removed causing the keys set to be out of order.
+* Fix           - We now correctly save the shipping organization name.
+* Fix           - Fixed an issue where we tried to get the quantity of fees.
+
 = 2021.01.12    - version 2.4.2 =
 * Enhancement   - Improved logging around checkout errors. The checkout error that stops the purchase is now being logged to make debugging easier.
 * Enhancement   - Payment method changes to subscriptions are now confirmed instantly when changing to Klarna or updating a expired card. The push is no longer required, but is still used as a backup.
