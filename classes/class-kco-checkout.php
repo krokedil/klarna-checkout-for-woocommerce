@@ -48,8 +48,8 @@ class KCO_Checkout {
 		if ( ! is_checkout() ) {
 			return;
 		}
-		if ( isset( $_POST['post_data'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			parse_str( $_POST['post_data'], $post_data ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['post_data'] ) ) { // phpcs:ignore
+			parse_str( $_POST['post_data'], $post_data ); // phpcs:ignore
 			if ( isset( $post_data['kco_shipping_data'] ) ) {
 				WC()->session->set( 'kco_shipping_data', $post_data['kco_shipping_data'] );
 				$data = json_decode( $post_data['kco_shipping_data'], true );
