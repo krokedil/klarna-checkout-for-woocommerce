@@ -33,7 +33,6 @@ class KCO_AJAX extends WC_AJAX {
 			'kco_wc_update_cart'                    => true,
 			'kco_wc_update_shipping'                => true,
 			'kco_wc_change_payment_method'          => true,
-			'kco_wc_update_klarna_order'            => true,
 			'kco_wc_iframe_shipping_address_change' => true,
 			'kco_wc_set_session_value'              => true,
 			'kco_wc_get_klarna_order'               => true,
@@ -87,24 +86,6 @@ class KCO_AJAX extends WC_AJAX {
 	}
 
 	/**
-	 * Update shipping method function.
-	 */
-	public static function kco_wc_update_shipping() {
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
-		if ( ! wp_verify_nonce( $nonce, 'kco_wc_update_shipping' ) ) {
-			wp_send_json_error( 'bad_nonce' );
-			exit;
-		}
-
-		$return                         = array();
-		$data                           = ( isset( $_POST['data'] ) && 'false' !== $_POST['data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['data'] ) ) : false;
-		$return['shipping_option_name'] = kco_update_wc_shipping( $data );
-
-		wp_send_json_success( $return );
-		wp_die();
-	}
-
-	/**
 	 * Refresh checkout fragment.
 	 */
 	public static function kco_wc_change_payment_method() {
@@ -137,71 +118,6 @@ class KCO_AJAX extends WC_AJAX {
 		);
 
 		wp_send_json_success( $data );
-		wp_die();
-	}
-
-	/**
-	 * Updates Klarna order.
-	 */
-	public static function kco_wc_update_klarna_order() {
-		wc_maybe_define_constant( 'WOOCOMMERCE_CHECKOUT', true );
-
-		if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
-
-			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
-
-			// Set empty return error array.
-			$return = array();
-
-			// Check if we have a klarna order id.
-			if ( empty( $klarna_order_id ) ) {
-				wc_add_notice( 'Klarna order id is missing.', 'error' );
-				wp_send_json_error();
-				wp_die();
-			} else {
-				// Get the Klarna order from Klarna.
-				$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
-				// Check if we got a wp_error.
-				if ( is_wp_error( $klarna_order ) ) {
-					wp_send_json_error();
-					wp_die();
-				}
-
-				// Get the Klarna order object.
-				// Calculate cart totals.
-				WC()->cart->calculate_fees();
-				WC()->cart->calculate_totals();
-
-				// Check if order needs payment.
-				if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
-					if ( ! WC()->cart->needs_payment() && 'checkout_incomplete' === $klarna_order['status'] ) {
-						$return['redirect_url'] = wc_get_checkout_url();
-						wp_send_json_error( $return );
-						wp_die();
-					}
-				}
-
-				// Check if payment status is checkout_incomplete.
-				if ( 'checkout_incomplete' === $klarna_order['status'] ) {
-					// If it is, update order.
-					$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
-
-					// If is wp_error return error.
-					if ( is_wp_error( $klarna_order ) ) {
-						wp_send_json_error();
-						wp_die();
-					}
-				} elseif ( 'checkout_complete' !== $klarna_order['status'] ) {
-					// Checkout is not completed or incomplete. Send to cart and display error.
-					$return['redirect_url'] = add_query_arg( 'kco-order', 'error', wc_get_cart_url() );
-					wp_send_json_error( $return );
-					wp_die();
-				}
-			}
-		}
-
-		// Everything is okay if we get here. Send empty success and kill wp.
-		wp_send_json_success();
 		wp_die();
 	}
 

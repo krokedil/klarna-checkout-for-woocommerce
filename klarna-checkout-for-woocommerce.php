@@ -212,6 +212,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-subscription.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-templates.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-settings-saved.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-checkout.php';
 
 			// Admin includes.
 			if ( is_admin() ) {

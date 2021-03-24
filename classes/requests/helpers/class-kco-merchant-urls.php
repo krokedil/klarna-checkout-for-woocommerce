@@ -8,6 +8,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
 /**
  * KCO_Merchant_URLs class.
  *
@@ -23,12 +24,11 @@ class KCO_Merchant_URLs {
 	 */
 	public function get_urls( $order_id = null ) {
 		$merchant_urls = array(
-			'terms'                  => $this->get_terms_url(),                   // Required.
-			'checkout'               => $this->get_checkout_url(),                // Required.
-			'confirmation'           => $this->get_confirmation_url( $order_id ), // Required.
-			'push'                   => $this->get_push_url(),                    // Required.
-			'shipping_option_update' => $this->get_shipping_option_update_url(),  // HTTPS.
-			'notification'           => $this->get_notification_url(),
+			'terms'        => $this->get_terms_url(),                   // Required.
+			'checkout'     => $this->get_checkout_url(),                // Required.
+			'confirmation' => $this->get_confirmation_url( $order_id ), // Required.
+			'push'         => $this->get_push_url(),                    // Required.
+			'notification' => $this->get_notification_url(),
 		);
 
 		return apply_filters( 'kco_wc_merchant_urls', $merchant_urls );
