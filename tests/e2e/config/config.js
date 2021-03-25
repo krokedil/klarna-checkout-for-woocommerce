@@ -16,8 +16,6 @@ export const flatRateMethod = shippingSel.methods.flatRate;
 export const freeShippingMethodTarget = shippingSel.targets.freeShippingTarget;
 export const flatRateMethodTarget = shippingSel.targets.flatRateTarget;
 
-export const { iframeShipping } = shippingSel.targets;
-
 export const creditPaymentMethod = paymentSelectedMethod.creditMethod;
 export const debitPaymentMethod = paymentSelectedMethod.debitMethod;
 export const invoicePaymentMethod = paymentSelectedMethod.invoiceMethod;
