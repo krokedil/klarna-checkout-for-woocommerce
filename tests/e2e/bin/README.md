@@ -235,7 +235,7 @@ The naming conventions for the Test Suites is as follows, each separated with a 
     * Coupon 50% cart
     * iFrame shipping
 
-    
+
 
     - EXAMPLE #2 -
 
@@ -243,6 +243,7 @@ The naming conventions for the Test Suites is as follows, each separated with a 
     * Guest
     * Product variable 12% blue
     * Product variable 25% green
+    * Free shipping
     * Invoice
     * Coupon 12kr product fixed
     * Standard shipping selector
