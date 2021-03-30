@@ -425,7 +425,7 @@ jQuery( function( $ ) {
 						},
 						error: function( data ) {
 							kco_wc.logToFile( 'AJAX error | ' + data );
-							kco_wc.failOrder( 'ajax-error', data );
+							kco_wc.failOrder( 'ajax-error', data, callback );
 						}
 					});
 				} else {

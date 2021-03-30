@@ -227,6 +227,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-create.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-update.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-test-credentials.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-update-confirmation.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/get/class-kco-request-retrieve.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/order-management/get/class-kco-request-get-order.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/order-management/patch/class-kco-request-set-merchant-reference.php';
