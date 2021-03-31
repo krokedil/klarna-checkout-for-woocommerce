@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.03.31    - version 2.5.1 =
+* Fix           - Prevent shipping from being added to the Klarna order if shipping in the iframe is selected.
+
 = 2021.03.31    - version 2.5.0 =
 * Feature       - Added a setting to select if you want to show the order details in Klarna, WooCommerce or in both during the checkout process. Default is to show it in WooCommerce as the order review.
 * Enhancement   - Improved the calculation flow for the plugin so we are more inline with the WooCommerce standard.
