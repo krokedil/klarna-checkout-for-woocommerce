@@ -265,7 +265,7 @@ class KCO_Fields {
 				'type'        => 'select',
 				'options'     => array(
 					'woo'    => __( 'In the WooCommerce order review', 'klarna-checkout-for-woocommerce' ),
-					'iframe' => __( 'In the iFrame', 'klarna-checkout-for-woocommerce' ),
+					'iframe' => __( 'In the Klarna Checkout iFrame', 'klarna-checkout-for-woocommerce' ),
 					'both'   => __( 'In both', 'klarna-checkout-for-woocommerce' ),
 				),
 				'description' => __( 'Select how you want to show the subtotal details on the checkout page.', 'klarna-checkout-for-woocommerce' ),
