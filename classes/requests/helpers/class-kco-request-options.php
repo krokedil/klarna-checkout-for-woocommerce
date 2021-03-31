@@ -38,6 +38,7 @@ class KCO_Request_Options {
 			'require_client_validation'                   => true,
 			'require_client_validation_callback_response' => true,
 			'phone_mandatory'                             => 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ),
+			'show_subtotal_detail'                        => $this->show_subtotal_detail(),
 		);
 
 		if ( $this->get_iframe_colors() ) {
@@ -244,5 +245,17 @@ class KCO_Request_Options {
 			);
 		}
 		return apply_filters( 'kco_additional_checkboxes', $additional_checkboxes );
+	}
+
+	/**
+	 * Gets the value for the show_sbutotal_details argument.
+	 *
+	 * @return bool
+	 */
+	public function show_subtotal_detail() {
+		if ( isset( $this->settings['show_subtotal_detail'] ) && in_array( $this->settings['show_subtotal_detail'], array( 'iframe', 'both' ), true ) ) {
+			return true;
+		}
+		return false;
 	}
 }

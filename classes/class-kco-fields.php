@@ -260,6 +260,18 @@ class KCO_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
+			'show_subtotal_detail'       => array(
+				'title'       => __( 'Display subtotal details', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'select',
+				'options'     => array(
+					'woo'    => __( 'In the WooCommerce order review', 'klarna-checkout-for-woocommerce' ),
+					'iframe' => __( 'In the iFrame', 'klarna-checkout-for-woocommerce' ),
+					'both'   => __( 'In both', 'klarna-checkout-for-woocommerce' ),
+				),
+				'description' => __( 'Select how you want to show the subtotal details on the checkout page.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'woo',
+				'desc_tip'    => false,
+			),
 			// Checkout iframe settings.
 			'color_settings_title'       => array(
 				'title' => __( 'Color Settings', 'klarna-checkout-for-woocommerce' ),

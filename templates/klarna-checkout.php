@@ -16,6 +16,8 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 	echo esc_html( apply_filters( 'woocommerce_checkout_must_be_logged_in_message', __( 'You must be logged in to checkout.', 'woocommerce' ) ) );
 	return;
 }
+
+$settings = get_option( 'woocommerce_kco_settings' );
 ?>
 
 <form name="checkout" class="checkout woocommerce-checkout">
@@ -23,7 +25,11 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 	<div id="kco-wrapper">
 		<div id="kco-order-review">
 			<?php do_action( 'kco_wc_before_order_review' ); ?>
-			<?php woocommerce_order_review(); ?>
+			<?php
+			if ( ! isset( $settings['show_subtotal_detail'] ) || in_array( $settings['show_subtotal_detail'], array( 'woo', 'both' ), true ) ) {
+				woocommerce_order_review();
+			}
+			?>
 			<?php do_action( 'kco_wc_after_order_review' ); ?>
 		</div>
 
