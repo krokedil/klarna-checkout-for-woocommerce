@@ -66,8 +66,8 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * Feature       - Added a setting to select if you want to show the order details in Klarna, WooCommerce or in both during the checkout process. Default is to show it in WooCommerce as the order review.
 * Enhancement   - Improved the calculation flow for the plugin so we are more inline with the WooCommerce standard.
 * Enhancement   - Improved the speed of update calls to Klarna to enhance the checkout experience for the customer.
-* Enhancement   - Removed the dependency of URL fragments, or hashtag urls. This should improve the comptability with some other plugins that use a similar feature to display content.
-* Fix           - Fixed a issue with a fee reference beeing to long in some cases.
+* Enhancement   - Removed the dependency of URL fragments, or hashtag urls. This should improve the compatibility with some other plugins that use a similar feature to display content.
+* Fix           - Fixed a issue with a fee reference being to long in some cases.
 * Fix           - Fixed a issue with updating the Klarna order incorrectly during order submission if the cart had been cleared at this point.
 
 = 2021.02.17    - version 2.4.3 =
