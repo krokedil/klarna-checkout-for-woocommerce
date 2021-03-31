@@ -90,7 +90,7 @@ const isUserLoggedIn = true;
 const productsToCart = [
 	simpleProduct25,
 	variableProduct25Blue,
-	variableProduct25Green
+	variableProduct25Green,
 ];
 
 // Shipping method selection
@@ -404,13 +404,13 @@ describe("KCO", () => {
 
 				if (
 					klarnaOrderLinesContainer[i].total_tax_amount ===
-					(wooOrderLinesContainer[i].total_tax)*100
+					wooOrderLinesContainer[i].total_tax * 100
 				) {
 					klarnaValues.totalTax.push(
 						klarnaOrderLinesContainer[i].total_tax_amount
 					);
 					wooValues.totalTax.push(
-						(wooOrderLinesContainer[i].total_tax)*100
+						wooOrderLinesContainer[i].total_tax * 100
 					);
 				}
 
@@ -421,9 +421,7 @@ describe("KCO", () => {
 					klarnaValues.productName.push(
 						klarnaOrderLinesContainer[i].name
 					);
-					wooValues.productName.push(
-						wooOrderLinesContainer[i].name
-					);
+					wooValues.productName.push(wooOrderLinesContainer[i].name);
 				}
 
 				if (
@@ -435,13 +433,10 @@ describe("KCO", () => {
 					);
 					wooValues.sku.push(wooOrderLinesContainer[i].sku);
 				}
-
 			}
 		}
 
-		if(
-			response.data.order_id === wooCommerceOrder.data.transaction_id
-		) {
+		if (response.data.order_id === wooCommerceOrder.data.transaction_id) {
 			klarnaValues.orderId = response.data.order_id;
 			wooValues.orderId = wooCommerceOrder.data.transaction_id;
 		}
@@ -505,7 +500,7 @@ describe("KCO", () => {
 		}
 
 		if (
-			response.data.shipping_address.postal_code.replace(/\s/g, "") ==
+			response.data.shipping_address.postal_code.replace(/\s/g, "") ===
 			wooCommerceOrder.data.billing.postcode
 		) {
 			klarnaValues.postcode = response.data.shipping_address.postal_code.replace(
@@ -550,10 +545,13 @@ describe("KCO", () => {
 		}
 
 		if (
-			response.data.order_lines[productsToCart.length].name === wooCommerceOrder.data.shipping_lines[0].method_title
+			response.data.order_lines[productsToCart.length].name ===
+			wooCommerceOrder.data.shipping_lines[0].method_title
 		) {
-			klarnaValues.shippingMethod = response.data.order_lines[productsToCart.length].name;
-			wooValues.shippingMethod = wooCommerceOrder.data.shipping_lines[0].method_title;
+			klarnaValues.shippingMethod =
+				response.data.order_lines[productsToCart.length].name;
+			wooValues.shippingMethod =
+				wooCommerceOrder.data.shipping_lines[0].method_title;
 		}
 
 		await page.waitForTimeout(4 * timeOutTime);
