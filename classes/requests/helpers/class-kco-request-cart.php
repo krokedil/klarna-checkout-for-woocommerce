@@ -209,18 +209,21 @@ class KCO_Request_Cart {
 	 * Process WooCommerce shipping to Klarna Payments order lines.
 	 */
 	public function process_shipping() {
-		if ( WC()->shipping->get_packages() && ! empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
-			$shipping            = array(
-				'type'             => 'shipping_fee',
-				'reference'        => $this->get_shipping_reference(),
-				'name'             => $this->get_shipping_name(),
-				'quantity'         => 1,
-				'unit_price'       => $this->get_shipping_amount(),
-				'tax_rate'         => $this->get_shipping_tax_rate(),
-				'total_amount'     => $this->get_shipping_amount(),
-				'total_tax_amount' => $this->get_shipping_tax_amount(),
-			);
-			$this->order_lines[] = $shipping;
+		$settings = get_option( 'woocommerce_kco_settings' );
+		if ( ! isset( $settings['shipping_methods_in_iframe'] ) || 'no' === $settings['shipping_methods_in_iframe'] ) {
+			if ( WC()->shipping->get_packages() && ! empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
+				$shipping            = array(
+					'type'             => 'shipping_fee',
+					'reference'        => $this->get_shipping_reference(),
+					'name'             => $this->get_shipping_name(),
+					'quantity'         => 1,
+					'unit_price'       => $this->get_shipping_amount(),
+					'tax_rate'         => $this->get_shipping_tax_rate(),
+					'total_amount'     => $this->get_shipping_amount(),
+					'total_tax_amount' => $this->get_shipping_tax_amount(),
+				);
+				$this->order_lines[] = $shipping;
+			}
 		}
 	}
 
