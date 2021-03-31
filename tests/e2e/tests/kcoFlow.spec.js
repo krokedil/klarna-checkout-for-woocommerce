@@ -71,6 +71,7 @@ import {
 } from "../config/config";
 
 import API from "../api/API";
+import woocommerce from "../api/woocommerce";
 
 // Main selectors
 let page;
@@ -87,9 +88,9 @@ const isUserLoggedIn = true;
 
 // Products selection
 const productsToCart = [
-	variableProduct25Blue,
 	simpleProduct25,
-	variableProduct25Green,
+	variableProduct25Blue,
+	variableProduct25Green
 ];
 
 // Shipping method selection
@@ -403,25 +404,13 @@ describe("KCO", () => {
 
 				if (
 					klarnaOrderLinesContainer[i].total_tax_amount ===
-					wooOrderLinesContainer[i].rate_percent
+					(wooOrderLinesContainer[i].total_tax)*100
 				) {
 					klarnaValues.totalTax.push(
 						klarnaOrderLinesContainer[i].total_tax_amount
 					);
 					wooValues.totalTax.push(
-						wooOrderLinesContainer[i].rate_percent
-					);
-				}
-
-				if (
-					klarnaOrderLinesContainer[i].name ===
-					wooOrderLinesContainer[i].method_title
-				) {
-					klarnaValues.shippingMethod.push(
-						klarnaOrderLinesContainer[i].name
-					);
-					wooValues.shippingMethod.push(
-						wooOrderLinesContainer[i].method_title
+						(wooOrderLinesContainer[i].total_tax)*100
 					);
 				}
 
@@ -432,7 +421,9 @@ describe("KCO", () => {
 					klarnaValues.productName.push(
 						klarnaOrderLinesContainer[i].name
 					);
-					wooValues.productName.push(wooOrderLinesContainer[i].name);
+					wooValues.productName.push(
+						wooOrderLinesContainer[i].name
+					);
 				}
 
 				if (
@@ -445,18 +436,14 @@ describe("KCO", () => {
 					wooValues.sku.push(wooOrderLinesContainer[i].sku);
 				}
 
-				if (
-					klarnaOrderLinesContainer[i].order_id ===
-					wooOrderLinesContainer[i].transaction_id
-				) {
-					klarnaValues.orderId.push(
-						klarnaOrderLinesContainer[i].order_id
-					);
-					wooValues.orderId.push(
-						wooOrderLinesContainer[i].transaction_id
-					);
-				}
 			}
+		}
+
+		if(
+			response.data.order_id === wooCommerceOrder.data.transaction_id
+		) {
+			klarnaValues.orderId = response.data.order_id;
+			wooValues.orderId = wooCommerceOrder.data.transaction_id;
 		}
 
 		if (
@@ -518,14 +505,14 @@ describe("KCO", () => {
 		}
 
 		if (
-			response.data.shipping_address.postal_code.replace(/\s/g, "") ===
+			response.data.shipping_address.postal_code.replace(/\s/g, "") ==
 			wooCommerceOrder.data.billing.postcode
 		) {
-			klarnaValues.postCode = response.data.shipping_address.postal_code.replace(
+			klarnaValues.postcode = response.data.shipping_address.postal_code.replace(
 				/\s/g,
 				""
 			);
-			wooValues.postCode = wooCommerceOrder.data.billing.postcode;
+			wooValues.postcode = wooCommerceOrder.data.billing.postcode;
 		}
 
 		if (
@@ -562,6 +549,13 @@ describe("KCO", () => {
 			wooValues.currency = wooCommerceOrder.data.currency;
 		}
 
+		if (
+			response.data.order_lines[productsToCart.length].name === wooCommerceOrder.data.shipping_lines[0].method_title
+		) {
+			klarnaValues.shippingMethod = response.data.order_lines[productsToCart.length].name;
+			wooValues.shippingMethod = wooCommerceOrder.data.shipping_lines[0].method_title;
+		}
+
 		await page.waitForTimeout(4 * timeOutTime);
 		const value = await page.$eval(".entry-title", (e) => e.textContent);
 		expect(value).toBe("Order received");
@@ -570,6 +564,7 @@ describe("KCO", () => {
 	/**
 	 * Compare expected and received values
 	 */
+
 	test("Compare IDs", async () => {
 		expect(toString(klarnaValues.orderId)).toBe(
 			toString(wooValues.orderId)
@@ -597,7 +592,7 @@ describe("KCO", () => {
 	}, 190000);
 
 	test("Compare post codes", async () => {
-		expect(klarnaValues.postCode).toBe(wooValues.postCode);
+		expect(klarnaValues.postcode).toBe(wooValues.postcode);
 	}, 190000);
 
 	test("Compare companies", async () => {
