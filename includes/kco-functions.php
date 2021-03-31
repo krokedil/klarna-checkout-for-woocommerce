@@ -174,6 +174,17 @@ function kco_wc_prefill_consent() {
  * @param string $country Country code.
  */
 function kco_wc_country_code_converter( $country ) {
+	$countries = kco_get_country_codes();
+
+	return array_search( strtoupper( $country ), $countries, true );
+}
+
+/**
+ * Returns a list of country codes, 2-letter ISO => 3-letter ISO.
+ *
+ * @return array
+ */
+function kco_get_country_codes() {
 	$countries = array(
 		'AF' => 'AFG', // Afghanistan.
 		'AX' => 'ALA', // Aland Islands.
@@ -427,7 +438,7 @@ function kco_wc_country_code_converter( $country ) {
 		'ZW' => 'ZWE', // Zimbabwe.
 	);
 
-	return array_search( strtoupper( $country ), $countries, true );
+	return $countries;
 }
 
 /**
@@ -619,7 +630,7 @@ function kco_maybe_save_reference( $order_id, $klarna_order ) {
  *
  * @param array|bool $data The shipping data from Klarna. False if not set.
  * @param array|bool $klarna_order The Klarna order if we have one already. False if we don't.
- * @return array|WP_Error
+ * @return void
  */
 function kco_update_wc_shipping( $data, $klarna_order = false ) {
 	// Set cart definition.
@@ -644,19 +655,10 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 		return;
 	}
 
-	set_transient( 'kss_data_' . $klarna_order_id, $data, HOUR_IN_SECONDS );
+	do_action( 'kco_update_shipping_data', $data );
 
+	set_transient( 'kss_data_' . $klarna_order_id, $data, HOUR_IN_SECONDS );
 	$chosen_shipping_methods   = array();
 	$chosen_shipping_methods[] = wc_clean( $data['id'] );
 	WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
-
-	WC()->cart->calculate_shipping();
-	WC()->cart->calculate_fees();
-	WC()->cart->calculate_totals();
-
-	$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
-
-	$shipping_option_name = 'shipping_method_0_' . str_replace( ':', '', $data['id'] );
-
-	return $shipping_option_name;
 }

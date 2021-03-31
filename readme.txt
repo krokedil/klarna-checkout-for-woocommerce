@@ -62,6 +62,14 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.03.31    - version 2.5.0 =
+* Feature       - Added a setting to select if you want to show the order details in Klarna, WooCommerce or in both during the checkout process. Default is to show it in WooCommerce as the order review.
+* Enhancement   - Improved the calculation flow for the plugin so we are more inline with the WooCommerce standard.
+* Enhancement   - Improved the speed of update calls to Klarna to enhance the checkout experience for the customer.
+* Enhancement   - Removed the dependency of URL fragments, or hashtag urls. This should improve the comptability with some other plugins that use a similar feature to display content.
+* Fix           - Fixed a issue with a fee reference beeing to long in some cases.
+* Fix           - Fixed a issue with updating the Klarna order incorrectly during order submission if the cart had been cleared at this point.
+
 = 2021.02.17    - version 2.4.3 =
 * Enhancement   - We now save the recurring token from Klarna to the parent subscription order. If the token fails to be set for the subscription we will then get it from the Parent order instead. Should help some in cases where renewals fail when getting a HTTP error from Klarna.
 * Enhancement   - When moving from Klarna V2 to V3, in some cases the recurring token was missing on the subscription. If this is the case we will now fetch it from the parent order.
