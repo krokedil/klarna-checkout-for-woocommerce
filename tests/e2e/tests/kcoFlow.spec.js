@@ -378,9 +378,8 @@ describe("KCO", () => {
 						10
 					)
 				) {
-					klarnaValues.totalAmount =
-						klarnaOrderLinesContainer[i].total_amount;
-					wooValues.totalAmount = parseInt(
+					klarnaValues.totalAmount.push(klarnaOrderLinesContainer[i].total_amount);
+					wooValues.totalAmount.push(parseInt(
 						Math.round(
 							(parseFloat(wooOrderLinesContainer[i].total) +
 								parseFloat(
@@ -389,7 +388,7 @@ describe("KCO", () => {
 								100
 						).toFixed(2),
 						10
-					);
+					));
 				}
 
 				if (
