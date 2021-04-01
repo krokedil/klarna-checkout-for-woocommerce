@@ -86,7 +86,13 @@ class KCO_Request_Cart {
 	 * @return int
 	 */
 	public function get_order_amount() {
-		return round( WC()->cart->total * 100 );
+		$settings     = get_option( 'woocommerce_kco_settings' );
+		$order_amount = round( WC()->cart->total * 100 );
+
+		if ( isset( $settings['shipping_methods_in_iframe'] ) && 'yes' === $settings['shipping_methods_in_iframe'] ) {
+			$order_amount -= $this->get_shipping_amount();
+		}
+		return $order_amount;
 	}
 
 	/**
