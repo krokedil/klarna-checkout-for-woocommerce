@@ -634,7 +634,6 @@ function kco_maybe_save_reference( $order_id, $klarna_order ) {
  */
 function kco_update_wc_shipping( $data, $klarna_order = false ) {
 	// Set cart definition.
-	wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
 	$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
 	// If we don't have a Klarna order, return void.
