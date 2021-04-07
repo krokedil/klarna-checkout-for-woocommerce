@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.04.07    - version 2.5.3 =
+* Fix           - Removed old code that would set the Klarna checkout page to be considered to also be the cart page.
+
 = 2021.04.01    - version 2.5.2 =
 * Fix           - Fixed the total amount being calculated correctly if the shipping is in the iframe. This could cause an extra line item to be added to the Klarna order.
 
