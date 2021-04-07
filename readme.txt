@@ -3,7 +3,7 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.6.1
+Tested up to: 5.7.0
 Requires PHP: 5.6
 WC requires at least: 3.4.0
 WC tested up to: 5.0.0
