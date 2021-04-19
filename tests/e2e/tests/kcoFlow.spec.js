@@ -96,6 +96,9 @@ const productsToCart = [
 // Shipping method selection
 const shippingMethod = freeShippingMethod;
 
+// Private individual ("person") / Organization or Company ("company")
+const customerType = "company";
+
 // Payment method selection
 const selectedPaymentMethod = invoicePaymentMethod;
 
@@ -183,7 +186,7 @@ describe("KCO", () => {
 		await page.waitForTimeout(2 * timeOutTime);
 
 		// Submit billing data
-		await kcoFrame.submitBillingForm(originalFrame, billingData);
+		await kcoFrame.submitBillingForm(originalFrame, billingData, customerType);
 
 		// Apply coupons
 		await kcoUtils.addCouponsOnCheckout(
@@ -456,12 +459,27 @@ describe("KCO", () => {
 			wooValues.lastName = wooCommerceOrder.data.billing.last_name;
 		}
 
-		if (
-			response.data.shipping_address.title ===
-			wooCommerceOrder.data.billing.company
-		) {
-			klarnaValues.company = response.data.shipping_address.title;
-			wooValues.company = wooCommerceOrder.data.billing.company;
+		// Case for B2CB individual
+		if(customerType === 'person'){
+
+			if (
+				response.data.shipping_address.title ===
+				wooCommerceOrder.data.billing.company
+			) {
+				klarnaValues.company = response.data.shipping_address.title;
+				wooValues.company = wooCommerceOrder.data.billing.company;
+			}
+
+		// Case for B2CB for company
+		} else if ( customerType === 'company') {
+
+			if (
+				response.data.shipping_address.organization_name ===
+				wooCommerceOrder.data.billing.company
+			) {
+				klarnaValues.company = response.data.shipping_address.organization_name;
+				wooValues.company = wooCommerceOrder.data.billing.company;
+			}
 		}
 
 		if (
@@ -553,7 +571,8 @@ describe("KCO", () => {
 				wooCommerceOrder.data.shipping_lines[0].method_title;
 		}
 
-		await page.waitForTimeout(4 * timeOutTime);
+		// await page.waitForTimeout(4 * timeOutTime);
+		await page.waitForTimeout(timeOutTime);
 		const value = await page.$eval(".entry-title", (e) => e.textContent);
 		expect(value).toBe("Order received");
 	}, 190000);
