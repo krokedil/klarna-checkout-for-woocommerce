@@ -1,4 +1,5 @@
 import API from "../api/API";
+import {KCOSettingsArray} from "../config/config";
 
 /**
  *
@@ -142,51 +143,10 @@ const chooseKlarnaShippingMethod = async (
  * Select shipping method through KCO iFrame or standard WC checkout selection
  */
 const toggleIFrame = async (toggleSwitch) => {
-	const KCOSettingsArray = {
-		woocommerce_kco_settings: {
-			enabled: "yes",
-			title: "Klarna",
-			description: "Klarna Checkout for WooCommerce Test",
-			select_another_method_text: "",
-			testmode: "yes",
-			logging: "yes",
-			credentials_eu: "",
-			merchant_id_eu: "",
-			shared_secret_eu: "",
-			test_merchant_id_eu: "PK08164_dbc5171dedd2",
-			test_shared_secret_eu: "e7kG49n1SCJRh1rJ",
-			credentials_us: "",
-			merchant_id_us: "",
-			shared_secret_us: "",
-			test_merchant_id_us: "",
-			test_shared_secret_us: "",
-			shipping_section: "",
-			allow_separate_shipping: "no",
-			shipping_methods_in_iframe: toggleSwitch,
-			shipping_details: "",
-			checkout_section: "",
-			send_product_urls: "yes",
-			dob_mandatory: "no",
-			display_privacy_policy_text: "no",
-			add_terms_and_conditions_checkbox: "no",
-			allowed_customer_types: "B2C",
-			title_mandatory: "yes",
-			prefill_consent: "yes",
-			quantity_fields: "yes",
-			color_settings_title: "",
-			color_button: "",
-			color_button_text: "",
-			color_checkbox: "",
-			color_checkbox_checkmark: "",
-			color_header: "",
-			color_link: "",
-			radius_border: "",
-			add_to_email: "no",
-		},
-	};
-
+	KCOSettingsArray.woocommerce_kco_settings.shipping_methods_in_iframe = toggleSwitch
 	await API.updateOptions(KCOSettingsArray);
 };
+
 
 /**
  * Export data
