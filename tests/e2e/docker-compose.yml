@@ -3,6 +3,8 @@ services:
   db:
     image: mysql:5.7
     restart: on-failure
+    networks:
+      - kronet
     env_file:
       - ./.env
     volumes:
@@ -10,6 +12,8 @@ services:
   wordpress-dev:
     env_file:
       - ./.env
+    networks:
+      - kronet
     depends_on:
       - db
     build:
@@ -24,13 +28,14 @@ services:
       - "../../:/var/www/html/wp-content/plugins/klarna-checkout-for-woocommerce"
       - "wordpress:/var/www/html"
   wordpress-cli:
+    image: wordpress:cli-php7.4
+    networks:
+      - kronet
     env_file:
       - ./.env
     depends_on:
       - db
       - wordpress-dev
-    build:
-      context: ./cli/
     restart: on-failure
     user: xfs
     volumes:
@@ -41,6 +46,8 @@ services:
     depends_on:
       - db
     restart: always
+    networks:
+      - kronet
     ports:
       - "8080:80"
     environment:
@@ -49,3 +56,8 @@ services:
 volumes:
   db:
   wordpress:
+  
+
+networks: 
+  kronet: 
+    driver: bridge
