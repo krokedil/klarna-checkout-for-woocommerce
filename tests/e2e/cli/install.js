@@ -35,7 +35,7 @@ const installStorefront = (themeName = "storefront") => {
 
 const activateKCO = () => executeCommand(`wp plugin activate klarna-checkout-for-woocommerce`);
 
-const importDb = () => executeCommand("wp db import ./wp-content/plugins/klarna-checkout-for-woocommerce/tests/e2e/bin/data1.sql");
+const importDb = () => executeCommand("wp db import ./wp-content/plugins/klarna-checkout-for-woocommerce/tests/e2e/bin/data.sql");
 
 waitOn({ resources: [`http://localhost:8000`] }).then(() => {
     try {
