@@ -331,7 +331,7 @@ jQuery( function( $ ) {
 		 */
 		failOrder: function( event, error_message, callback ) {
 			callback({ should_proceed: false });
-		
+			kco_wc.blocked = false;
 			// Renable the form.
 			$( 'body' ).trigger( 'updated_checkout' );
 			$( kco_wc.checkoutFormSelector ).removeClass( 'processing' );
@@ -389,7 +389,7 @@ jQuery( function( $ ) {
 		},
 
 		placeKlarnaOrder: function(callback) {
-			console.log( 1 );
+			kco_wc.blocked = true;
 			kco_wc.getKlarnaOrder().done( function(response) {
 				if(response.success) {
 					console.log( 2 );
