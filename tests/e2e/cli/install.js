@@ -29,7 +29,7 @@ const installWC = () => {
     executeCommand("wp plugin install woocommerce --activate");
 };
 
-const installStorefront = (themeName = "storefront") => {
+const installTheme = (themeName = "storefront") => {
     executeCommand(`wp theme install ${themeName}`);
 };
 
@@ -41,7 +41,7 @@ waitOn({ resources: [`http://localhost:8000`] }).then(() => {
     try {
         installWP();
         installWC();
-        installStorefront();
+        installTheme();
         activateKCO();
         importDb();
     } catch (error) {
