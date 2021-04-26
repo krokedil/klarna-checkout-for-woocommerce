@@ -41,18 +41,6 @@ services:
     volumes:
       - "../../:/var/www/html/wp-content/plugins/klarna-checkout-for-woocommerce"
       - "wordpress:/var/www/html"
-  phpmyadmin-db:
-    image: phpmyadmin/phpmyadmin
-    depends_on:
-      - db
-    restart: always
-    networks:
-      - kronet
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: db
-
 volumes:
   db:
   wordpress:
