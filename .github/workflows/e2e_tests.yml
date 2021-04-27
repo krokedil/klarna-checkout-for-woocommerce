@@ -2,7 +2,7 @@ name: E2E tests
 on:
   push:
     branches:
-      - dev-e2e-testflow
+      - dev-e2e
 jobs:
   build:
     name: Run tests
