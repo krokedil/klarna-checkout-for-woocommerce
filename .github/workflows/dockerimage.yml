@@ -8,52 +8,6 @@ on:
       - develop
 
 jobs:
-  Test-Plugin:
-    name: Test plugin with wc-${{ matrix.woocommerce }} and wp-${{ matrix.wordpress }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        wordpress: [latest]
-        woocommerce: [4.4.0, 4.3.0, 4.2.0, 4.1.0, 4.0.0, 3.9.0, 3.8.0, 3.7.0]
-        os: [ubuntu-latest]
-        php: [7.0]
-    container:
-      image: chriszarate/wordpress-phpunit:6.0.6
-      volumes:
-        - "testsuite:/tmp"
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: wordpress_test
-          MYSQL_USER: wp_user
-          MYSQL_PASSWORD: wp_pass
-        ports:
-          - "33060:3306"
-        volumes:
-          - "${{ github.workspace }}/tests/bin/mysql:/docker-entrypoint-initdb.d"
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    steps:
-      - name: Settup repo
-        uses: actions/checkout@v2
-        with:
-          path: main
-      - name: Settup WooCommerce
-        uses: actions/checkout@v2
-        with:
-          repository: woocommerce/woocommerce
-          ref: ${{ matrix.woocommerce }}
-          path: woocommerce
-      - name: Install WP Testsuite
-        run: |
-          chmod +x ./main/tests/bin/install-wp-tests.sh
-          ./main/tests/bin/install-wp-tests.sh wordpress_test wp_user wp_pass mysql ${{ matrix.wordpress }}
-        env:
-          MYSQL_HOST: mysql
-      - name: Run PHPUnit
-        run: |
-          phpunit -c main/phpunit.xml
   PHPCS:
     name: PHPCS
     runs-on: ubuntu-latest
