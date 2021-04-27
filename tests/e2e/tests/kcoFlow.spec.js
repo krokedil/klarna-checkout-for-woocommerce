@@ -4,113 +4,113 @@ import user from "../helpers/kcoUser";
 import cart from "../helpers/kcoCart";
 import kcoFrame from "../helpers/kcoFrame";
 import kcoUtils from "../helpers/kcoUtils";
+import { wooValues, klarnaValues } from "../helpers/kcoCompRes";
 
 import {
-	freeShippingMethod,
-	freeShippingMethodTarget,
-	flatRateMethodTarget,
-	invoicePaymentMethod,
+	puppeteerOptions as options,
+	customerAPIData,
+	klarnaOrderEndpoint,
+
+	/**
+	 * General data
+	 */
 	billingData,
 	userCredentials,
 	timeOutTime,
 	cardNumber,
 	pinNumber,
-	puppeteerOptions as options,
-	customerAPIData,
-	klarnaOrderEndpoint,
 
-	iframeShipping,
+	/**
+	 * Shipping methods
+	 */
+	freeShippingMethod,
+	freeShippingMethodTarget,
 	flatRateMethod,
+	flatRateMethodTarget,
 
+	/**
+	 * Payment methods
+	 */
+	invoicePaymentMethod,
+	debitPaymentMethod,
+	creditPaymentMethod,
+
+	/**
+	 * Coupons
+	 */
+	couponFixedCart,
+	couponFixedProduct,
+	couponPercent,
+	couponTotalFreeShipping,
+	couponTotalWithShipping,
+
+	/**
+	 * Products
+	 */
+	simpleProduct25,
+	simpleProduct12,
+	simpleProduct6,
+	simpleProduct0,
+	simpleProductSale25,
+	simpleProductSale12,
+	simpleProductSale6,
+	simpleProductSale0,
+	variableProduct25Black,
+	variableProduct25Blue,
+	variableProduct25Brown,
+	variableProduct25Green,
+	variableProductMixedBlackS,
+	variableProductMixedBlackM,
+	variableProductMixedBlackL,
+	variableProductMixedBlackXL,
+	variableProductMixedGreenS,
+	variableProductMixedGreenM,
+	variableProductMixedGreenL,
+	variableProductMixedGreenXL,
+	variableProductVirtualDownloadable25,
 } from "../config/config";
-import API from "../api/API";
 
+import API from "../api/API";
+import woocommerce from "../api/woocommerce";
+
+// Main selectors
 let page;
 let browser;
 let context;
 
-let iframeShippingMethod = "";
-
-const klarnaOrderId = [];
-const wooOrderId = [];
-
-let klarnaFirstName = "klarna";
-let wooFirstName = "woo";
-
-let klarnaLastName = "klarna";
-let wooLastName = "woo";
-
-let klarnaCompany = "klarna";
-let wooCompany = "woo";
-
-let klarnaCurrency = "klarna";
-let wooCurrency = "woo";
-
-let klarnaAddressOne = "klarna";
-let wooAddressOne = "woo";
-
-let klarnaAddressTwo = "klarna";
-let wooAddressTwo = "woo";
-
-let klarnaCity = "klarna";
-let wooCity = "woo";
-
-let klarnaRegion = "klarna";
-let wooRegion = "woo";
-
-let klarnaPostcode = "klarna";
-let wooPostcode = "woo";
-
-let klarnaCountry = "klarna";
-let wooCountry = "woo";
-
-let klarnaEmail = "klarna";
-let wooEmail = "woo";
-
-const klarnaSKU = [];
-const wooSKU = [];
-
-let klarnaTotalAmount = [];
-let wooTotalAmount = [];
-
-const klarnaShippingMethod = [];
-const wooShippingMethod = [];
-
-const klarnaQuantity = [];
-const wooQuantity = [];
-
-let klarnaPhone = "klarna";
-let wooPhone = "woo";
-
-const klarnaTotalTax = [];
-const wooTotalTax = [];
-
-const klarnaProductName = [];
-const wooProductName = [];
-
 /**
- * Shipping method
+ * TEST ELEMENTS SELECTORS
+ * Input variables that are to be applied for the test
  */
 
-let shippingMethod = freeShippingMethod;
-// let shippingMethod = flatRateMethod;
-let shippingMethodTarget = null;
+// User logged-in (true) / Guest (false)
+const isUserLoggedIn = true;
 
-	if (iframeShipping !== 'yes') {
-		if (shippingMethod === "free") {
-			shippingMethodTarget = `[id*="${freeShippingMethodTarget}"]`;
-		} else if (shippingMethod === "flat") {
-			shippingMethodTarget = `[id*="${flatRateMethodTarget}"]`;
-		}
-	} else {
-		iframeShippingMethod = shippingMethod;
-	}
+// Products selection
+const productsToCart = [
+	simpleProduct25,
+	variableProduct25Blue,
+	variableProduct25Green,
+];
 
-/**
- * Payment Method
- */
+// Shipping method selection
+const shippingMethod = freeShippingMethod;
+
+// Private individual ("person") / Organization or Company ("company")
+const customerType = "company";
+
+// Payment method selection
 const selectedPaymentMethod = invoicePaymentMethod;
 
+// Coupon selection
+const appliedCoupons = [couponPercent];
+
+// Shipping in KCO iFrame ("yes") / Standard WC ("no")
+const iframeShipping = "yes";
+
+/**
+ * TEST INITIALIZATION
+ */
 describe("KCO", () => {
 	beforeAll(async () => {
 		browser = await puppeteer.launch(options);
@@ -119,7 +119,6 @@ describe("KCO", () => {
 		try {
 			const customerResponse = await API.getWCCustomers();
 			const { data } = customerResponse;
-			console.log("Customer exists");
 			if (parseInt(data.length, 10) < 1) {
 				try {
 					await API.createWCCustomer(customerAPIData);
@@ -130,23 +129,40 @@ describe("KCO", () => {
 		} catch (error) {
 			console.log(error);
 		}
-		await page.goto(kcoURLS.MY_ACCOUNT);
-		await user.login(userCredentials, { page });
-		await page.goto(kcoURLS.SHOP);
 
-		await cart.addMultipleProductsToCart(page, [1538, 1538, 1547]);
+		// Check for user logged in
+		if (isUserLoggedIn) {
+			// Login with User Credentials
+			await page.goto(kcoURLS.MY_ACCOUNT);
+			await user.login(userCredentials, { page });
+		}
+
+		await kcoUtils.toggleIFrame(iframeShipping);
 
 		await page.goto(kcoURLS.CHECKOUT, { waitUntil: "networkidle0" });
 	}, 250000);
 
+	// Close Chromium on test end (will close on both success and fail)
 	afterAll(() => {
 		if (!page.isClosed()) {
 			browser.close();
-			context.close();
+			// context.close();
 		}
 	}, 900000);
 
+	/**
+	 * Begin test suite
+	 */
 	test("second flow should be on the my account page", async () => {
+		// Add products to Cart
+		await page.waitForTimeout(timeOutTime);
+		await cart.addMultipleProductsToCart(page, productsToCart);
+		await page.waitForTimeout(timeOutTime);
+
+		await page.goto(kcoURLS.CHECKOUT);
+		await page.waitForTimeout(timeOutTime);
+
+		// Choose Klarna as payment method
 		if (await page.$('input[id="payment_method_kco"]')) {
 			await page.evaluate(
 				(paymentMethod) => paymentMethod.click(),
@@ -160,23 +176,25 @@ describe("KCO", () => {
 			await page.$('input[id="terms"]')
 		);
 
-		if (iframeShipping !== 'yes') {
-			if (shippingMethod !== "") {
-				await page.waitForTimeout(timeOutTime);
-				await page.waitForSelector(shippingMethodTarget).id;
-				await page.waitForTimeout(timeOutTime);
-				await page.click(shippingMethodTarget).id;
-				await page.waitForTimeout(timeOutTime);
-			}
-		}
+		await page.waitForTimeout(timeOutTime);
 
 		const originalFrame = await kcoFrame.loadIFrame(
 			page,
 			"klarna-checkout-iframe"
 		);
-		await kcoFrame.submitBillingForm(originalFrame, billingData);
 
-		await page.waitForTimeout(timeOutTime);
+		await page.waitForTimeout(2 * timeOutTime);
+
+		// Submit billing data
+		await kcoFrame.submitBillingForm(originalFrame, billingData, customerType);
+
+		// Apply coupons
+		await kcoUtils.addCouponsOnCheckout(
+			page,
+			isUserLoggedIn,
+			appliedCoupons
+		);
+
 		await kcoUtils.expectSelector(
 			originalFrame,
 			page,
@@ -191,16 +209,16 @@ describe("KCO", () => {
 			timeOutTime
 		);
 
-	if (iframeShipping === 'yes') {
-
-		const frameShippingTab = await originalFrame.$$('[data-cid="SHIPMO-shipping-option-basic"]' );
-
-		if ( iframeShippingMethod === 'flat' ) {
-			await frameShippingTab[0].click();
-		} else if ( iframeShippingMethod === 'free' ) {
-			await frameShippingTab[1].click();
-		}
-	}
+		// Check for Klarna iFrame shipping and implement shipping method
+		await kcoUtils.chooseKlarnaShippingMethod(
+			page,
+			originalFrame,
+			iframeShipping,
+			shippingMethod,
+			freeShippingMethodTarget,
+			flatRateMethodTarget,
+			timeOutTime
+		);
 
 		const frameNew = await kcoFrame.loadIFrame(
 			page,
@@ -227,6 +245,7 @@ describe("KCO", () => {
 				page,
 				"pgw-iframe-paynow_card"
 			);
+
 			await kcoUtils.expectInput(
 				frameCreditCard,
 				page,
@@ -234,6 +253,7 @@ describe("KCO", () => {
 				'input[id="cardNumber"]',
 				0.25 * timeOutTime
 			);
+
 			await kcoUtils.expectInput(
 				frameCreditCard,
 				page,
@@ -241,6 +261,7 @@ describe("KCO", () => {
 				'input[id="expire"]',
 				0.25 * timeOutTime
 			);
+
 			await kcoUtils.expectInput(
 				frameCreditCard,
 				page,
@@ -270,6 +291,7 @@ describe("KCO", () => {
 			'[data-cid="button.buy_button"]',
 			timeOutTime
 		);
+
 		await kcoUtils.expectSelector(
 			frameNew,
 			page,
@@ -283,6 +305,7 @@ describe("KCO", () => {
 			'[id="nin"]',
 			timeOutTime
 		);
+
 		await kcoUtils.expectInput(
 			frameNew,
 			page,
@@ -290,6 +313,7 @@ describe("KCO", () => {
 			'[id="nin"]',
 			timeOutTime
 		);
+
 		await kcoUtils.expectSelector(
 			frameNew,
 			page,
@@ -308,7 +332,8 @@ describe("KCO", () => {
 			'[id="confirm_bank_account_dialog__footer-button-wrapper"]',
 			timeOutTime
 		);
-		await page.waitForTimeout(3 * timeOutTime);
+
+		await page.waitForTimeout(2 * timeOutTime);
 		const currentURL = await page.url();
 		const currentKCOId = currentURL.split("kco_order_id=")[1];
 		const response = await API.getKlarnaOrderById(
@@ -338,7 +363,7 @@ describe("KCO", () => {
 			}
 		});
 
-		for (let i = 0; i < klarnaOrderLinesContainer.length; i++) {
+		for (let i = 0; i < klarnaOrderLinesContainer.length; i += 1) {
 			if (
 				klarnaOrderLinesContainer[i].reference ===
 				wooOrderLinesContainer[i].sku
@@ -356,9 +381,8 @@ describe("KCO", () => {
 						10
 					)
 				) {
-					klarnaTotalAmount =
-						klarnaOrderLinesContainer[i].total_amount;
-					wooTotalAmount = parseInt(
+					klarnaValues.totalAmount.push(klarnaOrderLinesContainer[i].total_amount);
+					wooValues.totalAmount.push(parseInt(
 						Math.round(
 							(parseFloat(wooOrderLinesContainer[i].total) +
 								parseFloat(
@@ -367,36 +391,28 @@ describe("KCO", () => {
 								100
 						).toFixed(2),
 						10
-					);
+					));
 				}
 
 				if (
 					klarnaOrderLinesContainer[i].quantity ===
 					wooOrderLinesContainer[i].quantity
 				) {
-					klarnaQuantity.push(klarnaOrderLinesContainer[i].quantity);
-					wooQuantity.push(wooOrderLinesContainer[i].quantity);
+					klarnaValues.quantity.push(
+						klarnaOrderLinesContainer[i].quantity
+					);
+					wooValues.quantity.push(wooOrderLinesContainer[i].quantity);
 				}
 
 				if (
 					klarnaOrderLinesContainer[i].total_tax_amount ===
-					wooOrderLinesContainer[i].rate_percent
+					wooOrderLinesContainer[i].total_tax * 100
 				) {
-					klarnaTotalTax.push(
+					klarnaValues.totalTax.push(
 						klarnaOrderLinesContainer[i].total_tax_amount
 					);
-					wooTotalTax.push(wooOrderLinesContainer[i].rate_percent);
-				}
-
-				if (
-					klarnaOrderLinesContainer[i].name ===
-					wooOrderLinesContainer[i].method_title
-				) {
-					klarnaShippingMethod.push(
-						klarnaOrderLinesContainer[i].name
-					);
-					wooShippingMethod.push(
-						wooOrderLinesContainer[i].method_title
+					wooValues.totalTax.push(
+						wooOrderLinesContainer[i].total_tax * 100
 					);
 				}
 
@@ -404,206 +420,252 @@ describe("KCO", () => {
 					klarnaOrderLinesContainer[i].name ===
 					wooOrderLinesContainer[i].name
 				) {
-					klarnaProductName.push(klarnaOrderLinesContainer[i].name);
-					wooProductName.push(wooOrderLinesContainer[i].name);
+					klarnaValues.productName.push(
+						klarnaOrderLinesContainer[i].name
+					);
+					wooValues.productName.push(wooOrderLinesContainer[i].name);
 				}
 
 				if (
 					klarnaOrderLinesContainer[i].reference ===
 					wooOrderLinesContainer[i].sku
 				) {
-					klarnaSKU.push(klarnaOrderLinesContainer[i].reference);
-					wooSKU.push(wooOrderLinesContainer[i].sku);
-				}
-
-				if (
-					klarnaOrderLinesContainer[i].order_id ===
-					wooOrderLinesContainer[i].transaction_id
-				) {
-					klarnaOrderId.push(klarnaOrderLinesContainer[i].order_id);
-					wooOrderId.push(wooOrderLinesContainer[i].transaction_id);
+					klarnaValues.sku.push(
+						klarnaOrderLinesContainer[i].reference
+					);
+					wooValues.sku.push(wooOrderLinesContainer[i].sku);
 				}
 			}
+		}
+
+		if (response.data.order_id === wooCommerceOrder.data.transaction_id) {
+			klarnaValues.orderId = response.data.order_id;
+			wooValues.orderId = wooCommerceOrder.data.transaction_id;
 		}
 
 		if (
 			response.data.shipping_address.given_name ===
 			wooCommerceOrder.data.billing.first_name
 		) {
-			klarnaFirstName = response.data.shipping_address.given_name;
-			wooFirstName = wooCommerceOrder.data.billing.first_name;
+			klarnaValues.firstName = response.data.shipping_address.given_name;
+			wooValues.firstName = wooCommerceOrder.data.billing.first_name;
 		}
 
 		if (
 			response.data.shipping_address.family_name ===
 			wooCommerceOrder.data.billing.last_name
 		) {
-			klarnaLastName = response.data.shipping_address.family_name;
-			wooLastName = wooCommerceOrder.data.billing.last_name;
+			klarnaValues.lastName = response.data.shipping_address.family_name;
+			wooValues.lastName = wooCommerceOrder.data.billing.last_name;
 		}
 
-		if (
-			response.data.shipping_address.title ===
-			wooCommerceOrder.data.billing.company
-		) {
-			klarnaCompany = response.data.shipping_address.title;
-			wooCompany = wooCommerceOrder.data.billing.company;
+		// Case for B2CB individual
+		if(customerType === 'person'){
+
+			if (
+				response.data.shipping_address.title ===
+				wooCommerceOrder.data.billing.company
+			) {
+				klarnaValues.company = response.data.shipping_address.title;
+				wooValues.company = wooCommerceOrder.data.billing.company;
+			}
+
+		// Case for B2CB for company
+		} else if ( customerType === 'company') {
+
+			if (
+				response.data.shipping_address.organization_name ===
+				wooCommerceOrder.data.billing.company
+			) {
+				klarnaValues.company = response.data.shipping_address.organization_name;
+				wooValues.company = wooCommerceOrder.data.billing.company;
+			}
 		}
 
 		if (
 			response.data.shipping_address.street_address ===
 			wooCommerceOrder.data.billing.address_1
 		) {
-			klarnaAddressOne = response.data.shipping_address.street_address;
-			wooAddressOne = wooCommerceOrder.data.billing.address_1;
+			klarnaValues.addressOne =
+				response.data.shipping_address.street_address;
+			wooValues.addressOne = wooCommerceOrder.data.billing.address_1;
 		}
 
 		if (
 			response.data.shipping_address.street_address2 ===
 			wooCommerceOrder.data.billing.address_2
 		) {
-			klarnaAddressTwo = response.data.shipping_address.street_address2;
-			wooAddressTwo = wooCommerceOrder.data.billing.address_2;
+			klarnaValues.addressTwo =
+				response.data.shipping_address.street_address2;
+			wooValues.addressTwo = wooCommerceOrder.data.billing.address_2;
 		}
 
 		if (
 			response.data.shipping_address.city ===
 			wooCommerceOrder.data.billing.city
 		) {
-			klarnaCity = response.data.shipping_address.city;
-			wooCity = wooCommerceOrder.data.billing.city;
+			klarnaValues.city = response.data.shipping_address.city;
+			wooValues.city = wooCommerceOrder.data.billing.city;
 		}
 
 		if (
 			response.data.shipping_address.region ===
 			wooCommerceOrder.data.billing.state
 		) {
-			klarnaRegion = response.data.shipping_address.region;
-			wooRegion = wooCommerceOrder.data.billing.state;
+			klarnaValues.region = response.data.shipping_address.region;
+			wooValues.region = wooCommerceOrder.data.billing.state;
 		}
 
 		if (
 			response.data.shipping_address.postal_code.replace(/\s/g, "") ===
 			wooCommerceOrder.data.billing.postcode
 		) {
-			klarnaPostcode = response.data.shipping_address.postal_code.replace(
+			klarnaValues.postcode = response.data.shipping_address.postal_code.replace(
 				/\s/g,
 				""
 			);
-			wooPostcode = wooCommerceOrder.data.billing.postcode;
+			wooValues.postcode = wooCommerceOrder.data.billing.postcode;
 		}
 
 		if (
 			response.data.shipping_address.country ===
 			wooCommerceOrder.data.billing.country
 		) {
-			klarnaCountry = response.data.shipping_address.country;
-			wooCountry = wooCommerceOrder.data.billing.country;
+			klarnaValues.country = response.data.shipping_address.country;
+			wooValues.country = wooCommerceOrder.data.billing.country;
 		}
 
 		if (
 			response.data.shipping_address.email ===
 			wooCommerceOrder.data.billing.email
 		) {
-			klarnaEmail = response.data.shipping_address.email;
-			wooEmail = wooCommerceOrder.data.billing.email;
+			klarnaValues.email = response.data.shipping_address.email;
+			wooValues.email = wooCommerceOrder.data.billing.email;
 		}
 
 		if (
 			response.data.shipping_address.phone ===
 			wooCommerceOrder.data.billing.phone.replace(/\s/g, "")
 		) {
-			klarnaPhone = response.data.shipping_address.phone;
-			wooPhone = wooCommerceOrder.data.billing.phone.replace(/\s/g, "");
+			klarnaValues.phone = response.data.shipping_address.phone;
+			wooValues.phone = wooCommerceOrder.data.billing.phone.replace(
+				/\s/g,
+				""
+			);
 		}
 
 		if (
 			response.data.purchase_currency === wooCommerceOrder.data.currency
 		) {
-			klarnaCurrency = response.data.purchase_currency;
-			wooCurrency = wooCommerceOrder.data.currency;
+			klarnaValues.currency = response.data.purchase_currency;
+			wooValues.currency = wooCommerceOrder.data.currency;
 		}
 
-		await page.waitForTimeout(5 * timeOutTime);
+		if (
+			response.data.order_lines[productsToCart.length].name ===
+			wooCommerceOrder.data.shipping_lines[0].method_title
+		) {
+			klarnaValues.shippingMethod =
+				response.data.order_lines[productsToCart.length].name;
+			wooValues.shippingMethod =
+				wooCommerceOrder.data.shipping_lines[0].method_title;
+		}
+
+		// await page.waitForTimeout(4 * timeOutTime);
+		await page.waitForTimeout(timeOutTime);
 		const value = await page.$eval(".entry-title", (e) => e.textContent);
 		expect(value).toBe("Order received");
 	}, 190000);
 
+	/**
+	 * Compare expected and received values
+	 */
+
 	test("Compare IDs", async () => {
-		expect(toString(klarnaOrderId)).toBe(toString(wooOrderId));
+		expect(toString(klarnaValues.orderId)).toBe(
+			toString(wooValues.orderId)
+		);
 	}, 190000);
 
 	test("Compare names", async () => {
-		expect(klarnaFirstName).toBe(wooFirstName);
+		expect(klarnaValues.firstName).toBe(wooValues.firstName);
 	}, 190000);
 
 	test("Compare last names", async () => {
-		expect(klarnaLastName).toBe(wooLastName);
+		expect(klarnaValues.lastName).toBe(wooValues.lastName);
 	}, 190000);
 
 	test("Compare cities", async () => {
-		expect(klarnaCity).toBe(wooCity);
+		expect(klarnaValues.city).toBe(wooValues.city);
 	}, 190000);
 
 	test("Compare regions", async () => {
-		expect(klarnaRegion).toBe(wooRegion);
+		expect(klarnaValues.region).toBe(wooValues.region);
 	}, 190000);
 
 	test("Compare countries", async () => {
-		expect(klarnaCountry).toBe(wooCountry);
+		expect(klarnaValues.country).toBe(wooValues.country);
 	}, 190000);
 
 	test("Compare post codes", async () => {
-		expect(klarnaPostcode).toBe(wooPostcode);
+		expect(klarnaValues.postcode).toBe(wooValues.postcode);
 	}, 190000);
 
 	test("Compare companies", async () => {
-		expect(klarnaCompany).toBe(wooCompany);
+		expect(klarnaValues.company).toBe(wooValues.company);
 	}, 190000);
 
 	test("Compare first address", async () => {
-		expect(klarnaAddressOne).toBe(wooAddressOne);
+		expect(klarnaValues.addressOne).toBe(wooValues.addressOne);
 	}, 190000);
 
 	test("Compare second address", async () => {
-		expect(klarnaAddressTwo).toBe(wooAddressTwo);
+		expect(klarnaValues.addressTwo).toBe(wooValues.addressTwo);
 	}, 190000);
 
 	test("Compare emails", async () => {
-		expect(klarnaEmail).toBe(wooEmail);
+		expect(klarnaValues.email).toBe(wooValues.email);
 	}, 190000);
 
 	test("Compare telephones", async () => {
-		expect(klarnaPhone).toBe(wooPhone);
+		expect(klarnaValues.phone).toBe(wooValues.phone);
 	}, 190000);
 
 	test("Compare SKU-s", async () => {
-		expect(toString(klarnaSKU)).toBe(toString(wooSKU));
+		expect(toString(klarnaValues.sku)).toBe(toString(wooValues.sku));
 	}, 190000);
 
 	test("Compare total amounts", async () => {
-		expect(toString(klarnaTotalAmount)).toBe(toString(wooTotalAmount));
+		expect(toString(klarnaValues.totalAmount)).toBe(
+			toString(wooValues.totalAmount)
+		);
 	}, 190000);
 
 	test("Compare total taxes", async () => {
-		expect(toString(klarnaTotalTax)).toBe(toString(wooTotalTax));
+		expect(toString(klarnaValues.totalTax)).toBe(
+			toString(wooValues.totalTax)
+		);
 	}, 190000);
 
 	test("Compare product names", async () => {
-		expect(toString(klarnaProductName)).toBe(toString(wooProductName));
+		expect(toString(klarnaValues.productName)).toBe(
+			toString(wooValues.productName)
+		);
 	}, 190000);
 
 	test("Compare Shipping methods", async () => {
-		expect(toString(klarnaShippingMethod)).toBe(
-			toString(wooShippingMethod)
+		expect(toString(klarnaValues.shippingMethod)).toBe(
+			toString(wooValues.shippingMethod)
 		);
 	}, 190000);
 
 	test("Compare Quantities", async () => {
-		expect(toString(klarnaQuantity)).toBe(toString(wooQuantity));
+		expect(toString(klarnaValues.quantity)).toBe(
+			toString(wooValues.quantity)
+		);
 	}, 190000);
 
 	test("Compare currencies", async () => {
-		expect(klarnaCurrency).toBe(wooCurrency);
+		expect(klarnaValues.currency).toBe(wooValues.currency);
 	}, 190000);
 });

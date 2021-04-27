@@ -13,52 +13,89 @@ const loadIFrame = async (page, name) =>
  * @param data
  * @returns {Promise<void>}
  */
-const submitBillingForm = async (frame, data) => {
+
+const submitBillingForm = async (frame, data, customerType) => {
 	const {
 		emailSelector,
 		email,
 		postalCodeSelector,
 		postalCode,
-		submitSelector,
+		organizationIDSelector,
+		organizationID,
+		organizationNameSelector,
+		organizationName,
+		firstNameSelector,
+		firstName,
+		lastNameSelector,
+		lastName,
+		telephoneSelector,
+		telephone
+
 	} = data;
-	if (await frame.$("#billing-email")) {
-		await frame.type(emailSelector, String(email));
-		await frame.type(postalCodeSelector, String(postalCode));
-		await frame.click(submitSelector);
+
+	// Fill out input field
+	const fillOutFrameField = async (fieldName, inputFieldFillIn) => {
+
+		if (await frame.$(fieldName)){
+
+			let inputField = await frame.$(fieldName);
+			await inputField.click({clickCount: 3});
+			await inputField.press('Backspace');
+			await frame.waitForTimeout(100);
+			await inputField.type(inputFieldFillIn);
+			await frame.waitForTimeout(200);
+		}
 	}
-};
 
-/**
- *
- * @param frame
- * @param selector
- * @returns {Promise<void>}
- */
-const payLater = async (frame, selector) => {
-	await frame.waitForSelector(selector);
-	await frame.click(selector);
-};
+	// Fill out the form
+	const completeForm = async () => {
+		await fillOutFrameField(organizationIDSelector,organizationID );
+		await fillOutFrameField(organizationNameSelector, organizationName);
+		await fillOutFrameField(firstNameSelector, firstName);
+		await fillOutFrameField(lastNameSelector, lastName);
+		await fillOutFrameField(emailSelector, email);
+		await fillOutFrameField(telephoneSelector, telephone);
+	}
+	
+	// Check for miniaturized frame
+		if(	await frame.$('[id="preview__link"]')) {
+			await frame.waitForTimeout(1000);
+			await frame.click('[id="preview__link"]');
+			await frame.waitForTimeout(1000);
+		}
+	
+	// Fork from B2CB switches
+	if (await frame.$('[data-cid="am.customer_type"]')) {
 
-/**
- *
- * @param frame
- * @param selector
- * @returns {Promise<void>}
- */
-const payNow = async (frame, selector) => {
-	await frame.waitForSelector(selector);
-	await frame.click(selector);
-};
+		await frame.waitForTimeout(1000);
+		await frame.click('[data-cid="am.customer_type"]');
+		await frame.waitForTimeout(1000);
 
-/**
- *
- * @param frame
- * @param selector
- * @returns {Promise<void>}
- */
-const payALittle = async (frame, selector) => {
-	await frame.waitForSelector(selector);
-	await frame.click(selector);
+		if (customerType === "person"){
+			await frame.click('[data-cid="row person"]');
+			await frame.waitForTimeout(1000);
+			await completeForm()
+
+		} else if (customerType === "company") {
+			await frame.click('[data-cid="row organization"]');
+			await frame.waitForTimeout(1000);
+			await completeForm()
+		}
+
+		let postalCodeSelectorInput = await frame.$(postalCodeSelector);
+
+		await postalCodeSelectorInput.click({clickCount: 3});
+		await postalCodeSelectorInput.press('Backspace');
+		await frame.type(postalCodeSelector, postalCode);
+
+		await frame.click('[data-cid="am.continue_button"]');
+		await frame.waitForTimeout(1000);
+
+		if(await frame.$('[data-cid="am.continue_button"]')){
+			await completeForm()
+			await frame.click('[data-cid="am.continue_button"]');
+		}
+	}
 };
 
 /**
@@ -75,8 +112,5 @@ const createOrder = async (frame, buttonSelector) => {
 export default {
 	loadIFrame,
 	submitBillingForm,
-	payLater,
-	payALittle,
 	createOrder,
-	payNow,
 };

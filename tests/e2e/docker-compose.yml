@@ -3,49 +3,49 @@ services:
   db:
     image: mysql:5.7
     restart: on-failure
-    environment:
-      MYSQL_DATABASE: testdb
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
-      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    networks:
+      - kronet
+    env_file:
+      - ./.env
     volumes:
       - db:/var/lib/mysql
-
   wordpress-dev:
+    env_file:
+      - ./.env
+    networks:
+      - kronet
     depends_on:
       - db
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - WP_TAG=${WP_VERSION}
     ports:
       - "8000:80"
     restart: on-failure
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_NAME: testdb
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpress
-      WORDPRESS_TABLE_PREFIX: "wp_"
-      WORDPRESS_DEBUG: 1
-      WORDPRESS_CONFIG_EXTRA: |
-        define( 'WP_DEBUG', true );
-        define( 'WP_DEBUG_LOG', true );
-        define( 'WP_DEBUG_DISPLAY', false );
-        define( 'SCRIPT_DEBUG', true );
     volumes:
       - "../../:/var/www/html/wp-content/plugins/klarna-checkout-for-woocommerce"
       - "wordpress:/var/www/html"
   wordpress-cli:
+    image: wordpress:cli-php7.4
+    networks:
+      - kronet
+    env_file:
+      - ./.env
     depends_on:
       - db
       - wordpress-dev
-    image: wordpress:cli
     restart: on-failure
     user: xfs
     volumes:
       - "../../:/var/www/html/wp-content/plugins/klarna-checkout-for-woocommerce"
       - "wordpress:/var/www/html"
-
 volumes:
   db:
   wordpress:
+  
+
+networks: 
+  kronet: 
+    driver: bridge

@@ -6,6 +6,8 @@ const CHECKOUT = `${BASE_URL}/checkout`;
 
 const SHOP = `${BASE_URL}/shop`;
 
+const ADD_TO_CART = `${BASE_URL}/shop/?add-to-cart=`;
+
 const MY_ACCOUNT = `${BASE_URL}/my-account`;
 
 const API_ORDER_ENDPOINT = "/wc/v3/orders/";
@@ -22,6 +24,7 @@ export default {
 	BASE_URL,
 	CHECKOUT,
 	SHOP,
+	ADD_TO_CART,
 	MY_ACCOUNT,
 	API_BASE_URL,
 	API_ORDER_ENDPOINT,
