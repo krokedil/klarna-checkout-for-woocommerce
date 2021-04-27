@@ -1,0 +1,17 @@
+name: E2E tests
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: convictional/trigger-workflow-and-wait@v1.3.0
+        with:
+          owner: krokedil
+          repo: e2e-tests
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow_file_name: e2e-tests.yml
+          ref: dev-e2e-testflow
