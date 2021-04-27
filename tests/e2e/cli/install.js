@@ -39,6 +39,7 @@ const importDb = () => executeCommand("wp db import ./wp-content/plugins/klarna-
 
 waitOn({ resources: [`http://localhost:8000`] }).then(() => {
     try {
+        // do stuff.
         installWP();
         installWC();
         installTheme();
