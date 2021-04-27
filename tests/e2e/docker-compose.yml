@@ -1,0 +1,51 @@
+version: '3.1'
+services:
+  db:
+    image: mysql:5.7
+    restart: on-failure
+    networks:
+      - kronet
+    env_file:
+      - ./.env
+    volumes:
+      - db:/var/lib/mysql
+  wordpress-dev:
+    env_file:
+      - ./.env
+    networks:
+      - kronet
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - WP_TAG=${WP_VERSION}
+    ports:
+      - "8000:80"
+    restart: on-failure
+    volumes:
+      - "../../:/var/www/html/wp-content/plugins/klarna-checkout-for-woocommerce"
+      - "wordpress:/var/www/html"
+  wordpress-cli:
+    image: wordpress:cli-php7.4
+    networks:
+      - kronet
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - wordpress-dev
+    restart: on-failure
+    user: xfs
+    volumes:
+      - "../../:/var/www/html/wp-content/plugins/klarna-checkout-for-woocommerce"
+      - "wordpress:/var/www/html"
+volumes:
+  db:
+  wordpress:
+  
+
+networks: 
+  kronet: 
+    driver: bridge

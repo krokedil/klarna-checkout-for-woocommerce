@@ -35,7 +35,7 @@ class KCO_Request_Shipping_Options {
 						continue;
 					}
 
-					if ( $separate_sales_tax || 'excl' === $tax_display ) {
+					if ( $separate_sales_tax ) {
 						$method_price = intval( round( $method->cost, 2 ) * 100 );
 					} else {
 						$method_price = intval( round( $method->cost + array_sum( $method->taxes ), 2 ) * 100 );

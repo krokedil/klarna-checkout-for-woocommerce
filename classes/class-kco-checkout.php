@@ -29,9 +29,9 @@ class KCO_Checkout {
 	 * @return array
 	 */
 	public function add_shipping_data_input( $fields ) {
-		$klarna_order_id                      = WC()->session->get( 'kco_wc_order_id' );
-		$shipping_data                        = get_transient( 'kss_data_' . $klarna_order_id );
-		$fields['order']['kco_shipping_data'] = array(
+		$klarna_order_id                        = WC()->session->get( 'kco_wc_order_id' );
+		$shipping_data                          = get_transient( 'kss_data_' . $klarna_order_id );
+		$fields['billing']['kco_shipping_data'] = array(
 			'type'    => 'hidden',
 			'class'   => array( 'kco_shipping_data' ),
 			'default' => wp_json_encode( $shipping_data ),
