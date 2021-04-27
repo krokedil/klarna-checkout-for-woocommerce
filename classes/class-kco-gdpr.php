@@ -18,7 +18,6 @@ class KCO_GDPR {
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'privacy_declarations' ) );
 		add_action( 'init', array( $this, 'maybe_add_privacy_policy_text' ) );
-		add_filter( 'kco_wc_api_request_args', array( $this, 'maybe_add_checkbox' ) );
 	}
 	/**
 	 * Privacy declarations.
@@ -69,25 +68,6 @@ class KCO_GDPR {
 		if ( function_exists( 'wc_checkout_privacy_policy_text' ) ) {
 			echo wp_kses_post( wc_checkout_privacy_policy_text() );
 		}
-	}
-
-	/**
-	 * Maybe adds a checkbox to the Klarna iFrame.
-	 *
-	 * @param array $args The arguments array for the Klarna request.
-	 * @return array $args The arguments array for the Klarna request.
-	 */
-	public function maybe_add_checkbox( $args ) {
-		if ( function_exists( 'wc_terms_and_conditions_checkbox_enabled' ) ) {
-			$settings     = get_option( 'woocommerce_kco_settings' );
-			$add_checkbox = $settings['add_terms_and_conditions_checkbox'];
-			if ( 'yes' === $add_checkbox && wc_terms_and_conditions_checkbox_enabled() ) {
-				$args['options']['additional_checkbox']['text']     = wc_replace_policy_page_link_placeholders( wc_get_terms_and_conditions_checkbox_text() );
-				$args['options']['additional_checkbox']['checked']  = false;
-				$args['options']['additional_checkbox']['required'] = true;
-			}
-		}
-		return $args;
 	}
 }
 new KCO_GDPR();

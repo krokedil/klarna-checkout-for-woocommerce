@@ -8,6 +8,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
 /**
  * KCO_Merchant_URLs class.
  *
@@ -27,7 +28,6 @@ class KCO_Merchant_URLs {
 			'checkout'     => $this->get_checkout_url(),                // Required.
 			'confirmation' => $this->get_confirmation_url( $order_id ), // Required.
 			'push'         => $this->get_push_url(),                    // Required.
-			// 'shipping_option_update' => $this->get_shipping_option_update_url(),  // HTTPS.
 			'notification' => $this->get_notification_url(),
 		);
 

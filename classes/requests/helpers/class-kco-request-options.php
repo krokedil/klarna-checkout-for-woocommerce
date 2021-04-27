@@ -38,6 +38,7 @@ class KCO_Request_Options {
 			'require_client_validation'                   => true,
 			'require_client_validation_callback_response' => true,
 			'phone_mandatory'                             => 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ),
+			'show_subtotal_detail'                        => $this->show_subtotal_detail(),
 		);
 
 		if ( $this->get_iframe_colors() ) {
@@ -46,6 +47,11 @@ class KCO_Request_Options {
 
 		if ( $this->get_shipping_details() ) {
 			$options['shipping_details'] = $this->get_shipping_details();
+		}
+
+		$additional_checkboxes = $this->additional_checkboxes();
+		if ( ! empty( $additional_checkboxes ) ) {
+			$options['additional_checkboxes'] = $additional_checkboxes;
 		}
 
 		return $options;
@@ -221,5 +227,35 @@ class KCO_Request_Options {
 		$country       = $base_location['country'];
 
 		return $country;
+	}
+
+	/**
+	 * Inserts a checkbox with description in the Klarna frame.
+	 *
+	 * @return array
+	 */
+	public function additional_checkboxes() {
+		$additional_checkboxes = array();
+		if ( isset( $this->settings['add_terms_and_conditions_checkbox'] ) && 'yes' === $this->settings['add_terms_and_conditions_checkbox'] ) {
+			$additional_checkboxes[] = array(
+				'id'       => 'terms_and_conditions',
+				'text'     => wc_replace_policy_page_link_placeholders( wc_get_terms_and_conditions_checkbox_text() ),
+				'checked'  => false,
+				'required' => true,
+			);
+		}
+		return apply_filters( 'kco_additional_checkboxes', $additional_checkboxes );
+	}
+
+	/**
+	 * Gets the value for the show_sbutotal_details argument.
+	 *
+	 * @return bool
+	 */
+	public function show_subtotal_detail() {
+		if ( isset( $this->settings['show_subtotal_detail'] ) && in_array( $this->settings['show_subtotal_detail'], array( 'iframe', 'both' ), true ) ) {
+			return true;
+		}
+		return false;
 	}
 }

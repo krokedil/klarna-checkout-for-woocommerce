@@ -142,6 +142,21 @@ class KCO_API {
 	}
 
 	/**
+	 * Acknowledges the order with Klarna. Goes to the order management API.
+	 *
+	 * @param string $klarna_order_id The Klarna Checkout order id.
+	 * @param array  $klarna_order The Klarna order.
+	 * @param int    $order_id The WooCommerce order id.
+	 * @return mixed
+	 */
+	public function update_klarna_confirmation( $klarna_order_id, $klarna_order, $order_id ) {
+		$request  = new KCO_Request_Update_Confirmation();
+		$response = $request->request( $klarna_order_id, $klarna_order, $order_id );
+
+		return $this->check_for_api_error( $response );
+	}
+
+	/**
 	 * Checks for WP Errors and returns either the response as array or a false.
 	 *
 	 * @param array $response The response from the request.

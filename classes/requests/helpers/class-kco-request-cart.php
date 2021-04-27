@@ -19,7 +19,7 @@ class KCO_Request_Cart {
 	/**
 	 * Formatted order lines.
 	 *
-	 * @var $order_lines
+	 * @var array $order_lines
 	 */
 	public $order_lines = array();
 
@@ -77,7 +77,7 @@ class KCO_Request_Cart {
 	 * @return array
 	 */
 	public function get_order_lines() {
-		return $this->order_lines;
+		return array_values( $this->order_lines );
 	}
 
 	/**
@@ -86,7 +86,13 @@ class KCO_Request_Cart {
 	 * @return int
 	 */
 	public function get_order_amount() {
-		return round( WC()->cart->total * 100 );
+		$settings     = get_option( 'woocommerce_kco_settings' );
+		$order_amount = round( WC()->cart->total * 100 );
+
+		if ( isset( $settings['shipping_methods_in_iframe'] ) && 'yes' === $settings['shipping_methods_in_iframe'] ) {
+			$order_amount -= $this->get_shipping_amount();
+		}
+		return $order_amount;
 	}
 
 	/**
@@ -209,18 +215,21 @@ class KCO_Request_Cart {
 	 * Process WooCommerce shipping to Klarna Payments order lines.
 	 */
 	public function process_shipping() {
-		if ( WC()->shipping->get_packages() && ! empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
-			$shipping            = array(
-				'type'             => 'shipping_fee',
-				'reference'        => $this->get_shipping_reference(),
-				'name'             => $this->get_shipping_name(),
-				'quantity'         => 1,
-				'unit_price'       => $this->get_shipping_amount(),
-				'tax_rate'         => $this->get_shipping_tax_rate(),
-				'total_amount'     => $this->get_shipping_amount(),
-				'total_tax_amount' => $this->get_shipping_tax_amount(),
-			);
-			$this->order_lines[] = $shipping;
+		$settings = get_option( 'woocommerce_kco_settings' );
+		if ( ! isset( $settings['shipping_methods_in_iframe'] ) || 'no' === $settings['shipping_methods_in_iframe'] ) {
+			if ( WC()->shipping->get_packages() && ! empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
+				$shipping            = array(
+					'type'             => 'shipping_fee',
+					'reference'        => $this->get_shipping_reference(),
+					'name'             => $this->get_shipping_name(),
+					'quantity'         => 1,
+					'unit_price'       => $this->get_shipping_amount(),
+					'tax_rate'         => $this->get_shipping_tax_rate(),
+					'total_amount'     => $this->get_shipping_amount(),
+					'total_tax_amount' => $this->get_shipping_tax_amount(),
+				);
+				$this->order_lines[] = $shipping;
+			}
 		}
 	}
 
@@ -422,7 +431,7 @@ class KCO_Request_Cart {
 				// Add separate discount line item, but only if it's a smart coupon or country is US.
 				$fee_item            = array(
 					'type'                  => 'surcharge',
-					'reference'             => $fee->id,
+					'reference'             => substr( $fee->id, 0, 64 ),
 					'name'                  => $fee->name,
 					'quantity'              => 1,
 					'unit_price'            => $fee_amount,
