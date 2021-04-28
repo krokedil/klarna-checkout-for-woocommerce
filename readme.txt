@@ -65,6 +65,7 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 = 2021.04.27    - version 2.5.4 =
 * Fix           - Move our hidden shipping field to the billing address fields to prevent issues if you remove the order comments from the checkout using the filter woocommerce_enable_order_notes_field.
 * Fix           - Prevent unlocking the iframe during the order submission process.
+* Fix           - Fixed an issue with not sending shipping tax to Klarna if you had prices exclusive of tax and shipping in the Klarna iframe.
 
 = 2021.04.07    - version 2.5.3 =
 * Fix           - Removed old code that would set the Klarna checkout page to be considered to also be the cart page.
