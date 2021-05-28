@@ -397,6 +397,37 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
+	 	 * Get required setting keys for setup.
+		 *
+		 * @return array Array of setting keys used for setup.
+		 */
+		public function get_required_settings_keys() {
+			$setting_suffix = $this->check_if_eu() === 'EU' ? 'eu' : 'us';
+			
+			return array(
+				'merchant_id_' . $setting_suffix,
+				'shared_secret_' . $setting_suffix,
+			);
+		}
+
+		/**
+		 * Get help text to display during quick setup.
+		 */
+		public function get_setup_help_text() {
+			return __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' );
+		}
+
+		/**
+		 * Get the oAuth connection URL.
+		 *
+		 * @param string $return_url The URL to return to after the oAuth connection has been established.
+		 * @return string Connection URL.
+		 */
+		public function get_oauth_connection_url( $return_url = '' ) { 
+			return null;
+		}
+
+		/**
 		 * Process the payment with information from Klarna and return the result.
 		 *
 		 * @param  int $order_id WooCommerce order ID.
