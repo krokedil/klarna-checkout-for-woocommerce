@@ -36,6 +36,11 @@ jQuery( function( $ ) {
 			} else {
 				kco_wc.paymentMethod = 'kco';
 			}
+
+			if( 'kco' ===  kco_wc.paymentMethod ){
+				$( '#ship-to-different-address-checkbox' ).prop( 'checked', true);
+			}
+
 			kco_wc.moveExtraCheckoutFields();
 			kco_wc.updateShipping( false );
 		},
