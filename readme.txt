@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.7.0
+Tested up to: 5.7.2
 Requires PHP: 5.6
 WC requires at least: 3.4.0
-WC tested up to: 5.0.0
+WC tested up to: 5.3.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,10 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.06.02    - version 2.5.5 =
+* Fix           - Fixed an issue that could happen if you had shipping set to be calculated on billing address  in WooCommerce, but allowed for seperate shipping in Klarna.
+* Fix           - Errors that happen on AJAX calls are now properly logged instead of [Object, Object] in the status log when placing an order.
+
 = 2021.04.27    - version 2.5.4 =
 * Fix           - Move our hidden shipping field to the billing address fields to prevent issues if you remove the order comments from the checkout using the filter woocommerce_enable_order_notes_field.
 * Fix           - Prevent unlocking the iframe during the order submission process.

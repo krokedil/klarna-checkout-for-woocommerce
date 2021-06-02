@@ -36,6 +36,11 @@ jQuery( function( $ ) {
 			} else {
 				kco_wc.paymentMethod = 'kco';
 			}
+
+			if( 'kco' ===  kco_wc.paymentMethod ){
+				$( '#ship-to-different-address-checkbox' ).prop( 'checked', true);
+			}
+
 			kco_wc.moveExtraCheckoutFields();
 			kco_wc.updateShipping( false );
 		},
@@ -419,13 +424,17 @@ jQuery( function( $ ) {
 									kco_wc.failOrder( 'submission', data.messages, callback );
 								} else {
 									kco_wc.logToFile( 'Checkout error | No message' );
-									kco_wc.failOrder( 'submission', '<div class="woocommerce-error">' + 'Checkout error' + '</div>', callback );
+									kco_wc.failOrder( 'submission', '<div class="woocommerce-error">Checkout error</div>', callback );
 								}
 							}
 						},
 						error: function( data ) {
-							kco_wc.logToFile( 'AJAX error | ' + data );
-							kco_wc.failOrder( 'ajax-error', data, callback );
+							try {
+								kco_wc.logToFile( 'AJAX error | ' + JSON.stringify(data) );
+							} catch( e ) {
+								kco_wc.logToFile( 'AJAX error | Failed to parse error message.' );
+							}
+							kco_wc.failOrder( 'ajax-error', '<div class="woocommerce-error">Internal Server Error</div>', callback )
 						}
 					});
 				} else {
