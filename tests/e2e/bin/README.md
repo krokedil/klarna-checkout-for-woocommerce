@@ -62,7 +62,9 @@ Each KCO Test Suite contains 20 separate tests.
 
 # 3. Environment setup
 
-**BEFORE ALL** : Install the yarn package manager.
+**BEFORE ALL** :
+- Install the NodeJS and the yarn package manager onto your system.
+- Install Docker onto your system.
 
 1. Clone the repository branch containing the E2E Automated Testing.
 2. Copy and paste from an external source:
@@ -75,21 +77,29 @@ Each KCO Test Suite contains 20 separate tests.
 
 >*PLUGIN_PATH* > tests > e2e > config > { here }
 
+- .env
+
+>*PLUGIN_PATH* > tests > e2e > { here }
+
 3. Open your Terminal, and use the Console to navigate to ***PLUGIN_PATH > tests > e2e***
-4. Input the following command:
+4. Install the required NodeJS packages ***PLUGIN_PATH > tests > e2e***
 
-- npm run docker:up
+- yarn install
 
-5. Wait for around 30 seconds, or monitor the loading progress from your Docker Desktop GUI.
-6. Input the following command, and wait for the test to fail (this first run will update the WordPress database):
+5. Input the following command:
 
-- npm run jettison
+- yarn docker:up
 
-7. From here on, each time you use the “npm run jettison” command, the automated testing will run all of the created Test Suites one by one.
+6. Monitor the loading progress from your Docker Desktop GUI.
+7. Input the following command:
+
+- yarn jettison
+
+8. From here on, each time you use the “yarn jettison” command, the automated testing will run all of the created Test Suites one by one.
 
 **AFTER ALL** : Bring the Docker image down with the following command:
 
-- npm run docker:down
+- yarn docker:down
 
 # 4. Test setup
 
@@ -98,7 +108,7 @@ Each KCO Test Suite contains 20 separate tests.
 
   The **timeoutTime** key’s value (set in the ***config.data.json*** file) defines the number of milliseconds the testing run for each Test Suite will pause after completing an action.
   
-  Being that the plugin heavily dependent on responses from a server, the loading times for iFrames and different stages of the checkout process may very independently and inconsistently.
+  Being that the plugin heavily dependent on responses from a server, the loading times for iFrames and different stages of the checkout process may vary independently and inconsistently.
 
 - >*PLUGIN_PATH* > tests > e2e > tests > {Test Suite}
 
@@ -118,7 +128,9 @@ Each KCO Test Suite contains 20 separate tests.
       simpleProduct25,
       variableProduct25Green
       ];
-      
+  
+    To add multiple instances of a single product, just add the product name variable that many times into the array.
+
     The list of the product names is included in the entry portion of the Test Suite, while the product ID’s are within the **config.data.json** file.
 
   - ***Select the shipping method***
