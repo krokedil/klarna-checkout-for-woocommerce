@@ -336,95 +336,115 @@ msgstr ""
 msgid "If this option is checked, the customer will be able to change the quantity of a product purchased on the checkout page as they would on the cart page."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:265
-msgid "Color Settings"
+#: ../classes/class-kco-fields.php:264
+msgid "Display subtotal details"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:267
+msgid "In the WooCommerce order review"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:268
+msgid "In the Klarna Checkout iFrame"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:269
-msgid "Checkout button color"
+msgid "In both"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:271
-msgid "Checkout page button color"
+msgid "Select how you want to show the subtotal details on the checkout page."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:276
-msgid "Checkout button text color"
+#: ../classes/class-kco-fields.php:277
+msgid "Color Settings"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:278
-msgid "Checkout page button text color"
+#: ../classes/class-kco-fields.php:281
+msgid "Checkout button color"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:283
-msgid "Checkout checkbox color"
+msgid "Checkout page button color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:285
-msgid "Checkout page checkbox color"
+#: ../classes/class-kco-fields.php:288
+msgid "Checkout button text color"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:290
-msgid "Checkout checkbox checkmark color"
+msgid "Checkout page button text color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:292
-msgid "Checkout page checkbox checkmark color"
+#: ../classes/class-kco-fields.php:295
+msgid "Checkout checkbox color"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:297
-msgid "Checkout header color"
+msgid "Checkout page checkbox color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:299
-msgid "Checkout page header color"
+#: ../classes/class-kco-fields.php:302
+msgid "Checkout checkbox checkmark color"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:304
-msgid "Checkout link color"
+msgid "Checkout page checkbox checkmark color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:306
-msgid "Checkout page link color"
+#: ../classes/class-kco-fields.php:309
+msgid "Checkout header color"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:311
+msgid "Checkout page header color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:316
+msgid "Checkout link color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:318
+msgid "Checkout page link color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:323
 msgid "Checkout radius border (px)"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:313
+#: ../classes/class-kco-fields.php:325
 msgid "Checkout page radius border in pixels"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:326
+#: ../classes/class-kco-fields.php:338
 msgid "Checkout privacy policy text"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:327
+#: ../classes/class-kco-fields.php:339
 msgid "Select if you want to show the <em>Checkout privacy policy</em> text on the checkout page, and where you want to display it."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:331
+#: ../classes/class-kco-fields.php:343
 msgid "Do not display"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:332
+#: ../classes/class-kco-fields.php:344
 msgid "Display above checkout"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:333
+#: ../classes/class-kco-fields.php:345
 msgid "Display below checkout"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:337
+#: ../classes/class-kco-fields.php:349
 msgid "Terms and conditions checkbox"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:338
+#: ../classes/class-kco-fields.php:350
 msgid "Add a terms and conditions checkbox inside Klarna checkout iframe"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:340
+#: ../classes/class-kco-fields.php:352
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
@@ -497,23 +517,23 @@ msgstr ""
 msgid "Failed to load Klarna Checkout template file."
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:124
+#: ../classes/requests/helpers/class-kco-request-cart.php:130
 msgid "Surcharge"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:236, ../classes/requests/helpers/class-kco-request-cart.php:237
+#: ../classes/requests/helpers/class-kco-request-cart.php:245, ../classes/requests/helpers/class-kco-request-cart.php:246
 msgid "Sales Tax"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:269, ../classes/requests/helpers/class-kco-request-cart.php:266, ../classes/requests/helpers/class-kco-request-cart.php:334
+#: ../classes/requests/helpers/class-kco-request-cart.php:278, ../classes/requests/helpers/class-kco-request-cart.php:275, ../classes/requests/helpers/class-kco-request-cart.php:343
 msgid "Gift card"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:355, ../classes/requests/helpers/class-kco-request-cart.php:378
+#: ../classes/requests/helpers/class-kco-request-cart.php:364, ../classes/requests/helpers/class-kco-request-cart.php:387
 msgid "giftcard"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:684, ../classes/requests/helpers/class-kco-request-cart.php:712
+#: ../classes/requests/helpers/class-kco-request-cart.php:693, ../classes/requests/helpers/class-kco-request-cart.php:721
 msgid "Shipping"
 msgstr ""
 

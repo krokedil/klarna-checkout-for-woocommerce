@@ -62,6 +62,9 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.06.03    - version 2.5.6 =
+* Fix           - Update the minified JavaScript file from the 2.5.5 update that was missed.
+
 = 2021.06.02    - version 2.5.5 =
 * Fix           - Fixed an issue that could happen if you had shipping set to be calculated on billing address  in WooCommerce, but allowed for seperate shipping in Klarna.
 * Fix           - Errors that happen on AJAX calls are now properly logged instead of [Object, Object] in the status log when placing an order.
