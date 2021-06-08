@@ -147,6 +147,18 @@ const toggleIFrame = async (toggleSwitch) => {
 	await API.updateOptions(KCOSettingsArray);
 };
 
+/**
+ * 
+ * @param {*} mainArray 
+ * @param {*} helperArray 
+ */
+const createHelperArray = (mainArray, helperArray) =>{
+	mainArray.forEach((element) => {
+		if(!helperArray.includes(element)){
+			helperArray.push(element)
+		}
+	});
+}
 
 /**
  * Export data
@@ -159,4 +171,5 @@ export default {
 	addCouponsOnCheckout,
 	chooseKlarnaShippingMethod,
 	toggleIFrame,
+	createHelperArray
 };
