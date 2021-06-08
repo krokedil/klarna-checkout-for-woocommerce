@@ -47,27 +47,19 @@ import {
 	/**
 	 * Products
 	 */
-	simpleProduct25,
-	simpleProduct12,
-	simpleProduct6,
-	simpleProduct0,
-	simpleProductSale25,
-	simpleProductSale12,
-	simpleProductSale6,
-	simpleProductSale0,
-	variableProduct25Black,
-	variableProduct25Blue,
-	variableProduct25Brown,
-	variableProduct25Green,
-	variableProductMixedBlackS,
-	variableProductMixedBlackM,
-	variableProductMixedBlackL,
-	variableProductMixedBlackXL,
-	variableProductMixedGreenS,
-	variableProductMixedGreenM,
-	variableProductMixedGreenL,
-	variableProductMixedGreenXL,
-	variableProductVirtualDownloadable25,
+	 outOfStock,
+	 variable25,
+	 downloadable0,
+	 downloadable25,
+	 downloadableShipping0,
+	 downloadableShipping25,
+	 simple12,
+	 simple6,
+	 virtual0,
+	 virtual25,
+	 virtualDownloadable0,
+	 virtualDownloadable25,
+	 manyCharacters
 } from "../config/config";
 
 import API from "../api/API";
@@ -77,6 +69,7 @@ import woocommerce from "../api/woocommerce";
 let page;
 let browser;
 let context;
+let productCounterArray = []
 
 /**
  * TEST ELEMENTS SELECTORS
@@ -88,10 +81,12 @@ const isUserLoggedIn = true;
 
 // Products selection
 const productsToCart = [
-	simpleProduct25,
-	variableProduct25Blue,
-	variableProduct25Green,
+	downloadable0,
+	simple12,
+	virtualDownloadable25,
 ];
+
+kcoUtils.createHelperArray(productsToCart, productCounterArray)
 
 // Shipping method selection
 const shippingMethod = freeShippingMethod;
@@ -562,16 +557,15 @@ describe("KCO", () => {
 		}
 
 		if (
-			response.data.order_lines[productsToCart.length].name ===
+			response.data.order_lines[productCounterArray.length].name ===
 			wooCommerceOrder.data.shipping_lines[0].method_title
 		) {
 			klarnaValues.shippingMethod =
-				response.data.order_lines[productsToCart.length].name;
+				response.data.order_lines[productCounterArray.length].name;
 			wooValues.shippingMethod =
 				wooCommerceOrder.data.shipping_lines[0].method_title;
 		}
 
-		// await page.waitForTimeout(4 * timeOutTime);
 		await page.waitForTimeout(timeOutTime);
 		const value = await page.$eval(".entry-title", (e) => e.textContent);
 		expect(value).toBe("Order received");
