@@ -99,6 +99,9 @@ const appliedCoupons = [couponPercent];
 // Shipping in KCO iFrame ("yes") / Standard WC ("no")
 const iframeShipping = "yes";
 
+// Tax Inclusive ( yes ) / Exclusive ( no )
+const inclusivePrice = "no";
+
 /**
  * TEST INITIALIZATION
  */
@@ -120,6 +123,10 @@ describe("KCO", () => {
 		} catch (error) {
 			console.log(error);
 		}
+
+		await kcoUtils.wcPricesIncludeTax({
+			value: inclusivePrice,
+		});
 
 		// Check for user logged in
 		if (isUserLoggedIn) {

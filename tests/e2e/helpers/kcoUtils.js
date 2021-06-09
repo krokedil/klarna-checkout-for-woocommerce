@@ -161,6 +161,15 @@ const createHelperArray = (mainArray, helperArray) => {
 };
 
 /**
+ *
+ * @param value
+ * @returns {Promise<void>}
+ */
+const wcPricesIncludeTax = async (value) => {
+	await API.pricesIncludeTax(value);
+};
+
+/**
  * Export data
  */
 export default {
@@ -172,4 +181,5 @@ export default {
 	chooseKlarnaShippingMethod,
 	toggleIFrame,
 	createHelperArray,
+	wcPricesIncludeTax,
 };
