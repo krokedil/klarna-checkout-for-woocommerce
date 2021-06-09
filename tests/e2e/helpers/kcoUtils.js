@@ -1,5 +1,5 @@
 import API from "../api/API";
-import {KCOSettingsArray} from "../config/config";
+import { KCOSettingsArray } from "../config/config";
 
 /**
  *
@@ -143,22 +143,22 @@ const chooseKlarnaShippingMethod = async (
  * Select shipping method through KCO iFrame or standard WC checkout selection
  */
 const toggleIFrame = async (toggleSwitch) => {
-	KCOSettingsArray.woocommerce_kco_settings.shipping_methods_in_iframe = toggleSwitch
+	KCOSettingsArray.woocommerce_kco_settings.shipping_methods_in_iframe = toggleSwitch;
 	await API.updateOptions(KCOSettingsArray);
 };
 
 /**
- * 
- * @param {*} mainArray 
- * @param {*} helperArray 
+ *
+ * @param {*} mainArray
+ * @param {*} helperArray
  */
-const createHelperArray = (mainArray, helperArray) =>{
+const createHelperArray = (mainArray, helperArray) => {
 	mainArray.forEach((element) => {
-		if(!helperArray.includes(element)){
-			helperArray.push(element)
+		if (!helperArray.includes(element)) {
+			helperArray.push(element);
 		}
 	});
-}
+};
 
 /**
  * Export data
@@ -171,5 +171,5 @@ export default {
 	addCouponsOnCheckout,
 	chooseKlarnaShippingMethod,
 	toggleIFrame,
-	createHelperArray
+	createHelperArray,
 };
