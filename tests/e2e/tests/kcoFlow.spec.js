@@ -47,19 +47,19 @@ import {
 	/**
 	 * Products
 	 */
-	 outOfStock,
-	 variable25,
-	 downloadable0,
-	 downloadable25,
-	 downloadableShipping0,
-	 downloadableShipping25,
-	 simple12,
-	 simple6,
-	 virtual0,
-	 virtual25,
-	 virtualDownloadable0,
-	 virtualDownloadable25,
-	 manyCharacters
+	outOfStock,
+	variable25,
+	downloadable0,
+	downloadable25,
+	downloadableShipping0,
+	downloadableShipping25,
+	simple12,
+	simple6,
+	virtual0,
+	virtual25,
+	virtualDownloadable0,
+	virtualDownloadable25,
+	manyCharacters,
 } from "../config/config";
 
 import API from "../api/API";
@@ -69,7 +69,7 @@ import woocommerce from "../api/woocommerce";
 let page;
 let browser;
 let context;
-let productCounterArray = []
+const productCounterArray = [];
 
 /**
  * TEST ELEMENTS SELECTORS
@@ -80,13 +80,9 @@ let productCounterArray = []
 const isUserLoggedIn = true;
 
 // Products selection
-const productsToCart = [
-	downloadable0,
-	simple12,
-	virtualDownloadable25,
-];
+const productsToCart = [downloadable0, simple12, virtualDownloadable25];
 
-kcoUtils.createHelperArray(productsToCart, productCounterArray)
+kcoUtils.createHelperArray(productsToCart, productCounterArray);
 
 // Shipping method selection
 const shippingMethod = freeShippingMethod;
@@ -181,7 +177,11 @@ describe("KCO", () => {
 		await page.waitForTimeout(2 * timeOutTime);
 
 		// Submit billing data
-		await kcoFrame.submitBillingForm(originalFrame, billingData, customerType);
+		await kcoFrame.submitBillingForm(
+			originalFrame,
+			billingData,
+			customerType
+		);
 
 		// Apply coupons
 		await kcoUtils.addCouponsOnCheckout(
@@ -376,17 +376,21 @@ describe("KCO", () => {
 						10
 					)
 				) {
-					klarnaValues.totalAmount.push(klarnaOrderLinesContainer[i].total_amount);
-					wooValues.totalAmount.push(parseInt(
-						Math.round(
-							(parseFloat(wooOrderLinesContainer[i].total) +
-								parseFloat(
-									wooOrderLinesContainer[i].total_tax
-								)) *
-								100
-						).toFixed(2),
-						10
-					));
+					klarnaValues.totalAmount.push(
+						klarnaOrderLinesContainer[i].total_amount
+					);
+					wooValues.totalAmount.push(
+						parseInt(
+							Math.round(
+								(parseFloat(wooOrderLinesContainer[i].total) +
+									parseFloat(
+										wooOrderLinesContainer[i].total_tax
+									)) *
+									100
+							).toFixed(2),
+							10
+						)
+					);
 				}
 
 				if (
@@ -455,8 +459,7 @@ describe("KCO", () => {
 		}
 
 		// Case for B2CB individual
-		if(customerType === 'person'){
-
+		if (customerType === "person") {
 			if (
 				response.data.shipping_address.title ===
 				wooCommerceOrder.data.billing.company
@@ -465,14 +468,14 @@ describe("KCO", () => {
 				wooValues.company = wooCommerceOrder.data.billing.company;
 			}
 
-		// Case for B2CB for company
-		} else if ( customerType === 'company') {
-
+			// Case for B2CB for company
+		} else if (customerType === "company") {
 			if (
 				response.data.shipping_address.organization_name ===
 				wooCommerceOrder.data.billing.company
 			) {
-				klarnaValues.company = response.data.shipping_address.organization_name;
+				klarnaValues.company =
+					response.data.shipping_address.organization_name;
 				wooValues.company = wooCommerceOrder.data.billing.company;
 			}
 		}
