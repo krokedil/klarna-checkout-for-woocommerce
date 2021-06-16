@@ -253,7 +253,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			);
 
 			$email_exists = 'no';
-			if ( method_exists( WC()->customer, 'get_billing_email' ) && ! empty( WC()->customer->get_billing_email() ) ) {
+			if ( null !== WC()->customer && method_exists( WC()->customer, 'get_billing_email' ) && ! empty( WC()->customer->get_billing_email() ) ) {
 				if ( email_exists( WC()->customer->get_billing_email() ) ) {
 					// Email exist in a user account.
 					$email_exists = 'yes';
@@ -532,7 +532,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function add_body_class( $class ) {
 			if ( is_checkout() && 'yes' === $this->shipping_methods_in_iframe ) {
 				// Don't display KCO Shipping Display body classes if we have a cart that doesn't needs payment.
-				if ( method_exists( WC()->cart, 'needs_payment' ) && ! WC()->cart->needs_payment() ) {
+				if ( null !== WC()->cart && method_exists( WC()->cart, 'needs_payment' ) && ! WC()->cart->needs_payment() ) {
 					return $class;
 				}
 
