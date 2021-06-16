@@ -91,7 +91,7 @@ function kco_wc_show_another_gateway_button() {
  */
 function kco_wc_get_selected_payment_method() {
 	$selected_payment_method = '';
-	if ( method_exists( WC()->session, 'get' ) && WC()->session->get( 'chosen_payment_method' ) ) {
+	if ( null !== WC()->session && method_exists( WC()->session, 'get' ) && WC()->session->get( 'chosen_payment_method' ) ) {
 		$selected_payment_method = WC()->session->get( 'chosen_payment_method' );
 	} else {
 		$available_payment_gateways = WC()->payment_gateways->get_available_payment_gateways();

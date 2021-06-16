@@ -200,7 +200,7 @@ class KCO_Templates {
 	 */
 	public function kco_wc_unrequire_wc_billing_state_field( $fields ) {
 		// Unrequire if chosen payment method is Klarna Checkout.
-		if ( method_exists( WC()->session, 'get' ) &&
+		if ( null !== WC()->session && method_exists( WC()->session, 'get' ) &&
 			WC()->session->get( 'chosen_payment_method' ) &&
 			'kco' === WC()->session->get( 'chosen_payment_method' )
 			) {
@@ -218,7 +218,7 @@ class KCO_Templates {
 	 */
 	public function kco_wc_unrequire_wc_shipping_state_field( $fields ) {
 		// Unrequire if chosen payment method is Klarna Checkout.
-		if ( method_exists( WC()->session, 'get' ) &&
+		if ( null !== WC()->session && method_exists( WC()->session, 'get' ) &&
 			WC()->session->get( 'chosen_payment_method' ) &&
 			'kco' === WC()->session->get( 'chosen_payment_method' )
 			) {
