@@ -413,7 +413,7 @@ jQuery( function( $ ) {
 						success: function( data ) {
 							try {
 								if ( 'success' === data.result ) {
-									kco_wc.logToFile( 'Successfully placed order. Sending "should_procede: true" to Klarna' );
+									kco_wc.logToFile( 'Successfully placed order. Sending "should_proceed: true" to Klarna' );
 									callback({ should_proceed: true });
 								} else {
 									throw 'Result failed';
