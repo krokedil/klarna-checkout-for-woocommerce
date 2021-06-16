@@ -62,6 +62,10 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.06.16    - version 2.5.7 =
+* Fix           - Fixed an issue with PHP 8.0 that could cause a fatal error.
+* Fix           - Fixed a typo in one of the log entries from the frontend JavaScript.
+
 = 2021.06.03    - version 2.5.6 =
 * Fix           - Update the minified JavaScript file from the 2.5.5 update that was missed.
 
