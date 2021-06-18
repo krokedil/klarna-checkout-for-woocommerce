@@ -11,7 +11,7 @@ const {
 } = kcoURLS;
 
 const getProducts = () => {
-	return createRequest(API_ORDER_ENDPOINT);
+	return createRequest(API_PRODUCTS_ENDPOINT);
 };
 const getProductById = (id) => {
 	return createRequest(`${API_PRODUCTS_ENDPOINT}${id}`);
