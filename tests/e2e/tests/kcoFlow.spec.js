@@ -100,7 +100,7 @@ const appliedCoupons = [couponPercent];
 const iframeShipping = "yes";
 
 // Tax Inclusive ( yes ) / Exclusive ( no )
-const inclusivePrice = "no";
+const inclusivePrice = "yes";
 
 /**
  * TEST INITIALIZATION
@@ -525,10 +525,8 @@ describe("KCO", () => {
 			response.data.shipping_address.postal_code.replace(/\s/g, "") ===
 			wooCommerceOrder.data.billing.postcode
 		) {
-			klarnaValues.postcode = response.data.shipping_address.postal_code.replace(
-				/\s/g,
-				""
-			);
+			klarnaValues.postcode =
+				response.data.shipping_address.postal_code.replace(/\s/g, "");
 			wooValues.postcode = wooCommerceOrder.data.billing.postcode;
 		}
 
