@@ -143,26 +143,21 @@ function kco_wc_prefill_consent() {
 		$credentials = KCO_WC()->credentials->get_credentials_from_session();
 		$merchant_id = $credentials['merchant_id'];
 
-		if ( 'de_DE' === get_locale() || 'de_DE_formal' === get_locale() ) {
-			$button_text = 'Meine Adressdaten vorausfüllen';
-			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
-			$popup_text  = 'In unserem Kassenbereich nutzen wir Klarna Checkout. Dazu werden Ihre Daten, wie E-Mail-Adresse, Vor- und
-			Nachname, Geburtsdatum, Adresse und Telefonnummer, soweit erforderlich, automatisch an Klarna AB übertragen,
-			sobald Sie in den Kassenbereich gelangen. Die Nutzungsbedingungen für Klarna Checkout finden Sie hier:
-			<a href="https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/de_de/checkout" target="_blank">https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/de_de/checkout</a>';
-		} else {
-			$button_text = 'Meine Adressdaten vorausfüllen';
-			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
-			$popup_text  = 'We use Klarna Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Klarna AB, enabling the provision of Klarna Checkout. These User Terms apply for the use of Klarna Checkout is available here: 
-			<a target="_blank" href="https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/en_us/checkout">https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/en_us/checkout</a>';
-		}
+		$button_text = __('Prefill my address', 'klarna-checkout-for-woocommerce');
+		$link_text   = __('The terms of use for data transfer apply', 'klarna-checkout-for-woocommerce');
+		$popup_text  = __('We use Klarna Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Klarna AB, enabling the provision of Klarna Checkout. These User Terms apply for the use of Klarna Checkout is available here:', 'klarna-checkout-for-woocommerce');
+		if ( 'de_DE' === get_locale() || 'de_DE_formal' === get_locale() )
+			$country_link = 'de_de';
+		else
+			$country_link = 'en_us';
+		$popup_text  .=	' <br /><br /><a target="_blank" href="https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/'.$country_link.'/checkout">https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/'.$country_link.'/checkout</a>';
 		?>
 		<p><a class="button" href="<?php echo esc_attr( $consent_url ); ?>"><?php echo esc_html( $button_text ); ?></a></p>
 		<p><a href="#TB_inline?width=600&height=550&inlineId=consent-text"
 			class="thickbox"><?php echo esc_html( $link_text ); ?></a>
 		</p>
 		<div id="consent-text" style="display:none;">
-			<p><?php echo esc_html( $popup_text ); ?></p>
+			<p><?php echo wp_kses( $popup_text, array('br' => array(), 'a' => array('href' => array(), 'target' => array())) ); ?></p>
 		</div>
 		<?php
 	}
