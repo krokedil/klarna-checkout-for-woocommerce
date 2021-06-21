@@ -30,6 +30,7 @@ const updateOptions = async (data) => woocommerce.updateOption(data);
 const createWCProduct = async (data) => woocommerce.createProduct(data);
 const getWCOrders = async () => woocommerce.getOrders();
 const getWCProductById = async (id) => woocommerce.getProductById(id);
+const pricesIncludeTax = async (data) => woocommerce.pricesIncludeTax(data);
 
 export default {
 	getKlarnaOrderById,
@@ -41,4 +42,5 @@ export default {
 	createWCProduct,
 	getWCOrders,
 	getWCProductById,
+	pricesIncludeTax,
 };

@@ -47,27 +47,19 @@ import {
 	/**
 	 * Products
 	 */
-	simpleProduct25,
-	simpleProduct12,
-	simpleProduct6,
-	simpleProduct0,
-	simpleProductSale25,
-	simpleProductSale12,
-	simpleProductSale6,
-	simpleProductSale0,
-	variableProduct25Black,
-	variableProduct25Blue,
-	variableProduct25Brown,
-	variableProduct25Green,
-	variableProductMixedBlackS,
-	variableProductMixedBlackM,
-	variableProductMixedBlackL,
-	variableProductMixedBlackXL,
-	variableProductMixedGreenS,
-	variableProductMixedGreenM,
-	variableProductMixedGreenL,
-	variableProductMixedGreenXL,
-	variableProductVirtualDownloadable25,
+	outOfStock,
+	variable25,
+	downloadable0,
+	downloadable25,
+	downloadableShipping0,
+	downloadableShipping25,
+	simple12,
+	simple6,
+	virtual0,
+	virtual25,
+	virtualDownloadable0,
+	virtualDownloadable25,
+	manyCharacters,
 } from "../config/config";
 
 import API from "../api/API";
@@ -77,6 +69,7 @@ import woocommerce from "../api/woocommerce";
 let page;
 let browser;
 let context;
+const productCounterArray = [];
 
 /**
  * TEST ELEMENTS SELECTORS
@@ -87,11 +80,9 @@ let context;
 const isUserLoggedIn = true;
 
 // Products selection
-const productsToCart = [
-	simpleProduct25,
-	variableProduct25Blue,
-	variableProduct25Green,
-];
+const productsToCart = [downloadable0, simple12, virtualDownloadable25];
+
+kcoUtils.createHelperArray(productsToCart, productCounterArray);
 
 // Shipping method selection
 const shippingMethod = freeShippingMethod;
@@ -107,6 +98,9 @@ const appliedCoupons = [couponPercent];
 
 // Shipping in KCO iFrame ("yes") / Standard WC ("no")
 const iframeShipping = "yes";
+
+// Tax Inclusive ( yes ) / Exclusive ( no )
+const inclusivePrice = "yes";
 
 /**
  * TEST INITIALIZATION
@@ -129,6 +123,10 @@ describe("KCO", () => {
 		} catch (error) {
 			console.log(error);
 		}
+
+		await kcoUtils.wcPricesIncludeTax({
+			value: inclusivePrice,
+		});
 
 		// Check for user logged in
 		if (isUserLoggedIn) {
@@ -186,7 +184,11 @@ describe("KCO", () => {
 		await page.waitForTimeout(2 * timeOutTime);
 
 		// Submit billing data
-		await kcoFrame.submitBillingForm(originalFrame, billingData, customerType);
+		await kcoFrame.submitBillingForm(
+			originalFrame,
+			billingData,
+			customerType
+		);
 
 		// Apply coupons
 		await kcoUtils.addCouponsOnCheckout(
@@ -381,17 +383,21 @@ describe("KCO", () => {
 						10
 					)
 				) {
-					klarnaValues.totalAmount.push(klarnaOrderLinesContainer[i].total_amount);
-					wooValues.totalAmount.push(parseInt(
-						Math.round(
-							(parseFloat(wooOrderLinesContainer[i].total) +
-								parseFloat(
-									wooOrderLinesContainer[i].total_tax
-								)) *
-								100
-						).toFixed(2),
-						10
-					));
+					klarnaValues.totalAmount.push(
+						klarnaOrderLinesContainer[i].total_amount
+					);
+					wooValues.totalAmount.push(
+						parseInt(
+							Math.round(
+								(parseFloat(wooOrderLinesContainer[i].total) +
+									parseFloat(
+										wooOrderLinesContainer[i].total_tax
+									)) *
+									100
+							).toFixed(2),
+							10
+						)
+					);
 				}
 
 				if (
@@ -460,8 +466,7 @@ describe("KCO", () => {
 		}
 
 		// Case for B2CB individual
-		if(customerType === 'person'){
-
+		if (customerType === "person") {
 			if (
 				response.data.shipping_address.title ===
 				wooCommerceOrder.data.billing.company
@@ -470,14 +475,14 @@ describe("KCO", () => {
 				wooValues.company = wooCommerceOrder.data.billing.company;
 			}
 
-		// Case for B2CB for company
-		} else if ( customerType === 'company') {
-
+			// Case for B2CB for company
+		} else if (customerType === "company") {
 			if (
 				response.data.shipping_address.organization_name ===
 				wooCommerceOrder.data.billing.company
 			) {
-				klarnaValues.company = response.data.shipping_address.organization_name;
+				klarnaValues.company =
+					response.data.shipping_address.organization_name;
 				wooValues.company = wooCommerceOrder.data.billing.company;
 			}
 		}
@@ -520,10 +525,8 @@ describe("KCO", () => {
 			response.data.shipping_address.postal_code.replace(/\s/g, "") ===
 			wooCommerceOrder.data.billing.postcode
 		) {
-			klarnaValues.postcode = response.data.shipping_address.postal_code.replace(
-				/\s/g,
-				""
-			);
+			klarnaValues.postcode =
+				response.data.shipping_address.postal_code.replace(/\s/g, "");
 			wooValues.postcode = wooCommerceOrder.data.billing.postcode;
 		}
 
@@ -562,16 +565,15 @@ describe("KCO", () => {
 		}
 
 		if (
-			response.data.order_lines[productsToCart.length].name ===
+			response.data.order_lines[productCounterArray.length].name ===
 			wooCommerceOrder.data.shipping_lines[0].method_title
 		) {
 			klarnaValues.shippingMethod =
-				response.data.order_lines[productsToCart.length].name;
+				response.data.order_lines[productCounterArray.length].name;
 			wooValues.shippingMethod =
 				wooCommerceOrder.data.shipping_lines[0].method_title;
 		}
 
-		// await page.waitForTimeout(4 * timeOutTime);
 		await page.waitForTimeout(timeOutTime);
 		const value = await page.$eval(".entry-title", (e) => e.textContent);
 		expect(value).toBe("Order received");
