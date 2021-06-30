@@ -1,5 +1,8 @@
+require("dotenv").config();
 const waitOn = require("wait-on");
 const { execSync } = require("child_process");
+
+const { SITEHOST, PORT, PLUGIN_NAME } = process.env;
 
 const executeCommand = (command) => {
 	const dockerRunCLI = "docker-compose run --rm wordpress-cli";
@@ -19,7 +22,7 @@ const installWP = () => {
 		admin: "admin",
 		pass: "password",
 		email: "info@example.com",
-		url: "http://localhost:8000",
+		url: `http://${SITEHOST}:${PORT}`,
 	};
 	const installCommand = wpInstallCommand(data);
 	executeCommand(installCommand);
@@ -33,15 +36,16 @@ const installTheme = (themeName = "storefront") => {
 	executeCommand(`wp theme install ${themeName}`);
 };
 
-const activateKCO = () =>
-	executeCommand(`wp plugin activate klarna-checkout-for-woocommerce`);
+const activateKCO = () => executeCommand(`wp plugin activate ${PLUGIN_NAME}`);
 
 const importDb = () =>
 	executeCommand(
-		"wp db import ./wp-content/plugins/klarna-checkout-for-woocommerce/tests/e2e/bin/data.sql"
+		`wp db import ./wp-content/plugins/${PLUGIN_NAME}/tests/e2e/bin/data.sql`
 	);
 
-waitOn({ resources: [`http://localhost:8000`] }).then(() => {
+waitOn({
+	resources: [`http://${SITEHOST}:${PORT}`],
+}).then(() => {
 	try {
 		// do stuff.
 		installWP();
