@@ -16,7 +16,8 @@ const settingsArray = {
 		merchant_id_eu: "",
 		shared_secret_eu: "",
 		test_merchant_id_eu: customerData.klarnaCredentials.test_merchant_id_eu,
-		test_shared_secret_eu: customerData.klarnaCredentials.test_shared_secret_eu,
+		test_shared_secret_eu:
+			customerData.klarnaCredentials.test_shared_secret_eu,
 		credentials_us: "",
 		merchant_id_us: "",
 		shared_secret_us: "",
@@ -24,7 +25,8 @@ const settingsArray = {
 		test_shared_secret_us: "",
 		shipping_section: "",
 		allow_separate_shipping: "no",
-		shipping_methods_in_iframe: customerData.shippingSelectors.iframe.iframeShipping,
+		shipping_methods_in_iframe:
+			customerData.shippingSelectors.iframe.iframeShipping,
 		shipping_details: "",
 		checkout_section: "",
 		send_product_urls: "yes",
@@ -44,7 +46,7 @@ const settingsArray = {
 		color_link: "",
 		radius_border: "",
 		add_to_email: "no",
-	}
+	},
 };
 
 export const shippingTargets = customerData.shipping.targets;
@@ -69,18 +71,18 @@ export const customerEmail = customerData.email;
 export const customerUsername = customerData.username;
 
 export const outOfStock = productIdData.out_of_stock;
-export const variable25 = productIdData.variable_25
-export const downloadable0 = productIdData.downloadable_0
-export const downloadable25 = productIdData.downloadable_25
-export const downloadableShipping0 = productIdData.downloadable_shipping_0
-export const downloadableShipping25 = productIdData.downloadable_shipping_25
-export const simple12 = productIdData.simple_12
-export const simple6 = productIdData.simple_6
-export const virtual0 = productIdData.virtual_0
-export const virtual25 = productIdData.virtual_25
-export const virtualDownloadable0 = productIdData.virtual_downloadable_0
-export const virtualDownloadable25 = productIdData.virtual_downloadable_25
-export const manyCharacters = productIdData.many_characters
+export const variable25 = productIdData.variable_25;
+export const downloadable0 = productIdData.downloadable_0;
+export const downloadable25 = productIdData.downloadable_25;
+export const downloadableShipping0 = productIdData.downloadable_shipping_0;
+export const downloadableShipping25 = productIdData.downloadable_shipping_25;
+export const simple12 = productIdData.simple_12;
+export const simple6 = productIdData.simple_6;
+export const virtual0 = productIdData.virtual_0;
+export const virtual25 = productIdData.virtual_25;
+export const virtualDownloadable0 = productIdData.virtual_downloadable_0;
+export const virtualDownloadable25 = productIdData.virtual_downloadable_25;
+export const manyCharacters = productIdData.many_characters;
 
 export const couponFixedCart = customerData.coupons.fixed_cart;
 export const couponFixedProduct = customerData.coupons.fixed_product;
