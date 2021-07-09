@@ -93,6 +93,7 @@ class KCO_Request_Cart {
 			$order_amount -= $this->get_shipping_amount();
 		}
 
+		if ( $order_amount < 0 ) {
 			return 0;
 		}
 
