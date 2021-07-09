@@ -92,6 +92,10 @@ class KCO_Request_Cart {
 		if ( isset( $settings['shipping_methods_in_iframe'] ) && 'yes' === $settings['shipping_methods_in_iframe'] ) {
 			$order_amount -= $this->get_shipping_amount();
 		}
+
+			return 0;
+		}
+
 		return $order_amount;
 	}
 
