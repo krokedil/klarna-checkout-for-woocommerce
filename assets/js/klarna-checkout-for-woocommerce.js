@@ -474,12 +474,14 @@ jQuery( function( $ ) {
 								$( '#shipping_last_name' ).val( ( ( 'family_name' in data ) ? data.family_name : '' ) );
 								$( '#shipping_postcode' ).val( ( ( 'postal_code' in data) ? data.postal_code : '' ) );
 								$( '#shipping_country' ).val( ( ( 'country' in data ) ? country : '' ) );
+								$( '#shipping_country' ).change();
 							} else {
 								$( '#billing_first_name' ).val( ( ( 'given_name' in data ) ? data.given_name : '' ) );
 								$( '#billing_last_name' ).val( ( ( 'family_name' in data ) ? data.family_name : '' ) );
 								$( '#billing_postcode' ).val( ( ( 'postal_code' in data) ? data.postal_code : '' ) );
 								$( '#billing_country' ).val( ( ( 'country' in data ) ? country : '' ) );
 								$( '#billing_email' ).val( ( ( 'email' in data ) ? data.email : '' ) );
+								$( '#billing_country' ).change();
 								$( '#billing_email' ).change();
 								$( '#billing_email' ).blur();
 							}
