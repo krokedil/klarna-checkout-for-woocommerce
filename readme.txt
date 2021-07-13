@@ -6,7 +6,7 @@ Requires at least: 4.0
 Tested up to: 5.7.2
 Requires PHP: 5.6
 WC requires at least: 3.4.0
-WC tested up to: 5.4.0
+WC tested up to: 5.4.1
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.07.12    - version 2.5.8 =
+* Fix           - Trigger .change after adding country via shipping_address_change. So country change in checkout is update correctly in Woo.
+
+= 2021.06.16    - version 2.5.7 =
+* Fix           - Fixed an issue with PHP 8.0 that could cause a fatal error.
+* Fix           - Fixed a typo in one of the log entries from the frontend JavaScript.
+
 = 2021.06.03    - version 2.5.6 =
 * Fix           - Update the minified JavaScript file from the 2.5.5 update that was missed.
 

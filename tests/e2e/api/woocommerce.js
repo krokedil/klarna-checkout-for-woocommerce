@@ -7,10 +7,11 @@ const {
 	API_CUSTOMER_ENDPOINT,
 	API_SESSION_ENDPOINT,
 	API_WC_OPTIONS,
+	API_WC_PRICE_INC_EXC,
 } = kcoURLS;
 
 const getProducts = () => {
-	return createRequest(API_ORDER_ENDPOINT);
+	return createRequest(API_PRODUCTS_ENDPOINT);
 };
 const getProductById = (id) => {
 	return createRequest(`${API_PRODUCTS_ENDPOINT}${id}`);
@@ -39,6 +40,11 @@ const updateOption = async (data) => {
 const createProduct = async (data) => {
 	return createRequest(API_PRODUCTS_ENDPOINT, post, data);
 };
+
+const pricesIncludeTax = async (data) => {
+	return createRequest(API_WC_PRICE_INC_EXC, put, data);
+};
+
 export default {
 	getProducts,
 	getProductById,
@@ -49,4 +55,5 @@ export default {
 	clearSession,
 	updateOption,
 	createProduct,
+	pricesIncludeTax,
 };

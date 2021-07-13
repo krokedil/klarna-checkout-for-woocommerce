@@ -102,7 +102,7 @@ class KCO_Request {
 	 */
 	protected function get_purchase_country() {
 		// Try to use customer country if available.
-		if ( method_exists( WC()->customer, 'get_billing_country' ) &&
+		if ( null !== WC()->customer && method_exists( WC()->customer, 'get_billing_country' ) &&
 			! empty( WC()->customer->get_billing_country() ) &&
 			strlen( WC()->customer->get_billing_country() ) === 2
 			) {
