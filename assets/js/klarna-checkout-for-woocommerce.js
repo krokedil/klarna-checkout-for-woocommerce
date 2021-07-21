@@ -419,6 +419,18 @@ jQuery( function( $ ) {
 									throw 'Result failed';
 								}
 							} catch ( err ) {
+
+								// Reload page.
+								if ( true === data.reload ) {
+									window.location.reload();
+									return;
+								}
+
+								// Trigger update in case we need a fresh nonce.
+								if ( true === data.refresh ) {
+									$( 'body' ).trigger( 'update_checkout' );
+								}
+
 								if ( data.messages )  {
 									kco_wc.logToFile( 'Checkout error | ' + data.messages );
 									kco_wc.failOrder( 'submission', data.messages, callback );
