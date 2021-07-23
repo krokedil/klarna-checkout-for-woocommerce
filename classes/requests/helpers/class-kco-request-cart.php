@@ -338,15 +338,14 @@ class KCO_Request_Cart {
 			 *
 			 * @var WC_GC_Gift_Card_Data $wc_gc_gift_card_data
 			*/
-			/*
-			$giftcards     = WC_GC()->giftcards->get();
-			$cover_balance = WC_GC()->giftcards->cover_balance( 63.5, WC_GC()->giftcards->get_applied_giftcards_from_session() );
-			error_log( 'cover_balance ' . var_export( $cover_balance, true ) );
-			error_log( 'from session ' . var_export( WC_GC()->giftcards->get_applied_giftcards_from_session(), true ) );
+			$totals_before_giftcard = round( WC()->cart->get_subtotal() + WC()->cart->get_shipping_total() + WC()->cart->get_subtotal_tax() + WC()->cart->get_shipping_tax(), wc_get_price_decimals() );
+			$giftcards              = WC_GC()->giftcards->get();
+			$giftcards_used         = WC_GC()->giftcards->cover_balance( $totals_before_giftcard, WC_GC()->giftcards->get_applied_giftcards_from_session() );
+
 			foreach ( WC_GC()->giftcards->get_applied_giftcards_from_session() as $wc_gc_gift_card_data ) {
 				$gift_card_code   = $wc_gc_gift_card_data->get_data()['code'];
-				$gift_card_amount = - $wc_gc_gift_card_data->get_data()['balance'] * 100;
-				error_log( 'get_applied_giftcards_from_session ' . var_export( WC_GC()->giftcards->get_applied_giftcards_from_session(), true ) );
+				$gift_card_amount = - $giftcards_used['total_amount'] * 100;
+
 				$gift_card = array(
 					'type'                  => 'gift_card',
 					'reference'             => $gift_card_code,
@@ -362,7 +361,6 @@ class KCO_Request_Cart {
 				$this->order_lines[] = $gift_card;
 
 			}
-			*/
 		}
 
 		// YITH Gift Cards.
