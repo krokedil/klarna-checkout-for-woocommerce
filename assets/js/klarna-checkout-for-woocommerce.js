@@ -397,7 +397,6 @@ jQuery( function( $ ) {
 			kco_wc.blocked = true;
 			kco_wc.getKlarnaOrder().done( function(response) {
 				if(response.success) {
-					console.log( 2 );
 					$( '.woocommerce-checkout-review-order-table' ).block({
 						message: null,
 						overlayCSS: {
@@ -452,7 +451,6 @@ jQuery( function( $ ) {
 						}
 					});
 				} else {
-					console.log( 3 );
 					kco_wc.failOrder( 'get_order', '<div class="woocommerce-error">' + 'Failed to get the order from Klarna.' + '</div>', callback );
 				}
 			});
