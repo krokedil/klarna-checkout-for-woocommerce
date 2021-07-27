@@ -420,6 +420,14 @@ jQuery( function( $ ) {
 								}
 							} catch ( err ) {
 
+								if ( data.messages )  {
+									var message = data.messages;
+									kco_wc.logToFile( 'Checkout error | ' + data.messages );
+								} else {
+									var message = '<div class="woocommerce-error">Checkout error</div>';
+									kco_wc.logToFile( 'Checkout error | No message' );
+								}
+
 								// Reload page.
 								if ( true === data.reload ) {
 									window.location.reload();
@@ -430,14 +438,8 @@ jQuery( function( $ ) {
 								if ( true === data.refresh ) {
 									$( 'body' ).trigger( 'update_checkout' );
 								}
-
-								if ( data.messages )  {
-									kco_wc.logToFile( 'Checkout error | ' + data.messages );
-									kco_wc.failOrder( 'submission', data.messages, callback );
-								} else {
-									kco_wc.logToFile( 'Checkout error | No message' );
-									kco_wc.failOrder( 'submission', '<div class="woocommerce-error">Checkout error</div>', callback );
-								}
+								
+								kco_wc.failOrder( 'submission', message, callback );
 							}
 						},
 						error: function( data ) {
