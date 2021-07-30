@@ -41,8 +41,10 @@ jQuery( function( $ ) {
 				$( '#ship-to-different-address-checkbox' ).prop( 'checked', true);
 			}
 
-			kco_wc.moveExtraCheckoutFields();
-			kco_wc.updateShipping( false );
+			if( ! kco_params.pay_for_order ) {
+				kco_wc.moveExtraCheckoutFields();
+				kco_wc.updateShipping( false );
+			}
 		},
 
 		/**
@@ -241,6 +243,7 @@ jQuery( function( $ ) {
 					opacity: 0.6
 				}
 			});
+
 			var ajax = $.ajax({
 				type: 'POST',
 				url: kco_params.get_klarna_order_url,
@@ -337,6 +340,7 @@ jQuery( function( $ ) {
 		failOrder: function( event, error_message, callback ) {
 			callback({ should_proceed: false });
 			kco_wc.blocked = false;
+			var className = kco_params.pay_for_order ? 'div.woocommerce-notices-wrapper' : 'form.checkout';
 			// Renable the form.
 			$( 'body' ).trigger( 'updated_checkout' );
 			$( kco_wc.checkoutFormSelector ).removeClass( 'processing' );
@@ -345,12 +349,12 @@ jQuery( function( $ ) {
 
 			// Print error messages, and trigger checkout_error, and scroll to notices.
 			$( '.woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message' ).remove();
-			$( 'form.checkout' ).prepend( '<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' + error_message + '</div>' ); // eslint-disable-line max-len
-			$( 'form.checkout' ).removeClass( 'processing' ).unblock();
-			$( 'form.checkout' ).find( '.input-text, select, input:checkbox' ).trigger( 'validate' ).blur();
+			$( className ).prepend( '<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' + error_message + '</div>' ); // eslint-disable-line max-len
+			$( className ).removeClass( 'processing' ).unblock();
+			$( className ).find( '.input-text, select, input:checkbox' ).trigger( 'validate' ).blur();
 			$( document.body ).trigger( 'checkout_error' , [ error_message ] );
 			$( 'html, body' ).animate( {
-				scrollTop: ( $( 'form.checkout' ).offset().top - 100 )
+				scrollTop: ( $( className ).offset().top - 100 )
 			}, 1000 );
 		},
 
@@ -396,50 +400,52 @@ jQuery( function( $ ) {
 		placeKlarnaOrder: function(callback) {
 			kco_wc.blocked = true;
 			kco_wc.getKlarnaOrder().done( function(response) {
-				if(response.success) {
-					console.log( 2 );
-					$( '.woocommerce-checkout-review-order-table' ).block({
-						message: null,
-						overlayCSS: {
-							background: '#fff',
-							opacity: 0.6
-						}
-					});
-					$.ajax({
-						type: 'POST',
-						url: kco_params.submit_order,
-						data: $('form.checkout').serialize(),
-						dataType: 'json',
-						success: function( data ) {
-							try {
-								if ( 'success' === data.result ) {
-									kco_wc.logToFile( 'Successfully placed order. Sending "should_proceed: true" to Klarna' );
-									callback({ should_proceed: true });
-								} else {
-									throw 'Result failed';
-								}
-							} catch ( err ) {
-								if ( data.messages )  {
-									kco_wc.logToFile( 'Checkout error | ' + data.messages );
-									kco_wc.failOrder( 'submission', data.messages, callback );
-								} else {
-									kco_wc.logToFile( 'Checkout error | No message' );
-									kco_wc.failOrder( 'submission', '<div class="woocommerce-error">Checkout error</div>', callback );
-								}
-							}
-						},
-						error: function( data ) {
-							try {
-								kco_wc.logToFile( 'AJAX error | ' + JSON.stringify(data) );
-							} catch( e ) {
-								kco_wc.logToFile( 'AJAX error | Failed to parse error message.' );
-							}
-							kco_wc.failOrder( 'ajax-error', '<div class="woocommerce-error">Internal Server Error</div>', callback )
-						}
-					});
+				if(response.success ) {
+					kco_wc.submitOrder()
 				} else {
-					console.log( 3 );
 					kco_wc.failOrder( 'get_order', '<div class="woocommerce-error">' + 'Failed to get the order from Klarna.' + '</div>', callback );
+				}
+			});
+		},
+
+		submitOrder: function(callback) {
+			$( '.woocommerce-checkout-review-order-table' ).block({
+				message: null,
+				overlayCSS: {
+					background: '#fff',
+					opacity: 0.6
+				}
+			});
+			$.ajax({
+				type: 'POST',
+				url: kco_params.submit_order,
+				data: $('form.checkout').serialize(),
+				dataType: 'json',
+				success: function( data ) {
+					try {
+						if ( 'success' === data.result ) {
+							kco_wc.logToFile( 'Successfully placed order. Sending "should_proceed: true" to Klarna' );
+							callback({ should_proceed: true });
+						} else {
+							throw 'Result failed';
+						}
+					} catch ( err ) {
+						if ( data.messages )  {
+							kco_wc.logToFile( 'Checkout error | ' + data.messages );
+							kco_wc.failOrder( 'submission', data.messages, callback );
+						} else {
+							kco_wc.logToFile( 'Checkout error | No message' );
+							kco_wc.failOrder( 'submission', '<div class="woocommerce-error">Checkout error</div>', callback );
+						}
+					}
+				},
+				error: function( data ) {
+					try {
+						kco_wc.logToFile( 'AJAX error | ' + JSON.stringify(data) );
+					} catch( e ) {
+						kco_wc.logToFile( 'AJAX error | Failed to parse error message.' );
+					}
+					kco_wc.failOrder( 'ajax-error', '<div class="woocommerce-error">Internal Server Error</div>', callback )
 				}
 			});
 		},
@@ -504,7 +510,11 @@ jQuery( function( $ ) {
 						},
 						'validation_callback': function( data, callback ) {
 							kco_wc.logToFile( 'validation_callback from Klarna triggered' );
-							kco_wc.placeKlarnaOrder(callback);
+							if( kco_params.pay_for_order ) {
+								callback({ should_proceed: true });
+							} else {
+								kco_wc.placeKlarnaOrder(callback);
+							}
 						}
 					});
 				});

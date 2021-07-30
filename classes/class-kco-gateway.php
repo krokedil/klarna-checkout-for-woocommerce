@@ -228,8 +228,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
+			$pay_for_order = false;
 			if ( is_wc_endpoint_url( 'order-pay' ) ) {
-				return;
+				$pay_for_order = true;
 			}
 
 			if ( ! kco_wc_prefill_allowed() ) {
@@ -283,6 +284,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'timeout_message'              => __( 'Please try again, something went wrong with processing your order.', 'klarna-checkout-for-woocommerce' ),
 				'timeout_time'                 => apply_filters( 'kco_checkout_timeout_duration', 20 ),
 				'countries'                    => kco_get_country_codes(),
+				'pay_for_order'                => $pay_for_order,
 			);
 
 			if ( version_compare( WC_VERSION, '3.9', '>=' ) ) {
@@ -291,7 +293,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			wp_localize_script( 'kco', 'kco_params', $checkout_localize_params );
 
 			wp_enqueue_script( 'kco' );
-			wp_enqueue_style( 'kco' );
+
+			if ( ! $pay_for_order ) {
+				wp_enqueue_style( 'kco' );
+			}
 		}
 
 
