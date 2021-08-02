@@ -184,37 +184,6 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 								</div>
 					</div>
 				</div>
-
-				<div id="klarna-sidebar">
-
-					<div class="kb-sidebar-section" >
-						<h1 id="kb-sidebar-title">The future proof integration</h1>
-							<div class="kb-sidebar-content">
-								<p id="kb-sidebar-main-text">
-									Klarna is entering the new world of smooth. We would love for you to join us on the ride and to do so you'll need
-									to upgrade your Klarna integration to the latest one.
-								<br>
-								<br>
-									By upgrading your current version to Klarna's latest platform you will always get the
-									latest features that Klarna develops
-								</p>
-								<div id="sidebar-link-holder">
-								<a id="kb-sidebar-button-left" class="kb-sidebar-button"
-									href="<?php echo esc_attr( self::get_go_live_url() ); ?>"
-									target="_blank">Get started
-								</a>
-								</div>
-							</div>
-
-								<div id="kb-sidebar-bottom-holder">
-									<p id="kb-sidebar-logo-follow-up-text">
-										Pay later with
-									</p>
-									<img id="kb-sidebar-klarna-logo-left"
-									src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_white.png">
-								</div>
-					</div>
-			</div>
 			<div class="save-separator"></div>
 			<?php
 		}
