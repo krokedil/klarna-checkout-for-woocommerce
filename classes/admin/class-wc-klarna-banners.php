@@ -19,7 +19,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		 * WC_Klarna_Banners constructor.
 		 */
 		public function __construct() {
-			add_action( 'in_admin_header', array( $this, 'klarna_banner' ) );
+			add_action( 'admin_notices', array( $this, 'klarna_banner' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_css' ) );
 			add_action( 'wp_ajax_hide_klarna_banner', array( $this, 'hide_klarna_banner' ) );
 			add_action( 'wp_ajax_nopriv_hide_klarna_banner', array( $this, 'hide_klarna_banner' ) );
