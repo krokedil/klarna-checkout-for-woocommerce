@@ -397,7 +397,6 @@ jQuery( function( $ ) {
 			kco_wc.blocked = true;
 			kco_wc.getKlarnaOrder().done( function(response) {
 				if(response.success) {
-					console.log( 2 );
 					$( '.woocommerce-checkout-review-order-table' ).block({
 						message: null,
 						overlayCSS: {
@@ -419,13 +418,27 @@ jQuery( function( $ ) {
 									throw 'Result failed';
 								}
 							} catch ( err ) {
+
 								if ( data.messages )  {
+									var message = data.messages;
 									kco_wc.logToFile( 'Checkout error | ' + data.messages );
-									kco_wc.failOrder( 'submission', data.messages, callback );
 								} else {
+									var message = '<div class="woocommerce-error">Checkout error</div>';
 									kco_wc.logToFile( 'Checkout error | No message' );
-									kco_wc.failOrder( 'submission', '<div class="woocommerce-error">Checkout error</div>', callback );
 								}
+
+								// Reload page.
+								if ( true === data.reload ) {
+									window.location.reload();
+									return;
+								}
+
+								// Trigger update in case we need a fresh nonce.
+								if ( true === data.refresh ) {
+									$( 'body' ).trigger( 'update_checkout' );
+								}
+								
+								kco_wc.failOrder( 'submission', message, callback );
 							}
 						},
 						error: function( data ) {
@@ -438,7 +451,6 @@ jQuery( function( $ ) {
 						}
 					});
 				} else {
-					console.log( 3 );
 					kco_wc.failOrder( 'get_order', '<div class="woocommerce-error">' + 'Failed to get the order from Klarna.' + '</div>', callback );
 				}
 			});

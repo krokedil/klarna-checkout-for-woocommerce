@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.7.2
+Tested up to: 5.8.0
 Requires PHP: 5.6
 WC requires at least: 3.4.0
-WC tested up to: 5.4.1
+WC tested up to: 5.5.2
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,13 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.08.03    - version 2.5.9 =
+* Enhancement   - Added a filter to the fields we ignore when moving extra checkout fields on the checkout page. This filter is "kco_ignored_checkout_fields" and expects an array of strings that are the HTML element IDs of the fields you wish to not have moved.
+* Fix           - Fixed a bug causing you to have to click some setting groups twice to have them properly expand.
+* Fix           - Fixed an issue that could happen if a customer no longer had shipping options available to them, the old methods would still show. (Thank you Himanshu Seth!).
+* Fix           - Removed the Klarna banner from the sidebar on the settings page.
+* Fix           - Fixed an issue that could happen if a coupon a customer was using is no longer valid for the customer. The checkout would not be updated properly.
+
 = 2021.07.12    - version 2.5.8 =
 * Fix           - Trigger .change after adding country via shipping_address_change. So country change in checkout is update correctly in Woo.
 

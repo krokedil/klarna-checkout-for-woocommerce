@@ -8,24 +8,22 @@ jQuery( function($) {
 	var credentialsFields = 'input#woocommerce_kco_test_merchant_id_eu, input#woocommerce_kco_merchant_id_eu, input#woocommerce_kco_test_merchant_id_us, input#woocommerce_kco_merchant_id_us';
 
 
-	titles.append(' <a href="#" style="font-size:12px; font-weight: normal; text-decoration: none"><span class="dashicons dashicons-arrow-down-alt2"></span></a>');
+	titles.append(' <a href="#" class="collapsed" style="font-size:12px; font-weight: normal; text-decoration: none"><span class="dashicons dashicons-arrow-down-alt2"></span></a>');
 	tables.css('marginLeft', '20px').hide();
 	if(location === 'EU') {
 		var title = $('#woocommerce_kco_credentials_eu');
-		$('#woocommerce_kco_credentials_us').find('a').addClass('collapsed');
 		title.find('a').html('<span class="dashicons dashicons-arrow-up-alt2">');
 		title.next().show();
 	} else if( location === 'US') {
 		var title = $('#woocommerce_kco_credentials_us');
-		$('#woocommerce_kco_credentials_eu').find('a').addClass('collapsed');
 		title.find('a').html('<span class="dashicons dashicons-arrow-up-alt2">');
 		title.next().show();
 	} else {
 		var title = titles;
 	}
-	$('#woocommerce_kco_color_settings_title').find('a').addClass('collapsed');
 
 	titles.find('a').click(function(e) {
+		console.log('click');
 		e.preventDefault();
 
 		if ($(this).hasClass('collapsed')) {
