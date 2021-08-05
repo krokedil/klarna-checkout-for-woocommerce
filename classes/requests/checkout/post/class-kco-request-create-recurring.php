@@ -20,7 +20,7 @@ class KCO_Request_Create_Recurring extends KCO_Request {
 	 * @param string $recurring_token The Klarna recurring token.
 	 * @return array
 	 */
-	public function request( $order_id = null, $recurring_token ) {
+	public function request( $order_id = null, $recurring_token = null ) {
 		$request_url       = $this->get_api_url_base() . 'customer-token/v1/tokens/' . $recurring_token . '/order';
 		$request_args      = apply_filters( 'kco_wc_create_recurring_order', $this->get_request_args( $order_id ) );
 		$response          = wp_remote_request( $request_url, $request_args );

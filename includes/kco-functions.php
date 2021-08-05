@@ -12,10 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Gets a Klarna order. Either creates or updates existing order.
  *
- * @param int $order_id The WooCommerce order id.
  * @return array
  */
-function kco_create_or_update_order( $order_id = null ) {
+function kco_create_or_update_order() {
 	// Need to calculate these here, because WooCommerce hasn't done it yet.
 	WC()->cart->calculate_fees();
 	WC()->cart->calculate_shipping();
@@ -46,10 +45,52 @@ function kco_create_or_update_order( $order_id = null ) {
 }
 
 /**
- * Echoes Klarna Checkout iframe snippet.
+ * Creates or updates a Klarna order for the Pay for order feature.
+ *
+ * @return array
  */
-function kco_wc_show_snippet() {
-	$klarna_order = kco_create_or_update_order();
+function kco_create_or_update_order_pay_for_order() {
+	global $wp;
+	$order_id = $wp->query_vars['order-pay'];
+
+	if ( get_post_meta( $order_id, 'kco_order_id' ) ) { // Check if we have an order id.
+		$klarna_order_id = get_post_meta( $order_id, 'kco_order_id' );
+		// Try to update the order, if it fails try to create new order.
+		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id, $order_id, true );
+		if ( ! $klarna_order ) {
+			// If update order failed try to create new order.
+			$klarna_order = KCO_WC()->api->create_klarna_order( $order_id );
+			if ( ! $klarna_order ) {
+				// If failed then bail.
+				return;
+			}
+			update_post_meta( $order_id, 'kco_wc_order_id', $klarna_order['order_id'] );
+			return $klarna_order;
+		}
+		return $klarna_order;
+	} else {
+		// Create new order, since we dont have one.
+		$klarna_order = KCO_WC()->api->create_klarna_order( $order_id );
+		if ( ! $klarna_order ) {
+			return;
+		}
+		update_post_meta( $order_id, 'kco_wc_order_id', $klarna_order['order_id'] );
+		return $klarna_order;
+	}
+}
+
+/**
+ * Echoes Klarna Checkout iframe snippet.
+ *
+ * @param bool $pay_for_order If this is for a pay for order page or not.
+ * @return void
+ */
+function kco_wc_show_snippet( $pay_for_order = false ) {
+	if ( $pay_for_order ) {
+		$klarna_order = kco_create_or_update_order_pay_for_order();
+	} else {
+		$klarna_order = kco_create_or_update_order();
+	}
 	do_action( 'kco_wc_show_snippet', $klarna_order );
 	echo $klarna_order['html_snippet']; // phpcs:ignore WordPress -- Can not escape this, since its the iframe snippet.
 }
@@ -482,7 +523,7 @@ function kco_unset_sessions() {
  * @param string $klarna_order_id The Klarna Order id.
  * @return void
  */
-function kco_confirm_klarna_order( $order_id = null, $klarna_order_id ) {
+function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 	if ( $order_id ) {
 		$order = wc_get_order( $order_id );
 		// If the order is already completed, return.

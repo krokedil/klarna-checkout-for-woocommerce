@@ -20,9 +20,9 @@ class KCO_API {
 	 *
 	 * @return mixed
 	 */
-	public function create_klarna_order() {
+	public function create_klarna_order( $order_id = false ) {
 		$request  = new KCO_Request_Create();
-		$response = $request->request();
+		$response = $request->request( $order_id );
 
 		return $this->check_for_api_error( $response );
 	}
