@@ -202,7 +202,7 @@ class KCO_Subscription {
 	 * @param array $klarna_order The Klarna order.
 	 * @return void
 	 */
-	public function set_recurring_token_for_order( $order_id = null, $klarna_order ) {
+	public function set_recurring_token_for_order( $order_id = null, $klarna_order = null ) {
 		$wc_order = wc_get_order( $order_id );
 		if ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
 			$subscriptions   = wcs_get_subscriptions_for_order( $order_id );
@@ -235,7 +235,7 @@ class KCO_Subscription {
 	 * @param array $klarna_order The Klarna order.
 	 * @return void
 	 */
-	public function set_recurring_token_for_subscription( $subscription_id = null, $klarna_order ) {
+	public function set_recurring_token_for_subscription( $subscription_id = null, $klarna_order = null ) {
 		if ( isset( $klarna_order['recurring_token'] ) ) {
 			$recurring_token = $klarna_order['recurring_token'];
 			update_post_meta( $subscription_id, '_kco_recurring_token', $recurring_token );

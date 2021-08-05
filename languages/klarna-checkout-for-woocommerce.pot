@@ -79,7 +79,7 @@ msgid "There was an error installing the addon. Please try again."
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:110, ../includes/kco-functions.php:522
+#: ../classes/class-kco-api-callbacks.php:110, ../includes/kco-functions.php:563
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
@@ -87,7 +87,7 @@ msgstr ""
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:104, ../includes/kco-functions.php:514
+#: ../classes/class-kco-api-callbacks.php:104, ../includes/kco-functions.php:555
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
@@ -456,23 +456,23 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:280
+#: ../classes/class-kco-gateway.php:281
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:283
+#: ../classes/class-kco-gateway.php:284
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:508
+#: ../classes/class-kco-gateway.php:513
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:567
+#: ../classes/class-kco-gateway.php:572
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:588, ../classes/class-kco-gateway.php:609
+#: ../classes/class-kco-gateway.php:593, ../classes/class-kco-gateway.php:614
 msgid "Reference:"
 msgstr ""
 
@@ -513,7 +513,7 @@ msgstr ""
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
-#: ../classes/class-kco-templates.php:148
+#: ../classes/class-kco-templates.php:179
 msgid "Failed to load Klarna Checkout template file."
 msgstr ""
 
@@ -537,15 +537,15 @@ msgstr ""
 msgid "Shipping"
 msgstr ""
 
-#: ../includes/kco-functions.php:77
+#: ../includes/kco-functions.php:118
 msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:533
+#: ../includes/kco-functions.php:574
 msgid "Waiting for verification from Klarnas push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:528
+#: ../includes/kco-functions.php:569
 msgid "Klarna Checkout order was rejected"
 msgstr ""
 
