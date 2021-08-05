@@ -401,51 +401,47 @@ jQuery( function( $ ) {
 			kco_wc.blocked = true;
 			kco_wc.getKlarnaOrder().done( function(response) {
 				if(response.success ) {
-					kco_wc.submitOrder()
+					$( '.woocommerce-checkout-review-order-table' ).block({
+						message: null,
+						overlayCSS: {
+							background: '#fff',
+							opacity: 0.6
+						}
+					});
+					$.ajax({
+						type: 'POST',
+						url: kco_params.submit_order,
+						data: $('form.checkout').serialize(),
+						dataType: 'json',
+						success: function( data ) {
+							try {
+								if ( 'success' === data.result ) {
+									kco_wc.logToFile( 'Successfully placed order. Sending "should_proceed: true" to Klarna' );
+									callback({ should_proceed: true });
+								} else {
+									throw 'Result failed';
+								}
+							} catch ( err ) {
+								if ( data.messages )  {
+									kco_wc.logToFile( 'Checkout error | ' + data.messages );
+									kco_wc.failOrder( 'submission', data.messages, callback );
+								} else {
+									kco_wc.logToFile( 'Checkout error | No message' );
+									kco_wc.failOrder( 'submission', '<div class="woocommerce-error">Checkout error</div>', callback );
+								}
+							}
+						},
+						error: function( data ) {
+							try {
+								kco_wc.logToFile( 'AJAX error | ' + JSON.stringify(data) );
+							} catch( e ) {
+								kco_wc.logToFile( 'AJAX error | Failed to parse error message.' );
+							}
+							kco_wc.failOrder( 'ajax-error', '<div class="woocommerce-error">Internal Server Error</div>', callback )
+						}
+					});
 				} else {
 					kco_wc.failOrder( 'get_order', '<div class="woocommerce-error">' + 'Failed to get the order from Klarna.' + '</div>', callback );
-				}
-			});
-		},
-
-		submitOrder: function(callback) {
-			$( '.woocommerce-checkout-review-order-table' ).block({
-				message: null,
-				overlayCSS: {
-					background: '#fff',
-					opacity: 0.6
-				}
-			});
-			$.ajax({
-				type: 'POST',
-				url: kco_params.submit_order,
-				data: $('form.checkout').serialize(),
-				dataType: 'json',
-				success: function( data ) {
-					try {
-						if ( 'success' === data.result ) {
-							kco_wc.logToFile( 'Successfully placed order. Sending "should_proceed: true" to Klarna' );
-							callback({ should_proceed: true });
-						} else {
-							throw 'Result failed';
-						}
-					} catch ( err ) {
-						if ( data.messages )  {
-							kco_wc.logToFile( 'Checkout error | ' + data.messages );
-							kco_wc.failOrder( 'submission', data.messages, callback );
-						} else {
-							kco_wc.logToFile( 'Checkout error | No message' );
-							kco_wc.failOrder( 'submission', '<div class="woocommerce-error">Checkout error</div>', callback );
-						}
-					}
-				},
-				error: function( data ) {
-					try {
-						kco_wc.logToFile( 'AJAX error | ' + JSON.stringify(data) );
-					} catch( e ) {
-						kco_wc.logToFile( 'AJAX error | Failed to parse error message.' );
-					}
-					kco_wc.failOrder( 'ajax-error', '<div class="woocommerce-error">Internal Server Error</div>', callback )
 				}
 			});
 		},
