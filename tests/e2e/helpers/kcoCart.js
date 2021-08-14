@@ -33,14 +33,31 @@ const addSingleProductToCart = async (page, productId) => {
  * @param products
  * @returns {Promise<void>}
  */
-const addMultipleProductsToCart = async (page, products) => {
+const addMultipleProductsToCart = async (page, products, data) => {
 	const timer = products.length;
 
 	await page.waitForTimeout(timer * 800);
+	let ids = [];
+
+	products.forEach( name => {
+		data.products.simple.forEach(product => {
+			if(name === product.name) {
+				ids.push(product.id);
+			}
+		});
+
+		data.products.variable.forEach(product => {
+			product.attribute.options.forEach(variation => {
+				if(name === variation.name) {
+					ids.push(variation.id);
+				}
+			});
+		});
+	});
 
 	(async function addEachProduct() {
-		for (let i = 0; i < products.length + 1; i += 1) {
-			await addSingleProductToCart(page, products[i]);
+		for (let i = 0; i < ids.length + 1; i += 1) {
+			await addSingleProductToCart(page, ids[i]);
 		}
 	})();
 

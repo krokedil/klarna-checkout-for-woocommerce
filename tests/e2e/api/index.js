@@ -45,15 +45,15 @@ const createRequest = async (endpoint, method = "GET", data = null) => {
 			response = axios.get(requestData.url, config);
 			break;
 		case post:
-			response = axios.post(requestData.url, data, config);
+			response = axios.post(requestData.url, data, config).catch(e => console.log(e));
 			break;
 		case put:
 			response = axios.put(requestData.url, data, config);
 			break;
 		default:
-			return Promise.reject(
-				new Error("Unsupported method")
-			).then((result) => console.log(result));
+			return Promise.reject(new Error("Unsupported method")).then(
+				(result) => console.log(result)
+			);
 	}
 	return response;
 };

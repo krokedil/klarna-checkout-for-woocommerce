@@ -1,0 +1,133 @@
+{
+    "url": "http://localhost:8000/",
+    "baseUrl": "",
+    "users": {
+        "admin": {
+            "username": "admin",
+            "password": "password",
+            "klarnaOrderEndpoint": "https://api.playground.klarna.com/ordermanagement/v1/orders/"
+        },
+        "customer": {
+            "username": "ruben",
+            "password": "password",
+            "cardNumber": "4111 1111 1111 1111",
+            "pinNumber": "410321-9202",
+            "email": "test@krokedil.se",
+            "first_name": "RUBEN",
+            "last_name": "HENRIKSSON",
+            "phone": "070-999 91 23",
+            "organizationName": "KROKEDIL",
+            "billingData": {
+                "organizationIDSelector": "[data-cid='am.organization_registration_id']",
+                "organizationID": "002031-0132",
+                "organizationNameSelector": "[data-cid='am.organization_name']",
+                "organizationName": "KROKEDIL",
+                "firstNameSelector": "[data-cid='am.given_name']",
+                "firstName": "RUBEN",
+                "lastNameSelector": "[data-cid='am.family_name']",
+                "lastName": "HENRIKSSON",
+                "telephoneSelector": "[data-cid='am.phone']",
+                "telephone": "070-999 91 23",
+                "emailSelector": "[data-cid='am.email']",
+                "email": "test@krokedil.se",
+                "postalCodeSelector": "[data-cid='am.postal_code']",
+                "postalCode": "12600",
+                "submitSelector": "button[id='button-primary']"
+            },
+            "customerType": {
+                "b2c": "B2C",
+                "b2b": "B2B",
+                "b2cb": "B2CB",
+                "b2bc": "B2BC"
+            },
+            "credentialsAndSelectors": {
+                "username": "admin",
+                "password": "password",
+                "selectorForName": "#username",
+                "selectorForPass": "#password"
+            },
+            "shippingSelectors": {
+                "iframe": {
+                    "iframeShipping": "no"
+                },
+                "methods": {
+                    "freeShipping": "free",
+                    "flatRate": "flat"
+                },
+                "targets": {
+                    "flatRateTarget": "_flat_rate",
+                    "freeShippingTarget": "_free_shipping"
+                }
+            },
+            "coupons": {
+                "fixed_cart": "fixedcart",
+                "fixed_product": "fixedproduct",
+                "percent": "percentage",
+                "free_shipping_100": "free"
+            },
+            "payment": {
+                "selectedMethod": {
+                    "creditMethod": "credit",
+                    "debitMethod": "debit",
+                    "invoiceMethod": "invoice"
+                }
+            },
+            "billing": {
+                "first_name": "RUBEN",
+                "last_name": "HENRIKSSON",
+                "company": "",
+                "address_1": "Getstigen 4",
+                "address_2": "",
+                "city": "Hägersten",
+                "state": "",
+                "postcode": "12600",
+                "country": "SE",
+                "phone": "070-999 91 23",
+                "email": "test@krokedil.se"
+            },
+            "shipping": {
+                "first_name": "RUBEN",
+                "last_name": "HENRIKSSON",
+                "company": "",
+                "address_1": "Getstigen 4",
+                "address_2": "",
+                "city": "Hägersten",
+                "state": "",
+                "postcode": "12600",
+                "country": "SE",
+                "email": "test@krokedil.se"
+            },
+            "api": {
+                "consumerKey": "ck_6b26ae8bf280ffe5fd140d793ff14243c56a343a",
+                "consumerSecret": "cs_4b7dc229c7f65cf54e5e30c5dc79287c2eae16d2"
+            }
+        }
+    },
+    "products": {
+        "product_id": {
+            "out_of_stock": "11",
+            "variable_25": "12",
+            "downloadable_0": "17",
+            "downloadable_25": "18",
+            "downloadable_shipping_0": "20",
+            "downloadable_shipping_25": "21",
+            "simple_12": "22",
+            "simple_6": "23",
+            "virtual_0": "26",
+            "virtual_25": "28",
+            "virtual_downloadable_0": "29",
+            "virtual_downloadable_25": "30",
+            "many_characters": "31"
+        }
+    },
+    "timeoutTime": 2500,
+    "puppeteerOptions": {
+        "headless": false,
+        "defaultViewport": null,
+        "args": [
+            "--disable-infobars",
+            "--disable-web-security",
+            "--disable-features=IsolateOrigins,site-per-process"
+        ]
+    }
+}

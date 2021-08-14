@@ -33,15 +33,21 @@ const submitBillingForm = async (frame, data, customerType) => {
 
 	} = data;
 
+	const emptyField = async (fieldName) => {
+		if (await frame.$(fieldName)){
+			let inputField = await frame.$(fieldName);
+			await frame.waitForTimeout(200);
+			await inputField.click({clickCount: 3});
+			await inputField.press("Backspace");
+			await frame.waitForTimeout(200);
+		}
+	}
+
 	// Fill out input field
 	const fillOutFrameField = async (fieldName, inputFieldFillIn) => {
-
 		if (await frame.$(fieldName)){
-
 			let inputField = await frame.$(fieldName);
-			await inputField.click({clickCount: 3});
-			await inputField.press('Backspace');
-			await frame.waitForTimeout(100);
+			await frame.waitForTimeout(200);
 			await inputField.type(inputFieldFillIn);
 			await frame.waitForTimeout(200);
 		}
@@ -49,6 +55,13 @@ const submitBillingForm = async (frame, data, customerType) => {
 
 	// Fill out the form
 	const completeForm = async () => {
+		await emptyField(organizationIDSelector);
+		await emptyField(organizationNameSelector);
+		await emptyField(firstNameSelector);
+		await emptyField(lastNameSelector);
+		await emptyField(emailSelector);
+		await emptyField(telephoneSelector);
+		// ---------------------------------------------------------------- //
 		await fillOutFrameField(organizationIDSelector,organizationID );
 		await fillOutFrameField(organizationNameSelector, organizationName);
 		await fillOutFrameField(firstNameSelector, firstName);
@@ -58,14 +71,14 @@ const submitBillingForm = async (frame, data, customerType) => {
 	}
 	
 	// Check for miniaturized frame
-		if(	await frame.$('[id="preview__link"]')) {
-			await frame.waitForTimeout(1000);
-			await frame.click('[id="preview__link"]');
-			await frame.waitForTimeout(1000);
-		}
+	if(	frame && await frame.$('[id="preview__link"]')) {
+		await frame.waitForTimeout(1000);
+		await frame.click('[id="preview__link"]');
+		await frame.waitForTimeout(1000);
+	}
 	
 	// Fork from B2CB switches
-	if (await frame.$('[data-cid="am.customer_type"]')) {
+	if ( frame && await frame.$('[data-cid="am.customer_type"]')) {
 
 		await frame.waitForTimeout(1000);
 		await frame.click('[data-cid="am.customer_type"]');
@@ -91,7 +104,7 @@ const submitBillingForm = async (frame, data, customerType) => {
 		await frame.click('[data-cid="am.continue_button"]');
 		await frame.waitForTimeout(1000);
 
-		if(await frame.$('[data-cid="am.continue_button"]')){
+		if(frame && await frame.$('[data-cid="am.continue_button"]')){
 			await completeForm()
 			await frame.click('[data-cid="am.continue_button"]');
 		}

@@ -15,9 +15,8 @@ const settingsArray = {
 		credentials_eu: "",
 		merchant_id_eu: "",
 		shared_secret_eu: "",
-		test_merchant_id_eu: customerData.klarnaCredentials.test_merchant_id_eu,
-		test_shared_secret_eu:
-			customerData.klarnaCredentials.test_shared_secret_eu,
+		test_merchant_id_eu: process.env.API_KEY,
+		test_shared_secret_eu: process.env.API_SECRET,
 		credentials_us: "",
 		merchant_id_us: "",
 		shared_secret_us: "",

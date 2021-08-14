@@ -10,8 +10,8 @@ import { klarnaAuth } from "../config/config";
  */
 const getKlarnaOrderById = async (page, endpoint, id) => {
 	const encodedKey = await page.evaluate((auth) => {
-		const merchant = auth.test_merchant_id_eu;
-		const secret = auth.test_shared_secret_eu;
+		const merchant = process.env.API_KEY;
+		const secret = process.env.API_SECRET;
 		return btoa(`${merchant}:${secret}`);
 	}, klarnaAuth);
 

@@ -2,6 +2,7 @@
   "author": "Miodrag Stojanovic <miodrag@krokedil.se>",
   "dependencies": {
     "axios": "^0.21.1",
+    "axios-debug-log": "^0.8.4",
     "crypto-js": "^4.0.0",
     "dotenv": "^10.0.0",
     "jest": "27.0.6",
@@ -43,7 +44,7 @@
     "docker:site-init": "npm run docker:setup && npm run docker:import-data",
     "jettison": "jest --detectOpenHandles --forceExit",
     "wp:install": "node ./cli/install.js",
-    "e2e:test": "yarn docker:up && yarn wp:install && yarn jettison"
+    "e2e:test": "yarn docker:up && yarn wp:install && yarn jettison && yarn docker:down"
   },
   "version": "1.0.0"
 }

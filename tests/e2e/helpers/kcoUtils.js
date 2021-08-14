@@ -103,18 +103,12 @@ const chooseKlarnaShippingMethod = async (
 	frame,
 	iframeShipping,
 	shippingMethod,
-	freeShippingMethodTarget,
-	flatRateMethodTarget,
 	timeOutTime
 ) => {
 	let shippingMethodTarget;
 
 	if (iframeShipping !== "yes") {
-		if (shippingMethod === "free") {
-			shippingMethodTarget = `[id*="${freeShippingMethodTarget}"]`;
-		} else if (shippingMethod === "flat") {
-			shippingMethodTarget = `[id*="${flatRateMethodTarget}"]`;
-		}
+		shippingMethodTarget = `[id*="_${shippingMethod}"]`;
 
 		if (shippingMethod !== "") {
 			await page.waitForTimeout(timeOutTime);
@@ -131,9 +125,9 @@ const chooseKlarnaShippingMethod = async (
 			'[data-cid="SHIPMO-shipping-option-basic"]'
 		);
 
-		if (iframeShippingMethod === "flat") {
+		if (iframeShippingMethod === "flat_rate") {
 			await frameShippingTab[0].click();
-		} else if (iframeShippingMethod === "free") {
+		} else if (iframeShippingMethod === "free_shipping") {
 			await frameShippingTab[1].click();
 		}
 	}
