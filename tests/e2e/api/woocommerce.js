@@ -1,4 +1,4 @@
-import kcoURLS from "../helpers/kcoURLS";
+import urls from "../helpers/urls";
 import { createRequest, post, put } from "./index";
 
 const {
@@ -11,7 +11,7 @@ const {
 	API_SESSION_ENDPOINT,
 	API_WC_OPTIONS,
 	API_WC_PRICE_INC_EXC,
-} = kcoURLS;
+} = urls;
 
 const getProducts = () => {
 	return createRequest(API_PRODUCTS_ENDPOINT);

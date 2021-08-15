@@ -42,7 +42,7 @@
     "docker:setup": "docker-compose run --rm wordpress-cli ./wp-content/plugins/klarna-checkout-for-woocommerce/tests/e2e/bin/setup.sh",
     "docker:import-data": "docker-compose run --rm wordpress-cli ./wp-content/plugins/klarna-checkout-for-woocommerce/tests/e2e/bin/import.sh",
     "docker:site-init": "npm run docker:setup && npm run docker:import-data",
-    "jettison": "jest --detectOpenHandles --forceExit",
+    "jettison": "jest --detectOpenHandles",
     "wp:install": "node ./cli/install.js",
     "e2e:test": "yarn docker:up && yarn wp:install && yarn jettison && yarn docker:down"
   },

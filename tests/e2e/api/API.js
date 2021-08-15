@@ -1,6 +1,5 @@
 import axios from "axios";
 import woocommerce from "./woocommerce";
-import { klarnaAuth } from "../config/config";
 
 /**
  * @param page
@@ -13,7 +12,7 @@ const getKlarnaOrderById = async (page, endpoint, id) => {
 		const merchant = process.env.API_KEY;
 		const secret = process.env.API_SECRET;
 		return btoa(`${merchant}:${secret}`);
-	}, klarnaAuth);
+	});
 
 	return axios.get(`${endpoint}/${id}`, {
 		headers: {

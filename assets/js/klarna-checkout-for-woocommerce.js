@@ -401,7 +401,7 @@ jQuery( function( $ ) {
 			kco_wc.blocked = true;
 			kco_wc.getKlarnaOrder().done( function(response) {
 				if(response.success ) {
-					kco_wc.submitOrder()
+					kco_wc.submitOrder(callback)
 				} else {
 					kco_wc.failOrder( 'get_order', '<div class="woocommerce-error">' + 'Failed to get the order from Klarna.' + '</div>', callback );
 				}

@@ -59,9 +59,9 @@ const createAttributes = async () => {
 }
 
 const createVariableProducts = async () => {
+	let i = 0;
 	for( const variableProduct of json.products.variable ) {
 		let attributeId = 0;
-		let i = 0;
 		json.products.attribute.forEach(element => {
 			if(element.name === json.products.variable[i].attribute.name) {
 				attributeId = element.id
