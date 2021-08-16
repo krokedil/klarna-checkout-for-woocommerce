@@ -129,7 +129,8 @@ class KCO_Templates {
 					}
 
 					if ( 'kco' === $order->get_payment_method() ) {
-						if ( ! isset( $_GET['confirm'] ) ) {
+						$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_STRING );
+						if ( empty( $confirm ) ) {
 							$template = $klarna_checkout_template;
 						}
 					}

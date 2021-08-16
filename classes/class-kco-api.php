@@ -18,6 +18,7 @@ class KCO_API {
 	/**
 	 * Creates a Klarna Checkout order.
 	 *
+	 * @param int $order_id The WooCommerce order id.
 	 * @return mixed
 	 */
 	public function create_klarna_order( $order_id = false ) {
