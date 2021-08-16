@@ -2,7 +2,7 @@ name: E2E tests
 on:
   push:
     branches:
-      - develop-e2e-v2
+      - develop
 jobs:
   test-plugin:
     name: Run E2E Tests
