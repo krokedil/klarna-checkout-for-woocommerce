@@ -1,7 +1,7 @@
 import API from "../api/API";
 import urls from "./urls";
 
-const timeOutTime = 1500;
+const timeOutTime = 2500;
 const KCOSettingsArray = {
 	woocommerce_kco_settings: {
 		enabled: "yes",

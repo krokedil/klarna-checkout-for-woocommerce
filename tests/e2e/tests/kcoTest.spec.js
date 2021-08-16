@@ -21,7 +21,7 @@ const options = {
 let page;
 let browser;
 let context;
-let timeOutTime = 1500;
+let timeOutTime = 2500;
 let json = data;
 
 describe("KCO E2E tests", () => {
@@ -62,6 +62,7 @@ describe("KCO E2E tests", () => {
 
 				// --------------- ADD PRODUCTS TO CART --------------- //
 				await utils.addMultipleProductsToCart(page, args.products, json);
+				await page.waitForTimeout(1 * timeOutTime);
 
 				// --------------- GO TO CHECKOUT --------------- //
 				await page.goto(urls.CHECKOUT);
@@ -93,7 +94,7 @@ describe("KCO E2E tests", () => {
 
 			// --------------- POST PURCHASE CHECKS --------------- //
 			
-			await page.waitForTimeout(8 * timeOutTime);
+			await page.waitForTimeout(5 * timeOutTime);
 			const value = await page.$eval(".entry-title", (e) => e.textContent);
 			expect(value).toBe("Order received");
 

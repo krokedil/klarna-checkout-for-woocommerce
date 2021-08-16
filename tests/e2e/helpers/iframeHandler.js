@@ -1,4 +1,4 @@
-const timeOutTime = 1500;
+const timeOutTime = 2500;
 
 const setCustomerType = async (page, kcoIframe, customerTyoe) => {
 	if ( await kcoIframe.$('[data-cid="am.customer_type"]') ) {
