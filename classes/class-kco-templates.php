@@ -139,7 +139,7 @@ class KCO_Templates {
 					if ( empty( $order->get_payment_method() ) ) {
 						reset( $available_gateways );
 						if ( 'kco' === key( $available_gateways ) ) {
-							if ( ! isset( $_GET['confirm'] ) ) {
+							if ( empty( $confirm ) ) {
 								$template = $klarna_checkout_template;
 							}
 						}
