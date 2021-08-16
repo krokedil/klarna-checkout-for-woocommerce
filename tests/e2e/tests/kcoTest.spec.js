@@ -8,7 +8,7 @@ import tests from "../config/tests.json"
 import data from "../config/data.json";
 
 const options = {
-	"headless": false,
+	"headless": true,
 	"defaultViewport": null,
 	"args": [
 		"--disable-infobars",
