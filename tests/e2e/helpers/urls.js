@@ -14,6 +14,12 @@ const API_ORDER_ENDPOINT = "/wc/v3/orders/";
 
 const API_PRODUCTS_ENDPOINT = "/wc/v3/products/";
 
+const API_COUPON_ENDPOINT = "/wc/v3/coupons/";
+
+const API_TAXES_ENDPOINT = "/wc/v3/taxes/";
+
+const API_SHIPPING_ENDPOINT = "/wc/v3/shipping/";
+
 const API_CUSTOMER_ENDPOINT = "/wc/v3/customers";
 
 const API_WC_PRICE_INC_EXC =
@@ -32,6 +38,9 @@ export default {
 	API_BASE_URL,
 	API_ORDER_ENDPOINT,
 	API_PRODUCTS_ENDPOINT,
+	API_COUPON_ENDPOINT,
+	API_TAXES_ENDPOINT,
+	API_SHIPPING_ENDPOINT,
 	API_CUSTOMER_ENDPOINT,
 	API_SESSION_ENDPOINT,
 	API_WC_OPTIONS,

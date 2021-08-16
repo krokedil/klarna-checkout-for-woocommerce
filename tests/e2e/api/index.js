@@ -1,9 +1,10 @@
 import Oauth from "oauth-1.0a";
 import crypto from "crypto";
 import axios from "axios";
-import { customerKey, customerSecret } from "../config/config";
-import kcoURLS from "../helpers/kcoURLS";
+import kcoURLS from "../helpers/urls";
 
+const consumerKey = "ck_6b26ae8bf280ffe5fd140d793ff14243c56a343a";
+const consumerSecret = "cs_4b7dc229c7f65cf54e5e30c5dc79287c2eae16d2";
 const { API_BASE_URL } = kcoURLS;
 const httpMethods = {
 	get: "GET",
@@ -13,8 +14,8 @@ const httpMethods = {
 const { get, post, put } = httpMethods;
 const oauth = Oauth({
 	consumer: {
-		key: customerKey,
-		secret: customerSecret,
+		key: consumerKey,
+		secret: consumerSecret,
 	},
 	signature_method: "HMAC-SHA1",
 	// eslint-disable-next-line camelcase
@@ -45,15 +46,15 @@ const createRequest = async (endpoint, method = "GET", data = null) => {
 			response = axios.get(requestData.url, config);
 			break;
 		case post:
-			response = axios.post(requestData.url, data, config);
+			response = axios.post(requestData.url, data, config).catch(e => console.log(e));
 			break;
 		case put:
 			response = axios.put(requestData.url, data, config);
 			break;
 		default:
-			return Promise.reject(
-				new Error("Unsupported method")
-			).then((result) => console.log(result));
+			return Promise.reject(new Error("Unsupported method")).then(
+				(result) => console.log(result)
+			);
 	}
 	return response;
 };
