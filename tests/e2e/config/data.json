@@ -1,45 +1,250 @@
 {
 	"taxes": [
-		{ "name": "25", "rate": "25" },
-		{ "name": "12", "rate": "12" },
-		{ "name": "06", "rate": "6" },
-		{ "name": "00", "rate": "0" }
+		{
+			"name": "25",
+			"rate": "25"
+		},
+		{
+			"name": "12",
+			"rate": "12"
+		},
+		{
+			"name": "06",
+			"rate": "6"
+		},
+		{
+			"name": "00",
+			"rate": "0"
+		}
 	],
-
 	"products": {
-		"simple": [ 
-			{ "id": null, "name": "Simple 25%", "sku": "simple-25", "regular_price": "99.99", "virtual": false, "downloadable": false, "tax_class": "25" },
-			{ "id": null, "name": "Simple 12%", "sku": "simple-12", "regular_price": "158.39", "virtual": false, "downloadable": false, "tax_class": "12" },
-			{ "id": null, "name": "Simple 6%", "sku": "simple-06", "regular_price": "84.49", "virtual": false, "downloadable": false, "tax_class": "06" },
-			{ "id": null, "name": "Simple 0%", "sku": "simple-00", "regular_price": "9.99", "virtual": false, "downloadable": false, "tax_class": "00" },
-			{ "id": null, "name": "Simple Virtual 25%", "sku": "simple-virtual-25", "regular_price": "12.85", "virtual": true, "downloadable": true, "tax_class": "25" },
-			{ "id": null, "name": "Simple Virtual 12%", "sku": "simple-virtual-12", "regular_price": "6.54", "virtual": true, "downloadable": true, "tax_class": "12" },
-			{ "id": null, "name": "Simple Virtual 6%", "sku": "simple-virtual-06", "regular_price": "48.24", "virtual": true, "downloadable": true, "tax_class": "06" },
-			{ "id": null, "name": "Simple Virtual 0%", "sku": "simple-virtual-00", "regular_price": "75.42", "virtual": true, "downloadable": true, "tax_class": "00" }
+		"simple": [
+			{
+				"id": null,
+				"name": "Simple 25%",
+				"sku": "simple-25",
+				"regular_price": "99.99",
+				"virtual": false,
+				"downloadable": false,
+				"tax_class": "25"
+			},
+			{
+				"id": null,
+				"name": "Simple 12%",
+				"sku": "simple-12",
+				"regular_price": "158.39",
+				"virtual": false,
+				"downloadable": false,
+				"tax_class": "12"
+			},
+			{
+				"id": null,
+				"name": "Simple 6%",
+				"sku": "simple-06",
+				"regular_price": "84.49",
+				"virtual": false,
+				"downloadable": false,
+				"tax_class": "06"
+			},
+			{
+				"id": null,
+				"name": "Simple 0%",
+				"sku": "simple-00",
+				"regular_price": "9.99",
+				"virtual": false,
+				"downloadable": false,
+				"tax_class": "00"
+			},
+			{
+				"id": null,
+				"name": "Simple Virtual 25%",
+				"sku": "simple-virtual-25",
+				"regular_price": "12.85",
+				"virtual": true,
+				"downloadable": true,
+				"tax_class": "25"
+			},
+			{
+				"id": null,
+				"name": "Simple Virtual 12%",
+				"sku": "simple-virtual-12",
+				"regular_price": "6.54",
+				"virtual": true,
+				"downloadable": true,
+				"tax_class": "12"
+			},
+			{
+				"id": null,
+				"name": "Simple Virtual 6%",
+				"sku": "simple-virtual-06",
+				"regular_price": "48.24",
+				"virtual": true,
+				"downloadable": true,
+				"tax_class": "06"
+			},
+			{
+				"id": null,
+				"name": "Simple Virtual 0%",
+				"sku": "simple-virtual-00",
+				"regular_price": "75.42",
+				"virtual": true,
+				"downloadable": true,
+				"tax_class": "00"
+			}
 		],
 		"variable": [
-			{ "id": null, "name": "Variable 25%", "sku": "variable-product-25", "regular_price": "26.75", "virtual": false, "downloadable": false, "tax_class": "25", "attribute": { "name": "color", "options": [ { "id": null, "name": "Variable 25%:black", "option": "black" }, { "id": null, "name": "Variable 25%:red", "option": "red"}, { "id": null, "name": "Variable 25%:green", "option": "green" } ] } },
-			{ "id": null, "name": "Variable 12%", "sku": "variable-product-12", "regular_price": "95.28", "virtual": false, "downloadable": false, "tax_class": "12", "attribute": { "name": "color", "options": [ { "id": null, "name": "Variable 12%:black", "option": "black" }, { "id": null, "name": "Variable 12%:red", "option": "red"}, { "id": null, "name": "Variable 12%:green", "option": "green" } ] } },
-			{ "id": null, "name": "Variable 6%", "sku": "variable-product-06", "regular_price": "26.79", "virtual": false, "downloadable": false, "tax_class": "06", "attribute": { "name": "color", "options": [ { "id": null, "name": "Variable 6%:black", "option": "black" }, { "id": null, "name": "Variable 6%:red", "option": "red"}, { "id": null, "name": "Variable 6%:green", "option": "green" } ] } },
-			{ "id": null, "name": "Variable 0%", "sku": "variable-product-00", "regular_price": "52.90", "virtual": false, "downloadable": false, "tax_class": "00", "attribute": { "name": "color", "options": [ { "id": null, "name": "Variable 0%:black", "option": "black" }, { "id": null, "name": "Variable 0%:red", "option": "red"}, { "id": null, "name": "Variable 0%:green", "option": "green" } ] } }
+			{
+				"id": null,
+				"name": "Variable 25%",
+				"sku": "variable-product-25",
+				"regular_price": "26.75",
+				"virtual": false,
+				"downloadable": false,
+				"tax_class": "25",
+				"attribute": {
+					"name": "color",
+					"options": [
+						{
+							"id": null,
+							"name": "Variable 25%:black",
+							"option": "black"
+						},
+						{
+							"id": null,
+							"name": "Variable 25%:red",
+							"option": "red"
+						},
+						{
+							"id": null,
+							"name": "Variable 25%:green",
+							"option": "green"
+						}
+					]
+				}
+			},
+			{
+				"id": null,
+				"name": "Variable 12%",
+				"sku": "variable-product-12",
+				"regular_price": "95.28",
+				"virtual": false,
+				"downloadable": false,
+				"tax_class": "12",
+				"attribute": {
+					"name": "color",
+					"options": [
+						{
+							"id": null,
+							"name": "Variable 12%:black",
+							"option": "black"
+						},
+						{
+							"id": null,
+							"name": "Variable 12%:red",
+							"option": "red"
+						},
+						{
+							"id": null,
+							"name": "Variable 12%:green",
+							"option": "green"
+						}
+					]
+				}
+			},
+			{
+				"id": null,
+				"name": "Variable 6%",
+				"sku": "variable-product-06",
+				"regular_price": "26.79",
+				"virtual": false,
+				"downloadable": false,
+				"tax_class": "06",
+				"attribute": {
+					"name": "color",
+					"options": [
+						{
+							"id": null,
+							"name": "Variable 6%:black",
+							"option": "black"
+						},
+						{
+							"id": null,
+							"name": "Variable 6%:red",
+							"option": "red"
+						},
+						{
+							"id": null,
+							"name": "Variable 6%:green",
+							"option": "green"
+						}
+					]
+				}
+			},
+			{
+				"id": null,
+				"name": "Variable 0%",
+				"sku": "variable-product-00",
+				"regular_price": "52.90",
+				"virtual": false,
+				"downloadable": false,
+				"tax_class": "00",
+				"attribute": {
+					"name": "color",
+					"options": [
+						{
+							"id": null,
+							"name": "Variable 0%:black",
+							"option": "black"
+						},
+						{
+							"id": null,
+							"name": "Variable 0%:red",
+							"option": "red"
+						},
+						{
+							"id": null,
+							"name": "Variable 0%:green",
+							"option": "green"
+						}
+					]
+				}
+			}
 		],
 		"attribute": [
-			{ "id": null, "name": "color" }
+			{
+				"id": null,
+				"name": "color"
+			}
 		]
 	},
-
 	"coupons": [
-		{ "code": "fixedcart", "amount": "10", "discountType": "fixed_cart" },
-		{ "code": "percent", "amount": "10", "discountType": "percent" }
+		{
+			"code": "fixedcart",
+			"amount": "10",
+			"discountType": "fixed_cart"
+		},
+		{
+			"code": "percent",
+			"amount": "10",
+			"discountType": "percent"
+		}
 	],
-
 	"shipping": [
 		{
 			"name": "Sweden",
-			"location": { "code": "SE", "type": "country" },
+			"location": {
+				"code": "SE",
+				"type": "country"
+			},
 			"methods": [
-				{ "method": "flat_rate", "amount": 49 },
-				{ "method": "free_shipping", "amount": 0 }
+				{
+					"method": "flat_rate",
+					"amount": 49
+				},
+				{
+					"method": "free_shipping",
+					"amount": 0
+				}
 			]
 		}
 	]

@@ -1,15 +1,15 @@
 const timeOutTime = 2500;
 
-const setCustomerType = async (page, kcoIframe, customerTyoe) => {
+const setCustomerType = async (page, kcoIframe, customerType) => {
 	if ( await kcoIframe.$('[data-cid="am.customer_type"]') ) {
 		let inputField = await kcoIframe.$('[data-cid="am.customer_type"]');
 		await inputField.click();
 		await page.waitForTimeout(0.1 * timeOutTime);
-		if (customerTyoe === "person"){
+		if (customerType === "person"){
 			await kcoIframe.click('[data-cid="row person"]');
 			await kcoIframe.waitForTimeout(1 * timeOutTime);
 
-		} else if (customerTyoe === "company") {
+		} else if (customerType === "company") {
 			await kcoIframe.click('[data-cid="row organization"]');
 			await kcoIframe.waitForTimeout(1 * timeOutTime);
 		}
