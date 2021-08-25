@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<thead>
 	<tr>
 		<th colspan="6" data-export-label="Klarna Checkout Request Log">
-			<h2><?php esc_html_e( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' ); ?><?php echo wc_help_tip( esc_html__( 'Klarna Checkout System Status.', 'klarna-checkout-for-woocommerce' ) ); ?></h2>
+			<h2><?php esc_html_e( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' ); ?><?php echo wc_help_tip( esc_html__( 'Klarna Checkout System Status.', 'klarna-checkout-for-woocommerce' ) ); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></h2>
 		</th>
 	</tr>
 
