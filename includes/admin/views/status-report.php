@@ -40,6 +40,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$log_title      = isset( $log['title'] ) ? $log['title'] : '';
 			$code           = isset( $log['response']['code'] ) ? $log['response']['code'] : '';
 			$body           = isset( $log['response']['body'] ) ? json_encode( $log['response']['body'] ) : '';
+			$error_code     = isset( $log['response']['body']['error_code'] ) ? 'Error code: ' . $log['response']['body']['error_code'] . '.' : '';
+			$error_messages = isset( $log['response']['body']['error_messages'] ) ? 'Error messages: ' . json_encode( $log['response']['body']['error_messages'] ) : '';
 			$correlation_id = isset( $log['response']['body']['correlation_id'] ) ? $log['response']['body']['correlation_id'] : '';
 
 			?>
@@ -48,7 +50,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<td class="help"></td>
 				<td><?php echo esc_html( $log_title ); ?><span style="display: none;">, Response code: <?php echo esc_html( $code ); ?>, Response message: <?php echo esc_html( $body ); ?>, Correlation ID: <?php echo esc_html( $correlation_id ); ?></span</td>
 				<td><?php echo esc_html( $code ); ?></td>
-				<td><?php echo esc_html( $body ); ?></td>
+				<td><?php echo esc_html( $error_code ) . ' ' . esc_html( $error_messages ); ?></td>
 				<td><?php echo esc_html( $correlation_id ); ?></td>
 			</tr>
 			<?php
