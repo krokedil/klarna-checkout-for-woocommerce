@@ -39,9 +39,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$timestamp      = isset( $log['timestamp'] ) ? $log['timestamp'] : '';
 			$log_title      = isset( $log['title'] ) ? $log['title'] : '';
 			$code           = isset( $log['response']['code'] ) ? $log['response']['code'] : '';
-			$body           = isset( $log['response']['body'] ) ? json_encode( $log['response']['body'] ) : '';
+			$body           = isset( $log['response']['body'] ) ? wp_json_encode( $log['response']['body'] ) : '';
 			$error_code     = isset( $log['response']['body']['error_code'] ) ? 'Error code: ' . $log['response']['body']['error_code'] . '.' : '';
-			$error_messages = isset( $log['response']['body']['error_messages'] ) ? 'Error messages: ' . json_encode( $log['response']['body']['error_messages'] ) : '';
+			$error_messages = isset( $log['response']['body']['error_messages'] ) ? 'Error messages: ' . wp_json_encode( $log['response']['body']['error_messages'] ) : '';
 			$correlation_id = isset( $log['response']['body']['correlation_id'] ) ? $log['response']['body']['correlation_id'] : '';
 
 			?>
