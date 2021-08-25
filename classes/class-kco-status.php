@@ -32,4 +32,4 @@ class KCO_Status {
 		include_once KCO_WC_PLUGIN_PATH . '/includes/admin/views/status-report.php';
 	}
 }
-$wc_collector_checkout_status = new KCO_Status();
+$kco_status = new KCO_Status();
