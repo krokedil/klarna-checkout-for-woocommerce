@@ -62,6 +62,11 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.08.25    - version 2.6.0 =
+* Feature       - We now support Pay for order. You can now create an order in advance on the admin page and send a pay link to a customer, where they can finish the payment using Klarna Checkout.
+* Feature       - We will now save the last 15 requests to Klarna that had an API error and display them on the WooCommerce status page. This should help with getting error messages when you need to debug issues without going through the logs. These will also be in the status report that you can send to us for support tickets.
+* Fix           - Fixed some error notices related to PHP 8.0.
+
 = 2021.08.03    - version 2.5.9 =
 * Enhancement   - Added a filter to the fields we ignore when moving extra checkout fields on the checkout page. This filter is "kco_ignored_checkout_fields" and expects an array of strings that are the HTML element IDs of the fields you wish to not have moved.
 * Fix           - Fixed a bug causing you to have to click some setting groups twice to have them properly expand.

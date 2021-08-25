@@ -79,7 +79,7 @@ class KCO_Checkout {
 
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
-		if ( 'checkout_incomplete' === $klarna_order['status'] ) {
+		if ( $klarna_order && 'checkout_incomplete' === $klarna_order['status'] ) {
 			// If it is, update order.
 			$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 		}
