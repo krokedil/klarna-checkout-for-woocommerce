@@ -27,12 +27,17 @@ class KCO_Logger {
 	 */
 	public static function log( $data ) {
 		$settings = get_option( 'woocommerce_kco_settings' );
+
 		if ( 'yes' === $settings['logging'] ) {
 			$message = self::format_data( $data );
 			if ( empty( self::$log ) ) {
 				self::$log = new WC_Logger();
 			}
 			self::$log->add( 'klarna-checkout-for-woocommerce', wp_json_encode( $message ) );
+		}
+
+		if ( isset( $data['response']['code'] ) && ( $data['response']['code'] < 200 || $data['response']['code'] > 299 ) ) {
+			self::log_to_db( $data );
 		}
 	}
 
@@ -110,6 +115,24 @@ class KCO_Logger {
 			$stack[] = $data['function'] . $extra_data;
 		}
 		return $stack;
+	}
+
+	/**
+	 * Logs an event in the WP DB.
+	 *
+	 * @param array $data The data to be logged.
+	 */
+	public static function log_to_db( $data ) {
+		$logs = get_option( 'krokedil_debuglog_kco', array() );
+
+		if ( ! empty( $logs ) ) {
+			$logs = json_decode( $logs );
+		}
+
+		$logs   = array_slice( $logs, -14 );
+		$logs[] = $data;
+		$logs   = wp_json_encode( $logs );
+		update_option( 'krokedil_debuglog_kco', $logs );
 	}
 
 }
