@@ -10,7 +10,7 @@
 			"Test Product - (Virtual, 0% Tax, Stock Quantity)",
 			"Test Product - (Virtual, 25% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 25% Tax, Stock Quantity)",
-			"Test Product - (1 Variable Product, 25% Tax)",
+			"Variable 25%:blue",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
@@ -22,7 +22,7 @@
 		"shippingMethod": "flat_rate",
 		"coupons": "",
 		"customerType": "person",
-		"expectedTotal": 6137.17,
+		"expectedTotal": 6124.92,
 		"expectedOrderLines": 8
 	},
 	{
@@ -38,7 +38,7 @@
 		"coupons": "",
 		"customerType": "person",
 		"expectedTotal": 2980,
-		"expectedOrderLines": 3
+		"expectedOrderLines": 2
 	},
 	{
 		"name": "[21] Buy 2 virtual/downloadable products (0% and 25% Tax)",
@@ -53,7 +53,7 @@
 		"coupons": "",
 		"customerType": "person",
 		"expectedTotal": 3352.50,
-		"expectedOrderLines": 3
+		"expectedOrderLines": 2
 	},
 	{
 		"name": "[24] Buy different types of products (0% and 25% tax)",
@@ -66,7 +66,7 @@
 			"Test Product - (Virtual, 0% Tax, Stock Quantity)",
 			"Test Product - (Virtual, 25% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 25% Tax, Stock Quantity)",
-			"Test Product - (1 Variable Product, 25% Tax)",
+			"Variable 25%:blue",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
@@ -78,7 +78,7 @@
 		"shippingMethod": "flat_rate",
 		"coupons": "",
 		"customerType": "person",
-		"expectedTotal": 6910.25,
+		"expectedTotal": 6898.00,
 		"expectedOrderLines": 8
 	},
 	{
@@ -94,7 +94,7 @@
 		"coupons": "",
 		"customerType": "company",
 		"expectedTotal": 3352.50,
-		"expectedOrderLines": 3
+		"expectedOrderLines": 2
 	},
 	{
 		"name": "[31] Buy different types of products (0% and 25% tax)",
@@ -107,7 +107,7 @@
 			"Test Product - (Virtual, 0% Tax, Stock Quantity)",
 			"Test Product - (Virtual, 25% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 25% Tax, Stock Quantity)",
-			"Test Product - (1 Variable Product, 25% Tax)",
+			"Variable 25%:blue",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
@@ -119,7 +119,7 @@
 		"shippingMethod": "flat_rate",
 		"coupons": "",
 		"customerType": "company",
-		"expectedTotal": 6910.25,
+		"expectedTotal": 6898.00,
 		"expectedOrderLines": 8
 	},
 	{
@@ -133,7 +133,7 @@
 			"Test Product - (Virtual, 0% Tax, Stock Quantity)",
 			"Test Product - (Virtual, 25% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 25% Tax, Stock Quantity)",
-			"Test Product - (1 Variable Product, 25% Tax)",
+			"Variable 25%:blue",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
@@ -145,7 +145,7 @@
 		"shippingMethod": "flat_rate",
 		"coupons": "",
 		"customerType": "company",
-		"expectedTotal": 6910.25,
+		"expectedTotal": 6124.92,
 		"expectedOrderLines": 8
 	},
 	{
@@ -159,7 +159,7 @@
 			"Test Product - (Virtual, 0% Tax, Stock Quantity)",
 			"Test Product - (Virtual, 25% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 25% Tax, Stock Quantity)",
-			"Test Product - (1 Variable Product, 25% Tax)",
+			"Variable 25%:blue",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
 			"Test Product - (Simple Product, 12% Tax, Stock Quantity)",
@@ -171,7 +171,7 @@
 		"shippingMethod": "flat_rate",
 		"coupons": "",
 		"customerType": "company",
-		"expectedTotal": 6137.17,
+		"expectedTotal": 6124.92,
 		"expectedOrderLines": 8
 	},
 	{
