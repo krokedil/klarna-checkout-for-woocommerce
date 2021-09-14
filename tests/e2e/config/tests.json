@@ -34,7 +34,7 @@
 			"Test Product - (Virtual, Downloadable, 0% Tax, Stock Quantity)",
 			"Test Product - (Virtual, Downloadable, 25% Tax, Stock Quantity)"
 		],
-		"shippingMethod": "flat_rate",
+		"shippingMethod": "",
 		"coupons": "",
 		"customerType": "person",
 		"expectedTotal": 2980,
@@ -49,7 +49,7 @@
 			"Test Product - (Virtual, Downloadable, 0% Tax, Stock Quantity)",
 			"Test Product - (Virtual, Downloadable, 25% Tax, Stock Quantity)"
 		],
-		"shippingMethod": "flat_rate",
+		"shippingMethod": "",
 		"coupons": "",
 		"customerType": "person",
 		"expectedTotal": 3352.50,
@@ -90,7 +90,7 @@
 			"Test Product - (Virtual, Downloadable, 0% Tax, Stock Quantity)",
 			"Test Product - (Virtual, Downloadable, 25% Tax, Stock Quantity)"
 		],
-		"shippingMethod": "flat_rate",
+		"shippingMethod": "",
 		"coupons": "",
 		"customerType": "company",
 		"expectedTotal": 3352.50,
