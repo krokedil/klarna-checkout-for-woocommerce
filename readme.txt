@@ -5,8 +5,8 @@ Donate link: https://klarna.com
 Requires at least: 4.0
 Tested up to: 5.8.0
 Requires PHP: 5.6
-WC requires at least: 3.4.0
-WC tested up to: 5.6.0
+WC requires at least: 4.0.0
+WC tested up to: 5.7.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,12 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.09.29    - version 2.6.1 =
+* Fix           - Fixed so that billing and shipping addresses gets updated to the WooCommerce order after the customer changes the payment method for a subscription.
+* Fix           - Fixed an issues where the customer object would sometimes be missing from the Klarna order causing a PHP notice.
+* Tweak         - Updates the URLs to Klarnas docs for the post purchase email information.
+* Tweak         - Bumped minimum supported versions for WooCommerce to version 4.0.0.
+
 = 2021.08.25    - version 2.6.0 =
 * Feature       - We now support Pay for order. You can now create an order in advance on the admin page and send a pay link to a customer, where they can finish the payment using Klarna Checkout.
 * Feature       - We will now save the last 15 requests to Klarna that had an API error and display them on the WooCommerce status page. This should help with getting error messages when you need to debug issues without going through the logs. These will also be in the status report that you can send to us for support tickets.
