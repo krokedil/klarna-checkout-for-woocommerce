@@ -638,7 +638,7 @@ function kco_maybe_save_surcharge( $order_id, $klarna_order ) {
  * @return void
  */
 function kco_maybe_save_org_nr( $order_id, $klarna_order ) {
-	if ( 'organization' === $klarna_order['customer']['type'] ) {
+	if ( isset( $klarna_order['customer'] ) && isset( $klarna_order['customer']['type'] ) && 'organization' === $klarna_order['customer']['type'] ) {
 		$org_nr = isset( $klarna_order['customer']['organization_registration_id'] ) ? $klarna_order['customer']['organization_registration_id'] : null;
 		if ( ! empty( $org_nr ) ) {
 			update_post_meta( $order_id, '_billing_org_nr', $org_nr );
@@ -654,7 +654,7 @@ function kco_maybe_save_org_nr( $order_id, $klarna_order ) {
  * @return void
  */
 function kco_maybe_save_reference( $order_id, $klarna_order ) {
-	if ( 'organization' === $klarna_order['customer']['type'] ) {
+	if ( isset( $klarna_order['customer'] ) && isset( $klarna_order['customer']['type'] ) && 'organization' === $klarna_order['customer']['type'] ) {
 		$billing_reference  = isset( $klarna_order['billing_address']['attention'] ) ? $klarna_order['billing_address']['attention'] : null;
 		$shipping_reference = isset( $klarna_order['shipping_address']['attention'] ) ? $klarna_order['shipping_address']['attention'] : null;
 		if ( ! empty( $billing_reference ) ) {

@@ -163,7 +163,6 @@ class KCO_Subscription {
 						// Modify merchant url's.
 						global $wp;
 						$query_string     = filter_input( INPUT_SERVER, 'QUERY_STRING', FILTER_SANITIZE_URL );
-						$query_string     = $query_string;
 						$current_url      = add_query_arg( $query_string, '', home_url( $wp->request ) );
 						$confirmation_url = add_query_arg(
 							array(
