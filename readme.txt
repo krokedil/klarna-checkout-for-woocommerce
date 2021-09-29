@@ -4,7 +4,7 @@ Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
 Tested up to: 5.8.0
-Requires PHP: 5.6
+Requires PHP: 7.0
 WC requires at least: 4.0.0
 WC tested up to: 5.7.0
 Stable tag: trunk
