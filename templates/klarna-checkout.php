@@ -7,7 +7,6 @@
  * @package klarna-checkout-for-woocommerce
  */
 
-wc_print_notices();
 
 do_action( 'woocommerce_before_checkout_form', WC()->checkout() );
 
