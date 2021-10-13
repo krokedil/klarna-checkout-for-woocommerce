@@ -21,9 +21,8 @@ jobs:
     - name: Install Packages
       run: |
         echo "Update package lists."
-        apt-get update
-        echo "Install base packages."
-        apt-get install -y build-essential libssl-dev gnupg libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev libicu-dev libxml2-dev vim wget unzip
+        curl -sS https://getcomposer.org/installer | php 
+        mv composer.phar /usr/local/bin/composer
     - name: Install Composer
       run: |
         echo "Install composer."
