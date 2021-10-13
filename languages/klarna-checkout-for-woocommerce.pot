@@ -25,7 +25,7 @@ msgid "Support"
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:110, ../includes/kco-functions.php:522
+#: ../classes/class-kco-api-callbacks.php:110, ../includes/kco-functions.php:563
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
@@ -33,7 +33,7 @@ msgstr ""
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:104, ../includes/kco-functions.php:514
+#: ../classes/class-kco-api-callbacks.php:104, ../includes/kco-functions.php:555
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
@@ -402,23 +402,23 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:280
+#: ../classes/class-kco-gateway.php:281
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:283
+#: ../classes/class-kco-gateway.php:284
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:508
+#: ../classes/class-kco-gateway.php:513
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:567
+#: ../classes/class-kco-gateway.php:572
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:588, ../classes/class-kco-gateway.php:609
+#: ../classes/class-kco-gateway.php:593, ../classes/class-kco-gateway.php:614
 msgid "Reference:"
 msgstr ""
 
@@ -459,7 +459,7 @@ msgstr ""
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
-#: ../classes/class-kco-templates.php:148
+#: ../classes/class-kco-templates.php:179
 msgid "Failed to load Klarna Checkout template file."
 msgstr ""
 
@@ -483,17 +483,16 @@ msgstr ""
 msgid "You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout. "
 msgstr ""
 
-#: ../classes/admin/class-kco-admin-notices.php:91, ../classes/admin/class-kco-admin-notices.php:108, ../classes/admin/class-kco-admin-notices.php:128, ../classes/admin/class-kco-admin-notices.php:147, ../classes/admin/class-kco-admin-notices.php:169, ../classes/admin/class-kco-admin-notices.php:232
-msgid "Read more here. "
+#: ../includes/kco-functions.php:118
+msgid "Select another payment method"
 msgstr ""
 
-#: ../classes/admin/class-kco-admin-notices.php:108
-msgid "You need to enable and configure https to be able to use Klarna Checkout. "
+#: ../includes/kco-functions.php:574
+msgid "Waiting for verification from Klarnas push notification"
 msgstr ""
 
-#. translators: %s: URL.
-#: ../classes/admin/class-kco-admin-notices.php:128
-msgid "It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href=\"%s\">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>). "
+#: ../includes/kco-functions.php:569
+msgid "Klarna Checkout order was rejected"
 msgstr ""
 
 #: ../classes/admin/class-kco-admin-notices.php:147

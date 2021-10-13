@@ -163,7 +163,6 @@ class KCO_Subscription {
 						// Modify merchant url's.
 						global $wp;
 						$query_string     = filter_input( INPUT_SERVER, 'QUERY_STRING', FILTER_SANITIZE_URL );
-						$query_string     = $query_string;
 						$current_url      = add_query_arg( $query_string, '', home_url( $wp->request ) );
 						$confirmation_url = add_query_arg(
 							array(
@@ -202,7 +201,7 @@ class KCO_Subscription {
 	 * @param array $klarna_order The Klarna order.
 	 * @return void
 	 */
-	public function set_recurring_token_for_order( $order_id = null, $klarna_order ) {
+	public function set_recurring_token_for_order( $order_id = null, $klarna_order = null ) {
 		$wc_order = wc_get_order( $order_id );
 		if ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
 			$subscriptions   = wcs_get_subscriptions_for_order( $order_id );
@@ -235,7 +234,7 @@ class KCO_Subscription {
 	 * @param array $klarna_order The Klarna order.
 	 * @return void
 	 */
-	public function set_recurring_token_for_subscription( $subscription_id = null, $klarna_order ) {
+	public function set_recurring_token_for_subscription( $subscription_id = null, $klarna_order = null ) {
 		if ( isset( $klarna_order['recurring_token'] ) ) {
 			$recurring_token = $klarna_order['recurring_token'];
 			update_post_meta( $subscription_id, '_kco_recurring_token', $recurring_token );
@@ -404,7 +403,39 @@ class KCO_Subscription {
 		if ( ! empty( $klarna_order_id ) ) {
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			$this->set_recurring_token_for_subscription( $subscription_id, $klarna_order );
+			$this->update_subscription_address( $subscription_id, $klarna_order );
 		}
+	}
+
+	/**
+	 * Update the address for a subscription after changing payment method.
+	 *
+	 * @param int   $subscription_id The ID of the WooCommerce Subscription.
+	 * @param array $klarna_order The Klarna order.
+	 * @return void
+	 */
+	public function update_subscription_address( $subscription_id, $klarna_order ) {
+		$subscription = wcs_get_subscription( $subscription_id );
+
+		$subscription->set_billing_first_name( $klarna_order['billing_address']['given_name'] );
+		$subscription->set_billing_last_name( $klarna_order['billing_address']['family_name'] );
+		$subscription->set_billing_address_1( $klarna_order['billing_address']['street_address'] );
+		$subscription->set_billing_address_2( $klarna_order['billing_address']['street_address2'] );
+		$subscription->set_billing_country( strtoupper( $klarna_order['billing_address']['country'] ) );
+		$subscription->set_billing_postcode( $klarna_order['billing_address']['postal_code'] );
+		$subscription->set_billing_city( $klarna_order['billing_address']['city'] );
+		$subscription->set_billing_email( $klarna_order['billing_address']['email'] );
+		$subscription->set_billing_phone( $klarna_order['billing_address']['phone'] );
+
+		$subscription->set_shipping_first_name( $klarna_order['shipping_address']['given_name'] );
+		$subscription->set_shipping_last_name( $klarna_order['shipping_address']['family_name'] );
+		$subscription->set_shipping_address_1( $klarna_order['shipping_address']['street_address'] );
+		$subscription->set_shipping_address_2( $klarna_order['shipping_address']['street_address2'] );
+		$subscription->set_shipping_country( strtoupper( $klarna_order['shipping_address']['country'] ) );
+		$subscription->set_shipping_postcode( $klarna_order['shipping_address']['postal_code'] );
+		$subscription->set_shipping_city( $klarna_order['shipping_address']['city'] );
+
+		$subscription->save();
 	}
 }
 new KCO_Subscription();

@@ -4,14 +4,28 @@ on:
     branches:
       - develop
 jobs:
-  build:
-    name: Run tests
-    runs-on: ubuntu-latest
+  test-plugin:
+    name: Run E2E Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    env:
+      API_KEY: ${{secrets.E2E_API_KEY}}
+      API_SECRET: ${{secrets.E2E_API_SECRET}}
     steps:
-      - uses: convictional/trigger-workflow-and-wait@v1.3.0
+      - name: Create dirs.
+        run: |
+              mkdir -p kco
+      - name: Setup KCO
+        uses: actions/checkout@v2
         with:
-          owner: krokedil
-          repo: e2e-tests
-          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow_file_name: e2e-tests.yml
-          ref: master
+          path: kco
+      - name: Setup Yarn
+        run: |
+           cd ./kco/tests/e2e/
+           yarn install
+      - name: Run Tests
+        run: |
+           cd ./kco/tests/e2e/
+           yarn e2e:test

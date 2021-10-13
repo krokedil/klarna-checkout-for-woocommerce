@@ -53,9 +53,9 @@ class KCO_Fields {
 				),
 			),
 			'add_to_email'               => array(
-				'title'    => __( 'Add Klarna Urls to order email', 'klarna-checkout-for-woocommerce' ),
+				'title'    => __( 'Add Klarna Post Purchase info to order email', 'klarna-checkout-for-woocommerce' ),
 				'type'     => 'checkbox',
-				'label'    => __( 'This will add Klarna urls to the order emails that are sent. You can read more about this here: ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://developers.klarna.com/resources/klarna-score/order-confirmation-email/" target="_blank">Klarna URLs</a>',
+				'label'    => __( 'This will add Klarnas Post Purchase information to the order emails that are sent. You can read more about this here: ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.klarna.com/guidelines/klarna-checkout-best-practices/post-purchase/order-confirmation/" target="_blank">Klarna URLs</a>',
 				'default'  => 'no',
 				'desc_tip' => true,
 			),
