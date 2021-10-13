@@ -21,7 +21,7 @@ jobs:
     - name: Install Packages
       run: |
         echo "Update package lists."
-        curl -sS https://getcomposer.org/installer | php 
+        curl -sS -k https://getcomposer.org/installer | php 
         mv composer.phar /usr/local/bin/composer
     - name: Install Composer
       run: |
