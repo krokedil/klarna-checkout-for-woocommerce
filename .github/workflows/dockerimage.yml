@@ -27,7 +27,7 @@ jobs:
     - name: Install Composer
       run: |
         echo "Install composer."
-        curl -sS https://getcomposer.org/installer | php 
+        curl -sS -k https://getcomposer.org/installer | php 
         mv composer.phar /usr/local/bin/composer
     - name: Install PHPCS with WordPress Coding Standards
       run: |
