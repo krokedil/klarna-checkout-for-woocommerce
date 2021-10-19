@@ -175,7 +175,7 @@ const getOrderData = async (thankyouIframe) => {
 			}
 		}
 
-		let orderTotal = parseFloat( orderTotalData.firstChild.querySelector("div").childNodes[1].innerHTML.replace(",", ".").replace("&nbsp;kr", "") );
+		let orderTotal = parseFloat( orderTotalData.firstChild.querySelector("div").childNodes[1].innerHTML.replace(",", ".").replace("&nbsp;kr", "").replace("&nbsp;", "") );
 		return [orderLines, orderTotal];
 	});
 
