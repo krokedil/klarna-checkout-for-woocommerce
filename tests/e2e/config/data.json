@@ -21,83 +21,92 @@
 		"simple": [
 			{
 				"id": null,
-				"name": "Simple 25%",
-				"sku": "simple-25",
-				"regular_price": "99.99",
-				"virtual": false,
-				"downloadable": false,
-				"tax_class": "25"
-			},
-			{
-				"id": null,
-				"name": "Simple 12%",
-				"sku": "simple-12",
-				"regular_price": "158.39",
-				"virtual": false,
-				"downloadable": false,
-				"tax_class": "12"
-			},
-			{
-				"id": null,
-				"name": "Simple 6%",
-				"sku": "simple-06",
-				"regular_price": "84.49",
-				"virtual": false,
-				"downloadable": false,
-				"tax_class": "06"
-			},
-			{
-				"id": null,
-				"name": "Simple 0%",
-				"sku": "simple-00",
+				"name": "Test Product - (Simple Product, 25% Tax, Stock Quantity)",
+				"sku": "test-product-simple-product-25-tax-stock-quantity",
 				"regular_price": "9.99",
 				"virtual": false,
 				"downloadable": false,
+				"tax_class": "25"
+			},
+			{
+				"id": null,
+				"name": "Test Product - (Virtual, 0% Tax, Stock Quantity)",
+				"sku": "test-product-virtual-0-tax-stock-quantity",
+				"regular_price": "1490",
+				"virtual": true,
+				"downloadable": false,
 				"tax_class": "00"
 			},
 			{
 				"id": null,
-				"name": "Simple Virtual 25%",
-				"sku": "simple-virtual-25",
-				"regular_price": "12.85",
+				"name": "Test Product - (Virtual, 25% Tax, Stock Quantity)",
+				"sku": "test-product-virtual-25-tax-stock-quantity",
+				"regular_price": "1490",
+				"virtual": true,
+				"downloadable": false,
+				"tax_class": "25"
+			},
+			{
+				"id": null,
+				"name": "Test Product - (Virtual, Downloadable, 0% Tax, Stock Quantity)",
+				"sku": "test-product-virtual-downloadable-0-tax-stock-quantity",
+				"regular_price": "1490",
+				"virtual": true,
+				"downloadable": true,
+				"tax_class": "00"
+			},
+			{
+				"id": null,
+				"name": "Test Product - (Virtual, Downloadable, 25% Tax, Stock Quantity)",
+				"sku": "test-product-virtual-downloadable-25-tax-stock-quantity",
+				"regular_price": "1490",
 				"virtual": true,
 				"downloadable": true,
 				"tax_class": "25"
 			},
 			{
 				"id": null,
-				"name": "Simple Virtual 12%",
-				"sku": "simple-virtual-12",
-				"regular_price": "6.54",
-				"virtual": true,
+				"name": "Test Product - (Downloadable, Shipping, 0% Tax, Stock Quantity)",
+				"sku": "test-product-downloadable-0-tax-stock-quantity",
+				"regular_price": "1490",
+				"virtual": false,
 				"downloadable": true,
+				"tax_class": "00"
+			},
+			{
+				"id": null,
+				"name": "Test Product - (Downloadable, Shipping, 25% Tax, Stock Quantity)",
+				"sku": "test-product-downloadable-25-tax-stock-quantity",
+				"regular_price": "1490",
+				"virtual": false,
+				"downloadable": true,
+				"tax_class": "25"
+			},
+			{
+				"id": null,
+				"name": "Test Product - (Simple Product, 12% Tax, Stock Quantity)",
+				"sku": "test-product-simple-product-12-tax",
+				"regular_price": "0.99",
+				"virtual": false,
+				"downloadable": false,
 				"tax_class": "12"
 			},
 			{
 				"id": null,
-				"name": "Simple Virtual 6%",
-				"sku": "simple-virtual-06",
-				"regular_price": "48.24",
-				"virtual": true,
-				"downloadable": true,
+				"name": "Test Product - (Simple Product, 6% Tax, Stock Quantity)",
+				"sku": "test-product-simple-product-6-tax",
+				"regular_price": "0.99",
+				"virtual": false,
+				"downloadable": false,
 				"tax_class": "06"
-			},
-			{
-				"id": null,
-				"name": "Simple Virtual 0%",
-				"sku": "simple-virtual-00",
-				"regular_price": "75.42",
-				"virtual": true,
-				"downloadable": true,
-				"tax_class": "00"
 			}
 		],
 		"variable": [
 			{
 				"id": null,
-				"name": "Variable 25%",
-				"sku": "variable-product-25",
-				"regular_price": "26.75",
+				"name": "Test Product - (1 Variable Product, 25% Tax)",
+				"sku": "test-product-1-variable-product-25-tax",
+				"regular_price": "99",
 				"virtual": false,
 				"downloadable": false,
 				"tax_class": "25",
@@ -111,100 +120,18 @@
 						},
 						{
 							"id": null,
-							"name": "Variable 25%:red",
-							"option": "red"
+							"name": "Variable 25%:blue",
+							"option": "blue"
 						},
 						{
 							"id": null,
 							"name": "Variable 25%:green",
 							"option": "green"
-						}
-					]
-				}
-			},
-			{
-				"id": null,
-				"name": "Variable 12%",
-				"sku": "variable-product-12",
-				"regular_price": "95.28",
-				"virtual": false,
-				"downloadable": false,
-				"tax_class": "12",
-				"attribute": {
-					"name": "color",
-					"options": [
-						{
-							"id": null,
-							"name": "Variable 12%:black",
-							"option": "black"
 						},
 						{
 							"id": null,
-							"name": "Variable 12%:red",
+							"name": "Variable 25%:red",
 							"option": "red"
-						},
-						{
-							"id": null,
-							"name": "Variable 12%:green",
-							"option": "green"
-						}
-					]
-				}
-			},
-			{
-				"id": null,
-				"name": "Variable 6%",
-				"sku": "variable-product-06",
-				"regular_price": "26.79",
-				"virtual": false,
-				"downloadable": false,
-				"tax_class": "06",
-				"attribute": {
-					"name": "color",
-					"options": [
-						{
-							"id": null,
-							"name": "Variable 6%:black",
-							"option": "black"
-						},
-						{
-							"id": null,
-							"name": "Variable 6%:red",
-							"option": "red"
-						},
-						{
-							"id": null,
-							"name": "Variable 6%:green",
-							"option": "green"
-						}
-					]
-				}
-			},
-			{
-				"id": null,
-				"name": "Variable 0%",
-				"sku": "variable-product-00",
-				"regular_price": "52.90",
-				"virtual": false,
-				"downloadable": false,
-				"tax_class": "00",
-				"attribute": {
-					"name": "color",
-					"options": [
-						{
-							"id": null,
-							"name": "Variable 0%:black",
-							"option": "black"
-						},
-						{
-							"id": null,
-							"name": "Variable 0%:red",
-							"option": "red"
-						},
-						{
-							"id": null,
-							"name": "Variable 0%:green",
-							"option": "green"
 						}
 					]
 				}
@@ -224,10 +151,20 @@
 			"discountType": "fixed_cart"
 		},
 		{
+			"code": "fixedproduct",
+			"amount": "13",
+			"discountType": "fixed_product"
+		},
+		{
 			"code": "percent",
-			"amount": "10",
+			"amount": "11",
 			"discountType": "percent"
-		}
+		},
+		{
+			"code": "free",
+			"amount": "100",
+			"discountType": "percent"
+		}	
 	],
 	"shipping": [
 		{

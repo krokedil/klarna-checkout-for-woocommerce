@@ -92,6 +92,11 @@ class KCO_Request_Cart {
 		if ( isset( $settings['shipping_methods_in_iframe'] ) && 'yes' === $settings['shipping_methods_in_iframe'] ) {
 			$order_amount -= $this->get_shipping_amount();
 		}
+
+		if ( $order_amount < 0 ) {
+			return 0;
+		}
+
 		return $order_amount;
 	}
 
@@ -332,10 +337,14 @@ class KCO_Request_Cart {
 			 * Use the applied giftcards.
 			 *
 			 * @var WC_GC_Gift_Card_Data $wc_gc_gift_card_data
-			 */
+			*/
+			$totals_before_giftcard = round( WC()->cart->get_subtotal() + WC()->cart->get_shipping_total() + WC()->cart->get_subtotal_tax() + WC()->cart->get_shipping_tax(), wc_get_price_decimals() );
+			$giftcards              = WC_GC()->giftcards->get();
+			$giftcards_used         = WC_GC()->giftcards->cover_balance( $totals_before_giftcard, WC_GC()->giftcards->get_applied_giftcards_from_session() );
+
 			foreach ( WC_GC()->giftcards->get_applied_giftcards_from_session() as $wc_gc_gift_card_data ) {
 				$gift_card_code   = $wc_gc_gift_card_data->get_data()['code'];
-				$gift_card_amount = - $wc_gc_gift_card_data->get_data()['balance'] * 100;
+				$gift_card_amount = - $giftcards_used['total_amount'] * 100;
 
 				$gift_card = array(
 					'type'                  => 'gift_card',
