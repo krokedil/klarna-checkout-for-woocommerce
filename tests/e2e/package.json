@@ -1,7 +1,7 @@
 {
   "author": "Miodrag Stojanovic <miodrag@krokedil.se>",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "axios-debug-log": "^0.8.4",
     "crypto-js": "^4.0.0",
     "dotenv": "^10.0.0",
