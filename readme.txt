@@ -6,7 +6,7 @@ Requires at least: 4.0
 Tested up to: 5.8.0
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 5.7.0
+WC tested up to: 5.8.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,11 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.10.26    - version 2.6.2 =
+* Fix           - Fixed an issue where we sent the incorrect giftcard amount to Klarna when using WC Giftcards.
+* Tweak         - Updated URLs to our documentation.
+* Tweak         - Update description of the setting that adds post purchase information to emails.
+
 = 2021.09.29    - version 2.6.1 =
 * Fix           - Fixed so that billing and shipping addresses gets updated to the WooCommerce order after the customer changes the payment method for a subscription.
 * Fix           - Fixed an issues where the customer object would sometimes be missing from the Klarna order causing a PHP notice.
