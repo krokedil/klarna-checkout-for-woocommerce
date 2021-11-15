@@ -120,7 +120,7 @@ class KCO_Request_Order {
 			'name'             => substr( $order_fee->get_name(), 0, 254 ),
 			'quantity'         => $order_fee->get_quantity(),
 			'total_amount'     => $this->get_fee_total_amount( $order, $order_fee ),
-			'unit_price'       => $this->get_fee_unit_price( $order, $order_fee ),
+			'unit_price'       => $this->get_fee_unit_price( $order_fee ),
 			'total_tax_amount' => $this->get_fee_total_tax_amount( $order, $order_fee ),
 			'tax_rate'         => ( '0' !== $order->get_total_tax() ) ? $this->get_order_line_tax_rate( $order, current( $order->get_items( 'fee' ) ) ) : 0,
 		);
