@@ -1,16 +1,10 @@
 name: "CI"
 
 on:
-  push:
-    branches:
-      - develop-new-ci
-    paths:
-      - "**.php"
-      - "phpcs.xml"
-      - ".github/workflows/phpcs.yml"
   pull_request:
     branches:
-      - develop-new-ci
+      - develop
+      - master
     paths:
       - "**.php"
       - "phpcs.xml"
