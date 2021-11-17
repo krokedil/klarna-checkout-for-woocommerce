@@ -216,6 +216,10 @@ class KCO_Subscription {
 				foreach ( $subscriptions as $subscription ) {
 					update_post_meta( $subscription->get_id(), '_kco_recurring_token', $recurring_token );
 				}
+
+				// Also update the renewal order with the new recurring token.
+				update_post_meta( $order_id, '_kco_recurring_token', sanitize_key( $recurring_token ) );
+
 			} else {
 				$wc_order->add_order_note( __( 'Recurring token was missing from the Klarna order during the checkout process. Please contact Klarna for help.', 'klarna-checkout-for-woocommerce' ) );
 				$wc_order->set_status( 'on-hold' );

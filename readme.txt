@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.8.0
+Tested up to: 5.8.2
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 5.8.0
+WC tested up to: 5.9.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,6 +62,11 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.11.17    - version 2.6.3 =
+* Fix           - Fixed an issue where we would sometimes print the same error notices twice.
+* Fix           - Fixed a bug that could cause incorrect order totals when using a fee with admin created orders / pay for order links.
+* Fix           - Fixed an issue where we did not update the renewal order with a new recurring token after the customer changes payment method for their subscription.
+
 = 2021.10.26    - version 2.6.2 =
 * Fix           - Fixed an issue where we sent the incorrect giftcard amount to Klarna when using WC Giftcards.
 * Tweak         - Updated URLs to our documentation.

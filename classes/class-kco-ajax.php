@@ -269,5 +269,4 @@ class KCO_AJAX extends WC_AJAX {
 		wp_die();
 	}
 }
-
 KCO_AJAX::init();
