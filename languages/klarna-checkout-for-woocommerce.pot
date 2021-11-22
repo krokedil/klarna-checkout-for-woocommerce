@@ -99,11 +99,11 @@ msgid "Customize the <em>Select another payment method</em> button text that is 
 msgstr ""
 
 #: ../classes/class-kco-fields.php:56
-msgid "Add Klarna Urls to order email"
+msgid "Add Klarna Post Purchase info to order email"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:58
-msgid "This will add Klarna urls to the order emails that are sent. You can read more about this here: "
+msgid "This will add Klarnas Post Purchase information to the order emails that are sent. You can read more about this here: "
 msgstr ""
 
 #: ../classes/class-kco-fields.php:63
@@ -394,7 +394,7 @@ msgstr ""
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:25, ../includes/kco-status-report.php:17
+#: ../classes/class-kco-gateway.php:25, ../includes/admin/views/status-report.php:17
 msgid "Klarna Checkout"
 msgstr ""
 
@@ -426,61 +426,41 @@ msgstr ""
 msgid "Klarna Checkout for WooCommerce"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:221
+#: ../classes/class-kco-subscription.php:224
 msgid "Recurring token was missing from the Klarna order during the checkout process. Please contact Klarna for help."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:214
+#: ../classes/class-kco-subscription.php:213
 msgid "Recurring token for subscription: %s"
 msgstr ""
 
 #. translators: Error message.
-#: ../classes/class-kco-subscription.php:291
+#: ../classes/class-kco-subscription.php:294
 msgid "Subscription payment failed with Klarna. Message: %1$s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:284
+#: ../classes/class-kco-subscription.php:287
 msgid "Subscription payment made with Klarna. Klarna order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:318
+#: ../classes/class-kco-subscription.php:321
 msgid "Klarna recurring token"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:370
+#: ../classes/class-kco-subscription.php:373
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:364
+#: ../classes/class-kco-subscription.php:367
 msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:391
+#: ../classes/class-kco-subscription.php:394
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
-#: ../classes/class-kco-templates.php:179
+#: ../classes/class-kco-templates.php:180
 msgid "Failed to load Klarna Checkout template file."
-msgstr ""
-
-#: ../includes/kco-functions.php:77
-msgid "Select another payment method"
-msgstr ""
-
-#: ../includes/kco-functions.php:533
-msgid "Waiting for verification from Klarnas push notification"
-msgstr ""
-
-#: ../includes/kco-functions.php:528
-msgid "Klarna Checkout order was rejected"
-msgstr ""
-
-#: ../includes/kco-status-report.php:17
-msgid "Klarna Checkout System Status."
-msgstr ""
-
-#: ../classes/admin/class-kco-admin-notices.php:91
-msgid "You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout. "
 msgstr ""
 
 #: ../includes/kco-functions.php:118
@@ -493,6 +473,23 @@ msgstr ""
 
 #: ../includes/kco-functions.php:569
 msgid "Klarna Checkout order was rejected"
+msgstr ""
+
+#: ../classes/admin/class-kco-admin-notices.php:91
+msgid "You need to specify a terms page in WooCommerce Settings to be able to use Klarna Checkout. "
+msgstr ""
+
+#: ../classes/admin/class-kco-admin-notices.php:91, ../classes/admin/class-kco-admin-notices.php:108, ../classes/admin/class-kco-admin-notices.php:128, ../classes/admin/class-kco-admin-notices.php:147, ../classes/admin/class-kco-admin-notices.php:169, ../classes/admin/class-kco-admin-notices.php:232
+msgid "Read more here. "
+msgstr ""
+
+#: ../classes/admin/class-kco-admin-notices.php:108
+msgid "You need to enable and configure https to be able to use Klarna Checkout. "
+msgstr ""
+
+#. translators: %s: URL.
+#: ../classes/admin/class-kco-admin-notices.php:128
+msgid "It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Klarna Checkout plugin. You can deactivate this feature in the  <a href=\"%s\">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>). "
 msgstr ""
 
 #: ../classes/admin/class-kco-admin-notices.php:147
@@ -554,4 +551,32 @@ msgstr ""
 
 #: ../classes/requests/helpers/class-kco-request-cart.php:702, ../classes/requests/helpers/class-kco-request-cart.php:730
 msgid "Shipping"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:17
+msgid "Klarna Checkout System Status."
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:63
+msgid "No error logs"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:27
+msgid "Time"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:29
+msgid "Request"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:30
+msgid "Response Code"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:31
+msgid "Response Message"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:32
+msgid "Correlation ID"
 msgstr ""
