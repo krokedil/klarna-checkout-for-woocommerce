@@ -74,6 +74,7 @@ class KCO_Checkout {
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
 		if ( empty( $klarna_order_id ) ) {
+			KCO_Logger::log( 'Missing WC session kco_wc_order_id during update Klarna order sequence.' );
 			return;
 		}
 
