@@ -29,7 +29,7 @@ class KCO_Request_Create extends KCO_Request {
 		$klarna_order_id = is_wp_error( $formated_response ) ? null : $formated_response['order_id'];
 
 		// Log the request.
-		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO create order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code );
+		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO create order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $request_url );
 		KCO_Logger::log( $log );
 		return $formated_response;
 	}
