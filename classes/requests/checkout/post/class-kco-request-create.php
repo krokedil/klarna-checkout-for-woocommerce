@@ -89,13 +89,28 @@ class KCO_Request_Create extends KCO_Request {
 				'city'            => WC()->checkout()->get_value( 'billing_city' ),
 				'region'          => WC()->checkout()->get_value( 'billing_state' ),
 			);
+
+			if ( 'yes' === $this->settings['allow_separate_shipping'] ) {
+				$request_body['shipping_address'] = array(
+					'email'           => WC()->checkout()->get_value( 'billing_email' ),
+					'phone'           => WC()->checkout()->get_value( 'billing_phone' ),
+					'postal_code'     => WC()->checkout()->get_value( 'shipping_postcode' ),
+					'country'         => WC()->checkout()->get_value( 'shipping_country' ),
+					'given_name'      => WC()->checkout()->get_value( 'shipping_first_name' ),
+					'family_name'     => WC()->checkout()->get_value( 'shipping_last_name' ),
+					'street_address'  => WC()->checkout()->get_value( 'shipping_address_1' ),
+					'street_address2' => WC()->checkout()->get_value( 'shipping_address_2' ),
+					'city'            => WC()->checkout()->get_value( 'shipping_city' ),
+					'region'          => WC()->checkout()->get_value( 'shipping_state' ),
+				);
+			}
 		}
 
 		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {
 			$request_body['shipping_options'] = KCO_Request_Shipping_Options::get_shipping_options( $this->separate_sales_tax );
 		}
 
-		return $request_body;
+			return $request_body;
 	}
 
 	/**
