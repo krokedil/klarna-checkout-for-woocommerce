@@ -92,8 +92,6 @@ class KCO_Request_Create extends KCO_Request {
 
 			if ( 'yes' === $this->settings['allow_separate_shipping'] ) {
 				$request_body['shipping_address'] = array(
-					'email'           => WC()->checkout()->get_value( 'billing_email' ),
-					'phone'           => WC()->checkout()->get_value( 'billing_phone' ),
 					'postal_code'     => WC()->checkout()->get_value( 'shipping_postcode' ),
 					'country'         => WC()->checkout()->get_value( 'shipping_country' ),
 					'given_name'      => WC()->checkout()->get_value( 'shipping_first_name' ),
