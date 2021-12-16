@@ -42,7 +42,6 @@ class KCO_API_Callbacks {
 	public function __construct() {
 		add_action( 'woocommerce_api_kco_wc_push', array( $this, 'push_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_notification', array( $this, 'notification_cb' ) );
-		add_action( 'woocommerce_api_kco_wc_shipping_option_update', array( $this, 'shipping_option_update_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
 		add_action( 'kco_wc_punted_notification', array( $this, 'kco_wc_punted_notification_cb' ), 10, 2 );
 	}
@@ -177,23 +176,6 @@ class KCO_API_Callbacks {
 	 */
 	public function kco_wc_punted_notification_cb( $klarna_order_id, $data ) {
 		do_action( 'wc_klarna_notification_listener', $klarna_order_id, $data );
-	}
-
-	/**
-	 * Shipping option update callback function.
-	 * Response must be sent to Klarna API.
-	 *
-	 * @link https://developers.klarna.com/api/#checkout-api-callbacks-shipping-option-update
-	 */
-	public function shipping_option_update_cb() {
-		// Send back order amount, order tax amount, order lines, purchase currency and status 200.
-		$post_body = file_get_contents( 'php://input' );
-		$data      = json_decode( $post_body, true );
-		do_action( 'wc_klarna_shipping_option_update_cb', $data );
-
-		header( 'HTTP/1.0 200 OK' );
-		echo wp_json_encode( $data, JSON_PRETTY_PRINT );
-		die();
 	}
 
 	/**
