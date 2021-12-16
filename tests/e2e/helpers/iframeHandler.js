@@ -146,6 +146,11 @@ const completeOrder = async (page, kcoIframe) => {
 			let inputField = await fullscreenIframe.$("[id='nin']");
 			await inputField.click({clickCount: 3});
 			await inputField.type("410321-9202");
+			
+			await page.waitForTimeout(0.25 * timeOutTime);
+			if ( await fullscreenIframe.$('[id="b2b_nin_dialog__footer-button-wrapper"]') ) {
+				await fullscreenIframe.click('[id="b2b_nin_dialog__footer-button-wrapper"]');
+			}
 		}
 
 		await page.waitForTimeout(0.25 * timeOutTime);
