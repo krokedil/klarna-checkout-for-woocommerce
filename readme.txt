@@ -62,6 +62,12 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2021.12.16    - version 2.6.4 =
+* Enhancement   - Stored customer shipping address will now be sent to Klarna with the first request if you have enabled separate shipping address in the plugin.
+* Enhancement   - The Request URLs are now saved to the log entries to make debugging issues easier.
+* Enhancement   - Translations for the mail text addition have been added for several languages.
+* Fix           - Removed old code related to the shipping option callback from Klarna that we no longer use.
+
 = 2021.11.17    - version 2.6.3 =
 * Fix           - Fixed an issue where we would sometimes print the same error notices twice.
 * Fix           - Fixed a bug that could cause incorrect order totals when using a fee with admin created orders / pay for order links.
