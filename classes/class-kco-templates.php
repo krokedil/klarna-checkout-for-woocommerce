@@ -77,7 +77,7 @@ class KCO_Templates {
 				if ( locate_template( 'woocommerce/klarna-checkout.php' ) ) {
 					$klarna_checkout_template = locate_template( 'woocommerce/klarna-checkout.php' );
 				} else {
-					$klarna_checkout_template = KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout.php';
+					$klarna_checkout_template = apply_filters( 'kco_locate_checkout_template', KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout.php', $template_name );
 				}
 
 				// Klarna checkout page.
