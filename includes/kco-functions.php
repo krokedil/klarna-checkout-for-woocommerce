@@ -128,6 +128,20 @@ function kco_wc_show_another_gateway_button() {
 }
 
 /**
+ * Adds the extra checkout field div to the checkout page.
+ *
+ * @return void
+ */
+function kco_wc_add_extra_checkout_fields() {
+	do_action( 'kco_wc_before_extra_fields' );
+	?>
+	<div id="kco-extra-checkout-fields">
+	</div>
+	<?php
+	do_action( 'kco_wc_after_extra_fields' );
+}
+
+/**
  * Get the selected, or the first, payment method.
  */
 function kco_wc_get_selected_payment_method() {
