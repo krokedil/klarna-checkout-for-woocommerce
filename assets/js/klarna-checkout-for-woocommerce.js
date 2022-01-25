@@ -318,11 +318,9 @@ jQuery( function( $ ) {
 
 				// extra shipping fields (email, phone).
 				if (kco_wc.shippingEmailExists === true && $('#shipping_email')) {
-					console.log('da li ulazis nekada ovde email');
 					$( '#shipping_email' ).val( ( ( 'email' in data.shipping_address ) ? data.shipping_address.email : '' ) );
 				}
 				if (kco_wc.shippingPhoneExists === true && $('#shipping_phone')) {
-					console.log('da li nekada ulazis ovde phone')
 					$( '#shipping_phone' ).val( ( ( 'phone' in data.shipping_address ) ? data.shipping_address.phone : '' ) );
 				}
 			}
