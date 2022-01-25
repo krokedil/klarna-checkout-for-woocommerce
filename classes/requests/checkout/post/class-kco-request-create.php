@@ -91,6 +91,18 @@ class KCO_Request_Create extends KCO_Request {
 			);
 
 			if ( 'yes' === $this->settings['allow_separate_shipping'] ) {
+				if ( ! empty( WC()->checkout()->get_value( 'shipping_phone' ) ) ) {
+					$shipping_phone = WC()->checkout()->get_value( 'shipping_phone' );
+				} else {
+					$shipping_phone = WC()->checkout()->get_value( 'billing_phone' );
+				}
+
+				if ( ! empty( WC()->checkout()->get_value( 'shipping_email' ) ) ) {
+					$shipping_email = WC()->checkout()->get_value( 'shipping_email' );
+				} else {
+					$shipping_email = WC()->checkout()->get_value( 'billing_email' );
+				}
+
 				$request_body['shipping_address'] = array(
 					'postal_code'     => WC()->checkout()->get_value( 'shipping_postcode' ),
 					'country'         => WC()->checkout()->get_value( 'shipping_country' ),
@@ -100,6 +112,8 @@ class KCO_Request_Create extends KCO_Request {
 					'street_address2' => WC()->checkout()->get_value( 'shipping_address_2' ),
 					'city'            => WC()->checkout()->get_value( 'shipping_city' ),
 					'region'          => WC()->checkout()->get_value( 'shipping_state' ),
+					'phone'           => $shipping_phone,
+					'email'           => $shipping_email,
 				);
 			}
 		}
