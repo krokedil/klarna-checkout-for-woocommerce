@@ -15,8 +15,6 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 *Checkout is an embedded checkout solution and includes all popular payment methods (Pay Now, Pay Later, Financing, Installments). With Checkout, Klarna is your single payment provider.*
 
-https://www.youtube.com/watch?v=XayUzOUkyDQ
-
 Our complete checkout is a seamless and mobile optimized solution that delivers a best-in-class user experience that comes with all our payment methods. It also identifies the customer and enables one-click repeat purchases across Klarna’s merchant network, resulting in increased average order value, conversions, and loyalty.
 
 This official Klarna extension also makes it easy for you to handle orders in WooCommerce after a purchase is complete. With a single click of a button, you can activate, update, refund and cancel orders directly from WooCommerce without logging into the Klarna administration.
