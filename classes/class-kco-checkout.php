@@ -31,19 +31,19 @@ class KCO_Checkout {
 	public function add_shipping_data_input( $fields ) {
 		$default = '';
 
-        if ( is_checkout() ) {
-            $klarna_order_id  = WC()->session->get( 'kco_wc_order_id' );
-            $shipping_data    = get_transient( 'kss_data_' . $klarna_order_id );
-            $default          = wp_json_encode( $shipping_data );
-        }
+		if ( is_checkout() ) {
+			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+			$shipping_data   = get_transient( 'kss_data_' . $klarna_order_id );
+			$default         = wp_json_encode( $shipping_data );
+		}
 
-        $fields['billing']['kco_shipping_data'] = array(
-            'type'    => 'hidden',
-            'class'   => array( 'kco_shipping_data' ),
-            'default' => $default,
-        );
+		$fields['billing']['kco_shipping_data'] = array(
+			'type'    => 'hidden',
+			'class'   => array( 'kco_shipping_data' ),
+			'default' => $default,
+		);
 
-        return $fields;
+		return $fields;
 	}
 
 	/**
@@ -55,6 +55,11 @@ class KCO_Checkout {
 		if ( ! is_checkout() ) {
 			return;
 		}
+
+		if ( 'kco' !== WC()->session->get( 'chosen_payment_method' ) ) {
+			return;
+		}
+
 		if ( isset( $_POST['post_data'] ) ) { // phpcs:ignore
 			parse_str( $_POST['post_data'], $post_data ); // phpcs:ignore
 			if ( isset( $post_data['kco_shipping_data'] ) ) {

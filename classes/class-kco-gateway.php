@@ -261,7 +261,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				}
 			}
 
-			$standard_woo_checkout_fields = apply_filters( 'kco_ignored_checkout_fields', array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'terms', 'terms-field', '_wp_http_referer' ) );
+			$standard_woo_checkout_fields = apply_filters( 'kco_ignored_checkout_fields', array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'terms', 'terms-field', '_wp_http_referer', 'ship_to_different_address' ) );
 			$checkout_localize_params     = array(
 				'update_cart_url'              => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
 				'update_cart_nonce'            => wp_create_nonce( 'kco_wc_update_cart' ),
@@ -285,6 +285,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'timeout_time'                 => apply_filters( 'kco_checkout_timeout_duration', 20 ),
 				'countries'                    => kco_get_country_codes(),
 				'pay_for_order'                => $pay_for_order,
+				'no_shipping_message'          => apply_filters( 'woocommerce_no_shipping_available_html', __( 'There are no shipping options available. Please ensure that your address has been entered correctly, or contact us if you need any help.', 'woocommerce' ) ),
 			);
 
 			if ( version_compare( WC_VERSION, '3.9', '>=' ) ) {

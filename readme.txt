@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.8.2
+Tested up to: 5.9
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 5.9.0
+WC tested up to: 6.2.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -14,8 +14,6 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 == DESCRIPTION ==
 
 *Checkout is an embedded checkout solution and includes all popular payment methods (Pay Now, Pay Later, Financing, Installments). With Checkout, Klarna is your single payment provider.*
-
-https://www.youtube.com/watch?v=XayUzOUkyDQ
 
 Our complete checkout is a seamless and mobile optimized solution that delivers a best-in-class user experience that comes with all our payment methods. It also identifies the customer and enables one-click repeat purchases across Klarna’s merchant network, resulting in increased average order value, conversions, and loyalty.
 
@@ -62,6 +60,16 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2022.03.08    - version 2.7.0 =
+* Enhancement   - Added a filter for the located checkout template when the Klarna checkout template is being used. The filter is kco_locate_checkout_template.
+* Enhancement   - Added the field ship_to_different_address as a standard field, to prevent it from being moved.
+* Enhancement   - Added shipping email and shipping phone to the default address that we send to Klarna if they are available.
+* Fix           - We will now show the standard WooCommerce text for missing shipping methods if the customer address does not have a valid shipping method.
+* Fix           - Fixed a bug that caused shipping options to not be updated properly on the normal checkout page if you had selected to show shipping options in Klarna Checkout.
+* Fix           - Fixed an issue caused by us printing error notices during AJAX calls.
+* Fix           - Fixed a incorrect log of GET order requests being logged as a POST request.
+* Fix           - Removed the ability to use External Payment Methods for admin created orders, since this caused an issue when switching to the other payment method on the confirmation page.
+
 = 2021.12.16    - version 2.6.4 =
 * Enhancement   - Stored customer shipping address will now be sent to Klarna with the first request if you have enabled separate shipping address in the plugin.
 * Enhancement   - The Request URLs are now saved to the log entries to make debugging issues easier.
