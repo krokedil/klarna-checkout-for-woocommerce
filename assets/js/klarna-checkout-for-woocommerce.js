@@ -195,8 +195,10 @@ jQuery( function( $ ) {
 				return;
 			}
 
-			if ( 'kco' === kco_wc.paymentMethod && 'yes' === kco_params.shipping_methods_in_iframe && 'no' === kco_params.is_confirmation_page ) {
-				if ( $( '#shipping_method input[type=\'radio\']' ).length ) {
+			if ('kco' === kco_wc.paymentMethod && 'yes' === kco_params.shipping_methods_in_iframe && 'no' === kco_params.is_confirmation_page) {
+				
+				var available_shipping_methods = $('#shipping_method input[type=\'radio\']').length
+				if ( available_shipping_methods > 1 ) {
 					// Multiple shipping options available.
 					$( '#shipping_method input[type=\'radio\']:checked' ).each( function() {
 						var idVal = $( this ).attr( 'id' );
@@ -204,12 +206,17 @@ jQuery( function( $ ) {
 						$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
 						$( '.woocommerce-shipping-totals td' ).addClass( 'kco-shipping' );
 					});
-				} else {
+
+				} else if ( available_shipping_methods === 1) {
 					// Only one shipping option available.
 					var idVal = $( '#shipping_method input[name=\'shipping_method[0]\']' ).attr( 'id' );
 					var shippingPrice = $( 'label[for=\'' + idVal + '\']' ).text();
 					$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
-					$( '.woocommerce-shipping-totals td' ).addClass( 'kco-shipping' );
+					$('.woocommerce-shipping-totals td').addClass('kco-shipping');
+					
+				} else {
+					// No shipping method is available.
+					$('.woocommerce-shipping-totals td').text(kco_params.no_shipping_message);
 				}
 			}
 		},
