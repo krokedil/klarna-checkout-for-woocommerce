@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.9
+Tested up to: 5.9.1
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 6.2.0
+WC tested up to: 6.3.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -60,6 +60,9 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
 
 == Changelog ==
+= 2022.03.09    - version 2.7.1 =
+* Fix           - Fix showing standard WooCommerce text for missing shipping methods when there is only a single shipping method available.
+
 = 2022.03.08    - version 2.7.0 =
 * Enhancement   - Added a filter for the located checkout template when the Klarna checkout template is being used. The filter is kco_locate_checkout_template.
 * Enhancement   - Added the field ship_to_different_address as a standard field, to prevent it from being moved.
