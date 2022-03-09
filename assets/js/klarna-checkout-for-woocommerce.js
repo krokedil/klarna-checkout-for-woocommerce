@@ -197,20 +197,19 @@ jQuery( function( $ ) {
 
 			if ('kco' === kco_wc.paymentMethod && 'yes' === kco_params.shipping_methods_in_iframe && 'no' === kco_params.is_confirmation_page) {
 				
-				var available_shipping_methods = $('#shipping_method input[type=\'radio\']').length
-				if ( available_shipping_methods > 1 ) {
+				if ( $('#shipping_method input[type="radio"]').length > 1 ) {
 					// Multiple shipping options available.
-					$( '#shipping_method input[type=\'radio\']:checked' ).each( function() {
+					$( '#shipping_method input[type="radio"]:checked' ).each( function() {
 						var idVal = $( this ).attr( 'id' );
-						var shippingPrice = $( 'label[for=\'' + idVal + '\']' ).text();
+						var shippingPrice = $( 'label[for="' + idVal + '"]' ).text();
 						$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
 						$( '.woocommerce-shipping-totals td' ).addClass( 'kco-shipping' );
 					});
 
-				} else if ( available_shipping_methods === 1) {
+				} else if ( $('#shipping_method input[type="hidden"]').length === 1) {
 					// Only one shipping option available.
-					var idVal = $( '#shipping_method input[name=\'shipping_method[0]\']' ).attr( 'id' );
-					var shippingPrice = $( 'label[for=\'' + idVal + '\']' ).text();
+					var idVal = $( '#shipping_method input[name="shipping_method[0]"]' ).attr( 'id' );
+					var shippingPrice = $( 'label[for="' + idVal + '"]' ).text();
 					$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
 					$('.woocommerce-shipping-totals td').addClass('kco-shipping');
 					
