@@ -43,7 +43,7 @@ __Klarna Payments__ removes the headaches of payments, for both consumers and me
 1. Upload plugin folder to to the "/wp-content/plugins/" directory.
 2. Activate the plugin through the "Plugins" menu in WordPress.
 3. Go WooCommerce Settings –> Payment Gateways and configure your Klarna Checkout settings.
-4. Read more about the configuration process in the [plugin documentation](https://docs.krokedil.com/collection/121-klarna-checkout/).
+4. Read more about the configuration process in the [plugin documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 
 == Frequently Asked Questions ==
@@ -51,13 +51,7 @@ __Klarna Payments__ removes the headaches of payments, for both consumers and me
 Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria, the Netherlands, UK and United States.
 
 = Where can I find Klarna Checkout for WooCommerce documentation? =
-For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/collection/121-klarna-checkout/).
-
-= Are there any specific requirements? =
-* WooCommerce 3.2 or newer is required.
-* PHP 5.6 or higher is required.
-* A SSL Certificate is required.
-* This plugin integrates with Klarnas V3 platform. You need an agreement with Klarna specific to the V3 platform to use this plugin.
+For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
 = 2022.03.09    - version 2.7.1 =
