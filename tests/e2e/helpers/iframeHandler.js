@@ -75,11 +75,13 @@ const processKcoForm = async (page, kcoIframe, customerType) => {
 	if ( await kcoIframe.$("[data-cid='am.street_address']") ) {
 		let inputField = await kcoIframe.$("[data-cid='am.street_address']");
 		await inputField.click({clickCount: 3});
+		await inputField.click({clickCount: 3});
 		await inputField.type("Hamngatan 2");
 	}
 
 	if ( await kcoIframe.$("[data-cid='am.city']") ) {
 		let inputField = await kcoIframe.$("[data-cid='am.city']");
+		await inputField.click({clickCount: 3});
 		await inputField.click({clickCount: 3});
 		await inputField.type("Arvika");
 	}
