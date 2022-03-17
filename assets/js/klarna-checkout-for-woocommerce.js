@@ -215,7 +215,7 @@ jQuery( function( $ ) {
 					
 				} else {
 					// No shipping method is available.
-					$('.woocommerce-shipping-totals td').text(kco_params.no_shipping_message);
+					$('.woocommerce-shipping-totals td').html(kco_params.no_shipping_message);
 				}
 			}
 		},
