@@ -54,6 +54,9 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2022.03.17    - version 2.7.2 =
+* Tweak         - Print any HTML part of the standard WooCommerce text for missing shipping methods if the customer address does not have a valid shipping method.
+
 = 2022.03.09    - version 2.7.1 =
 * Fix           - Fix showing standard WooCommerce text for missing shipping methods when there is only a single shipping method available.
 
