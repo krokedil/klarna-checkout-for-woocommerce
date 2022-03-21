@@ -32,9 +32,6 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 		 * @return void
 		 */
 		public function add_klarna_data_to_mail( $order, $sent_to_admin, $plain_text, $email ) {
-			if ( $sent_to_admin ) {
-				return;
-			}
 			$gateway_used = $order->get_payment_method();
 			$settings     = get_option( 'woocommerce_kco_settings' );
 			$add_to_email = isset( $settings['add_to_email'] ) && 'yes' === $settings['add_to_email'] ? true : false;
@@ -43,23 +40,24 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 				$klarna_app_url = '<a href="https://app.klarna.com/">' . esc_html__( 'Klarna App', 'klarna-checkout-for-woocommerce' ) . '</a>';
 				?>
 				<p><?php echo esc_html__( 'Klarna order id:', 'klarna-checkout-for-woocommerce' ) . ' ' . esc_html( $order->get_transaction_id() ); ?></p>
-				<p>
-					<?php
-					echo wp_kses(
-						sprintf(
-							// translators: 1. Klarna customer service URL. 2. Klarnas app url.
-							__(
-								'Your payment is processed by our partner %1$s. You will shortly receive instructions on how to complete your payment. You can manage all your payments via Klarna.com or in the %2$s',
-								'klarna-checkout-for-woocommerce'
+				<?php if (!$sent_to_admin) { ?>
+					<p>
+						<?php
+						echo wp_kses(
+							sprintf(
+								// translators: 1. Klarna customer service URL. 2. Klarnas app url.
+								__(
+									'Your payment is processed by our partner %1$s. You will shortly receive instructions on how to complete your payment. You can manage all your payments via Klarna.com or in the %2$s',
+									'klarna-checkout-for-woocommerce'
+								),
+								$klarna_cs_url,
+								$klarna_app_url
 							),
-							$klarna_cs_url,
-							$klarna_app_url
-						),
-						array( 'a' => array( 'href' => array() ) )
-					);
-					?>
-				</p>
-				<?php
+							array( 'a' => array( 'href' => array() ) )
+						);
+						?>
+					</p>
+				<?php }
 			}
 		}
 	}
