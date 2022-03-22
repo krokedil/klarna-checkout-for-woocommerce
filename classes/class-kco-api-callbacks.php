@@ -102,6 +102,7 @@ class KCO_API_Callbacks {
 					// translators: Klarna order ID.
 					$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
 					$order->add_order_note( $note );
+					do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
 				} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
 					$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
 				} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
