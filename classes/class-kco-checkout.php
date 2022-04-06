@@ -95,5 +95,12 @@ class KCO_Checkout {
 			// If it is, update order.
 			$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 		}
+
+		// If cart doesn't need payment anymore - reload the checkout page.
+		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
+			if ( ! WC()->cart->needs_payment() && 'checkout_incomplete' === $klarna_order['status'] ) {
+				WC()->session->reload_checkout = true;
+			}
+		}
 	}
 } new KCO_Checkout();
