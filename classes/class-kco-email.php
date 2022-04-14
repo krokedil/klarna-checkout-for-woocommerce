@@ -25,8 +25,8 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 		 * Adds Klarna data to the order email.
 		 *
 		 * @param WC_Order $order The WooCommerce order.
-		 * @param bool $sent_to_admin If the email is being sent to the admin, and not the customer.
-		 * @param bool $plain_text If the email is as plain text or HTML.
+		 * @param bool     $sent_to_admin If the email is being sent to the admin, and not the customer.
+		 * @param bool     $plain_text If the email is as plain text or HTML.
 		 * @param WC_Email $email The current WooCommerce email object.
 		 *
 		 * @return void
@@ -40,7 +40,7 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 				$klarna_app_url = '<a href="https://app.klarna.com/">' . esc_html__( 'Klarna App', 'klarna-checkout-for-woocommerce' ) . '</a>';
 				?>
 				<p><?php echo esc_html__( 'Klarna order id:', 'klarna-checkout-for-woocommerce' ) . ' ' . esc_html( $order->get_transaction_id() ); ?></p>
-				<?php if (!$sent_to_admin) { ?>
+				<?php if ( ! $sent_to_admin ) { ?>
 					<p>
 						<?php
 						echo wp_kses(
@@ -57,7 +57,8 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 						);
 						?>
 					</p>
-				<?php }
+					<?php
+				}
 			}
 		}
 	}
