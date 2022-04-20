@@ -29,7 +29,7 @@ class KCO_Request_Create extends KCO_Request {
 		$klarna_order_id = is_wp_error( $formated_response ) ? null : $formated_response['order_id'];
 
 		// Log the request.
-		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO create order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code );
+		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO create order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $request_url );
 		KCO_Logger::log( $log );
 		return $formated_response;
 	}
@@ -89,13 +89,40 @@ class KCO_Request_Create extends KCO_Request {
 				'city'            => WC()->checkout()->get_value( 'billing_city' ),
 				'region'          => WC()->checkout()->get_value( 'billing_state' ),
 			);
+
+			if ( 'yes' === $this->settings['allow_separate_shipping'] ) {
+				if ( ! empty( WC()->checkout()->get_value( 'shipping_phone' ) ) ) {
+					$shipping_phone = WC()->checkout()->get_value( 'shipping_phone' );
+				} else {
+					$shipping_phone = WC()->checkout()->get_value( 'billing_phone' );
+				}
+
+				if ( ! empty( WC()->checkout()->get_value( 'shipping_email' ) ) ) {
+					$shipping_email = WC()->checkout()->get_value( 'shipping_email' );
+				} else {
+					$shipping_email = WC()->checkout()->get_value( 'billing_email' );
+				}
+
+				$request_body['shipping_address'] = array(
+					'postal_code'     => WC()->checkout()->get_value( 'shipping_postcode' ),
+					'country'         => WC()->checkout()->get_value( 'shipping_country' ),
+					'given_name'      => WC()->checkout()->get_value( 'shipping_first_name' ),
+					'family_name'     => WC()->checkout()->get_value( 'shipping_last_name' ),
+					'street_address'  => WC()->checkout()->get_value( 'shipping_address_1' ),
+					'street_address2' => WC()->checkout()->get_value( 'shipping_address_2' ),
+					'city'            => WC()->checkout()->get_value( 'shipping_city' ),
+					'region'          => WC()->checkout()->get_value( 'shipping_state' ),
+					'phone'           => $shipping_phone,
+					'email'           => $shipping_email,
+				);
+			}
 		}
 
 		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {
 			$request_body['shipping_options'] = KCO_Request_Shipping_Options::get_shipping_options( $this->separate_sales_tax );
 		}
 
-		return $request_body;
+			return $request_body;
 	}
 
 	/**
@@ -109,7 +136,7 @@ class KCO_Request_Create extends KCO_Request {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'method'     => 'POST',
-			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id ) ) ),
+			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id ), $order_id ) ),
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
 		);
 	}

@@ -25,6 +25,8 @@ jQuery( function( $ ) {
 
 		// True or false if we need to update the Klarna order. Set to false on initial page load.
 		klarnaUpdateNeeded: false,
+		shippingEmailExists: false,
+		shippingPhoneExists: false,
 
 		/**
 		 * Triggers on document ready.
@@ -49,7 +51,7 @@ jQuery( function( $ ) {
 
 		/**
 		 * Resumes the Klarna Iframe
-		 * @param {boolean} autoResumeBool 
+		 * @param {boolean} autoResumeBool
 		 */
 		kcoSuspend: function( autoResumeBool ) {
 			if ( window._klarnaCheckout ) {
@@ -78,7 +80,7 @@ jQuery( function( $ ) {
 
 		/**
 		 * When the customer changes from KCO to other payment methods.
-		 * @param {Event} e 
+		 * @param {Event} e
 		 */
 		changeFromKco: function( e ) {
 			e.preventDefault();
@@ -170,6 +172,12 @@ jQuery( function( $ ) {
 							$( 'div#wc_checkout_add_ons' ).appendTo( '#kco-extra-checkout-fields' );
 						}
 					} else if ( 0 < $( 'p#' + name + '_field' ).length ) {
+						if (name === 'shipping_phone') {
+							kco_wc.shippingPhoneExists = true;
+						}
+						if (name === 'shipping_email') {
+							kco_wc.shippingEmailExists =  true;
+						}
 						$( 'p#' + name + '_field' ).appendTo( '#kco-extra-checkout-fields' );
 					} else {
 						$( 'input[name="' + name + '"]' ).closest( 'p' ).appendTo( '#kco-extra-checkout-fields' );
@@ -186,22 +194,28 @@ jQuery( function( $ ) {
 			if( $('.kco-shipping').length ) {
 				return;
 			}
-			
-			if ( 'kco' === kco_wc.paymentMethod && 'yes' === kco_params.shipping_methods_in_iframe && 'no' === kco_params.is_confirmation_page ) {
-				if ( $( '#shipping_method input[type=\'radio\']' ).length ) {
+
+			if ('kco' === kco_wc.paymentMethod && 'yes' === kco_params.shipping_methods_in_iframe && 'no' === kco_params.is_confirmation_page) {
+				
+				if ( $('#shipping_method input[type="radio"]').length > 1 ) {
 					// Multiple shipping options available.
-					$( '#shipping_method input[type=\'radio\']:checked' ).each( function() {
+					$( '#shipping_method input[type="radio"]:checked' ).each( function() {
 						var idVal = $( this ).attr( 'id' );
-						var shippingPrice = $( 'label[for=\'' + idVal + '\']' ).text();
+						var shippingPrice = $( 'label[for="' + idVal + '"]' ).text();
 						$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
 						$( '.woocommerce-shipping-totals td' ).addClass( 'kco-shipping' );
 					});
-				} else {
+
+				} else if ( $('#shipping_method input[type="hidden"]').length === 1) {
 					// Only one shipping option available.
-					var idVal = $( '#shipping_method input[name=\'shipping_method[0]\']' ).attr( 'id' );
-					var shippingPrice = $( 'label[for=\'' + idVal + '\']' ).text();
+					var idVal = $( '#shipping_method input[name="shipping_method[0]"]' ).attr( 'id' );
+					var shippingPrice = $( 'label[for="' + idVal + '"]' ).text();
 					$( '.woocommerce-shipping-totals td' ).html( shippingPrice );
-					$( '.woocommerce-shipping-totals td' ).addClass( 'kco-shipping' );
+					$('.woocommerce-shipping-totals td').addClass('kco-shipping');
+					
+				} else {
+					// No shipping method is available.
+					$('.woocommerce-shipping-totals td').html(kco_params.no_shipping_message);
 				}
 			}
 		},
@@ -253,7 +267,7 @@ jQuery( function( $ ) {
 				dataType: 'json',
 				success: function( data ) {
 					kco_wc.setCustomerData( data.data );
-					
+
 					// Check Terms checkbox, if it exists.
 					if ( 0 < $( 'form.checkout #terms' ).length ) {
 						$( 'form.checkout #terms' ).prop( 'checked', true );
@@ -273,7 +287,7 @@ jQuery( function( $ ) {
 
 		/**
 		 * Sets the customer data.
-		 * @param {array} data 
+		 * @param {array} data
 		 */
 		setCustomerData: function( data ) {
 			kco_wc.log( data );
@@ -294,7 +308,7 @@ jQuery( function( $ ) {
 				$('#billing_email').change();
 				$('#billing_email').blur();
 			}
-			
+
 			if ( 'shipping_address' in data && data.shipping_address !== null ) {
 				$( '#ship-to-different-address-checkbox' ).prop( 'checked', true);
 
@@ -308,12 +322,20 @@ jQuery( function( $ ) {
 				$( '#shipping_postcode' ).val( ( ( 'postal_code' in data.shipping_address ) ? data.shipping_address.postal_code : '' ) );
 				$( '#shipping_country' ).val( ( ( 'country' in data.shipping_address ) ? data.shipping_address.country.toUpperCase() : '' ) );
 				$( '#shipping_state' ).val( ( ( 'region' in data.shipping_address ) ? data.shipping_address.region : '' ) );
+
+				// extra shipping fields (email, phone).
+				if (kco_wc.shippingEmailExists === true && $('#shipping_email')) {
+					$( '#shipping_email' ).val( ( ( 'email' in data.shipping_address ) ? data.shipping_address.email : '' ) );
+				}
+				if (kco_wc.shippingPhoneExists === true && $('#shipping_phone')) {
+					$( '#shipping_phone' ).val( ( ( 'phone' in data.shipping_address ) ? data.shipping_address.phone : '' ) );
+				}
 			}
 		},
 
 		/**
 		 * Checks the URL for the hashtag.
-		 * @param {function} callback 
+		 * @param {function} callback
 		 */
 		checkUrl: function( callback ) {
 			if ( window.location.hash ) {
@@ -330,13 +352,13 @@ jQuery( function( $ ) {
 					$( '.woocommerce-checkout-review-order-table' ).unblock();
 					$( kco_wc.checkoutFormSelector ).unblock();
 				}
-			} 
+			}
 		},
 
 		/**
 		 * Fails the order with Klarna on a checkout error and timeout.
-		 * @param {function} callback 
-		 * @param {string} event 
+		 * @param {function} callback
+		 * @param {string} event
 		 */
 		failOrder: function( event, error_message, callback ) {
 			callback({ should_proceed: false });
@@ -361,7 +383,7 @@ jQuery( function( $ ) {
 
 		/**
 		 * Logs the message to the klarna checkout log in WooCommerce.
-		 * @param {string} message 
+		 * @param {string} message
 		 */
 		logToFile: function( message ) {
 			$.ajax(
@@ -379,7 +401,7 @@ jQuery( function( $ ) {
 
 		/**
 		 * Logs messages to the console.
-		 * @param {string} message 
+		 * @param {string} message
 		 */
 		log: function( message ) {
 			if ( kco_params.logging ) {
@@ -465,7 +487,7 @@ jQuery( function( $ ) {
 						'shipping_address_change': function( data ) {
 							kco_wc.log( 'shipping_address_change' );
 							kco_wc.log( data );
-							
+
 							var country = kco_wc.convertCountry( data.country.toUpperCase() );
 
 							// Check if shipping address is enabled.

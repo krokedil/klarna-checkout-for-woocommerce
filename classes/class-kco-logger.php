@@ -63,9 +63,10 @@ class KCO_Logger {
 	 * @param array  $request_args The request args.
 	 * @param array  $response The response.
 	 * @param string $code The status code.
+	 * @param string $request_url The request url.
 	 * @return array
 	 */
-	public static function format_log( $klarna_order_id, $method, $title, $request_args, $response, $code ) {
+	public static function format_log( $klarna_order_id, $method, $title, $request_args, $response, $code, $request_url = null ) {
 		// Unset the snippet to prevent issues in the response.
 		if ( isset( $response['html_snippet'] ) ) {
 			unset( $response['html_snippet'] );
@@ -83,6 +84,7 @@ class KCO_Logger {
 			'type'           => $method,
 			'title'          => $title,
 			'request'        => $request_args,
+			'request_url'    => $request_url,
 			'response'       => array(
 				'body' => $response,
 				'code' => $code,

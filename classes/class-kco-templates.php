@@ -41,8 +41,8 @@ class KCO_Templates {
 		add_action( 'wp_footer', array( $this, 'check_that_kco_template_has_loaded' ) );
 
 		// Template hooks.
+		add_action( 'kco_wc_after_order_review', 'kco_wc_add_extra_checkout_fields', 10 );
 		add_action( 'kco_wc_after_order_review', 'kco_wc_show_another_gateway_button', 20 );
-		add_action( 'kco_wc_after_order_review', array( $this, 'add_extra_checkout_fields' ), 10 );
 		add_action( 'kco_wc_before_snippet', 'kco_wc_prefill_consent', 10 );
 		add_action( 'kco_wc_before_snippet', array( $this, 'add_wc_form' ), 10 ); // @TODO Look into changing this to kco_wc_after_wrapper later.
 		add_action( 'kco_wc_before_snippet', array( $this, 'add_review_order_before_submit' ), 15 );
@@ -77,7 +77,7 @@ class KCO_Templates {
 				if ( locate_template( 'woocommerce/klarna-checkout.php' ) ) {
 					$klarna_checkout_template = locate_template( 'woocommerce/klarna-checkout.php' );
 				} else {
-					$klarna_checkout_template = KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout.php';
+					$klarna_checkout_template = apply_filters( 'kco_locate_checkout_template', KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout.php', $template_name );
 				}
 
 				// Klarna checkout page.
@@ -208,20 +208,6 @@ class KCO_Templates {
 			</div>
 			<input id="payment_method_kco" type="radio" class="input-radio" name="payment_method" value="kco" checked="checked" />		</div>
 		<?php
-	}
-
-	/**
-	 * Adds the extra checkout field div to the checkout page.
-	 *
-	 * @return void
-	 */
-	public function add_extra_checkout_fields() {
-		do_action( 'kco_wc_before_extra_fields' );
-		?>
-		<div id="kco-extra-checkout-fields">
-		</div>
-		<?php
-		do_action( 'kco_wc_after_extra_fields' );
 	}
 
 	/**

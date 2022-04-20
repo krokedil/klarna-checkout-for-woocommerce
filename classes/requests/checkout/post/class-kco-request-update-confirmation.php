@@ -29,7 +29,7 @@ class KCO_Request_Update_Confirmation extends KCO_Request {
 		$formated_response = $this->process_response( $response, $request_args, $request_url );
 
 		// Log the request.
-		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO update confirmation', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code );
+		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO update confirmation', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $request_url );
 		KCO_Logger::log( $log );
 		return $formated_response;
 	}
@@ -81,7 +81,7 @@ class KCO_Request_Update_Confirmation extends KCO_Request {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'method'     => 'POST',
-			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $klarna_order, $order_id ) ) ),
+			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $klarna_order, $order_id ), $order_id ) ),
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
 		);
 	}

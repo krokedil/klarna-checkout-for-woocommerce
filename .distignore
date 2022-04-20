@@ -3,6 +3,7 @@
 /.github
 /node_modules
 /tests
+/languages/*-backup-*
 .editorconfig
 .distignore
 .gitignore

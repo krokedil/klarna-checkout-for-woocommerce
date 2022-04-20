@@ -62,7 +62,7 @@ describe("KCO E2E tests", () => {
 
 				// --------------- ADD PRODUCTS TO CART --------------- //
 				await utils.addMultipleProductsToCart(page, args.products, json);
-				await page.waitForTimeout(1 * timeOutTime);
+				await page.waitForTimeout(3 * timeOutTime);
 
 				// --------------- GO TO CHECKOUT --------------- //
 				await page.goto(urls.CHECKOUT);
