@@ -81,7 +81,7 @@ class KCO_Request_Update_Confirmation extends KCO_Request {
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'method'     => 'POST',
-			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $klarna_order, $order_id ) ) ),
+			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $klarna_order, $order_id ), $order_id ) ),
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
 		);
 	}
