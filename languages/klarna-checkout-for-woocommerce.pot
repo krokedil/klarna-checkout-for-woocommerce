@@ -79,11 +79,11 @@ msgid "There was an error installing the addon. Please try again."
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:109, ../includes/kco-functions.php:581
+#: ../classes/class-kco-api-callbacks.php:110, ../includes/kco-functions.php:581
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:106
+#: ../classes/class-kco-api-callbacks.php:107
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
@@ -103,20 +103,20 @@ msgstr ""
 msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
 
-#: ../classes/class-kco-email.php:36
+#: ../classes/class-kco-email.php:39
 msgid "Klarna"
 msgstr ""
 
-#: ../classes/class-kco-email.php:37
+#: ../classes/class-kco-email.php:40
 msgid "Klarna App"
 msgstr ""
 
-#: ../classes/class-kco-email.php:39
+#: ../classes/class-kco-email.php:42
 msgid "Klarna order id:"
 msgstr ""
 
 #. translators: 1. Klarna customer service URL. 2. Klarnas app url.
-#: ../classes/class-kco-email.php:45
+#: ../classes/class-kco-email.php:49
 msgid "Your payment is processed by our partner %1$s. You will shortly receive instructions on how to complete your payment. You can manage all your payments via Klarna.com or in the %2$s"
 msgstr ""
 
@@ -456,23 +456,23 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:281
+#: ../classes/class-kco-gateway.php:282
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:284
+#: ../classes/class-kco-gateway.php:285
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:514
+#: ../classes/class-kco-gateway.php:515
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:573
+#: ../classes/class-kco-gateway.php:574
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:594, ../classes/class-kco-gateway.php:615
+#: ../classes/class-kco-gateway.php:595, ../classes/class-kco-gateway.php:616
 msgid "Reference:"
 msgstr ""
 
@@ -515,6 +515,10 @@ msgstr ""
 
 #: ../classes/class-kco-templates.php:180
 msgid "Failed to load Klarna Checkout template file."
+msgstr ""
+
+#: ../classes/requests/helpers/class-kco-request-cart.php:135
+msgid "Surcharge"
 msgstr ""
 
 #: ../classes/requests/helpers/class-kco-request-cart.php:250, ../classes/requests/helpers/class-kco-request-cart.php:251
@@ -575,32 +579,4 @@ msgstr ""
 
 #: ../klarna-checkout-for-woocommerce.php:164
 msgid "Support"
-msgstr ""
-
-#: ../includes/admin/views/status-report.php:17
-msgid "Klarna Checkout System Status."
-msgstr ""
-
-#: ../includes/admin/views/status-report.php:63
-msgid "No error logs"
-msgstr ""
-
-#: ../includes/admin/views/status-report.php:27
-msgid "Time"
-msgstr ""
-
-#: ../includes/admin/views/status-report.php:29
-msgid "Request"
-msgstr ""
-
-#: ../includes/admin/views/status-report.php:30
-msgid "Response Code"
-msgstr ""
-
-#: ../includes/admin/views/status-report.php:31
-msgid "Response Message"
-msgstr ""
-
-#: ../includes/admin/views/status-report.php:32
-msgid "Correlation ID"
 msgstr ""
