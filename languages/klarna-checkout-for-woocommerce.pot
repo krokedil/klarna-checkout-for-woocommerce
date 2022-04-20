@@ -517,10 +517,6 @@ msgstr ""
 msgid "Failed to load Klarna Checkout template file."
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:135
-msgid "Surcharge"
-msgstr ""
-
 #: ../classes/requests/helpers/class-kco-request-cart.php:250, ../classes/requests/helpers/class-kco-request-cart.php:251
 msgid "Sales Tax"
 msgstr ""
@@ -579,4 +575,32 @@ msgstr ""
 
 #: ../klarna-checkout-for-woocommerce.php:164
 msgid "Support"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:17
+msgid "Klarna Checkout System Status."
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:63
+msgid "No error logs"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:27
+msgid "Time"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:29
+msgid "Request"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:30
+msgid "Response Code"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:31
+msgid "Response Message"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:32
+msgid "Correlation ID"
 msgstr ""

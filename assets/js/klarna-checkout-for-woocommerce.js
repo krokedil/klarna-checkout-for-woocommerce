@@ -276,6 +276,7 @@ jQuery( function( $ ) {
 				},
 				error: function( data ) {
 					console.log( 'error' );
+					window.location.reload();
 				},
 				complete: function( data ) {
 				}
