@@ -80,7 +80,8 @@ class KCO_Request_Order {
 	public function get_order_line_items( $order_item ) {
 		$order_id = $order_item->get_order_id();
 		$order    = wc_get_order( $order_id );
-		return array(
+
+		$order_line = array(
 			'name'             => $order_item->get_name(),
 			'quantity'         => $order_item->get_quantity(),
 			'total_amount'     => $this->get_item_total_amount( $order, $order_item ),
@@ -88,6 +89,20 @@ class KCO_Request_Order {
 			'total_tax_amount' => $this->get_item_total_tax_amount( $order, $order_item ),
 			'tax_rate'         => $this->get_order_line_tax_rate( $order, $order_item ),
 		);
+
+		$settings = get_option( 'woocommerce_kco_settings', array() );
+		if ( isset( $settings['send_product_urls'] ) && 'yes' === $settings['send_product_urls'] ) {
+			$product = wc_get_product( $order_item->get_product_id() );
+
+			$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'shop_single', false );
+			if ( $image_url ) {
+				$order_line['image_url'] = $image_url;
+			}
+
+			$order_line['product_url'] = $product->get_permalink();
+		}
+
+		return $order_line;
 	}
 
 	/**
