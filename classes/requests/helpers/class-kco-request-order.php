@@ -117,13 +117,14 @@ class KCO_Request_Order {
 		$shipping_item = reset( $order->get_shipping_methods() );
 
 		return array(
+			'type'             => 'shipping_fee',
 			'reference'        => $this->get_item_reference( $shipping_item ),
 			'name'             => $order->get_shipping_method(),
 			'quantity'         => 1,
 			'total_amount'     => $this->get_shipping_total_amount( $order ),
 			'unit_price'       => $this->get_shipping_total_amount( $order ),
 			'total_tax_amount' => $this->get_shipping_total_tax_amount( $order ),
-			'tax_rate'         => ( '0' !== $order->get_shipping_tax() ) ? $this->get_order_line_tax_rate( $order, current( $order->get_items( 'shipping' ) ) ) : 0,
+			'tax_rate'         => ( ! empty( floatval( $order->get_shipping_tax() ) ) ) ? $this->get_order_line_tax_rate( $order, current( $order->get_items( 'shipping' ) ) ) : 0,
 		);
 	}
 
@@ -137,13 +138,15 @@ class KCO_Request_Order {
 		$order_id = $order_fee->get_order_id();
 		$order    = wc_get_order( $order_id );
 		return array(
-			'reference'        => $this->get_item_reference( $order_fee ),
-			'name'             => substr( $order_fee->get_name(), 0, 254 ),
-			'quantity'         => $order_fee->get_quantity(),
-			'total_amount'     => $this->get_fee_total_amount( $order, $order_fee ),
-			'unit_price'       => $this->get_fee_unit_price( $order_fee ),
-			'total_tax_amount' => $this->get_fee_total_tax_amount( $order, $order_fee ),
-			'tax_rate'         => ( '0' !== $order->get_total_tax() ) ? $this->get_order_line_tax_rate( $order, current( $order->get_items( 'fee' ) ) ) : 0,
+			'type'                  => 'surcharge',
+			'reference'             => $this->get_item_reference( $order_fee ),
+			'name'                  => substr( $order_fee->get_name(), 0, 254 ),
+			'quantity'              => $order_fee->get_quantity(),
+			'total_amount'          => $this->get_fee_total_amount( $order, $order_fee ),
+			'unit_price'            => $this->get_fee_unit_price( $order_fee ),
+			'total_discount_amount' => 0,
+			'total_tax_amount'      => $this->get_fee_total_tax_amount( $order, $order_fee ),
+			'tax_rate'              => ( ! empty( floatval( $order->get_total_tax() ) ) ) ? $this->get_order_line_tax_rate( $order, current( $order->get_items( 'fee' ) ) ) : 0,
 		);
 	}
 
