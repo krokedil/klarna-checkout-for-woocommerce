@@ -18,7 +18,7 @@ class KCO_Checkout {
 	 */
 	public function __construct() {
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'add_shipping_data_input' ) );
-		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_shipping_method' ), 1 );
+		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_shipping_method' ), 9999 );
 		add_action( 'woocommerce_after_calculate_totals', array( $this, 'update_klarna_order' ), 9999 );
 	}
 
@@ -60,13 +60,26 @@ class KCO_Checkout {
 			return;
 		}
 
+		$data = false;
+
+		/*
+		 * If - During the normal checkout flow.
+		 * Else If - During the placing of the order.
+		 */
 		if ( isset( $_POST['post_data'] ) ) { // phpcs:ignore
 			parse_str( $_POST['post_data'], $post_data ); // phpcs:ignore
 			if ( isset( $post_data['kco_shipping_data'] ) ) {
-				WC()->session->set( 'kco_shipping_data', $post_data['kco_shipping_data'] );
-				$data = json_decode( $post_data['kco_shipping_data'], true );
-				kco_update_wc_shipping( $data );
+				$data = $post_data['kco_shipping_data'];
 			}
+		} else if( isset( $_POST['kco_shipping_data'] ) ) { // phpcs:ignore
+			$data = $_POST['kco_shipping_data']; // phpcs:ignore
+		}
+
+		// If we have data, update the shipping.
+		if ( ! empty( $data ) ) {
+			WC()->session->set( 'kco_shipping_data', $data );
+			$data = json_decode( $post_data['kco_shipping_data'], true );
+			kco_update_wc_shipping( $data );
 		}
 	}
 
