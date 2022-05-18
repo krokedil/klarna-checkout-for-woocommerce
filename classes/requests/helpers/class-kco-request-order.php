@@ -80,8 +80,10 @@ class KCO_Request_Order {
 	public function get_order_line_items( $order_item ) {
 		$order_id = $order_item->get_order_id();
 		$order    = wc_get_order( $order_id );
+		$product  = wc_get_product( $order_item->get_product_id() );
 
 		$order_line = array(
+			'reference'        => $this->get_item_reference( $order_item ),
 			'name'             => $order_item->get_name(),
 			'quantity'         => $order_item->get_quantity(),
 			'total_amount'     => $this->get_item_total_amount( $order, $order_item ),
@@ -92,7 +94,6 @@ class KCO_Request_Order {
 
 		$settings = get_option( 'woocommerce_kco_settings', array() );
 		if ( isset( $settings['send_product_urls'] ) && 'yes' === $settings['send_product_urls'] ) {
-			$product = wc_get_product( $order_item->get_product_id() );
 
 			$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'shop_single', false );
 			if ( $image_url ) {
@@ -112,13 +113,18 @@ class KCO_Request_Order {
 	 * @return array
 	 */
 	public function get_order_line_shipping( $order ) {
+
+		$shipping_item = reset( $order->get_shipping_methods() );
+
 		return array(
+			'type'             => 'shipping_fee',
+			'reference'        => $this->get_item_reference( $shipping_item ),
 			'name'             => $order->get_shipping_method(),
 			'quantity'         => 1,
 			'total_amount'     => $this->get_shipping_total_amount( $order ),
 			'unit_price'       => $this->get_shipping_total_amount( $order ),
 			'total_tax_amount' => $this->get_shipping_total_tax_amount( $order ),
-			'tax_rate'         => ( '0' !== $order->get_shipping_tax() ) ? $this->get_order_line_tax_rate( $order, current( $order->get_items( 'shipping' ) ) ) : 0,
+			'tax_rate'         => ( ! empty( floatval( $order->get_shipping_tax() ) ) ) ? $this->get_order_line_tax_rate( $order, current( $order->get_items( 'shipping' ) ) ) : 0,
 		);
 	}
 
@@ -132,12 +138,15 @@ class KCO_Request_Order {
 		$order_id = $order_fee->get_order_id();
 		$order    = wc_get_order( $order_id );
 		return array(
-			'name'             => substr( $order_fee->get_name(), 0, 254 ),
-			'quantity'         => $order_fee->get_quantity(),
-			'total_amount'     => $this->get_fee_total_amount( $order, $order_fee ),
-			'unit_price'       => $this->get_fee_unit_price( $order_fee ),
-			'total_tax_amount' => $this->get_fee_total_tax_amount( $order, $order_fee ),
-			'tax_rate'         => ( '0' !== $order->get_total_tax() ) ? $this->get_order_line_tax_rate( $order, current( $order->get_items( 'fee' ) ) ) : 0,
+			'type'                  => 'surcharge',
+			'reference'             => $this->get_item_reference( $order_fee ),
+			'name'                  => substr( $order_fee->get_name(), 0, 254 ),
+			'quantity'              => $order_fee->get_quantity(),
+			'total_amount'          => $this->get_fee_total_amount( $order, $order_fee ),
+			'unit_price'            => $this->get_fee_unit_price( $order_fee ),
+			'total_discount_amount' => 0,
+			'total_tax_amount'      => $this->get_fee_total_tax_amount( $order, $order_fee ),
+			'tax_rate'              => ( ! empty( floatval( $order->get_total_tax() ) ) ) ? $this->get_order_line_tax_rate( $order, current( $order->get_items( 'fee' ) ) ) : 0,
 		);
 	}
 
@@ -313,5 +322,38 @@ class KCO_Request_Order {
 		}
 		$this->total_tax += round( $fee_tax_amount );
 		return round( $fee_tax_amount );
+	}
+
+	/**
+	 * Get cart item reference.
+	 *
+	 * @param WC_Order_Item_Product|WC_Order_Item_Shipping|WC_Order_Item_Fee|WC_Order_Item_Coupon $order_line_item WooCommerce order line item.
+	 *
+	 * @return string $item_reference Cart item reference.
+	 */
+	public function get_item_reference( $order_line_item ) {
+		if ( 'line_item' === $order_line_item->get_type() ) {
+			$product = $order_line_item['variation_id'] ? wc_get_product( $order_line_item['variation_id'] ) : wc_get_product( $order_line_item['product_id'] );
+			if ( $product ) {
+				if ( $product->get_sku() ) {
+					$item_reference = $product->get_sku();
+				} else {
+					$item_reference = $product->get_id();
+				}
+			} else {
+				$item_reference = $order_line_item->get_name();
+			}
+		} elseif ( 'shipping' === $order_line_item->get_type() ) {
+			// Matching the shipping reference from KCO order.
+			$item_reference = $order_line_item->get_method_id() . ':' . $order_line_item->get_instance_id();
+		} elseif ( 'coupon' === $order_line_item->get_type() ) {
+			$item_reference = 'Discount';
+		} elseif ( 'fee' === $order_line_item->get_type() ) {
+			$item_reference = 'Fee';
+		} else {
+			$item_reference = $order_line_item->get_name();
+		}
+
+		return substr( (string) $item_reference, 0, 64 );
 	}
 }
