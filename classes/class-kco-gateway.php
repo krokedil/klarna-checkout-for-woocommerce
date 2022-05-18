@@ -82,7 +82,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			add_action( 'woocommerce_receipt_kco', array( $this, 'receipt_page' ) );
 
 			add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 3 );
-			add_filter( 'kco_wc_api_request_args', array( $this, 'maybe_remove_kco_epm' ), 9999, 2 );
+			add_filter( 'kco_wc_api_request_args', array( $this, 'maybe_remove_kco_epm' ), 9999 );
 		}
 
 
@@ -645,15 +645,14 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
-		 * Remove any external payment method.
+		 * Remove any external payment method from pay for order.
 		 *
 		 * @param array $request_args The request args.
-		 * @param int   $order_id The WooCommerce order id.
 		 *
-		 * @return mixed
+		 * @return array
 		 */
-		public function maybe_remove_kco_epm( $request_args, $order_id ) {
-			if ( isset( $request_args['external_payment_methods'] ) && ! empty( $order_id ) ) {
+		public function maybe_remove_kco_epm( $request_args ) {
+			if ( isset( $request_args['external_payment_methods'] ) && is_wc_endpoint_url( 'order-pay' ) ) {
 				unset( $request_args['external_payment_methods'] );
 			}
 
