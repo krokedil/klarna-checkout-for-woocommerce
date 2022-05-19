@@ -123,7 +123,7 @@ class KCO_Templates {
 				$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 				if ( array_key_exists( 'kco', $available_gateways ) ) {
 					if ( locate_template( 'woocommerce/klarna-checkout-pay.php' ) ) {
-						$klarna_checkout_template = locate_template( 'woocommerce/paysoncheckout-pay.php' );
+						$klarna_checkout_template = locate_template( 'woocommerce/klarna-checkout-pay.php' );
 					} else {
 						$klarna_checkout_template = KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout-pay.php';
 					}
