@@ -720,7 +720,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$klarna_upsell_order = KCO_WC()->api->upsell_klarna_order( $order_id, $upsell_uuid );
 
 			if ( is_wp_error( $klarna_upsell_order ) ) {
-				return false;
+				return $klarna_upsell_order;
 			}
 
 			return true;

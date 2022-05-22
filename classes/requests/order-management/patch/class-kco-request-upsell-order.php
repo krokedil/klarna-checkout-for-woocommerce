@@ -42,7 +42,6 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 	 * @return array
 	 */
 	public function get_body( $order_id, $upsell_uuid ) {
-		$order  = wc_get_order( $order_id );
 		$helper = new KCO_Request_Order();
 		return array(
 			'order_lines'  => $helper->get_order_lines( $order_id ),
@@ -66,5 +65,24 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 			'body'       => wp_json_encode( $this->get_body( $order_id, $upsell_uuid ) ),
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
 		);
+	}
+
+	/**
+	 * Checks response for any error. We might need this to handle special cases with headers.
+	 *
+	 * @TODO follow up with klarna on how a rejected message looks.
+	 *
+	 * @param object $response The response.
+	 * @param array  $request_args The request args.
+	 * @param string $request_url The request URL.
+	 * @return object|array
+	 */
+	public function process_response( $response, $request_args = array(), $request_url = '' ) {
+		// If its a WP Error, just let the parent deal with it.
+		if ( is_wp_error( $response ) ) {
+			return parent::process_response( $response, $request_args, $request_url );
+		}
+
+		return parent::process_response( $response, $request_args, $request_url );
 	}
 }
