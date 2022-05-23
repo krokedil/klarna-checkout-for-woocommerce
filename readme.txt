@@ -54,6 +54,14 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2022.05.23    - version 2.8.0 =
+* Feature       - Add support for the Post Purchase Upsell For WooCommerce plugin.
+* Enhancement   - Changed so the debuglog option is no longer autoloaded.
+* Enhancement   - Shipping address fields will now be prefilled by billing address data from WooCommerce when creating a Klarna order if no shipping address exists for the customer in WooCommerce.
+* Fix           - Product images and URLs will now be correctly sent to Klarna when using Pay for order.
+* Fix           - Fixed a incorrect template name reference.
+* Fix           - Fixed a issue that could cause a missmatch in order line references in the Klarna Portal.
+
 = 2022.04.27    - version 2.7.4 =
 * Enhancement   - Remove the Klarna payment information text from emails sent to the admin. ( Thank you Andréas Lundgren ).
 * Fix           - External Payment methods will now be stripped from admin orders sent to customers. This is because we can not guarantee compatability with the payment gateways when this is the case.

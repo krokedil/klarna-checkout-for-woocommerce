@@ -88,6 +88,8 @@ class KCO_Request_Update extends KCO_Request {
 				'city'            => WC()->checkout()->get_value( 'billing_city' ),
 				'region'          => WC()->checkout()->get_value( 'billing_state' ),
 			);
+
+			$request_body['shipping_address'] = wp_parse_args( $request_body['billing_address'], $request_body['shipping_address'] );
 		}
 
 		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {

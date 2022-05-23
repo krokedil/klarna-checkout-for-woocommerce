@@ -260,4 +260,19 @@ class KCO_API {
 		}
 		return $klarna_order->get_error_message();
 	}
+
+	/**
+	 * Make an upsell request to Klarna.
+	 *
+	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $upsell_uuid The unique id for the upsell request.
+	 * @return array|WP_Error
+	 */
+	public function upsell_klarna_order( $order_id, $upsell_uuid ) {
+		$klarna_order_id = get_post_meta( $order_id, '_wc_klarna_order_id', true );
+		$request         = new KCO_Request_Upsell_Order();
+		$response        = $request->request( $klarna_order_id, $order_id, $upsell_uuid );
+
+		return $this->check_for_api_error( $response );
+	}
 }
