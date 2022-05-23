@@ -247,6 +247,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				true
 			);
 
+			/* Add Klarna's script as inline. This is required when the iframe snippet is escaped when outputted in some WordPress blocks (e.g., Gutenberg). */
+			wp_add_inline_script( 'kco', kco_wc_js_tag(), 'before' );
+
 			wp_register_style(
 				'kco',
 				plugins_url( 'assets/css/klarna-checkout-for-woocommerce' . $suffix . '.css', KCO_WC_MAIN_FILE ),

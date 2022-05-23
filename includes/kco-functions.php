@@ -91,8 +91,33 @@ function kco_wc_show_snippet( $pay_for_order = false ) {
 	} else {
 		$klarna_order = kco_create_or_update_order();
 	}
+
 	do_action( 'kco_wc_show_snippet', $klarna_order );
-	echo $klarna_order['html_snippet']; // phpcs:ignore WordPress -- Can not escape this, since its the iframe snippet.
+	$snippet = preg_replace( '/\n/', '', $klarna_order['html_snippet'] ); // remove newline (regex operations are line-based).
+	$snippet = preg_replace( '/<script[^>]*.*<\/script>/', '', $snippet ); // remove the <script> tag, and its content.
+
+	echo $snippet;
+}
+
+/**
+ * Retrieves the Klarna's JavaScript content.
+ *
+ * @param bool $pay_for_order If this is for a pay for order page or not.
+ * @return string
+ */
+function kco_wc_js_tag( $pay_for_order = false ) {
+	if ( $pay_for_order ) {
+		$klarna_order = kco_create_or_update_order_pay_for_order();
+	} else {
+		$klarna_order = kco_create_or_update_order();
+	}
+
+	$snippet = preg_replace( '/\n/', '', $klarna_order['html_snippet'] ); // remove newline (regex operations are line-based).
+	preg_match( '/<script.*\/script>/', $snippet, $js ); // extract the <script> tag.
+	$js = preg_replace( '/<\/?script[^>]*>/', '', $js[0] ); // extract the content of the <script> tag.
+
+	return $js;
+
 }
 
 /**
