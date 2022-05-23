@@ -356,8 +356,8 @@ class KCO_Request_Order {
 
 		return substr( (string) $item_reference, 0, 64 );
 	}
-  
-  /**
+
+	/**
 	 * Gets the upsell order lines for the order.
 	 *
 	 * @param WC_Order $order The WooCommerce order id.
