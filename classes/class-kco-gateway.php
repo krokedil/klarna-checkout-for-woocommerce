@@ -423,6 +423,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// ----- Extra Debug Logging Start ----- //
 			try {
 				$shipping_debug_log = array(
+					'kco_order_id'          => $klarna_order_id,
 					'wc_order_shipping'     => $order->get_shipping_method(),
 					'wc_session_shipping'   => WC()->session->get( 'chosen_shipping_methods' ),
 					'kco_order_shipping'    => $klarna_order['selected_shipping_option'],
