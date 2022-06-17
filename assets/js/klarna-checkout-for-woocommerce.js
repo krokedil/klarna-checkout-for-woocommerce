@@ -363,11 +363,8 @@ jQuery( function( $ ) {
 			callback({ should_proceed: false });
 			kco_wc.blocked = false;
 			var className = kco_params.pay_for_order ? 'div.woocommerce-notices-wrapper' : 'form.checkout';
-			// Renable the form.
-			$( 'body' ).trigger( 'updated_checkout' );
-			$( kco_wc.checkoutFormSelector ).removeClass( 'processing' );
-			$( kco_wc.checkoutFormSelector ).unblock();
-			$( '.woocommerce-checkout-review-order-table' ).unblock();
+			// Update the checkout and renable the form.
+			$( 'body' ).trigger( 'update_checkout' );
 
 			// Print error messages, and trigger checkout_error, and scroll to notices.
 			$( '.woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message' ).remove();

@@ -722,8 +722,4 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 	KCO_Logger::Log( "Set chosen shipping method for $klarna_order_id " . json_encode( $chosen_shipping_methods ) );
 
 	WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
-
-	WC()->session->save_data();
-
-	KCO_Logger::Log( "Getting the set shipping method for the cart for $klarna_order_id" . json_encode( WC()->session->get( 'chosen_shipping_methods' ) ) );
 }

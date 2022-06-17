@@ -20,6 +20,10 @@ class KCO_Checkout {
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'add_shipping_data_input' ) );
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_shipping_method' ), 9999 );
 		add_action( 'woocommerce_after_calculate_totals', array( $this, 'update_klarna_order' ), 9999 );
+
+		// Handle potential shipping selection errors.
+		add_filter( 'woocommerce_shipping_chosen_method', array( $this, 'maybe_register_shipping_error' ), 9999, 3 );
+		add_action( 'woocommerce_shipping_method_chosen', array( $this, 'maybe_throw_shipping_error' ), 9999 );
 	}
 
 	/**
@@ -108,5 +112,67 @@ class KCO_Checkout {
 			// If it is, update order.
 			$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 		}
+	}
+
+	/**
+	 * Maybe registers an error if we are attempting to set a new shipping method during the checkout process.
+	 * WooCommerce will in some cases reset the shipping selection, instead of throwing an error if shipping options
+	 * have changed. In our case its better to throw an error for the customer to see, so they can try again
+	 * or select another shipping option.
+	 *
+	 * @param string $default The shipping method id that would be set as the default method.
+	 * @param array  $rates The rates calculated when getting the default shipping method.
+	 * @param string $chosen_method The shipping method id that was chosen by the customer.
+	 *
+	 * @return string
+	 */
+	public function maybe_register_shipping_error( $default, $rates, $chosen_method ) {
+		// Only do this if we are during the checkout process.
+		if ( did_action( 'woocommerce_checkout_process' ) <= 0 ) {
+			return $default;
+		}
+
+		// Only do this if KCO is the selected payment method and shipping in the iframe is selected.
+		if ( 'kco' !== WC()->session->get( 'chosen_payment_method' ) ) {
+			return $default;
+		}
+
+		$options = get_option( 'woocommerce_kco_settings', array() );
+		if ( 'yes' !== $options['shipping_methods_in_iframe'] ?? 'no' ) {
+			return $default;
+		}
+
+		KCO_Logger::log( "Checkout error - Shipping methods where changed during the checkout process by WooCommerce. Chosen shipping method by the customer was $chosen_method, WooCommerce wanted to set $default instead" );
+
+		/*
+		 * Add a filter to allow people to set if they want to automatically correct shipping discrepencies instead of throwing an error.
+		 * Note however that this is not recommended. If you do this, and the shipping method that the customer selected is no longer available,
+		 * then unexpected issues might happen. Only do this if you are sure the chosen method actually exists and is available.
+		 */
+		if ( apply_filters( 'kco_shipping_auto_correct', false, $default, $rates, $chosen_method ) ) {
+			KCO_Logger::log( "Checkout error - Correcting the shipping method to the customers chosen method: $chosen_method" );
+			return $chosen_method;
+		}
+
+		// If we are not auto-correcting the shipping method, we return the default, but trigger our action. This is so we can throw the error at a later time.
+		do_action( 'kco_checkout_shipping_error' );
+		return $default;
+	}
+
+	/**
+	 * Actually throws the error registered previously.
+	 * This is moved to happen on a separate action instead, since we need to allow WooCommerce to set a couple sessions.
+	 * This prevents customers needing to reload the page.
+	 *
+	 * @return void
+	 * @throws Exception Exception with the error message.
+	 */
+	public function maybe_throw_shipping_error() {
+		if ( did_action( 'kco_checkout_shipping_error' ) <= 0 ) {
+			return;
+		}
+
+		KCO_Logger::log( 'Checkout error - Printing shipping error message to the customer.' );
+		throw new Exception( __( 'The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again.', 'klarna-checkout-for-woocommerce' ) );
 	}
 } new KCO_Checkout();
