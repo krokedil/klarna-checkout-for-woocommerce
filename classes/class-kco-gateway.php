@@ -221,14 +221,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
-			if ( ! is_checkout() ) {
-				return;
-			}
-
-			if ( is_order_received_page() ) {
-				return;
-			}
-
 			$pay_for_order = false;
 			if ( is_wc_endpoint_url( 'order-pay' ) ) {
 				$pay_for_order = true;
@@ -246,9 +238,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				KCO_WC_VERSION,
 				true
 			);
-
-			/* Add Klarna's script as inline. This is required when the iframe snippet is escaped when outputted in some WordPress blocks (e.g., Gutenberg). */
-			wp_add_inline_script( 'kco', kco_wc_js_tag(), 'before' );
 
 			wp_register_style(
 				'kco',
@@ -281,6 +270,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'logging'                      => $this->logging,
 				'standard_woo_checkout_fields' => $standard_woo_checkout_fields,
 				'is_confirmation_page'         => ( is_kco_confirmation() ) ? 'yes' : 'no',
+				'is_order_received_page'       => is_order_received_page() ? 'yes' : 'no',
 				'shipping_methods_in_iframe'   => $this->shipping_methods_in_iframe,
 				'required_fields_text'         => __( 'Please fill in all required checkout fields.', 'klarna-checkout-for-woocommerce' ),
 				'email_exists'                 => $email_exists,
@@ -478,7 +468,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 					$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 					if ( $klarna_order ) {
-						echo $klarna_order['html_snippet']; // phpcs:ignore WordPress.Security.EscapeOutput -- Cant escape since this is the iframe snippet.
+						echo kco_extract_script( $klarna_order['html_snippet'] ); // phpcs:ignore WordPress.Security.EscapeOutput -- Cant escape since this is the iframe snippet.
 					}
 
 					// Check if we need to finalize purchase here. Should already been done in process_payment.

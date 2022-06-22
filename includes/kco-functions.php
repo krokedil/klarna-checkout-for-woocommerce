@@ -93,31 +93,45 @@ function kco_wc_show_snippet( $pay_for_order = false ) {
 	}
 
 	do_action( 'kco_wc_show_snippet', $klarna_order );
-	$snippet = preg_replace( '/\n/', '', $klarna_order['html_snippet'] ); // remove newline (regex operations are line-based).
-	$snippet = preg_replace( '/<script[^>]*.*<\/script>/', '', $snippet ); // remove the <script> tag, and its content.
-
-	echo $snippet;
+	echo kco_extract_script( $klarna_order['html_snippet'] );
 }
 
 /**
- * Retrieves the Klarna's JavaScript content.
+ * Returns the HTML snippet with the script tag (and its content) removed.
  *
- * @param bool $pay_for_order If this is for a pay for order page or not.
- * @return string
+ * The extracted JavaScript is inserted in kco_add_inline_script. This is required since certain themes escapes the HTML snippet,
+ * which renders its content (and thus the script) useless.
+ *
+ * @param string $html_snippet
+ * @return string The HTML snippet without the script tag (and its content).
  */
-function kco_wc_js_tag( $pay_for_order = false ) {
-	if ( $pay_for_order ) {
-		$klarna_order = kco_create_or_update_order_pay_for_order();
-	} else {
-		$klarna_order = kco_create_or_update_order();
-	}
+function kco_extract_script( $html_snippet ) {
+	preg_match( '/<script(.|\n)*\/script>/', $html_snippet, $js ); // extract the <script> tag.
 
-	$snippet = preg_replace( '/\n/', '', $klarna_order['html_snippet'] ); // remove newline (regex operations are line-based).
-	preg_match( '/<script.*\/script>/', $snippet, $js ); // extract the <script> tag.
-	$js = preg_replace( '/<\/?script[^>]*>/', '', $js[0] ); // extract the content of the <script> tag.
+	// Remove the HTML tags from the script.
+	kco_add_inline_script( $js );
 
-	return $js;
+	// Return the snippet without script tag.
+	return preg_replace(
+		'/<script(.|\n)*\/script>/',
+		'',
+		$html_snippet
+	);
+}
 
+/**
+ * Inserts the script tag.
+ *
+ * Inserts the JavaScript that was extracted from kco_extract_script.
+ *
+ * @param string $js The extract JavaScript (excluding the tags).
+ * @return void
+ */
+function kco_add_inline_script( $js ) {
+	$js = preg_replace( '/<\/?script[^>]*>/', '', $js[0] );
+	wp_register_script( 'kco-script', '', array(), '', true );
+	wp_enqueue_script( 'kco-script' );
+	wp_add_inline_script( 'kco-script', $js, 'before' );
 }
 
 /**
