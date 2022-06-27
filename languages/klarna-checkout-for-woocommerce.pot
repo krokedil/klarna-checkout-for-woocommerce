@@ -91,7 +91,7 @@ msgstr ""
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../classes/class-kco-checkout.php:176
+#: ../classes/class-kco-checkout.php:184
 msgid "The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again."
 msgstr ""
 
@@ -229,7 +229,7 @@ msgid "Shipping methods in iframe"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:183
-msgid "Display Shipping methods in Klarna iframe."
+msgid "Display Shipping methods in Klarna iframe.  If you are using the <b>Klarna Shipping Assistant</b> plugin, please follow the steps explained in the plugin documentation under the section titled "
 msgstr ""
 
 #: ../classes/class-kco-fields.php:185
@@ -460,23 +460,23 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:282
+#: ../classes/class-kco-gateway.php:283
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:285
+#: ../classes/class-kco-gateway.php:286
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:531
+#: ../classes/class-kco-gateway.php:533
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:590
+#: ../classes/class-kco-gateway.php:592
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:611, ../classes/class-kco-gateway.php:632
+#: ../classes/class-kco-gateway.php:613, ../classes/class-kco-gateway.php:634
 msgid "Reference:"
 msgstr ""
 
@@ -525,19 +525,19 @@ msgstr ""
 msgid "Surcharge"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:250, ../classes/requests/helpers/class-kco-request-cart.php:251
+#: ../classes/requests/helpers/class-kco-request-cart.php:255, ../classes/requests/helpers/class-kco-request-cart.php:256
 msgid "Sales Tax"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:283, ../classes/requests/helpers/class-kco-request-cart.php:280, ../classes/requests/helpers/class-kco-request-cart.php:352
+#: ../classes/requests/helpers/class-kco-request-cart.php:288, ../classes/requests/helpers/class-kco-request-cart.php:285, ../classes/requests/helpers/class-kco-request-cart.php:357
 msgid "Gift card"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:373, ../classes/requests/helpers/class-kco-request-cart.php:396
+#: ../classes/requests/helpers/class-kco-request-cart.php:378, ../classes/requests/helpers/class-kco-request-cart.php:401
 msgid "giftcard"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:702, ../classes/requests/helpers/class-kco-request-cart.php:730
+#: ../classes/requests/helpers/class-kco-request-cart.php:707, ../classes/requests/helpers/class-kco-request-cart.php:735
 msgid "Shipping"
 msgstr ""
 
