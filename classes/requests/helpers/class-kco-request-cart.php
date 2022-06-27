@@ -211,7 +211,12 @@ class KCO_Request_Cart {
 						$klarna_item['image_url'] = $this->get_item_image_url( $product );
 					}
 				}
-				$this->order_lines[] = apply_filters( 'kco_wc_cart_line_item', $klarna_item, $cart_item );
+
+				/* This should better support get_catalog_visibility = hidden on product components.  */
+				$cart_line_item = apply_filters( 'kco_wc_cart_line_item', $klarna_item, $cart_item );
+				if ( $cart_line_item ) {
+					$this->order_lines[] = $cart_line_item;
+				}
 			}
 		}
 	}
