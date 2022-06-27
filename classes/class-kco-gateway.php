@@ -38,6 +38,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					'multiple_subscriptions',
 					'subscription_payment_method_change_customer',
 					'subscription_payment_method_change_admin',
+					'upsell',
 				)
 			);
 
@@ -82,6 +83,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			add_action( 'woocommerce_receipt_kco', array( $this, 'receipt_page' ) );
 
 			add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 3 );
+			add_filter( 'kco_wc_api_request_args', array( $this, 'maybe_remove_kco_epm' ), 9999 );
 		}
 
 
@@ -655,6 +657,86 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// Only if our filter is active and is set to false.
 			if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
 				return $wc_result;
+			}
+
+			return true;
+		}
+
+		/**
+		 * Remove any external payment method from pay for order.
+		 *
+		 * @param array $request_args The request args.
+		 *
+		 * @return array
+		 */
+		public function maybe_remove_kco_epm( $request_args ) {
+			if ( isset( $request_args['external_payment_methods'] ) && is_wc_endpoint_url( 'order-pay' ) ) {
+				unset( $request_args['external_payment_methods'] );
+			}
+
+			return $request_args;
+		}
+
+		/**
+		 * Check if upsell should be available for the Klarna order or not.
+		 *
+		 * @param int $order_id The WooCommerce order id.
+		 * @return bool
+		 */
+		public function upsell_available( $order_id ) {
+			$klarna_order_id = get_post_meta( $order_id, '_wc_klarna_order_id', true );
+
+			if ( empty( $klarna_order_id ) ) {
+				return false;
+			}
+
+			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
+
+			if ( is_wp_error( $klarna_order ) ) {
+				return false;
+			}
+
+			// If the needed keys are not set, return false.
+			if ( ! isset( $klarna_order['initial_payment_method'] ) || ! isset( $klarna_order['initial_payment_method']['type'] ) ) {
+				return false;
+			}
+
+			// Set allowed payment methods for upsell based on country. https://developers.klarna.com/documentation/order-management/integration-guide/pre-delivery/#update-order-amount.
+			$allowed_payment_methods = array( 'INVOICE', 'INVOICE_BUSINESS', 'ACCOUNT' );
+			switch ( wc_get_base_location()['country'] ) {
+				case 'SE':
+				case 'NO':
+				case 'FI':
+				case 'DK':
+				case 'AT':
+				case 'DE':
+					$allowed_payment_methods[] = 'DIRECT_DEBIT';
+					$allowed_payment_methods[] = 'FIXED_AMOUNT';
+					break;
+				case 'US':
+					$allowed_payment_methods[] = 'DEFERRED_INTEREST';
+					$allowed_payment_methods[] = 'DIRECT_DEBIT';
+					break;
+				case 'CH':
+					$allowed_payment_methods = array();
+					break;
+			}
+
+			return in_array( $klarna_order['initial_payment_method']['type'], $allowed_payment_methods, true );
+		}
+
+		/**
+		 * Make an upsell request to Klarna.
+		 *
+		 * @param int    $order_id The WooCommerce order id.
+		 * @param string $upsell_uuid The unique id for the upsell request.
+		 * @return bool
+		 */
+		public function upsell( $order_id, $upsell_uuid ) {
+			$klarna_upsell_order = KCO_WC()->api->upsell_klarna_order( $order_id, $upsell_uuid );
+
+			if ( is_wp_error( $klarna_upsell_order ) ) {
+				return $klarna_upsell_order;
 			}
 
 			return true;

@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.9.1
+Tested up to: 6.0.0
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 6.3.0
+WC tested up to: 6.6.1
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,24 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2022.05.25    - version 2.8.1 =
+* Fix           - Fix undefined index warning.
+
+= 2022.05.23    - version 2.8.0 =
+* Feature       - Add support for the Post Purchase Upsell For WooCommerce plugin.
+* Enhancement   - Changed so the debuglog option is no longer autoloaded.
+* Enhancement   - Shipping address fields will now be prefilled by billing address data from WooCommerce when creating a Klarna order if no shipping address exists for the customer in WooCommerce.
+* Fix           - Product images and URLs will now be correctly sent to Klarna when using Pay for order.
+* Fix           - Fixed a incorrect template name reference.
+* Fix           - Fixed a issue that could cause a missmatch in order line references in the Klarna Portal.
+
+= 2022.04.27    - version 2.7.4 =
+* Enhancement   - Remove the Klarna payment information text from emails sent to the admin. ( Thank you Andréas Lundgren ).
+* Fix           - External Payment methods will now be stripped from admin orders sent to customers. This is because we can not guarantee compatability with the payment gateways when this is the case.
+* Fix           - Reload the checkout page if the order no longer needs to be paid for to show the default WooCommerce checkout page.
+* Fix           - Fixed an issue that could happen if the Klarna order id is no longer set during the order validation.
+
+
 = 2022.03.18    - version 2.7.3 =
 * Fix           - Update the minified JavaScript file from the 2.7.2 update that was missed.
 
