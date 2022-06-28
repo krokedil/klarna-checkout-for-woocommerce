@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 5.9.1
+Tested up to: 6.0.0
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 6.4.0
+WC tested up to: 6.6.1
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,12 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2022.06.28    - version 2.8.2 =
+* Fix           - The setting for changing border radius should now work as expected (thanks @adevade!)
+* Fix           - External payment methods ("EPM") should now appear on the checkout page. EPM are not available for pay for order.
+* Tweak         - Added additional documentation on the settings page.
+* Tweak         - You can now use the 'kco_wc_cart_line_item' hook to filter out products that you don't want to send to Klarna.
+
 = 2022.05.25    - version 2.8.1 =
 * Fix           - Fix undefined index warning.
 

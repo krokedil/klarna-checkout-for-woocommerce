@@ -161,7 +161,7 @@ class KCO_Request_Options {
 		}
 
 		if ( $this->check_option_field( 'radius_border' ) ) {
-			$color_settings['radius_border'] = self::add_hash_to_color( $this->check_option_field( 'radius_border' ) );
+			$color_settings['radius_border'] = $this->check_option_field( 'radius_border' );
 		}
 
 		if ( count( $color_settings ) > 0 ) {
