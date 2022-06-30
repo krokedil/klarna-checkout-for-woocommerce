@@ -273,6 +273,6 @@ class KCO_API {
 		$request         = new KCO_Request_Upsell_Order();
 		$response        = $request->request( $klarna_order_id, $order_id, $upsell_uuid );
 
-		return $this->check_for_api_error( $response );
+		return $response;
 	}
 }
