@@ -16,7 +16,6 @@ jQuery( function( $ ) {
 
 		// Form fields.
 		shippingUpdated: false,
-		blocked: false,
 		validation: false,
 
 		preventPaymentMethodChange: false,
@@ -72,9 +71,7 @@ jQuery( function( $ ) {
 		kcoResume: function() {
 			if ( window._klarnaCheckout && ! kco_wc.validation) {
 				window._klarnaCheckout( function( api ) {
-					if ( false === kco_wc.validation ) {
-						api.resume();
-					}
+					api.resume();
 				});
 			}
 		},
@@ -422,7 +419,6 @@ jQuery( function( $ ) {
 		},
 
   placeKlarnaOrder: function(callback) {
-			kco_wc.validation = true;
 			kco_wc.getKlarnaOrder().done( function(response) {
 				if(response.success ) {
 					$( '.woocommerce-checkout-review-order-table' ).block({
@@ -530,15 +526,14 @@ jQuery( function( $ ) {
 						'can_not_complete_order': function( data ) {
 							kco_wc.log( 'can_not_complete_order', data );
 						},
-						'validation_callback': function( data, callback ) {
+						'validation_callback': function (data, callback) {
+							kco_wc.validation = true;
 							kco_wc.logToFile( 'validation_callback from Klarna triggered' );
 							if( kco_params.pay_for_order ) {
 								callback({ should_proceed: true });
 							} else {
 								kco_wc.placeKlarnaOrder(callback);
 							}
-
-							kco_wc.validation = false;
 						}
 					});
 				});
