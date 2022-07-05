@@ -485,21 +485,12 @@ jQuery( function( $ ) {
 					api.on({
 						'shipping_address_change': function( data ) {
 							kco_wc.log( 'shipping_address_change' );
-							kco_wc.log( data );
+							kco_wc.log(data);
 
 							var country = kco_wc.convertCountry( data.country.toUpperCase() );
 
-							// Check if shipping address is enabled.
-							if( $( '#shipping_first_name' ).length >= 0 ) {
-								$( '#ship-to-different-address-checkbox' ).prop( 'checked', true);
-								$( '#ship-to-different-address-checkbox' ).change();
-								$( '#ship-to-different-address-checkbox' ).blur();
-								$( '#shipping_first_name' ).val( ( ( 'given_name' in data ) ? data.given_name : '' ) );
-								$( '#shipping_last_name' ).val( ( ( 'family_name' in data ) ? data.family_name : '' ) );
-								$( '#shipping_postcode' ).val( ( ( 'postal_code' in data) ? data.postal_code : '' ) );
-								$( '#shipping_country' ).val( ( ( 'country' in data ) ? country : '' ) );
-								$( '#shipping_country' ).change();
-							} else {
+							// Check if separate shipping address is enabled.
+							if (!$('#ship-to-different-address-checkbox').is(":checked")) {
 								$( '#billing_first_name' ).val( ( ( 'given_name' in data ) ? data.given_name : '' ) );
 								$( '#billing_last_name' ).val( ( ( 'family_name' in data ) ? data.family_name : '' ) );
 								$( '#billing_postcode' ).val( ( ( 'postal_code' in data) ? data.postal_code : '' ) );
@@ -508,6 +499,17 @@ jQuery( function( $ ) {
 								$( '#billing_country' ).change();
 								$( '#billing_email' ).change();
 								$( '#billing_email' ).blur();
+								
+							} else {
+								$( '#ship-to-different-address-checkbox' ).prop( 'checked', true);
+								$( '#ship-to-different-address-checkbox' ).change();
+								$( '#ship-to-different-address-checkbox' ).blur();
+								$( '#shipping_first_name' ).val( ( ( 'given_name' in data ) ? data.given_name : '' ) );
+								$( '#shipping_last_name' ).val( ( ( 'family_name' in data ) ? data.family_name : '' ) );
+								$( '#shipping_postcode' ).val( ( ( 'postal_code' in data) ? data.postal_code : '' ) );
+								$( '#shipping_country' ).val( ( ( 'country' in data ) ? country : '' ) );
+								$( '#shipping_country' ).change();
+
 							}
 
 							$( 'form.checkout' ).trigger( 'update_checkout' );
