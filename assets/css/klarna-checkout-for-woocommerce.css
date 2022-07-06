@@ -35,6 +35,7 @@
     text-align: center;
 }
 @media only screen and (min-width : 769px) {
+    /* Default two-layout, KCO on right column. */
 	#kco-order-review {
 		float: left;
 		width: 40%;
@@ -49,6 +50,30 @@
 		padding-left: 20px;
 		box-sizing: border-box;
 	}
+
+    /* Two-layout, KCO on left column. */
+    .kco-two-column-left #kco-wrapper {
+        display: grid;
+        grid-template-columns: 6fr 4fr;	
+        grid-column-gap: 70px;
+    }
+
+    .kco-two-column-left #kco-iframe, .kco-two-column-left #kco-order-review {
+        width: 100%;
+    }
+
+    .kco-two-column-left #kco-order-review {
+        order: 2;
+    }
+
+    .kco-two-column-left #kco-wc-form {
+        order: 1;
+    }
+
+    /* One-colum layout. */
+    .kco-one-selected #kco-iframe, .kco-one-selected #kco-order-review {
+        width: 100%;
+    }
 }
 /* Hide shipping methods in order review if displayed in KCO iframe */
 .kco-shipping-display ul#shipping_method {

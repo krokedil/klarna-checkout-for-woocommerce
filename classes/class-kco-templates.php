@@ -50,6 +50,9 @@ class KCO_Templates {
 		add_filter( 'woocommerce_billing_fields', array( $this, 'kco_wc_unrequire_wc_billing_state_field' ) );
 		// Unrequire WooCommerce Shipping State field.
 		add_filter( 'woocommerce_shipping_fields', array( $this, 'kco_wc_unrequire_wc_shipping_state_field' ) );
+
+		// Adds the required CSS classes for the checkout layout.
+		add_filter( 'body_class', array( $this, 'add_body_class' ) );
 	}
 
 	/**
@@ -252,6 +255,44 @@ class KCO_Templates {
 	 */
 	public function add_review_order_before_submit() {
 		do_action( 'woocommerce_review_order_before_submit' );
+	}
+
+		/**
+		 * Add checkout page body class, depending on checkout page layout settings.
+		 *
+		 * @param array $class CSS classes used in body tag.
+		 * @return array The same input array with the addition of our custom classes.
+		 */
+	public function add_body_class( $class ) {
+		if ( ! is_checkout() || is_wc_endpoint_url( 'order-received' ) ) {
+			return $class;
+		}
+
+		if ( method_exists( WC()->cart, 'needs_payment' ) && ! WC()->cart->needs_payment() ) {
+			return $class;
+		}
+
+		$settings        = get_option( 'woocommerce_kco_settings' );
+		$checkout_layout = $settings['checkout_layout'] ?? 'two_column_right';
+
+		$first_gateway = '';
+		if ( WC()->session->get( 'chosen_payment_method' ) ) {
+			$first_gateway = WC()->session->get( 'chosen_payment_method' );
+		} else {
+			$available_payment_gateways = WC()->payment_gateways->get_available_payment_gateways();
+			reset( $available_payment_gateways );
+			$first_gateway = key( $available_payment_gateways );
+		}
+
+		if ( 'kco' === $first_gateway && 'two_column_left' === $checkout_layout ) {
+			$class[] = 'kco-two-column-left';
+		}
+
+		if ( 'kco' === $first_gateway && 'one_column_checkout' === $checkout_layout ) {
+			$class[] = 'kco-one-selected';
+		}
+
+		return $class;
 	}
 }
 
