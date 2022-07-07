@@ -288,6 +288,10 @@ class KCO_Templates {
 			$class[] = 'kco-two-column-left';
 		}
 
+		if ( 'kco' === $first_gateway && 'two_column_left_sf' === $checkout_layout ) {
+			$class[] = 'kco-two-column-left-sf';
+		}
+
 		if ( 'kco' === $first_gateway && 'one_column_checkout' === $checkout_layout ) {
 			$class[] = 'kco-one-selected';
 		}

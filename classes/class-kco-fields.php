@@ -82,6 +82,7 @@ class KCO_Fields {
 					'one_column_checkout' => __( 'One column checkout', 'klarna-checkout-for-woocommerce' ),
 					'two_column_right'    => __( 'Two column checkout (Klarna Checkout in right column)', 'klarna-checkout-for-woocommerce' ),
 					'two_column_left'     => __( 'Two column checkout (Klarna Checkout in left column)', 'klarna-checkout-for-woocommerce' ),
+					'two_column_left_sf'  => __( 'Two column checkout (Klarna Checkout in left column) - Storefront light', 'klarna-checkout-for-woocommerce' ),
 				),
 				'default'  => 'two_column_right',
 				'desc_tip' => false,
