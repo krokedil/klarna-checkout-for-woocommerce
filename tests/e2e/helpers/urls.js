@@ -6,6 +6,8 @@ const CHECKOUT = `${BASE_URL}/checkout`;
 
 const SHOP = `${BASE_URL}/shop`;
 
+const ORDER = `${BASE_URL}/wp-admin/edit.php?post_type=shop_order`;
+
 const ADD_TO_CART = `${BASE_URL}/shop/?add-to-cart=`;
 
 const MY_ACCOUNT = `${BASE_URL}/my-account`;
@@ -45,4 +47,5 @@ export default {
 	API_SESSION_ENDPOINT,
 	API_WC_OPTIONS,
 	API_WC_PRICE_INC_EXC,
+	ORDER
 };
