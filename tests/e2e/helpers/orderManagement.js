@@ -3,6 +3,7 @@ import urls from "../helpers/urls"
 
 const completeRefund = async (page, orderID) => {
 
+
     await page.goto(urls.ORDER);
 
     await page.waitForTimeout(timeOutTime);
@@ -73,7 +74,7 @@ const completeRefund = async (page, orderID) => {
 
     await page.waitForTimeout(1000);
 
-    await final.focus();
+    // await final.focus();
     await final.click();
 
     await page.waitForTimeout(timeOutTime);
@@ -113,8 +114,14 @@ const completeRefund = async (page, orderID) => {
     let shippingAmount = await page.$eval('#order_shipping_line_items > .shipping > .line_cost > .edit > input', e => e.value)
     let shippingInput = await page.$('#order_shipping_line_items > .shipping > .line_cost > .refund > input');
 
+    let shippingAmountTax = await page.$eval('#order_shipping_line_items > .shipping > .line_tax > .edit > input', e => e.value)
+    let shippingTaxInput = await page.$('#order_shipping_line_items > .shipping > .line_tax > .refund > input');
+
     await shippingInput.click({ clickCount: 3 });
     await shippingInput.type(shippingAmount);
+
+    await shippingTaxInput.click({ clickCount: 3 });
+    await shippingTaxInput.type(shippingAmountTax);
 
     await page.waitForTimeout(1500)
 
