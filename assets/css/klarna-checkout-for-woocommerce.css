@@ -56,6 +56,7 @@ form.checkout {
     color: #6d6d6d;
 }
 
+
 .kco-two-column-left-sf .woocommerce-info:before {
     color: #6d6d6d;
 }
@@ -73,6 +74,7 @@ form.checkout {
 .kco-two-column-left-sf .woocommerce-checkout-review-order-table thead {
     display: none;
 }
+
 
 .kco-two-column-left-sf .woocommerce-checkout-review-order-table:not(.has-background) th,
 .kco-two-column-left-sf .woocommerce-checkout-review-order-table:not(.has-background) tbody td {

@@ -356,4 +356,28 @@ class KCO_Request_Order {
 
 		return substr( (string) $item_reference, 0, 64 );
 	}
+
+	/**
+	 * Gets the upsell order lines for the order.
+	 *
+	 * @param WC_Order $order The WooCommerce order id.
+	 * @param string   $upsell_request_id The order line upsell id.
+	 * @return array
+	 */
+	public function get_upsell_order_lines( $order, $upsell_request_id ) {
+		$order_lines = array();
+
+		/**
+		 * Process order item products.
+		 *
+		 * @var WC_Order_Item_Product $order_item WooCommerce order item product.
+		 */
+		foreach ( $order->get_items() as $order_item ) {
+			if ( $upsell_request_id === $order_item->get_meta( '_ppu_upsell_id' ) ) {
+				$order_lines[] = self::get_order_line_items( $order_item, $order );
+			}
+		}
+
+		return array_values( $order_lines );
+	}
 }

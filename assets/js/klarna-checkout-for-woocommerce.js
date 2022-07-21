@@ -16,7 +16,7 @@ jQuery( function( $ ) {
 
 		// Form fields.
 		shippingUpdated: false,
-		blocked: false,
+		validation: false,
 
 		preventPaymentMethodChange: false,
 
@@ -53,8 +53,8 @@ jQuery( function( $ ) {
 		 * Resumes the Klarna Iframe
 		 * @param {boolean} autoResumeBool
 		 */
-		kcoSuspend: function( autoResumeBool ) {
-			if ( window._klarnaCheckout ) {
+		kcoSuspend: function (autoResumeBool) {
+			if ( window._klarnaCheckout && ! kco_wc.validation) {
 				window._klarnaCheckout( function( api ) {
 					api.suspend({
 						autoResume: {
@@ -69,11 +69,9 @@ jQuery( function( $ ) {
 		 * Resumes the KCO Iframe
 		 */
 		kcoResume: function() {
-			if ( window._klarnaCheckout ) {
+			if ( window._klarnaCheckout && ! kco_wc.validation) {
 				window._klarnaCheckout( function( api ) {
-					if ( false === kco_wc.blocked ) {
-						api.resume();
-					}
+					api.resume();
 				});
 			}
 		},
@@ -362,7 +360,7 @@ jQuery( function( $ ) {
 		 */
 		failOrder: function( event, error_message, callback ) {
 			callback({ should_proceed: false });
-			kco_wc.blocked = false;
+			kco_wc.validation = false;
 			var className = kco_params.pay_for_order ? 'div.woocommerce-notices-wrapper' : 'form.checkout';
 			// Renable the form.
 			$( 'body' ).trigger( 'updated_checkout' );
@@ -421,7 +419,6 @@ jQuery( function( $ ) {
 		},
 
   placeKlarnaOrder: function(callback) {
-			kco_wc.blocked = true;
 			kco_wc.getKlarnaOrder().done( function(response) {
 				if(response.success ) {
 					$( '.woocommerce-checkout-review-order-table' ).block({
@@ -466,6 +463,8 @@ jQuery( function( $ ) {
 				} else {
 					kco_wc.failOrder( 'get_order', '<div class="woocommerce-error">' + 'Failed to get the order from Klarna.' + '</div>', callback );
 				}
+				kco_wc.validation = false;
+
 			});
 		},
 
@@ -532,7 +531,8 @@ jQuery( function( $ ) {
 						'can_not_complete_order': function( data ) {
 							kco_wc.log( 'can_not_complete_order', data );
 						},
-						'validation_callback': function( data, callback ) {
+						'validation_callback': function (data, callback) {
+							kco_wc.validation = true;
 							kco_wc.logToFile( 'validation_callback from Klarna triggered' );
 							if( kco_params.pay_for_order ) {
 								callback({ should_proceed: true });
