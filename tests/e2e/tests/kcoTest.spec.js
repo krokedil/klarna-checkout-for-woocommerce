@@ -6,7 +6,6 @@ import utils from "../helpers/utils";
 import iframeHandler from "../helpers/iframeHandler";
 import tests from "../config/tests.json"
 import data from "../config/data.json";
-import completeRefund from "../helpers/orderManagement"
 import orderManagement from "../helpers/orderManagement";
 
 const options = {
@@ -92,13 +91,8 @@ describe("KCO E2E tests", () => {
 					// --------------- COMPLETE ORDER --------------- //
 					await iframeHandler.completeOrder(page, kcoIframe);
 
-					await page.waitForTimeout( timeOutTime);
 
-					let checkoutURL = await page.evaluate(() => window.location.href)
-
-					orderID = await checkoutURL.split('/')[5]
-
-					await page.waitForTimeout(1000);
+					await page.waitForTimeout(2 * timeOutTime);
 
 
 				} catch (e) {
@@ -111,21 +105,21 @@ describe("KCO E2E tests", () => {
 				const value = await page.$eval(".entry-title", (e) => e.textContent);
 				expect(value).toBe("Order received");
 
+				let checkoutURL = await page.evaluate(() => window.location.href)
+				orderID = await checkoutURL.split('/')[5]
+
 				// Get the thankyou page iframe and run checks.
 				const thankyouIframe = await page.frames().find((frame) => frame.name() === "klarna-checkout-iframe");
 				await thankyouIframe.click("[id='section-order-details__link']");
 				await page.waitForTimeout(1 * timeOutTime);
 				const kcoOrderData = await iframeHandler.getOrderData(thankyouIframe);
-				// expect(kcoOrderData[0]).toBe(args.expectedOrderLines);
-				// expect(kcoOrderData[1]).toBe(args.expectedTotal);
+				expect(kcoOrderData[0]).toBe(args.expectedOrderLines);
+				expect(kcoOrderData[1]).toBe(args.expectedTotal);
 
 
 				if(args.orderManagement != '') {
 
-					let compareTotals = await orderManagement.completeRefund(page, orderID)
-					
-					expect(compareTotals[0]).toBe(compareTotals[1]);
-					expect(compareTotals[0]).toBe(compareTotals[2]);
+					await orderManagement.OrderManagementAction(page, orderID, args.orderManagement)
 
 				}
 
