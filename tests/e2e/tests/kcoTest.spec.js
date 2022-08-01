@@ -43,9 +43,9 @@ describe("KCO E2E tests", () => {
 	}),
 
 		afterEach(async () => {
-			// if (!page.isClosed()) {
-			// 	browser.close();
-			// }
+			if (!page.isClosed()) {
+				browser.close();
+			}
 			API.clearWCSession();
 		}),
 
