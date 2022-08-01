@@ -99,7 +99,7 @@
 		"customerType": "company",
 		"expectedTotal": 3352.50,
 		"expectedOrderLines": 2,
-		"orderManagement": "cancel_order"
+		"orderManagement": ""
 	},
 	{
 		"name": "[31] Buy different types of products (0% and 25% tax)",
