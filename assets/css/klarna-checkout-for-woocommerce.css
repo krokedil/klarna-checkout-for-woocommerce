@@ -34,7 +34,46 @@
     max-width: 600px; /* Could be more or less, depending on screen size */
     text-align: center;
 }
+
+/* Storefront light */
+.kco-two-column-left-sf .woocommerce-info {
+    background-color: #eeeeee;
+    color: #6d6d6d;
+}
+.kco-two-column-left-sf .woocommerce-info:before {
+    color: #6d6d6d;
+}
+.kco-two-column-left-sf .woocommerce-info a,
+.kco-two-column-left-sf .woocommerce-info a:hover {
+    color: #6d6d6d;
+}
+
+.kco-two-column-left-sf .woocommerce-checkout-review-order-table th,
+.kco-two-column-left-sf .woocommerce-checkout-review-order-table td {
+    padding: 1em 0.41575em;
+}
+
+.kco-two-column-left-sf .woocommerce-checkout-review-order-table thead {
+    display: none;
+}
+.kco-two-column-left-sf .woocommerce-checkout-review-order-table:not( .has-background ) th, 
+.kco-two-column-left-sf .woocommerce-checkout-review-order-table:not( .has-background ) tbody td {
+    background-color: #fdfdfd;
+}
+.kco-two-column-left-sf .cart-subtotal th,
+.kco-two-column-left-sf .cart-subtotal td {
+    border-top: .0625rem solid #e6e6e6;
+}
+.kco-two-column-left-sf textarea {
+    background-color: transparent;
+    border: .0625rem solid #e6e6e6;
+}
+.kco-two-column-left-sf .woocommerce-checkout-review-order-table {
+    padding-top: 1.5rem;
+}
+
 @media only screen and (min-width : 769px) {
+    /* Default two-layout, KCO on right column. */
 	#kco-order-review {
 		float: left;
 		width: 40%;
@@ -49,6 +88,34 @@
 		padding-left: 20px;
 		box-sizing: border-box;
 	}
+
+    /* Two-layout, KCO on left column. */
+    .kco-two-column-left #kco-wrapper,
+    .kco-two-column-left-sf #kco-wrapper {
+        display: grid;
+        grid-template-columns: 6fr 4fr;	
+        grid-column-gap: 70px;
+    }
+
+    .kco-two-column-left #kco-iframe, .kco-two-column-left #kco-order-review,
+    .kco-two-column-left-sf #kco-iframe, .kco-two-column-left-sf #kco-order-review {
+        width: 100%;
+    }
+
+	.kco-two-column-left #kco-order-review,
+    .kco-two-column-left-sf #kco-order-review {
+        order: 2;
+    }
+
+    .kco-two-column-left #kco-wc-form,
+    .kco-two-column-left-sf #kco-wc-form {
+        order: 1;
+    }
+
+    /* One-colum layout. */
+    .kco-one-selected #kco-iframe, .kco-one-selected #kco-order-review {
+        width: 100%;
+    }
 }
 /* Hide shipping methods in order review if displayed in KCO iframe */
 .kco-shipping-display ul#shipping_method {

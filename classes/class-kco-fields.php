@@ -75,6 +75,18 @@ class KCO_Fields {
 				'default'     => 'yes',
 				'desc_tip'    => true,
 			),
+			'checkout_layout'            => array(
+				'title'    => __( 'Checkout layout', 'klarna-checkout-for-woocommerce' ),
+				'type'     => 'select',
+				'options'  => array(
+					'one_column_checkout' => __( 'One column checkout', 'klarna-checkout-for-woocommerce' ),
+					'two_column_right'    => __( 'Two column checkout (Klarna Checkout in right column)', 'klarna-checkout-for-woocommerce' ),
+					'two_column_left'     => __( 'Two column checkout (Klarna Checkout in left column)', 'klarna-checkout-for-woocommerce' ),
+					'two_column_left_sf'  => __( 'Two column checkout (Klarna Checkout in left column) - Storefront light', 'klarna-checkout-for-woocommerce' ),
+				),
+				'default'  => 'two_column_right',
+				'desc_tip' => false,
+			),
 			// EU.
 			'credentials_eu'             => array(
 				'title' => '<img src="' . KCO_WC_PLUGIN_URL . '/assets/img/flags/eu.svg height="12" /> API Credentials Europe',
@@ -180,7 +192,7 @@ class KCO_Fields {
 			),
 			'shipping_methods_in_iframe' => array(
 				'title'       => __( 'Shipping methods in iframe', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Display Shipping methods in Klarna iframe.  If you are using the <b>Klarna Shipping Assistant</b> plugin, please follow the steps explained in the plugin documentation under the section titled ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.krokedil.com/klarna-for-woocommerce/additional-klarna-plugins/klarna-shipping-assistant/#tax-settings" target="_blank">Tax Settings</a>',
+				'label'       => sprintf( __( 'Display Shipping methods in Klarna iframe.  If you are using the <b>Klarna Shipping Assistant</b> plugin, please follow the steps explained in the plugin documentation under the sections titled %1$s and %2$s', 'klarna-checkout-for-woocommerce' ), ( '<a href="https://docs.krokedil.com/klarna-for-woocommerce/additional-klarna-plugins/klarna-shipping-assistant/#configuration" target="_blank">configuration</a>' ), ( '<a href="https://docs.krokedil.com/klarna-for-woocommerce/additional-klarna-plugins/klarna-shipping-assistant/#tax-settings" target="_blank">tax settings</a>' ) ),
 				'type'        => 'checkbox',
 				'description' => __( 'If this option is checked, selection of shipping methods is done in Klarna iframe. Shipping price and name of the selected shipping method will still be displayed in WooCommerce order review.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'no',

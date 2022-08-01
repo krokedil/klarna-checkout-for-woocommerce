@@ -54,6 +54,18 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2022.07.04    - version 2.8.4 =
+* Tweak         - Prevent the resume/suspend-cycle during validation.
+
+= 2022.06.30    - version 2.8.3 =
+* Fix           - Fixed the error handling for upselling orders using Post Purchase Upsell For WooCommerce.
+
+= 2022.06.28    - version 2.8.2 =
+* Fix           - The setting for changing border radius should now work as expected (thanks @adevade!)
+* Fix           - External payment methods ("EPM") should now appear on the checkout page. EPM are not available for pay for order.
+* Tweak         - Added additional documentation on the settings page.
+* Tweak         - You can now use the 'kco_wc_cart_line_item' hook to filter out products that you don't want to send to Klarna.
+
 = 2022.05.25    - version 2.8.1 =
 * Fix           - Fix undefined index warning.
 
