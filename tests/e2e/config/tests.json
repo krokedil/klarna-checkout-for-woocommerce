@@ -23,7 +23,8 @@
 		"coupons": "",
 		"customerType": "person",
 		"expectedTotal": 6124.92,
-		"expectedOrderLines": 7
+		"expectedOrderLines": 7,
+		"orderManagement": ""
 	},
 	{
 		"name": "[04] Buy 2 virtual/downloadable products (0% and 25% Tax)",
@@ -38,7 +39,8 @@
 		"coupons": "",
 		"customerType": "person",
 		"expectedTotal": 2980,
-		"expectedOrderLines": 2
+		"expectedOrderLines": 2,
+		"orderManagement": ""
 	},
 	{
 		"name": "[21] Buy 2 virtual/downloadable products (0% and 25% Tax)",
@@ -53,7 +55,8 @@
 		"coupons": "",
 		"customerType": "person",
 		"expectedTotal": 3352.50,
-		"expectedOrderLines": 2
+		"expectedOrderLines": 2,
+		"orderManagement": ""
 	},
 	{
 		"name": "[24] Buy different types of products (0% and 25% tax)",
@@ -79,7 +82,8 @@
 		"coupons": "",
 		"customerType": "person",
 		"expectedTotal": 6898.00,
-		"expectedOrderLines": 7
+		"expectedOrderLines": 7,
+		"orderManagement": ""
 	},
 	{
 		"name": "[30] Buy 2 virtual/downloadable products (0% and 25% Tax)",
@@ -94,7 +98,8 @@
 		"coupons": "",
 		"customerType": "company",
 		"expectedTotal": 3352.50,
-		"expectedOrderLines": 2
+		"expectedOrderLines": 2,
+		"orderManagement": ""
 	},
 	{
 		"name": "[31] Buy different types of products (0% and 25% tax)",
@@ -120,7 +125,8 @@
 		"coupons": "",
 		"customerType": "company",
 		"expectedTotal": 6898.00,
-		"expectedOrderLines": 7
+		"expectedOrderLines": 7,
+		"orderManagement": ""
 	},
 	{
 		"name": "[40] Buy different types of products (0% and 25% tax)",
@@ -146,7 +152,8 @@
 		"coupons": "",
 		"customerType": "company",
 		"expectedTotal": 6124.92,
-		"expectedOrderLines": 7
+		"expectedOrderLines": 7,
+		"orderManagement": ""
 	},
 	{
 		"name": "[41] Buy different types of products (0% and 25% tax)",
@@ -172,7 +179,8 @@
 		"coupons": "",
 		"customerType": "company",
 		"expectedTotal": 6124.92,
-		"expectedOrderLines": 7
+		"expectedOrderLines": 7,
+		"orderManagement": ""
 	},
 	{
 		"name": "[50] Buy any shippable product with a 100% discount (without free shipping)",
@@ -188,6 +196,7 @@
 		],
 		"customerType": "person",
 		"expectedTotal": 61.25,
-		"expectedOrderLines": 1
+		"expectedOrderLines": 1,
+		"orderManagement": ""
 	}
 ]
