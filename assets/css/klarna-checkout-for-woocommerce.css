@@ -1,6 +1,6 @@
 /* The "Twenty Twenty-One and Two" themes use table-layout which shrinks the content to fit-content, creating a large empty area. */
 
-form.checkout {
+form.kco-checkout {
     width: 100%;
 }
 
