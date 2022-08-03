@@ -75,7 +75,7 @@ class KCO_Checkout {
 			if ( isset( $post_data['kco_shipping_data'] ) ) {
 				$data = $post_data['kco_shipping_data'];
 			}
-		} else if( isset( $_POST['kco_shipping_data'] ) ) { // phpcs:ignore
+		} elseif ( isset( $_POST['kco_shipping_data'] ) ) { // phpcs:ignore
 			$data = $_POST['kco_shipping_data']; // phpcs:ignore
 		}
 
@@ -147,6 +147,11 @@ class KCO_Checkout {
 
 		$options = get_option( 'woocommerce_kco_settings', array() );
 		if ( 'yes' !== $options['shipping_methods_in_iframe'] ?? 'no' ) {
+			return $default;
+		}
+
+		// The Klarna Shipping Service sets the chosen shipping method to the method without the instance ID, so if $chosen method === 'klarna_kss' return $default.
+		if ( 'klarna_kss' === $chosen_method ) {
 			return $default;
 		}
 
