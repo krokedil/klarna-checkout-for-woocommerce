@@ -222,14 +222,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
-			if ( ! is_checkout() ) {
-				return;
-			}
-
-			if ( is_order_received_page() ) {
-				return;
-			}
-
 			$pay_for_order = false;
 			if ( is_wc_endpoint_url( 'order-pay' ) ) {
 				$pay_for_order = true;
@@ -279,6 +271,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'logging'                      => $this->logging,
 				'standard_woo_checkout_fields' => $standard_woo_checkout_fields,
 				'is_confirmation_page'         => ( is_kco_confirmation() ) ? 'yes' : 'no',
+				'is_order_received_page'       => is_order_received_page() ? 'yes' : 'no',
 				'shipping_methods_in_iframe'   => $this->shipping_methods_in_iframe,
 				'required_fields_text'         => __( 'Please fill in all required checkout fields.', 'klarna-checkout-for-woocommerce' ),
 				'email_exists'                 => $email_exists,
@@ -421,6 +414,23 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+
+			// ----- Extra Debug Logging Start ----- //
+			try {
+				$shipping_debug_log = array(
+					'kco_order_id'          => $klarna_order_id,
+					'wc_order_shipping'     => $order->get_shipping_method(),
+					'wc_session_shipping'   => WC()->session->get( 'chosen_shipping_methods' ),
+					'kco_order_shipping'    => $klarna_order['selected_shipping_option'],
+					'kco_shipping_transiet' => get_transient( "kss_data_$klarna_order_id" ),
+				);
+				$data               = json_encode( $shipping_debug_log );
+				KCO_Logger::log( "Extra shipping debug: $data" );
+			} catch ( Exception $e ) {
+				KCO_Logger::log( 'Extra shipping debug: Error generating log' );
+			}
+			// ----- Extra Debug Logging End ----- //
+
 			if ( ! $klarna_order ) {
 				return false;
 			}
@@ -476,7 +486,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 					$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 					if ( $klarna_order ) {
-						echo $klarna_order['html_snippet']; // phpcs:ignore WordPress.Security.EscapeOutput -- Cant escape since this is the iframe snippet.
+						echo kco_extract_script( $klarna_order['html_snippet'] ); // phpcs:ignore WordPress.Security.EscapeOutput -- Cant escape since this is the iframe snippet.
 					}
 
 					// Check if we need to finalize purchase here. Should already been done in process_payment.

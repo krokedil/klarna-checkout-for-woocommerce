@@ -19,7 +19,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 $settings = get_option( 'woocommerce_kco_settings' );
 ?>
 
-<form name="checkout" class="checkout woocommerce-checkout">
+<form name="checkout" class="checkout woocommerce-checkout kco-checkout">
 <?php do_action( 'kco_wc_before_wrapper' ); ?>
 	<div id="kco-wrapper">
 		<div id="kco-order-review">

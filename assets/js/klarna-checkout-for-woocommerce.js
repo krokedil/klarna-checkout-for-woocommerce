@@ -362,11 +362,8 @@ jQuery( function( $ ) {
 			callback({ should_proceed: false });
 			kco_wc.validation = false;
 			var className = kco_params.pay_for_order ? 'div.woocommerce-notices-wrapper' : 'form.checkout';
-			// Renable the form.
-			$( 'body' ).trigger( 'updated_checkout' );
-			$( kco_wc.checkoutFormSelector ).removeClass( 'processing' );
-			$( kco_wc.checkoutFormSelector ).unblock();
-			$( '.woocommerce-checkout-review-order-table' ).unblock();
+			// Update the checkout and renable the form.
+			$( 'body' ).trigger( 'update_checkout' );
 
 			// Print error messages, and trigger checkout_error, and scroll to notices.
 			$( '.woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message' ).remove();
@@ -471,7 +468,12 @@ jQuery( function( $ ) {
 		/**
 		 * Initiates the script.
 		 */
-		init: function() {
+		init: function () {
+			/* If this is order received page, abort ASAP to render the snippet faster. */
+			if ('yes' === kco_params.is_order_received_page) {
+				return;
+			}
+
 			$( document ).ready( kco_wc.documentReady );
 			kco_wc.bodyEl.on( 'update_checkout', function() {  kco_wc.kcoSuspend( true ) } );
 			kco_wc.bodyEl.on( 'updated_checkout', kco_wc.kcoResume );
