@@ -56,6 +56,7 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 == Changelog ==
 = 2022.08.15    - version 2.8.5 =
 * Feature       - Add new layouts for the checkout form, including a new theme.
+* Enhancement   - Compatibility with WordPress block themes.
 * Tweak         - Improved handling of shipping method changes during the checkout process along with a new filter 'kco_shipping_auto_correct'.
 * Tweak         - Updated links to documentation.
 
