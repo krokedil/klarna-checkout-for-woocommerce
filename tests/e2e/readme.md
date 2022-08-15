@@ -41,6 +41,15 @@ To create a new test, simply add a line to the tests.json file and include the f
 - expectedTotal: A float value of the expected price that you expect the test to return. We will check the Klarna order to make sure this matches at the end.
 - expectedOrderLines: A int of how many order lines you expect the test to return. We will check the Klarna order to make sure this matches at the end.
 
+## Order management testing
+Should you require to test the possibilities of refunding and canceling a created order, modify the value of `orderManagement` key in the `/config/tests.json` file to one of the following:
+
+- `"complete_refund"` tests for a total order refund
+- `"partial_refund"` tests for a partial order refund
+- `"cancel_order"` tests for an order cancelation
+
+If you do not wish to test for order management capabilities for a specific order, set the value of the `orderManagement` key as `""`.
+
 ## Adding products, shipping methods and coupons to the environment.
 Similarly to the tests above, we have a json file for all the products, coupons, shipping methods an more that the environment needs to run the tests. These can be expanded on in the same way as above.
 

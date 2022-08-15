@@ -718,5 +718,8 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 	set_transient( 'kss_data_' . $klarna_order_id, $data, HOUR_IN_SECONDS );
 	$chosen_shipping_methods   = array();
 	$chosen_shipping_methods[] = wc_clean( $data['id'] );
+
+	KCO_Logger::Log( "Set chosen shipping method for $klarna_order_id " . json_encode( $chosen_shipping_methods ) );
+
 	WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
 }
