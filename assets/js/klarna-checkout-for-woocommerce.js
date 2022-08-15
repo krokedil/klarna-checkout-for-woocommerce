@@ -468,7 +468,12 @@ jQuery( function( $ ) {
 		/**
 		 * Initiates the script.
 		 */
-		init: function() {
+		init: function () {
+			/* If this is order received page, abort ASAP to render the snippet faster. */
+			if ('yes' === kco_params.is_order_received_page) {
+				return;
+			}
+
 			$( document ).ready( kco_wc.documentReady );
 			kco_wc.bodyEl.on( 'update_checkout', function() {  kco_wc.kcoSuspend( true ) } );
 			kco_wc.bodyEl.on( 'updated_checkout', kco_wc.kcoResume );
