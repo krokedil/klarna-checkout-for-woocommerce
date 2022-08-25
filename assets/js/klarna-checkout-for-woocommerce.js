@@ -492,7 +492,7 @@ jQuery( function( $ ) {
 							var country = kco_wc.convertCountry( data.country.toUpperCase() );
 
 							// Check if shipping address is enabled.
-							if( $( '#shipping_first_name' ).length >= 0 ) {
+							if( $( '#shipping_first_name' ).length > 0 ) {
 								$( '#ship-to-different-address-checkbox' ).prop( 'checked', true);
 								$( '#ship-to-different-address-checkbox' ).change();
 								$( '#ship-to-different-address-checkbox' ).blur();
