@@ -194,7 +194,6 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		public function hide_klarna_banner() {
 			set_transient( 'klarna_hide_banner', '1', 5 * DAY_IN_SECONDS );
 			wp_send_json_success( 'Hide Klarna banner.' );
-			wp_die();
 		}
 
 		/**
