@@ -63,7 +63,7 @@ class KCO_AJAX extends WC_AJAX {
 
 		$values = array();
 		if ( isset( $_POST['checkout'] ) ) {
-			parse_str( wp_unslash( $_POST['checkout'] ), $values );// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			wp_parse_str( wp_unslash( $_POST['checkout'] ), $values );// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		}
 		$cart = $values['cart'];
 
