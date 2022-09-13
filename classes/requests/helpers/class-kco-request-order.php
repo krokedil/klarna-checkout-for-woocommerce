@@ -92,6 +92,14 @@ class KCO_Request_Order {
 			'tax_rate'         => $this->get_order_line_tax_rate( $order, $order_item ),
 		);
 
+		if ( class_exists( 'WC_Subscriptions_Product' ) && WC_Subscriptions_Product::is_subscription( $product ) ) {
+			$order_line['subscription'] = array(
+				'name'           => $order_line['name'],
+				'interval'       => strtoupper( WC_Subscriptions_Product::get_period( $product ) ),
+				'interval_count' => absint( WC_Subscriptions_Product::get_interval( $product ) ),
+			);
+		}
+
 		$settings = get_option( 'woocommerce_kco_settings', array() );
 		if ( isset( $settings['send_product_urls'] ) && 'yes' === $settings['send_product_urls'] ) {
 
