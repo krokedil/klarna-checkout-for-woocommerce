@@ -196,6 +196,14 @@ class KCO_Request_Cart {
 					'total_discount_amount' => $this->get_item_discount_amount( $cart_item, $product ),
 				);
 
+				if ( class_exists( 'WC_Subscriptions_Product' ) && WC_Subscriptions_Product::is_subscription( $product ) ) {
+					$klarna_item['subscription'] = array(
+						'name'           => $klarna_item['name'],
+						'interval'       => strtoupper( WC_Subscriptions_Product::get_period( $product ) ),
+						'interval_count' => absint( WC_Subscriptions_Product::get_interval( $product ) ),
+					);
+				}
+
 				// Product type.
 				if ( $product->is_downloadable() || $product->is_virtual() ) {
 					$klarna_item['type'] = 'digital';
