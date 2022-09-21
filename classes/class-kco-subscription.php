@@ -204,7 +204,7 @@ class KCO_Subscription {
 	public function set_recurring_token_for_order( $order_id = null, $klarna_order = null ) {
 		$wc_order = wc_get_order( $order_id );
 		if ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
-			$subscriptions   = wcs_get_subscriptions_for_order( $order_id );
+			$subscriptions   = wcs_get_subscriptions_for_order( $order_id, array( 'order_type' => 'any' ) );
 			$klarna_order_id = $wc_order->get_transaction_id();
 			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( isset( $klarna_order['recurring_token'] ) ) {
