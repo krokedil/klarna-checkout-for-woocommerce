@@ -82,8 +82,7 @@ class KCO_Checkout {
 		// If we have data, update the shipping.
 		if ( ! empty( $data ) ) {
 			WC()->session->set( 'kco_shipping_data', $data );
-			$data = json_decode( $post_data['kco_shipping_data'], true );
-			kco_update_wc_shipping( $data );
+			kco_update_wc_shipping( json_decode( $data, true ) );
 		}
 	}
 
