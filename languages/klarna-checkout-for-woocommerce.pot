@@ -25,7 +25,7 @@ msgid "Support"
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:110, ../includes/kco-functions.php:581
+#: ../classes/class-kco-api-callbacks.php:110, ../includes/kco-functions.php:620
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
@@ -33,7 +33,7 @@ msgstr ""
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:103, ../includes/kco-functions.php:573
+#: ../classes/class-kco-api-callbacks.php:103, ../includes/kco-functions.php:612
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
@@ -426,23 +426,23 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:283
+#: ../classes/class-kco-gateway.php:276
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:286
+#: ../classes/class-kco-gateway.php:279
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:533
+#: ../classes/class-kco-gateway.php:526
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:592
+#: ../classes/class-kco-gateway.php:585
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:613, ../classes/class-kco-gateway.php:634
+#: ../classes/class-kco-gateway.php:606, ../classes/class-kco-gateway.php:627
 msgid "Reference:"
 msgstr ""
 
@@ -487,15 +487,15 @@ msgstr ""
 msgid "Failed to load Klarna Checkout template file."
 msgstr ""
 
-#: ../includes/kco-functions.php:118
+#: ../includes/kco-functions.php:157
 msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:592
+#: ../includes/kco-functions.php:631
 msgid "Waiting for verification from Klarnas push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:587
+#: ../includes/kco-functions.php:626
 msgid "Klarna Checkout order was rejected"
 msgstr ""
 

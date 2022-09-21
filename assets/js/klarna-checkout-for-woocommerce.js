@@ -486,8 +486,6 @@ jQuery( function( $ ) {
 
 							var country = kco_wc.convertCountry(data.country.toUpperCase());
 
-
-
 							// Check if separate shipping address is enabled before filling the billing address fields.
 							if ($('#ship-to-different-address-checkbox').is(":checked")) {
 								$('#ship-to-different-address-checkbox').prop('checked', true);

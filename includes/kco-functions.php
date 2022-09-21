@@ -91,8 +91,47 @@ function kco_wc_show_snippet( $pay_for_order = false ) {
 	} else {
 		$klarna_order = kco_create_or_update_order();
 	}
+
 	do_action( 'kco_wc_show_snippet', $klarna_order );
-	echo $klarna_order['html_snippet']; // phpcs:ignore WordPress -- Can not escape this, since its the iframe snippet.
+	echo kco_extract_script( $klarna_order['html_snippet'] );
+}
+
+/**
+ * Returns the HTML snippet with the script tag (and its content) removed.
+ *
+ * The extracted JavaScript is inserted in kco_add_inline_script. This is required since certain themes escapes the HTML snippet,
+ * which renders its content (and thus the script) useless.
+ *
+ * @param string $html_snippet
+ * @return string The HTML snippet without the script tag (and its content).
+ */
+function kco_extract_script( $html_snippet ) {
+	preg_match( '/<script(.|\n)*\/script>/', $html_snippet, $js ); // extract the <script> tag.
+
+	// Remove the HTML tags from the script.
+	kco_add_inline_script( $js );
+
+	// Return the snippet without script tag.
+	return preg_replace(
+		'/<script(.|\n)*\/script>/',
+		'',
+		$html_snippet
+	);
+}
+
+/**
+ * Inserts the script tag.
+ *
+ * Inserts the JavaScript that was extracted from kco_extract_script.
+ *
+ * @param string $js The extract JavaScript (excluding the tags).
+ * @return void
+ */
+function kco_add_inline_script( $js ) {
+	$js = preg_replace( '/<\/?script[^>]*>/', '', $js[0] );
+	wp_register_script( 'kco-script', '', array(), '', true );
+	wp_enqueue_script( 'kco-script' );
+	wp_add_inline_script( 'kco-script', $js, 'before' );
 }
 
 /**
