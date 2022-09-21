@@ -318,8 +318,6 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 				);
 				wp_send_json_success( $return );
 			}
-
-			wp_die();
 		}
 
 		/**

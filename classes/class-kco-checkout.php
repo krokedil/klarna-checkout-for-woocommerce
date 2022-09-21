@@ -71,7 +71,7 @@ class KCO_Checkout {
 		 * Else If - During the placing of the order.
 		 */
 		if ( isset( $_POST['post_data'] ) ) { // phpcs:ignore
-			parse_str( $_POST['post_data'], $post_data ); // phpcs:ignore
+			wp_parse_str( $_POST['post_data'], $post_data ); // phpcs:ignore
 			if ( isset( $post_data['kco_shipping_data'] ) ) {
 				$data = $post_data['kco_shipping_data'];
 			}

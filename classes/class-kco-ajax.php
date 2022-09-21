@@ -63,9 +63,13 @@ class KCO_AJAX extends WC_AJAX {
 
 		$values = array();
 		if ( isset( $_POST['checkout'] ) ) {
-			parse_str( wp_unslash( $_POST['checkout'] ), $values );// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			wp_parse_str( wp_unslash( $_POST['checkout'] ), $values );// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		}
 		$cart = $values['cart'];
+
+		if ( ! is_iterable( $cart ) ) {
+			wp_send_json_error();
+		}
 
 		foreach ( $cart as $cart_key => $cart_value ) {
 			$new_quantity = (int) $cart_value['qty'];
@@ -80,7 +84,6 @@ class KCO_AJAX extends WC_AJAX {
 		// If the update failed return error.
 		if ( is_wp_error( $klarna_order ) ) {
 			wp_send_json_error();
-			wp_die();
 		}
 		wp_die();
 	}
@@ -118,7 +121,6 @@ class KCO_AJAX extends WC_AJAX {
 		);
 
 		wp_send_json_success( $data );
-		wp_die();
 	}
 
 	/**
@@ -139,7 +141,6 @@ class KCO_AJAX extends WC_AJAX {
 		if ( empty( $klarna_order_id ) ) {
 			wc_add_notice( 'Klarna order id is missing.', 'error' );
 			wp_send_json_error();
-			wp_die();
 		}
 
 		if ( isset( $_REQUEST['data'] ) && is_array( $_REQUEST['data'] ) ) {
@@ -190,13 +191,11 @@ class KCO_AJAX extends WC_AJAX {
 
 		if ( is_wp_error( $klarna_order ) ) {
 			wp_send_json_error();
-			wp_die();
 		}
 
 		// If the Klarna order was false, there was no update needed. Don't change any address data.
 		if ( ! $klarna_order ) {
 			wp_send_json_success( false );
-			wp_die();
 		}
 
 		wp_send_json_success(
@@ -205,7 +204,6 @@ class KCO_AJAX extends WC_AJAX {
 				'shipping_address' => isset( $klarna_order['shipping_address'] ) ? $klarna_order['shipping_address'] : array(),
 			)
 		);
-		wp_die();
 	}
 
 	/**
@@ -223,7 +221,6 @@ class KCO_AJAX extends WC_AJAX {
 		$klarna_order = KCO_WC()->api->get_klarna_order( WC()->session->get( 'kco_wc_order_id' ) );
 		if ( ! $klarna_order ) {
 			wp_send_json_error( $klarna_order );
-			wp_die();
 		}
 
 		// Convert the billing region to unicode format.
@@ -246,7 +243,6 @@ class KCO_AJAX extends WC_AJAX {
 				'shipping_address' => $klarna_order['shipping_address'],
 			)
 		);
-		wp_die();
 
 	}
 
@@ -266,7 +262,6 @@ class KCO_AJAX extends WC_AJAX {
 		$message         = "Frontend JS $klarna_order_id: $posted_message";
 		KCO_Logger::log( $message );
 		wp_send_json_success();
-		wp_die();
 	}
 }
 KCO_AJAX::init();
