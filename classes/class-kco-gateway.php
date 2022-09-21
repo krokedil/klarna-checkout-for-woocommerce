@@ -222,6 +222,11 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
+			/* Only enqueue for pages where the checkout form should appear. */
+			if ( ! ( is_checkout() || is_wc_endpoint_url( 'order-pay' ) ) ) {
+				return;
+			}
+
 			$pay_for_order = false;
 			if ( is_wc_endpoint_url( 'order-pay' ) ) {
 				$pay_for_order = true;
