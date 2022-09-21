@@ -16,7 +16,7 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:163, ../classes/admin/class-klarna-for-woocommerce-addons.php:399
+#: ../klarna-checkout-for-woocommerce.php:163, ../classes/admin/class-klarna-for-woocommerce-addons.php:397
 msgid "Settings"
 msgstr ""
 
@@ -37,7 +37,7 @@ msgstr ""
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
-#: ../classes/class-kco-checkout.php:189
+#: ../classes/class-kco-checkout.php:192
 msgid "The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again."
 msgstr ""
 
@@ -426,23 +426,23 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:276
+#: ../classes/class-kco-gateway.php:281
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:279
+#: ../classes/class-kco-gateway.php:284
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:526
+#: ../classes/class-kco-gateway.php:531
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:585
+#: ../classes/class-kco-gateway.php:590
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:606, ../classes/class-kco-gateway.php:627
+#: ../classes/class-kco-gateway.php:611, ../classes/class-kco-gateway.php:632
 msgid "Reference:"
 msgstr ""
 
@@ -529,7 +529,7 @@ msgstr ""
 msgid "It looks as if you don't have pretty permalinks enabled in WordPress. For Klarna checkout for WooCommerce to function properly, this needs to be enabled. "
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:81, ../classes/admin/class-klarna-for-woocommerce-addons.php:398
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:81, ../classes/admin/class-klarna-for-woocommerce-addons.php:396
 msgid "Klarna Add-ons"
 msgstr ""
 
@@ -561,19 +561,19 @@ msgstr ""
 msgid "Surcharge"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:255, ../classes/requests/helpers/class-kco-request-cart.php:256
+#: ../classes/requests/helpers/class-kco-request-cart.php:263, ../classes/requests/helpers/class-kco-request-cart.php:264
 msgid "Sales Tax"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:288, ../classes/requests/helpers/class-kco-request-cart.php:285, ../classes/requests/helpers/class-kco-request-cart.php:357
+#: ../classes/requests/helpers/class-kco-request-cart.php:296, ../classes/requests/helpers/class-kco-request-cart.php:293, ../classes/requests/helpers/class-kco-request-cart.php:365
 msgid "Gift card"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:378, ../classes/requests/helpers/class-kco-request-cart.php:401
+#: ../classes/requests/helpers/class-kco-request-cart.php:386, ../classes/requests/helpers/class-kco-request-cart.php:409
 msgid "giftcard"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:707, ../classes/requests/helpers/class-kco-request-cart.php:735
+#: ../classes/requests/helpers/class-kco-request-cart.php:715, ../classes/requests/helpers/class-kco-request-cart.php:743
 msgid "Shipping"
 msgstr ""
 
