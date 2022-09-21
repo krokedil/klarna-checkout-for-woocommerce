@@ -145,6 +145,10 @@ class KCO_Checkout {
 			return $default;
 		}
 
+		if ( empty( $chosen_method ) ) {
+			return $default;
+		}
+
 		$options = get_option( 'woocommerce_kco_settings', array() );
 		if ( 'yes' !== $options['shipping_methods_in_iframe'] ?? 'no' ) {
 			return $default;
@@ -158,7 +162,7 @@ class KCO_Checkout {
 		KCO_Logger::log( "Checkout error - Shipping methods where changed during the checkout process by WooCommerce. Chosen shipping method by the customer was $chosen_method, WooCommerce wanted to set $default instead" );
 
 		/*
-		 * Add a filter to allow people to set if they want to automatically correct shipping discrepencies instead of throwing an error.
+		 * Add a filter to allow people to set if they want to automatically correct shipping discrepancies instead of throwing an error.
 		 * Note however that this is not recommended. If you do this, and the shipping method that the customer selected is no longer available,
 		 * then unexpected issues might happen. Only do this if you are sure the chosen method actually exists and is available.
 		 */
