@@ -65,7 +65,7 @@ class KCO_Templates {
 	 */
 	public function override_template( $template, $template_name ) {
 		if ( is_checkout() ) {
-			$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_STRING );
+			$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			// Don't display KCO template if we have a cart that doesn't needs payment.
 			if ( apply_filters( 'kco_check_if_needs_payment', true ) && ! is_wc_endpoint_url( 'order-pay' ) ) {
 				if ( ! WC()->cart->needs_payment() ) {
@@ -132,7 +132,7 @@ class KCO_Templates {
 					}
 
 					if ( 'kco' === $order->get_payment_method() ) {
-						$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_STRING );
+						$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 						if ( empty( $confirm ) ) {
 							$template = $klarna_checkout_template;
 						}
