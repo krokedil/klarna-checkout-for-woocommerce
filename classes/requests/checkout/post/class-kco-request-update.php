@@ -56,7 +56,7 @@ class KCO_Request_Update extends KCO_Request {
 		$request_body = array(
 			'purchase_country'   => $this->get_purchase_country(),
 			'purchase_currency'  => get_woocommerce_currency(),
-			'locale'             => substr( str_replace( '_', '-', get_locale() ), 0, 5 ),
+			'locale'             => apply_filters( 'kco_locale', substr( str_replace( '_', '-', get_locale() ), 0, 5 ) ),
 			'merchant_urls'      => KCO_WC()->merchant_urls->get_urls( $order_id ),
 			'order_amount'       => $cart_data->get_order_amount(),
 			'order_lines'        => $cart_data->get_order_lines(),
