@@ -215,6 +215,12 @@ class KCO_Subscription {
 
 				foreach ( $subscriptions as $subscription ) {
 					update_post_meta( $subscription->get_id(), '_kco_recurring_token', $recurring_token );
+
+					// Do not overwrite any existing phone number in case the customer has changed payment method (and thus shipping details).
+					if ( empty( $subscription->get_shipping_phone() ) ) {
+						$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
+						$subscription->save();
+					}
 				}
 
 				// Also update the renewal order with the new recurring token.
@@ -438,6 +444,7 @@ class KCO_Subscription {
 		$subscription->set_shipping_country( strtoupper( $klarna_order['shipping_address']['country'] ) );
 		$subscription->set_shipping_postcode( $klarna_order['shipping_address']['postal_code'] );
 		$subscription->set_shipping_city( $klarna_order['shipping_address']['city'] );
+		$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
 
 		$subscription->save();
 	}
