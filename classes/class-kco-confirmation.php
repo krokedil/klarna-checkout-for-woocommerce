@@ -48,9 +48,9 @@ class KCO_Confirmation {
 	 * @return void
 	 */
 	public function confirm_order() {
-		$kco_confirm     = filter_input( INPUT_GET, 'kco_confirm', FILTER_SANITIZE_STRING );
-		$klarna_order_id = filter_input( INPUT_GET, 'kco_order_id', FILTER_SANITIZE_STRING );
-		$order_key       = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_STRING );
+		$kco_confirm     = filter_input( INPUT_GET, 'kco_confirm', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$klarna_order_id = filter_input( INPUT_GET, 'kco_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$order_key       = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		// Return if we dont have our parameters set.
 		if ( empty( $kco_confirm ) || empty( $klarna_order_id ) || empty( $order_key ) ) {
@@ -76,9 +76,9 @@ class KCO_Confirmation {
 	 * @return void
 	 */
 	public function check_if_external_payment() {
-		$epm             = filter_input( INPUT_GET, 'kco-external-payment', FILTER_SANITIZE_STRING );
-		$order_id        = filter_input( INPUT_GET, 'order_id', FILTER_SANITIZE_STRING );
-		$klarna_order_id = filter_input( INPUT_GET, 'kco_order_id', FILTER_SANITIZE_STRING );
+		$epm             = filter_input( INPUT_GET, 'kco-external-payment', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$order_id        = filter_input( INPUT_GET, 'order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$klarna_order_id = filter_input( INPUT_GET, 'kco_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( ! empty( $epm ) ) {
 			$this->run_kepm( $epm, $order_id, $klarna_order_id );
 		}
