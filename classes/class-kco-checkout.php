@@ -158,6 +158,11 @@ class KCO_Checkout {
 			return $default;
 		}
 
+		// This covers for situations where the shipping rate packages may be changed through a hook, which may result in an incorrect shipping method change assessment.
+		if ( $default === $chosen_method ) {
+			return $default;
+		}
+
 		KCO_Logger::log( "Checkout error - Shipping methods where changed during the checkout process by WooCommerce. Chosen shipping method by the customer was $chosen_method, WooCommerce wanted to set $default instead" );
 
 		/*
