@@ -26,11 +26,12 @@ jobs:
 
   send-to-slack:
       runs-on: ${{ matrix.os }}
+              needs: test-plugin
       steps:
       - name: Send custom JSON data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
-        needs: test-plugin
+
         with:
           payload: |
             {
