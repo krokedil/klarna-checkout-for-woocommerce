@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - develop
+  workflow_dispatch:
+
 jobs:
   test-plugin:
     name: Run E2E Tests
@@ -29,3 +31,14 @@ jobs:
         run: |
            cd ./kco/tests/e2e/
            yarn e2e:test
+      - name: Send custom JSON data to Slack workflow
+        id: slack
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "test1": "Johan",
+              "test2": "Danilo"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
