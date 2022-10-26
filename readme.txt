@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 6.0.2
+Tested up to: 6.1
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 6.9.4
+WC tested up to: 7.0.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,12 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2022.10.25    - version 2.8.7 =
+* Fix           - The shipping phone number should now be saved to the subscription.
+* Fix           - Fixed an undefined index when trying to create or update the session.
+* Enhancement   - You can now use the 'kco_locale' filter to change the Klarna locale.
+* Enhancement   - Added support for PHP 8.
+
 = 2022.09.21    - version 2.8.6 =
 * Fix           - Fixed an issue where WooCommerce reported about shipping changes happening despite no changes which prevented the customer from finalizing the purchase.
 * Fix           - Fixed undefined index and variable.
