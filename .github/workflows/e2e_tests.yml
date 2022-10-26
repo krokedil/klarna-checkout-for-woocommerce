@@ -45,7 +45,7 @@ jobs:
         with:
           payload: |
             {
-              "test1": ${{outputs.output1}},
+              "test1": ${{test-plugin.outputs.output1}},
               "test2": "Danilo"
             }
         env:
