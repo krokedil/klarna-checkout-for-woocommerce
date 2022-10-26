@@ -15,6 +15,10 @@ jobs:
     env:
       API_KEY: ${{secrets.E2E_API_KEY}}
       API_SECRET: ${{secrets.E2E_API_SECRET}}
+
+  outputs:
+      output1: ${{ steps.step1.outputs.test }}
+
     steps:
       - name: Create dirs.
         run: |
@@ -39,6 +43,6 @@ jobs:
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-            ${{needs.job1.outputs.output1}}
+            ${{job1.outputs.output1}}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
