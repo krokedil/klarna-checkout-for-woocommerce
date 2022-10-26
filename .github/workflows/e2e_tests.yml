@@ -20,6 +20,9 @@ jobs:
       output1: ${{ steps.step1.outputs.test }}
 
     steps:
+      - bash: |
+          FOO="some value"
+          echo "##vso[task.setvariable variable=FOO;isOutput=true]$FOO"
       - id: step1
         run: echo "test=hello" >> $GITHUB_OUTPUT
 
@@ -28,11 +31,14 @@ jobs:
       name: Send to Slack
       runs-on: [ubuntu-latest]
       needs: test-plugin
-      steps:
-        - bash: |
-        FOO=${{needs.test-plugin.outputs.output1}}
-        echo "##vso[task.setvariable variable=FOO]$FOO"
 
+      variables:
+      FOO: $[ dependencies.test-plugin.outputs['step1.FOO'] ]
+        
+      env:
+          FOO: $(FOO)
+
+      steps:
       - name: Send custom JSON data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
@@ -40,7 +46,7 @@ jobs:
         with:
           payload: |
             {
-              "test1": "$FOO",
+              "test1": $(FOO),
               "test2": "Robert"
             }
         env:
