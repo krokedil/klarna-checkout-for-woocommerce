@@ -4,6 +4,11 @@ on:
     branches:
       - develop
       - dev-e2e
+    outputs:
+      workflow_output1:
+        description: "The first job output"
+        value: ${{ jobs.test-plugin.outputs.job_output1 }}
+
 
 jobs:
   test-plugin:
@@ -44,7 +49,7 @@ jobs:
         with:
           payload: |
             {
-              "test1": ${{test-plugin.outputs.output1}},
+              "test1": ${{outputs.workflow_output1}},
               "test2": "Danilo"
             }
         env:
