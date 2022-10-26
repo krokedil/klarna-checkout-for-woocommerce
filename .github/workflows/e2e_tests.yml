@@ -30,7 +30,7 @@ jobs:
         with:
           payload: |
           
-            ${{job1.outputs.output1}}
+            ${{needs.job1.outputs.output1}}
           
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
