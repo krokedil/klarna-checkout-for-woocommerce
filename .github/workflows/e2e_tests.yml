@@ -42,10 +42,12 @@ jobs:
       - name: Send custom JSON data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
+        run: |
+          echo XXXX
         with:
           payload: |
             {
-              "test1": ${{test-plugin.outputs.output1}},
+              "test1": "Johan",
               "test2": "Danilo"
             }
         env:
