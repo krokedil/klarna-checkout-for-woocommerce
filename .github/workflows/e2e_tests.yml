@@ -23,7 +23,6 @@ jobs:
     - id: step1
       run: echo "test=hello" >> $GITHUB_OUTPUT  
 
-  send-to-slack:
     - name: Send custom JSON data to Slack workflow
       id: slack
 
