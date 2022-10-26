@@ -5,7 +5,8 @@ on:
       - develop
       - dev-e2e
   workflow_dispatch:
-
+    branches:
+      - dev-e2e
 jobs:
   test-plugin:
     name: Run E2E Tests
