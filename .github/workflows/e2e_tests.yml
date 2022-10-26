@@ -16,19 +16,39 @@ jobs:
       API_KEY: ${{secrets.E2E_API_KEY}}
       API_SECRET: ${{secrets.E2E_API_SECRET}}
 
-
-
+    outputs:
+      output1: ${{ steps.step1.outputs.test }}
 
     steps:
+      - name: Create dirs.
+        run: |
+              mkdir -p kco
+      - name: Setup KCO
+        uses: actions/checkout@v2
+        with:
+          path: kco
+      - name: Setup Yarn
+        run: |
+          cd ./kco/tests/e2e/
+          yarn install
+      - name: Run Tests
+        run: |
+          cd ./kco/tests/e2e/
+          yarn e2e:test
+      - name: Send variable TEST
+        id: step1
+        run: echo "test=hello" >> $GITHUB_OUTPUT
 
+  send-to-slack:
       - name: Send custom JSON data to Slack workflow
         id: slack
+        needs: test-plugin
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {
-              "test1":  "Hello"
-              "test2": "Greetings"
+              "test1": "Send1",
+              "test2": "Send2"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
