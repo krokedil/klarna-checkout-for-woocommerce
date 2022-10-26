@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - develop
+      - dev-e2e
   workflow_dispatch:
 
 jobs:
