@@ -30,7 +30,7 @@ describe("KCO E2E tests", () => {
 	beforeAll(async () => {
 		try {
 			json = await setup.setupStore(json);
-
+			console.log('TEST FILE');
 		} catch (e) {
 			console.log(e);
 		}
