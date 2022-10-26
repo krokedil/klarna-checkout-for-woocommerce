@@ -28,12 +28,13 @@ jobs:
       name: Send to Slack
       runs-on: [ubuntu-latest]
       needs: test-plugin
+              variables:
+            $FOO = echo ${{needs.test-plugin.outputs.output1}}
       steps:
       - name: Send custom JSON data to Slack workflow
         id: slack
         # uses: slackapi/slack-github-action@v1.23.0
-        variables:
-            $FOO = echo ${{needs.test-plugin.outputs.output1}}
+
         # with:
         #   payload: |
         #     {
