@@ -41,4 +41,4 @@ jobs:
         #     }
         # env:
         #   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: echo ${{needs.test-plugin.outputs.output1}}
+- run: echo ${{needs.test-plugin.outputs.output1}}
