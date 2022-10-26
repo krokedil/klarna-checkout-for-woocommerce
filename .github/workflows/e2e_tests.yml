@@ -25,8 +25,9 @@ jobs:
 
 
   send-to-slack:
+      name: Send to Slack
       runs-on: ${{ matrix.os }}
-              needs: test-plugin
+      needs: test-plugin
       steps:
       - name: Send custom JSON data to Slack workflow
         id: slack
