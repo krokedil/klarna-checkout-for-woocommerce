@@ -18,10 +18,13 @@ jobs:
 
     outputs:
       output1: ${{ steps.step1.outputs.test }}
+      output2: ${{ steps.step2.outputs.test }}
 
     steps:
       - id: step1
-        run: echo "TEST=hello" >> $GITHUB_OUTPUT
+        run: echo "TEST=Receive this from previous job 1" >> $GITHUB_OUTPUT
+      - id: step2
+        run: echo "TEST=Receive this from previous job 2" >> $GITHUB_OUTPUT
 
 
   send-to-slack:
@@ -38,7 +41,7 @@ jobs:
           payload: |
             {
               "test1": "${{needs.test-plugin.outputs.output1}}",
-              "test2": "Danilo"
+              "test2": "${{needs.test-plugin.outputs.output2}}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
