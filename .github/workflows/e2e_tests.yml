@@ -36,10 +36,10 @@ jobs:
 
         with:
           payload: |
-            echo '{
+            {
               "test1": "${{needs.test-plugin.outputs.output1}}",
               "test2": "Danilo"
-            }'
+            }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
  
