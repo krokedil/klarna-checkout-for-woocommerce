@@ -56,7 +56,7 @@ class KCO_API_Callbacks {
 		 * 4. Acknowledge the order
 		 * 5. Send merchant_reference1
 		 */
-		$klarna_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_STRING );
+		$klarna_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		// Do nothing if there's no Klarna Checkout order ID.
 		if ( empty( $klarna_order_id ) ) {
 			return;
@@ -140,7 +140,7 @@ class KCO_API_Callbacks {
 		 */
 
 		$order_id        = '';
-		$klarna_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_STRING );
+		$klarna_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		if ( ! empty( $klarna_order_id ) ) {
 			$klarna_order_id = $klarna_order_id;

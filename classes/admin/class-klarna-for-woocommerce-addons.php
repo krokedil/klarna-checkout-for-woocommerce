@@ -70,8 +70,8 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		 * Add the Addons options page to WooCommerce.
 		 **/
 		public function options_page() {
-			$tab     = filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_STRING );
-			$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_STRING );
+			$tab     = filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+			$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			$this->add_page_tabs( $tab );
 			if ( empty( $tab ) || 'addons' === $tab ) {
 				$addon_content = self::get_addons();

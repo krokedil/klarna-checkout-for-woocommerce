@@ -45,7 +45,7 @@ class KCO_Request_Create extends KCO_Request {
 
 		$request_body = array(
 			'purchase_country'   => $this->get_purchase_country(),
-			'locale'             => substr( str_replace( '_', '-', get_locale() ), 0, 5 ),
+			'locale'             => apply_filters( 'kco_locale', substr( str_replace( '_', '-', get_locale() ), 0, 5 ) ),
 			'merchant_urls'      => KCO_WC()->merchant_urls->get_urls( $order_id ),
 			'billing_countries'  => KCO_Request_Countries::get_billing_countries(),
 			'shipping_countries' => KCO_Request_Countries::get_shipping_countries(),

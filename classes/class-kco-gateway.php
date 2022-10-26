@@ -107,7 +107,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 */
 		public function process_payment( $order_id ) {
 			$order                 = wc_get_order( $order_id );
-			$change_payment_method = filter_input( INPUT_GET, 'change_payment_method', FILTER_SANITIZE_STRING );
+			$change_payment_method = filter_input( INPUT_GET, 'change_payment_method', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			// Order-pay purchase (or subscription payment method change)
 			// 1. Redirect to receipt page.
 			// 2. Process the payment by displaying the KCO iframe via woocommerce_receipt_kco hook.
@@ -147,7 +147,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return void
 		 */
 		public function receipt_page( $order ) {
-			$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_STRING );
+			$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			if ( ! empty( $kco_action ) && 'change-subs-payment' === $kco_action ) {
 				kco_wc_show_snippet();
 			}
@@ -312,7 +312,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			if ( 'woocommerce_page_wc-settings' !== $hook ) {
 				return;
 			}
-			$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_STRING );
+			$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 			if ( empty( $section ) || 'kco' !== $section ) {
 				return;
@@ -512,7 +512,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return string
 		 */
 		public function admin_footer_text( $text ) {
-			$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_STRING );
+			$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			if ( ! empty( $section ) && 'kco' === $section ) {
 				$text = 'If you like Klarna Checkout for WooCommerce, please consider <strong>assigning Krokedil as your integration partner.</strong>.';
 			}
@@ -537,7 +537,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * Adds prefill consent to WC session.
 		 */
 		public function prefill_consent() {
-			$prefill_consent = filter_input( INPUT_GET, 'prefill_consent', FILTER_SANITIZE_STRING );
+			$prefill_consent = filter_input( INPUT_GET, 'prefill_consent', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			if ( ! empty( $prefill_consent ) ) {
 				if ( 'yes' === $prefill_consent ) {
 					WC()->session->set( 'kco_wc_prefill_consent', true );

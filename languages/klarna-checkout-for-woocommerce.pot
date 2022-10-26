@@ -25,7 +25,7 @@ msgid "Support"
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:110, ../includes/kco-functions.php:620
+#: ../classes/class-kco-api-callbacks.php:110, ../includes/kco-functions.php:622
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
@@ -33,7 +33,7 @@ msgstr ""
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:103, ../includes/kco-functions.php:612
+#: ../classes/class-kco-api-callbacks.php:103, ../includes/kco-functions.php:614
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
@@ -450,7 +450,7 @@ msgstr ""
 msgid "Klarna Checkout for WooCommerce"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:224
+#: ../classes/class-kco-subscription.php:230
 msgid "Recurring token was missing from the Klarna order during the checkout process. Please contact Klarna for help."
 msgstr ""
 
@@ -459,27 +459,27 @@ msgid "Recurring token for subscription: %s"
 msgstr ""
 
 #. translators: Error message.
-#: ../classes/class-kco-subscription.php:294
+#: ../classes/class-kco-subscription.php:300
 msgid "Subscription payment failed with Klarna. Message: %1$s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:287
+#: ../classes/class-kco-subscription.php:293
 msgid "Subscription payment made with Klarna. Klarna order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:321
+#: ../classes/class-kco-subscription.php:327
 msgid "Klarna recurring token"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:373
+#: ../classes/class-kco-subscription.php:379
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:367
+#: ../classes/class-kco-subscription.php:373
 msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:394
+#: ../classes/class-kco-subscription.php:400
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -487,15 +487,15 @@ msgstr ""
 msgid "Failed to load Klarna Checkout template file."
 msgstr ""
 
-#: ../includes/kco-functions.php:157
+#: ../includes/kco-functions.php:159
 msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:631
+#: ../includes/kco-functions.php:633
 msgid "Waiting for verification from Klarnas push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:626
+#: ../includes/kco-functions.php:628
 msgid "Klarna Checkout order was rejected"
 msgstr ""
 

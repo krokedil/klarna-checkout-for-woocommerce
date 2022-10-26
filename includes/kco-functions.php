@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Gets a Klarna order. Either creates or updates existing order.
  *
- * @return array
+ * @return array|null If an order could not be created or updated, NULL is returned.
  */
 function kco_create_or_update_order() {
 	// Need to calculate these here, because WooCommerce hasn't done it yet.
@@ -47,7 +47,7 @@ function kco_create_or_update_order() {
 /**
  * Creates or updates a Klarna order for the Pay for order feature.
  *
- * @return array
+ * @return array|null If an order could not be created or updated, NULL is returned.
  */
 function kco_create_or_update_order_pay_for_order() {
 	global $wp;
@@ -92,8 +92,10 @@ function kco_wc_show_snippet( $pay_for_order = false ) {
 		$klarna_order = kco_create_or_update_order();
 	}
 
-	do_action( 'kco_wc_show_snippet', $klarna_order );
-	echo kco_extract_script( $klarna_order['html_snippet'] );
+	if ( isset( $klarna_order['html_snippet'] ) ) {
+		do_action( 'kco_wc_show_snippet', $klarna_order );
+		echo kco_extract_script( $klarna_order['html_snippet'] );
+	}
 }
 
 /**

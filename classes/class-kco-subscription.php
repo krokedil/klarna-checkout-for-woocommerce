@@ -54,8 +54,8 @@ class KCO_Subscription {
 	 * @return bool
 	 */
 	public function is_kco_subs_change_payment_method() {
-		$key        = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_STRING );
-		$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_STRING );
+		$key        = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		if ( ! empty( $key ) && ( ! empty( $kco_action ) && 'change-subs-payment' === $kco_action ) ) {
 			return true;
@@ -137,7 +137,7 @@ class KCO_Subscription {
 
 		// If this is a change payment method request.
 		if ( $this->is_kco_subs_change_payment_method() ) {
-			$key      = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_STRING );
+			$key      = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			$order_id = wc_get_order_id_by_order_key( $key );
 			if ( $order_id ) {
 				$wc_order = wc_get_order( $order_id );
@@ -204,7 +204,7 @@ class KCO_Subscription {
 	public function set_recurring_token_for_order( $order_id = null, $klarna_order = null ) {
 		$wc_order = wc_get_order( $order_id );
 		if ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
-			$subscriptions   = wcs_get_subscriptions_for_order( $order_id );
+			$subscriptions   = wcs_get_subscriptions_for_order( $order_id, array( 'order_type' => 'any' ) );
 			$klarna_order_id = $wc_order->get_transaction_id();
 			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( isset( $klarna_order['recurring_token'] ) ) {
@@ -215,6 +215,12 @@ class KCO_Subscription {
 
 				foreach ( $subscriptions as $subscription ) {
 					update_post_meta( $subscription->get_id(), '_kco_recurring_token', $recurring_token );
+
+					// Do not overwrite any existing phone number in case the customer has changed payment method (and thus shipping details).
+					if ( empty( $subscription->get_shipping_phone() ) ) {
+						$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
+						$subscription->save();
+					}
 				}
 
 				// Also update the renewal order with the new recurring token.
@@ -337,7 +343,7 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function save_kco_recurring_token_update( $post_id, $post ) {
-		$klarna_recurring_token = filter_input( INPUT_POST, '_kco_recurring_token', FILTER_SANITIZE_STRING );
+		$klarna_recurring_token = filter_input( INPUT_POST, '_kco_recurring_token', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$order                  = wc_get_order( $post_id );
 		if ( 'shop_subscription' === $order->get_type() && get_post_meta( $post_id, '_kco_recurring_token' ) ) {
 			update_post_meta( $post_id, '_kco_recurring_token', $klarna_recurring_token );
@@ -352,8 +358,8 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function handle_push_cb_for_payment_method_change( $klarna_order_id ) {
-		$subscription_id = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_STRING );
-		$kco_action      = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_STRING );
+		$subscription_id = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$kco_action      = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( ! empty( $subscription_id ) && ( ! empty( $kco_action ) && 'subs-payment-changed' === $kco_action ) ) {
 
 			$subscription = wcs_get_subscription( $subscription_id );
@@ -389,7 +395,7 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function display_thankyou_message_for_payment_method_change() {
-		$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_STRING );
+		$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( ! empty( $kco_action ) && 'subs-payment-changed' === $kco_action ) {
 			wc_add_notice( __( 'Thank you, your subscription payment method is now updated.', 'klarna-checkout-for-woocommerce' ), 'success' );
 			kco_unset_sessions();
@@ -403,7 +409,7 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function maybe_confirm_change_payment_method( $subscription_id ) {
-		$klarna_order_id = filter_input( INPUT_GET, 'kco-order-id', FILTER_SANITIZE_STRING );
+		$klarna_order_id = filter_input( INPUT_GET, 'kco-order-id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( ! empty( $klarna_order_id ) ) {
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			$this->set_recurring_token_for_subscription( $subscription_id, $klarna_order );
@@ -438,6 +444,7 @@ class KCO_Subscription {
 		$subscription->set_shipping_country( strtoupper( $klarna_order['shipping_address']['country'] ) );
 		$subscription->set_shipping_postcode( $klarna_order['shipping_address']['postal_code'] );
 		$subscription->set_shipping_city( $klarna_order['shipping_address']['city'] );
+		$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
 
 		$subscription->save();
 	}
