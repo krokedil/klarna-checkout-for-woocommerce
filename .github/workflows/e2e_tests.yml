@@ -20,7 +20,6 @@ jobs:
 
 
     steps:
-T
 
       - name: Send custom JSON data to Slack workflow
         id: slack
