@@ -37,7 +37,7 @@ jobs:
         with:
           payload: |
             echo '{
-              "test1": "${{needs.test-plugin.outputs.output1}}"",
+              "test1": "${{needs.test-plugin.outputs.output1}}",
               "test2": "Danilo"
             }'
         env:
