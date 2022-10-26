@@ -184,16 +184,19 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return false;
 			}
 
-			// If we can't retrieve a set of credentials, disable KCO.
-			if ( is_checkout() && ! KCO_WC()->credentials->get_credentials_from_session() ) {
-				return false;
-			}
+			if ( is_checkout() ) {
 
-			// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE or AT, disable KCO.
-			if ( is_checkout() && class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
-				$available_recurring_countries = array( 'SE', 'NO', 'FI', 'DE', 'AT' );
-				if ( ! in_array( WC()->customer->get_billing_country(), $available_recurring_countries, true ) ) {
+				// If we can't retrieve a set of credentials, disable KCO.
+				if ( ! KCO_WC()->credentials->get_credentials_from_session() ) {
 					return false;
+				}
+
+				// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE or AT, disable KCO.
+				if ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
+					$available_recurring_countries = array( 'SE', 'NO', 'FI', 'DE', 'AT' );
+					if ( ! in_array( WC()->customer->get_billing_country(), $available_recurring_countries, true ) ) {
+						return false;
+					}
 				}
 			}
 
