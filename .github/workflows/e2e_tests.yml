@@ -23,7 +23,7 @@ jobs:
       - bash: |
           FOO="some value"
           echo "##vso[task.setvariable variable=FOO;isOutput=true]$FOO"
-      - id: step1
+        id: step1
         run: echo "test=hello" >> $GITHUB_OUTPUT
 
 
