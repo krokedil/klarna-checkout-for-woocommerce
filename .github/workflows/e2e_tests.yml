@@ -32,22 +32,20 @@ jobs:
           cd ./kco/tests/e2e/
           yarn install
       - name: Run Tests
+        id: step1
         run: |
+          echo "test=hello" >> $GITHUB_OUTPUT
           cd ./kco/tests/e2e/
           yarn e2e:test
-      - name: Send variable TEST
-        id: step1
-        run: echo "test=hello" >> $GITHUB_OUTPUT
-
-  send-to-slack:
+          
+      - name: Send custom JSON data to Slack workflow
         id: slack
-        needs: test-plugin
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {
-              "test1": "Send1",
-              "test2": "Send2"
+              "test1": ${{outputs.output1}},
+              "test2": "Danilo"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
