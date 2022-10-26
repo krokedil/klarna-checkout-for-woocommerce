@@ -25,6 +25,7 @@ jobs:
 
 
   send-to-slack:
+      runs-on: ${{ matrix.os }}
       steps:
       - name: Send custom JSON data to Slack workflow
         id: slack
@@ -33,7 +34,7 @@ jobs:
         with:
           payload: |
             {
-              "test1": ${{needs.job1.outputs.output1}},
+              "test1": ${{needs.test-plugin.outputs.output1}},
               "test2": "Danilo"
             }
         env:
