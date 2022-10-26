@@ -30,14 +30,15 @@ jobs:
       needs: test-plugin
       steps:
       - name: Send custom JSON data to Slack workflow
-        id: slack
-        uses: slackapi/slack-github-action@v1.23.0
+        # id: slack
+        # uses: slackapi/slack-github-action@v1.23.0
 
-        with:
-          payload: |
-            {
-              "test1": ${{needs.test-plugin.outputs.output1}},
-              "test2": "Danilo"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        # with:
+        #   payload: |
+        #     {
+        #       "test1": ${{needs.test-plugin.outputs.output1}},
+        #       "test2": "Danilo"
+        #     }
+        # env:
+        #   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: echo ${{needs.test-plugin.outputs.output1}}
