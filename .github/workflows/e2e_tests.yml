@@ -17,7 +17,8 @@ jobs:
       API_SECRET: ${{secrets.E2E_API_SECRET}}
     steps:
       - name: Create dirs.
-
+        run: |
+              mkdir -p kco
       - name: Send custom JSON data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
