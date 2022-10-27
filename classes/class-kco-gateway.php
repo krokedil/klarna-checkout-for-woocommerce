@@ -198,6 +198,19 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 						return false;
 					}
 				}
+
+				/**
+				 * Prevent the checkout from loading to prevent an issue where we reload to switch to a different payment gateway,
+				 * but Klarna Checkout is the only one available, thus causing an indefinite reload since WC is redirecting back to Klarna Checkout.
+				 *
+				 * This happens when the the cart contain a subscription with a free trial, and since an order needs to be created to register
+				 * a new subscription, the check WC()->cart->needs_payment will be TRUE.
+				 */
+				if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
+					if ( empty( floatval( WC()->cart->total ) ) ) {
+						return false;
+					}
+				}
 			}
 
 			return true;
