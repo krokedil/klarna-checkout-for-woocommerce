@@ -12,4 +12,4 @@ jobs:
       - name: List dir and path
         run: |
             echo "ls command"
-            pwd && ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce
+            pwd && ls -la /home/runner/work/klarna-checkout-for-woocommerce
