@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: artifact-test-e2e
-          path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/output.txt
+          path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/
           retention-days: 1
 
   # upload-e2e-test-artifact:
