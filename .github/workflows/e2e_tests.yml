@@ -26,10 +26,18 @@ jobs:
       - id: step2
         run: echo "TEST=Receive this from previous job 2" >> $GITHUB_OUTPUT
 
+  bash-example-ls:
+      needs: test-plugin
+    runs-on: ubuntu-latest
+    steps:
+      - name: List dir and path
+        run: |
+            echo "ls command"
+            pwd && ls -la
 
   upload-e2e-test-artifact:
     name: Upload E2E Test as artifact
-    needs: test-plugin
+    needs: bash-example-ls
     runs-on: [ubuntu-latest]
     steps:
       - name: Upload E2E Test as artifact
