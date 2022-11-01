@@ -40,7 +40,7 @@ jobs:
       - name: List dir and path
         run: |
           echo "ls command"
-          pwd && ls -la  /home/
+          pwd && ls -la  home/runner/work/
       - name: Upload E2E Test as artifact
         uses: actions/upload-artifact@v3
         with:
