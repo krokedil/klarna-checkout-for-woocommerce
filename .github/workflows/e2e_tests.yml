@@ -30,7 +30,7 @@ jobs:
   upload-e2e-test-artifact:
     name: Upload E2E Test as artifact
     needs: test-plugin
-    runs-on: ${{ matrix.os }}
+    runs-on: [ubuntu-latest]
     steps:
       - name: Upload E2E Test as artifact
         uses: actions/upload-artifact@v3
@@ -42,7 +42,7 @@ jobs:
   download-e2e-test-artifact:
     name: Get the E2E test artifact
     needs: upload-e2e-test-artifact
-    runs-on: ${{ matrix.os }}
+    runs-on: [ubuntu-latest]
     outputs:
       output3: ${{ steps.step3.outputs.test }}
     steps:
