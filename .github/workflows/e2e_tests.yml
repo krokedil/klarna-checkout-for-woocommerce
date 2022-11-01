@@ -35,16 +35,6 @@ jobs:
         run: |
           echo "ls command"
           pwd && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
-
-  upload-e2e-test-artifact:
-    name: Upload E2E Test as artifact
-    needs: test-plugin
-    runs-on: [ubuntu-latest]
-    steps:
-      - name: List dir and path
-        run: |
-          echo "ls command"
-          pwd && ls -la  /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/
       - name: Upload E2E Test as artifact
         uses: actions/upload-artifact@v3
         with:
@@ -52,18 +42,34 @@ jobs:
           path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/output.txt
           retention-days: 1
 
-  # download-e2e-test-artifact:
-  #   name: Get the E2E test artifact
-  #   needs: upload-e2e-test-artifact
+  # upload-e2e-test-artifact:
+  #   name: Upload E2E Test as artifact
+  #   needs: test-plugin
   #   runs-on: [ubuntu-latest]
   #   steps:
-  #     - name: Download E2E Test results for KCO
-  #       uses: actions/download-artifact@v3
+  #     - name: List dir and path
+  #       run: |
+  #         echo "ls command"
+  #         pwd && ls -la  /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/
+  #     - name: Upload E2E Test as artifact
+  #       uses: actions/upload-artifact@v3
   #       with:
   #         name: artifact-test-e2e
-  #     - name: Print test artifact
-  #       shell: bash
-  #       run: |
-  #         value=`cat output.txt`
+  #         path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/output.txt
+  #         retention-days: 1
+
+  download-e2e-test-artifact:
+    name: Get the E2E test artifact
+    needs: upload-e2e-test-artifact
+    runs-on: test-plugin
+    steps:
+      - name: Download E2E Test results for KCO
+        uses: actions/download-artifact@v3
+        with:
+          name: artifact-test-e2e
+      - name: Print test artifact
+        shell: bash
+        run: |
+          value=`cat output.txt`
 
 
