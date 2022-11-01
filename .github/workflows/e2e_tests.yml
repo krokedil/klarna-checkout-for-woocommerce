@@ -25,11 +25,6 @@ jobs:
         run: echo "TEST=Receive this from previous job 1" >> $GITHUB_OUTPUT
       - id: step2
         run: echo "TEST=Receive this from previous job 2" >> $GITHUB_OUTPUT
-
-
-  bash-example-ls:
-    runs-on: ubuntu-latest
-    steps:
       - name: List dir and path
         run: |
             echo "ls command"
