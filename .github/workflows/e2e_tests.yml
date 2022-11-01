@@ -6,41 +6,41 @@ on:
       - dev-e2e
 
 jobs:
-  test-plugin:
-    name: Run E2E Tests
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-    env:
-      API_KEY: ${{secrets.E2E_API_KEY}}
-      API_SECRET: ${{secrets.E2E_API_SECRET}}
-    steps:
-      - name: Create dirs.
-        run: |
-              mkdir -p kco
-      - name: Setup KCO
-        uses: actions/checkout@v2
-        with:
-          path: kco
-      - name: Setup Yarn
-        run: |
-          cd ./kco/tests/e2e/
-          yarn install
-      - name: Run Tests
-        run: |
-          cd ./kco/tests/e2e/
-          yarn e2e:test
-      - name: List dir and path
-        run: |
-          echo "ls command"
-          pwd && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
-      - name: Upload E2E Test as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: artifact-test-e2e
-          path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce//kco/tests/e2e/outputs/output.txt
-          retention-days: 1
+  # test-plugin:
+  #   name: Run E2E Tests
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest]
+  #   env:
+  #     API_KEY: ${{secrets.E2E_API_KEY}}
+  #     API_SECRET: ${{secrets.E2E_API_SECRET}}
+  #   steps:
+  #     - name: Create dirs.
+  #       run: |
+  #             mkdir -p kco
+  #     - name: Setup KCO
+  #       uses: actions/checkout@v2
+  #       with:
+  #         path: kco
+  #     - name: Setup Yarn
+  #       run: |
+  #         cd ./kco/tests/e2e/
+  #         yarn install
+  #     - name: Run Tests
+  #       run: |
+  #         cd ./kco/tests/e2e/
+  #         yarn e2e:test
+  #     - name: List dir and path
+  #       run: |
+  #         echo "ls command"
+  #         pwd && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
+  #     - name: Upload E2E Test as artifact
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: artifact-test-e2e
+  #         path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce//kco/tests/e2e/outputs/output.txt
+  #         retention-days: 1
 
   # upload-e2e-test-artifact:
   #   name: Upload E2E Test as artifact
@@ -60,7 +60,6 @@ jobs:
 
   download-e2e-test-artifact:
     name: Get the E2E test artifact
-    needs: test-plugin
     runs-on: [ubuntu-latest]
     steps:
       - name: Download E2E Test results for KCO
@@ -71,5 +70,5 @@ jobs:
         shell: bash
         run: |
           value=`cat output.txt`
-
+           echo Test file output: $value
 
