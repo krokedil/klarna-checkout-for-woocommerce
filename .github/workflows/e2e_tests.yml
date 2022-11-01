@@ -27,7 +27,7 @@ jobs:
         run: echo "TEST=Receive this from previous job 2" >> $GITHUB_OUTPUT
 
 
- upload-e2e-test-artifact:
+  upload-e2e-test-artifact:
     name: Upload E2E Test as artifact
     needs: test-plugin
     runs-on: ${{ matrix.os }}
@@ -41,7 +41,7 @@ jobs:
 
   download-e2e-test-artifact:
     name: Get the E2E test artifact
-    needs: download-e2e-test-artifact
+    needs: upload-e2e-test-artifact
     runs-on: ${{ matrix.os }}
     outputs:
       output3: ${{ steps.step3.outputs.test }}
