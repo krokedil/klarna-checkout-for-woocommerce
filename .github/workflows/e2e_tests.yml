@@ -25,27 +25,24 @@ jobs:
         run: echo "TEST=Receive this from previous job 1" >> $GITHUB_OUTPUT
       - id: step2
         run: echo "TEST=Receive this from previous job 2" >> $GITHUB_OUTPUT
-
-    - name: 'Upload E2E Test as artifact'
-      uses: actions/upload-artifact@v3
-      with:
-        name: artifact-test
-        path: ./outputs/output.txt
-        retention-days: 1
+      - name: 'Upload E2E Test as artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact-test
+          path: ../tests/e2e/outputs/output.txt
+          retention-days: 1
 
   download-e2e-test-artifact:
     name: Get the E2E test artifact
     needs: test-plugin
     runs-on: ${{ matrix.os }}
+    outputs:
+      output3: ${{ steps.step3.outputs.test }}
     steps:
       - name: Download E2E Test results for KCO
         uses: actions/download-artifact@v3
         with:
           name: artifact-test
-
-    outputs:
-      output3: ${{ steps.step3.outputs.test }}
-
       - id: step3
         shell: bash
         run: |
@@ -56,12 +53,10 @@ jobs:
       name: Send to Slack
       runs-on: [ubuntu-latest]
       needs: download-e2e-test-artifact
-
       steps:
       - name: Send custom JSON data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
-
         with:
           payload: |
             {
