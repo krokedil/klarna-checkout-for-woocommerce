@@ -32,20 +32,30 @@ jobs:
           cd ./kco/tests/e2e/
           yarn e2e:test
 
-  download-e2e-test-artifact:
-    name: Get the E2E test artifact
+  upload-e2e-test-artifact:
+    name: Upload E2E Test as artifact
     needs: test-plugin
     runs-on: [ubuntu-latest]
-    outputs:
-      output3: ${{ steps.step3.outputs.test }}
+    steps:
+      - name: Upload E2E Test as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact-test-e2e
+          path: klarna-checkout-for-woocommerce/tests/e2e/outputs/
+          retention-days: 1
+
+  download-e2e-test-artifact:
+    name: Get the E2E test artifact
+    needs: upload-e2e-test-artifact
+    runs-on: [ubuntu-latest]
     steps:
       - name: Download E2E Test results for KCO
         uses: actions/download-artifact@v3
         with:
           name: artifact-test-e2e
-      - id: step3
+      - name: Print test artifact
         shell: bash
         run: |
           value=`cat output.txt`
-          echo "TEST={{$value}}" >> $GITHUB_OUTPUT
+
 
