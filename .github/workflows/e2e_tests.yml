@@ -34,7 +34,7 @@ jobs:
       - name: List dir and path
         run: |
           echo "ls command"
-          pwd && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
+          pwd && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
 
   upload-e2e-test-artifact:
     name: Upload E2E Test as artifact
