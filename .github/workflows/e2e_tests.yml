@@ -33,13 +33,13 @@ jobs:
           yarn e2e:test
       - name: List dir and path
         run: |
-          echo "List all command"
+          echo "ls command"
           pwd && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
       - name: Upload E2E Test as artifact
         uses: actions/upload-artifact@v3
         with:
           name: artifact-test-e2e
-          path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/
+          path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/output.txt
           retention-days: 1
 
   # upload-e2e-test-artifact:
@@ -60,8 +60,8 @@ jobs:
 
   download-e2e-test-artifact:
     name: Get the E2E test artifact
-    needs: upload-e2e-test-artifact
-    runs-on: test-plugin
+    needs: test-plugin
+    runs-on: [ubuntu-latest]
     steps:
       - name: Download E2E Test results for KCO
         uses: actions/download-artifact@v3
