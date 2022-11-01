@@ -26,11 +26,36 @@ jobs:
       - id: step2
         run: echo "TEST=Receive this from previous job 2" >> $GITHUB_OUTPUT
 
+    - name: 'Upload E2E Test as artifact'
+      uses: actions/upload-artifact@v3
+      with:
+        name: artifact-test
+        path: ../tests/e2e/outputs/output.json
+        retention-days: 1
+
+  download-e2e-test-artifact:
+    name: Get the E2E test artifact
+    needs: test-plugin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Download E2E Test results for KCO
+        uses: actions/download-artifact@v3
+        with:
+          name: artifact-test
+
+    outputs:
+      output3: ${{ steps.step3.outputs.test }}
+
+      - id: step3
+        shell: bash
+        run: |
+          value=`cat output.json`
+          echo "TEST={{$value}}" >> $GITHUB_OUTPUT
 
   send-to-slack:
       name: Send to Slack
       runs-on: [ubuntu-latest]
-      needs: test-plugin
+      needs: download-e2e-test-artifact
 
       steps:
       - name: Send custom JSON data to Slack workflow
@@ -40,9 +65,9 @@ jobs:
         with:
           payload: |
             {
-              "test1": "${{needs.test-plugin.outputs.output1}}",
-              "test2": "${{needs.test-plugin.outputs.output2}}"
+              "test1": "${{needs.download-e2e-test-artifact.outputs.output3}}",
+              "test2": "::: Test for workflow :::"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
- 
+
