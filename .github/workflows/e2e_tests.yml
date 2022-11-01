@@ -37,11 +37,15 @@ jobs:
     needs: test-plugin
     runs-on: [ubuntu-latest]
     steps:
+      - name: List dir and path
+        run: |
+          echo "ls command"
+          pwd && ls -la
       - name: Upload E2E Test as artifact
         uses: actions/upload-artifact@v3
         with:
           name: artifact-test-e2e
-          path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/output.txt
+          path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/
           retention-days: 1
 
   download-e2e-test-artifact:
