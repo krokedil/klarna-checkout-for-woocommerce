@@ -33,7 +33,7 @@ jobs:
           yarn e2e:test
       - name: List dir and path
         run: |
-          echo "ls command"
+          echo "List all command"
           pwd && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
       - name: Upload E2E Test as artifact
         uses: actions/upload-artifact@v3
