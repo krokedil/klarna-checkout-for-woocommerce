@@ -2,6 +2,7 @@ name: E2E tests
 on:
   push:
     branches:
+      - develop
       - dev-e2e
 
 jobs:
@@ -15,8 +16,6 @@ jobs:
       API_KEY: ${{secrets.E2E_API_KEY}}
       API_SECRET: ${{secrets.E2E_API_SECRET}}
 
-    needs: '**/output.json'
-    
     outputs:
       output1: ${{ steps.step1.outputs.test }}
       output2: ${{ steps.step2.outputs.test }}
@@ -25,7 +24,8 @@ jobs:
       - id: step1
         run: echo "TEST=Receive this from previous job 1" >> $GITHUB_OUTPUT
       - id: step2
-        run: echo "TEST={{needs}}" >> $GITHUB_OUTPUT
+        run: echo "TEST=Receive this from previous job 2" >> $GITHUB_OUTPUT
+
 
   send-to-slack:
       name: Send to Slack
