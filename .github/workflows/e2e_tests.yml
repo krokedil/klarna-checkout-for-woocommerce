@@ -40,12 +40,17 @@ jobs:
         run: echo "TEST=Receive this from previous job 1" >> $GITHUB_OUTPUT
       - id: step2
         run: echo "TEST=Receive this from previous job 2" >> $GITHUB_OUTPUT
-      - name: 'Upload E2E Test as artifact'
-        uses: actions/upload-artifact@v3
-        with:
-          name: artifact-test
-          path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/
-          retention-days: 1
+  
+  upload-artifact-test:
+      name: 'Upload E2E Test as artifact'
+      runs-on: ${{ matrix.os }}
+      steps:
+        - name: 'Upload E2E Test as artifact'
+          uses: actions/upload-artifact@v3
+          with:
+            name: artifact-test
+            path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/
+            retention-days: 1
 
   download-e2e-test-artifact:
     name: Get the E2E test artifact
