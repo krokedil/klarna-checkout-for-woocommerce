@@ -32,3 +32,15 @@ jobs:
           cd ./kco/tests/e2e/
           yarn e2e:test
 
+  upload-e2e-test-artifact:
+    name: Upload E2E Test as artifact
+    needs: test-plugin
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Upload E2E Test as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact-test-e2e
+          path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/
+          retention-days: 1
+
