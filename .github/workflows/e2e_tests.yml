@@ -52,7 +52,7 @@ jobs:
           slack-message: ${{ steps.vars.outputs.e2e_res }}
           payload: |
             {
-              "test1": ${{ steps.vars.outputs.e2e_res }}
+              "test1": "Text file"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
