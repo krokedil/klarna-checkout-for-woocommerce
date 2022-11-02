@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
-          echo "TEST=\"$value\"" >> $GITHUB_OUTPUT
+          echo "TEST=${{ $value }}" >> $GITHUB_OUTPUT
 
   send-to-slack:
       name: Send to Slack
