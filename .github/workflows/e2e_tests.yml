@@ -42,7 +42,7 @@ jobs:
         shell: bash
         run: |
 
-          echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.json)
+          echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt)
 
       - name: Send custom data to Slack workflow
         id: slack
@@ -50,5 +50,9 @@ jobs:
         with:
           channel-id: ${{secrets.SLACK_CHANNEL_ID}}
           slack-message: ${{ steps.vars.outputs.e2e_res }}
+          payload: |
+            {
+              "test1": "Get this variable and message",
+            }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
