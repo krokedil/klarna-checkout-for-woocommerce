@@ -16,9 +16,6 @@ jobs:
       API_KEY: ${{secrets.E2E_API_KEY}}
       API_SECRET: ${{secrets.E2E_API_SECRET}}
 
-    outputs:
-      output1: ${{ steps.step1.outputs.test }}
-
     steps:
       - name: Create dirs.
         run: |
@@ -38,14 +35,13 @@ jobs:
       - name: List dir and path
         run: |
           echo "ls command"
-          export MY_VALUE=5 && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
-          echo $MY_VALUE
-          echo "----------------"
-      # - id: step1
-      #   shell: bash
-      #   run: |
-      #     value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
-      #     echo "TEST= $value" >> $GITHUB_OUTPUT
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
+
+      - name: Set env variable
+        shell: bash
+        run: |
+          value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
+          echo "TESTE2E= $value" >> $GITHUB_ENV
 
       - name: Send custom JSON data to Slack workflow
         id: slack
@@ -53,7 +49,7 @@ jobs:
         with:
           payload: |
             {
-              "test1": $MY_VALUE,
+              "test1": ${{ env.TESTE2E }},
               "test2": "Filler data"
             }
         env:
