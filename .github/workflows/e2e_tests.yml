@@ -39,7 +39,8 @@ jobs:
         run: |
           echo "ls command"
           export MY_VALUE=5 && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
-
+          echo $MY_VALUE
+          echo "----------------"
       # - id: step1
       #   shell: bash
       #   run: |
