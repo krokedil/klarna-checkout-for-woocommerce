@@ -44,6 +44,8 @@ jobs:
         shell: bash
         run: |
           value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.json`
+          echo $value
+          echo `cat $value`
           echo `TEST= $value` >> $GITHUB_OUTPUT
 
   send-to-slack:
