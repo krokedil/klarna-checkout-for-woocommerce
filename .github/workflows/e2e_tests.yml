@@ -38,13 +38,13 @@ jobs:
       - name: List dir and path
         run: |
           echo "ls command"
-          pwd && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
+          export MY_VALUE=5 && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
 
       - id: step1
         shell: bash
         run: |
           value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
-          echo "TEST= $value " >> $GITHUB_OUTPUT
+          echo "TEST= $value" >> $GITHUB_OUTPUT
 
       - name: Send custom JSON data to Slack workflow
         id: slack
@@ -52,7 +52,7 @@ jobs:
         with:
           payload: |
             {
-              "test1": "${{output1}}",
+              "test1": $MY_VALUE,
               "test2": "Filler data"
             }
         env:
