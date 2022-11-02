@@ -43,7 +43,7 @@ jobs:
       - id: step1
         shell: bash
         run: |
-          value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
+          value=`cat ./kco/tests/e2e/outputs/output.txt`
           echo "TEST=$value" >> $GITHUB_OUTPUT
 
   send-to-slack:
