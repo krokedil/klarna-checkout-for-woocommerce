@@ -41,7 +41,7 @@ jobs:
         id: vars
         shell: bash
         run: |
-          value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.json`
+          value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
           echo $value
           echo "-------------"
           echo ::set-output name=e2e_res::$value
@@ -52,8 +52,8 @@ jobs:
         with:
           payload: |
             {
-              "test1": ${{ steps.vars.outputs.e2e_res }},
-              "test2": "Filler data"
+              "test1": '${{ steps.vars.outputs.e2e_res }}',
+              "test2": "${{ steps.vars.outputs.e2e_res }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
