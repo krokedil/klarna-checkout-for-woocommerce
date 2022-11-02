@@ -16,8 +16,8 @@ jobs:
       API_KEY: ${{secrets.E2E_API_KEY}}
       API_SECRET: ${{secrets.E2E_API_SECRET}}
 
-    # outputs:
-    #   output1: ${{ steps.step1.outputs.test }}
+    outputs:
+      output1: ${{ steps.step1.outputs.test }}
 
     steps:
       - name: Create dirs.
@@ -40,22 +40,18 @@ jobs:
           echo "ls command"
           pwd && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
 
-      # - id: step1
-      #   shell: bash
-      #   run: |
-      #     value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
-      #     echo TEST= $value
-      #     echo TEST= {{ $value }}
-      #     echo TEST= $value >> $GITHUB_OUTPUT
+      - id: step1
+        shell: bash
+        run: |
+          value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
 
       - name: Send custom JSON data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
-
         with:
           payload: |
             {
-              "test1": /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt,
+              "test1": $value,
               "test2": "Filler data"
             }
         env:
