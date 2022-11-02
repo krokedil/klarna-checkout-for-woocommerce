@@ -52,7 +52,7 @@ jobs:
         with:
           payload: |
             {
-              "test1": "${{outputs.output1}}",
+              "test1": "${{output1}}",
               "test2": "Filler data"
             }
         env:
