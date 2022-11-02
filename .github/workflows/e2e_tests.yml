@@ -49,8 +49,10 @@ jobs:
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-
-              "test1": ${{ steps.vars.outputs.e2e_res.numFailedTestSuites }}
-
+            {
+              "test1":  {
+                ${{ steps.vars.outputs.e2e_res }}
+              }
+            }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
