@@ -69,7 +69,7 @@ jobs:
   #         path: /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/tests/e2e/outputs/output.txt
   #         retention-days: 1
 
-  download-e2e-test-artifact:
+  # download-e2e-test-artifact:
     # name: Get the E2E test artifact
     # runs-on: [ubuntu-latest]
     # steps:
