@@ -41,6 +41,9 @@ jobs:
         shell: bash
         run: |
           value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
+          echo $value
+          echo "-------------"
+          echo "TESTE2E= $value"
           echo "TESTE2E= $value" >> $GITHUB_ENV
 
       - name: Send custom JSON data to Slack workflow
