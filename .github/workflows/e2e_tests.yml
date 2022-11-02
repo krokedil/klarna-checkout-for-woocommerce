@@ -44,7 +44,7 @@ jobs:
 
       #     echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt)
 
-      - name: Send custom data to Slack workflow and channel
+      - name: Send custom data to Slack workflows and channel
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
