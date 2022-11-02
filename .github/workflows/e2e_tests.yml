@@ -40,11 +40,11 @@ jobs:
           echo "ls command"
           export MY_VALUE=5 && ls -la   /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
 
-      - id: step1
-        shell: bash
-        run: |
-          value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
-          echo "TEST= $value" >> $GITHUB_OUTPUT
+      # - id: step1
+      #   shell: bash
+      #   run: |
+      #     value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
+      #     echo "TEST= $value" >> $GITHUB_OUTPUT
 
       - name: Send custom JSON data to Slack workflow
         id: slack
