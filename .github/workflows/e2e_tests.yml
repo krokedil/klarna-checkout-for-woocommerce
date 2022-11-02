@@ -43,8 +43,8 @@ jobs:
           value=`cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt`
           echo $value
           echo "-------------"
-          echo `TESTE2E= $value`
-          echo `TESTE2E= $value` >> $GITHUB_ENV
+          echo "e2e_res= $value"
+          echo ::set-output name=e2e_res::$value
 
       - name: Send custom JSON data to Slack workflow
         id: slack
@@ -52,7 +52,7 @@ jobs:
         with:
           payload: |
             {
-              "test1": ${{ env.TESTE2E }},
+              "test1": ${{ steps.vars.outputs.e2e_res }},
               "test2": "Filler data"
             }
         env:
