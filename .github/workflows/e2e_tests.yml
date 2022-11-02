@@ -48,8 +48,8 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
-          channel-id: ${{secrets.SLACK_CHANNEL_ID}}
-          slack-message: ${{ steps.vars.outputs.e2e_res }}
+          # channel-id: ${{secrets.SLACK_CHANNEL_ID}}
+          # slack-message: ${{ steps.vars.outputs.e2e_res }}
           payload: |
             {
               "test1": "Get this variable and message",
