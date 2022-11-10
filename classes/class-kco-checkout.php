@@ -144,6 +144,7 @@ class KCO_Checkout {
 			return $default;
 		}
 
+		$chosen_method = trim( $chosen_method );
 		if ( empty( $chosen_method ) ) {
 			return $default;
 		}
