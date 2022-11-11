@@ -22,8 +22,8 @@ class KCO_Checkout {
 		add_action( 'woocommerce_after_calculate_totals', array( $this, 'update_klarna_order' ), 9999 );
 
 		// Handle potential shipping selection errors.
-		add_filter( 'woocommerce_shipping_chosen_method', array( $this, 'maybe_register_shipping_error' ), 9999, 3 );
-		add_action( 'woocommerce_shipping_method_chosen', array( $this, 'maybe_throw_shipping_error' ), 9999 );
+		add_filter( 'woocommerce_shipping_chosen_method', __CLASS__ . '::maybe_register_shipping_error', 9999, 3 );
+		add_action( 'woocommerce_shipping_method_chosen', __CLASS__ . '::maybe_throw_shipping_error', 9999 );
 	}
 
 	/**
@@ -133,7 +133,7 @@ class KCO_Checkout {
 	 *
 	 * @return string
 	 */
-	public function maybe_register_shipping_error( $default, $rates, $chosen_method ) {
+	public static function maybe_register_shipping_error( $default, $rates, $chosen_method ) {
 		// Only do this if we are during the checkout process.
 		if ( did_action( 'woocommerce_checkout_process' ) <= 0 ) {
 			return $default;
@@ -189,7 +189,7 @@ class KCO_Checkout {
 	 * @return void
 	 * @throws Exception Exception with the error message.
 	 */
-	public function maybe_throw_shipping_error() {
+	public static function maybe_throw_shipping_error() {
 		if ( did_action( 'kco_checkout_shipping_error' ) <= 0 ) {
 			return;
 		}
