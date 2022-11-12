@@ -94,7 +94,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 */
 		public function get_icon() {
 			$icon_src  = 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100';
-			$icon_html = '<img src="' . $icon_src . '" alt="Klarna Checkout" style="border-radius:0px"/>';
+			$icon_html = '<img src="' . $icon_src . '" alt="Klarna Checkout" style="border-radius:0px" width="100"/>';
 			return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
 		}
 
