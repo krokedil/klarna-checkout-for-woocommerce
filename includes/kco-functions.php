@@ -219,14 +219,6 @@ function kco_wc_prefill_allowed() {
 }
 
 /**
- * Calculates cart totals.
- */
-function kco_wc_calculate_totals() {
-	WC()->cart->calculate_fees();
-	WC()->cart->calculate_totals();
-}
-
-/**
  * Shows prefill consent text.
  */
 function kco_wc_prefill_consent() {
