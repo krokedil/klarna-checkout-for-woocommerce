@@ -45,7 +45,7 @@ jobs:
             {
               "test1": "Test string"
               "test2": "X"
-              "test3": "${{ steps.vars.outputs.e2e_res }}"
+              "test3": "No var should be here"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
