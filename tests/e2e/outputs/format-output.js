@@ -7,5 +7,5 @@ let newRow = newData.split(',')
 
 // let xString = '{ "test1":"' + newData + '"}'
 
-console.log(newRow)
+console.log("test1:" + newRow)
 
