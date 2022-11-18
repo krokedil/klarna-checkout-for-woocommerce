@@ -28,7 +28,7 @@ jobs:
       - name: List dir and path
         run: |
           echo "ls command"
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
 
       - name: Set env variable
         id: vars
@@ -41,6 +41,6 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
-          payload-file-path: "./.github/workflows/test-file.json"
+          payload-file-path: "/home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco//.github/workflows/test-file.json"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
