@@ -4,8 +4,21 @@ const  data  = require('./output.json');
 let newData = JSON.stringify(data)
 
 let newRow = newData.split(',')
+let x = []
 
-// let xString = '{ "test1":"' + newData + '"}'
+newRow.forEach(element => {
+    element = element.replace(/\"/g, '')
+    if(element[0] == "{") {
+        element = element.replace(element[0], '')
+    }
 
-console.log("test1:" + newRow)
+    x.push(element)
+});
+
+x = x.toString()
+x = x.replace(/.$/, '')
+
+let xString = '{ "test1": "' + x + '"}'
+
+console.log(xString)
 
