@@ -28,7 +28,7 @@ jobs:
       - name: List dir and path
         run: |
           echo "ls command"
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/.github/workflows/
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/
 
       - name: Set env variable
         id: vars
