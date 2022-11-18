@@ -28,7 +28,10 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           yarn install
-
+      - name: Run Tests
+        run: |
+          cd ./kco/tests/e2e/
+          yarn e2e:test
       - name: List dir and path
         run: |
           echo "ls command"
@@ -47,6 +50,6 @@ jobs:
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-              ${{ steps.vars.outputs.e2e_res_2}}
+              ${{ steps.vars.outputs.e2e_res }},
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

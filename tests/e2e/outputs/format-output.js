@@ -1,8 +1,11 @@
-const  data  = require('../config/data.json');
+const  data  = require('./output.json');
 // import { data } from './output.json'
 
 let newData = JSON.stringify(data)
-let xString = '{ "test1":' + newData + '}'
 
-console.log(xString)
+let newRow = newData.split(',')
+
+// let xString = '{ "test1":"' + newData + '"}'
+
+console.log(newRow)
 
