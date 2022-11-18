@@ -24,14 +24,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: kco
-      - name: Setup Yarn
-        run: |
-          cd ./kco/tests/e2e/
-          yarn install
-      - name: Run Tests
-        run: |
-          cd ./kco/tests/e2e/
-          yarn e2e:test
+
       - name: List dir and path
         run: |
           echo "ls command"
@@ -41,8 +34,8 @@ jobs:
         id: vars
         shell: bash
         run: |
-
-          echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt)
+          echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/test-output.txt)
+          echo ::set-output name=e2e_res_2::$(cat 'variable message')
 
       - name: Send custom data to Slack workflow
         id: slack
@@ -52,7 +45,9 @@ jobs:
           slack-message: ${{ steps.vars.outputs.e2e_res }}
           payload: |
             {
-              "test1": "browsers\":{\"firefox\":{\"name\":\"Firefox\",\"pref_url\":\"about:config\",\"releases\":{\"1\":{\"release_date\":\"2004-11-09\",\"status\":\"retired\",\"engine\":\"Gecko\",\"engine_version\":\"1.7"
+              "test1": "Test string"
+              "test2": ${{e2e_res}}
+              "test3": ${{e2e_res_2}}
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
