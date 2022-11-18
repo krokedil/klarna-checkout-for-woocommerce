@@ -41,13 +41,6 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
-          channel-id: ${{secrets.SLACK_CHANNEL_ID}}
-          slack-message: ${{ steps.vars.outputs.e2e_res }}
-          payload: |
-            {
-              "test1": "Test string"
-              "test2": "X"
-              "test3": "${{ steps.vars.outputs.e2e_res_2 }}"
-            }
+          payload-file-path: "./test-file.json"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
