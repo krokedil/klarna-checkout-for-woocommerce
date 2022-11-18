@@ -35,17 +35,19 @@ jobs:
         shell: bash
         run: |
           echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/test-output.txt)
-          echo ::set-output name=e2e_res_2::$(cat myCustomVariable)
+          echo ::set-output name=e2e_res_2::$(cat 'variable message')
 
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
+          channel-id: ${{secrets.SLACK_CHANNEL_ID}}
+          slack-message: ${{ steps.vars.outputs.e2e_res }}
           payload: |
             {
-              "test1": "Test string"
-              "test2": "X X X X X"
-              "test3": "No var should be here"
+              "test1": "Test string",
+              "test2": ${{ steps.vars.outputse2e_res }},
+              "test3": ${{ steps.vars.outputse2e_res }}
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
