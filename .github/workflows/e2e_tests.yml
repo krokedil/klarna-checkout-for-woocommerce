@@ -47,7 +47,7 @@ jobs:
           payload: |
             {
               "test1": "Test string",
-              ${{ steps.vars.outputs.e2e_res }},
+              "test2": ${{ steps.vars.outputs.e2e_res_2 }}
               "test3": ${{ steps.vars.outputs.e2e_res_2 }}
             }
         env:
