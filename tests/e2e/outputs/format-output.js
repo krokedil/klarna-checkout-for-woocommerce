@@ -1,4 +1,6 @@
-// import data from './output.json'
+import data from './output.json'
 
-console.log('{ "test1":"Single string" }')
+let newData = JSON.stringify(data)
+
+console.log(`{ "test1":${newData} }`)
 
