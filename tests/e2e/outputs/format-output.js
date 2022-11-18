@@ -1,4 +1,4 @@
 // import data from './output.json'
 
-return "Single string"
+console.log("Single string")
 
