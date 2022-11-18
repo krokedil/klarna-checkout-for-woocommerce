@@ -44,7 +44,7 @@ jobs:
           payload: |
             {
               "test1": "Test string"
-              "test2": "X"
+              "test2": "X X X X X"
               "test3": "No var should be here"
             }
         env:
