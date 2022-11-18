@@ -28,19 +28,24 @@ jobs:
       - name: List dir and path
         run: |
           echo "ls command"
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
 
       - name: Set env variable
         id: vars
         shell: bash
         run: |
-          echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/test-output.txt)
+          echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/test-ouput-payload-file.json)
           echo ::set-output name=e2e_res_2::$(cat myCustomVariable)
 
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
-          payload-file-path: "/home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco//.github/workflows/test-file.json"
+          payload: |
+            {
+              "test1": "Test string"
+              "test2": "X"
+              "test3": "${{ steps.vars.outputs.e2e_res }}"
+            }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
