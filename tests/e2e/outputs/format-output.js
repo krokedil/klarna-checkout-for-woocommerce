@@ -1,6 +1,7 @@
 import data from './output.json'
 
 let newData = JSON.stringify(data)
+let xString = '{ "test1":' + newData + '}'
 
-console.log(`{ "test1":${newData} }`)
+console.log(xString)
 
