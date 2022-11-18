@@ -36,7 +36,6 @@ jobs:
         run: |
           echo "ls command"
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.json
 
       - name: Set env variable
         id: vars
@@ -44,12 +43,13 @@ jobs:
         run: |
 
           echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.json)
+          echo ::set-output name=e2e_res_2::$(node /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-output.js)
 
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-              ${{ steps.vars.outputs.e2e_res }},
+              ${{ steps.vars.outputs.e2e_res_2 }},
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
