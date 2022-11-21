@@ -50,6 +50,6 @@ jobs:
         with:
           payload: |
 
-          '{ "test1": "${{ steps.vars.outputs.e2e_res_3 }} "}'
+          { "test1": "${{ steps.vars.outputs.e2e_res_3 }} "}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
