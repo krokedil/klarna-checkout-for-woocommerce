@@ -43,7 +43,8 @@ jobs:
         run: |
 
           echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.json)
-          echo ::set-output name=e2e_res_2::$(node /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-output.js)
+          echo ::set-output name=e2e_res_2::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/output.txt)
+          echo ::set-output name=e2e_res_3::$(node /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-output.js)
 
       - name: Send custom data to Slack workflow
         id: slack
