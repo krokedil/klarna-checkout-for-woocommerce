@@ -47,12 +47,14 @@ jobs:
           echo "ls command"
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
           echo "cat command"
-          cat outputs/rest2.txt
+          cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
           echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt)
 
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
+        run: |
+          echo ${{ steps.vars.outputs.e2e_res}}
         with:
           payload: |
             ${{ steps.vars.outputs.e2e_res}}
