@@ -20,7 +20,7 @@ newRow.forEach(element => {
 x = x.toString()
 x = x.replace(/.$/, '')
 
-let xString = '{ "test1": "' + x + '"}'
+let xString = '{ "test1": "' + process.env + '"}'
 
-console.log(process.env)
+console.log(xString)
 
