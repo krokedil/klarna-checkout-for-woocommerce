@@ -43,11 +43,14 @@ jobs:
         run: |
 
           echo ::set-output name=e2e_res_2::$(node /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-output.js)
+          echo ::set-output name=e2e_res_3::$(php -version)
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
+
+          '{ "test1": "${{ steps.vars.outputs.e2e_res_3 }} "}'
               ${{ steps.vars.outputs.e2e_res_2 }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
