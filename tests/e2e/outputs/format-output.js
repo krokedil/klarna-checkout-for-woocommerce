@@ -23,5 +23,5 @@ let xString = `
     "link_to_test": "http://teste2elink.e2e.com"
 }`
 
-console.log(process.env)
+console.log(xString)
 
