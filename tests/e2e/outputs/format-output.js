@@ -20,5 +20,5 @@ x = x.replace(/.$/, '')
 
 let xString = '{ "test1": "' + x + '"}'
 
-console.log(xString)
+console.log(process.env)
 
