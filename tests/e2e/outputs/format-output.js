@@ -1,3 +1,5 @@
+require("dotenv").config();
+const { SITEHOST, PORT, PLUGIN_NAME, KOM } = process.env;
 const  data  = require('./output.json');
 // import { data } from './output.json'
 
