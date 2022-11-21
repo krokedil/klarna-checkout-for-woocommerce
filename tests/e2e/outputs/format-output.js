@@ -1,6 +1,6 @@
-// require("dotenv").config();
+require("dotenv").config();
 
-// const { execSync } = require("child_process");
+const { execSync } = require("child_process");
 
 // const { SITEHOST, PORT, PLUGIN_NAME, KOM } = process.env;
 // const  data  = require('./output.json');
@@ -12,7 +12,7 @@
 //     stdio: "inherit",
 // });
 
-let xString = '{ "wc_version": "' + process.env.LOGNAME + '"}'
+let xString = '{ "wc_version": "' + process.env.WC_VERSION + '"}'
 
 // let xString = process.env.WC_VERSION
 // let xString = process.env.LOGNAME
