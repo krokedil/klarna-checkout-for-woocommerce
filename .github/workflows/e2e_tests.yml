@@ -28,10 +28,10 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           yarn install
-      # - name: Run Tests
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     yarn e2e:test
+      - name: Run Tests
+        run: |
+          cd ./kco/tests/e2e/
+          yarn e2e:test
       - name: List dir and path
         run: |
           echo "ls command"
