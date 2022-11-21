@@ -42,22 +42,14 @@ jobs:
         shell: bash
         run: |
 
-          echo ::set-output name=e2e_res_2::$(node /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-output.js)
+          echo ::set-output name=e2e_res::$(yarn /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-output.js)
+          echo ::set-output name=e2e_res_2::$(yarn e2e:fake-test)
           echo ::set-output name=e2e_res_php::$(php -version)
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-            { 
-              "php_version": "${{ steps.vars.outputs.e2e_res_php }}",
-              "wc_version": "${{ steps.vars.outputs.e2e_res_2 }}",
-              "wp_version": "${{ steps.vars.outputs.e2e_res_2 }}",
-              "plugin_name": "${{ steps.vars.outputs.e2e_res_2 }}",
-              "plugin_version": "${{ steps.vars.outputs.e2e_res_2 }}",
-              "branch_name": "krokedil-dev-test",
-              "link_to_test": "http://teste2elink.e2e.com"
-
-            }
+            ${{ steps.vars.outputs.e2e_res_2 }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
