@@ -46,6 +46,7 @@ jobs:
           yarn e2e:fake-test > outputs/rest.txt | tr -d '\n' < outputs/rest.txt | sed 's/^.*{/{/' | sed 's/}.*/}/' > outputs/rest2.txt
           echo "ls command"
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
+          echo "cat command"
           cat outputs/rest2.txt
           echo ::set-output name=e2e_res::$(cat outputs/rest2.txt)
 
