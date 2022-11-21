@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { execSync } = require("child_process");
+// const { execSync } = require("child_process");
 
 // const { SITEHOST, PORT, PLUGIN_NAME, KOM } = process.env;
 // const  data  = require('./output.json');
