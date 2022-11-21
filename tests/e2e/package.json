@@ -45,7 +45,7 @@
     "jettison": "jest --detectOpenHandles --outputFile=./outputs/output.txt",
     "wp:install": "node ./cli/install.js",
     "e2e:test": "yarn docker:up && yarn wp:install && yarn jettison && yarn docker:down",
-    "e2e:fake-test": "node outputs/format-output.js"
+    "e2e:fake-test": "node /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-output.js"
 
   },
   "version": "1.0.0"

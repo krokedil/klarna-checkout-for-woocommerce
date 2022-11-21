@@ -39,7 +39,7 @@ jobs:
         shell: bash
         run: |
           echo ::set-output name=e2e_res::$(node /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-output.js)
-          echo ::set-output name=e2e_res_2::$(yarn node /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-output.js)
+          echo ::set-output name=e2e_res_2::$(yarn e2e:fake-test)
           echo ::set-output name=e2e_res_php::$(php -version)
       - name: Send custom data to Slack workflow
         id: slack
