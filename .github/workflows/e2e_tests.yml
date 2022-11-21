@@ -51,7 +51,7 @@ jobs:
           echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt)
 
       - name: Check data to Slack workflow
-        id: slack
+        id: checker
         run: |
           echo ${{ steps.vars.outputs.e2e_res}}
       - name: Send custom data to Slack workflow
