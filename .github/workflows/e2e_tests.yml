@@ -122,7 +122,7 @@ jobs:
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.version_clean}}" }
+            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.versioncleanvar.outputs.version_clean}}" }
           # payload: |
           #   ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" }
         env:
