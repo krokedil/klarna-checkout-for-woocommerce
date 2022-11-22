@@ -38,7 +38,8 @@ jobs:
         id: current_branch
         shell: bash
         run: |
-        echo ::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})
+          cd ./kco/tests/e2e/
+          echo ::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})
 
       # Plugin version
       - name: Remove plugin main file new lines
