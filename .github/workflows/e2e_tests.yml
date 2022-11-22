@@ -58,11 +58,17 @@ jobs:
           cd ./kco/tests/e2e/
           tr -d '\n' < outputs/rest.txt > outputs/rest2.txt
 
-      - name: Format variable
-        id: format
+      - name: Format variable 2
+        id: format1
         run: |
           cd ./kco/tests/e2e/
-          sed 's/^.*{/{/' | sed 's/}.*/}/' > outputs/rest2.txt
+          sed 's/^.*{/{/'
+
+      - name: Format variable 2
+        id: format2
+        run: |
+          cd ./kco/tests/e2e/
+          sed 's/}.*/}/' > outputs/rest2.txt
 
       - name: Get formatted variable
         id: cleanvar
