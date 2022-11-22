@@ -29,10 +29,10 @@ jobs:
           cd ./kco/tests/e2e/
           yarn install
 
-      - name: Run Tests
-        run: |
-          cd ./kco/tests/e2e/
-          yarn e2e:test
+      # - name: Run Tests
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     yarn e2e:test
 
 
       # Plugin version
@@ -122,6 +122,10 @@ jobs:
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" , "plugin_version": "${{ steps.versioncleanvar.outputs.version_clean}}", "workflow_link": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" }
+            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" ,
+            "plugin_version": "${{ steps.versioncleanvar.outputs.version_clean}}",
+            "workflow_link": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}".
+            "branch-name": "${GITHUB_REF#refs/heads/}"
+            }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
