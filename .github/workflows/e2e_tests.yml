@@ -28,6 +28,7 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           yarn install
+
       - name: Run Tests
         run: |
           cd ./kco/tests/e2e/
@@ -43,20 +44,39 @@ jobs:
 
       - name: List dir and path
         run: |
-          
-          echo "ls command"
-          ls -la /home/
-          ls -la /home/runner/
-          ls -la /home/runner/work/
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
+          cd ./kco/tests/e2e/
 
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
+
+      # Plugin version
+      - name: Remove plugin main file new lines
+        id: versionnewlineformat
+        shell: bash
+        run: |
+          cd ./kco/
+          tr -d '\n' < klarna-checkout-for-woocommerce.php >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/plugin-version-sans-new-lines.txt
+      
+      - name: Format plugin main file version
+        id: versionfullformat
+        shell: bash
+        run: |
+          cd ./kco/
+          sed 's/.*Version:\(.*\)\* Text.*/\1/' < tests/e2e/outputs/plugin-version-sans-new-lines.txt >> tests/e2e/outputs/plugin-version-clean.txt
+      
+      - name: Get plugin version formatted variable
+        id: versioncleanvar
+        shell: bash
+        run: |
+          cd ./kco/tests/e2e/
+          echo ::set-output name=version_clean::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/plugin-version-clean.txt)
+    
+      # Environment variables
       - name: Remove new lines
         id: newlineformat
         shell: bash
         run: |
-          cd ./kco/tests/e2e/
+        cd ./kco/tests/e2e/
           tr -d '\n' < outputs/rest.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
 
       - name: Remove all before object
@@ -99,6 +119,8 @@ jobs:
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" }
+            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.version_clean}}" }
+          # payload: |
+          #   ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
