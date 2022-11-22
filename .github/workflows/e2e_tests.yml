@@ -56,9 +56,7 @@ jobs:
         id: extract
         run: |
           cd ./kco/tests/e2e/
-          tr -d '\n' < outputs/rest.txt
-
-
+          tr -d '\n' < outputs/rest.txt > outputs/rest2.txt
 
       - name: Format variable
         id: format
