@@ -50,7 +50,7 @@ jobs:
       - name: Check 1
         run: |
           cd ./kco/tests/e2e/
-          echo ${{ steps.vars.outputs.e2e_res}}
+          echo "{e2e_res}={cat outputs/rest2.txt}" >> $GITHUB_OUTPUT
 
       - name: Extract relevant variable data
         id: extract
@@ -58,7 +58,7 @@ jobs:
           cd ./kco/tests/e2e/
           tr -d '\n' < outputs/rest.txt > outputs/rest2.txt
 
-      - name: Format variable 2
+      - name: Format variable 1
         id: format1
         run: |
           cd ./kco/tests/e2e/
@@ -81,7 +81,7 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           cat outputs/rest2.txt
-          echo ::set-output name=e2e_res_2::$(cat outputs/rest2.txt)
+          echo "{e2e_res_2}={cat outputs/rest2.txt}" >> $GITHUB_OUTPUT
 
       - name: Check 2
         run: |
@@ -101,13 +101,6 @@ jobs:
       #   run: |
       #     cd ./kco/tests/e2e/
       #     yarn docker:down
-
-
-      # - name: Run Tests
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     yarn docker:down
-
-      
+     
       
       # yarn docker:up && yarn wp:install && yarn jettison
