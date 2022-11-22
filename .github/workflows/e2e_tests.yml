@@ -38,8 +38,8 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          yarn e2e:fake-test > outputs/rest.txt
-          echo ::set-output name=e2e_res::$(cat outputs/rest.txt)
+          yarn e2e:fake-test > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt
+          echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt)
 
       - name: List dir and path
         run: |
@@ -57,33 +57,41 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          tr -d '\n' < outputs/rest.txt >> outputs/rest2.txt
+          tr -d '\n' < outputs/rest.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
 
       - name: Remove all before object
         id: formatbefore
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed 's/^.*{/{/' < outputs/rest2.txt >> outputs/rest3.txt
+          sed 's/^.*{/{/' < outputs/rest2.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest3.txt
 
       - name: Remove all before object
         id: formatafter
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed 's/}.*/}/' < outputs/rest3.txt >> outputs/rest4.txt
+          sed 's/}.*/}/' < outputs/rest3.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
 
       - name: Get formatted variable
         id: cleanvar
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=e2e_res::$(cat outputs/rest4.txt)
+          echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt)
 
       - name: Check 2
         run: |
           cd ./kco/tests/e2e/
           echo ${{ steps.cleanvar.outputs.e2e_res_2}}
+
+
+      - name: List dir and path 2
+        run: |
+          cd ./kco/tests/e2e/
+          echo "ls command"
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
+
 
       - name: Send custom data to Slack workflow
         id: slack
