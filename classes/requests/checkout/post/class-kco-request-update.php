@@ -77,16 +77,29 @@ class KCO_Request_Update extends KCO_Request {
 
 		if ( kco_wc_prefill_allowed() ) {
 			$request_body['billing_address'] = array(
-				'email'           => WC()->checkout()->get_value( 'billing_email' ),
-				'postal_code'     => WC()->checkout()->get_value( 'billing_postcode' ),
-				'country'         => WC()->checkout()->get_value( 'billing_country' ),
-				'phone'           => WC()->checkout()->get_value( 'billing_phone' ),
-				'given_name'      => WC()->checkout()->get_value( 'billing_first_name' ),
-				'family_name'     => WC()->checkout()->get_value( 'billing_last_name' ),
-				'street_address'  => WC()->checkout()->get_value( 'billing_address_1' ),
-				'street_address2' => WC()->checkout()->get_value( 'billing_address_2' ),
-				'city'            => WC()->checkout()->get_value( 'billing_city' ),
-				'region'          => WC()->checkout()->get_value( 'billing_state' ),
+				'email'             => WC()->checkout()->get_value( 'billing_email' ),
+				'postal_code'       => WC()->checkout()->get_value( 'billing_postcode' ),
+				'country'           => WC()->checkout()->get_value( 'billing_country' ),
+				'phone'             => WC()->checkout()->get_value( 'billing_phone' ),
+				'given_name'        => WC()->checkout()->get_value( 'billing_first_name' ),
+				'family_name'       => WC()->checkout()->get_value( 'billing_last_name' ),
+				'organization_name' => WC()->checkout()->get_value( 'billing_company' ),
+				'street_address'    => WC()->checkout()->get_value( 'billing_address_1' ),
+				'street_address2'   => WC()->checkout()->get_value( 'billing_address_2' ),
+				'city'              => WC()->checkout()->get_value( 'billing_city' ),
+				'region'            => WC()->checkout()->get_value( 'billing_state' ),
+			);
+
+			$request_body['shipping_address'] = array(
+				'postal_code'       => WC()->checkout()->get_value( 'shipping_postcode' ),
+				'country'           => WC()->checkout()->get_value( 'shipping_country' ),
+				'given_name'        => WC()->checkout()->get_value( 'shipping_first_name' ),
+				'family_name'       => WC()->checkout()->get_value( 'shipping_last_name' ),
+				'organization_name' => WC()->checkout()->get_value( 'shipping_company' ),
+				'street_address'    => WC()->checkout()->get_value( 'shipping_address_1' ),
+				'street_address2'   => WC()->checkout()->get_value( 'shipping_address_2' ),
+				'city'              => WC()->checkout()->get_value( 'shipping_city' ),
+				'region'            => WC()->checkout()->get_value( 'shipping_state' ),
 			);
 
 			$request_body['shipping_address'] = wp_parse_args( $request_body['billing_address'], $request_body['shipping_address'] ?? array() );
