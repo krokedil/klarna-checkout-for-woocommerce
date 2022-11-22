@@ -117,17 +117,11 @@ jobs:
           cd ./kco/tests/e2e/
           echo ::set-output name=php_ver::$(php -version)
 
-      - name: Get workflow link
-        id: gitlink
-        shell: bash
-        run: |
-          echo ::set-output name=workflow_link::$("https://github.com/${{github.repository}}/commit/${{github.sha}}/checks/${{github.run_id}}")
-
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" , "plugin_version": "${{ steps.versioncleanvar.outputs.version_clean}}", "workflow_link": "${{steps.gitlink.outputs.workflow_link}}" }
+            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" , "plugin_version": "https://github.com/${{github.repository}}/commit/${{github.sha}}/checks/${{github.run_id}}" }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
