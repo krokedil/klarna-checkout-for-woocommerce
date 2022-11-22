@@ -129,7 +129,7 @@ jobs:
             ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" ,
             "plugin_version": "${{ steps.versioncleanvar.outputs.version_clean}}",
             "workflow_link": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-            "branch-name": "${{ steps.current_branch.outputs.branch }}"
+            "branch_name": "${{ steps.current_branch.outputs.branch }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
