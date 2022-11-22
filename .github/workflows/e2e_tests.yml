@@ -52,12 +52,12 @@ jobs:
           tr -d '\n' < rest.txt
 
       - name: Format variable
-        id: extract
+        id: format
         run: |
           sed 's/^.*{/{/' | sed 's/}.*/}/' > rest2.txt
 
       - name: Get formatted variable
-        id: format
+        id: cleanvar
         run: |
           echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt)
 
@@ -66,7 +66,7 @@ jobs:
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-            ${{ steps.format.outputs.e2e_res}}
+            ${{ steps.cleanvar.outputs.e2e_res}}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
