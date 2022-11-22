@@ -122,6 +122,6 @@ jobs:
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" , "plugin_version": "${{ steps.versioncleanvar.outputs.version_clean}}", "workflow_link": "https://github.com/${{github.repository}}/commit/${{github.sha}}/checks/${{github.run_id}}" }
+            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" , "plugin_version": "${{ steps.versioncleanvar.outputs.version_clean}}", "workflow_link": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
