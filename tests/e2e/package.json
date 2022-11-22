@@ -45,7 +45,7 @@
     "jettison": "jest --detectOpenHandles --outputFile=./outputs/output.txt",
     "wp:install": "node ./cli/install.js",
     "e2e:test": "yarn docker:up && yarn wp:install && yarn jettison",
-    "e2e:fake-test": "node outputs/format-output.js "
+    "e2e:format-slack-output": "node outputs/format-output.js "
 
   },
   "version": "1.0.0"
