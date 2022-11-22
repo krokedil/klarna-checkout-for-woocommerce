@@ -69,7 +69,7 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          yarn e2e:fake-test > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt
+          yarn e2e:format-slack-output > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt
           echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt)
 
       - name: List dir and path
@@ -86,19 +86,26 @@ jobs:
           cd ./kco/tests/e2e/
           tr -d '\n' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
 
-      - name: Remove all before object
-        id: formatbefore
-        shell: bash
-        run: |
-          cd ./kco/tests/e2e/
-          sed 's/^.*{/{/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest3.txt
+      # - name: Remove all before object
+      #   id: formatbefore
+      #   shell: bash
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     sed 's/^.*{/{/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest3.txt
 
-      - name: Remove all after object
+      # - name: Remove all after object
+      #   id: formatafter
+      #   shell: bash
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     sed 's/}.*/}/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest3.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
+      
+      - name: Remove all around object
         id: formatafter
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed 's/}.*/}/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest3.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
+          sed sed 's/.*{\(.*\)}.*/\1/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
       
       - name: Remove last character
         id: formatlast
