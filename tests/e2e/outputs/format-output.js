@@ -12,7 +12,7 @@ require("dotenv").config();
 //     stdio: "inherit",
 // });
 
-let xString = '{ "wp_version": "' + process.env.WP_VERSION + '"}'
+let xString = '{ "wc_version": "' + process.env.WP_VERSION + '"}'
 
 // let xString = process.env.WC_VERSION
 // let xString = process.env.LOGNAME
