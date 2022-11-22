@@ -51,13 +51,13 @@ jobs:
         id: extract
         run: |
           cd ./kco/tests/e2e/
-          tr -d '\n' < rest.txt
+          tr -d '\n' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt
 
       - name: Format variable
         id: format
         run: |
           cd ./kco/tests/e2e/
-          sed 's/^.*{/{/' | sed 's/}.*/}/' > rest2.txt
+          sed 's/^.*{/{/' | sed 's/}.*/}/' > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
 
       - name: Get formatted variable
         id: cleanvar
