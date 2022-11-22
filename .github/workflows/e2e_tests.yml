@@ -43,8 +43,11 @@ jobs:
 
       - name: List dir and path
         run: |
-          cd ./kco/tests/e2e/
+          
           echo "ls command"
+          ls -la /home/
+          ls -la /home/runner/
+          ls -la /home/runner/work/
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
