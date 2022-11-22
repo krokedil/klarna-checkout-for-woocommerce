@@ -39,7 +39,7 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           yarn e2e:fake-test > outputs/rest.txt
-          echo ::set-output name=e2e_res::$(cat outputs/rest.txt)
+          echo "{e2e_res}={cat outputs/rest.txt}" >> $GITHUB_OUTPUT
 
       - name: List dir and path
         run: |
@@ -52,36 +52,33 @@ jobs:
           cd ./kco/tests/e2e/
           echo "{e2e_res}={cat outputs/rest2.txt}" >> $GITHUB_OUTPUT
 
-      - name: Extract relevant variable data
-        id: extract
+      - name: Remove new lines
+        id: newlineformat
+        shell: bash
         run: |
           cd ./kco/tests/e2e/
-          tr -d '\n' < outputs/rest.txt > outputs/rest2.txt
+          tr -d '\n' < outputs/rest.txt >> outputs/rest2.txt
 
-      - name: Format variable 1
-        id: format1
+      - name: Remove all before object
+        id: formatbefore
+        shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed 's/^.*{/{/'
+          sed 's/^.*{/{/' < outputs/rest2.txt >> outputs/rest3.txt
 
-      - name: Format variable 2
-        id: format2
+      - name: Remove all before object
+        id: formatafter
+        shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed 's/}.*/}/' > outputs/rest2.txt
-
-      - name: List dir and path 2
-        run: |
-          cd ./kco/tests/e2e/
-          echo "ls command"
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
+          sed 's/}.*/}/' < outputs/rest3.txt >> outputs/rest4.txt
 
       - name: Get formatted variable
         id: cleanvar
+        shell: bash
         run: |
           cd ./kco/tests/e2e/
-          cat outputs/rest2.txt
-          echo "{e2e_res_2}={cat outputs/rest2.txt}" >> $GITHUB_OUTPUT
+          echo "{e2e_res_2}={cat outputs/rest4.txt}" >> $GITHUB_OUTPUT
 
       - name: Check 2
         run: |
@@ -93,7 +90,7 @@ jobs:
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
-            ${{ steps.cleanvar.outputs.e2e_res}}
+            ${{ steps.cleanvar.outputs.e2e_res_2}}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
