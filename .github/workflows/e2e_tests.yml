@@ -41,7 +41,6 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           yarn e2e:fake-test > outputs/rest.txt
-
           echo ::set-output name=e2e_res::$(cat outputs/rest.txt)
 
       - name: List dir and path
@@ -49,10 +48,10 @@ jobs:
           echo "ls command"
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
 
-      - name: Check data to Slack workflow
-        id: checker
-        run: |
-          cat ${{ steps.vars.outputs.e2e_res}}
+      # - name: Check data to Slack workflow
+      #   id: checker
+      #   run: |
+      #     cat ${{ steps.vars.outputs.e2e_res}}
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
