@@ -28,10 +28,10 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           yarn install
-      # - name: Run Tests
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     yarn e2e:test
+      - name: Run Tests
+        run: |
+          cd ./kco/tests/e2e/
+          yarn e2e:test
 
       - name: Get unformatted variable
         id: vars
@@ -50,7 +50,7 @@ jobs:
           ls -la /home/runner/work/
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
 
       - name: Remove new lines
         id: newlineformat
