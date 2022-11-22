@@ -69,7 +69,7 @@ jobs:
           sed 's/}.*/}/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest3.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
       
       - name: Remove last character
-        id: formatafter
+        id: formatlast
         shell: bash
         run: |
           cd ./kco/tests/e2e/
