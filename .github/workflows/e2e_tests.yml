@@ -51,20 +51,20 @@ jobs:
         id: extract
         run: |
           cd ./kco/tests/e2e/
-          tr -d '\n' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt
+          tr -d '\n' < outputs/rest.txt
 
       - name: Format variable
         id: format
         run: |
           cd ./kco/tests/e2e/
-          sed 's/^.*{/{/' | sed 's/}.*/}/' > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
+          sed 's/^.*{/{/' | sed 's/}.*/}/' > outputs/rest2.txt
 
       - name: Get formatted variable
         id: cleanvar
         run: |
           cd ./kco/tests/e2e/
-          cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
-          echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt)
+          cat outputs/rest2.txt
+          echo ::set-output name=e2e_res::$(cat outputs/rest2.txt)
 
       - name: Send custom data to Slack workflow
         id: slack
