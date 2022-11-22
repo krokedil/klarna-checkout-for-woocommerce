@@ -123,7 +123,5 @@ jobs:
         with:
           payload: |
             ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" , "plugin_version": "${{ steps.versioncleanvar.outputs.version_clean}}" }
-          # payload: |
-          #   ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
