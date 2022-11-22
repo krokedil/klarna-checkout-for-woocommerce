@@ -47,11 +47,18 @@ jobs:
           echo "ls command"
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
 
+      - name: Check 1
+        run: |
+          cd ./kco/tests/e2e/
+          echo ${{ steps.vars.outputs.e2e_res}}
+
       - name: Extract relevant variable data
         id: extract
         run: |
           cd ./kco/tests/e2e/
           tr -d '\n' < outputs/rest.txt
+
+
 
       - name: Format variable
         id: format
@@ -64,7 +71,12 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           cat outputs/rest2.txt
-          echo ::set-output name=e2e_res::$(cat outputs/rest2.txt)
+          echo ::set-output name=e2e_res_2::$(cat outputs/rest2.txt)
+
+      - name: Check 2
+        run: |
+          cd ./kco/tests/e2e/
+          echo ${{ steps.cleanvar.outputs.e2e_res_2}}
 
       - name: Send custom data to Slack workflow
         id: slack
