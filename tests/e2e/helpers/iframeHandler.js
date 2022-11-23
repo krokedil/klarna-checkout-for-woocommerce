@@ -157,14 +157,15 @@ const completeOrder = async (page, kcoIframe) => {
 			}
 		}
 
+		let addressUpdated = await fullscreenIframe.$('[id="supplement_nin_dialog__footer-button-wrapper"]')
+
 		// Handle potential "Address updated" window.
-		if (await fullscreenIframe.$('[id="supplement_nin_dialog__footer-button-wrapper"]')) {
+		if (addressUpdated) {
 			await fullscreenIframe.click('[id="supplement_nin_dialog__footer-button-wrapper"]');
 		} else {
-			await page.waitForTimeout(2 * timeOutTime);
-
-			if (await fullscreenIframe.$('[id="error-dialog__footer-button-wrapper"]')) {
-
+			let errorDialog = await fullscreenIframe.$('[id="error-dialog__footer-button-wrapper"]')
+			
+			if (errorDialog) {
 				await fullscreenIframe.click('[id="error-dialog__footer-button-wrapper"]');
 				await page.waitForTimeout(3 * timeOutTime);
 
