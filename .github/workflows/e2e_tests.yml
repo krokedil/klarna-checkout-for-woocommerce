@@ -33,7 +33,7 @@ jobs:
       - name: Run Tests
         run: |
           cd ./kco/tests/e2e/
-          yarn docker:up && yarn wp:install && yarn jettison
+          yarn docker:up && yarn wp:install 
         # run: |
         #   cd ./kco/tests/e2e/
         #   yarn e2e:test
@@ -78,9 +78,7 @@ jobs:
       - name: List dir and path
         run: |
           cd ./kco/tests/e2e/
-
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/
 
       - name: Remove new lines
         id: newlineformat
@@ -131,7 +129,13 @@ jobs:
       - name: End Tests
         run: |
         cd ./kco/tests/e2e/
-        yarn docker:down
+        yarn jettison && yarn docker:down
 
       # Clean up temporary files
+        - name: End Tests
+        run: |
+        cd ./kco/tests/e2e/outputs/
+        ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
+        rm -Rf *
+        ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
 
