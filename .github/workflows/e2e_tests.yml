@@ -29,11 +29,14 @@ jobs:
           cd ./kco/tests/e2e/
           yarn install
 
-      # # Run tests
-      # - name: Run Tests
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     yarn e2e:test
+      # Run tests
+      - name: Run Tests
+        run: |
+          cd ./kco/tests/e2e/
+          yarn e2e:test
+        # run: |
+        #   cd ./kco/tests/e2e/
+        #   yarn e2e:test
 
       - name: Get branch name
         id: current_branch
