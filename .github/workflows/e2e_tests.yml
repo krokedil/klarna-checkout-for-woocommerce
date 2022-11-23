@@ -29,14 +29,10 @@ jobs:
           cd ./kco/tests/e2e/
           yarn install
 
-      # Run tests
-      - name: Run Tests
-        run: |
-          cd ./kco/tests/e2e/
-          yarn docker:up && yarn wp:install && yarn jettison
-        # run: |
-        #   cd ./kco/tests/e2e/
-        #   yarn e2e:test
+      # - name: Run Tests
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     yarn e2e:test
 
       - name: Get branch name
         id: current_branch
@@ -52,14 +48,14 @@ jobs:
         run: |
           cd ./kco/
           tr -d '\n' < klarna-checkout-for-woocommerce.php >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/plugin-version-sans-new-lines.txt
-      
+
       - name: Format plugin main file version
         id: versionfullformat
         shell: bash
         run: |
           cd ./kco/
           sed 's/.*Version:\(.*\)\* Text.*/\1/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/plugin-version-sans-new-lines.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/plugin-version-clean.txt
-      
+
       - name: Get plugin version formatted variable
         id: versioncleanvar
         shell: bash
@@ -73,35 +69,58 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          yarn e2e:format-slack-output > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-env-data.txt
+          yarn e2e:format-slack-output > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt
+          echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt)
 
       - name: List dir and path
         run: |
           cd ./kco/tests/e2e/
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/
+
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
 
       - name: Remove new lines
         id: newlineformat
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          tr -d '\n' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-env-data.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-env-data-no-space.txt
+          tr -d '\n' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
+
+      # - name: Remove all before object
+      #   id: formatbefore
+      #   shell: bash
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     sed 's/^.*{/{/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest3.txt
+
+      # - name: Remove all after object
+      #   id: formatafter
+      #   shell: bash
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     sed 's/}.*/}/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest3.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
 
       - name: Remove all around object
         id: formatafter
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed 's/.*{\(.*\)}.*/\1/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-env-data-no-space.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-env-data-clean.txt
+          sed 's/.*{\(.*\)}.*/\1/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
+
+      - name: Remove last character
+        id: formatlast
+        shell: bash
+        run: |
+          cd ./kco/tests/e2e/
+          sed 's/.$//' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt
 
       - name: Get formatted variable
         id: cleanvar
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=e2e_res_2::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/format-env-data-clean.txt)
-    
-      # PHP Version
+          echo ::set-output name=e2e_res_2::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt)
+
       - name: Get PHP version
         id: phpver
         shell: bash
@@ -109,33 +128,16 @@ jobs:
           cd ./kco/tests/e2e/
           echo ::set-output name=php_ver::$(php -version)
 
-      # Send to Slack
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {
-            ${{ steps.cleanvar.outputs.e2e_res_2}},
-            "php_version": "${{ steps.phpver.outputs.php_ver}}",
+            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" ,
             "plugin_version": "${{ steps.versioncleanvar.outputs.version_clean}}",
             "workflow_link": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
             "branch_name": "${{ steps.current_branch.outputs.branch }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      
-      # Bring down test environment image
-      - name: End Tests
-        run: |
-          cd ./kco/tests/e2e/
-          yarn docker:down
-
-      # # Clean up temporary files
-      # - name: End Tests
-      #   run: |
-      #     cd ./kco/tests/e2e/outputs/
-      #     ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
-      #     rm -Rf *
-      #     ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
-
