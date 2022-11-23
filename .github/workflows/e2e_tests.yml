@@ -75,7 +75,6 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           yarn e2e:format-slack-output > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt
-          echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt)
 
       - name: Remove new lines
         id: newlineformat
@@ -103,7 +102,7 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=e2e_res_2::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt)
+          echo ::set-output name=e2e_test_vars::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt)
 
       # Process variables
       - name: Get PHP version
@@ -126,7 +125,9 @@ jobs:
         with:
           payload: |
             {
-            ${{ steps.cleanvar.outputs.e2e_res_2}}, "php_version": "${{ steps.phpver.outputs.php_ver}}" ,
+            ${{ steps.cleanvar.outputs.e2e_test_vars}},
+            "wp_version": "${{ steps.childwpver.outputs.child_wp_ver}}"
+            "php_version": "${{ steps.phpver.outputs.php_ver}}" ,
             "plugin_version": "${{ steps.versioncleanvar.outputs.version_clean}}",
             "workflow_link": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
             "branch_name": "${{ steps.current_branch.outputs.branch }}"
