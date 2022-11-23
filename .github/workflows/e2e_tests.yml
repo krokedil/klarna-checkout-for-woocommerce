@@ -143,7 +143,6 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-
       - name: End Tests
         run: |
           cd ./kco/tests/e2e/
