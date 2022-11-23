@@ -45,7 +45,7 @@ jobs:
       - name: List dir and path
         run: |
           cd ./kco/tests/e2e/
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
 
 
       # Plugin version
