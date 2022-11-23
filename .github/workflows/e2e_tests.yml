@@ -29,10 +29,10 @@ jobs:
           cd ./kco/tests/e2e/
           yarn install
 
-      - name: Run Tests
-        run: |
-          cd ./kco/tests/e2e/
-          yarn docker:up && yarn wp:install && yarn jettison
+      # - name: Run Tests
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     yarn docker:up && yarn wp:install && yarn jettison
 
       - name: Get branch name
         id: current_branch
@@ -41,13 +41,21 @@ jobs:
           cd ./kco/tests/e2e/
           echo ::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})
 
+
+      - name: List dir and path
+        run: |
+          cd ./kco/tests/e2e/
+
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
+
+
       # Plugin version
       - name: Remove plugin main file new lines
         id: versionnewlineformat
         shell: bash
         run: |
           cd ./kco/
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
           tr -d '\n' < klarna-checkout-for-woocommerce.php >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/plugin-version-sans-new-lines.txt
 
       - name: Format plugin main file version
@@ -72,13 +80,6 @@ jobs:
           cd ./kco/tests/e2e/
           yarn e2e:format-slack-output > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt
           echo ::set-output name=e2e_res::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt)
-
-      - name: List dir and path
-        run: |
-          cd ./kco/tests/e2e/
-
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
 
       - name: Remove new lines
         id: newlineformat
@@ -143,7 +144,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: End Tests
-        run: |
-          cd ./kco/tests/e2e/
-          yarn docker:down
+      # - name: End Tests
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     yarn docker:down
