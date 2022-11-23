@@ -52,9 +52,9 @@ jobs:
           cd ./kco/tests/e2e/
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
           echo "--------1"
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/tests
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests
           echo "--------2"
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/tests/e2e/
+
 
       # Plugin version
       - name: Remove plugin main file new lines
