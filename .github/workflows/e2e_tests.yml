@@ -132,7 +132,7 @@ jobs:
         yarn jettison && yarn docker:down
 
       # Clean up temporary files
-        - name: End Tests
+      - name: End Tests
         run: |
         cd ./kco/tests/e2e/outputs/
         ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
