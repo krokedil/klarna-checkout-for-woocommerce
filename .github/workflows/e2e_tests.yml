@@ -33,7 +33,7 @@ jobs:
       - name: Run Tests
         run: |
           cd ./kco/tests/e2e/
-          yarn docker:up && yarn wp:install 
+          yarn docker:up && yarn wp:install && yarn jettison
         # run: |
         #   cd ./kco/tests/e2e/
         #   yarn e2e:test
@@ -129,7 +129,7 @@ jobs:
       - name: End Tests
         run: |
           cd ./kco/tests/e2e/
-          yarn jettison && yarn docker:down
+          yarn docker:down
 
       # Clean up temporary files
       - name: End Tests
