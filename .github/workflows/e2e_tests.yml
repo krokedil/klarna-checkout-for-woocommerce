@@ -29,17 +29,10 @@ jobs:
           cd ./kco/tests/e2e/
           yarn install
 
-      # - name: Run Tests
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     yarn docker:up && yarn wp:install && yarn jettison
-
-      # - name: Run Tests
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     yarn e2e:test
-      # - name: Run Tests
-
+      - name: Run Tests
+        run: |
+          cd ./kco/tests/e2e/
+          yarn e2e:test
 
       - name: Get branch name
         id: current_branch
@@ -48,15 +41,10 @@ jobs:
           cd ./kco/tests/e2e/
           echo ::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})
 
-
       - name: List dir and path
         run: |
           cd ./kco/tests/e2e/
-          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/
-          echo "--------1"
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/tests/
-          echo "--------2"
-
 
       # Plugin version
       - name: Remove plugin main file new lines
@@ -96,20 +84,6 @@ jobs:
           cd ./kco/tests/e2e/
           tr -d '\n' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
 
-      # - name: Remove all before object
-      #   id: formatbefore
-      #   shell: bash
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     sed 's/^.*{/{/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest3.txt
-
-      # - name: Remove all after object
-      #   id: formatafter
-      #   shell: bash
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     sed 's/}.*/}/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest3.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
-
       - name: Remove all around object
         id: formatafter
         shell: bash
@@ -136,7 +110,14 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=php_ver::$(php -version)
+          echo ::set-output name=php_ver::$(yarn wp:version-run)
+
+      - name: Get child WP version
+        id: phpver
+        shell: bash
+        run: |
+          cd ./kco/tests/e2e/
+          echo ::set-output name=child_wp_ver::$(php -version)
 
       - name: Send custom data to Slack workflow
         id: slack
@@ -151,8 +132,3 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      # - name: End Tests
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     yarn docker:down
