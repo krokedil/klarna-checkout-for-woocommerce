@@ -33,7 +33,7 @@ jobs:
       - name: Run Tests
         run: |
           cd ./kco/tests/e2e/
-          yarn e2e:test
+          yarn docker:up && yarn wp:install && yarn jettison
         # run: |
         #   cd ./kco/tests/e2e/
         #   yarn e2e:test
@@ -127,5 +127,11 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
+      # Bring down test environment image
+      - name: End Tests
+        run: |
+        cd ./kco/tests/e2e/
+        yarn docker:down
+
       # Clean up temporary files
 
