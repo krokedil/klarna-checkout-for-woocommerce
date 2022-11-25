@@ -36,6 +36,7 @@
   "scripts": {
     "wp:version": "docker-compose run --rm wordpress-cli wp core version --user=1",
     "wp:version-run": "node helpers/childVars/getWpVersion.js",
+    "wc:version-run": "node helpers/childVars/getWcVersion.js",
     "lint": "npx eslint --ext .js ./ --fix",
     "test": "jest",
     "docker:up": "docker-compose up -d --build",
