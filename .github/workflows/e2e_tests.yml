@@ -127,34 +127,6 @@ jobs:
           sed 's/.*://' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp-no-lines.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp-no-lines-clean.txt 
       #---
 
-      # - name: Remove new lines
-      #   id: newlineformat
-      #   shell: bash
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     tr -d '\n' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
-
-      # - name: Remove all around object
-      #   id: formatafter
-      #   shell: bash
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     sed 's/.*{\(.*\)}.*/\1/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
-
-      # - name: Remove last character
-      #   id: formatlast
-      #   shell: bash
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     sed 's/.$//' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt
-
-      # - name: Get formatted variable
-      #   id: cleanvar
-      #   shell: bash
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     echo ::set-output name=e2e_test_vars::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt)
-
       # Process variables
       - name: Get PHP version
         id: phpver
