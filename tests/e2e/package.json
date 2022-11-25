@@ -38,6 +38,7 @@
     "wp:version-run": "node helpers/childVars/getWpVersion.js",
     "wc:version-run": "node helpers/childVars/getWcVersion.js",
     "klarna:version-run": "node helpers/childVars/getKlarnaVersion.js",
+    "wp:php-version-run": "node helpers/childVars/getPhpVersion.js",
     "lint": "npx eslint --ext .js ./ --fix",
     "test": "jest",
     "docker:up": "docker-compose up -d --build",
