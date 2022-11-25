@@ -126,6 +126,29 @@ jobs:
           cd ./kco/tests/e2e/
           sed 's/.*://' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp-no-lines.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp-no-lines-clean.txt 
       #---
+      #---
+      - name: Get unformatted Klarna details
+        id: klarnavar
+        shell: bash
+        run: |
+          cd ./kco/tests/e2e/
+          yarn klarna:version-run > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-klarna-version-temp.txt
+    
+      - name: Get unformatted WC version
+        id: klarnavarformat
+        shell: bash
+        run: |
+          cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-klarna-version-temp.txt
+          cd ./kco/tests/e2e/
+          sed '7q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-klarna-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-klarna-version-temp-no-lines.txt 
+
+      - name: Format WC version
+        id: klarnavarformatclean
+        shell: bash
+        run: |
+          cd ./kco/tests/e2e/
+          sed 's/.*://' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-klarna-version-temp-no-lines.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-klarna-version-temp-no-lines-clean.txt 
+      #---
 
       # Process variables
       - name: Get PHP version
@@ -151,6 +174,14 @@ jobs:
           cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp-no-lines-clean.txt
           echo ::set-output name=child_wc_ver::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp-no-lines-clean.txt )
 
+      - name: Get child Klarna version
+        id: childklarnaver
+        shell: bash
+        run: |
+          cd ./kco/tests/e2e/
+          cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-klarna-version-temp-no-lines-clean.txt
+          echo ::set-output name=child_klarna_ver::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-klarna-version-temp-no-lines-clean.txt )
+
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
@@ -161,7 +192,7 @@ jobs:
             "plugin_name": "temp plugin name",
             "wp_version": "${{ steps.childwpver.outputs.child_wp_ver}}",
             "php_version": "${{ steps.phpver.outputs.php_ver}}" ,
-            "plugin_version": "temp plugin",
+            "plugin_version": "${{ steps.bash.outputs.child_klarna_ver}}",
             "workflow_link": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
             "branch_name": "${{ steps.current_branch.outputs.branch }}"
             }
