@@ -108,7 +108,6 @@ jobs:
         id: wcvar
         shell: bash
         run: |
-          cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp.txt
           cd ./kco/tests/e2e/
           yarn wc:version-run > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp.txt
     
@@ -116,6 +115,7 @@ jobs:
         id: wcvarformat
         shell: bash
         run: |
+          cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp.txt
           cd ./kco/tests/e2e/
           sed '7q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp-no-lines.txt 
 
