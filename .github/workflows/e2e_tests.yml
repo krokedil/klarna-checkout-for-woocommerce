@@ -74,35 +74,35 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          yarn e2e:format-slack-output > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt
+          yarn e2e:format-slack-output > outputs/rest.txt
 
       - name: Remove new lines
         id: newlineformat
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          tr -d '\n' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
+          tr -d '\n' < outputs/rest.txt >> outputs/rest2.txt
 
       - name: Remove all around object
         id: formatafter
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed 's/.*{\(.*\)}.*/\1/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
+          sed 's/.*{\(.*\)}.*/\1/' outputs/rest2.txt >> outputs/rest4.txt
 
       - name: Remove last character
         id: formatlast
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed 's/.$//' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt
+          sed 's/.$//' < outputs/rest4.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt
 
       - name: Get formatted variable
         id: cleanvar
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=e2e_test_vars::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt)
+          echo ::set-output name=e2e_test_vars::$(cat outputs/rest5.txt)
 
       # Process variables
       - name: Get PHP version
@@ -110,14 +110,14 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=php_ver::$(yarn wp:version-run)
+          echo ::set-output name=php_ver::$(php -version)
 
       - name: Get child WP version
         id: childwpver
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=child_wp_ver::$(php -version)
+          echo ::set-output name=child_wp_ver::$(yarn wp:version-run)
 
       - name: Send custom data to Slack workflow
         id: slack
