@@ -102,6 +102,7 @@ jobs:
           cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wp-version-temp.txt 
           cd ./kco/tests/e2e/
           sed '3q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wp-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wp-version-temp-no-lines-clean.txt
+      
       #---
       - name: Get unformatted WC details
         id: wcvar
