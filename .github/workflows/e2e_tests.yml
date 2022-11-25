@@ -29,10 +29,10 @@ jobs:
           cd ./kco/tests/e2e/
           yarn install
 
-      - name: Run Tests
-        run: |
-          cd ./kco/tests/e2e/
-          yarn e2e:test
+      # - name: Run Tests
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     yarn e2e:test
 
       - name: Get branch name
         id: current_branch
@@ -77,49 +77,71 @@ jobs:
           yarn e2e:format-slack-output > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt
 
       #---
-      # Environment variables
-      - name: Get unformatted variable
+      # Child variables
+      - name: Get unformatted WP version
         id: tempvars
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          yarn wp:version-run > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-version-temp.txt
+          yarn wp:version-run > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wp-version-temp.txt
 
-      - name: Remove new lines
+      - name: Format WP version
         id: tempnewlineformat
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed '3q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-version-temp-no-lines.txt 
+          sed '3q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wp-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wp-version-temp-no-lines.txt 
+      #---
+      - name: Get unformatted WC details
+        id: wcvar
+        shell: bash
+        run: |
+          cd ./kco/tests/e2e/
+          yarn wc:version-run > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp.txt
+    
+      - name: Get unformatted WC version
+        id: wcvar
+        shell: bash
+        run: |
+          cd ./kco/tests/e2e/
+          sed '7q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp-no-lines.txt 
+
+      - name: Format WC version
+        id: wcvarformat
+        shell: bash
+        run: |
+          cd ./kco/tests/e2e/
+          sed 's/.*://'' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp-no-lines.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp-no-lines.txt 
+      
       #---
 
-      - name: Remove new lines
-        id: newlineformat
-        shell: bash
-        run: |
-          cd ./kco/tests/e2e/
-          tr -d '\n' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
+      # - name: Remove new lines
+      #   id: newlineformat
+      #   shell: bash
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     tr -d '\n' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt
 
-      - name: Remove all around object
-        id: formatafter
-        shell: bash
-        run: |
-          cd ./kco/tests/e2e/
-          sed 's/.*{\(.*\)}.*/\1/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
+      # - name: Remove all around object
+      #   id: formatafter
+      #   shell: bash
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     sed 's/.*{\(.*\)}.*/\1/' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest2.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt
 
-      - name: Remove last character
-        id: formatlast
-        shell: bash
-        run: |
-          cd ./kco/tests/e2e/
-          sed 's/.$//' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt
+      # - name: Remove last character
+      #   id: formatlast
+      #   shell: bash
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     sed 's/.$//' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest4.txt >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt
 
-      - name: Get formatted variable
-        id: cleanvar
-        shell: bash
-        run: |
-          cd ./kco/tests/e2e/
-          echo ::set-output name=e2e_test_vars::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt)
+      # - name: Get formatted variable
+      #   id: cleanvar
+      #   shell: bash
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     echo ::set-output name=e2e_test_vars::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/rest5.txt)
 
       # Process variables
       - name: Get PHP version
@@ -134,7 +156,14 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=child_wp_ver::$(cat outputs/child-version-temp-no-lines.txt)
+          echo ::set-output name=child_wp_ver::$(cat outputs/child-wp-version-temp-no-lines.txt)
+
+      - name: Get child WC version
+        id: childwpver
+        shell: bash
+        run: |
+          cd ./kco/tests/e2e/
+          echo ::set-output name=child_wp_ver::$(cat outputs/child-wc-version-temp-no-lines.txt)
 
       - name: Send custom data to Slack workflow
         id: slack
@@ -142,10 +171,11 @@ jobs:
         with:
           payload: |
             {
-            ${{ steps.cleanvar.outputs.e2e_test_vars}},
+            "wc_version": ${{steps.childwpver.outputs.child_wc_ver}}",
+            "plugin_name": "temp plugin name"
             "wp_version": "${{ steps.childwpver.outputs.child_wp_ver}}",
             "php_version": "${{ steps.phpver.outputs.php_ver}}" ,
-            "plugin_version": "${{ steps.versioncleanvar.outputs.version_clean}}",
+            "plugin_version": "temp plugin",
             "workflow_link": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
             "branch_name": "${{ steps.current_branch.outputs.branch }}"
             }
