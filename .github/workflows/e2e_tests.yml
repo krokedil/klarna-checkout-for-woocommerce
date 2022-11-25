@@ -93,7 +93,6 @@ jobs:
           sed '3q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-version-temp-no-lines.txt 
       #---
 
-
       - name: Remove new lines
         id: newlineformat
         shell: bash
