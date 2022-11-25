@@ -134,7 +134,7 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=child_wp_ver::$(cat outputs/child-version-temp.txt)
+          echo ::set-output name=child_wp_ver::$(cat outputs/child-version-temp-no-lines.txt)
 
       - name: Send custom data to Slack workflow
         id: slack
