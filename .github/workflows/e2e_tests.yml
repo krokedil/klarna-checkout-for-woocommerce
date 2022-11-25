@@ -79,14 +79,14 @@ jobs:
       #---
       # Child variables
       - name: Get unformatted WP version
-        id: tempvars
+        id: wpvar
         shell: bash
         run: |
           cd ./kco/tests/e2e/
           yarn wp:version-run > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wp-version-temp.txt
 
       - name: Format WP version
-        id: tempnewlineformat
+        id: wpvarformat
         shell: bash
         run: |
           cd ./kco/tests/e2e/
@@ -100,14 +100,14 @@ jobs:
           yarn wc:version-run > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp.txt
     
       - name: Get unformatted WC version
-        id: wcvar
+        id: wcvarformat
         shell: bash
         run: |
           cd ./kco/tests/e2e/
           sed '7q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/child-wc-version-temp-no-lines.txt 
 
       - name: Format WC version
-        id: wcvarformat
+        id: wcvarformatclean
         shell: bash
         run: |
           cd ./kco/tests/e2e/
