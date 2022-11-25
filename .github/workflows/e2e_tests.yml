@@ -202,7 +202,6 @@ jobs:
               "workflow_link": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
               "branch_name": "${{ steps.current_branch.outputs.branch }}"
             }
-            
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
