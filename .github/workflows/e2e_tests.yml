@@ -102,7 +102,6 @@ jobs:
           cd ./kco/tests/e2e/
           sed '5q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt 
 
-
       - name: Get unformatted Klarna version
         shell: bash
         run: |
@@ -188,7 +187,7 @@ jobs:
               "wc_version": "${{steps.wc_ver.outputs.child_wc_ver}}",
               "wp_version": "${{ steps.wp_ver.outputs.child_wp_ver}}",
               "php_version": "${{ steps.php_ver.outputs.child_php_ver}}" ,
-              "plugin_name: "${{ steps.klarna_name.outputs.child_klarna_name}}",
+              "plugin_name": "${{ steps.klarna_name.outputs.child_klarna_name}}",
               "plugin_version": "${{ steps.klarna_ver.outputs.child_klarna_ver}}",
               "workflow_link": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
               "branch_name": "${{ steps.current_branch.outputs.branch }}"
