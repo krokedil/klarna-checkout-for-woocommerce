@@ -161,12 +161,16 @@ const completeOrder = async (page, kcoIframe) => {
 
 		// Handle potential "Address updated" window.
 		if (addressUpdated) {
+
 			await fullscreenIframe.click('[id="supplement_nin_dialog__footer-button-wrapper"]');
 		} else {
+			await page.waitForTimeout(1 * timeOutTime);
+
 			let errorDialog = await fullscreenIframe.$('[id="error-dialog__footer-button-wrapper"]')
+
 			if (errorDialog) {
 				await fullscreenIframe.click('[id="error-dialog__footer-button-wrapper"]');
-				await page.waitForTimeout(3 * timeOutTime);
+				await page.waitForTimeout(2 * timeOutTime);
 
 				await kcoIframe.click('[data-cid="button.buy_button"]');
 				await page.waitForTimeout(1 * timeOutTime);
