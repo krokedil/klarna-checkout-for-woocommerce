@@ -178,7 +178,6 @@ jobs:
           echo "{child_php_ver}={x}" >> $GITHUB_OUTPUT
 
       # Send data to Slack
-
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
