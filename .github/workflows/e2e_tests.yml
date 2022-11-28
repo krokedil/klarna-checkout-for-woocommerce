@@ -147,35 +147,35 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "{child_wp_ver}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wp-version-temp-no-lines-clean.txt}"
+          echo "{child_wp_ver}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wp-version-temp-no-lines-clean.txt}" >> $GITHUB_STATE
 
       - name: Get WC version
         id: wc_ver
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "{child_wc_ver}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines-clean.txt}"
+          echo "{child_wc_ver}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines-clean.txt}" >> $GITHUB_STATE
 
       - name: Get Klarna version
         id: klarna_ver
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "{child_klarna_ver}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines-clean.txt}"
+          echo "{child_klarna_ver}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines-clean.txt}" >> $GITHUB_STATE
 
       - name: Get Klarna name
         id: klarna_name
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "{child_klarna_name}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt}"
+          echo "{child_klarna_name}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt}" >> $GITHUB_STATE
 
       - name: Get PHP version
         id: php_ver
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "{child_php_ver}={x}"
+          echo "{child_php_ver}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt}" >> $GITHUB_STATE
 
       # Send data to Slack
 
