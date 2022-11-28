@@ -81,19 +81,19 @@ describe("KCO E2E tests", () => {
 
 					// --------------- B2B/B2C SELECTOR --------------- //
 					await iframeHandler.setCustomerType(page, kcoIframe, args.customerType);
-					console.log('Status -------------- 1');
+					console.log('MAIN -------------- 1');
 					// --------------- FORM SUBMISSION --------------- //
 					await iframeHandler.processKcoForm(page, kcoIframe, args.customerType);
-					console.log('Status -------------- 2');
+					console.log('MAIN -------------- 2');
 					// --------------- SHIPPING HANDLER --------------- //
 					await iframeHandler.processShipping(page, kcoIframe, args.shippingMethod, args.shippingInIframe)
-					console.log('Status -------------- 3');
+					console.log('MAIN -------------- 3');
 					// --------------- COMPLETE ORDER --------------- //
 					await iframeHandler.completeOrder(page, kcoIframe);
-					console.log('Status -------------- 4');
+					console.log('MAIN -------------- 4');
 
 					await page.waitForTimeout(2 * timeOutTime);
-					console.log('Status -------------- 5');
+					console.log('MAIN -------------- 5');
 
 				} catch (e) {
 					console.log("Error placing order", e)
@@ -113,12 +113,12 @@ describe("KCO E2E tests", () => {
 				await thankyouIframe.click("[id='section-order-details__link']");
 				await page.waitForTimeout(1 * timeOutTime);
 
-				console.log('Status -------------- 6');
+				console.log('MAIN -------------- 6');
 
 				const kcoOrderData = await iframeHandler.getOrderData(thankyouIframe);
 				expect(kcoOrderData[0]).toBe(args.expectedOrderLines);
 				expect(kcoOrderData[1]).toBe(args.expectedTotal);
-				console.log('Status -------------- 7');
+				console.log('MAIN -------------- 7');
 
 				if(args.orderManagement != '') {
 					await orderManagement.OrderManagementAction(page, orderID, args.orderManagement)

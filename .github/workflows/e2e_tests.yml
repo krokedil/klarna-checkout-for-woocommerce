@@ -192,7 +192,7 @@ jobs:
               "plugin_name": "${{ steps.klarna_name.outputs.child_klarna_name}}",
               "plugin_version": "${{ steps.klarna_ver.outputs.child_klarna_ver}}",
               "workflow_link": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-              "branch_name": "${{ steps.current_branch.outputs.branch }}"
+              "branch_name": "${{ github.head_ref || github.ref_name }} "
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
