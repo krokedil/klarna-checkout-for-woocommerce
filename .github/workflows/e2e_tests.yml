@@ -147,28 +147,28 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=child_wp_ver::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wp-version-temp-no-lines-clean.txt )
+          echo "name={child_wp_ver}::{cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wp-version-temp-no-lines-clean.txt}"
 
       - name: Get WC version
         id: wc_ver
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=child_wc_ver::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines-clean.txt )
+          echo "name={child_wc_ver}::{cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines-clean.txt}"
 
       - name: Get Klarna version
         id: klarna_ver
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=child_klarna_ver::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines-clean.txt )
+          echo "name={child_klarna_ver}::{cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines-clean.txt}"
 
       - name: Get Klarna name
         id: klarna_name
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=child_klarna_name::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt )
+          echo "name={child_klarna_name}::{cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt}"
 
       - name: Get PHP version
         id: php_ver
@@ -176,7 +176,7 @@ jobs:
         run: |
           cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt
           cd ./kco/tests/e2e/
-          echo ::set-output name=child_php_ver::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt )
+          echo "name={child_php_ver}::{cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt}"
 
       # Send data to Slack
 
