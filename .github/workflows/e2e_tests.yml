@@ -175,7 +175,7 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "{child_php_ver}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt}" >> $GITHUB_OUTPUT
+          echo "{child_php_ver}={(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt)}" >> $GITHUB_OUTPUT
 
       # Send data to Slack
 
