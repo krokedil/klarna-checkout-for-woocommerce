@@ -9,7 +9,7 @@ import data from "../config/data.json";
 import orderManagement from "../helpers/orderManagement";
 
 const options = {
-	"headless": false,
+	"headless": true,
 	"defaultViewport": null,
 	"args": [
 		"--disable-infobars",
