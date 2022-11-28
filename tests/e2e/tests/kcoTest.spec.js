@@ -81,19 +81,19 @@ describe("KCO E2E tests", () => {
 
 					// --------------- B2B/B2C SELECTOR --------------- //
 					await iframeHandler.setCustomerType(page, kcoIframe, args.customerType);
-
+					console.log('Status -------------- 1');
 					// --------------- FORM SUBMISSION --------------- //
 					await iframeHandler.processKcoForm(page, kcoIframe, args.customerType);
-
+					console.log('Status -------------- 2');
 					// --------------- SHIPPING HANDLER --------------- //
 					await iframeHandler.processShipping(page, kcoIframe, args.shippingMethod, args.shippingInIframe)
-
+					console.log('Status -------------- 3');
 					// --------------- COMPLETE ORDER --------------- //
 					await iframeHandler.completeOrder(page, kcoIframe);
-
+					console.log('Status -------------- 4');
 
 					await page.waitForTimeout(2 * timeOutTime);
-
+					console.log('Status -------------- 5');
 
 				} catch (e) {
 					console.log("Error placing order", e)
@@ -112,10 +112,13 @@ describe("KCO E2E tests", () => {
 				const thankyouIframe = await page.frames().find((frame) => frame.name() === "klarna-checkout-iframe");
 				await thankyouIframe.click("[id='section-order-details__link']");
 				await page.waitForTimeout(1 * timeOutTime);
+
+				console.log('Status -------------- 6');
+
 				const kcoOrderData = await iframeHandler.getOrderData(thankyouIframe);
 				expect(kcoOrderData[0]).toBe(args.expectedOrderLines);
 				expect(kcoOrderData[1]).toBe(args.expectedTotal);
-
+				console.log('Status -------------- 7');
 
 				if(args.orderManagement != '') {
 
