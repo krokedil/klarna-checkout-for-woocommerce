@@ -50,7 +50,6 @@ jobs:
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/tests/
 
       # Environment variables
-      
       # WP
       - name: Get unformatted WP version
         shell: bash
