@@ -44,12 +44,6 @@ jobs:
           cd ./kco/tests/e2e/
           yarn docker:up && yarn wp:install && yarn jettison
 
-      # - name: Get branch name
-      #   shell: bash
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     echo ::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})
-
       - name: List dir and path
         run: |
           cd ./kco/tests/e2e/
@@ -154,30 +148,31 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "{child_wc_ver}={"u"}" >> $GITHUB_OUTPUT
+          echo "{child_wc_ver}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines-clean.txt}" >> $GITHUB_OUTPUT
 
       - name: Get Klarna version
         id: klarna_ver
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "{child_klarna_ver}={'r'}" >> $GITHUB_OUTPUT
+          echo "{child_klarna_ver}={cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines-clean.txt}" >> $GITHUB_OUTPUT
 
       - name: Get Klarna name
         id: klarna_name
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "{child_klarna_name}={z}" >> $GITHUB_OUTPUT
+          echo "child_klarna_name=cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt" >> $GITHUB_OUTPUT
 
       - name: Get PHP version
         id: php_ver
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "{child_php_ver}={x}" >> $GITHUB_OUTPUT
+          echo "child_php_ver=$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt)" >> $GITHUB_OUTPUT
 
       # Send data to Slack
+
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
