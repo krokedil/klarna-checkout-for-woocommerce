@@ -121,9 +121,7 @@ describe("KCO E2E tests", () => {
 				console.log('Status -------------- 7');
 
 				if(args.orderManagement != '') {
-
 					await orderManagement.OrderManagementAction(page, orderID, args.orderManagement)
-
 				}
 
 			}, 240000);
