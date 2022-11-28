@@ -93,7 +93,6 @@ describe("KCO E2E tests", () => {
 					console.log('MAIN -------------- 4');
 
 					await page.waitForTimeout(2 * timeOutTime);
-					console.log('MAIN -------------- 5');
 
 				} catch (e) {
 					console.log("Error placing order", e)
@@ -104,6 +103,8 @@ describe("KCO E2E tests", () => {
 				await page.waitForTimeout(1 * timeOutTime);
 				const value = await page.$eval(".entry-title", (e) => e.textContent);
 				expect(value).toBe("Order received");
+
+				console.log('MAIN -------------- 5');
 
 				let checkoutURL = await page.evaluate(() => window.location.href)
 				orderID = await checkoutURL.split('/')[5]
