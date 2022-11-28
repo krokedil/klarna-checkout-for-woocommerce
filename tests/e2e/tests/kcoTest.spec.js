@@ -9,7 +9,7 @@ import data from "../config/data.json";
 import orderManagement from "../helpers/orderManagement";
 
 const options = {
-	"headless": true,
+	"headless": false,
 	"defaultViewport": null,
 	"args": [
 		"--disable-infobars",
@@ -30,7 +30,7 @@ describe("KCO E2E tests", () => {
 	beforeAll(async () => {
 		try {
 			json = await setup.setupStore(json);
-			console.log('TEST FILE');
+			console.log(JSON.stringify(json));
 		} catch (e) {
 			console.log(e);
 		}
@@ -43,9 +43,9 @@ describe("KCO E2E tests", () => {
 	}),
 
 		afterEach(async () => {
-			if (!page.isClosed()) {
-				browser.close();
-			}
+			// if (!page.isClosed()) {
+			// 	browser.close();
+			// }
 			API.clearWCSession();
 		}),
 
