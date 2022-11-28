@@ -29,10 +29,10 @@ jobs:
           cd ./kco/tests/e2e/
           yarn install
 
-      # - name: Run Tests
-      #   run: |
-      #     cd ./kco/tests/e2e/
-      #     yarn e2e:test
+      - name: Run Tests
+        run: |
+          cd ./kco/tests/e2e/
+          yarn e2e:test
 
       - name: Close any open images
         run: |
@@ -44,14 +44,18 @@ jobs:
           cd ./kco/tests/e2e/
           yarn docker:up && yarn wp:install && yarn jettison
 
+      - name: Get branch name
+        shell: bash
+        run: |
+          cd ./kco/tests/e2e/
+          echo ::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})
+
       - name: List dir and path
         run: |
           cd ./kco/tests/e2e/
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/tests/
 
       # Environment variables
-
-
       # WP
       - name: Get unformatted WP version
         shell: bash
@@ -64,7 +68,7 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           sed '3q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wp-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wp-version-temp-no-lines-clean.txt
-      
+
       # WC
       - name: Get unformatted WC details
         id: wcvar
@@ -72,51 +76,49 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           yarn wc:version-run > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp.txt
-    
+
       - name: Get unformatted WC version
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed '7q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines.txt 
+          sed '7q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines.txt
 
       - name: Format WC version
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed 's/.*://' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines-clean.txt 
-      
+          sed 's/.*://' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines-clean.txt
+
       # Klarna
       - name: Get unformatted Klarna details
         shell: bash
         run: |
           cd ./kco/tests/e2e/
           yarn klarna:version-run > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp.txt
-    
+
       - name: Get unformatted Klarna name
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed '2q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt 
+          sed '5q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt
 
       - name: Get unformatted Klarna version
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed '7q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines.txt 
+          sed '7q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines.txt
 
       - name: Format Klarna version
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          sed 's/.*://' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines-clean.txt 
+          sed 's/.*://' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines-clean.txt
 
       - name: Format Klarna name
         shell: bash
         run: |
-          cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp.txt
-          cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt
           cd ./kco/tests/e2e/
-          sed 's/.*://' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt 
+          sed 's/.*://' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines.txt  >> /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt
 
       # PHP
       - name: Get unformatted PHP details
@@ -124,20 +126,20 @@ jobs:
         run: |
           cd ./kco/tests/e2e/
           yarn wp:php-version-run > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp.txt
-    
+
       - name: Get unformatted PHP version
         shell: bash
         run: |
           cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp.txt
           cd ./kco/tests/e2e/
-          sed '6q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp.txt > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines.txt 
+          sed '6q;d' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp.txt > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines.txt
 
       - name: Format PHP version
         shell: bash
         run: |
-          cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines.txt 
+          cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines.txt
           cd ./kco/tests/e2e/
-          sed 's/.*://' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines.txt  > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt 
+          sed 's/.*://' < /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines.txt  > /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt
 
       # Process variables
       - name: Get child WP version
@@ -145,35 +147,36 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "child_wp_ver=$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wp-version-temp-no-lines-clean.txt)" >> $GITHUB_OUTPUT
+          echo ::set-output name=child_wp_ver::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wp-version-temp-no-lines-clean.txt )
 
       - name: Get WC version
         id: wc_ver
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "child_wc_ver=$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines-clean.txt)" >> $GITHUB_OUTPUT
+          echo ::set-output name=child_wc_ver::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/wc-version-temp-no-lines-clean.txt )
 
       - name: Get Klarna version
         id: klarna_ver
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "child_klarna_ver=$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines-clean.txt)" >> $GITHUB_OUTPUT
+          echo ::set-output name=child_klarna_ver::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-version-temp-no-lines-clean.txt )
 
       - name: Get Klarna name
         id: klarna_name
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "child_klarna_name=$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt)" >> $GITHUB_OUTPUT
+          echo ::set-output name=child_klarna_name::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name.txt )
 
       - name: Get PHP version
         id: php_ver
         shell: bash
         run: |
+          cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt
           cd ./kco/tests/e2e/
-          echo "child_php_ver=$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt)" >> $GITHUB_OUTPUT
+          echo ::set-output name=child_php_ver::$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt )
 
       # Send data to Slack
 
