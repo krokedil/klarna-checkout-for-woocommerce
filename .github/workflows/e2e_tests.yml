@@ -169,7 +169,7 @@ jobs:
         run: |
           cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name-clean.txt
           cd ./kco/tests/e2e/
-          echo "child_klarna_name=$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name-clean.txt)"
+          echo "child_klarna_name=$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/klarna-name-clean.txt)">> $GITHUB_OUTPUT
 
       - name: Get PHP version
         id: php_ver
@@ -177,7 +177,7 @@ jobs:
         run: |
           cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt
           cd ./kco/tests/e2e/
-          echo "child_php_ver=$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt)"
+          echo "child_php_ver=$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt)" >> $GITHUB_OUTPUT
 
       # Send data to Slack
 
