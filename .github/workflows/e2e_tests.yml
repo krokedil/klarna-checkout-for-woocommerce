@@ -44,15 +44,11 @@ jobs:
           cd ./kco/tests/e2e/
           yarn docker:up && yarn wp:install && yarn jettison
 
-      - name: Run Tests
-        run: |
-          cd ./kco/tests/e2e/
-          yarn docker:up && yarn wp:install && yarn jettison
-
       - name: List dir and path
         run: |
           cd ./kco/tests/e2e/
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/tests/
+          ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/tests/outputs/
 
       # Environment variables
       # WP
