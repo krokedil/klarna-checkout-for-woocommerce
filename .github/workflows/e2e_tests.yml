@@ -46,7 +46,7 @@ jobs:
           ls -la /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/
 
       # Environment variables
-      
+
       # WP
       - name: Get unformatted WP version
         shell: bash
@@ -169,6 +169,7 @@ jobs:
           echo "child_php_ver=$(cat /home/runner/work/klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce/kco/tests/e2e/outputs/php-version-temp-no-lines-clean.txt)" >> $GITHUB_OUTPUT
 
       # Send data to Slack
+      
       - name: Send custom data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
