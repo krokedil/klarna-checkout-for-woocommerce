@@ -49,7 +49,7 @@
     "docker:site-init": "npm run docker:setup && npm run docker:import-data",
     "jettison": "jest --detectOpenHandles --outputFile=./outputs/output.txt",
     "wp:install": "node ./cli/install.js",
-    "e2e:test": "yarn docker:up && yarn wp:install && yarn jettison && yarn docker:down",
+    "e2e:test": "yarn docker:up && yarn wp:install && yarn jettison && yarn docker:down"
   },
   "version": "1.0.0"
 }
