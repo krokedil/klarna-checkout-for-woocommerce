@@ -50,8 +50,6 @@
     "jettison": "jest --detectOpenHandles --outputFile=./outputs/output.txt",
     "wp:install": "node ./cli/install.js",
     "e2e:test": "yarn docker:up && yarn wp:install && yarn jettison && yarn docker:down",
-    "e2e:format-slack-output": "node helpers/formatOutput.js"
-
   },
   "version": "1.0.0"
 }

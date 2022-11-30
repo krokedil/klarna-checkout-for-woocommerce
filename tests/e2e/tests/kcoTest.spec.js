@@ -30,7 +30,6 @@ describe("KCO E2E tests", () => {
 	beforeAll(async () => {
 		try {
 			json = await setup.setupStore(json);
-			// console.log(JSON.stringify(json));
 		} catch (e) {
 			console.log(e);
 		}
@@ -117,10 +116,9 @@ describe("KCO E2E tests", () => {
 				expect(kcoOrderData[1]).toBe(args.expectedTotal);
 
 
+				// Check if Order Management is activated
 				if(args.orderManagement != '') {
-
 					await orderManagement.OrderManagementAction(page, orderID, args.orderManagement)
-
 				}
 
 			}, 240000);
