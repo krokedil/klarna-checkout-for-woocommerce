@@ -171,7 +171,7 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo "child_php_ver=$(php -version)" >> $GITHUB_OUTPUT
+          echo ::set-output name=php_ver::$(php -version)
 
       # Send data to Slack
       - name: Send custom data to Slack workflow
