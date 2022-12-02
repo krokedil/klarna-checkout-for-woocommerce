@@ -171,7 +171,7 @@ jobs:
         shell: bash
         run: |
           cd ./kco/tests/e2e/
-          echo ::set-output name=php_ver::$(php -version)
+          echo ::set-output name=child_php_ver::$(php -version)
 
       # Send data to Slack
       - name: Send custom data to Slack workflow
