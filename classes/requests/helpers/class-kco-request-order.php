@@ -121,8 +121,7 @@ class KCO_Request_Order {
 	 * @return array
 	 */
 	public function get_order_line_shipping( $order ) {
-
-		$shipping_item = reset( $order->get_shipping_methods() );
+		$shipping_item = array_slice( $order->get_shipping_methods(), 0, 1 )[0];
 
 		return array(
 			'type'             => 'shipping_fee',
