@@ -34,10 +34,15 @@ jobs:
           cd ./kco/tests/e2e/
           yarn docker:down
       
+      # - name: Run Tests
+      #   run: |
+      #     cd ./kco/tests/e2e/
+      #     yarn e2e:test
+
       - name: Run Tests
         run: |
           cd ./kco/tests/e2e/
-          yarn e2e:test
+          yarn docker:up && yarn wp:install && yarn jettison
 
       - name: List dir and path
         run: |
