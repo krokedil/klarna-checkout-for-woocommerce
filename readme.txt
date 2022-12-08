@@ -6,7 +6,7 @@ Requires at least: 4.0
 Tested up to: 6.1
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 7.0.0
+WC tested up to: 7.2.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,15 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2022.12.08    - version 2.9.0 =
+* Feature       - Added subscription support for Denmark and the Netherlands.
+* Tweak         - Explicitly set the size of the branding icon to prevent it from growing out of proportion on certain themes.
+* Tweak         - If a business customer has saved their company details to WooCommerce, it will be used for prefilling the payment form.
+* Tweak         - Related to Klarna Shipping Assistant, the purchase currency is saved as a transient to add compatibility with currency switchers.
+* Fix           - Fixed pass by reference warning.
+* Fix           - Fixed an issue where the shipping tax would sometimes not be accounted for.
+* Fix           - Fixed an issue with recurring subscriptions and negative fee that occurs when renewing the subscription.
+
 = 2022.10.26    - version 2.8.7 =
 * Fix           - The shipping phone number should now be saved to the subscription.
 * Fix           - Fixed an undefined index when trying to create or update the session.

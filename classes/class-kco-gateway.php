@@ -94,7 +94,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 */
 		public function get_icon() {
 			$icon_src  = 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100';
-			$icon_html = '<img src="' . $icon_src . '" alt="Klarna Checkout" style="border-radius:0px"/>';
+			$icon_html = '<img src="' . $icon_src . '" alt="Klarna Checkout" style="border-radius:0px" width="100"/>';
 			return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
 		}
 
@@ -189,9 +189,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return false;
 			}
 
-			// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE or AT, disable KCO.
+			// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE, DK, AT or NL, disable KCO.
 			if ( is_checkout() && class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
-				$available_recurring_countries = array( 'SE', 'NO', 'FI', 'DE', 'AT' );
+				$available_recurring_countries = array( 'SE', 'NO', 'FI', 'DK', 'DE', 'AT', 'NL' );
 				if ( ! in_array( WC()->customer->get_billing_country(), $available_recurring_countries, true ) ) {
 					return false;
 				}
