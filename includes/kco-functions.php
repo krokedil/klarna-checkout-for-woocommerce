@@ -746,6 +746,7 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 		return;
 	}
 
+	$data['currency'] = $klarna_order['purchase_currency'];
 	do_action( 'kco_update_shipping_data', $data );
 
 	set_transient( 'kss_data_' . $klarna_order_id, $data, HOUR_IN_SECONDS );
