@@ -25,7 +25,7 @@ msgid "Support"
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:110, ../includes/kco-functions.php:622
+#: ../classes/class-kco-api-callbacks.php:110, ../includes/kco-functions.php:614
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
@@ -33,7 +33,7 @@ msgstr ""
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:103, ../includes/kco-functions.php:614
+#: ../classes/class-kco-api-callbacks.php:103, ../includes/kco-functions.php:606
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
@@ -491,11 +491,11 @@ msgstr ""
 msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:633
+#: ../includes/kco-functions.php:625
 msgid "Waiting for verification from Klarnas push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:628
+#: ../includes/kco-functions.php:620
 msgid "Klarna Checkout order was rejected"
 msgstr ""
 
