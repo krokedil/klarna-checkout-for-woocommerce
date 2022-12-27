@@ -64,10 +64,6 @@ class KCO_Confirmation {
 			return;
 		}
 
-		// Set WC order transaction ID.
-		update_post_meta( $order_id, '_wc_klarna_order_id', $klarna_order_id );
-		update_post_meta( $order_id, '_transaction_id', $klarna_order_id );
-
 		// Confirm the order.
 		KCO_Logger::log( $klarna_order_id . ': Confirm the klarna order from the confirmation page.' );
 		kco_confirm_klarna_order( $order_id, $klarna_order_id );
