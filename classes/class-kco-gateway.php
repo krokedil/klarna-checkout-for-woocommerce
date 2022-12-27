@@ -442,6 +442,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			if ( $order_id && $klarna_order ) {
 
+				// Set Klarna order ID.
+				update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
+
 				if ( isset( $klarna_order['recurring_token'] ) ) {
 					update_post_meta( $order_id, '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
 				}
