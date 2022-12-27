@@ -412,7 +412,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function process_payment_handler( $order_id ) {
 			// Get the Klarna order ID.
 			$order = wc_get_order( $order_id );
-			if ( is_object( $order ) && $order->get_transaction_id() ) {
+			if ( is_object( $order ) && ! empty( $order->get_transaction_id() ) ) {
 				$klarna_order_id = $order->get_transaction_id();
 			} else {
 				$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
@@ -442,10 +442,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			if ( $order_id && $klarna_order ) {
 
-				// Set WC order transaction ID.
+				// Set Klarna order ID.
 				update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
-
-				update_post_meta( $order_id, '_transaction_id', sanitize_key( $klarna_order['order_id'] ) );
 
 				if ( isset( $klarna_order['recurring_token'] ) ) {
 					update_post_meta( $order_id, '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
@@ -468,10 +466,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				// Let other plugins hook into this sequence.
 				do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
 
-				// Check that the transaction id got set correctly.
-				if ( get_post_meta( $order_id, '_transaction_id', true ) === $klarna_order_id ) {
-					return true;
-				}
+				return true;
 			}
 			// Return false if we get here. Something went wrong.
 			return false;
