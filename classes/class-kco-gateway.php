@@ -124,6 +124,16 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					'redirect' => $pay_url,
 				);
 			}
+
+			// Order pay.
+			if ( is_wc_endpoint_url( 'order-pay' ) || 'redirect' === $this->checkout_flow ) {
+				KCO_Logger::log( sprintf( 'Processing order %s|%s (Klarna ID: %s) OK. Redirecting to order pay page.', $order_id, $order->get_order_number(), $avarda_purchase_id ) );
+
+				return array(
+					'result'   => 'success',
+					'redirect' => $order->get_checkout_payment_url( true ),
+				);
+			}
 			// Regular purchase.
 			// 1. Process the payment.
 			// 2. Redirect to order received page.
@@ -412,8 +422,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function process_payment_handler( $order_id ) {
 			// Get the Klarna order ID.
 			$order = wc_get_order( $order_id );
-			if ( is_object( $order ) && ! empty( $order->get_transaction_id() ) ) {
-				$klarna_order_id = $order->get_transaction_id();
+			if ( is_object( $order ) && ! empty( get_post_meta( $order->get_id(), '_wc_klarna_order_id', true ) ) ) {
+				$klarna_order_id = get_post_meta( $order->get_id(), '_wc_klarna_order_id', true );
 			} else {
 				$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 			}
