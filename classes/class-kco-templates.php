@@ -73,6 +73,11 @@ class KCO_Templates {
 				}
 			}
 
+			// Don't use KCO template for pay for order orders.
+			if ( is_wc_endpoint_url( 'order-pay' ) ) {
+				return $template;
+			}
+
 			// Klarna Checkout.
 			if ( 'checkout/form-checkout.php' === $template_name ) {
 				$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
@@ -112,38 +117,6 @@ class KCO_Templates {
 								if ( empty( $confirm ) ) {
 									$template = $klarna_checkout_template;
 								}
-							}
-						}
-					}
-				}
-			}
-
-			// Klarna Checkout Pay for order.
-			if ( 'checkout/form-pay.php' === $template_name ) {
-				global $wp;
-				$order_id           = $wp->query_vars['order-pay'];
-				$order              = wc_get_order( $order_id );
-				$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
-				if ( array_key_exists( 'kco', $available_gateways ) ) {
-					if ( locate_template( 'woocommerce/klarna-checkout-pay.php' ) ) {
-						$klarna_checkout_template = locate_template( 'woocommerce/klarna-checkout-pay.php' );
-					} else {
-						$klarna_checkout_template = KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout-pay.php';
-					}
-
-					if ( 'kco' === $order->get_payment_method() ) {
-						$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-						if ( empty( $confirm ) ) {
-							$template = $klarna_checkout_template;
-						}
-					}
-
-					// If chosen payment method does not exist and PCO is the first gateway.
-					if ( empty( $order->get_payment_method() ) ) {
-						reset( $available_gateways );
-						if ( 'kco' === key( $available_gateways ) ) {
-							if ( empty( $confirm ) ) {
-								$template = $klarna_checkout_template;
 							}
 						}
 					}

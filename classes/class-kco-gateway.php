@@ -80,8 +80,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// Body class for KSS.
 			add_filter( 'body_class', array( $this, 'add_body_class' ) );
 
-			add_action( 'woocommerce_receipt_kco', array( $this, 'receipt_page' ) );
-
 			add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 3 );
 			add_filter( 'kco_wc_api_request_args', array( $this, 'maybe_remove_kco_epm' ), 9999 );
 		}
@@ -112,55 +110,33 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// 1. Redirect to receipt page.
 			// 2. Process the payment by displaying the KCO iframe via woocommerce_receipt_kco hook.
 			if ( ! empty( $change_payment_method ) ) {
-				$pay_url = add_query_arg(
-					array(
-						'kco-action' => 'change-subs-payment',
-					),
-					$order->get_checkout_payment_url( true )
-				);
-
-				return array(
-					'result'   => 'success',
-					'redirect' => $pay_url,
-				);
+				$klarna_order = KCO_WC()->api->create_klarna_order( $order_id, 'redirect' );
+				if ( is_wp_error( $klarna_order ) ) {
+					wc_add_notice( $klarna_order->get_error_message(), 'error' );
+					return array(
+						'result' => 'error',
+					);
+				}
+				return $this->process_redirect_handler( $order_id, $klarna_order );
 			}
 
 			// Order pay.
-			if ( is_wc_endpoint_url( 'order-pay' ) || 'redirect' === $this->checkout_flow ) {
-				KCO_Logger::log( sprintf( 'Processing order %s|%s (Klarna ID: %s) OK. Redirecting to order pay page.', $order_id, $order->get_order_number(), $avarda_purchase_id ) );
-
-				return array(
-					'result'   => 'success',
-					'redirect' => $order->get_checkout_payment_url( true ),
-				);
-			}
-			// Regular purchase.
-			// 1. Process the payment.
-			// 2. Redirect to order received page.
-			if ( $this->process_payment_handler( $order_id ) ) {
-				// Base64 encoded timestamp to always have a fresh URL for on hash change event.
-				return array(
-					'result' => 'success',
-				);
-			} else {
-				return array(
-					'result' => 'error',
-				);
+			if ( is_wc_endpoint_url( 'order-pay' ) ) {
+				$klarna_order = KCO_WC()->api->create_klarna_order( $order_id, 'redirect' );
+				if ( is_wp_error( $klarna_order ) ) {
+					wc_add_notice( $klarna_order->get_error_message(), 'error' );
+					return array(
+						'result' => 'error',
+					);
+				}
+				return $this->process_redirect_handler( $order_id, $klarna_order );
 			}
 
-		}
+			// Regular embedded purchase.
+			// 1. Save Klarna data to the pending order.
+			// 2. Approve process payment sequence to customer can continue/complete payment.
+			return $this->process_embedded_payment_handler( $order_id );
 
-		/**
-		 * Receipt page. Used to display the KCO iframe during subscription payment method change.
-		 *
-		 * @param WC_Order $order The WooCommerce order.
-		 * @return void
-		 */
-		public function receipt_page( $order ) {
-			$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-			if ( ! empty( $kco_action ) && 'change-subs-payment' === $kco_action ) {
-				kco_wc_show_snippet();
-			}
 		}
 
 		/**
@@ -232,8 +208,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
-			/* Only enqueue for pages where the checkout form should appear. */
-			if ( ! ( is_checkout() || is_wc_endpoint_url( 'order-pay' ) ) ) {
+			/* On the 'order-pay' page we redirect the customer to a hosted payment page, and therefore don't need need to enqueue any of the following assets. */
+			if ( ! is_checkout() || is_wc_endpoint_url( 'order-pay' ) ) {
 				return;
 			}
 
@@ -419,7 +395,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 *
 		 * @return mixed
 		 */
-		public function process_payment_handler( $order_id ) {
+		public function process_embedded_payment_handler( $order_id ) {
 			// Get the Klarna order ID.
 			$order = wc_get_order( $order_id );
 			if ( is_object( $order ) && ! empty( get_post_meta( $order->get_id(), '_wc_klarna_order_id', true ) ) ) {
@@ -452,22 +428,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			if ( $order_id && $klarna_order ) {
 
-				// Set Klarna order ID.
-				update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
-
-				if ( isset( $klarna_order['recurring_token'] ) ) {
-					update_post_meta( $order_id, '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
-				}
-
-				$environment = $this->testmode ? 'test' : 'live';
-				update_post_meta( $order_id, '_wc_klarna_environment', $environment );
-
-				$klarna_country = wc_get_base_location()['country'];
-				update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
-
-				// Set shipping phone and email.
-				update_post_meta( $order_id, '_shipping_phone', sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
-				update_post_meta( $order_id, '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
+				$this->save_metadata_to_order( $order_id, $klarna_order, 'embedded' );
 
 				// Update the order with new confirmation page url.
 				$klarna_order = KCO_WC()->api->update_klarna_confirmation( $klarna_order_id, $klarna_order, $order_id );
@@ -476,10 +437,81 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				// Let other plugins hook into this sequence.
 				do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
 
-				return true;
+				return array(
+					'result' => 'success',
+				);
 			}
 			// Return false if we get here. Something went wrong.
-			return false;
+			return array(
+				'result' => 'error',
+			);
+		}
+
+		/**
+		 * @param int   $order_id The WooCommerce order id.
+		 * @param array $klarna_order The response from payment.
+		 *
+		 * @return array|string[]
+		 */
+		protected function process_redirect_handler( $order_id, $klarna_order ) {
+			$order = wc_get_order( $order_id );
+
+			$this->save_metadata_to_order( $order_id, $klarna_order, 'redirect' );
+
+			// Create a HPP url.
+			$hpp = KCO_WC()->api->create_klarna_hpp_url( $klarna_order['order_id'], $order_id );
+
+			if ( is_wp_error( $hpp ) ) {
+				wc_add_notice( 'Failed to create a HPP session with Klarna.', 'error' );
+				KCO_Logger::log( sprintf( 'Failed to create a HPP session with Klarna. Order %s|%s (Klarna ID: %s) OK. Redirecting to hosted payment page.', $order_id, $order->get_order_number(), $klarna_order['order_id'] ) );
+				return array(
+					'result' => 'error',
+				);
+			}
+
+			$hpp_redirect = $hpp['redirect_url'];
+			// Save Klarna HPP url & Session ID.
+			update_post_meta( $order_id, '_wc_klarna_hpp_url', sanitize_key( $hpp_redirect ) );
+			update_post_meta( $order_id, '_wc_klarna_hpp_session_id', sanitize_key( $hpp['session_id'] ) );
+
+			KCO_Logger::log( sprintf( 'Processing order %s|%s (Klarna ID: %s) OK. Redirecting to hosted payment page.', $order_id, $order->get_order_number(), $klarna_order['order_id'] ) );
+
+			return array(
+				'result'   => 'success',
+				'redirect' => $hpp_redirect,
+			);
+		}
+
+		/**
+		 * Save metadata to Woo order.
+		 *
+		 * @param int    $order_id The WooCommerce order id.
+		 * @param array  $klarna_order The response from payment.
+		 * @param string $checkout_flow The type of checkout flow used by customer.
+		 *
+		 * @return void.
+		 */
+		public function save_metadata_to_order( $order_id, $klarna_order, $checkout_flow = 'embedded' ) {
+
+			// Set Klarna checkout flow.
+			update_post_meta( $order_id, '_wc_klarna_checkout_flow', sanitize_key( $checkout_flow ) );
+
+			// Set Klarna order ID.
+			update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
+
+			if ( isset( $klarna_order['recurring_token'] ) ) {
+				update_post_meta( $order_id, '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
+			}
+
+			$environment = $this->testmode ? 'test' : 'live';
+			update_post_meta( $order_id, '_wc_klarna_environment', $environment );
+
+			$klarna_country = wc_get_base_location()['country'];
+			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
+
+			// Set shipping phone and email.
+			update_post_meta( $order_id, '_shipping_phone', sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+			update_post_meta( $order_id, '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
 		}
 
 		/**
