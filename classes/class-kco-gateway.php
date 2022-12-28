@@ -473,10 +473,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			$hpp_redirect = $hpp['redirect_url'];
 			// Save Klarna HPP url & Session ID.
-			update_post_meta( $order_id, '_wc_klarna_hpp_url', sanitize_key( $hpp_redirect ) );
+			update_post_meta( $order_id, '_wc_klarna_hpp_url', sanitize_text_field( $hpp_redirect ) );
 			update_post_meta( $order_id, '_wc_klarna_hpp_session_id', sanitize_key( $hpp['session_id'] ) );
 
 			KCO_Logger::log( sprintf( 'Processing order %s|%s (Klarna ID: %s) OK. Redirecting to hosted payment page.', $order_id, $order->get_order_number(), $klarna_order['order_id'] ) );
+
+			// All good. Redirect customer to Klarna Hosted payment page.
+			$order->add_order_note( __( 'Customer redirected to Klarna Hosted Payment Page.', 'klarna-checkout-for-woocommerce' ) );
 
 			return array(
 				'result'   => 'success',
@@ -496,7 +499,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function save_metadata_to_order( $order_id, $klarna_order, $checkout_flow = 'embedded' ) {
 
 			// Set Klarna checkout flow.
-			update_post_meta( $order_id, '_wc_klarna_checkout_flow', sanitize_key( $checkout_flow ) );
+			update_post_meta( $order_id, '_wc_klarna_checkout_flow', sanitize_text_field( $checkout_flow ) );
 
 			// Set Klarna order ID.
 			update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
