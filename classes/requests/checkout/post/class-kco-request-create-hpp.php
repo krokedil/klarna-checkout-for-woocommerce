@@ -75,10 +75,10 @@ class KCO_Request_Create_HPP extends KCO_Request {
 			'payment_session_url' => $this->get_api_url_base() . 'checkout/v3/orders/' . $session_id,
 			'merchant_urls'       => array(
 				'success' => $success_url,
-				'cancel'  => wc_get_checkout_url(),
-				'back'    => wc_get_checkout_url(),
-				'failure' => wc_get_checkout_url(),
-				'error'   => wc_get_checkout_url(),
+				'cancel'  => $order->get_checkout_payment_url(),
+				'back'    => $order->get_checkout_payment_url(),
+				'failure' => $order->get_checkout_payment_url(),
+				'error'   => $order->get_checkout_payment_url(),
 			),
 		);
 	}
