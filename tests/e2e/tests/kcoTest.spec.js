@@ -33,7 +33,7 @@ describe("KCO E2E tests", () => {
 		} catch (e) {
 			console.log(e);
 		}
-	}, 250000);
+	}, 290000);
 
 	beforeEach(async () => {
 		browser = await puppeteer.launch(options);
@@ -74,7 +74,7 @@ describe("KCO E2E tests", () => {
 
 					// --------------- COUPON HANDLER --------------- //
 					await utils.applyCoupons(page, args.coupons);
-
+					
 					// --------------- START OF IFRAME --------------- //
 					const kcoIframe = await page.frames().find((frame) => frame.name() === "klarna-checkout-iframe");
 
@@ -121,5 +121,5 @@ describe("KCO E2E tests", () => {
 					await orderManagement.OrderManagementAction(page, orderID, args.orderManagement)
 				}
 
-			}, 240000);
+			}, 290000);
 });
