@@ -462,7 +462,9 @@ class KCO_Subscription {
 		$subscription->set_billing_first_name( $klarna_order['billing_address']['given_name'] );
 		$subscription->set_billing_last_name( $klarna_order['billing_address']['family_name'] );
 		$subscription->set_billing_address_1( $klarna_order['billing_address']['street_address'] );
-		$subscription->set_billing_address_2( $klarna_order['billing_address']['street_address2'] );
+		if ( isset( $klarna_order['billing_address']['street_address2'] ) ) {
+			$subscription->set_billing_address_2( $klarna_order['billing_address']['street_address2'] );
+		}
 		$subscription->set_billing_country( strtoupper( $klarna_order['billing_address']['country'] ) );
 		$subscription->set_billing_postcode( $klarna_order['billing_address']['postal_code'] );
 		$subscription->set_billing_city( $klarna_order['billing_address']['city'] );
@@ -472,7 +474,9 @@ class KCO_Subscription {
 		$subscription->set_shipping_first_name( $klarna_order['shipping_address']['given_name'] );
 		$subscription->set_shipping_last_name( $klarna_order['shipping_address']['family_name'] );
 		$subscription->set_shipping_address_1( $klarna_order['shipping_address']['street_address'] );
-		$subscription->set_shipping_address_2( $klarna_order['shipping_address']['street_address2'] );
+		if ( isset( $klarna_order['shipping_address']['street_address2'] ) ) {
+			$subscription->set_shipping_address_2( $klarna_order['shipping_address']['street_address2'] );
+		}
 		$subscription->set_shipping_country( strtoupper( $klarna_order['shipping_address']['country'] ) );
 		$subscription->set_shipping_postcode( $klarna_order['shipping_address']['postal_code'] );
 		$subscription->set_shipping_city( $klarna_order['shipping_address']['city'] );
