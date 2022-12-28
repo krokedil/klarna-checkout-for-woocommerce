@@ -16,7 +16,8 @@ class KCO_Request_Create extends KCO_Request {
 	/**
 	 * Makes the request.
 	 *
-	 * @param int $order_id The WooCommerce order id.
+	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $checkout_flow Embedded in checkout page or redirect via Klarna HPP.
 	 * @return array
 	 */
 	public function request( $order_id = null, $checkout_flow = 'embedded' ) {
@@ -37,7 +38,8 @@ class KCO_Request_Create extends KCO_Request {
 	/**
 	 * Gets the request body.
 	 *
-	 * @param int $order_id The WooCommerce order id.
+	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $checkout_flow Embedded in checkout page or redirect via Klarna HPP.
 	 * @return array
 	 */
 	public function get_body( $order_id, $checkout_flow ) {
@@ -132,7 +134,8 @@ class KCO_Request_Create extends KCO_Request {
 	/**
 	 * Gets the request args for the API call.
 	 *
-	 * @param int $order_id The WooCommerce order id.
+	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $checkout_flow Embedded in checkout page or redirect via Klarna HPP.
 	 * @return array
 	 */
 	protected function get_request_args( $order_id, $checkout_flow ) {

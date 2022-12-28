@@ -389,7 +389,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
-		 * Process the payment with information from Klarna and return the result.
+		 * Process the payment with information from Klarna and return the result - for regular embedded checkout.
 		 *
 		 * @param  int $order_id WooCommerce order ID.
 		 *
@@ -448,6 +448,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
+		 * Process the payment for HPP/redirect checkout flow.
+		 *
 		 * @param int   $order_id The WooCommerce order id.
 		 * @param array $klarna_order The response from payment.
 		 *
