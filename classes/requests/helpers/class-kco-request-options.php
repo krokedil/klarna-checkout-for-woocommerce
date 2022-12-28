@@ -27,7 +27,7 @@ class KCO_Request_Options {
 	 *
 	 * @return array
 	 */
-	public function get_options( $checkout_flow ) {
+	public function get_options( $checkout_flow = 'embedded' ) {
 		$options = array(
 			'title_mandatory'                             => $this->get_title_mandatory(),
 			'allow_separate_shipping_address'             => $this->get_allow_separate_shipping_address(),
