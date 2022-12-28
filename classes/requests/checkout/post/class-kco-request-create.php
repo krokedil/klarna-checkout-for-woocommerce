@@ -19,9 +19,9 @@ class KCO_Request_Create extends KCO_Request {
 	 * @param int $order_id The WooCommerce order id.
 	 * @return array
 	 */
-	public function request( $order_id = null ) {
+	public function request( $order_id = null, $checkout_flow = 'embedded' ) {
 		$request_url       = $this->get_api_url_base() . 'checkout/v3/orders';
-		$request_args      = apply_filters( 'kco_wc_create_order', $this->get_request_args( $order_id ) );
+		$request_args      = apply_filters( 'kco_wc_create_order', $this->get_request_args( $order_id, $checkout_flow ) );
 		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
 		$formated_response = $this->process_response( $response, $request_args, $request_url );
@@ -40,7 +40,7 @@ class KCO_Request_Create extends KCO_Request {
 	 * @param int $order_id The WooCommerce order id.
 	 * @return array
 	 */
-	public function get_body( $order_id ) {
+	public function get_body( $order_id, $checkout_flow ) {
 		$request_options = new KCO_Request_Options();
 
 		$request_body = array(
@@ -50,7 +50,7 @@ class KCO_Request_Create extends KCO_Request {
 			'billing_countries'  => KCO_Request_Countries::get_billing_countries(),
 			'shipping_countries' => KCO_Request_Countries::get_shipping_countries(),
 			'merchant_data'      => KCO_Request_Merchant_Data::get_merchant_data(),
-			'options'            => $request_options->get_options(),
+			'options'            => $request_options->get_options( $checkout_flow ),
 			'customer'           => array(
 				'type' => ( in_array( $this->settings['allowed_customer_types'], array( 'B2B', 'B2BC' ), true ) ) ? 'organization' : 'person',
 			),
@@ -122,7 +122,7 @@ class KCO_Request_Create extends KCO_Request {
 			$request_body['shipping_address'] = wp_parse_args( $request_body['billing_address'], $request_body['shipping_address'] ?? array() );
 		}
 
-		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {
+		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() && 'embedded' === $checkout_flow ) {
 			$request_body['shipping_options'] = KCO_Request_Shipping_Options::get_shipping_options( $this->separate_sales_tax );
 		}
 
@@ -135,12 +135,12 @@ class KCO_Request_Create extends KCO_Request {
 	 * @param int $order_id The WooCommerce order id.
 	 * @return array
 	 */
-	protected function get_request_args( $order_id ) {
+	protected function get_request_args( $order_id, $checkout_flow ) {
 		return array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent(),
 			'method'     => 'POST',
-			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id ), $order_id ) ),
+			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id, $checkout_flow ), $order_id ) ),
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
 		);
 	}
