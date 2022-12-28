@@ -224,6 +224,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			// Requests.
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/class-kco-request.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-create-recurring.php';
+			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-create-hpp.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-create.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-update.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/requests/checkout/post/class-kco-request-test-credentials.php';
