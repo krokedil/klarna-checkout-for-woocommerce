@@ -25,6 +25,7 @@ class KCO_Subscription {
 	public function __construct() {
 		add_filter( 'kco_wc_api_request_args', array( $this, 'create_extra_merchant_data' ) );
 		add_filter( 'kco_wc_api_request_args', array( $this, 'set_recurring' ) );
+		add_filter( 'kco_wc_api_hpp_request_args', array( $this, 'change_return_url_for_recurring_change_payment_method' ), 10, 3 );
 		add_action( 'kco_wc_payment_complete', array( $this, 'set_recurring_token_for_order' ), 10, 2 );
 		add_action( 'woocommerce_scheduled_subscription_payment_kco', array( $this, 'trigger_scheduled_payment' ), 10, 2 );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'show_recurring_token' ) );
@@ -54,10 +55,10 @@ class KCO_Subscription {
 	 * @return bool
 	 */
 	public function is_kco_subs_change_payment_method() {
-		$key        = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$key                   = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$change_payment_method = filter_input( INPUT_GET, 'change_payment_method', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-		if ( ! empty( $key ) && ( ! empty( $kco_action ) && 'change-subs-payment' === $kco_action ) ) {
+		if ( ! empty( $key ) && ( ! empty( $change_payment_method ) ) ) {
 			return true;
 		}
 		return false;
@@ -188,6 +189,37 @@ class KCO_Subscription {
 						$request_args['merchant_urls']['push']         = $push_url;
 					}
 				}
+			}
+		}
+
+		return $request_args;
+	}
+
+	/**
+	 * Changes the success URL for HPP payments if this is a subscription payment method change.
+	 *
+	 * @param array $request_args The Klarna HPP request arguments.
+	 * @param int   $order_id The WooCommerce order ID.
+	 * @param array $session_id The Klarna Checkout order ID.
+	 * @return array
+	 */
+	public function change_return_url_for_recurring_change_payment_method( $request_args, $order_id, $session_id ) {
+
+		// If this is a change payment method request.
+		if ( $this->is_kco_subs_change_payment_method() ) {
+
+			$order = wc_get_order( $order_id );
+			if ( is_object( $order ) ) {
+				$success_url = add_query_arg(
+					array(
+						'kco-action'   => 'subs-payment-changed',
+						'hppid'        => '{{session_id}}',
+						'kco-order-id' => $session_id,
+					),
+					$order->get_view_order_url()
+				);
+
+				$request_args['merchant_urls']['success'] = $success_url;
 			}
 		}
 
@@ -430,7 +462,9 @@ class KCO_Subscription {
 		$subscription->set_billing_first_name( $klarna_order['billing_address']['given_name'] );
 		$subscription->set_billing_last_name( $klarna_order['billing_address']['family_name'] );
 		$subscription->set_billing_address_1( $klarna_order['billing_address']['street_address'] );
-		$subscription->set_billing_address_2( $klarna_order['billing_address']['street_address2'] );
+		if ( isset( $klarna_order['billing_address']['street_address2'] ) ) {
+			$subscription->set_billing_address_2( $klarna_order['billing_address']['street_address2'] );
+		}
 		$subscription->set_billing_country( strtoupper( $klarna_order['billing_address']['country'] ) );
 		$subscription->set_billing_postcode( $klarna_order['billing_address']['postal_code'] );
 		$subscription->set_billing_city( $klarna_order['billing_address']['city'] );
@@ -440,7 +474,9 @@ class KCO_Subscription {
 		$subscription->set_shipping_first_name( $klarna_order['shipping_address']['given_name'] );
 		$subscription->set_shipping_last_name( $klarna_order['shipping_address']['family_name'] );
 		$subscription->set_shipping_address_1( $klarna_order['shipping_address']['street_address'] );
-		$subscription->set_shipping_address_2( $klarna_order['shipping_address']['street_address2'] );
+		if ( isset( $klarna_order['shipping_address']['street_address2'] ) ) {
+			$subscription->set_shipping_address_2( $klarna_order['shipping_address']['street_address2'] );
+		}
 		$subscription->set_shipping_country( strtoupper( $klarna_order['shipping_address']['country'] ) );
 		$subscription->set_shipping_postcode( $klarna_order['shipping_address']['postal_code'] );
 		$subscription->set_shipping_city( $klarna_order['shipping_address']['city'] );
