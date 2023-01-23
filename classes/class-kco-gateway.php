@@ -240,7 +240,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			wp_register_script(
 				'kco',
 				plugins_url( 'assets/js/klarna-checkout-for-woocommerce' . $suffix . '.js', KCO_WC_MAIN_FILE ),
-				array( 'jquery', 'wc-cart', 'jquery-blockui' ),
+				array( 'jquery', 'jquery-blockui' ),
 				KCO_WC_VERSION,
 				true
 			);
