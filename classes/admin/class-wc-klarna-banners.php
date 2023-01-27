@@ -160,19 +160,20 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 				<div id="krokdocs-sidebar">
 
 					<div class="krokdocs-sidebar-section">
-						<h1 id="krokdocs-sidebar-title">Get started</h1>
+						<h1 id="krokdocs-sidebar-title">Plugin resources</h1>
 							<div class="krokdocs-sidebar-content">
-								<p id="krokdocs-sidebar-main-text">
-									<a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/" target="_blank">Documentation</a> <br/>
-									<a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/" target="_blank">Plugin site</a>
-								</p>
-						<h1 id="krokdocs-sidebar-title">Support</h1>
-								<p id="krokdocs-sidebar-main-text">
-									If you have questions regarding a certain purchase you are welcome to contact <a href="http://klarna.com/merchant-support" target="_blank">Klarna</a>.
-								</p>
-								<p id="krokdocs-sidebar-main-text">
-									If you have technical questions or questions regarding the configuration of the plugin you are welcome to contact <a href="https://www.krokedil.com/support" target="_blank">Krokedil</a>.
-								</p>
+									<ul>
+									<li><a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/" target="_blank">General information</a></li>
+									<li><a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/" target="_blank">Technical documentation</a></li>
+									<li><a href="">Support</a></li>
+									<li><a href="">Add-ons</a></li>
+									</ul>
+						<h1 id="krokdocs-sidebar-title">Additional resources</h1>
+									<ul>
+										<li><a href="https://docs.krokedil.com/krokedil-general-support-info/" target="_blank">General support information</a></li>
+										<li><a href="https://krokedil.com/products/" target="_blank">Other Krokedil plugins</a></li>
+										<li><a href="https://krokedil.com/knowledge/" target="_blank">Krokedil blog</a></li>
+									</ul>
 							</div>
 
 								<div id="krokdocs-sidebar-bottom-holder">

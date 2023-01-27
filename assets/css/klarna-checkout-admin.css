@@ -234,7 +234,7 @@ font: 1em sans-serif;
 
 #krokdocs-sidebar {
 	width:  350px;
-	margin-left: 20px;
+	margin-left: 35px;
 	margin-bottom: 20px;
 	float: left;
 	box-sizing: border-box;
@@ -245,8 +245,7 @@ font: 1em sans-serif;
 	border-style: solid;
 	border-color: #cccccc;
 	display: flex;
-	justify-content: center;
-	padding: 20px 0px;
+	padding: 20px 0 20px 20px;
 }
 
 .krokdocs-sidebar-section{
@@ -267,6 +266,15 @@ font: 1em sans-serif;
 .krokdocs-sidebar-content{
 	display: flex;
 	flex-direction: column;
+}
+
+.krokdocs-sidebar-content ul {
+	list-style: '» ' inside;
+}
+
+.krokdocs-sidebar-content ul a[target="_blank"]::after {
+	content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+	margin: 0 3px 0 5px;
 }
 
 #krokdocs-sidebar-main-text{
@@ -290,7 +298,7 @@ font: 1em sans-serif;
 #krokdocs-sidebar-bottom-holder{
 	padding: 5px 10px 10px 10px;
 	margin-top: 10px;
-	align-self:flex-end;
+	align-self:start;
 	flex-direction: column;
 }
 
