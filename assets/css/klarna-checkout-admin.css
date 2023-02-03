@@ -15,25 +15,28 @@
 	height: 60px;
 }
 
-.kb-new-container{
+.kb-new-container {
 	background-color: #FFB3C7;
 	display: flex;
 	margin: 0px !important;
 	padding: 20px 2% 30px 2% !important;
 }
-.kb-left-group{
+
+.kb-left-group {
 	width: 50%;
 }
-.kb-middle-group{
-	width:25%;
-	display:grid;
+
+.kb-middle-group {
+	width: 25%;
+	display: grid;
 	grid-template-rows: 25% 25% 25% 25%;
 
 
 }
-.kb-right-group{
-	width:25%;
-	display:flex;
+
+.kb-right-group {
+	width: 25%;
+	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
 }
@@ -43,15 +46,15 @@
 	font-size: 94px;
 	font-weight: bold;
 	font-family: KlarnaHeadline, sans-serif;
-	width:100%;
-	margin-bottom:38px;
+	width: 100%;
+	margin-bottom: 38px;
 }
 
-.container-main-text{
+.container-main-text {
 	font-size: 21px;
-	font-weight:300;
-	letter-spacing:0.3px;
-	width:80%;
+	font-weight: 300;
+	letter-spacing: 0.3px;
+	width: 80%;
 	line-height: 1.3;
 	color: black;
 }
@@ -59,59 +62,62 @@
 /* Middle */
 
 
-.kb-button{
+.kb-button {
 	font-size: 24px;
-	letter-spacing:0.9px;
-	padding:20px 35px 20px 35px;
+	letter-spacing: 0.9px;
+	padding: 20px 35px 20px 35px;
 	text-decoration: none;
 	white-space: nowrap;
 	overflow: hidden;
 }
 
-#left-main-title{
+#left-main-title {
 	color: #000000;
-	font-size: 4em;;
-	margin:15px 0px 30px 0px;
+	font-size: 4em;
+	;
+	margin: 15px 0px 30px 0px;
 }
 
 #left-main-text {
 	font-size: 1rem;
 }
 
-#kb-button-left-frame{
+#kb-button-left-frame {
 	grid-row: 2;
-		align-self:center;
-		margin-bottom: 20px !important;
+	align-self: center;
+	margin-bottom: 20px !important;
 }
-#kb-button-go-live-frame{
+
+#kb-button-go-live-frame {
 	grid-row: 3;
-	align-self:center;
+	align-self: center;
 	margin-top: 40px;
 }
 
 
-#kb-button-left{
+#kb-button-left {
 	background-color: black;
 	color: white;
 	font-size: 1.5em;
 }
-#kb-button-go-live{
+
+#kb-button-go-live {
 	color: black;
 	background-color: white;
 	font-size: 1.5em;
 }
 
-#klarna-logo-left-frame{
+#klarna-logo-left-frame {
 	display: flex;
-justify-content: flex-end;
+	justify-content: flex-end;
 }
 
 /* Other */
-.klarna-logo-img{
+.klarna-logo-img {
 	z-index: 1;
 }
 
-#klarna-logo-left{
+#klarna-logo-left {
 	max-height: 40px;
 	max-width: 180px;
 }
@@ -125,17 +131,86 @@ justify-content: flex-end;
 }
 
 #klarna-main {
-	width: 70%;
+	width: 60%;
+	min-width: 660px;
 	float: left;
 	padding: 0 2% 0 0;
 	border-right: 1px solid #ccc;
 	box-sizing: border-box;
 }
 
+#klarna-wrapper {
+	max-width: 1440px;
+}
+
+#kco-support,
+#kco-addons {
+	display: none;
+	width: 60%;
+	float: left;
+}
+
+#klarna-wrapper .nav-tab-wrapper {
+	width: 60%;
+}
+
+.kco-addons-cards {
+	display: flex;
+	flex-wrap: wrap;
+	column-gap: 3em;
+	margin-bottom: 1.2em;
+	max-width: 1080px;
+	min-width: 700px;
+}
+
+.kco-addon-card {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+	min-width: 30%;
+	width: 40%;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	background-color: white;
+}
+
+.kco-addon-card-image {
+	width: 100%;
+	background-size: cover;
+	background-position: center;
+	border-radius: 3px 3px 0 0;
+}
+
+.kco-addon-card-title {
+	font-weight: bold;
+	padding: 0 0.7em;
+}
+
+.kco-addon-card-description {
+	padding: 1.1em;
+	padding-top: 0;
+	height: 50%;
+}
+
+.kco-addon-read-more {
+	display: block;
+	padding: 1.1em;
+	padding-top: 0;
+	border-bottom: 2px solid lightgray;
+}
+
+.kco-addon-card-action {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 1.1em;
+	font-weight: bold;
+}
+
 /* Sidebar  */
 
 #klarna-sidebar {
-	width:  350px;
+	width: 350px;
 	margin-left: 20px;
 	float: left;
 	box-sizing: border-box;
@@ -148,40 +223,41 @@ justify-content: flex-end;
 }
 
 
-.kb-sidebar-section{
+.kb-sidebar-section {
 	max-width: 85%;
-	display:flex;
+	display: flex;
 	flex-direction: column;
 
 }
 
-#kb-sidebar-title{
+#kb-sidebar-title {
 	font-size: 2em !important;
 	font-weight: bold;
 	font-family: KlarnaHeadline, sans-serif;
 	text-align: start;
-	width:100%;
-	margin-bottom:10px;
+	width: 100%;
+	margin-bottom: 10px;
 }
 
 
-.kb-sidebar-content{
+.kb-sidebar-content {
 	display: flex;
 	flex-direction: column;
 }
 
-#kb-sidebar-main-text{
+#kb-sidebar-main-text {
 	text-align: start;
 	font-size: 1.5em !important;
-	letter-spacing:0.2px;
-	width:95%;
+	letter-spacing: 0.2px;
+	width: 95%;
 	line-height: 1.4;
 }
-#sidebar-link-holder{
+
+#sidebar-link-holder {
 	text-align: start;
 }
 
-#kb-sidebar-button-left{
+#kb-sidebar-button-left {
 	font-size: 20px;
 	color: black;
 	text-decoration: none;
@@ -190,27 +266,27 @@ justify-content: flex-end;
 	font-weight: bolder;
 }
 
-#kb-sidebar-bottom-holder{
+#kb-sidebar-bottom-holder {
 	background-color: #000000;
 	padding: 5px 10px 10px 10px;
 	margin-top: 80px;
-	display:flex;
-	align-self:flex-end;
+	display: flex;
+	align-self: flex-end;
 	flex-direction: column;
 }
 
-#kb-sidebar-logo-follow-up-text{
-align-self: flex-start;
-color: #ffffff;
-margin: 5px 0px 5px 0px !important;
-word-spacing: 0.3em;
-font: 1em sans-serif;
+#kb-sidebar-logo-follow-up-text {
+	align-self: flex-start;
+	color: #ffffff;
+	margin: 5px 0px 5px 0px !important;
+	word-spacing: 0.3em;
+	font: 1em sans-serif;
 }
 
-#kb-sidebar-klarna-logo-left{
-	margin:0px !important;
-	height:20px;
-	width:auto;
+#kb-sidebar-klarna-logo-left {
+	margin: 0px !important;
+	height: 20px;
+	width: auto;
 }
 
 #klarna-sidebar h3 {
@@ -233,7 +309,7 @@ font: 1em sans-serif;
 }
 
 #krokdocs-sidebar {
-	width:  350px;
+	width: 350px;
 	margin-left: 35px;
 	margin-bottom: 20px;
 	float: left;
@@ -248,22 +324,22 @@ font: 1em sans-serif;
 	padding: 20px 0 20px 20px;
 }
 
-.krokdocs-sidebar-section{
+.krokdocs-sidebar-section {
 	max-width: 85%;
-	display:flex;
+	display: flex;
 	flex-direction: column;
 }
 
-#krokdocs-sidebar-title{
+#krokdocs-sidebar-title {
 	font-size: 1.5em !important;
 	font-weight: bold;
 	font-family: Roboto, sans-serif !important;
 	text-align: start;
-	width:100%;
-	margin-bottom:0px;
+	width: 100%;
+	margin-bottom: 0px;
 }
 
-.krokdocs-sidebar-content{
+.krokdocs-sidebar-content {
 	display: flex;
 	flex-direction: column;
 }
@@ -277,16 +353,16 @@ font: 1em sans-serif;
 	margin: 0 3px 0 5px;
 }
 
-#krokdocs-sidebar-main-text{
+#krokdocs-sidebar-main-text {
 	text-align: start;
 	font-size: 1.1em !important;
-	letter-spacing:0.2px;
-	width:95%;
+	letter-spacing: 0.2px;
+	width: 95%;
 	line-height: 1.4;
 	margin-top: 5px;
 }
 
-#krokdocs-sidebar-button-left{
+#krokdocs-sidebar-button-left {
 	font-size: 20px;
 	color: black;
 	text-decoration: none;
@@ -295,25 +371,25 @@ font: 1em sans-serif;
 	font-weight: bolder;
 }
 
-#krokdocs-sidebar-bottom-holder{
+#krokdocs-sidebar-bottom-holder {
 	padding: 5px 10px 10px 10px;
 	margin-top: 10px;
-	align-self:start;
+	align-self: start;
 	flex-direction: column;
 }
 
-#krokdocs-sidebar-krokedil-logo-right{
-	margin:0px !important;
-	height:20px;
-	width:auto;
+#krokdocs-sidebar-krokedil-logo-right {
+	margin: 0px !important;
+	height: 20px;
+	width: auto;
 }
 
-#krokdocs-sidebar-logo-follow-up-text{
+#krokdocs-sidebar-logo-follow-up-text {
 	align-self: flex-start;
 	color: #000000;
 	margin: 5px 0px 5px 0px !important;
 	font: 1em sans-serif;
-	}
+}
 
 
 /*--- Dismiss button -----*/
@@ -336,97 +412,97 @@ font: 1em sans-serif;
 
 /* ----- MOBILE VIEW ----- */
 
-@media (hover: none) and (max-width:700px){
+@media (hover: none) and (max-width:700px) {
 
-/* Main container */
-.kb-spacer{
-	display:none;
-}
+	/* Main container */
+	.kb-spacer {
+		display: none;
+	}
 
-.kb-new-container{
-	display: grid;
-	height: auto !important;
-	width:calc(100% - 25px) !important;
-	margin-top:35px !important;
+	.kb-new-container {
+		display: grid;
+		height: auto !important;
+		width: calc(100% - 25px) !important;
+		margin-top: 35px !important;
 
-}
+	}
 
-.kb-left-group{
-	width: 100%;
-}
+	.kb-left-group {
+		width: 100%;
+	}
 
-.kb-right-group{
-	width:100%;
-	display:flex;
-	flex-direction: row;
-	justify-content: flex-end;
-}
+	.kb-right-group {
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+	}
 
 
-.kb-small-container{
-	padding: 0px 30px;
-}
+	.kb-small-container {
+		padding: 0px 30px;
+	}
 
-/*Left*/
-.container-title {
-	font-size: 56px;
-	font-weight: bold;
-	width:100%;
-	margin-bottom:10vh;
-}
+	/*Left*/
+	.container-title {
+		font-size: 56px;
+		font-weight: bold;
+		width: 100%;
+		margin-bottom: 10vh;
+	}
 
-.container-main-text{
-	font-size: 17px;
-	font-weight:300;
-	letter-spacing:0.5px;
-	width:100%;
-}
+	.container-main-text {
+		font-size: 17px;
+		font-weight: 300;
+		letter-spacing: 0.5px;
+		width: 100%;
+	}
 
-.kb-button{
-	font-size: 22px;
-	letter-spacing:0.9px;
-	text-decoration: none;
-	white-space: nowrap;
-	overflow: hidden;
-	margin-left: 30px !important;
-}
+	.kb-button {
+		font-size: 22px;
+		letter-spacing: 0.9px;
+		text-decoration: none;
+		white-space: nowrap;
+		overflow: hidden;
+		margin-left: 30px !important;
+	}
 
-#kb-button-left{
-	background-color: black;
-	color: white;
-	padding:10px 25px 10px 25px;
-}
+	#kb-button-left {
+		background-color: black;
+		color: white;
+		padding: 10px 25px 10px 25px;
+	}
 
-#kb-button-go-live{
-	font-size: 18px;
-	font-weight: 700;
-	color: black;
-	background-color: unset !important;
-	padding: 0px !important;
-	margin-left: 5px;
-	border-bottom: 3px solid black !important;
-}
+	#kb-button-go-live {
+		font-size: 18px;
+		font-weight: 700;
+		color: black;
+		background-color: unset !important;
+		padding: 0px !important;
+		margin-left: 5px;
+		border-bottom: 3px solid black !important;
+	}
 
-#klarna-logo-left-frame{
-display:unset;
-align-self: center;
-margin-top: 40px;
-margin-right:20px;
-}
+	#klarna-logo-left-frame {
+		display: unset;
+		align-self: center;
+		margin-top: 40px;
+		margin-right: 20px;
+	}
 
-/* Other */
-.klarna-logo-img{
-	z-index: 1;
-}
+	/* Other */
+	.klarna-logo-img {
+		z-index: 1;
+	}
 
-#klarna-logo-left{
-	height: 30px;
-}
+	#klarna-logo-left {
+		height: 30px;
+	}
 
-#klarna-main{
-	border: none;
-	margin-bottom:30px !important;
-}
+	#klarna-main {
+		border: none;
+		margin-bottom: 30px !important;
+	}
 
 	/* Mobile Sidebar */
 
@@ -447,39 +523,44 @@ margin-right:20px;
 	}
 
 
-	.kb-sidebar-section{
+	.kb-sidebar-section {
 		/* padding:30px; */
 
-		width:unset;
+		width: unset;
 		max-width: unset;
-		display:flex;
+		display: flex;
 		flex-direction: column;
 		margin: 0px 10px;
 
 	}
 }
+
 /* --- END --- Mobile View*/
 
 
 
-.wc-settings-sub-title a, .wc-settings-sub-title a:hover, .wc-settings-sub-title a:click, .wc-settings-sub-title a:visited, .wc-settings-sub-title a:focus {
-	border:none;
-	outline:none;
-	text-decoration:none;
-	color:black;
+.wc-settings-sub-title a,
+.wc-settings-sub-title a:hover,
+.wc-settings-sub-title a:click,
+.wc-settings-sub-title a:visited,
+.wc-settings-sub-title a:focus {
+	border: none;
+	outline: none;
+	text-decoration: none;
+	color: black;
 }
 
 div.kco-message.notice {
-	border-left-color: #bb2525!important;
+	border-left-color: #bb2525 !important;
 	position: relative;
 	overflow: hidden;
 }
 
 input.bad_credential {
-	border-color: #bb2525!important;
+	border-color: #bb2525 !important;
 }
 
 /* fix for the footer */
-#wpfooter{
+#wpfooter {
 	position: unset !important;
 }
