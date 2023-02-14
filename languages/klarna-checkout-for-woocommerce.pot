@@ -1,4 +1,4 @@
-# Copyright (C) 2022 klarna-checkout-for-woocommerce
+# Copyright (C) 2023 klarna-checkout-for-woocommerce
 # This file is distributed under the same license as the klarna-checkout-for-woocommerce package.
 msgid ""
 msgstr ""
@@ -426,23 +426,27 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:281
+#: ../classes/class-kco-gateway.php:267
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:284
+#: ../classes/class-kco-gateway.php:270
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:531
+#: ../classes/class-kco-gateway.php:482
+msgid "Customer redirected to Klarna Hosted Payment Page."
+msgstr ""
+
+#: ../classes/class-kco-gateway.php:573
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:590
+#: ../classes/class-kco-gateway.php:632
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:611, ../classes/class-kco-gateway.php:632
+#: ../classes/class-kco-gateway.php:653, ../classes/class-kco-gateway.php:674
 msgid "Reference:"
 msgstr ""
 
@@ -450,40 +454,40 @@ msgstr ""
 msgid "Klarna Checkout for WooCommerce"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:230
+#: ../classes/class-kco-subscription.php:262
 msgid "Recurring token was missing from the Klarna order during the checkout process. Please contact Klarna for help."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:213
+#: ../classes/class-kco-subscription.php:245
 msgid "Recurring token for subscription: %s"
 msgstr ""
 
 #. translators: Error message.
-#: ../classes/class-kco-subscription.php:300
+#: ../classes/class-kco-subscription.php:332
 msgid "Subscription payment failed with Klarna. Message: %1$s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:293
+#: ../classes/class-kco-subscription.php:325
 msgid "Subscription payment made with Klarna. Klarna order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:327
+#: ../classes/class-kco-subscription.php:359
 msgid "Klarna recurring token"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:379
+#: ../classes/class-kco-subscription.php:411
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:373
+#: ../classes/class-kco-subscription.php:405
 msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:400
+#: ../classes/class-kco-subscription.php:432
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
-#: ../classes/class-kco-templates.php:183
+#: ../classes/class-kco-templates.php:156
 msgid "Failed to load Klarna Checkout template file."
 msgstr ""
 
