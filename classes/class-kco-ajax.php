@@ -37,6 +37,7 @@ class KCO_AJAX extends WC_AJAX {
 			'kco_wc_set_session_value'              => true,
 			'kco_wc_get_klarna_order'               => true,
 			'kco_wc_log_js'                         => true,
+			'kco_wc_get_log'                        => true, /* MUST BE PRIVATE: Access to sensitive data must required admin access. */
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -262,6 +263,24 @@ class KCO_AJAX extends WC_AJAX {
 		$message         = "Frontend JS $klarna_order_id: $posted_message";
 		KCO_Logger::log( $message );
 		wp_send_json_success();
+	}
+
+	/**
+	 * Retrieve the contents of a log by filename.
+	 *
+	 * @param string $filename The name of the log file to retrieve.
+	 * @return void The contents of the log file or an empty string.
+	 */
+	public static function kco_wc_get_log() {
+		// FIXME: This code is called with nopriv set to TRUE.
+		$nonce = isset( $_GET['nonce'] ) ? sanitize_key( $_GET['nonce'] ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'kco_wc_get_log' ) ) {
+			wp_send_json_error( 'bad_nonce' );
+		}
+
+		$filename = isset( $_GET['filename'] ) ? sanitize_text_field( wp_unslash( $_GET['filename'] ) ) : '';
+		$content  = file_get_contents( WC_LOG_DIR . $filename );
+		wp_send_json_success( $content );
 	}
 }
 KCO_AJAX::init();

@@ -320,7 +320,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				false
 			);
 			$admin_localize_params = array(
-				'location' => $location,
+				'location'         => $location,
+				'wc_get_log'       => WC_AJAX::get_endpoint( 'kco_wc_get_log' ),
+				'wc_get_log_nonce' => wp_create_nonce( 'kco_wc_get_log' ),
 			);
 			wp_localize_script( 'kco_admin', 'kco_admin_params', $admin_localize_params );
 			wp_enqueue_script( 'kco_admin' );
