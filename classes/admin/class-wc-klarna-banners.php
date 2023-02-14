@@ -36,6 +36,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 				array(),
 				KCO_WC_VERSION
 			);
+
 		}
 
 
@@ -142,59 +143,24 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			}
 		}
 
-		/**
-		 * Generate the URL for activating a plugin.
-		 *
-		 * Note: the user will be redirected to the plugins page after activation.
-		 *
-		 * @param string $plugin_name The plugin's directory and name of main plugin file.
-		 * @return string The URL for activating the plugin.
-		 */
-		public static function activate_plugin_url( $plugin_name ) {
-			return esc_url( wp_nonce_url( admin_url( 'plugins.php?action=activate&plugin=' . $plugin_name ), 'activate-plugin_' . $plugin_name ) );
-		}
+		public static function get_plugin_logs( $plugin_name ) {
+			$logs = array();
+			foreach ( WC_Admin_Status::scan_log_files() as $log => $path ) {
+				if ( strpos( $log, $plugin_name ) !== false ) {
+					$timestamp = filemtime( WC_LOG_DIR . $path );
+					$date      = sprintf(
+						/* translators: 1: last access date 2: last access time 3: last access timezone abbreviation */
+						__( '%1$s at %2$s %3$s', 'woocommerce' ),
+						wp_date( wc_date_format(), $timestamp ),
+						wp_date( wc_time_format(), $timestamp ),
+						wp_date( 'T', $timestamp )
+					);
 
-		/**
-		 * Check if a plugin is activated.
-		 *
-		 * @param string $plugin_name The plugin's directory and name of main plugin file.
-		 * @return bool True if the plugin is activated, false otherwise.
-		 */
-		public static function is_plugin_activated( $plugin_name ) {
-			$active_plugins = (array) get_option( 'active_plugins', array() );
-			if ( is_multisite() ) {
-				$active_plugins = array_merge( $active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
-			}
-			return in_array( $plugin_name, $active_plugins, true ) || array_key_exists( $plugin_name, $active_plugins );
-		}
-
-		/**
-		 * Generate the HTML for a plugin action button.
-		 *
-		 * @param string $plugin_name The plugin's directory and name of main plugin file.
-		 * @param array  $install The plugin's install URL or slug.
-		 * @return string The HTML for the plugin action button.
-		 */
-		public static function plugin_action_button( $plugin_name, $install = array() ) {
-
-			if ( self::is_plugin_activated( $plugin_name ) ) {
-				$attr = 'class="button button-disabled"';
-				$text = __( 'Active', 'plugin' );
-			} elseif ( get_plugins()[ $plugin_name ] ?? false ) {
-				$attr = 'class="button activate-now button-primary" href="' . self::activate_plugin_url( $plugin_name ) . '"';
-				$text = __( 'Activate', 'plugin' );
-			} else {
-				$attr = 'class="install-now button"';
-
-				if ( ! empty( $install['url'] ) ) {
-					$attr .= ' href="' . esc_url( $install['url'] ) . '"';
-				} else {
-					$attr .= ' href="' . wp_nonce_url( self_admin_url( 'update.php?action=install-plugin&plugin=' . $install['slug'] ), 'install-plugin_' . $install['slug'] ) . '"';
+					$logs[ $date ] = $path;
 				}
-
-				$text = __( 'Install Now', 'plugin' );
 			}
-			return "<a {$attr}>{$text}</a>";
+
+			return $logs;
 		}
 
 		/**
@@ -203,10 +169,36 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		 * @param array $parent_options The parent options.
 		 */
 		public static function settings_sidebar( $parent_options ) {
-			$osm_name = 'klarna-onsite-messaging-for-woocommerce/klarna-onsite-messaging-for-woocommerce.php';
-			$kom_name = 'klarna-order-management-for-woocommerce/klarna-order-management-for-woocommerce.php';
+
+			// $kco_log = array();
+			// foreach ( WC_Admin_Status::scan_log_files() as $log => $path ) {
+			// if ( strpos( $log, 'klarna-checkout-for-woocommerce' ) !== false ) {
+			// $timestamp = filemtime( WC_LOG_DIR . $path );
+			// $date      = sprintf(
+			// * translators: 1: last access date 2: last access time 3: last access timezone abbreviation */
+			// __( '%1$s at %2$s %3$s', 'woocommerce' ),
+			// wp_date( wc_date_format(), $timestamp ),
+			// wp_date( wc_time_format(), $timestamp ),
+			// wp_date( 'T', $timestamp )
+			// );
+
+			// $kco_log[ $date ] = $path;
+			// }
+			// }
+
+			$logs = array(
+				'kco'   => self::get_plugin_logs( 'klarna-checkout-for-woocommerce' ),
+				'kom'   => self::get_plugin_logs( 'klarna-order-management-for-woocommerce' ),
+				'fatal' => self::get_plugin_logs( 'fatal-errors' ),
+			);
 
 			?>
+			<div style="position: absolute; top: -9999px; left: -9999px;">
+			<?php
+				$system_report = new WC_Admin_Status();
+				echo $system_report->status_report();
+			?>
+			</div>
 			<img id="klarna-settings-logo"
 				src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png" width="200"/>
 			<script>
@@ -255,31 +247,208 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 					</ul>
 					<p>If you have questions regarding a certain purchase, you're welcome to contact <a href="">Klarna.</a></p>
 					<p>If you have <b>technical questions or questions regarding configuration</b> of the plugin, you're welcome to contact <a href="">Krokedil</a>, the plugin's developer.</p>
-				</div>
-				
-				<div id='kco-addons'>
-					<p>These are other plugins from Krokedil that work well with the plugin Klarna Checkout.</p>
-					<div class='kco-addons-cards'>
-						<div class="kco-addon-card">
-							<img class="kco-addon-card-image" src="https://krokedil.com/wp-content/uploads/sites/3/2020/11/kom-chosen-960x544.jpg" alt="Get Klarna Order Management">
-							<h3 class="kco-addon-card-title">Klarna Order Management</h3>
-							<p class="kco-addon-card-description">Handle post purchase order management in Klarna's system directly from WooCommerce. This way you can save time and don't have to work in both systems simultaneously.</p>
-							<a class="kco-addon-read-more" href="https://krokedil.com/product/klarna-order-management/" target="_blank">Read more</a>
-							<p class="kco-addon-card-action"><span class='kco-addon-card-price'>Free</span>
-							<?php echo self::plugin_action_button( $kom_name, array( 'slug' => 'klarna-order-management-for-woocommerce' ) ); ?></p>
-						</div>
+					<style>
+						.support-form input {
+							display: block;
+						}
 
-						<div class="kco-addon-card">
-							<img class="kco-addon-card-image" src="https://krokedil.com/wp-content/uploads/sites/3/2020/11/osm-chosen-960x544.jpg" alt="Get Klarna On-Site Messaging">
-							<h3 class="kco-addon-card-title">On-Site Messaging</h3>
-							<p class="kco-addon-card-description">On-Site Messaging is easy and simple to integrate, providing tailored messaging ranging from generic banners to promote your partnership with Klarna and availability of financing to personalized credit promotion on product or cart pages.</p>
-							<a class="kco-addon-read-more" href="https://krokedil.com/product/on-site-messaging-for-woocommerce/" target="_blank">Read more</a>
-							<p class="kco-addon-card-action"><span class='kco-addon-card-price'>Free</span>
-							<?php echo self::plugin_action_button( $osm_name, array( 'url' => 'https://krokedil.com/product/klarna-on-site-messaging/?utm_source=kco&utm_medium=wp-admin&utm_campaign=add-ons' ) ); ?></p>
+						.support-form .required {
+							font-size: 0.7em;
+							color: black;
+						}
+
+						.support-form textarea#issue {
+							width: 100%;
+						}
+
+						.support-form .system-report-wrapper, .log-wrapper {
+							display: flex;
+							align-items: center;
+							flex-wrap: wrap;
+						}
+
+						.system-report-wrapper a, .log-wrapper a {
+							margin-left: 2em;
+						}
+
+						.system-report-wrapper a::after, .log-wrapper a::after {
+							display: inline-block;
+							content: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23555%22%2F%3E%3C%2Fsvg%3E");
+							transform: scale(0.7) translateY(30%);
+							filter: sepia(100%) hue-rotate(190deg) saturate(500%);
+						}
+						
+						.system-report-wrapper a:focus, .log-wrapper a:focus {
+							outline: none;
+							border: none;
+							box-shadow: none;
+						}
+
+						.system-report-wrapper textarea, .log-wrapper textarea {
+							display: none;
+							flex-basis: 100%;
+							font-family: monospace;
+							width: 100%;
+							margin: 1em 0;
+							height: 150px;
+							padding-left: 10px;
+							border-radius: 0;
+							resize: none;
+							font-size: 12px;
+							line-height: 20px;
+							outline: 0;
+						}
+
+						.woocommerce-log {
+							display: flex;
+							flex-wrap: wrap;
+							align-items: center;
+						}
+
+						.woocommerce-log h3 {
+							flex-basis: 100%;
+						}
+
+						.woocommerce-log .select2-container {
+							max-width: 60%;
+							min-width: 60%;
+						}
+
+						.woocommerce-log a {
+							margin-left: 2em;
+						}
+
+					</style>
+					<div class="support-form">
+						<h1>Technical support request form</h1>
+						<h2>E-mail <span class="required">(required)</span></h2>
+						<p>
+							<label for="email">Replies will be sent to this address, please check for typos.</label>
+							<input id="email" name="email" type="email" size="50" required>
+						</p>
+						<h2>Subject <span class="required">(required)</span></h2>
+						<p>
+							<label for="subject">Summarize your question in a few words.</label>
+							<input id="subject" name="subject" type="text" size="50" required>
+						</p>
+						<h2>How can we help? <span class="required">(required)</span></h2>
+						<p>
+							<label for="issue">Describe the issue you are having as detailed as possible.</label>
+							<textarea id="issue" name="issue" rows="4" cols="70" ></textarea>
+						</p>
+						<h2>WooCommerce system status report <span class="woocommerce-help-tip"></span></h2>
+						<p>This report contains information about your website that is very useful for troubleshooting issues.</p>
+						<script>
+							jQuery(function($) {
+								$( '.system-report-wrapper a' ).on( 'click', function() {
+									/* Refer to "wp-content/plugins/woocommerce/assets/js/admin/system-status.js:generateReport()" */
+									let report = '';
+									$( '.wc_status_table thead, .wc_status_table tbody' ).each( function() {
+										if ( $( this ).is( 'thead' ) ) {
+											var label = $( this ).find( 'th:eq(0)' ).data( 'exportLabel' ) || $( this ).text();
+											report = report + '\n### ' + label.trim() + ' ###\n\n';
+										} else {
+											$( 'tr', $( this ) ).each( function() {
+												var label       = $( this ).find( 'td:eq(0)' ).data( 'exportLabel' ) || $( this ).find( 'td:eq(0)' ).text();
+												var the_name    = label.trim().replace( /(<([^>]+)>)/ig, '' ); // Remove HTML.
+												// Find value
+												var $value_html = $( this ).find( 'td:eq(2)' ).clone();
+												$value_html.find( '.private' ).remove();
+												$value_html.find( '.dashicons-yes' ).replaceWith( '&#10004;' );
+												$value_html.find( '.dashicons-no-alt, .dashicons-warning' ).replaceWith( '&#10060;' );
+												// Format value
+												var the_value   = $value_html.text().trim();
+												var value_array = the_value.split( ', ' );
+												if ( value_array.length > 1 ) {
+													// If value have a list of plugins ','.
+													// Split to add new line.
+													var temp_line ='';
+													$.each( value_array, function( key, line ) {
+														temp_line = temp_line + line + '\n';
+													});
+													the_value = temp_line;
+												}
+												report = report + '' + the_name + ': ' + the_value + '\n';
+											});
+										}
+									})
+
+									$('.system-report-content').val(report);
+								})
+								$('.system-report-action').click(function(e) {
+									$('.system-report-content').toggle({duration: 250});
+									if ($(this).text() === 'View report') {
+										$(this).text('Hide report');
+									} else {
+										$(this).text('View report');
+									}
+									
+									e.preventDefault();
+								})
+
+								$('.view-log').click(function(e) {
+									$(this).siblings('.log-content').toggle({duration: 250});
+									if ($(this).text() === 'View log') {
+										$(this).text('Hide log');
+									} else {
+										$(this).text('View log');
+									}
+									
+									e.preventDefault();
+								})
+
+							})
+						</script>
+						<div class="system-report-wrapper">
+							<input type="checkbox" id="system-report" checked>
+							<!-- TODO: Handle the checkbox event. -->
+							<label id="system-report">Attach this store's WooCommerce system status report.</label>
+							<a href="#" class="system-report-action">View report</a>
+							<textarea class="system-report-content" readonly></textarea>
+						</div>
+						<h2>WooCommerce logs <span class="woocommerce-help-tip"></span></h2>
+						<p>
+							If you have logging enabled, providing relevant logs can be very useful for troubleshooting (e.g., issue with a specific order).
+						</p>
+						<div class="woocommerce-log">
+							<!-- TODO: Include the WC_AJAX::endpoint in an enqueued script. -->
+							<div class="log-wrapper">
+							<h3>Klarna Checkout</h3>
+							<!-- TODO: Handle sitution where there are no log entries: show no logs available text. -->
+							<select class="kco-log-option wc-enhanced-select" name="kco-log">
+								<?php foreach ( $logs['kco'] as $date => $path ) : ?>
+								<option name="kco-log" value="<?php echo esc_attr( $path ); ?>"><?php echo esc_html( "{$path} ({$date})" ); ?></option>
+								<?php endforeach; ?>
+							</select>
+							<a class="view-log">View log</a>
+							<textarea class="log-content" readonly></textarea>
+							</div>
+							<div class="log-wrapper">
+							<h3>Klarna Order Management</h3>
+							<!-- TODO: Handle sitution where there are no log entries: show no logs available text. -->
+							<select class="kco-log-option wc-enhanced-select" name="kco-log">
+								<?php foreach ( $logs['kom'] as $date => $path ) : ?>
+								<option name="kco-log" value="<?php echo esc_attr( $path ); ?>"><?php echo esc_html( "{$path} ({$date})" ); ?></option>
+								<?php endforeach; ?>
+							</select>
+							<a class="view-log">View log</a>
+							<textarea class="log-content" readonly></textarea>
+							</div>
+							<div class="log-wrapper">
+							<h3>Fatal error log</h3>
+							<!-- TODO: Handle sitution where there are no log entries: show no logs available text. -->
+							<select class="kco-log-option wc-enhanced-select" name="kco-log">
+								<?php foreach ( $logs['fatal'] as $date => $path ) : ?>
+								<option name="kco-log" value="<?php echo esc_attr( $path ); ?>"><?php echo esc_html( "{$path} ({$date})" ); ?></option>
+								<?php endforeach; ?>
+							</select>
+							<a class="view-log">View log</a>
+							<textarea class="log-content" readonly></textarea>
+							</div>
 						</div>
 					</div>
 				</div>
-
+				
 				<div id="krokdocs-sidebar">
 					<div class="krokdocs-sidebar-section">
 						<h1 id="krokdocs-sidebar-title">Plugin resources</h1>

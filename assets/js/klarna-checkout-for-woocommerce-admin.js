@@ -115,6 +115,37 @@ jQuery( function($) {
 	})
 
 	$('body').on('change', credentialsFields, testCredential);
+
+	$('.woocommerce-log .view-log').on('click', function () {
+		const pathname = $(this).siblings('select').val();
+		if (pathname.length === 0) {
+			return;
+		}
+
+		const textarea = $(this).siblings('textarea');
+		if (! textarea.is(':hidden')) {
+			return;
+		}
+
+		$.ajax({
+			type: 'GET',
+			url: kco_admin_params.wc_get_log,
+			data: {
+				filename: pathname,
+				nonce: kco_admin_params.wc_get_log_nonce,
+			},
+			dataType: 'JSON',
+			cache: true,
+			success: function (response) {
+				console.log(response)
+				textarea.val(response.data);
+			},
+			error: function (response) {
+				console.error(response);
+			}
+		})
+
+	});
 });
 
 
