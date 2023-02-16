@@ -190,12 +190,17 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * Add sidebar to the settings page.
 		 */
 		public function admin_options() {
+			$parent_options = array();
 			ob_start();
 			parent::admin_options();
 			$parent_options = ob_get_contents();
 			ob_end_clean();
 			KCO_Settings_Saved::maybe_show_errors();
-			WC_Klarna_Banners::settings_sidebar( $parent_options );
+			if ( 'support' === $_GET['subtab'] ) {
+				include plugin_dir_path( KCO_WC_MAIN_FILE ) . 'includes/admin/views/kco-support.php';
+			} else {
+				WC_Klarna_Banners::settings_sidebar( $parent_options );
+			}
 		}
 
 		/**
