@@ -20,7 +20,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		 * WC_Klarna_Banners constructor.
 		 */
 		public function __construct() {
-			 add_action( 'admin_notices', array( $this, 'klarna_banner' ) );
+			add_action( 'admin_notices', array( $this, 'klarna_banner' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_css' ) );
 			add_action( 'wp_ajax_hide_klarna_banner', array( $this, 'hide_klarna_banner' ) );
 			add_action( 'wp_ajax_nopriv_hide_klarna_banner', array( $this, 'hide_klarna_banner' ) );
@@ -151,25 +151,25 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		/**
 		 * Adds banners to the settings sidebar.
 		 *
-		 * @param array $parent_options The parent options.
+		 * @param string $html The HTML to output on the page.
 		 */
-		public static function settings_sidebar( $parent_options ) {
-			$current_url = home_url( $_SERVER['REQUEST_URI'] );
+		public static function settings_sidebar( $html ) {
+			$settings_url = KCO_WC()->get_setting_link();
 			?>
 			<img id="klarna-settings-logo" src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png"
 				width="200" />
 			<div id="klarna-wrapper">
 				<div id="tabs" class="nav-tab-wrapper">
 					<nav>
-						<a class="nav-tab nav-tab-active" href="#kco-settings">Settings</a>
-						<a class="nav-tab" href="<?php echo $current_url . '&subtab=support'; ?>">Support</a>
-						<a class="nav-tab" href="<?php echo $current_url . '&subtab=addons'; ?>">Add-ons</a>
+						<a class="nav-tab nav-tab-active" href="<?php echo esc_url( $settings_url ); ?>">Settings</a>
+						<a class="nav-tab" href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-support', $settings_url ) ); ?>">Support</a>
+						<a class="nav-tab" href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-addons', $settings_url ) ); ?>">Add-ons</a>
 					</nav>
 				</div>
 				<div class="kco-tab-wrapper">
 					<div id="kco-settings">
 						<div id="klarna-main">
-							<?php echo $parent_options; // phpcs:ignore?>
+							<?php echo $html; // phpcs:ignore?>
 						</div>
 					</div>
 					<div id="krokdocs-sidebar">

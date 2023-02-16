@@ -9,64 +9,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Hides the WooCommerce save button for the settings page.
+$GLOBALS['hide_save_button'] = true;
+
 define( 'KCO_OSM_PATH', 'klarna-onsite-messaging-for-woocommerce/klarna-onsite-messaging-for-woocommerce.php' );
 define( 'KCO_KOM_PATH', 'klarna-order-management-for-woocommerce/klarna-order-management-for-woocommerce.php' );
-
-/**
- * Generate the URL for activating a plugin.
- *
- * Note: the user will be redirected to the plugins page after activation.
- *
- * @param string $plugin_name The plugin's directory and name of main plugin file.
- * @return string The URL for activating the plugin.
- */
-function kco_activate_plugin_url( $plugin_name ) {
-	return esc_url( wp_nonce_url( admin_url( 'plugins.php?action=activate&plugin=' . $plugin_name ), 'activate-plugin_' . $plugin_name ) );
-}
-
-/**
- * Check if a plugin is activated.
- *
- * @param string $plugin_name The plugin's directory and name of main plugin file.
- * @return bool True if the plugin is activated, false otherwise.
- */
-function kco_is_plugin_activated( $plugin_name ) {
-	$active_plugins = (array) get_option( 'active_plugins', array() );
-	if ( is_multisite() ) {
-		$active_plugins = array_merge( $active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
-	}
-	return in_array( $plugin_name, $active_plugins, true ) || array_key_exists( $plugin_name, $active_plugins );
-}
-
-/**
- * Generate the HTML for a plugin action button.
- *
- * @param string $plugin_name The plugin's directory and name of main plugin file.
- * @param array  $install The plugin's install URL or slug.
- * @return string The HTML for the plugin action button.
- */
-function kco_plugin_action_button( $plugin_name, $install = array() ) {
-	if ( kco_is_plugin_activated( $plugin_name ) ) {
-		$attr = 'class="button button-disabled"';
-		$text = __( 'Active', 'plugin' );
-	} elseif ( get_plugins()[ $plugin_name ] ?? false ) {
-		$attr = 'class="button activate-now button-primary" href="' . kco_activate_plugin_url( $plugin_name ) . '"';
-		$text = __( 'Activate', 'plugin' );
-	} else {
-		$attr = 'class="install-now button"';
-
-		if ( ! empty( $install['url'] ) ) {
-			$attr .= ' href="' . esc_url( $install['url'] ) . '"';
-		} else {
-			$attr .= ' href="' . wp_nonce_url( self_admin_url( 'update.php?action=install-plugin&plugin=' . $install['slug'] ), 'install-plugin_' . $install['slug'] ) . '"';
-		}
-
-		$text = __( 'Install Now', 'plugin' );
-	}
-	return "<a {$attr}>{$text}</a>";
-}
-
-
 ?>
 <div class="kco-addons">
 	<p>These are other plugins from Krokedil that work well with the plugin Klarna Checkout.</p>

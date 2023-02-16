@@ -8,29 +8,14 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-function get_plugin_logs( $plugin_name ) {
-	$logs = array();
-	foreach ( WC_Admin_Status::scan_log_files() as $log => $path ) {
-		if ( strpos( $log, $plugin_name ) !== false ) {
-			$timestamp = filemtime( WC_LOG_DIR . $path );
-			$date      = sprintf(
-				/* translators: 1: last access date 2: last access time 3: last access timezone abbreviation */
-				__( '%1$s at %2$s %3$s', 'woocommerce' ),
-				wp_date( wc_date_format(), $timestamp ),
-				wp_date( wc_time_format(), $timestamp ),
-				wp_date( 'T', $timestamp )
-			);
 
-			$logs[ $date ] = $path;
-		}
-	}
+// Hides the WooCommerce save button for the settings page.
+$GLOBALS['hide_save_button'] = true;
 
-	return $logs;
-}
 $logs = array(
-	'kco'   => get_plugin_logs( 'klarna-checkout-for-woocommerce' ),
-	'kom'   => get_plugin_logs( 'klarna-order-management-for-woocommerce' ),
-	'fatal' => get_plugin_logs( 'fatal-errors' ),
+	'kco'   => kco_get_plugin_logs( 'klarna-checkout-for-woocommerce' ),
+	'kom'   => kco_get_plugin_logs( 'klarna-order-management-for-woocommerce' ),
+	'fatal' => kco_get_plugin_logs( 'fatal-errors' ),
 );
 
 ?>

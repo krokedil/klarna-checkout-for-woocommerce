@@ -190,17 +190,34 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * Add sidebar to the settings page.
 		 */
 		public function admin_options() {
-			$parent_options = array();
+			// Get the current subtab.
+			$subtab = filter_input( INPUT_GET, 'subtab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+			// Start a output buffer.
 			ob_start();
-			parent::admin_options();
-			$parent_options = ob_get_contents();
-			ob_end_clean();
-			KCO_Settings_Saved::maybe_show_errors();
-			if ( 'support' === $_GET['subtab'] ) {
-				include plugin_dir_path( KCO_WC_MAIN_FILE ) . 'includes/admin/views/kco-support.php';
-			} else {
-				WC_Klarna_Banners::settings_sidebar( $parent_options );
+
+			// Render the suppor content.
+			if ( 'kco-support' === $subtab ) {
+				include KCO_WC_PLUGIN_PATH . '/includes/admin/views/kco-support.php';
 			}
+
+			// Render the addons content
+			if ( 'kco-addons' === $subtab ) {
+				include KCO_WC_PLUGIN_PATH . '/includes/admin/views/kco-addons.php';
+			}
+
+			// If we dont have a subttab just display the normal settings content.
+			if ( empty( $subtab ) ) {
+				parent::admin_options();
+				KCO_Settings_Saved::maybe_show_errors();
+			}
+
+			// Get the HTML code from the output buffer and end the buffer.
+			$html = ob_get_contents();
+			ob_end_clean();
+
+			// Pass the html code from the output bugger to the settings sidebar class to be rendered.
+			WC_Klarna_Banners::settings_sidebar( $html );
 		}
 
 		/**
