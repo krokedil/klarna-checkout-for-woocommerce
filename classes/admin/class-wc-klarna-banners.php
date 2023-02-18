@@ -155,15 +155,36 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		 */
 		public static function settings_sidebar( $html ) {
 			$settings_url = KCO_WC()->get_setting_link();
+			$subtab       = filter_input( INPUT_GET, 'subtab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
 			?>
 			<img id="klarna-settings-logo" src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png"
 				width="200" />
 			<div id="klarna-wrapper">
 				<div id="tabs" class="nav-tab-wrapper">
 					<nav>
-						<a class="nav-tab nav-tab-active" href="<?php echo esc_url( $settings_url ); ?>">Settings</a>
-						<a class="nav-tab" href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-support', $settings_url ) ); ?>">Support</a>
-						<a class="nav-tab" href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-addons', $settings_url ) ); ?>">Add-ons</a>
+						<a class="nav-tab 
+						<?php
+						if ( empty( $subtab ) ) {
+							echo 'nav-tab-active';
+						}
+						?>
+						" href="<?php echo esc_url( $settings_url ); ?>">Settings</a>
+						<a class="nav-tab 
+						<?php
+						if ( 'kco-support' === $subtab ) {
+							echo 'nav-tab-active';
+						}
+						?>
+						 " href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-support', $settings_url ) ); ?>">Support</a>
+						<a class="nav-tab 
+						<?php
+						if ( 'kco-addons' === $subtab ) {
+							echo 'nav-tab-active';
+						}
+						?>
+						"
+						 href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-addons', $settings_url ) ); ?>">Add-ons</a>
 					</nav>
 				</div>
 				<div class="kco-tab-wrapper">

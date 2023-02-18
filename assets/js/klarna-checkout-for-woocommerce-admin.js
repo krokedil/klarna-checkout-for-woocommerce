@@ -148,24 +148,6 @@ jQuery( function($) {
 	});
 
 	$(document).ready(function(){
-		$('#klarna-wrapper #tabs a').click(function(){
-			$('#klarna-wrapper #tabs a').removeClass('nav-tab-active');
-			$(this).addClass('nav-tab-active');
-			$(this).siblings().each(function(){
-				$('#' + $(this).attr('href').replace('#', '')).hide();
-			})
-			$('#' + $(this).attr('href').replace('#', '')).show();
-		});
-
-		$(window).on('hashchange', function() {
-			$('#klarna-wrapper #tabs a').removeClass('nav-tab-active');
-			$('#klarna-wrapper #tabs a[href="' + window.location.hash + '"]').addClass('nav-tab-active');
-			$('#klarna-wrapper #tabs a[href="' + window.location.hash + '"]').siblings().each(function(){
-				$('#' + $(this).attr('href').replace('#', '')).hide();
-			})
-			$('#' + window.location.hash.replace('#', '')).show();
-		})
-
 		$('.system-report-wrapper a').on('click', function () {
 			/* Refer to "wp-content/plugins/woocommerce/assets/js/admin/system-status.js:generateReport()" */
 			let report = '';
@@ -219,6 +201,32 @@ jQuery( function($) {
 				$(this).text('View log');
 			}
 			e.preventDefault();
+		})
+
+		
+		for (let i = 1; i <= 5; i++) {
+			$('select.additional-log-' + i).removeAttr('name');
+		}
+
+		$('a.additional-log').click(function (e) {
+			$(this).hide();
+			$(this).siblings('.additional-log-1').show();
+			$('select.additional-log-1').attr('name', 'additional-log-1');
+
+			for (let i = 1; i < 5; i++) {
+				$(this).siblings('a.additional-log-' + i).click(function (e) {
+					/* Show the <div> and the next <a>: */
+					const siblings = $(this).siblings('.additional-log-' + (i + 1));
+					siblings.show();
+
+					const div = siblings.first('div');
+					div.children('select').first().attr('name', 'additional-log-' + (i + 1));
+					div.css('display', 'flex');
+
+					$(this).hide();
+					e.preventDefault();
+				});
+			}
 		})
 	});
 });

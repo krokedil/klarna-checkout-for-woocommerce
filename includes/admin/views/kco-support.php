@@ -9,6 +9,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+function kco_log_wrapper( $title, $log ) {
+	// Normalized name intended to be form and CSS friendly.
+	$name = esc_attr( str_replace( ' ', '-', strtolower( $title ) ) );
+	?>
+	<div class="log-wrapper <?php esc_attr_e( $name ); ?>">
+		<h3><?php echo $title; ?></h3>
+		<?php
+		if ( empty( $log ) ) {
+			echo '<p class="' . $name . '">No log available.</p>';
+		}
+		?>
+		<select class="kco-log-option wc-enhanced-select <?php echo $name; ?> " name="<?php echo $name; ?>">
+			<?php foreach ( $log as $date => $path ) : ?>
+				<option name="<?php echo $name; ?>" value="<?php esc_attr_e( $path ); ?>"><?php echo esc_html( "{$path} ({$date})" ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<a class="view-log">View log</a>
+		<textarea class="log-content" readonly></textarea>
+	</div>
+	<?php
+}
+
 // Hides the WooCommerce save button for the settings page.
 $GLOBALS['hide_save_button'] = true;
 
@@ -16,108 +38,21 @@ $logs = array(
 	'kco'   => kco_get_plugin_logs( 'klarna-checkout-for-woocommerce' ),
 	'kom'   => kco_get_plugin_logs( 'klarna-order-management-for-woocommerce' ),
 	'fatal' => kco_get_plugin_logs( 'fatal-errors' ),
+	'all'   => kco_get_plugin_logs(),
 );
 
+$system_report = new WC_Admin_Status();
 ?>
 <div style="position: absolute; top: -9999px; left: -9999px;">
-<?php
-	$system_report = new WC_Admin_Status();
-	echo $system_report->status_report();
-?>
+	<?php echo $system_report->status_report(); ?>
 </div>
 
 <div id='kco-support'>
-	<p>Before opening a support ticket, please make sure you have read the relevant plugin resources for a solution to
-		your problem.</p>
-	<ul>
-		<li><a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-				target="_blank">General information</a></li>
-		<li><a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-				target="_blank">Technical documentation</a></li>
-		<li><a href="https://docs.krokedil.com/krokedil-general-support-info/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-				target="_blank">General support information</a></li>
-	</ul>
 	<p>If you have questions regarding a certain purchase, you're welcome to contact <a href="">Klarna.</a></p>
 	<p>If you have <b>technical questions or questions regarding configuration</b> of the plugin, you're welcome to
 		contact <a href="">Krokedil</a>, the plugin's developer.</p>
-	<style>
-		.support-form input {
-			display: block;
-		}
-
-		.support-form .required {
-			font-size: 0.7em;
-			color: black;
-		}
-
-		.support-form textarea#issue {
-			width: 100%;
-		}
-
-		.support-form .system-report-wrapper,
-		.log-wrapper {
-			display: flex;
-			align-items: center;
-			flex-wrap: wrap;
-		}
-
-		.system-report-wrapper a,
-		.log-wrapper a {
-			margin-left: 2em;
-		}
-
-		.system-report-wrapper a::after,
-		.log-wrapper a::after {
-			display: inline-block;
-			content: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23555%22%2F%3E%3C%2Fsvg%3E");
-			transform: scale(0.7) translateY(30%);
-			filter: sepia(100%) hue-rotate(190deg) saturate(500%);
-		}
-
-		.system-report-wrapper a:focus,
-		.log-wrapper a:focus {
-			outline: none;
-			border: none;
-			box-shadow: none;
-		}
-
-		.system-report-wrapper textarea,
-		.log-wrapper textarea {
-			display: none;
-			flex-basis: 100%;
-			font-family: monospace;
-			width: 100%;
-			margin: 1em 0;
-			height: 150px;
-			padding-left: 10px;
-			border-radius: 0;
-			resize: none;
-			font-size: 12px;
-			line-height: 20px;
-			outline: 0;
-		}
-
-		.woocommerce-log {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-		}
-
-		.woocommerce-log h3 {
-			flex-basis: 100%;
-		}
-
-		.woocommerce-log .select2-container {
-			max-width: 60%;
-			min-width: 60%;
-		}
-
-		.woocommerce-log a {
-			margin-left: 2em;
-		}
-	</style>
+	<h1 class="support-form title">Technical support request form</h1>
 	<div class="support-form">
-		<h1>Technical support request form</h1>
 		<h2>E-mail <span class="required">(required)</span></h2>
 		<p>
 			<label for="email">Replies will be sent to this address, please check for typos.</label>
@@ -130,14 +65,13 @@ $logs = array(
 		</p>
 		<h2>How can we help? <span class="required">(required)</span></h2>
 		<p>
-			<label for="issue">Describe the issue you are having as detailed as possible.</label>
-			<textarea id="issue" name="issue" rows="4" cols="70"></textarea>
+			<label for="issue-description">Describe the issue you are having as detailed as possible.</label>
+			<textarea id="issue-description" name="issue-description" rows="4" cols="70" required></textarea>
 		</p>
 		<h2>WooCommerce system status report <span class="woocommerce-help-tip"></span></h2>
 		<p>This report contains information about your website that is very useful for troubleshooting issues.</p>
 		<div class="system-report-wrapper">
-			<input type="checkbox" id="system-report" checked>
-			<!-- TODO: Handle the checkbox event. -->
+			<input name="system-report" type="checkbox" id="system-report" checked>
 			<label id="system-report">Attach this store's WooCommerce system status report.</label>
 			<a href="#" class="system-report-action">View report</a>
 			<textarea class="system-report-content" readonly></textarea>
@@ -148,40 +82,20 @@ $logs = array(
 			with a specific order).
 		</p>
 		<div class="woocommerce-log">
-			<!-- TODO: Include the WC_AJAX::endpoint in an enqueued script. -->
-			<div class="log-wrapper">
-				<h3>Klarna Checkout</h3>
-				<!-- TODO: Handle sitution where there are no log entries: show no logs available text. -->
-				<select class="kco-log-option wc-enhanced-select" name="kco-log">
-					<?php foreach ( $logs['kco'] as $date => $path ) : ?>
-						<option name="kco-log" value="<?php echo esc_attr( $path ); ?>"><?php echo esc_html( "{$path} ({$date})" ); ?></option>
-					<?php endforeach; ?>
-				</select>
-				<a class="view-log">View log</a>
-				<textarea class="log-content" readonly></textarea>
-			</div>
-			<div class="log-wrapper">
-				<h3>Klarna Order Management</h3>
-				<!-- TODO: Handle sitution where there are no log entries: show no logs available text. -->
-				<select class="kco-log-option wc-enhanced-select" name="kco-log">
-					<?php foreach ( $logs['kom'] as $date => $path ) : ?>
-						<option name="kco-log" value="<?php echo esc_attr( $path ); ?>"><?php echo esc_html( "{$path} ({$date})" ); ?></option>
-					<?php endforeach; ?>
-				</select>
-				<a class="view-log">View log</a>
-				<textarea class="log-content" readonly></textarea>
-			</div>
-			<div class="log-wrapper">
-				<h3>Fatal error log</h3>
-				<!-- TODO: Handle sitution where there are no log entries: show no logs available text. -->
-				<select class="kco-log-option wc-enhanced-select" name="kco-log">
-					<?php foreach ( $logs['fatal'] as $date => $path ) : ?>
-						<option name="kco-log" value="<?php echo esc_attr( $path ); ?>"><?php echo esc_html( "{$path} ({$date})" ); ?></option>
-					<?php endforeach; ?>
-				</select>
-				<a class="view-log">View log</a>
-				<textarea class="log-content" readonly></textarea>
-			</div>
+			<?php
+			kco_log_wrapper( 'Klarna Checkout', $logs['kco'] );
+			kco_log_wrapper( 'Klarna Order Management', $logs['kom'] );
+			kco_log_wrapper( 'Fatal error log', $logs['fatal'] );
+			kco_log_wrapper( 'Additional log', $logs['all'] );
+
+			echo '<a class="additional-log">+Add an additional log</a>';
+			for ( $i = 1; $i <= 5; $i++ ) {
+				kco_log_wrapper( "Additional log {$i}", $logs['all'] );
+				if ( $i < 5 ) {
+					echo "<a class='additional-log-{$i}'>+Add an additional log</a>";
+				}
+			}
+			?>
 		</div>
 		<div class="uploads">
 			<h1>Upload screenshots</h1>
@@ -190,7 +104,8 @@ $logs = array(
 				order notes clearly visible in the screenshot.</p>
 			<form action method="post" enctype="multipart/form-data">
 				<input type="file" name="screenshots[]" id="screenshot-picker" accept=".jpeg,.jpg,.png,.gif" multiple>
-				<input type="submit" value="Upload images" name="submit">
+				<input type="submit" value="Submit support ticket" name="submit" class="button button-primary button-large">
+			</form>
 		</div>
 	</div>
 </div>

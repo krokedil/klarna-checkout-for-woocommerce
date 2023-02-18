@@ -812,10 +812,10 @@ function kco_plugin_action_button( $plugin_name, $install = array() ) {
 	return "<a {$attr}>{$text}</a>";
 }
 
-function kco_get_plugin_logs( $plugin_name ) {
+function kco_get_plugin_logs( $plugin_name = 'all' ) {
 	$logs = array();
 	foreach ( WC_Admin_Status::scan_log_files() as $log => $path ) {
-		if ( strpos( $log, $plugin_name ) !== false ) {
+		if ( 'all' == $plugin_name || strpos( $log, $plugin_name ) !== false ) {
 			$timestamp = filemtime( WC_LOG_DIR . $path );
 			$date      = sprintf(
 				/* translators: 1: last access date 2: last access time 3: last access timezone abbreviation */
