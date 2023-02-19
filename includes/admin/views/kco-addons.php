@@ -24,7 +24,6 @@ define( 'KCO_KOM_PATH', 'klarna-order-management-for-woocommerce/klarna-order-ma
 			<p class="kco-addon-card-description">Handle post purchase order management in Klarna's system directly from WooCommerce. This way you can save time and don't have to work in both systems simultaneously.</p>
 			<a class="kco-addon-read-more" href="https://krokedil.com/product/klarna-order-management/" target="_blank">Read more</a>
 			<p class="kco-addon-card-action"><span class='kco-addon-card-price'>Free</span>
-			<!-- TODO: Escape output! -->
 			<?php echo kco_plugin_action_button( KCO_KOM_PATH, array( 'slug' => 'klarna-order-management-for-woocommerce' ) ); ?></p>
 		</div>
 

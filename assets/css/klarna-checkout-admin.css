@@ -169,7 +169,7 @@
 	font-size: 0.7em;
 	color: black;
 }
-.support-form textarea#issue-description {
+.support-form textarea#description {
 	width: 100%;
 }
 .support-form .system-report-wrapper,

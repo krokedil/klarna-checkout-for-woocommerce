@@ -9,6 +9,59 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( isset( $_POST['submit'] ) ) {
+
+	$send = true;
+	if ( ! is_email( $_POST['email'] ) ) {
+		$send = false;
+	}
+
+	$from    = sanitize_email( $_POST['email'] );
+	$to      = 'support@krokedil.se';
+	$subject = sanitize_text_field( $_POST['subject'] );
+	$message = sanitize_textarea_field( $_POST['description'] );
+	$headers = array(
+		'From: ' . $from,
+		'Reply-To: ' . $from,
+		'Content-Type: text/html; charset=UTF-8',
+	);
+
+
+	$attachment = array(
+		WC_LOG_DIR . sanitize_text_field( $_POST['klarna-checkout'] ),
+		WC_LOG_DIR . sanitize_text_field( $_POST['klarna-order-management'] ),
+		WC_LOG_DIR . sanitize_text_field( $_POST['fatal-error-log'] ),
+		WC_LOG_DIR . sanitize_text_field( $_POST['additional-log'] ),
+	);
+
+	foreach ( $_POST as $key => $value ) {
+		if ( strpos( $key, 'additional-log-' ) !== false ) {
+			$attachment[] = WC_LOG_DIR . sanitize_text_field( $value );
+		}
+	}
+
+	$attachment = array_filter(
+		$attachment,
+		function( $path ) {
+			return file_exists( $path ) && is_readable( $path );
+		},
+	);
+
+	if ( 'on' === $_POST['system-report-include'] ) {
+		$system_report = sanitize_textarea_field( $_POST['system-report'] );
+		$filename      = 'system-report-' . date( 'Y-m-d' ) . '.txt';
+		$filepath      = WP_CONTENT_DIR . '/uploads/' . $filename;
+
+		if ( file_put_contents( $filepath, $system_report ) ) {
+			$attachment[] = $filepath;
+		}
+	}
+
+	if ( $send ) {
+		// wp_mail( $to, $subject, $message, $headers, $attachment );
+	}
+}
+
 function kco_log_wrapper( $title, $log ) {
 	// Normalized name intended to be form and CSS friendly.
 	$name = esc_attr( str_replace( ' ', '-', strtolower( $title ) ) );
@@ -45,6 +98,7 @@ $system_report = new WC_Admin_Status();
 ?>
 <div style="position: absolute; top: -9999px; left: -9999px;">
 	<?php echo $system_report->status_report(); ?>
+	<input type="hidden" name="system-report" id="system-report">
 </div>
 
 <div id='kco-support'>
@@ -65,14 +119,14 @@ $system_report = new WC_Admin_Status();
 		</p>
 		<h2>How can we help? <span class="required">(required)</span></h2>
 		<p>
-			<label for="issue-description">Describe the issue you are having as detailed as possible.</label>
-			<textarea id="issue-description" name="issue-description" rows="4" cols="70" required></textarea>
+			<label for="description">Describe the issue you are having as detailed as possible.</label>
+			<textarea id="description" name="description" rows="4" cols="70" required></textarea>
 		</p>
 		<h2>WooCommerce system status report <span class="woocommerce-help-tip"></span></h2>
 		<p>This report contains information about your website that is very useful for troubleshooting issues.</p>
 		<div class="system-report-wrapper">
-			<input name="system-report" type="checkbox" id="system-report" checked>
-			<label id="system-report">Attach this store's WooCommerce system status report.</label>
+			<input name="system-report-include" type="checkbox" id="system-report-include" checked>
+			<label id="system-report-include">Attach this store's WooCommerce system status report.</label>
 			<a href="#" class="system-report-action">View report</a>
 			<textarea class="system-report-content" readonly></textarea>
 		</div>
@@ -102,10 +156,8 @@ $system_report = new WC_Admin_Status();
 			<p>Add any relevant screenshots, e.g., of an order related to the problem.</p>
 			<p>Please submit screenshots from both the WooCommerce admin, and the payment provider's portal with the
 				order notes clearly visible in the screenshot.</p>
-			<form action method="post" enctype="multipart/form-data">
 				<input type="file" name="screenshots[]" id="screenshot-picker" accept=".jpeg,.jpg,.png,.gif" multiple>
 				<input type="submit" value="Submit support ticket" name="submit" class="button button-primary button-large">
-			</form>
 		</div>
 	</div>
 </div>

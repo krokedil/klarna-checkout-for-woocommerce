@@ -147,8 +147,8 @@ jQuery( function($) {
 
 	});
 
-	$(document).ready(function(){
-		$('.system-report-wrapper a').on('click', function () {
+	$(document).ready(function () {
+			$('#system-report').val(function () {
 			/* Refer to "wp-content/plugins/woocommerce/assets/js/admin/system-status.js:generateReport()" */
 			let report = '';
 			$('.wc_status_table thead, .wc_status_table tbody').each(function () {
@@ -179,9 +179,16 @@ jQuery( function($) {
 						report = report + '' + the_name + ': ' + the_value + '\n';
 					});
 				}
+
 			})
-			$('.system-report-content').val(report);
+			
+			return report;
 		})
+		
+		$('.system-report-wrapper a').on('click', function () { 
+			$('.system-report-content').val($('#system-report').val());
+		});
+
 
 		$('.system-report-action').click(function (e) {
 			$('.system-report-content').toggle({ duration: 250 });
@@ -203,7 +210,6 @@ jQuery( function($) {
 			e.preventDefault();
 		})
 
-		
 		for (let i = 1; i <= 5; i++) {
 			$('select.additional-log-' + i).removeAttr('name');
 		}
