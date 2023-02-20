@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( isset( $_POST['submit'] ) ) {
 
 	$send = true;
-	if ( ! is_email( $_POST['email'] ) ) {
+	if ( ! is_email( sanitize_email( $_POST['email'] ) ) ) {
 		$send = false;
 	}
 
@@ -26,13 +26,23 @@ if ( isset( $_POST['submit'] ) ) {
 		'Content-Type: text/html; charset=UTF-8',
 	);
 
+	$attachment = array();
 
-	$attachment = array(
-		WC_LOG_DIR . sanitize_text_field( $_POST['klarna-checkout'] ),
-		WC_LOG_DIR . sanitize_text_field( $_POST['klarna-order-management'] ),
-		WC_LOG_DIR . sanitize_text_field( $_POST['fatal-error-log'] ),
-		WC_LOG_DIR . sanitize_text_field( $_POST['additional-log'] ),
-	);
+	if ( isset( $_POST['klarna-checkout'] ) ) {
+		$attachment[] = WC_LOG_DIR . sanitize_text_field( $_POST['klarna-checkout'] );
+	}
+
+	if ( isset( $_POST['klarna-order-management'] ) ) {
+		$attachment[] = WC_LOG_DIR . sanitize_text_field( $_POST['klarna-order-management'] );
+	}
+
+	if ( isset( $_POST['fatal-error-log'] ) ) {
+		$attachment[] = WC_LOG_DIR . sanitize_text_field( $_POST['fatal-error-log'] );
+	}
+
+	if ( isset( $_POST['additional-log'] ) ) {
+		$attachment[] = WC_LOG_DIR . sanitize_text_field( $_POST['additional-log'] );
+	}
 
 	foreach ( $_POST as $key => $value ) {
 		if ( strpos( $key, 'additional-log-' ) !== false ) {
