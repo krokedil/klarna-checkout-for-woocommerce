@@ -193,44 +193,45 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 							<?php echo $html; // phpcs:ignore?>
 						</div>
 					</div>
-					<div id="krokdocs-sidebar">
-						<div class="krokdocs-sidebar-section">
-							<h1 id="krokdocs-sidebar-title">Plugin resources</h1>
-							<div class="krokdocs-sidebar-content">
-								<ul>
-									<li><a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-											target="_blank">General information</a></li>
-									<li><a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-											target="_blank">Technical documentation</a></li>
-									<li><a
-											href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco#kco-support">Support</a>
-									</li>
-									<li><a
-											href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco#kco-addons">Add-ons</a>
-									</li>
-								</ul>
-								<h1 id="krokdocs-sidebar-title">Additional resources</h1>
-								<ul>
-									<li><a href="https://docs.krokedil.com/krokedil-general-support-info/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-											target="_blank">General support information</a></li>
-									<li><a href="https://krokedil.com/products/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-											target="_blank">Other Krokedil plugins</a></li>
-									<li><a href="https://krokedil.com/knowledge/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-											target="_blank">Krokedil blog</a></li>
-								</ul>
-							</div>
+				</div>
+				<div id="krokdocs-sidebar">
+					<div class="krokdocs-sidebar-section">
+						<h1 id="krokdocs-sidebar-title">Plugin resources</h1>
+						<div class="krokdocs-sidebar-content">
+							<ul>
+								<li><a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
+										target="_blank">General information</a></li>
+								<li><a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
+										target="_blank">Technical documentation</a></li>
+								<li><a
+										href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco#kco-support">Support</a>
+								</li>
+								<li><a
+										href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco#kco-addons">Add-ons</a>
+								</li>
+							</ul>
+							<h1 id="krokdocs-sidebar-title">Additional resources</h1>
+							<ul>
+								<li><a href="https://docs.krokedil.com/krokedil-general-support-info/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
+										target="_blank">General support information</a></li>
+								<li><a href="https://krokedil.com/products/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
+										target="_blank">Other Krokedil plugins</a></li>
+								<li><a href="https://krokedil.com/knowledge/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
+										target="_blank">Krokedil blog</a></li>
+							</ul>
+						</div>
 
-							<div id="krokdocs-sidebar-bottom-holder">
-								<p id="krokdocs-sidebar-logo-follow-up-text">
-									Developed by:
-								</p>
-								<img id="krokdocs-sidebar-krokedil-logo-right"
-									src="https://krokedil.se/wp-content/uploads/2020/05/webb_logo_400px.png">
-							</div>
+						<div id="krokdocs-sidebar-bottom-holder">
+							<p id="krokdocs-sidebar-logo-follow-up-text">
+								Developed by:
+							</p>
+							<img id="krokdocs-sidebar-krokedil-logo-right"
+								src="https://krokedil.se/wp-content/uploads/2020/05/webb_logo_400px.png">
 						</div>
 					</div>
 				</div>
-				<div class="save-separator"></div>
+			</div>
+			<div class="save-separator"></div>
 			<?php
 		}
 
