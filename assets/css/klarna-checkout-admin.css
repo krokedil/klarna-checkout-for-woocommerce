@@ -131,7 +131,6 @@
 }
 
 #klarna-main {
-	display: flex;
 	min-width: 660px;
 	padding: 0 2% 0 0;
 	border-right: 1px solid #ccc;

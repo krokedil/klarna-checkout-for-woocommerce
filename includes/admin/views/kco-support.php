@@ -66,22 +66,22 @@ function kco_log_wrapper( $title, $log ) {
 	// Normalized name intended to be form and CSS friendly.
 	$name = esc_attr( str_replace( ' ', '-', strtolower( $title ) ) );
 	?>
-	<div class="log-wrapper <?php esc_attr_e( $name ); ?>">
-		<h3><?php echo $title; ?></h3>
-		<?php
-		if ( empty( $log ) ) {
-			echo '<p class="' . $name . '">No log available.</p>';
-			return;
-		}
-		?>
-		<select class="kco-log-option wc-enhanced-select <?php echo $name; ?> " name="<?php echo $name; ?>">
-			<?php foreach ( $log as $date => $path ) : ?>
-				<option name="<?php echo $name; ?>" value="<?php esc_attr_e( $path ); ?>"><?php echo esc_html( "{$path} ({$date})" ); ?></option>
-			<?php endforeach; ?>
-		</select>
-		<a class="view-log">View log</a>
-		<textarea class="log-content" readonly></textarea>
-	</div>
+<div class="log-wrapper <?php esc_attr_e( $name ); ?>">
+	<h3><?php echo $title; ?></h3>
+	<?php
+	if ( empty( $log ) ) {
+		echo '<p class="' . $name . '">No log available.</p>';
+		return;
+	}
+	?>
+	<select class="kco-log-option wc-enhanced-select <?php echo $name; ?> " name="<?php echo $name; ?>">
+		<?php foreach ( $log as $date => $path ) : ?>
+		<option value="<?php esc_attr_e( $path ); ?>"><?php echo esc_html( "{$path} ({$date})" ); ?></option>
+		<?php endforeach; ?>
+	</select>
+	<a class="view-log">View log</a>
+	<textarea class="log-content" readonly></textarea>
+</div>
 	<?php
 }
 
@@ -126,7 +126,7 @@ $system_report = new WC_Admin_Status();
 		<h2>WooCommerce system status report <span class="woocommerce-help-tip"></span></h2>
 		<p>This report contains information about your website that is very useful for troubleshooting issues.</p>
 		<div class="system-report-wrapper">
-			<input name="system-report-include" type="checkbox" id="system-report-include" checked>
+			<input name="system-report-include" type="checkbox" checked>
 			<label id="system-report-include">Attach this store's WooCommerce system status report.</label>
 			<a href="#" class="system-report-action">View report</a>
 			<textarea class="system-report-content" readonly></textarea>
@@ -157,8 +157,11 @@ $system_report = new WC_Admin_Status();
 			<p>Add any relevant screenshots, e.g., of an order related to the problem.</p>
 			<p>Please submit screenshots from both the WooCommerce admin, and the payment provider's portal with the
 				order notes clearly visible in the screenshot.</p>
-				<input type="file" name="screenshots[]" id="screenshot-picker" accept=".jpeg,.jpg,.png,.gif" multiple>
-				<input type="submit" value="Submit support ticket" name="submit" class="button button-primary button-large">
+			<input type="file" name="screenshots[]" id="screenshot-picker" accept=".jpeg,.jpg,.png,.gif" multiple>
+			<input type="submit" value="Submit support ticket" name="submit" class="button button-primary button-large">
 		</div>
 	</div>
+</div>
+</div>
+</div>
 </div>
