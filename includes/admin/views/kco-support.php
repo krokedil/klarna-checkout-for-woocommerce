@@ -71,6 +71,7 @@ function kco_log_wrapper( $title, $log ) {
 		<?php
 		if ( empty( $log ) ) {
 			echo '<p class="' . $name . '">No log available.</p>';
+			return;
 		}
 		?>
 		<select class="kco-log-option wc-enhanced-select <?php echo $name; ?> " name="<?php echo $name; ?>">
