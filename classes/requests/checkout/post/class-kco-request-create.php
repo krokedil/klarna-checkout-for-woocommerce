@@ -69,12 +69,21 @@ class KCO_Request_Create extends KCO_Request {
 			$request_body['order_tax_amount']  = $cart_data->get_order_tax_amount( $cart_data->get_order_lines() );
 
 			if ( kco_wc_prefill_allowed() ) {
-				$request_body['billing_address'] = self::get_billing_address_from_customer();
+				$billing_address  = self::get_billing_address_from_customer();
+				$shipping_address = self::get_shipping_address_from_customer();
+
+				if ( ! empty( $billing_address ) ) {
+					$request_body['billing_address'] = $billing_address;
+				}
 
 				if ( 'yes' === $this->settings['allow_separate_shipping'] ) {
-					$request_body['shipping_address'] = self::get_shipping_address_from_customer();
+					if ( ! empty( $shipping_address ) ) {
+						$request_body['shipping_address '] = $shipping_address;
+					}
 				} else {
-					$request_body['shipping_address'] = self::get_billing_address_from_customer();
+					if ( ! empty( $billing_address ) ) {
+						$request_body['shipping_address'] = $billing_address;
+					}
 				}
 			}
 		} else {
@@ -86,8 +95,17 @@ class KCO_Request_Create extends KCO_Request {
 			$request_body['order_amount']      = $order_data->get_order_amount( $order_id );
 			$request_body['order_lines']       = $order_data->get_order_lines( $order_id );
 			$request_body['order_tax_amount']  = $order_data->get_total_tax( $order_id );
-			$request_body['billing_address']   = self::get_billing_address_from_order( $order );
-			$request_body['shipping_address']  = self::get_shipping_address_from_order( $order );
+
+			$billing_address  = self::get_billing_address_from_order( $order );
+			$shipping_address = self::get_shipping_address_from_order( $order );
+
+			if ( ! empty( $billing_address ) ) {
+				$request_body['billing_address'] = $billing_address;
+			}
+
+			if ( ! empty( $shipping_address ) ) {
+				$request_body['shipping_address '] = $shipping_address;
+			}
 		}
 
 		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() && 'embedded' === $checkout_flow ) {
