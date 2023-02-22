@@ -792,20 +792,29 @@ function kco_is_plugin_activated( $plugin_name ) {
  * @return string The HTML for the plugin action button.
  */
 function kco_plugin_action_button( $plugin_name, $install = array() ) {
+
+	$attr = 'href="#" data-plugin-name="' . $plugin_name . '"';
+	if ( isset( $install['slug'] ) ) {
+		$attr .= ' data-plugin-slug="' . $install['slug'] . '"';
+	}
+
+	if ( isset( $install['url'] ) ) {
+		$attr .= ' data-plugin-url="' . $install['url'] . '"';
+	}
+
 	if ( kco_is_plugin_activated( $plugin_name ) ) {
-		$attr = 'class="button button-disabled"';
+		$attr .= ' class="button button-disabled"';
+		$attr .= ' data-action="activated"';
+
 		$text = __( 'Active', 'plugin' );
 	} elseif ( get_plugins()[ $plugin_name ] ?? false ) {
-		$attr = 'class="button activate-now button-primary" href="' . kco_activate_plugin_url( $plugin_name ) . '"';
+		$attr .= ' class="button activate-now button-primary"';
+		$attr .= ' data-action="activate"';
+
 		$text = __( 'Activate', 'plugin' );
 	} else {
-		$attr = 'class="install-now button"';
-
-		if ( ! empty( $install['url'] ) ) {
-			$attr .= ' href="' . esc_url( $install['url'] ) . '"';
-		} else {
-			$attr .= ' href="' . wp_nonce_url( self_admin_url( 'update.php?action=install-plugin&plugin=' . $install['slug'] ), 'install-plugin_' . $install['slug'] ) . '"';
-		}
+		$attr .= ' class="install-now button"';
+		$attr .= ' data-action="install"';
 
 		$text = __( 'Install Now', 'plugin' );
 	}
