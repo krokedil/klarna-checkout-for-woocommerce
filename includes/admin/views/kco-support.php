@@ -11,9 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( isset( $_POST['submit'] ) ) {
 
-	$send = true;
+	$error = false;
 	if ( ! is_email( sanitize_email( $_POST['email'] ) ) ) {
-		$send = false;
+		$error = true;
 	}
 
 	$from    = sanitize_email( $_POST['email'] );
@@ -67,8 +67,8 @@ if ( isset( $_POST['submit'] ) ) {
 		}
 	}
 
-	if ( $send ) {
-		// wp_mail( $to, $subject, $message, $headers, $attachment );
+	if ( ! $error ) {
+		$error = wp_mail( $to, $subject, $message, $headers, $attachment );
 	}
 }
 
@@ -171,7 +171,6 @@ $system_report = new WC_Admin_Status();
 			<input type="submit" value="Submit support ticket" name="submit" class="button button-primary button-large">
 		</div>
 	</div>
-</div>
 </div>
 </div>
 </div>
