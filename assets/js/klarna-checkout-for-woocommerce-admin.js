@@ -189,6 +189,9 @@ jQuery( function($) {
 			$('.system-report-content').val($('#system-report').val());
 		});
 
+		$('#kco-support input.button').on('click', function () {
+			window.onbeforeunload = null;
+		});
 
 		$('.system-report-action').click(function (e) {
 			$('.system-report-content').toggle({ duration: 250 });
