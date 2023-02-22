@@ -309,6 +309,33 @@
 	font-weight: bold;
 }
 
+@keyframes loading {
+	0% {
+		color: blue;
+		background-color: white;
+	}
+	50% {
+		color: white;
+		background-color: blue;
+	}
+	100% {
+		color: blue;
+		background-color: white;
+	}
+}
+
+.kco-addon-card-action a.loading {
+  animation-name: loading;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+}
+
+.kco-addon-card .kco-addon-card-action a.failed {
+	color: white;
+	background-color: red;
+	border-color: white;
+}
+
 /* Sidebar  */
 
 #klarna-sidebar {
