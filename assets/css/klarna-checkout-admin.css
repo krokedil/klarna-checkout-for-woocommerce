@@ -131,9 +131,8 @@
 }
 
 #klarna-main {
-	width: 60%;
 	min-width: 660px;
-	float: left;
+	max-width: 70%;
 	padding: 0 2% 0 0;
 	border-right: 1px solid #ccc;
 	box-sizing: border-box;
@@ -143,16 +142,18 @@
 	max-width: 1440px;
 }
 
-#kco-support,
-#kco-addons {
-	display: none;
-	width: 60%;
-	float: left;
+#klarna-wrapper .nav-tab-wrapper {
+	width: 70%;
 }
 
-#klarna-wrapper .nav-tab-wrapper {
-	width: 60%;
+.kco-tab-wrapper {
+	display: flex;
 }
+
+/* SUPPORT TAB */
+
+
+/* ADDONS TAB*/
 
 .kco-addons-cards {
 	display: flex;
@@ -205,6 +206,33 @@
 	align-items: center;
 	padding: 0 1.1em;
 	font-weight: bold;
+}
+
+@keyframes loading {
+	0% {
+		color: blue;
+		background-color: white;
+	}
+	50% {
+		color: white;
+		background-color: blue;
+	}
+	100% {
+		color: blue;
+		background-color: white;
+	}
+}
+
+.kco-addon-card-action a.loading {
+  animation-name: loading;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+}
+
+.kco-addon-card .kco-addon-card-action a.failed {
+	color: white;
+	background-color: red;
+	border-color: white;
 }
 
 /* Sidebar  */
@@ -309,10 +337,11 @@
 }
 
 #krokdocs-sidebar {
-	width: 350px;
+	display: flex;
+	min-width: 350px;
+	max-height: 600px;
 	margin-left: 35px;
 	margin-bottom: 20px;
-	float: left;
 	box-sizing: border-box;
 	text-align: left;
 	font-family: Roboto, sans-serif;
@@ -320,7 +349,6 @@
 	border-width: 1px;
 	border-style: solid;
 	border-color: #cccccc;
-	display: flex;
 	padding: 20px 0 20px 20px;
 }
 

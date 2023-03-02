@@ -77,238 +77,154 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 
 			if ( $show_banner && false === get_transient( 'klarna_hide_banner' ) ) {
 				?>
-				<div id="kb-spacer"></div>
+<div id="kb-spacer"></div>
 
-				<div id="klarna-banner" class="kb-new-container">
+<div id="klarna-banner" class="kb-new-container">
 
-					<!-- Left group -->
-					<div class="kb-left-group">
-						<div id="kb-left" class="kb-small-container">
-							<h1 id="left-main-title" class="container-title">Go live.</h1>
-							<p id="left-main-text" class="container-main-text">Before you can start to sell with Klarna you need your store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will need to verify the integration. Then you can go live with your store! If you wish to switch Klarna products then you’ll need the Klarna team to approve your store again.</p>
-						</div>
-					</div>
+	<!-- Left group -->
+	<div class="kb-left-group">
+		<div id="kb-left" class="kb-small-container">
+			<h1 id="left-main-title" class="container-title">Go live.</h1>
+			<p id="left-main-text" class="container-main-text">Before you can start to sell with Klarna you need your
+				store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will
+				need to verify the integration. Then you can go live with your store! If you wish to switch Klarna
+				products then you’ll need the Klarna team to approve your store again.</p>
+		</div>
+	</div>
 
-					<!-- Middle group -->
-					<div class="kb-middle-group">
-						<div id="kb-button-left-frame">
-							<a id="kb-button-left" class="kb-dismiss kb-button"
-								href="<?php echo esc_attr( self::get_go_live_url() ); ?>"
-								target="_blank">Go live now
-							</a>
-						</div>
-						<div id="kb-button-go-live-frame">
-							<a id="kb-button-go-live" class="kb-button"
-								href="<?php echo esc_attr( self::get_playground_credentials_url() ); ?>"
-								target="_blank">Get playground credentials
-							</a>
-						</div>
-					</div>
+	<!-- Middle group -->
+	<div class="kb-middle-group">
+		<div id="kb-button-left-frame">
+			<a id="kb-button-left" class="kb-dismiss kb-button"
+				href="<?php echo esc_attr( self::get_go_live_url() ); ?>" target="_blank">Go live now
+			</a>
+		</div>
+		<div id="kb-button-go-live-frame">
+			<a id="kb-button-go-live" class="kb-button"
+				href="<?php echo esc_attr( self::get_playground_credentials_url() ); ?>" target="_blank">Get playground
+				credentials
+			</a>
+		</div>
+	</div>
 
-					<!-- Right group -->
-					<div class="kb-right-group">
-						<div id="klarna-logo-left-frame">
-							<img id="klarna-logo-left" class="klarna-logo-img"
-							src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png">
-						</div>
-					</div>
+	<!-- Right group -->
+	<div class="kb-right-group">
+		<div id="klarna-logo-left-frame">
+			<img id="klarna-logo-left" class="klarna-logo-img"
+				src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png">
+		</div>
+	</div>
 
-				</div>
-
+</div>
 
 
-					<span id="kb-dismiss-close-icon" class="kb-dismiss dashicons dashicons-dismiss"></span>
 
-				<script type="text/javascript">
+<span id="kb-dismiss-close-icon" class="kb-dismiss dashicons dashicons-dismiss"></span>
 
-				jQuery(document).ready(function($){
+<script type="text/javascript">
+jQuery(document).ready(function($) {
 
-					jQuery('.kb-dismiss').click(function(){
-						jQuery('#klarna-banner').slideUp();
-						jQuery.post(
-							ajaxurl,
-							{
-								action		: 'hide_klarna_banner',
-								_wpnonce	: '<?php echo wp_create_nonce( 'hide-klarna-banner' ); // phpcs:ignore?>',
-							},
-							function(response){
-								console.log('Success hide KCO banner');
-							}
-						);
-					});
-				});
-				</script>
+	jQuery('.kb-dismiss').click(function() {
+		jQuery('#klarna-banner').slideUp();
+		jQuery.post(
+			ajaxurl, {
+				action: 'hide_klarna_banner',
+                _wpnonce: '<?php echo wp_create_nonce('hide-klarna-banner'); // phpcs:ignore?>',
+			},
+			function(response) {
+				console.log('Success hide KCO banner');
+			}
+		);
+	});
+});
+</script>
 				<?php
 			}
 		}
 
-		/**
-		 * Generate the URL for activating a plugin.
-		 *
-		 * Note: the user will be redirected to the plugins page after activation.
-		 *
-		 * @param string $plugin_name The plugin's directory and name of main plugin file.
-		 * @return string The URL for activating the plugin.
-		 */
-		public static function activate_plugin_url( $plugin_name ) {
-			return esc_url( wp_nonce_url( admin_url( 'plugins.php?action=activate&plugin=' . $plugin_name ), 'activate-plugin_' . $plugin_name ) );
-		}
 
-		/**
-		 * Check if a plugin is activated.
-		 *
-		 * @param string $plugin_name The plugin's directory and name of main plugin file.
-		 * @return bool True if the plugin is activated, false otherwise.
-		 */
-		public static function is_plugin_activated( $plugin_name ) {
-			$active_plugins = (array) get_option( 'active_plugins', array() );
-			if ( is_multisite() ) {
-				$active_plugins = array_merge( $active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
-			}
-			return in_array( $plugin_name, $active_plugins, true ) || array_key_exists( $plugin_name, $active_plugins );
-		}
-
-		/**
-		 * Generate the HTML for a plugin action button.
-		 *
-		 * @param string $plugin_name The plugin's directory and name of main plugin file.
-		 * @param array  $install The plugin's install URL or slug.
-		 * @return string The HTML for the plugin action button.
-		 */
-		public static function plugin_action_button( $plugin_name, $install = array() ) {
-
-			if ( self::is_plugin_activated( $plugin_name ) ) {
-				$attr = 'class="button button-disabled"';
-				$text = __( 'Active', 'plugin' );
-			} elseif ( get_plugins()[ $plugin_name ] ?? false ) {
-				$attr = 'class="button activate-now button-primary" href="' . self::activate_plugin_url( $plugin_name ) . '"';
-				$text = __( 'Activate', 'plugin' );
-			} else {
-				$attr = 'class="install-now button"';
-
-				if ( ! empty( $install['url'] ) ) {
-					$attr .= ' href="' . esc_url( $install['url'] ) . '"';
-				} else {
-					$attr .= ' href="' . wp_nonce_url( self_admin_url( 'update.php?action=install-plugin&plugin=' . $install['slug'] ), 'install-plugin_' . $install['slug'] ) . '"';
-				}
-
-				$text = __( 'Install Now', 'plugin' );
-			}
-			return "<a {$attr}>{$text}</a>";
-		}
 
 		/**
 		 * Adds banners to the settings sidebar.
 		 *
-		 * @param array $parent_options The parent options.
+		 * @param string $html The HTML to output on the page.
 		 */
-		public static function settings_sidebar( $parent_options ) {
-			$osm_name = 'klarna-onsite-messaging-for-woocommerce/klarna-onsite-messaging-for-woocommerce.php';
-			$kom_name = 'klarna-order-management-for-woocommerce/klarna-order-management-for-woocommerce.php';
+		public static function settings_sidebar( $html ) {
+			$settings_url = KCO_WC()->get_setting_link();
+			$subtab       = filter_input( INPUT_GET, 'subtab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 			?>
-			<img id="klarna-settings-logo"
-				src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png" width="200"/>
-			<script>
-				jQuery(document).ready(function($){
-					$('#klarna-wrapper #tabs a').click(function(){
-						$('#klarna-wrapper #tabs a').removeClass('nav-tab-active');
-						$(this).addClass('nav-tab-active');
-						$(this).siblings().each(function(){
-							$('#' + $(this).attr('href').replace('#', '')).hide();
-						})
-						$('#' + $(this).attr('href').replace('#', '')).show();
-					});
+<img id="klarna-settings-logo" src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png"
+	width="200" />
+<div id="klarna-wrapper">
+	<div id="tabs" class="nav-tab-wrapper">
+		<nav>
+			<a class="nav-tab 
+						<?php
+						if ( empty( $subtab ) ) {
+							echo 'nav-tab-active';
+						}
+						?>
+						" href="<?php echo esc_url( $settings_url ); ?>">Settings</a>
+			<a class="nav-tab 
+						<?php
+						if ( 'kco-support' === $subtab ) {
+							echo 'nav-tab-active';
+						}
+						?>
+						 " href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-support', $settings_url ) ); ?>">Support</a>
+			<a class="nav-tab 
+						<?php
+						if ( 'kco-addons' === $subtab ) {
+							echo 'nav-tab-active';
+						}
+						?>
+						" href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-addons', $settings_url ) ); ?>">Add-ons</a>
+		</nav>
+	</div>
+</div>
+<div class="kco-tab-wrapper">
+	<div id="klarna-main">
+        <?php echo $html; // phpcs:ignore?>
+	</div>
+	<div id="krokdocs-sidebar">
+		<div class="krokdocs-sidebar-section">
+			<h1 id="krokdocs-sidebar-title">Plugin resources</h1>
+			<div class="krokdocs-sidebar-content">
+				<ul>
+					<li><a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
+							target="_blank">General information</a></li>
+					<li><a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
+							target="_blank">Technical documentation</a></li>
+					<li><a
+							href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco#kco-support">Support</a>
+					</li>
+					<li><a
+							href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco#kco-addons">Add-ons</a>
+					</li>
+				</ul>
+				<h1 id="krokdocs-sidebar-title">Additional resources</h1>
+				<ul>
+					<li><a href="https://docs.krokedil.com/krokedil-general-support-info/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
+							target="_blank">General support information</a></li>
+					<li><a href="https://krokedil.com/products/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
+							target="_blank">Other Krokedil plugins</a></li>
+					<li><a href="https://krokedil.com/knowledge/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
+							target="_blank">Krokedil blog</a></li>
+				</ul>
+			</div>
 
-					$(window).on('hashchange', function() {
-						$('#klarna-wrapper #tabs a').removeClass('nav-tab-active');
-						$('#klarna-wrapper #tabs a[href="' + window.location.hash + '"]').addClass('nav-tab-active');
-						$('#klarna-wrapper #tabs a[href="' + window.location.hash + '"]').siblings().each(function(){
-							$('#' + $(this).attr('href').replace('#', '')).hide();
-						})
-						$('#' + window.location.hash.replace('#', '')).show();
-					})
-				});
-			</script>
-
-			<div id="klarna-wrapper">
-				<div id='tabs' class='nav-tab-wrapper'>
-					<nav>
-						<a class='nav-tab nav-tab-active' href="#kco-settings">Settings</a>
-						<a class='nav-tab' href="#kco-support">Support</a>
-						<a class='nav-tab' href="#kco-addons">Add-ons</a>
-					</nav>
-				</div>
-				<div class='kco-tab-wrapper'>
-				<div id='kco-settings'>
-					<div id="klarna-main">
-						<?php echo $parent_options; // phpcs:ignore?>
-					</div>
-				</div>
-
-				<div id='kco-support'>
-					<p>Before opening a support ticket, please make sure you have read the relevant plugin resources for a solution to your problem.</p>
-					<ul>
-						<li><a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar" target="_blank">General information</a></li>
-						<li><a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar" target="_blank">Technical documentation</a></li>
-						<li><a href="https://docs.krokedil.com/krokedil-general-support-info/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar" target="_blank">General support information</a></li>
-					</ul>
-					<p>If you have questions regarding a certain purchase, you're welcome to contact <a href="">Klarna.</a></p>
-					<p>If you have <b>technical questions or questions regarding configuration</b> of the plugin, you're welcome to contact <a href="">Krokedil</a>, the plugin's developer.</p>
-				</div>
-				
-				<div id='kco-addons'>
-					<p>These are other plugins from Krokedil that work well with the plugin Klarna Checkout.</p>
-					<div class='kco-addons-cards'>
-						<div class="kco-addon-card">
-							<img class="kco-addon-card-image" src="https://krokedil.com/wp-content/uploads/sites/3/2020/11/kom-chosen-960x544.jpg" alt="Get Klarna Order Management">
-							<h3 class="kco-addon-card-title">Klarna Order Management</h3>
-							<p class="kco-addon-card-description">Handle post purchase order management in Klarna's system directly from WooCommerce. This way you can save time and don't have to work in both systems simultaneously.</p>
-							<a class="kco-addon-read-more" href="https://krokedil.com/product/klarna-order-management/" target="_blank">Read more</a>
-							<p class="kco-addon-card-action"><span class='kco-addon-card-price'>Free</span>
-							<?php echo self::plugin_action_button( $kom_name, array( 'slug' => 'klarna-order-management-for-woocommerce' ) ); ?></p>
-						</div>
-
-						<div class="kco-addon-card">
-							<img class="kco-addon-card-image" src="https://krokedil.com/wp-content/uploads/sites/3/2020/11/osm-chosen-960x544.jpg" alt="Get Klarna On-Site Messaging">
-							<h3 class="kco-addon-card-title">On-Site Messaging</h3>
-							<p class="kco-addon-card-description">On-Site Messaging is easy and simple to integrate, providing tailored messaging ranging from generic banners to promote your partnership with Klarna and availability of financing to personalized credit promotion on product or cart pages.</p>
-							<a class="kco-addon-read-more" href="https://krokedil.com/product/on-site-messaging-for-woocommerce/" target="_blank">Read more</a>
-							<p class="kco-addon-card-action"><span class='kco-addon-card-price'>Free</span>
-							<?php echo self::plugin_action_button( $osm_name, array( 'url' => 'https://krokedil.com/product/klarna-on-site-messaging/?utm_source=kco&utm_medium=wp-admin&utm_campaign=add-ons' ) ); ?></p>
-						</div>
-					</div>
-				</div>
-
-				<div id="krokdocs-sidebar">
-					<div class="krokdocs-sidebar-section">
-						<h1 id="krokdocs-sidebar-title">Plugin resources</h1>
-							<div class="krokdocs-sidebar-content">
-									<ul>
-									<li><a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar" target="_blank">General information</a></li>
-									<li><a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar" target="_blank">Technical documentation</a></li>
-									<li><a href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco#kco-support">Support</a></li>
-									<li><a href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco#kco-addons">Add-ons</a></li>
-									</ul>
-						<h1 id="krokdocs-sidebar-title">Additional resources</h1>
-									<ul>
-										<li><a href="https://docs.krokedil.com/krokedil-general-support-info/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar" target="_blank">General support information</a></li>
-										<li><a href="https://krokedil.com/products/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar" target="_blank">Other Krokedil plugins</a></li>
-										<li><a href="https://krokedil.com/knowledge/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar" target="_blank">Krokedil blog</a></li>
-									</ul>
-							</div>
-
-								<div id="krokdocs-sidebar-bottom-holder">
-									<p id="krokdocs-sidebar-logo-follow-up-text">
-										Developed by:
-									</p>
-									<img id="krokdocs-sidebar-krokedil-logo-right"
-									src="https://krokedil.se/wp-content/uploads/2020/05/webb_logo_400px.png">
-								</div>
-					</div>
-				</div>
-				</div>
-			<div class="save-separator"></div>
+			<div id="krokdocs-sidebar-bottom-holder">
+				<p id="krokdocs-sidebar-logo-follow-up-text">
+					Developed by:
+				</p>
+				<img id="krokdocs-sidebar-krokedil-logo-right"
+					src="https://krokedil.se/wp-content/uploads/2020/05/webb_logo_400px.png">
+			</div>
+		</div>
+	</div>
+</div>
+<div class="save-separator"></div>
 			<?php
 		}
 

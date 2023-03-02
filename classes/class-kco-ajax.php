@@ -37,6 +37,7 @@ class KCO_AJAX extends WC_AJAX {
 			'kco_wc_set_session_value'              => true,
 			'kco_wc_get_klarna_order'               => true,
 			'kco_wc_log_js'                         => true,
+			'kco_wc_change_addon_status'            => true, /* MUST BE PRIVATE: Access to sensitive data must required admin access. */
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -262,6 +263,74 @@ class KCO_AJAX extends WC_AJAX {
 		$message         = "Frontend JS $klarna_order_id: $posted_message";
 		KCO_Logger::log( $message );
 		wp_send_json_success();
+	}
+
+	/**
+	 * Handles installing and activating an addon plugin.
+	 *
+	 * @return void
+	 */
+	public static function kco_wc_change_addon_status() {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( wp_unslash( $_POST['nonce'] ) ) : '';
+		// Check nonce.
+		if ( ! wp_verify_nonce( $nonce, 'kco_wc_change_addon_status' ) ) {
+			wp_send_json_error( 'bad_nonce' );
+			exit;
+		}
+
+		// Either a slug or a URL is required.
+		$plugin_name = isset( $_POST['plugin'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin'] ) ) : '';
+		$plugin_url  = isset( $_POST['plugin_url'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin_url'] ) ) : '';
+
+		// Allowed: install, activate: plugin. If 'activated' do nothing.
+		$action = isset( $_POST['action'] ) ? sanitize_text_field( wp_unslash( $_POST['action'] ) ) : '';
+		if ( 'activated' === $action ) {
+			wp_send_json_success( 'active' );
+		}
+
+		if ( 'install' === $action ) {
+			if ( ! current_user_can( 'install_plugins' ) ) {
+				wp_send_json_error( 'no_permission' );
+			}
+		}
+
+		if ( 'activate' === $action ) {
+			if ( ! current_user_can( 'activate_plugins' ) ) {
+				wp_send_json_error( 'no_permission' );
+			}
+
+			$plugin = WP_PLUGIN_DIR . '/' . $plugin_name;
+			if ( 'activate' === $action && ! kco_is_plugin_activated( $plugin ) ) {
+				$result = activate_plugin( $plugin );
+
+				if ( is_wp_error( $result ) ) {
+					wp_send_json_error( $result->get_error_message() );
+				} else {
+					wp_send_json_success( 'activated' );
+				}
+			}
+		}
+
+		if ( 'install' === $action ) {
+			if ( ! class_exists( 'Plugin_Upgrader', false ) ) {
+				require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+			}
+
+			if ( ! class_exists( 'Klarna_Skin', false ) ) {
+				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-skin.php';
+			}
+
+			$skin      = new Klarna_Skin();
+			$installer = new Plugin_Upgrader( $skin );
+			$result    = $installer->install( $plugin_url );
+
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_error( $result->get_error_message() );
+			} else {
+				wp_send_json_success( 'installed' );
+			}
+		}
+
 	}
 }
 KCO_AJAX::init();

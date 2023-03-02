@@ -120,3 +120,53 @@ jQuery( function($) {
 
 
 
+	$(document).ready(function () {
+		$('.kco-addon-card-action a').click(function (e) {
+			const target = $(this);
+
+			target.removeClass('failed');
+			target.addClass('loading');
+
+			$.ajax({
+				type: 'POST',
+				url: kco_admin_params.change_addon_status,
+				data: {
+					plugin: $(this).data('pluginName'),
+					plugin_url: $(this).data('pluginUrl'),
+					action: $(this).data('action'),
+					nonce: kco_admin_params.change_addon_status_nonce,
+				},
+				success: function (response) {
+					target.removeClass('loading');
+					if (response.success) {
+						if ('activated' === response.data) {
+							target.data('action', 'active');
+							target.text('Active');
+							target.addClass('button button-disabled');
+						}
+
+						if ( 'installed' === response.data ) {
+							target.data('action', 'activate');
+							target.text('Activate');
+							target.addClass('install-now button');
+						}
+					} else {
+						target.text('Error');
+						target.addClass('failed');
+
+						console.error(response);
+					}
+				},
+				error: function (response) {
+					target.text('Error');
+					target.removeClass('loading');
+					target.addClass('failed');
+
+					console.error(response);
+				},
+			})
+
+			e.preventDefault();
+		});
+	});
+});
