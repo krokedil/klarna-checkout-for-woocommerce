@@ -115,10 +115,6 @@ jQuery( function($) {
 	})
 
 	$('body').on('change', credentialsFields, testCredential);
-});
-
-
-
 
 	$(document).ready(function () {
 		$('.kco-addon-card-action a').click(function (e) {
