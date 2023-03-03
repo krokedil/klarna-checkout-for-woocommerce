@@ -197,10 +197,10 @@ jQuery(document).ready(function($) {
 					<li><a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
 							target="_blank">Technical documentation</a></li>
 					<li><a
-							href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco#kco-support">Support</a>
+							href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco&subtab=kco-support">Support</a>
 					</li>
 					<li><a
-							href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco#kco-addons">Add-ons</a>
+							href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco&subtab=kco-addons">Add-ons</a>
 					</li>
 				</ul>
 				<h1 id="krokdocs-sidebar-title">Additional resources</h1>
