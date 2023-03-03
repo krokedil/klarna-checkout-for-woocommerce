@@ -9,6 +9,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Hides the WooCommerce save button for the settings page.
+$GLOBALS['hide_save_button'] = true;
+
 ?>
 <div id='kco-support'>
 	<p>Before opening a support ticket, please make sure you have read the relevant plugin resources for a solution to your problem.</p>
