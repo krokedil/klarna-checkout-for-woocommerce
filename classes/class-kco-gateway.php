@@ -203,6 +203,26 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			// Render the addons content
 			if ( 'kco-addons' === $subtab ) {
+				$addons = get_transient( 'wc_kco_addons' );
+				if ( false === $addons ) {
+					$kco_settings = get_option( 'woocommerce_kco_settings' );
+					$raw_addons   = wp_safe_remote_get( 'https://s3-eu-west-1.amazonaws.com/krokedil-checkout-addons/klarna-checkout-for-woocommerce-addons.json', array( 'user-agent' => 'KCO Addons Page. Testmode: ' . $kco_settings['testmode'] ) );
+					if ( ! is_wp_error( $raw_addons ) ) {
+						$addons = json_decode( wp_remote_retrieve_body( $raw_addons ), true );
+						if ( $addons ) {
+							set_transient( 'wc_kco_addons', $addons, DAY_IN_SECONDS );
+						}
+					}
+				}
+
+				$addons = $addons['sections'][0]['items'];
+				$addons = array_filter(
+					$addons,
+					function( $addon ) {
+						return 'coming soon' !== strtolower( $addon['title'] );
+					}
+				);
+
 				include KCO_WC_PLUGIN_PATH . '/includes/admin/views/html-kco-addons.php';
 			}
 

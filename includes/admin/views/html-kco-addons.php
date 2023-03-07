@@ -18,25 +18,21 @@ define( 'KCO_KOM_PATH', 'klarna-order-management-for-woocommerce/klarna-order-ma
 <div class="kco-addons">
 	<p>These are other plugins from Krokedil that work well with the plugin Klarna Checkout.</p>
 	<div class='kco-addons-cards'>
+		<?php foreach ( $addons as $addon ) : ?>
 		<div class="kco-addon-card">
-			<img class="kco-addon-card-image" src="https://krokedil.com/wp-content/uploads/sites/3/2020/11/kom-chosen-960x544.jpg" alt="Get Klarna Order Management">
-			<h3 class="kco-addon-card-title">Klarna Order Management</h3>
-			<p class="kco-addon-card-description">Handle post purchase order management in Klarna's system directly from WooCommerce. This way you can save time and don't have to work in both systems simultaneously.</p>
-			<a class="kco-addon-read-more" href="https://krokedil.com/product/klarna-order-management/" target="_blank">Read more</a>
+			<img class="kco-addon-card-image" src="<?php echo $addon['image']; ?>" alt="<?php echo $addon['description']; ?>">
+			<h3 class="kco-addon-card-title"><?php echo $addon['title']; ?></h3>
+			<p class="kco-addon-card-description"><?php echo $addon['description']; ?></p>
+			<a class="kco-addon-read-more" href="<?php echo $addon['docs_url']; ?>" target="_blank"><?php echo $addon['button']; ?></a>
 			<p class="kco-addon-card-action"><span class='kco-addon-card-price'>Free</span>
-			<?php
-			echo kco_plugin_action_button( KCO_KOM_PATH, array( 'url' => 'https://downloads.wordpress.org/plugin/klarna-order-management-for-woocommerce.zip' ) );
-			?>
+			<?php echo( ! empty( $addon['plugin_url'] ) ) ? kco_plugin_action_button( KCO_KOM_PATH, array( 'url' => $addon['plugin_url'] ) ) : ''; ?>
 			</p>
 		</div>
-
-		<div class="kco-addon-card">
-			<img class="kco-addon-card-image" src="https://krokedil.com/wp-content/uploads/sites/3/2020/11/osm-chosen-960x544.jpg" alt="Get Klarna On-Site Messaging">
-			<h3 class="kco-addon-card-title">On-Site Messaging</h3>
-			<p class="kco-addon-card-description">On-Site Messaging is easy and simple to integrate, providing tailored messaging ranging from generic banners to promote your partnership with Klarna and availability of financing to personalized credit promotion on product or cart pages.</p>
-			<a class="kco-addon-read-more" href="https://krokedil.com/product/klarna-on-site-messaging/?utm_source=kco&utm_medium=wp-admin&utm_campaign=add-ons" target="_blank">Read more</a>
-			<p class="kco-addon-card-action"><span class='kco-addon-card-price'>Free</span>
-			<?php echo kco_plugin_action_button( KCO_OSM_PATH, array( 'url' => 'https://bit.ly/klarna-on-site-messaging-for-woocommerce' ) ); ?></p>
+		<?php endforeach; ?>
+		<div class="kco-addon-card placeholder">
+			<img class="kco-addon-card-image" src="https://s3-eu-west-1.amazonaws.com/krokedil-checkout-addons/images/kco/klarna-icon-thumbnail.jpg" alt="">
+			<h3 class="kco-addon-card-title">Coming soon</h3>
+			<p class="kco-addon-card-description">We are working on more add-ons. Make sure to keep an eye on this page for updates.</p>
 		</div>
 	</div>
 </div>
