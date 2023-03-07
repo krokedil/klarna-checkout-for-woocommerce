@@ -280,6 +280,7 @@ class KCO_AJAX extends WC_AJAX {
 
 		// Either a slug or a URL is required.
 		$plugin_name = isset( $_POST['plugin'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin'] ) ) : '';
+		$plugin_slug = isset( $_POST['plugin_slug'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin_slug'] ) ) : '';
 		$plugin_url  = isset( $_POST['plugin_url'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin_url'] ) ) : '';
 
 		// Allowed: install, activate: plugin. If 'activated' do nothing.
@@ -301,7 +302,7 @@ class KCO_AJAX extends WC_AJAX {
 
 			$plugin = WP_PLUGIN_DIR . '/' . $plugin_name;
 			if ( 'activate' === $action && ! kco_is_plugin_activated( $plugin ) ) {
-				$result = activate_plugin( $plugin );
+				$result = activate_plugin( $plugin_slug );
 
 				if ( is_wp_error( $result ) ) {
 					wp_send_json_error( $result->get_error_message() );

@@ -129,6 +129,7 @@ jQuery( function($) {
 				data: {
 					plugin: $(this).data('pluginName'),
 					plugin_url: $(this).data('pluginUrl'),
+					plugin_slug: $(this).data('pluginSlug'),
 					action: $(this).data('action'),
 					nonce: kco_admin_params.change_addon_status_nonce,
 				},
