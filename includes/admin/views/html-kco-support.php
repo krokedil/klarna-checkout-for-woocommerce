@@ -14,7 +14,7 @@ $GLOBALS['hide_save_button'] = true;
 
 ?>
 <div id='kco-support'>
-	<p>Before opening a support ticket, please make sure you have read the relevant plugin resources for a solution to your problem.</p>
+	<p>Before opening a support ticket, please make sure you have read the relevant plugin resources for a solution to your problem:</p>
 	<ul>
 		<li><a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/" target="_blank">General information</a></li>
 		<li><a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/" target="_blank">Technical documentation</a></li>
