@@ -20,6 +20,6 @@ $GLOBALS['hide_save_button'] = true;
 		<li><a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/" target="_blank">Technical documentation</a></li>
 		<li><a href="https://docs.krokedil.com/krokedil-general-support-info/" target="_blank">General support information</a></li>
 	</ul>
-	<p>If you have questions regarding a certain purchase, you're welcome to contact <a href="https://klarna.com/merchant-support">Klarna.</a></p>
-	<p>If you have <b>technical questions or questions regarding configuration</b> of the plugin, you're welcome to contact <a href="<?php echo false !== strpos( get_locale(), 'sv' ) ? 'https://krokedil.se/support/' : 'https://krokedil.com/support/'; ?>">Krokedil</a>, the plugin's developer.</p>
+	<p>If you have questions regarding a certain purchase, you're welcome to contact <a href="https://klarna.com/merchant-support" target="_blank">Klarna.</a></p>
+	<p>If you have <b>technical questions or questions regarding configuration</b> of the plugin, you're welcome to contact <a href="<?php echo false !== strpos( get_locale(), 'sv' ) ? 'https://krokedil.se/support/' : 'https://krokedil.com/support/'; ?>" target="_blank">Krokedil</a>, the plugin's developer.</p>
 </div>

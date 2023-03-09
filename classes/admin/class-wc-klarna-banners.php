@@ -189,7 +189,7 @@ jQuery(document).ready(function($) {
 	</div>
 	<div id="krokdocs-sidebar">
 		<div class="krokdocs-sidebar-section">
-			<h1 id="krokdocs-sidebar-title">Plugin resources</h1>
+			<h2 id="krokdocs-sidebar-title">Plugin resources</h2>
 			<div class="krokdocs-sidebar-content">
 				<ul>
 					<li><a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
@@ -203,7 +203,7 @@ jQuery(document).ready(function($) {
 							href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco&subtab=kco-addons">Add-ons</a>
 					</li>
 				</ul>
-				<h1 id="krokdocs-sidebar-title">Additional resources</h1>
+				<h2 id="krokdocs-sidebar-title">Additional resources</h2>
 				<ul>
 					<li><a href="https://docs.krokedil.com/krokedil-general-support-info/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
 							target="_blank">General support information</a></li>
