@@ -158,7 +158,7 @@ class KCO_Checkout {
 			return $default;
 		}
 
-		KCO_Logger::log( "Checkout error - Shipping methods where changed during the checkout process by WooCommerce. Chosen shipping method by the customer was $chosen_method, WooCommerce wanted to set $default instead" );
+		KCO_Logger::log( "Checkout error - Shipping methods were changed during the checkout process by WooCommerce. Chosen shipping method by the customer was $chosen_method, WooCommerce wanted to set $default instead" );
 
 		/*
 		 * Add a filter to allow people to set if they want to automatically correct shipping discrepancies instead of throwing an error.
