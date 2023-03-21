@@ -153,6 +153,28 @@ jQuery(document).ready(function($) {
 			$settings_url = KCO_WC()->get_setting_link();
 			$subtab       = filter_input( INPUT_GET, 'subtab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
+			$lang             = substr( get_locale(), 0, 2 );
+			$data             = kco_external_data()['sidebar'];
+			$plugin_resources = $data['Plugin resources']['links'];
+
+			/* Filter to only one language, and default to English if not available. */
+			foreach ( $plugin_resources as $link => $properties ) {
+				foreach ( $properties as $property => $value ) {
+					if ( is_array( $value ) ) {
+						$plugin_resources[ $link ][ $property ] = $value[ $lang ] ?? $value['en'];
+					}
+				}
+			}
+
+			$additional_resources = $data['Additional resources']['links'];
+			foreach ( $additional_resources as $link => $properties ) {
+				foreach ( $properties as $property => $value ) {
+					if ( is_array( $value ) ) {
+						$additional_resources[ $link ][ $property ] = $value[ $lang ] ?? $value['en'];
+					}
+				}
+			}
+
 			?>
 <img id="klarna-settings-logo" src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png"
 	width="200" />
@@ -192,25 +214,19 @@ jQuery(document).ready(function($) {
 			<h2 id="krokdocs-sidebar-title">Plugin resources</h2>
 			<div class="krokdocs-sidebar-content">
 				<ul>
-					<li><a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-							target="_blank">General information</a></li>
-					<li><a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-							target="_blank">Technical documentation</a></li>
-					<li><a
-							href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco&subtab=kco-support">Support</a>
-					</li>
-					<li><a
-							href="https://krokedil.montazar.eu.ngrok.io/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco&subtab=kco-addons">Add-ons</a>
-					</li>
+					<?php
+					foreach ( $plugin_resources as $key => $value ) {
+						echo '<li><a href="' . esc_url( $value['href'] ) . '" target="' . esc_attr( $value['target'] ) . '">' . esc_html( $key ) . '</a></li>';
+					}
+					?>
 				</ul>
 				<h2 id="krokdocs-sidebar-title">Additional resources</h2>
 				<ul>
-					<li><a href="https://docs.krokedil.com/krokedil-general-support-info/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-							target="_blank">General support information</a></li>
-					<li><a href="https://krokedil.com/products/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-							target="_blank">Other Krokedil plugins</a></li>
-					<li><a href="https://krokedil.com/knowledge/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
-							target="_blank">Krokedil blog</a></li>
+					<?php
+					foreach ( $additional_resources as $key => $value ) {
+						echo '<li><a href="' . esc_url( $value['href'] ) . '" target="' . esc_attr( $value['target'] ) . '">' . esc_html( $key ) . '</a></li>';
+					}
+					?>
 				</ul>
 			</div>
 

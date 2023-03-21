@@ -196,28 +196,31 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// Start a output buffer.
 			ob_start();
 
+			if ( in_array( $subtab, array( 'kco-support', 'kco-addons' ), true ) ) {
+				$data = kco_external_data();
+			}
+
 			// Render the suppor content.
 			if ( 'kco-support' === $subtab ) {
+				$links = $data['support']['links'];
+				$lang  = substr( get_locale(), 0, 2 );
+
+				/* Filter to only one language, and default to English if not available. */
+				foreach ( $links as $link => $properties ) {
+					foreach ( $properties as $property => $value ) {
+						if ( is_array( $value ) ) {
+							$links[ $link ][ $property ] = $value[ $lang ] ?? $value['en'];
+						}
+					}
+				}
+
 				include KCO_WC_PLUGIN_PATH . '/includes/admin/views/html-kco-support.php';
 			}
 
 			// Render the addons content
 			if ( 'kco-addons' === $subtab ) {
-				$addons = get_transient( 'wc_kco_addons' );
-				if ( false === $addons ) {
-					$kco_settings = get_option( 'woocommerce_kco_settings' );
-					$raw_addons   = wp_safe_remote_get( 'https://s3-eu-west-1.amazonaws.com/krokedil-checkout-addons/klarna-checkout-for-woocommerce-addons.json', array( 'user-agent' => 'KCO Addons Page. Testmode: ' . $kco_settings['testmode'] ) );
-					if ( ! is_wp_error( $raw_addons ) ) {
-						$addons = json_decode( wp_remote_retrieve_body( $raw_addons ), true );
-						if ( $addons ) {
-							set_transient( 'wc_kco_addons', $addons, DAY_IN_SECONDS );
-						}
-					}
-				}
-
-				$addons = $addons['sections'][0]['items'];
 				$addons = array_filter(
-					$addons,
+					$data['addons']['items'],
 					function( $addon ) {
 						return 'coming soon' !== strtolower( $addon['title'] );
 					}

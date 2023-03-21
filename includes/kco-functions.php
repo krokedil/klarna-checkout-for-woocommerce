@@ -820,3 +820,23 @@ function kco_plugin_action_button( $plugin_name, $install = array() ) {
 	}
 	return "<a {$attr}>{$text}</a>";
 }
+
+/**
+ * Retrieve the external data used in the sidebar, support and add-on tabs from the JSON file.
+ *
+ * @return array Refer to the JSON file for the structure.
+ */
+function kco_external_data() {
+	$data = get_transient( 'wc_kco_external_data' );
+	if ( false === $data ) {
+		$raw_data = wp_safe_remote_get( 'https://kroconnect.blob.core.windows.net/krokedil/klarna-checkout-for-woocommerce-addons.json' );
+		if ( ! is_wp_error( $raw_data ) ) {
+			$data = json_decode( wp_remote_retrieve_body( $raw_data ), true );
+			if ( $data ) {
+				set_transient( 'wc_kco_external_data', $data, DAY_IN_SECONDS );
+			}
+		}
+	}
+
+	return $data;
+}
