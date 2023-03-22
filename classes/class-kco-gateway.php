@@ -366,8 +366,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			);
 			$admin_localize_params = array(
 				'location'                  => $location,
-				'change_addon_status'       => WC_AJAX::get_endpoint( 'kco_wc_change_addon_status' ),
-				'change_addon_status_nonce' => wp_create_nonce( 'kco_wc_change_addon_status' ),
+				'change_addon_status'       => WC_AJAX::get_endpoint( 'krokedil_set_plugin_status' ),
+				'change_addon_status_nonce' => wp_create_nonce( 'krokedil_set_plugin_status' ),
 			);
 			wp_localize_script( 'kco_admin', 'kco_admin_params', $admin_localize_params );
 			wp_enqueue_script( 'kco_admin' );

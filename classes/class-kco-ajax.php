@@ -37,7 +37,6 @@ class KCO_AJAX extends WC_AJAX {
 			'kco_wc_set_session_value'              => true,
 			'kco_wc_get_klarna_order'               => true,
 			'kco_wc_log_js'                         => true,
-			'kco_wc_change_addon_status'            => true, /* MUST BE PRIVATE: Access to sensitive data must required admin access. */
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -48,6 +47,8 @@ class KCO_AJAX extends WC_AJAX {
 				add_action( 'wc_ajax_' . $ajax_event, array( __CLASS__, $ajax_event ) );
 			}
 		}
+
+		Krokedil_Support_Form::init();
 	}
 
 	/**

@@ -759,69 +759,6 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 }
 
 /**
- * Generate the URL for activating a plugin.
- *
- * Note: the user will be redirected to the plugins page after activation.
- *
- * @param string $plugin_name The plugin's directory and name of main plugin file.
- * @return string The URL for activating the plugin.
- */
-function kco_activate_plugin_url( $plugin_name ) {
-	return esc_url( wp_nonce_url( admin_url( 'plugins.php?action=activate&plugin=' . $plugin_name ), 'activate-plugin_' . $plugin_name ) );
-}
-
-/**
- * Check if a plugin is activated.
- *
- * @param string $plugin_name The plugin's directory and name of main plugin file.
- * @return bool True if the plugin is activated, false otherwise.
- */
-function kco_is_plugin_activated( $plugin_name ) {
-	$active_plugins = (array) get_option( 'active_plugins', array() );
-	if ( is_multisite() ) {
-		$active_plugins = array_merge( $active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
-	}
-	return in_array( $plugin_name, $active_plugins, true ) || array_key_exists( $plugin_name, $active_plugins );
-}
-
-/**
- * Generate the HTML for a plugin action button.
- *
- * @param string $plugin_name The plugin's directory and name of main plugin file.
- * @param array  $install The plugin's install URL or slug.
- * @return string The HTML for the plugin action button.
- */
-function kco_plugin_action_button( $plugin_name, $install = array() ) {
-
-	$attr = 'href="#" data-plugin-name="' . $plugin_name . '"';
-	if ( isset( $install['slug'] ) ) {
-		$attr .= ' data-plugin-slug="' . $install['slug'] . '"';
-	}
-
-	if ( isset( $install['url'] ) ) {
-		$attr .= ' data-plugin-url="' . $install['url'] . '"';
-	}
-
-	if ( kco_is_plugin_activated( $plugin_name ) ) {
-		$attr .= ' class="button button-disabled"';
-		$attr .= ' data-action="activated"';
-
-		$text = __( 'Active', 'plugin' );
-	} elseif ( get_plugins()[ $plugin_name ] ?? false ) {
-		$attr .= ' class="button activate-now button-primary"';
-		$attr .= ' data-action="activate"';
-
-		$text = __( 'Activate', 'plugin' );
-	} else {
-		$attr .= ' class="install-now button"';
-		$attr .= ' data-action="install"';
-
-		$text = __( 'Install Now', 'plugin' );
-	}
-	return "<a {$attr}>{$text}</a>";
-}
-
-/**
  * Retrieve the external data used in the sidebar, support and add-on tabs from the JSON file.
  *
  * @return array Refer to the JSON file for the structure.
