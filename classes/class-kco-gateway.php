@@ -190,6 +190,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * Add sidebar to the settings page.
 		 */
 		public function admin_options() {
+			/* This placement is necessary to avoid the HTML element from being jerked up to the top. */
+			$message = get_transient( 'krokedil_support_form_message' );
+			if ( $message ) {
+				echo $message;
+				delete_transient( 'krokedil_support_form_message' );
+			}
+
 			// Get the current subtab.
 			$subtab = filter_input( INPUT_GET, 'subtab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 

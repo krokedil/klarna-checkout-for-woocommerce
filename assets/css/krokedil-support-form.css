@@ -16,6 +16,7 @@
 
 .krokedil-support-form p {
     margin-bottom: 0.5em;
+    max-width: 1080px;
 }
 
 .krokedil-support-form input {
@@ -87,12 +88,11 @@
     display: block;
 }
 
-
-
 .woocommerce-log {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    max-width: 1440px;
 }
 
 .woocommerce-log h3 {

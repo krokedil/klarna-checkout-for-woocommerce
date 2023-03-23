@@ -14,10 +14,12 @@ class Krokedil_Support_Form {
 	private static $init    = false;
 	private static $version = '1.0.0';
 
+	public static $form_message = '';
+
 	public static function init() {
-		// if ( self::$init ) {
-		// return;
-		// }
+		if ( self::$init ) {
+			return;
+		}
 
 		add_action( 'admin_init', array( __CLASS__, 'process_support_form' ) );
 		add_action( 'wc_ajax_krokedil_set_plugin_status', array( __CLASS__, 'set_plugin_status' ) );
@@ -245,6 +247,17 @@ class Krokedil_Support_Form {
 
 	}
 
+	private static function set_submission_message( $message, $is_success = false ) {
+		if ( ! $is_success ) {
+			self::$form_message = sprintf( "<div class='notice notice-error'><p>%s</p></div>", $message );
+		} else {
+			self::$form_message = sprintf( "<div class='notice notice-success'><p>%s</p></div>", $message );
+		}
+
+		set_transient( 'krokedil_support_form_message', self::$form_message, 60 );
+
+	}
+
 	/**
 	 * Process the form for submission to support.
 	 *
@@ -252,11 +265,15 @@ class Krokedil_Support_Form {
 	 */
 	public static function process_support_form() {
 		if ( isset( $_POST['submit'] ) ) {
+			self::$form_message = '';
+
 			if ( ! current_user_can( 'manage_options' ) ) {
+				self::set_submission_message( __( 'You do not have permission to submit a support request.', 'krokedil-support-form' ), false );
 				return;
 			}
 
 			if ( ! isset( $_POST['krokedil_support_form_nonce'] ) || ! wp_verify_nonce( $_POST['krokedil_support_form_nonce'], 'krokedil_support_form_nonce' ) ) {
+				self::set_submission_message( __( 'Nonce verification failed.', 'krokedil-support-form' ), false );
 				return;
 			}
 
@@ -268,7 +285,7 @@ class Krokedil_Support_Form {
 			$from    = sanitize_email( $_POST['email'] );
 			$to      = 'support@krokedil.se';
 			$subject = sanitize_text_field( $_POST['subject'] );
-			$message = sanitize_textarea_field( $_POST['description'] );
+			$message = nl2br( sanitize_textarea_field( $_POST['description'] ) );
 			$headers = array(
 				'From: ' . $from,
 				'Reply-To: ' . $from,
@@ -317,9 +334,18 @@ class Krokedil_Support_Form {
 			}
 
 			if ( ! $error ) {
-				$error = wp_mail( $to, $subject, $message, $headers, $attachment );
+				$result = wp_mail( $to, $subject, $message, $headers, $attachment );
+				if ( empty( $result ) ) {
+					self::set_submission_message( __( 'Something went wrong. Please try again.', 'krokedil-support-form' ), false );
+				} else {
+					self::set_submission_message( __( 'Your support request has been sent. We will get back to you as soon as possible.', 'krokedil-support-form' ), true );
+					wp_safe_redirect( $_SERVER['REQUEST_URI'] );
+					exit();
+				}
+			} else {
+				self::set_submission_message( __( 'Something went wrong. Please try again.', 'krokedil-support-form' ), false );
 			}
 		}
-	}
 
+	}
 }
