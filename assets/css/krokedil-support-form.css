@@ -10,6 +10,14 @@
     padding: 1em;
 }
 
+.krokedil-support-form h3 {
+    margin-bottom: 0.3em;
+}
+
+.krokedil-support-form p {
+    margin-bottom: 0.5em;
+}
+
 .krokedil-support-form input {
     display: block;
 }
@@ -21,6 +29,10 @@
 
 .krokedil-support-form textarea#description {
     width: 100%;
+}
+
+.krokedil-support-form .system-report-wrapper {
+    margin-top: 1em;
 }
 
 .krokedil-support-form .system-report-wrapper,
@@ -75,14 +87,7 @@
     display: block;
 }
 
-.woocommerce-log a.additional-log,
-.woocommerce-log a[class*="additional-log-"] {
-    font-size: 1.1em;
-    padding: 1.1em 0;
-    margin: 0;
-    text-decoration: underline;
-    cursor: pointer;
-}
+
 
 .woocommerce-log {
     display: flex;
@@ -91,6 +96,7 @@
 }
 
 .woocommerce-log h3 {
+    font-size: 1.2em;
     flex-basis: 100%;
 }
 
@@ -103,14 +109,19 @@
     margin-left: 2em;
 }
 
-.krokedil-support-form .uploads {
-    margin-top: 2em;
-}
-
 .krokedil-support-form input[type="submit"] {
     margin-top: 1em;
 }
 
 .woocommerce-log .view-log {
+    cursor: pointer;
+}
+
+.woocommerce-log a.additional-log,
+.woocommerce-log a[class*="additional-log-"] {
+    font-size: 1.1em;
+    padding: 1.1em 0;
+    margin: 0;
+    text-decoration: underline;
     cursor: pointer;
 }
