@@ -1,0 +1,116 @@
+#kco-support .title {
+    padding: 0.8em;
+    border: 1px solid #ccc;
+    border-bottom: 0;
+}
+
+.krokedil-support-form {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 1em;
+}
+
+.krokedil-support-form input {
+    display: block;
+}
+
+.krokedil-support-form .required {
+    font-size: 0.7em;
+    color: black;
+}
+
+.krokedil-support-form textarea#description {
+    width: 100%;
+}
+
+.krokedil-support-form .system-report-wrapper,
+.log-wrapper {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    flex: 1 1 100%;
+}
+
+.system-report-wrapper a,
+.log-wrapper a {
+    margin-left: 2em;
+}
+
+.system-report-wrapper a::after,
+.log-wrapper a::after {
+    display: inline-block;
+    content: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23555%22%2F%3E%3C%2Fsvg%3E");
+    transform: scale(0.7) translateY(30%);
+    filter: sepia(100%) hue-rotate(190deg) saturate(500%);
+}
+
+.system-report-wrapper a:focus,
+.log-wrapper a:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+
+.system-report-wrapper textarea,
+.log-wrapper textarea {
+    display: none;
+    flex-basis: 100%;
+    font-family: monospace;
+    width: 100%;
+    margin: 1em 0;
+    height: 150px;
+    padding-left: 10px;
+    border-radius: 0;
+    resize: none;
+    font-size: 12px;
+    line-height: 20px;
+    outline: 0;
+}
+
+[class*="additional-log-"] {
+    display: none;
+}
+
+.additional-log {
+    display: block;
+}
+
+.woocommerce-log a.additional-log,
+.woocommerce-log a[class*="additional-log-"] {
+    font-size: 1.1em;
+    padding: 1.1em 0;
+    margin: 0;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.woocommerce-log {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.woocommerce-log h3 {
+    flex-basis: 100%;
+}
+
+.woocommerce-log .select2-container {
+    max-width: 60%;
+    min-width: 60%;
+}
+
+.woocommerce-log a {
+    margin-left: 2em;
+}
+
+.krokedil-support-form .uploads {
+    margin-top: 2em;
+}
+
+.krokedil-support-form input[type="submit"] {
+    margin-top: 1em;
+}
+
+.woocommerce-log .view-log {
+    cursor: pointer;
+}
