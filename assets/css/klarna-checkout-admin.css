@@ -42,6 +42,7 @@
 }
 
 /*Left*/
+
 .container-title {
 	font-size: 94px;
 	font-weight: bold;
@@ -61,7 +62,6 @@
 
 /* Middle */
 
-
 .kb-button {
 	font-size: 24px;
 	letter-spacing: 0.9px;
@@ -74,7 +74,6 @@
 #left-main-title {
 	color: #000000;
 	font-size: 4em;
-	;
 	margin: 15px 0px 30px 0px;
 }
 
@@ -113,6 +112,7 @@
 }
 
 /* Other */
+
 .klarna-logo-img {
 	z-index: 1;
 }
@@ -131,20 +131,13 @@
 }
 
 #klarna-main {
-	min-width: 660px;
-	max-width: 70%;
-	padding: 0 2% 0 0;
-	border-right: none;
+	margin-right: 40px;
 	border-top: 1px solid #ccc;
 	box-sizing: border-box;
-}
-
-#klarna-wrapper {
-	max-width: 1440px;
+	flex: 1;
 }
 
 #klarna-wrapper .nav-tab-wrapper {
-	width: 100%;
 	border-bottom: none;
 }
 
@@ -157,7 +150,7 @@
 	flex-wrap: wrap;
 }
 
-/* SUPPORT TAB */
+/* Support tab */
 
 #kco-support ul {
 	list-style: inside "» ";
@@ -168,27 +161,23 @@
 	margin: 0 3px 0 5px;
 }
 
-/* ADDONS TAB*/
+/* Addons tab */
 
 .kco-addons-cards {
 	display: flex;
 	flex-wrap: wrap;
-	row-gap: 1em;
-	column-gap: 2em;
-	margin-bottom: 1.2em;
-	max-width: 1080px;
-	min-width: 700px;
+	column-gap: 2%;
 }
 
 .kco-addon-card {
 	display: flex;
-	justify-content: space-evenly;
-	align-items: stretch;
 	flex-direction: column;
-	max-width: 35%;
+	width: 32%;
 	border: 1px solid #ccc;
 	border-radius: 3px;
-	background-color: white;
+	box-sizing: border-box;
+	background-color: #fff;
+	margin-bottom: 20px;
 }
 
 
@@ -237,16 +226,16 @@
 
 @keyframes loading {
 	0% {
-		color: blue;
-		background-color: white;
+		color: #2271b1;
+		background-color: #f6f7f7;
 	}
 	50% {
-		color: white;
-		background-color: blue;
+		color: #f6f7f7;
+		background-color: #2271b1;
 	}
 	100% {
-		color: blue;
-		background-color: white;
+		color: #2271b1;
+		background-color: #f6f7f7;
 	}
 }
 
@@ -257,9 +246,9 @@
 }
 
 .kco-addon-card .kco-addon-card-action a.failed {
-	color: white;
-	background-color: red;
-	border-color: white;
+	color: #f6f7f7;
+	background-color: #d63638;
+	border-color: #2271b1;
 }
 
 /* Sidebar  */
@@ -364,39 +353,23 @@
 }
 
 #krokdocs-sidebar {
-	display: flex;
-	min-width: 350px;
-	max-height: 600px;
-	margin-bottom: 20px;
-	box-sizing: border-box;
-	text-align: left;
-	background-color: #f5f5f5;
-	border-width: 1px;
-	border-style: solid;
-	border-color: #cccccc;
-	padding: 20px 0 0 20px;
+	flex: 0 0 320px;
 }
 
 .krokdocs-sidebar-section {
-	max-width: 85%;
-	display: flex;
-	flex-direction: column;
+	padding: 25px 25px 30px 25px;
+	background-color: #f5f5f5;
+	border: 1px solid #ccc;
 }
 
 #krokdocs-sidebar-title {
-	text-align: start;
-	width: 100%;
-	margin-bottom: 0px;
-}
-
-.krokdocs-sidebar-content {
-	display: flex;
-	flex-direction: column;
+	margin: 0px;
 }
 
 .krokdocs-sidebar-content ul {
 	list-style: '» ' inside;
-	font-size: 14px
+	font-size: 14px;
+	margin-bottom: 30px;
 }
 
 .krokdocs-sidebar-content ul a[target="_blank"]::after {
@@ -423,23 +396,16 @@
 }
 
 #krokdocs-sidebar-bottom-holder {
-	padding: 5px 10px 10px 10px;
 	margin-top: 10px;
-	align-self: start;
-	flex-direction: column;
 }
 
 #krokdocs-sidebar-krokedil-logo-right {
-	margin: 0px !important;
 	height: 20px;
 	width: auto;
 }
 
 #krokdocs-sidebar-logo-follow-up-text {
-	align-self: flex-start;
-	color: #000000;
-	margin: 5px 0px 5px 0px !important;
-	font: 1em sans-serif;
+	margin: 5px 0px 5px 0px;
 }
 
 
@@ -461,9 +427,25 @@
 	margin: 20px 0;
 }
 
+/* ----- TABLET VIEW ----- */
+
+@media only screen and (max-width:1200px) {
+
+	#klarna-main {
+		margin: 0 0 30px 0;
+		flex: auto;
+	}
+
+	.kco-addon-card {
+		width: 49%;
+	}
+}
+
+/* --- END --- Tablet View*/
+
 /* ----- MOBILE VIEW ----- */
 
-@media (hover: none) and (max-width:700px) {
+@media only screen and (max-width:782px) {
 
 	/* Main container */
 	.kb-spacer {
@@ -550,18 +532,12 @@
 		height: 30px;
 	}
 
-	#klarna-main {
-		border-top: 1px solid #c3c4c7;
-		margin-bottom: 30px !important;
-	}
-
 	/* Mobile Sidebar */
 
 
 	#klarna-sidebar {
 		width: 95vw !important;
 		max-width: unset;
-
 		margin-left: 0px;
 		float: none;
 		box-sizing: border-box;
@@ -584,9 +560,10 @@
 		margin: 0px 10px;
 
 	}
+
 }
 
-/* --- END --- Mobile View*/
+/* --- END --- Mobile View */
 
 
 
