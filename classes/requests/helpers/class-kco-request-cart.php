@@ -290,7 +290,7 @@ class KCO_Request_Cart {
 					// the sum is discounted from order lines so we send it as 0 for reference.
 					if ( wc_tax_enabled() && 'yes' === $apply_before_tax ) {
 						$coupon_amount    = 0;
-						$coupon_reference = __( 'Gift card', 'klarna-checkout-for-woocommerce' ) . ' (amount: ' . WC()->cart->get_coupon_discount_amount( $coupon_key ) . ')';
+						$coupon_reference = __( 'Gift card', 'klarna-checkout-for-woocommerce' ) . ' (amount: ' . WC()->cart->get_coupon_discount_amount( $coupon_key, 'no' === get_option( 'woocommerce_prices_include_tax' ) ) . ')';
 					} else {
 						$coupon_amount    = - WC()->cart->get_coupon_discount_amount( $coupon_key ) * 100;
 						$coupon_reference = __( 'Gift card', 'klarna-checkout-for-woocommerce' );
