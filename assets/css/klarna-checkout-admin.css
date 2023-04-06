@@ -412,6 +412,9 @@
 	margin: 5px 0px 5px 0px;
 }
 
+#krokdocs-sidebar-logo-follow-up-text a:focus {
+	box-shadow: none;
+}
 
 /*--- Dismiss button -----*/
 

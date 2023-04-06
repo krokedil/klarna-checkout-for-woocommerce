@@ -232,10 +232,8 @@ jQuery(document).ready(function($) {
 
 			<div id="krokdocs-sidebar-bottom-holder">
 				<p id="krokdocs-sidebar-logo-follow-up-text">
-					Developed by:
+					Developed by:<br> <a href="<?php echo 'sv' === $lang ? 'https://krokedil.se/' : 'https://krokedil.com/'; ?>" target="_blank"><img id="krokdocs-sidebar-krokedil-logo-right" src="https://krokedil.se/wp-content/uploads/2020/05/webb_logo_400px.png"></a>
 				</p>
-				<img id="krokdocs-sidebar-krokedil-logo-right"
-					src="https://krokedil.se/wp-content/uploads/2020/05/webb_logo_400px.png">
 			</div>
 		</div>
 	</div>
