@@ -131,10 +131,11 @@
 }
 
 #klarna-main {
-	margin-right: 40px;
+	margin-right: 10px;
 	border-top: 1px solid #ccc;
 	box-sizing: border-box;
 	flex: 1;
+	max-width: 1080px;
 }
 
 #klarna-wrapper .nav-tab-wrapper {
@@ -161,23 +162,26 @@
 	margin: 0 3px 0 5px;
 }
 
-/* Addons tab */
-
+/* ADDONS TAB*/
 .kco-addons-cards {
 	display: flex;
 	flex-wrap: wrap;
-	column-gap: 2%;
+	row-gap: 1em;
+	justify-content: space-between;
+	margin-bottom: 1.2em;
+	min-width: 700px;
 }
 
 .kco-addon-card {
 	display: flex;
 	flex-direction: column;
-	width: 32%;
+	max-width: 32%;
 	border: 1px solid #ccc;
 	border-radius: 3px;
 	box-sizing: border-box;
 	background-color: #fff;
 	margin-bottom: 20px;
+	flex-basis: calc(100% / 3);
 }
 
 
