@@ -119,6 +119,15 @@ jQuery( function($) {
 	$(document).ready(function () {
 		$('.kco-addon-card-action a').click(function (e) {
 			const target = $(this);
+			const plugin = target.data('pluginName');
+			const plugin_url = target.data('pluginUrl');
+			const plugin_slug = target.data('pluginSlug');
+			const action = target.data('action');
+
+			// If the action is empty, keep default behavior. Used when the button links to external page.
+			if (! action) {
+				return;
+			}
 
 			target.removeClass('failed');
 			target.addClass('loading');
@@ -127,10 +136,10 @@ jQuery( function($) {
 				type: 'POST',
 				url: kco_admin_params.change_addon_status,
 				data: {
-					plugin: $(this).data('pluginName'),
-					plugin_url: $(this).data('pluginUrl'),
-					plugin_slug: $(this).data('pluginSlug'),
-					action: $(this).data('action'),
+					plugin: plugin,
+					plugin_url: plugin_url, 
+					plugin_slug: plugin_slug, 
+					action: action, 
 					nonce: kco_admin_params.change_addon_status_nonce,
 				},
 				success: function (response) {

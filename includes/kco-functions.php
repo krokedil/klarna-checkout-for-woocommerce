@@ -788,18 +788,18 @@ function kco_is_plugin_activated( $plugin_name ) {
  * Generate the HTML for a plugin action button.
  *
  * @param string $plugin_name The plugin's directory and name of main plugin file.
- * @param array  $install The plugin's install URL or slug.
+ * @param array  $options Configure the properties of the anchor tag. These may include the plugin's install URL and/or slug.
  * @return string The HTML for the plugin action button.
  */
-function kco_plugin_action_button( $plugin_name, $install = array() ) {
+function kco_plugin_action_button( $plugin_name, $options = array() ) {
 
 	$attr = 'href="#" data-plugin-name="' . $plugin_name . '"';
-	if ( isset( $install['slug'] ) ) {
-		$attr .= ' data-plugin-slug="' . $install['slug'] . '"';
+	if ( isset( $options['slug'] ) ) {
+		$attr .= ' data-plugin-slug="' . $options['slug'] . '"';
 	}
 
-	if ( isset( $install['url'] ) ) {
-		$attr .= ' data-plugin-url="' . $install['url'] . '"';
+	if ( isset( $options['url'] ) ) {
+		$attr .= ' data-plugin-url="' . $options['url'] . '"';
 	}
 
 	if ( kco_is_plugin_activated( $plugin_name ) ) {
@@ -813,11 +813,15 @@ function kco_plugin_action_button( $plugin_name, $install = array() ) {
 
 		$text = __( 'Activate', 'plugin' );
 	} else {
-		$attr .= ' class="install-now button"';
-		$attr .= ' data-action="install"';
-
-		$text = __( 'Install Now', 'plugin' );
+		if ( 'free' === $options['price'] ) {
+			$attr .= ' class="install-now button" data-action="install"';
+			$text  = __( 'Install Now', 'plugin' );
+		} else {
+			$attr = 'href="' . $options['url'] . '" class="install-now button" target="_blank"';
+			$text = __( 'Buy Now', 'woocommerce' );
+		}
 	}
+
 	return "<a {$attr}>{$text}</a>";
 }
 
@@ -828,8 +832,9 @@ function kco_plugin_action_button( $plugin_name, $install = array() ) {
  */
 function kco_external_data() {
 	$data = get_transient( 'wc_kco_external_data' );
-	if ( false === $data ) {
-		$raw_data = wp_safe_remote_get( 'https://kroconnect.blob.core.windows.net/krokedil/klarna-checkout-for-woocommerce-addons.json' );
+	if ( true || false === $data ) {
+		// $raw_data = wp_safe_remote_get( 'https:// kroconnect.blob.core.windows.net/krokedil/klarna-checkout-for-woocommerce-addons.json' );
+		$raw_data = wp_safe_remote_get( 'https://gist.githubusercontent.com/mntzrr/2647811a9ef7b88de9efbc09b5f1d4fd/raw/e54b38bcdac1ffa0dca0f5b7d88279abef8c7edc/klarna-checkout-for-woocommerce-addons.json' );
 		if ( ! is_wp_error( $raw_data ) ) {
 			$data = json_decode( wp_remote_retrieve_body( $raw_data ), true );
 			if ( $data ) {

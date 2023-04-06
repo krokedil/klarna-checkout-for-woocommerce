@@ -26,13 +26,14 @@ define( 'KCO_KOM_PATH', 'klarna-order-management-for-woocommerce/klarna-order-ma
 			<a class="kco-addon-read-more" href="<?php echo $addon['docs_url']; ?>" target="_blank"><?php echo $addon['button']; ?></a>
 			<p class="kco-addon-card-action"><span class='kco-addon-card-price'><?php echo ( isset( $addon['price'] ) ) ? $addon['price'] : 'Free'; ?></span>
 			<?php
-			echo( ! empty( $addon['plugin_url'] ) ) ? kco_plugin_action_button(
+			echo kco_plugin_action_button(
 				$addon['plugin_slug'],
 				array(
-					'url'  => $addon['plugin_url'],
-					'slug' => $addon['plugin_slug'],
+					'url'   => $addon['plugin_url'],
+					'slug'  => $addon['plugin_slug'],
+					'price' => $addon['price'] ?? '',
 				)
-			) : '';
+			)
 			?>
 			</p>
 		</div>
