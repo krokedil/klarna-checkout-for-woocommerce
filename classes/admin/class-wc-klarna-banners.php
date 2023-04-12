@@ -187,21 +187,21 @@ jQuery(document).ready(function($) {
 							echo 'nav-tab-active';
 						}
 						?>
-						" href="<?php echo esc_url( $settings_url ); ?>">Settings</a>
+						" href="<?php echo esc_url( $settings_url ); ?>"><?php echo __( 'Settings', 'klarna-checkout-for-woocommerce' ); ?></a>
 			<a class="nav-tab 
 						<?php
 						if ( 'kco-support' === $subtab ) {
 							echo 'nav-tab-active';
 						}
 						?>
-						 " href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-support', $settings_url ) ); ?>">Support</a>
+						 " href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-support', $settings_url ) ); ?>"><?php echo __( 'Support', 'klarna-checkout-for-woocommerce' ); ?></a>
 			<a class="nav-tab 
 						<?php
 						if ( 'kco-addons' === $subtab ) {
 							echo 'nav-tab-active';
 						}
 						?>
-						" href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-addons', $settings_url ) ); ?>">Add-ons</a>
+						" href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-addons', $settings_url ) ); ?>"><?php echo __( 'Add-ons', 'klarna-checkout-for-woocommerce' ); ?></a>
 		</nav>
 	</div>
 </div>
@@ -211,7 +211,7 @@ jQuery(document).ready(function($) {
 	</div>
 	<div id="krokdocs-sidebar">
 		<div class="krokdocs-sidebar-section">
-			<h2 id="krokdocs-sidebar-title">Plugin resources</h2>
+			<h2 id="krokdocs-sidebar-title"><?php echo __( 'Plugin resources', 'klarna-checkout-for-woocommerce' ); ?></h2>
 			<div class="krokdocs-sidebar-content">
 				<ul>
 					<?php
@@ -220,7 +220,7 @@ jQuery(document).ready(function($) {
 					}
 					?>
 				</ul>
-				<h2 id="krokdocs-sidebar-title">Additional resources</h2>
+				<h2 id="krokdocs-sidebar-title"><?php echo __( 'Additional resources', 'klarna-checkout-for-woocommerce' ); ?></h2>
 				<ul>
 					<?php
 					foreach ( $additional_resources as $key => $value ) {

@@ -832,9 +832,8 @@ function kco_plugin_action_button( $plugin_name, $options = array() ) {
  */
 function kco_external_data() {
 	$data = get_transient( 'wc_kco_external_data' );
-	if ( true || false === $data ) {
-		// $raw_data = wp_safe_remote_get( 'https:// kroconnect.blob.core.windows.net/krokedil/klarna-checkout-for-woocommerce-addons.json' );
-		$raw_data = wp_safe_remote_get( 'https://gist.githubusercontent.com/mntzrr/2647811a9ef7b88de9efbc09b5f1d4fd/raw/e54b38bcdac1ffa0dca0f5b7d88279abef8c7edc/klarna-checkout-for-woocommerce-addons.json' );
+	if ( false === $data ) {
+		$raw_data = wp_safe_remote_get( 'https:// kroconnect.blob.core.windows.net/krokedil/klarna-checkout-for-woocommerce-addons.json' );
 		if ( ! is_wp_error( $raw_data ) ) {
 			$data = json_decode( wp_remote_retrieve_body( $raw_data ), true );
 			if ( $data ) {

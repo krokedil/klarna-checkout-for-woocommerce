@@ -198,35 +198,45 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			if ( in_array( $subtab, array( 'kco-support', 'kco-addons' ), true ) ) {
 				$data = kco_external_data();
-			}
+				$lang = substr( get_locale(), 0, 2 );
 
-			// Render the suppor content.
-			if ( 'kco-support' === $subtab ) {
-				$links = $data['support']['links'];
-				$lang  = substr( get_locale(), 0, 2 );
+				// Render the suppor content.
+				if ( 'kco-support' === $subtab ) {
+					$links = $data['support']['links'];
 
-				/* Filter to only one language, and default to English if not available. */
-				foreach ( $links as $link => $properties ) {
-					foreach ( $properties as $property => $value ) {
-						if ( is_array( $value ) ) {
-							$links[ $link ][ $property ] = $value[ $lang ] ?? $value['en'];
+					/* Filter to only one language, and default to English if not available. */
+					foreach ( $links as $link => $properties ) {
+						foreach ( $properties as $property => $value ) {
+							if ( is_array( $value ) ) {
+								$links[ $link ][ $property ] = $value[ $lang ] ?? $value['en'];
+							}
 						}
 					}
+
+					include KCO_WC_PLUGIN_PATH . '/includes/admin/views/html-kco-support.php';
 				}
 
-				include KCO_WC_PLUGIN_PATH . '/includes/admin/views/html-kco-support.php';
-			}
-
-			// Render the addons content
-			if ( 'kco-addons' === $subtab ) {
-				$addons = array_filter(
-					$data['addons']['items'],
-					function( $addon ) {
-						return 'coming soon' !== strtolower( $addon['title'] );
+				// Render the addons content
+				if ( 'kco-addons' === $subtab ) {
+					$addons = $data['addons']['items'];
+					/* Filter to only one language, and default to English if not available. */
+					foreach ( $addons as $item => $properties ) {
+						foreach ( $properties as $property => $value ) {
+							if ( is_array( $value ) ) {
+								$addons[ $item ][ $property ] = $value[ $lang ] ?? $value['en'];
+							}
+						}
 					}
-				);
 
-				include KCO_WC_PLUGIN_PATH . '/includes/admin/views/html-kco-addons.php';
+					$addons = array_filter(
+						$addons,
+						function ( $addon ) {
+							return 'coming soon' !== strtolower( $addon['title'] );
+						}
+					);
+
+					include KCO_WC_PLUGIN_PATH . '/includes/admin/views/html-kco-addons.php';
+				}
 			}
 
 			// If we dont have a subttab just display the normal settings content.
