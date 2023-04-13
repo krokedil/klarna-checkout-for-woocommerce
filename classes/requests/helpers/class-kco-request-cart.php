@@ -122,7 +122,7 @@ class KCO_Request_Cart {
 	 * @return array
 	 */
 	public function adjust_order_lines() {
-		$amount_to_adjust = $this->get_order_amount() - $this->get_order_lines_total_amount( $this->order_lines );
+		$amount_to_adjust = $this->get_order_amount() - $this->get_order_lines_total_amount();
 
 		// If the amount to adjust is zero, return.
 		if ( 0 === intval( round( $amount_to_adjust * 100 ) ) ) {
