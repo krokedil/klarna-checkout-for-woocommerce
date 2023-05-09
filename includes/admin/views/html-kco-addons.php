@@ -16,15 +16,15 @@ define( 'KCO_OSM_PATH', 'klarna-onsite-messaging-for-woocommerce/klarna-onsite-m
 define( 'KCO_KOM_PATH', 'klarna-order-management-for-woocommerce/klarna-order-management-for-woocommerce.php' );
 ?>
 <div class="kco-addons">
-	<p><?php echo __( 'These are other plugins from Krokedil that work well with the plugin Klarna Checkout.', 'klarna-checkout-for-woocommerce' ); ?></p>
+	<p><?php esc_html_e( 'These are other plugins from Krokedil that work well with the plugin Klarna Checkout.', 'klarna-checkout-for-woocommerce' ); ?></p>
 	<div class='kco-addons-cards'>
 		<?php foreach ( $addons as $addon ) : ?>
 		<div class="kco-addon-card">
-			<img class="kco-addon-card-image" src="<?php echo $addon['image']; ?>" alt="<?php echo $addon['description']; ?>">
-			<h3 class="kco-addon-card-title"><?php echo $addon['title']; ?></h3>
-			<p class="kco-addon-card-description"><?php echo $addon['description']; ?></p>
-			<a class="kco-addon-read-more" href="<?php echo $addon['docs_url']; ?>" target="_blank"><?php echo $addon['button']; ?></a>
-			<p class="kco-addon-card-action"><span class='kco-addon-card-price'><?php echo ( isset( $addon['price'] ) ) ? $addon['price'] : __( 'Free', 'woocommerce' ); ?></span>
+			<img class="kco-addon-card-image" src="<?php echo esc_attr( $addon['image'] ); ?>" alt="<?php echo esc_attr( $addon['description'] ); ?>">
+			<h3 class="kco-addon-card-title"><?php echo esc_attr( $addon['title'] ); ?></h3>
+			<p class="kco-addon-card-description"><?php echo esc_attr( $addon['description'] ); ?></p>
+			<a class="kco-addon-read-more" href="<?php echo esc_attr( $addon['docs_url'] ); ?>" target="_blank"><?php echo esc_attr( $addon['button'] ); ?></a>
+			<p class="kco-addon-card-action"><span class='kco-addon-card-price'><?php echo esc_attr( ( isset( $addon['price'] ) ) ? $addon['price'] : __( 'Free', 'woocommerce' ) ); ?></span>
 			<?php
 			echo kco_plugin_action_button(
 				$addon['plugin_slug'],
@@ -40,8 +40,8 @@ define( 'KCO_KOM_PATH', 'klarna-order-management-for-woocommerce/klarna-order-ma
 		<?php endforeach; ?>
 		<div class="kco-addon-card placeholder">
 			<img class="kco-addon-card-image" src="https://s3-eu-west-1.amazonaws.com/krokedil-checkout-addons/images/kco/klarna-icon-thumbnail.jpg" alt="">
-			<h3 class="kco-addon-card-title"><?php echo __( 'Coming soon', 'klarna-checkout-for-woocommerce' ); ?></h3>
-			<p class="kco-addon-card-description"><?php echo __( 'We are working on more add-ons. Make sure to keep an eye on this page for updates.', 'klarna-checkout-for-woocommerce' ); ?></p>
+			<h3 class="kco-addon-card-title"><?php esc_html_e( 'Coming soon', 'klarna-checkout-for-woocommerce' ); ?></h3>
+			<p class="kco-addon-card-description"><?php esc_html_e( 'We are working on more add-ons. Make sure to keep an eye on this page for updates.', 'klarna-checkout-for-woocommerce' ); ?></p>
 		</div>
 	</div>
 </div>

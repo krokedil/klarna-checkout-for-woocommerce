@@ -795,11 +795,11 @@ function kco_plugin_action_button( $plugin_name, $options = array() ) {
 
 	$attr = 'href="#" data-plugin-name="' . $plugin_name . '"';
 	if ( isset( $options['slug'] ) ) {
-		$attr .= ' data-plugin-slug="' . $options['slug'] . '"';
+		$attr .= ' data-plugin-slug="' . esc_attr( $options['slug'] ) . '"';
 	}
 
 	if ( isset( $options['url'] ) ) {
-		$attr .= ' data-plugin-url="' . $options['url'] . '"';
+		$attr .= ' data-plugin-url="' . esc_attr( $options['url'] ) . '"';
 	}
 
 	if ( kco_is_plugin_activated( $plugin_name ) ) {
@@ -817,7 +817,7 @@ function kco_plugin_action_button( $plugin_name, $options = array() ) {
 			$attr .= ' class="install-now button" data-action="install"';
 			$text  = __( 'Install Now', 'plugin' );
 		} else {
-			$attr = 'href="' . $options['url'] . '" class="install-now button" target="_blank"';
+			$attr = 'href="' . esc_attr( $options['url'] ) . '" class="install-now button" target="_blank"';
 			$text = __( 'Buy Now', 'woocommerce' );
 		}
 	}
