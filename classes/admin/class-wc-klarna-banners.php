@@ -142,8 +142,6 @@ jQuery(document).ready(function($) {
 			}
 		}
 
-
-
 		/**
 		 * Adds banners to the settings sidebar.
 		 *
@@ -153,28 +151,18 @@ jQuery(document).ready(function($) {
 			$settings_url = KCO_WC()->get_setting_link();
 			$subtab       = filter_input( INPUT_GET, 'subtab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-			$lang             = substr( get_locale(), 0, 2 );
-			$data             = kco_external_data()['sidebar'];
-			$plugin_resources = $data['Plugin resources']['links'];
+			$lang = substr( get_locale(), 0, 2 );
+			$data = kco_external_data()['sidebar'];
 
-			/* Filter to only one language, and default to English if not available. */
-			foreach ( $plugin_resources as $link => $properties ) {
-				foreach ( $properties as $property => $value ) {
-					if ( is_array( $value ) ) {
-						$plugin_resources[ $link ][ $property ] = $value[ $lang ] ?? $value['en'];
-					}
-				}
+			$plugin_resources = $data['plugin_resources']['en'];
+			if ( isset( $data['plugin_resources'][ $lang ] ) ) {
+				$plugin_resources = $data['plugin_resources'][ $lang ];
 			}
 
-			$additional_resources = $data['Additional resources']['links'];
-			foreach ( $additional_resources as $link => $properties ) {
-				foreach ( $properties as $property => $value ) {
-					if ( is_array( $value ) ) {
-						$additional_resources[ $link ][ $property ] = $value[ $lang ] ?? $value['en'];
-					}
-				}
+			$additional_resources = $data['additional_resources']['en'];
+			if ( isset( $data['additional_resources'][ $lang ] ) ) {
+				$additional_resources = $data['additional_resources'][ $lang ];
 			}
-
 			?>
 <img id="klarna-settings-logo" src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png"
 	width="200" />
@@ -187,21 +175,21 @@ jQuery(document).ready(function($) {
 							echo 'nav-tab-active';
 						}
 						?>
-						" href="<?php echo esc_url( $settings_url ); ?>"><?php echo __( 'Settings', 'klarna-checkout-for-woocommerce' ); ?></a>
+						" href="<?php echo esc_url( $settings_url ); ?>"><?php esc_html_e( 'Settings', 'klarna-checkout-for-woocommerce' ); ?></a>
 			<a class="nav-tab 
 						<?php
 						if ( 'kco-support' === $subtab ) {
 							echo 'nav-tab-active';
 						}
 						?>
-						 " href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-support', $settings_url ) ); ?>"><?php echo __( 'Support', 'klarna-checkout-for-woocommerce' ); ?></a>
+						 " href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-support', $settings_url ) ); ?>"><?php esc_html_e( 'Support', 'klarna-checkout-for-woocommerce' ); ?></a>
 			<a class="nav-tab 
 						<?php
 						if ( 'kco-addons' === $subtab ) {
 							echo 'nav-tab-active';
 						}
 						?>
-						" href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-addons', $settings_url ) ); ?>"><?php echo __( 'Add-ons', 'klarna-checkout-for-woocommerce' ); ?></a>
+						" href="<?php echo esc_url( add_query_arg( 'subtab', 'kco-addons', $settings_url ) ); ?>"><?php esc_html_e( 'Add-ons', 'klarna-checkout-for-woocommerce' ); ?></a>
 		</nav>
 	</div>
 </div>
@@ -211,20 +199,20 @@ jQuery(document).ready(function($) {
 	</div>
 	<div id="krokdocs-sidebar">
 		<div class="krokdocs-sidebar-section">
-			<h2 id="krokdocs-sidebar-title"><?php echo __( 'Plugin resources', 'klarna-checkout-for-woocommerce' ); ?></h2>
+			<h2 id="krokdocs-sidebar-title"><?php esc_html_e( 'Plugin resources', 'klarna-checkout-for-woocommerce' ); ?></h2>
 			<div class="krokdocs-sidebar-content">
 				<ul>
 					<?php
-					foreach ( $plugin_resources as $key => $value ) {
-						echo '<li><a href="' . esc_url( $value['href'] ) . '" target="' . esc_attr( $value['target'] ) . '">' . esc_html( $key ) . '</a></li>';
+					foreach ( $plugin_resources as $link ) {
+						echo '<li><a href="' . esc_url( $link['href'] ) . '" target="' . esc_attr( $link['target'] ) . '">' . esc_html( $link['text'] ) . '</a></li>';
 					}
 					?>
 				</ul>
-				<h2 id="krokdocs-sidebar-title"><?php echo __( 'Additional resources', 'klarna-checkout-for-woocommerce' ); ?></h2>
+				<h2 id="krokdocs-sidebar-title"><?php esc_html_e( 'Additional resources', 'klarna-checkout-for-woocommerce' ); ?></h2>
 				<ul>
 					<?php
-					foreach ( $additional_resources as $key => $value ) {
-						echo '<li><a href="' . esc_url( $value['href'] ) . '" target="' . esc_attr( $value['target'] ) . '">' . esc_html( $key ) . '</a></li>';
+					foreach ( $additional_resources as $link ) {
+						echo '<li><a href="' . esc_url( $link['href'] ) . '" target="' . esc_attr( $link['target'] ) . '">' . esc_html( $link['text'] ) . '</a></li>';
 					}
 					?>
 				</ul>

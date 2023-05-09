@@ -202,36 +202,25 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 				// Render the suppor content.
 				if ( 'kco-support' === $subtab ) {
-					$links = $data['support']['links'];
-
-					/* Filter to only one language, and default to English if not available. */
-					foreach ( $links as $link => $properties ) {
-						foreach ( $properties as $property => $value ) {
-							if ( is_array( $value ) ) {
-								$links[ $link ][ $property ] = $value[ $lang ] ?? $value['en'];
-							}
-						}
+					$links = $data['support']['en'];
+					if ( 'en' !== $lang && isset( $data['support'][ $lang ] ) ) {
+						$links = $data['support'][ $lang ];
 					}
 
 					include KCO_WC_PLUGIN_PATH . '/includes/admin/views/html-kco-support.php';
 				}
 
-				// Render the addons content
+				// Render the addons content.
 				if ( 'kco-addons' === $subtab ) {
-					$addons = $data['addons']['items'];
-					/* Filter to only one language, and default to English if not available. */
-					foreach ( $addons as $item => $properties ) {
-						foreach ( $properties as $property => $value ) {
-							if ( is_array( $value ) ) {
-								$addons[ $item ][ $property ] = $value[ $lang ] ?? $value['en'];
-							}
-						}
+					$addons = $data['addons']['en'];
+					if ( isset( $data['addons'][ $lang ] ) ) {
+						$addons = $data['addons'][ $lang ];
 					}
 
 					$addons = array_filter(
 						$addons,
 						function ( $addon ) {
-							return 'coming soon' !== strtolower( $addon['title'] );
+							return ! empty( $addon['plugin_url'] );
 						}
 					);
 
