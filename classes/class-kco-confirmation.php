@@ -94,28 +94,25 @@ class KCO_Confirmation {
 	 */
 	public function run_kepm( $epm, $order_id, $klarna_order_id ) {
 		$order = wc_get_order( $order_id );
-		// Check if we have a KCO order id.
-		if ( ! empty( $klarna_order_id ) && ! $order ) {
-			// Do a database lookup for the WooCommerce order.
-			$query_args = array(
-				'fields'      => 'ids',
-				'post_type'   => wc_get_order_types(),
-				'post_status' => array_keys( wc_get_order_statuses() ),
-				'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-				'meta_value'  => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-				'date_query'  => array(
-					array(
-						'after' => '2 day ago',
+
+		// Try to retrieve the WC_Order using the Klarna order id.
+		if ( empty( $order ) && ! empty( $klarna_order_id ) ) {
+			$orders = wc_get_orders(
+				array(
+					'meta_query' => array(
+						array(
+							'key'     => '_wc_klarna_order_id',
+							'value'   => $klarna_order_id,
+							'compare' => '=',
+						),
 					),
-				),
+					'date_after' => '2 days ago',
+				)
 			);
-			$orders     = get_posts( $query_args );
-			// Set the order from the first order id returned.
-			if ( ! empty( $orders ) ) {
-				$order_id = $orders[0];
-				$order    = wc_get_order( $order_id );
-			}
+
+			$order = reset( $orders );
 		}
+
 		// Check if we have a order.
 		if ( ! $order ) {
 			wc_print_notice( __( 'Failed getting the order for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
