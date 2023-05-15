@@ -219,14 +219,6 @@ function kco_wc_prefill_allowed() {
 }
 
 /**
- * Calculates cart totals.
- */
-function kco_wc_calculate_totals() {
-	WC()->cart->calculate_fees();
-	WC()->cart->calculate_totals();
-}
-
-/**
  * Shows prefill consent text.
  */
 function kco_wc_prefill_consent() {
@@ -754,6 +746,7 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 		return;
 	}
 
+	$data['currency'] = $klarna_order['purchase_currency'];
 	do_action( 'kco_update_shipping_data', $data );
 
 	set_transient( 'kss_data_' . $klarna_order_id, $data, HOUR_IN_SECONDS );

@@ -27,7 +27,7 @@ class KCO_Request_Options {
 	 *
 	 * @return array
 	 */
-	public function get_options() {
+	public function get_options( $checkout_flow = 'embedded' ) {
 		$options = array(
 			'title_mandatory'                             => $this->get_title_mandatory(),
 			'allow_separate_shipping_address'             => $this->get_allow_separate_shipping_address(),
@@ -35,10 +35,10 @@ class KCO_Request_Options {
 			'national_identification_number_mandatory'    => $this->get_dob_mandatory(),
 			'verify_national_identification_number'       => $this->get_nin_validation_mandatory(),
 			'allowed_customer_types'                      => $this->get_allowed_customer_types(),
-			'require_client_validation'                   => true,
-			'require_client_validation_callback_response' => true,
+			'require_client_validation'                   => 'redirect' === $checkout_flow ? false : true,
+			'require_client_validation_callback_response' => 'redirect' === $checkout_flow ? false : true,
 			'phone_mandatory'                             => 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ),
-			'show_subtotal_detail'                        => $this->show_subtotal_detail(),
+			'show_subtotal_detail'                        => $this->show_subtotal_detail( $checkout_flow ),
 		);
 
 		if ( $this->get_iframe_colors() ) {
@@ -248,12 +248,14 @@ class KCO_Request_Options {
 	}
 
 	/**
-	 * Gets the value for the show_sbutotal_details argument.
+	 * Gets the value for the show_subtotal_details argument.
+	 *
+	 * @param string $checkout_flow The checkout flow: redirect or embedded.
 	 *
 	 * @return bool
 	 */
-	public function show_subtotal_detail() {
-		if ( isset( $this->settings['show_subtotal_detail'] ) && in_array( $this->settings['show_subtotal_detail'], array( 'iframe', 'both' ), true ) ) {
+	public function show_subtotal_detail( $checkout_flow ) {
+		if ( isset( $this->settings['show_subtotal_detail'] ) && in_array( $this->settings['show_subtotal_detail'], array( 'iframe', 'both' ), true ) && 'embedded' === $checkout_flow ) {
 			return true;
 		}
 		return false;

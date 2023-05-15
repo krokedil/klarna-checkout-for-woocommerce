@@ -121,8 +121,7 @@ class KCO_Request_Order {
 	 * @return array
 	 */
 	public function get_order_line_shipping( $order ) {
-
-		$shipping_item = reset( $order->get_shipping_methods() );
+		$shipping_item = array_slice( $order->get_shipping_methods(), 0, 1 )[0];
 
 		return array(
 			'type'             => 'shipping_fee',
@@ -283,10 +282,10 @@ class KCO_Request_Order {
 	public function get_fee_total_amount( $order, $order_fee ) {
 		if ( $this->separate_sales_tax ) {
 			$fee_total_amount      = number_format( ( $order_fee->get_total() ) * ( 1 + ( $this->get_order_line_tax_rate( $order, $order_fee ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
-			$max_order_line_amount = ( number_format( ( $order_fee->get_total() + $order_fee->get_total_tax() ) * 100, wc_get_price_decimals(), '.', '' ) * $order_fee->get_quantity() ) * 100;
+			$max_order_line_amount = ( number_format( ( $order_fee->get_total() + $order_fee->get_total_tax() ) * 100, wc_get_price_decimals(), '.', '' ) * $order_fee->get_quantity() );
 		} else {
 			$fee_total_amount      = number_format( ( $order_fee->get_total() ) * ( 1 + ( $this->get_order_line_tax_rate( $order, $order_fee ) / 10000 ) ), wc_get_price_decimals(), '.', '' ) * 100;
-			$max_order_line_amount = ( number_format( ( $order_fee->get_total() + $order_fee->get_total_tax() ) * 100, wc_get_price_decimals(), '.', '' ) * $order_fee->get_quantity() ) * 100;
+			$max_order_line_amount = ( number_format( ( $order_fee->get_total() + $order_fee->get_total_tax() ) * 100, wc_get_price_decimals(), '.', '' ) * $order_fee->get_quantity() );
 		}
 		// Check so the line_total isn't greater than product price x quantity.
 		// This can happen when having price display set to 0 decimals.

@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 6.0.2
+Tested up to: 6.1.1
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 6.9.4
+WC tested up to: 7.4.1
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,30 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2023.02.21    - version 2.10.1 =
+* Fix           - Fixed an issue caused by passing an empty array to Klarnas billing or shipping address when creating a order.
+
+= 2023.02.14    - version 2.10.0 =
+* Feature       - Pay for order purchases are now redirected to Klarna's hosted payment page. This will now also happen when changing payment method.
+* Fix           - Fixed an issue where a fatal error would occur when logging due to a third-party plugin "RankMath".
+* Tweak         - Delay saving the Klarna order id until we're on the confirmation page.
+* Tweak         - Removed 'wc-cart' JavaScript dependency as it is no longer needed.
+
+= 2022.12.08    - version 2.9.0 =
+* Feature       - Added subscription support for Denmark and the Netherlands.
+* Tweak         - Explicitly set the size of the branding icon to prevent it from growing out of proportion on certain themes.
+* Tweak         - If a business customer has saved their company details to WooCommerce, it will be used for prefilling the payment form.
+* Tweak         - Related to Klarna Shipping Assistant, the purchase currency is saved as a transient to add compatibility with currency switchers.
+* Fix           - Fixed pass by reference warning.
+* Fix           - Fixed an issue where the shipping tax would sometimes not be accounted for.
+* Fix           - Fixed an issue with recurring subscriptions and negative fee that occurs when renewing the subscription.
+
+= 2022.10.26    - version 2.8.7 =
+* Fix           - The shipping phone number should now be saved to the subscription.
+* Fix           - Fixed an undefined index when trying to create or update the session.
+* Enhancement   - You can now use the 'kco_locale' filter to change the Klarna locale.
+* Enhancement   - Added support for PHP 8.
+
 = 2022.09.21    - version 2.8.6 =
 * Fix           - Fixed an issue where WooCommerce reported about shipping changes happening despite no changes which prevented the customer from finalizing the purchase.
 * Fix           - Fixed undefined index and variable.
@@ -385,7 +409,7 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 
 = 2019.10.02    - version 1.11.3 =
 * Fix           - IE support in logic for checking if kco-external-payment exist in url during order confirmation process.
-* Fix           - Request order from checkout API (instead of Order Management API) for address field population during confirmation process in Woo to avoid 404-responses from Klarna. 
+* Fix           - Request order from checkout API (instead of Order Management API) for address field population during confirmation process in Woo to avoid 404-responses from Klarna.
 
 = 2019.09.26    - version 1.11.2 =
 * Tweak         - Increased minimum required WooCommerce version to 3.2.0.
@@ -437,7 +461,7 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * Tweak         - Added hook kco_wc_process_payment so plugins can execute action during process_payment.
 * Tweak         - Added kco_shipping_address_changed JS event so other plugins can act on the change.
 * Tweak         - Delete sessions in woocommerce_thankyou instead of when Klarna order staus is checkout_complete.
-* Tweak         - Display Klarna thankyou iframe even if order received page is reloaded in Woo. 
+* Tweak         - Display Klarna thankyou iframe even if order received page is reloaded in Woo.
 * Tweak         - Use get_label() instead of label when fetching shipping method name sent to Klarna.
 * Tweak         - Improved logging.
 * Tweak         - Added de_DE_formal to kco_wc_prefill_consent.
@@ -456,7 +480,7 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 
 = 2019.04.30  	- version 1.9.3 =
 * Fix           - Changed filter to wc_get_template for overriding checkout template (props @forsvunnet).
-* Fix           - Improved logic in locale sent to Klarna. Fixes WC 3.6 bug where English where displayed as default lang in some stores. 
+* Fix           - Improved logic in locale sent to Klarna. Fixes WC 3.6 bug where English where displayed as default lang in some stores.
 
 = 2019.04.18  	- version 1.9.2 =
 * Fix           - Only set autoResume = false when suspending KCO iframe during required extra checkout fields check. Otherwise keep it to 10 seconds.
@@ -495,7 +519,7 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 * Fix           - Bug fix in shipping_valid in validation callback.
 
 = 2019.02.13  	- version 1.8.4 =
-* Tweak         - Added WC hooks woocommerce_checkout_create_order & woocommerce_checkout_update_order_meta in backup order creation. Better support for Sequential order numbers plugin (props @jonathan-dejong). 
+* Tweak         - Added WC hooks woocommerce_checkout_create_order & woocommerce_checkout_update_order_meta in backup order creation. Better support for Sequential order numbers plugin (props @jonathan-dejong).
 * Tweak         - Added billing_state, billing_country, shipping_state & shipping_country to standard checkout fields to exclude from extra checkout fields control.
 * Tweak         - Don't display shipping on checkout page until customer address has been entered if WC setting "Hide shipping costs until an address is entered" is active.
 * Tweak         - Only unrequire checkout fields on KCO confirmation page.
@@ -633,7 +657,7 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 = 2018.07.23  	- version 1.5.4 =
 * Enhancement	- Added Klarna LEAP functionality (URL's for new customer signup & onboarding).
 * Fix			- Change fees to be sent to Klarna as surcharge.
-* Fix			- Maybe define constants WOOCOMMERCE_CHECKOUT & WOOCOMMERCE_CART in ajax functions. Fix compat issue with https://woocommerce.com/products/payment-gateway-based-fees/. 
+* Fix			- Maybe define constants WOOCOMMERCE_CHECKOUT & WOOCOMMERCE_CART in ajax functions. Fix compat issue with https://woocommerce.com/products/payment-gateway-based-fees/.
 * Fix			- Updated krokedil-logger with json parse error fix (that could be triggered on signel order page).
 
 = 2018.07.16  	- version 1.5.3 =

@@ -21,9 +21,23 @@ class KCO_API {
 	 * @param int $order_id The WooCommerce order id.
 	 * @return mixed
 	 */
-	public function create_klarna_order( $order_id = false ) {
+	public function create_klarna_order( $order_id = false, $checkout_flow = 'embedded' ) {
 		$request  = new KCO_Request_Create();
-		$response = $request->request( $order_id );
+		$response = $request->request( $order_id, $checkout_flow );
+
+		return $this->check_for_api_error( $response );
+	}
+
+	/**
+	 * Creates a Klarna HPP session.
+	 *
+	 * @param string $session_id The Klarna Checkout session to use for the HPP request.
+	 * @param int    $order_id The WooCommerce order id to use for the HPP request.
+	 * @return mixed
+	 */
+	public function create_klarna_hpp_url( $session_id, $order_id ) {
+		$request  = new KCO_Request_Create_HPP();
+		$response = $request->request( $session_id, $order_id );
 
 		return $this->check_for_api_error( $response );
 	}
