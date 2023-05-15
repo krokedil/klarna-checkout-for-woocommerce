@@ -38,7 +38,7 @@ class KCO_Request_Options {
 			'require_client_validation'                   => 'redirect' === $checkout_flow ? false : true,
 			'require_client_validation_callback_response' => 'redirect' === $checkout_flow ? false : true,
 			'phone_mandatory'                             => 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ),
-			'show_subtotal_detail'                        => $this->show_subtotal_detail(),
+			'show_subtotal_detail'                        => $this->show_subtotal_detail( $checkout_flow ),
 		);
 
 		if ( $this->get_iframe_colors() ) {
@@ -248,11 +248,13 @@ class KCO_Request_Options {
 	}
 
 	/**
-	 * Gets the value for the show_sbutotal_details argument.
+	 * Gets the value for the show_subtotal_details argument.
+	 *
+	 * @param string $checkout_flow The checkout flow: redirect or embedded.
 	 *
 	 * @return bool
 	 */
-	public function show_subtotal_detail() {
+	public function show_subtotal_detail( $checkout_flow ) {
 		if ( isset( $this->settings['show_subtotal_detail'] ) && in_array( $this->settings['show_subtotal_detail'], array( 'iframe', 'both' ), true ) && 'embedded' === $checkout_flow ) {
 			return true;
 		}
