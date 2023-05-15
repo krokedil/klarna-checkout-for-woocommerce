@@ -47,6 +47,25 @@ jQuery( function( $ ) {
 				kco_wc.moveExtraCheckoutFields();
 				kco_wc.updateShipping( false );
 			}
+
+			// Wait for the Klarna modal to disappear before scrolling up to show error notices.
+			const observer = new MutationObserver(function (mutations) {
+
+				mutations.forEach(function (mutation) {
+					if ('attributes' === mutation.type && 'class' === mutation.attributeName) {
+						const modalClassName = 'klarna-checkout-fso-open';
+
+						if (! $('html').hasClass(modalClassName)) {
+							const noticeClassName = kco_params.pay_for_order ? 'div.woocommerce-notices-wrapper' : 'form.checkout';
+							$('html, body').animate({
+								scrollTop: ($(noticeClassName).offset().top - 100)
+							}, 1000);
+						}
+					}
+				});
+			});
+
+			observer.observe(document.querySelector('html'), { attributes: true, attributeFilter: ['class'] });
 		},
 
 		/**
@@ -371,9 +390,6 @@ jQuery( function( $ ) {
 			$( className ).removeClass( 'processing' ).unblock();
 			$( className ).find( '.input-text, select, input:checkbox' ).trigger( 'validate' ).blur();
 			$( document.body ).trigger( 'checkout_error' , [ error_message ] );
-			$( 'html, body' ).animate( {
-				scrollTop: ( $( className ).offset().top - 100 )
-			}, 1000 );
 		},
 
 		/**
