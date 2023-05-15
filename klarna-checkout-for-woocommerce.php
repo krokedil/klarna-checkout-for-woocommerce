@@ -265,7 +265,7 @@ if ( ! class_exists( 'KCO' ) ) {
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
-			add_action( 'before_woocommerce_init', array( $this, 'declare_wc_compatability' ) );
+			add_action( 'before_woocommerce_init', array( $this, 'declare_wc_compatibility' ) );
 		}
 
 		/**
@@ -287,7 +287,7 @@ if ( ! class_exists( 'KCO' ) ) {
 		 *
 		 * @return void
 		 */
-		public function declare_wc_compatability() {
+		public function declare_wc_compatibility() {
 			// Declare HPOS compatibility.
 			if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
 				\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
