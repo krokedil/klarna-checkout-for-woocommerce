@@ -775,7 +775,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function upsell( $order_id, $upsell_uuid ) {
 			$klarna_upsell_order = KCO_WC()->api->upsell_klarna_order( $order_id, $upsell_uuid );
 
-			if ( is_wp_error( $klarna_upsell_order ) || ! $klarna_upsell_order ) {
+			if ( is_wp_error( $klarna_upsell_order ) ) {
 				$error = new WP_Error( '401', __( 'Klarna did not accept the new order amount, the order has not been updated' ) );
 				return $error;
 			}
