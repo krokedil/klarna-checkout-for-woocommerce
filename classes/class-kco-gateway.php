@@ -413,7 +413,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					'wc_order_shipping'     => $order->get_shipping_method(),
 					'wc_session_shipping'   => WC()->session->get( 'chosen_shipping_methods' ),
 					'kco_order_shipping'    => $klarna_order['selected_shipping_option'],
-					'kco_shipping_transiet' => get_transient( "kss_data_$klarna_order_id" ),
+					'kco_shipping_transient' => get_transient( "kss_data_$klarna_order_id" ),
 				);
 				$data               = json_encode( $shipping_debug_log );
 				KCO_Logger::log( "Extra shipping debug: $data" );
