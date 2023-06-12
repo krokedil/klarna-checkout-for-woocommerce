@@ -307,7 +307,12 @@ jQuery( function( $ ) {
 		 * @param {array} data
 		 */
 		setCustomerData: function( data ) {
-			kco_wc.log( data );
+			kco_wc.log('setCustomerData', data );
+
+			if (typeof data !== 'object' || data === null) {
+				return;
+			}
+
 			if ( 'billing_address' in data && data.billing_address !== null ) {
 				// Billing fields.
 				$( '#billing_first_name' ).val( ( ( 'given_name' in data.billing_address ) ? data.billing_address.given_name : '' ) );
