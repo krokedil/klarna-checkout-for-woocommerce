@@ -806,19 +806,19 @@ function kco_plugin_action_button( $plugin_name, $options = array() ) {
 		$attr .= ' class="button button-disabled"';
 		$attr .= ' data-action="activated"';
 
-		$text = __( 'Active', 'plugin' );
+		$text = __( 'Active', 'klarna-checkout-for-woocommerce' );
 	} elseif ( get_plugins()[ $plugin_name ] ?? false ) {
 		$attr .= ' class="button activate-now button-primary"';
 		$attr .= ' data-action="activate"';
 
-		$text = __( 'Activate' );
+		$text = __( 'Activate', 'klarna-checkout-for-woocommerce' );
 	} else {
 		if ( 'free' === $options['price'] ) {
 			$attr .= ' class="install-now button" data-action="install"';
-			$text  = __( 'Install Now' );
+			$text  = __( 'Install Now', 'klarna-checkout-for-woocommerce' );
 		} else {
 			$attr = 'href="' . esc_attr( $options['url'] ) . '" class="install-now button" target="_blank"';
-			$text = __( 'Buy Now', 'woocommerce' );
+			$text = __( 'Buy Now', 'klarna-checkout-for-woocommerce' );
 		}
 	}
 
