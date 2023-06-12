@@ -198,6 +198,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			}
 
 			// Classes.
+			include_once KCO_WC_PLUGIN_PATH . '/classes/class-krokedil-support-form.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-ajax.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api-callbacks.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api.php';

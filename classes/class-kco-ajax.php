@@ -47,6 +47,8 @@ class KCO_AJAX extends WC_AJAX {
 				add_action( 'wc_ajax_' . $ajax_event, array( __CLASS__, $ajax_event ) );
 			}
 		}
+
+		Krokedil_Support_Form::init();
 	}
 
 	/**
