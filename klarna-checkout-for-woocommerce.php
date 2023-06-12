@@ -217,7 +217,6 @@ if ( ! class_exists( 'KCO' ) ) {
 			// Admin includes.
 			if ( is_admin() ) {
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-kco-admin-notices.php';
-				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-for-woocommerce-addons.php';
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-wc-klarna-banners.php';
 			}
 
