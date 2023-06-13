@@ -24,14 +24,14 @@ define( 'KCO_KOM_PATH', 'klarna-order-management-for-woocommerce/klarna-order-ma
 			<h3 class="kco-addon-card-title"><?php echo esc_attr( $addon['title'] ); ?></h3>
 			<p class="kco-addon-card-description"><?php echo esc_attr( $addon['description'] ); ?></p>
 			<a class="kco-addon-read-more" href="<?php echo esc_attr( $addon['product_url'] ); ?>" target="_blank"><?php echo esc_attr( $addon['button'] ); ?></a>
-			<p class="kco-addon-card-action"><span class='kco-addon-card-price'><?php echo esc_attr( ( isset( $addon['price'] ) ) ? $addon['price'] : __( 'Free', 'klarna-checkout-for-woocommerce' ) ); ?></span>
+			<p class="kco-addon-card-action"><span class='kco-addon-card-price'><?php echo esc_attr( ( $addon['free'] ? __( 'Free', 'klarna-checkout-for-woocommerce' ) : $addon['price'] ) ); ?></span>
 			<?php
 			echo kco_plugin_action_button(
 				$addon['plugin_slug'],
 				array(
-					'url'   => $addon['plugin_url'],
-					'slug'  => $addon['plugin_slug'],
-					'price' => $addon['price'] ?? '',
+					'url'  => $addon['plugin_url'],
+					'slug' => $addon['plugin_slug'],
+					'free' => $addon['free'] ?? '',
 				)
 			)
 			?>

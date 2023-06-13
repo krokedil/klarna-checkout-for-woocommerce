@@ -813,7 +813,7 @@ function kco_plugin_action_button( $plugin_name, $options = array() ) {
 
 		$text = __( 'Activate', 'klarna-checkout-for-woocommerce' );
 	} else {
-		if ( 'free' === $options['price'] ) {
+		if ( $options['free'] ) {
 			$attr .= ' class="install-now button" data-action="install"';
 			$text  = __( 'Install Now', 'klarna-checkout-for-woocommerce' );
 		} else {
