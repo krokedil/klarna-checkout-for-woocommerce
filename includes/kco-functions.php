@@ -52,9 +52,10 @@ function kco_create_or_update_order() {
 function kco_create_or_update_order_pay_for_order() {
 	global $wp;
 	$order_id = $wp->query_vars['order-pay'];
+	$order    = wc_get_order( $order_id );
 
-	if ( get_post_meta( $order_id, 'kco_order_id' ) ) { // Check if we have an order id.
-		$klarna_order_id = get_post_meta( $order_id, 'kco_order_id' );
+	if ( $order->get_meta( 'kco_order_id', true ) ) { // Check if we have an order id.
+		$klarna_order_id = $order->get_meta( 'kco_order_id', true );
 		// Try to update the order, if it fails try to create new order.
 		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id, $order_id, true );
 		if ( ! $klarna_order ) {
@@ -64,7 +65,8 @@ function kco_create_or_update_order_pay_for_order() {
 				// If failed then bail.
 				return;
 			}
-			update_post_meta( $order_id, 'kco_wc_order_id', $klarna_order['order_id'] );
+			$order->update_meta_data( 'kco_wc_order_id', $klarna_order['order_id'] );
+			$order->save();
 			return $klarna_order;
 		}
 		return $klarna_order;
@@ -74,7 +76,8 @@ function kco_create_or_update_order_pay_for_order() {
 		if ( ! $klarna_order ) {
 			return;
 		}
-		update_post_meta( $order_id, 'kco_wc_order_id', $klarna_order['order_id'] );
+		$order->update_meta_data( 'kco_wc_order_id', $klarna_order['order_id'] );
+		$order->save();
 		return $klarna_order;
 	}
 }
@@ -673,11 +676,14 @@ function kco_convert_region( $region_string, $country_code ) {
  */
 function kco_maybe_save_surcharge( $order_id, $klarna_order ) {
 	if ( isset( $klarna_order['order_lines'] ) ) {
+		$order = wc_get_order( $order_id );
 		foreach ( $klarna_order['order_lines'] as $order_line ) {
 			if ( 'added-surcharge' === $order_line['reference'] ) {
-				update_post_meta( $order_id, '_kco_added_surcharge', wp_json_encode( $order_line ) );
+				$order->update_meta_data( '_kco_added_surcharge', wp_json_encode( $order_line ) );
 			}
 		}
+
+		$order->save();
 	}
 }
 
@@ -692,7 +698,9 @@ function kco_maybe_save_org_nr( $order_id, $klarna_order ) {
 	if ( isset( $klarna_order['customer'] ) && isset( $klarna_order['customer']['type'] ) && 'organization' === $klarna_order['customer']['type'] ) {
 		$org_nr = isset( $klarna_order['customer']['organization_registration_id'] ) ? $klarna_order['customer']['organization_registration_id'] : null;
 		if ( ! empty( $org_nr ) ) {
-			update_post_meta( $order_id, '_billing_org_nr', $org_nr );
+			$order = wc_get_order( $order_id );
+			$order->update_meta_data( '_billing_org_nr', $org_nr );
+			$order->save();
 		}
 	}
 }
@@ -708,12 +716,14 @@ function kco_maybe_save_reference( $order_id, $klarna_order ) {
 	if ( isset( $klarna_order['customer'] ) && isset( $klarna_order['customer']['type'] ) && 'organization' === $klarna_order['customer']['type'] ) {
 		$billing_reference  = isset( $klarna_order['billing_address']['attention'] ) ? $klarna_order['billing_address']['attention'] : null;
 		$shipping_reference = isset( $klarna_order['shipping_address']['attention'] ) ? $klarna_order['shipping_address']['attention'] : null;
+		$order              = wc_get_order( $order_id );
 		if ( ! empty( $billing_reference ) ) {
-			update_post_meta( $order_id, '_billing_reference', $billing_reference );
+			$order->update_meta_data( '_billing_reference', $billing_reference );
 		}
 		if ( ! empty( $shipping_reference ) ) {
-			update_post_meta( $order_id, '_shipping_reference', $shipping_reference );
+			$order->update_meta_data( '_shipping_reference', $shipping_reference );
 		}
+		$order->save();
 	}
 }
 
