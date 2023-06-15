@@ -161,7 +161,8 @@ if ( ! class_exists( 'KCO' ) ) {
 			$setting_link = $this->get_setting_link();
 			$plugin_links = array(
 				'<a href="' . $setting_link . '">' . __( 'Settings', 'klarna-checkout-for-woocommerce' ) . '</a>',
-				'<a href="http://krokedil.se/">' . __( 'Support', 'klarna-checkout-for-woocommerce' ) . '</a>',
+				'<a href="' . admin_url( '/admin.php?page=wc-settings&tab=checkout&section=kco&subtab=kco-addons' ) . '">' . __( 'Add-ons', 'klarna-checkout-for-woocommerce' ) . '</a>',
+				'<a href="' . admin_url( '/admin.php?page=wc-settings&tab=checkout&section=kco&subtab=kco-support' ) . '">' . __( 'Support', 'klarna-checkout-for-woocommerce' ) . '</a>',
 			);
 
 			return array_merge( $plugin_links, $links );
