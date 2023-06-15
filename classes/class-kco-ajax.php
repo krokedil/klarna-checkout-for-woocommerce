@@ -313,12 +313,6 @@ class KCO_AJAX extends WC_AJAX {
 		}
 
 		if ( 'install' === $action ) {
-			// The Plugin_Upgrader::install expects a URL to the zip file.
-			$file = wp_check_filetype( $plugin_url );
-			if ( 'zip' !== $file['ext'] ) {
-				wp_send_json_error( 'bad_url' );
-			}
-
 			if ( ! class_exists( 'Plugin_Upgrader', false ) ) {
 				require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 			}
@@ -337,7 +331,6 @@ class KCO_AJAX extends WC_AJAX {
 				wp_send_json_success( 'installed' );
 			}
 		}
-
 	}
 }
 KCO_AJAX::init();
