@@ -29,9 +29,10 @@ define( 'KCO_KOM_PATH', 'klarna-order-management-for-woocommerce/klarna-order-ma
 			echo kco_plugin_action_button(
 				$addon['plugin_slug'],
 				array(
-					'url'  => $addon['plugin_url'],
-					'slug' => $addon['plugin_slug'],
-					'free' => $addon['free'] ?? '',
+					'plugin_url'  => $addon['plugin_url'],
+					'plugin_slug' => $addon['plugin_slug'],
+					'free'        => $addon['free'] ?? '',
+					'product_url' => $addon['product_url'],
 				)
 			)
 			?>

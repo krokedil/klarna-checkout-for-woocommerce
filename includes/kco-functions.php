@@ -794,12 +794,12 @@ function kco_is_plugin_activated( $plugin_name ) {
 function kco_plugin_action_button( $plugin_name, $options = array() ) {
 
 	$attr = 'href="#" data-plugin-name="' . $plugin_name . '"';
-	if ( isset( $options['slug'] ) ) {
-		$attr .= ' data-plugin-slug="' . esc_attr( $options['slug'] ) . '"';
+	if ( isset( $options['plugin_slug'] ) ) {
+		$attr .= ' data-plugin-slug="' . esc_attr( $options['plugin_slug'] ) . '"';
 	}
 
-	if ( isset( $options['url'] ) ) {
-		$attr .= ' data-plugin-url="' . esc_attr( $options['url'] ) . '"';
+	if ( isset( $options['plugin_url'] ) ) {
+		$attr .= ' data-plugin-url="' . esc_attr( $options['plugin_url'] ) . '"';
 	}
 
 	if ( kco_is_plugin_activated( $plugin_name ) ) {
@@ -817,7 +817,7 @@ function kco_plugin_action_button( $plugin_name, $options = array() ) {
 			$attr .= ' class="install-now button" data-action="install"';
 			$text  = __( 'Install Now', 'klarna-checkout-for-woocommerce' );
 		} else {
-			$attr = 'href="' . esc_attr( $options['url'] ) . '" class="install-now button" target="_blank"';
+			$attr = 'href="' . esc_attr( $options['product_url'] ) . '" class="install-now button" target="_blank"';
 			$text = __( 'Buy Now', 'klarna-checkout-for-woocommerce' );
 		}
 	}
@@ -833,7 +833,7 @@ function kco_plugin_action_button( $plugin_name, $options = array() ) {
 function kco_external_data() {
 	$data = get_transient( 'wc_kco_external_data' );
 	if ( false === $data ) {
-		$raw_data = wp_safe_remote_get( 'https://gist.githubusercontent.com/mntzrr/2647811a9ef7b88de9efbc09b5f1d4fd/raw/937e448fd5af62cf19fcbf3a59ed85e34487df44/klarna-checkout-for-woocommerce-addons.json' );
+		$raw_data = wp_safe_remote_get( 'https://gist.githubusercontent.com/mntzrr/2647811a9ef7b88de9efbc09b5f1d4fd/raw/c1f4611e8648981a836654a88baf44748b1262fa/klarna-checkout-for-woocommerce-addons.json' );
 		if ( ! is_wp_error( $raw_data ) ) {
 			$data = json_decode( wp_remote_retrieve_body( $raw_data ), true );
 			if ( $data ) {
