@@ -56,7 +56,6 @@ jQuery( function( $ ) {
 					if ('attributes' === mutation.type && 'class' === mutation.attributeName) {
 						const modalClassName = 'klarna-checkout-fso-open';
 
-						// mutation.target.classList.contains('klarna-checkout-fso-open')
 						if (!$('html').hasClass(modalClassName)) {
 							// Wait for the Klarna modal to disappear before scrolling up to show error notices.
 							const noticeClassName = kco_params.pay_for_order ? 'div.woocommerce-notices-wrapper' : 'form.checkout';
