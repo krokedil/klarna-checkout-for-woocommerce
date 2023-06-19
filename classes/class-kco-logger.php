@@ -92,6 +92,7 @@ class KCO_Logger {
 			'timestamp'      => date( 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions -- Date is not used for display.
 			'stack'          => self::get_stack(),
 			'plugin_version' => KCO_WC_VERSION,
+			'user_agent'     => wc_get_user_agent(),
 		);
 	}
 
