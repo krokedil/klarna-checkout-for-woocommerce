@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 6.1.1
+Tested up to: 6.2.1
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 7.4.1
+WC tested up to: 7.8.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,15 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2023.06.20    - version 2.11.0 =
+* Feature       - The plugin now supports WooCommerce's "High-Performance Order Storage" ("HPOS") feature.
+* Fix           - Corrected a typo in transient name.
+* Fix           - Addressed a typo in the name of the order status (thanks @bhrugesh96!).
+* Fix           - Resolved an issue where the checkout would crash if invalid customer data was processed in the frontend events.
+* Fix           - Fixed a problem where the order review and checkout form would get stuck in a "blocked" state when the customer closes the Klarna modal without completing the order.
+* Tweak         - Due to API changes, the upsell feature would sometimes fail when receiving an empty body response. This has now been resolved.
+* Enhancement   - Updated logging to include the browser's user agent.
+
 = 2023.05.15    - version 2.10.2 =
 * Fix           - Fixed an issue where the Klarna modal would prevent the page from scrolling to the WooCommerce error notice.
 * Fix           - Fixed an issue with the $checkout_flow variable being referenced without being defined.
