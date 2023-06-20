@@ -398,11 +398,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function process_embedded_payment_handler( $order_id ) {
 			// Get the Klarna order ID.
 			$order = wc_get_order( $order_id );
-			if ( is_object( $order ) && ! empty( get_post_meta( $order->get_id(), '_wc_klarna_order_id', true ) ) ) {
-				$klarna_order_id = get_post_meta( $order->get_id(), '_wc_klarna_order_id', true );
-			} else {
-				$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+			if ( ! empty( $order ) ) {
+				$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
 			}
+			$klarna_order_id = ! empty( $klarna_order_id ) ? $klarna_order_id : WC()->session->get( 'kco_wc_order_id' );
 
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
@@ -413,7 +412,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					'wc_order_shipping'     => $order->get_shipping_method(),
 					'wc_session_shipping'   => WC()->session->get( 'chosen_shipping_methods' ),
 					'kco_order_shipping'    => $klarna_order['selected_shipping_option'],
-					'kco_shipping_transiet' => get_transient( "kss_data_$klarna_order_id" ),
+					'kco_shipping_transient' => get_transient( "kss_data_$klarna_order_id" ),
 				);
 				$data               = json_encode( $shipping_debug_log );
 				KCO_Logger::log( "Extra shipping debug: $data" );
@@ -473,8 +472,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			$hpp_redirect = $hpp['redirect_url'];
 			// Save Klarna HPP url & Session ID.
-			update_post_meta( $order_id, '_wc_klarna_hpp_url', sanitize_text_field( $hpp_redirect ) );
-			update_post_meta( $order_id, '_wc_klarna_hpp_session_id', sanitize_key( $hpp['session_id'] ) );
+			$order->update_meta_data( '_wc_klarna_hpp_url', sanitize_text_field( $hpp_redirect ) );
+			$order->update_meta_data( '_wc_klarna_hpp_session_id', sanitize_key( $hpp['session_id'] ) );
+			$order->save();
 
 			KCO_Logger::log( sprintf( 'Processing order %s|%s (Klarna ID: %s) OK. Redirecting to hosted payment page.', $order_id, $order->get_order_number(), $klarna_order['order_id'] ) );
 
@@ -497,26 +497,33 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return void.
 		 */
 		public function save_metadata_to_order( $order_id, $klarna_order, $checkout_flow = 'embedded' ) {
+			$order = wc_get_order( $order_id );
 
 			// Set Klarna checkout flow.
-			update_post_meta( $order_id, '_wc_klarna_checkout_flow', sanitize_text_field( $checkout_flow ) );
+			$order->update_meta_data( '_wc_klarna_checkout_flow', sanitize_text_field( $checkout_flow ) );
 
 			// Set Klarna order ID.
-			update_post_meta( $order_id, '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
+			$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
 
 			if ( isset( $klarna_order['recurring_token'] ) ) {
-				update_post_meta( $order_id, '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
+				$order->update_meta_data( '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
 			}
 
 			$environment = $this->testmode ? 'test' : 'live';
-			update_post_meta( $order_id, '_wc_klarna_environment', $environment );
+			$order->update_meta_data( '_wc_klarna_environment', $environment );
 
 			$klarna_country = wc_get_base_location()['country'];
-			update_post_meta( $order_id, '_wc_klarna_country', $klarna_country );
+			$order->update_meta_data( '_wc_klarna_country', $klarna_country );
 
-			// Set shipping phone and email.
-			update_post_meta( $order_id, '_shipping_phone', sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
-			update_post_meta( $order_id, '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
+			// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
+			if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
+				$order->set_shipping_phone( sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+			} else {
+				$order->update_meta_data( '_shipping_phone', sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+			}
+
+			$order->update_meta_data( '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
+			$order->save();
 		}
 
 		/**
@@ -624,12 +631,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 */
 		public function add_billing_org_nr( $order ) {
 			if ( $this->id === $order->get_payment_method() ) {
-				$order_id = $order->get_id();
-				$org_nr   = get_post_meta( $order_id, '_billing_org_nr', true );
+				$org_nr = $order->get_meta( '_billing_org_nr', true );
 				if ( $org_nr ) {
 					?>
 					<p>
-						<strong><?php esc_html_e( 'Organisation number:', 'klarna-checkout-for-woocommerce' ); ?></strong>
+						<strong>
+							<?php esc_html_e( 'Organisation number:', 'klarna-checkout-for-woocommerce' ); ?>
+						</strong>
 						<?php echo esc_html( $org_nr ); ?>
 					</p>
 					<?php
@@ -645,12 +653,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 */
 		public function add_billing_reference( $order ) {
 			if ( $this->id === $order->get_payment_method() ) {
-				$order_id  = $order->get_id();
-				$reference = get_post_meta( $order_id, '_billing_reference', true );
+				$reference = $order->get_meta( '_billing_reference', true );
 				if ( $reference ) {
 					?>
 					<p>
-						<strong><?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?></strong>
+						<strong>
+							<?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?>
+						</strong>
 						<?php echo esc_html( $reference ); ?>
 					</p>
 					<?php
@@ -666,12 +675,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 */
 		public function add_shipping_reference( $order ) {
 			if ( $this->id === $order->get_payment_method() ) {
-				$order_id  = $order->get_id();
-				$reference = get_post_meta( $order_id, '_shipping_reference', true );
+				$reference = $order->get_meta( '_shipping_reference', true );
 				if ( $reference ) {
 					?>
 					<p>
-						<strong><?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?></strong>
+						<strong>
+							<?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?>
+						</strong>
 						<?php echo esc_html( $reference ); ?>
 					</p>
 					<?php
@@ -724,7 +734,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return bool
 		 */
 		public function upsell_available( $order_id ) {
-			$klarna_order_id = get_post_meta( $order_id, '_wc_klarna_order_id', true );
+			$order           = wc_get_order( $order_id );
+			$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
 
 			if ( empty( $klarna_order_id ) ) {
 				return false;
@@ -775,7 +786,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function upsell( $order_id, $upsell_uuid ) {
 			$klarna_upsell_order = KCO_WC()->api->upsell_klarna_order( $order_id, $upsell_uuid );
 
-			if ( is_wp_error( $klarna_upsell_order ) || ! $klarna_upsell_order ) {
+			if ( is_wp_error( $klarna_upsell_order ) ) {
 				$error = new WP_Error( '401', __( 'Klarna did not accept the new order amount, the order has not been updated' ) );
 				return $error;
 			}

@@ -75,24 +75,21 @@ class KCO_API {
 			$extracted_response = json_decode( $extracted_response );
 			if ( 'READ_ONLY_ORDER' === $extracted_response->error_code ) {
 
-				$query_args = array(
-					'fields'      => 'ids',
-					'post_type'   => wc_get_order_types(),
-					'post_status' => array_keys( wc_get_order_statuses() ),
-					'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-					'meta_value'  => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-					'date_query'  => array(
-						array(
-							'after' => '2 day ago',
+				$orders = wc_get_orders(
+					array(
+						'meta_query' => array(
+							array(
+								'key'     => '_wc_klarna_order_id',
+								'value'   => $klarna_order_id,
+								'compare' => '=',
+							),
 						),
-					),
+						'date_after' => '2 day ago',
+					)
 				);
 
-				$orders   = get_posts( $query_args );
-				$order_id = $orders[0];
-				$order    = wc_get_order( $order_id );
-
-				if ( $order ) {
+				$order = reset( $orders );
+				if ( ! empty( $order ) ) {
 					wp_safe_redirect( $order->get_checkout_order_received_url() );
 					exit;
 				}
@@ -283,7 +280,8 @@ class KCO_API {
 	 * @return array|WP_Error
 	 */
 	public function upsell_klarna_order( $order_id, $upsell_uuid ) {
-		$klarna_order_id = get_post_meta( $order_id, '_wc_klarna_order_id', true );
+		$order           = wc_get_order( $order_id );
+		$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
 		$request         = new KCO_Request_Upsell_Order();
 		$response        = $request->request( $klarna_order_id, $order_id, $upsell_uuid );
 

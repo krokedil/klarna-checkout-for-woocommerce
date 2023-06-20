@@ -48,24 +48,39 @@ jQuery( function( $ ) {
 				kco_wc.updateShipping( false );
 			}
 
-			// Wait for the Klarna modal to disappear before scrolling up to show error notices.
+			// Handle events when the Klarna modal is closed when the purchase is not complete.
+			// Klarna does not provide an event listener for when the modal is closed.
 			const observer = new MutationObserver(function (mutations) {
 
 				mutations.forEach(function (mutation) {
 					if ('attributes' === mutation.type && 'class' === mutation.attributeName) {
 						const modalClassName = 'klarna-checkout-fso-open';
 
-						if (! $('html').hasClass(modalClassName)) {
+						if (!$('html').hasClass(modalClassName)) {
+							// Wait for the Klarna modal to disappear before scrolling up to show error notices.
 							const noticeClassName = kco_params.pay_for_order ? 'div.woocommerce-notices-wrapper' : 'form.checkout';
 							$('html, body').animate({
 								scrollTop: ($(noticeClassName).offset().top - 100)
 							}, 1000);
+
+							// Unlock the order review table and checkout form.
+							kco_wc.unblock();
+
 						}
 					}
 				});
 			});
 
 			observer.observe(document.querySelector('html'), { attributes: true, attributeFilter: ['class'] });
+		},
+
+		/**
+		 * Unblock the checkout form and order review.
+		 */
+		unblock: function () {
+			kco_wc.checkoutFormSelector.removeClass( 'processing' );
+			$( '.woocommerce-checkout-review-order-table' ).unblock();
+			$( kco_wc.checkoutFormSelector ).unblock();
 		},
 
 		/**
@@ -307,7 +322,12 @@ jQuery( function( $ ) {
 		 * @param {array} data
 		 */
 		setCustomerData: function( data ) {
-			kco_wc.log( data );
+			kco_wc.log('setCustomerData', data );
+
+			if (typeof data !== 'object' || data === null) {
+				return;
+			}
+
 			if ( 'billing_address' in data && data.billing_address !== null ) {
 				// Billing fields.
 				$( '#billing_first_name' ).val( ( ( 'given_name' in data.billing_address ) ? data.billing_address.given_name : '' ) );
@@ -365,9 +385,7 @@ jQuery( function( $ ) {
 					// Remove the timeout.
 					clearTimeout( kco_wc.timeout );
 					// Remove the processing class from the form.
-					kco_wc.checkoutFormSelector.removeClass( 'processing' );
-					$( '.woocommerce-checkout-review-order-table' ).unblock();
-					$( kco_wc.checkoutFormSelector ).unblock();
+					kco_wc.unblock();
 				}
 			}
 		},
