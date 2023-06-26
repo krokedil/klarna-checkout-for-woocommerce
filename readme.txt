@@ -54,6 +54,9 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2023.06.26    - version 2.11.1 =
+* Fix           - Resolved a critical error that occurred in certain cases when an external payment method ("EPM") was used and the order ID couldn't be retrieved.
+
 = 2023.06.20    - version 2.11.0 =
 * Feature       - The plugin now supports WooCommerce's "High-Performance Order Storage" ("HPOS") feature.
 * Fix           - Corrected a typo in transient name.

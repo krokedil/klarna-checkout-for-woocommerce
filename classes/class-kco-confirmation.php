@@ -111,13 +111,17 @@ class KCO_Confirmation {
 			);
 
 			$order = reset( $orders );
+			if ( ! empty( $order ) ) {
+				$order_id = $order->get_id();
+			}
 		}
 
 		// Check if we have a order.
-		if ( ! $order ) {
+		if ( empty( $order ) ) {
 			wc_print_notice( __( 'Failed getting the order for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
 			return;
 		}
+
 		$payment_methods = WC()->payment_gateways->get_available_payment_gateways();
 		// Check if the payment method is available.
 		if ( ! isset( $payment_methods[ $epm ] ) ) {
