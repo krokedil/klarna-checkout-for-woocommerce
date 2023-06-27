@@ -115,8 +115,64 @@ jQuery( function($) {
 	})
 
 	$('body').on('change', credentialsFields, testCredential);
+
+	$(document).ready(function () {
+		$('.kco-addon-card-action a').click(function (e) {
+			const target = $(this);
+			const plugin = target.data('pluginName');
+			const plugin_url = target.data('pluginUrl');
+			const plugin_slug = target.data('pluginSlug');
+			const action = target.data('action');
+
+			// If the action is empty, keep default behavior. Used when the button links to external page.
+			if (! action) {
+				return;
+			}
+
+			target.removeClass('failed');
+			target.addClass('loading');
+
+			$.ajax({
+				type: 'POST',
+				url: kco_admin_params.change_addon_status,
+				data: {
+					plugin: plugin,
+					plugin_url: plugin_url, 
+					plugin_slug: plugin_slug, 
+					action: action, 
+					nonce: kco_admin_params.change_addon_status_nonce,
+				},
+				success: function (response) {
+					target.removeClass('loading');
+					if (response.success) {
+						if ('activated' === response.data) {
+							target.data('action', 'active');
+							target.text('Active');
+							target.addClass('button button-disabled');
+						}
+
+						if ( 'installed' === response.data ) {
+							target.data('action', 'activate');
+							target.text('Activate');
+							target.addClass('install-now button');
+						}
+					} else {
+						target.text('Error');
+						target.addClass('failed');
+
+						console.error(response);
+					}
+				},
+				error: function (response) {
+					target.text('Error');
+					target.removeClass('loading');
+					target.addClass('failed');
+
+					console.error(response);
+				},
+			})
+
+			e.preventDefault();
+		});
+	});
 });
-
-
-
-

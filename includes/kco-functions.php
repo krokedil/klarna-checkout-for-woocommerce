@@ -767,3 +767,90 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 
 	WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
 }
+
+/**
+ * Generate the URL for activating a plugin.
+ *
+ * Note: the user will be redirected to the plugins page after activation.
+ *
+ * @param string $plugin_name The plugin's directory and name of main plugin file.
+ * @return string The URL for activating the plugin.
+ */
+function kco_activate_plugin_url( $plugin_name ) {
+	return esc_url( wp_nonce_url( admin_url( 'plugins.php?action=activate&plugin=' . $plugin_name ), 'activate-plugin_' . $plugin_name ) );
+}
+
+/**
+ * Check if a plugin is activated.
+ *
+ * @param string $plugin_name The plugin's directory and name of main plugin file.
+ * @return bool True if the plugin is activated, false otherwise.
+ */
+function kco_is_plugin_activated( $plugin_name ) {
+	$active_plugins = (array) get_option( 'active_plugins', array() );
+	if ( is_multisite() ) {
+		$active_plugins = array_merge( $active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
+	}
+	return in_array( $plugin_name, $active_plugins, true ) || array_key_exists( $plugin_name, $active_plugins );
+}
+
+/**
+ * Generate the HTML for a plugin action button.
+ *
+ * @param string $plugin_name The plugin's directory and name of main plugin file.
+ * @param array  $options Configure the properties of the anchor tag. These may include the plugin's install URL and/or slug.
+ * @return string The HTML for the plugin action button.
+ */
+function kco_plugin_action_button( $plugin_name, $options = array() ) {
+
+	$attr = 'href="#" data-plugin-name="' . $plugin_name . '"';
+	if ( isset( $options['plugin_slug'] ) ) {
+		$attr .= ' data-plugin-slug="' . esc_attr( $options['plugin_slug'] ) . '"';
+	}
+
+	if ( isset( $options['plugin_url'] ) ) {
+		$attr .= ' data-plugin-url="' . esc_attr( $options['plugin_url'] ) . '"';
+	}
+
+	if ( kco_is_plugin_activated( $plugin_name ) ) {
+		$attr .= ' class="button button-disabled"';
+		$attr .= ' data-action="activated"';
+
+		$text = __( 'Active', 'klarna-checkout-for-woocommerce' );
+	} elseif ( get_plugins()[ $plugin_name ] ?? false ) {
+		$attr .= ' class="button activate-now button-primary"';
+		$attr .= ' data-action="activate"';
+
+		$text = __( 'Activate', 'klarna-checkout-for-woocommerce' );
+	} else {
+		if ( $options['free'] ) {
+			$attr .= ' class="install-now button" data-action="install"';
+			$text  = __( 'Install Now', 'klarna-checkout-for-woocommerce' );
+		} else {
+			$attr = 'href="' . esc_attr( $options['product_url'] ) . '" class="install-now button" target="_blank"';
+			$text = __( 'Buy Now', 'klarna-checkout-for-woocommerce' );
+		}
+	}
+
+	return "<a {$attr}>{$text}</a>";
+}
+
+/**
+ * Retrieve the external data used in the sidebar, support and add-on tabs from the JSON file.
+ *
+ * @return array Refer to the JSON file for the structure.
+ */
+function kco_external_data() {
+	$data = get_transient( 'wc_kco_external_data' );
+	if ( false === $data ) {
+		$raw_data = wp_safe_remote_get( 'https://gist.githubusercontent.com/mntzrr/2647811a9ef7b88de9efbc09b5f1d4fd/raw/c1f4611e8648981a836654a88baf44748b1262fa/klarna-checkout-for-woocommerce-addons.json' );
+		if ( ! is_wp_error( $raw_data ) ) {
+			$data = json_decode( wp_remote_retrieve_body( $raw_data ), true );
+			if ( $data ) {
+				set_transient( 'wc_kco_external_data', $data, DAY_IN_SECONDS );
+			}
+		}
+	}
+
+	return $data;
+}
