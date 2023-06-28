@@ -68,19 +68,7 @@ class KCO_API_Callbacks {
 		// Used by Klarna_Checkout_Subscription::handle_push_cb_for_payment_method_change().
 		do_action( 'wc_klarna_push_cb', $klarna_order_id );
 
-		$orders = wc_get_orders(
-			array(
-				'meta_query' => array(
-					array(
-						'key'     => '_wc_klarna_order_id',
-						'value'   => $klarna_order_id,
-						'compare' => '=',
-					),
-				),
-			)
-		);
-
-		$order = reset( $orders );
+		$order = kco_get_order_by_klarna_id( $klarna_order_id );
 		if ( empty( $order ) ) {
 			// Backup order creation.
 			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Klarna order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
@@ -143,19 +131,9 @@ class KCO_API_Callbacks {
 		$klarna_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		if ( ! empty( $klarna_order_id ) ) {
-			$orders = wc_get_orders(
-				array(
-					'meta_query' => array(
-						array(
-							'key'     => '_wc_klarna_order_id',
-							'value'   => $klarna_order_id,
-							'compare' => '=',
-						),
-					),
-				)
-			);
 
-			$order = reset( $orders );
+			$order = kco_get_order_by_klarna_id( $klarna_order_id );
+
 			if ( ! empty( $order ) ) {
 				$order_id = $order->get_id();
 			}

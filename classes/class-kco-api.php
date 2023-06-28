@@ -74,21 +74,8 @@ class KCO_API {
 			$extracted_response = strstr( $response->get_error_message(), '}', true ) . '}';
 			$extracted_response = json_decode( $extracted_response );
 			if ( 'READ_ONLY_ORDER' === $extracted_response->error_code ) {
+				$order = kco_get_order_by_klarna_id( $klarna_order_id, '2 day ago' );
 
-				$orders = wc_get_orders(
-					array(
-						'meta_query' => array(
-							array(
-								'key'     => '_wc_klarna_order_id',
-								'value'   => $klarna_order_id,
-								'compare' => '=',
-							),
-						),
-						'date_after' => '2 day ago',
-					)
-				);
-
-				$order = reset( $orders );
 				if ( ! empty( $order ) ) {
 					wp_safe_redirect( $order->get_checkout_order_received_url() );
 					exit;
