@@ -97,20 +97,8 @@ class KCO_Confirmation {
 
 		// Try to retrieve the WC_Order using the Klarna order id.
 		if ( empty( $order ) && ! empty( $klarna_order_id ) ) {
-			$orders = wc_get_orders(
-				array(
-					'meta_query' => array(
-						array(
-							'key'     => '_wc_klarna_order_id',
-							'value'   => $klarna_order_id,
-							'compare' => '=',
-						),
-					),
-					'date_after' => '2 days ago',
-				)
-			);
+			$order = kco_get_order_by_klarna_id( $klarna_order_id, '2 day ago' );
 
-			$order = reset( $orders );
 			if ( ! empty( $order ) ) {
 				$order_id = $order->get_id();
 			}

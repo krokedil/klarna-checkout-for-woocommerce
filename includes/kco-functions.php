@@ -767,3 +767,44 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 
 	WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
 }
+
+/**
+ * Returns the WooCommerce order that has a matching Klarna order id saved as a meta field. If no order is found, returns false, and if many orders are found the newest one is returned.
+ * @param string $klarna_order_id
+ * @param string|null $date_after
+ * @return WC_Order|false
+ */
+function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
+	$args = array(
+		'meta_key'     => '_wc_klarna_order_id',
+		'meta_value'   => $klarna_order_id,
+		'meta_compare' => '=',
+		'order'        => 'DESC',
+		'orderby'      => 'date',
+		'limit'        => 1,
+	);
+
+	if ( $date_after ) {
+		$args['date_after'] = $date_after;
+	}
+
+	$orders = wc_get_orders( $args );
+
+	// If the orders array is empty, return false.
+	if ( empty( $orders ) ) {
+		return false;
+	}
+
+	// Get the first order in the array.
+	$order = reset( $orders );
+
+	// Validate that the order actuall has the metadata we're looking for, and that it is the same.
+	$meta_value = $order->get_meta( '_wc_klarna_order_id', true );
+
+	// If the meta value is not the same as the Klarna order id, return false.
+	if ( $meta_value !== $klarna_order_id ) {
+		return false;
+	}
+
+	return $order;
+}
