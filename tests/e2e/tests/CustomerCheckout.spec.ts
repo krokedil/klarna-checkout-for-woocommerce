@@ -2,7 +2,7 @@ import { GetWcApiClient, WcPages } from '@krokedil/wc-test-helper';
 import { test, expect } from '@playwright/test';
 import { APIRequestContext } from 'playwright-chromium';
 import { VerifyOrderRecieved } from '../utils/VerifyOrder';
-import { HandleKpPopup } from '../utils/Utils';
+import { HandleKcPopup } from '../utils/Utils';
 
 const {
 	CI,
@@ -18,7 +18,7 @@ test.describe('Customer Checkout @shortcode', () => {
 
 	let wcApiClient: APIRequestContext;
 
-	const paymentMethodId = 'klarna_payments';
+	const paymentMethodId = 'klarna_checkout';
 
 	let customerId;
 	let username;
@@ -87,7 +87,7 @@ test.describe('Customer Checkout @shortcode', () => {
 		await page.context().clearCookies();
 	});
 
-	test('Customer can checkout with Klarna Payments with prefilled address', async ({ page }) => {
+	test('Customer can checkout with Klarna Checkout with prefilled address', async ({ page }) => {
 		const cartPage = new WcPages.Cart(page, wcApiClient);
 		const orderRecievedPage = new WcPages.OrderReceived(page, wcApiClient);
 		const checkoutPage = new WcPages.Checkout(page);
@@ -107,7 +107,7 @@ test.describe('Customer Checkout @shortcode', () => {
 		await page.waitForResponse('**/?wc-ajax=checkout');
 
 		// A new window should open with the Klarna payment popup.
-		await HandleKpPopup(page);
+		await HandleKcPopup(page);
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);

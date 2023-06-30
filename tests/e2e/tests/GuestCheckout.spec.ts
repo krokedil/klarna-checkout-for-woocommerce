@@ -3,7 +3,7 @@ import { GetWcApiClient, WcPages } from '@krokedil/wc-test-helper';
 import { VerifyOrderRecieved } from '../utils/VerifyOrder';
 import { KlarnaPopup } from '../pages/KlarnaPopup';
 import { gt, valid } from 'semver';
-import { HandleKpPopup } from '../utils/Utils';
+import { HandleKcPopup } from '../utils/Utils';
 
 const {
 	BASE_URL,
@@ -16,7 +16,7 @@ test.describe('Guest Checkout @shortcode', () => {
 
 	let wcApiClient: APIRequestContext;
 
-	const paymentMethodId = 'klarna_payments';
+	const paymentMethodId = 'klarna_checkout';
 
 	let orderId: string;
 
@@ -50,7 +50,7 @@ test.describe('Guest Checkout @shortcode', () => {
 		await checkoutPage.placeOrder();
 
 		// A new window should open with the Klarna payment popup.
-		await HandleKpPopup(page);
+		await HandleKcPopup(page);
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);
@@ -81,7 +81,7 @@ test.describe('Guest Checkout @shortcode', () => {
 		await checkoutPage.placeOrder();
 
 		// A new window should open with the Klarna payment popup.
-		await HandleKpPopup(page);
+		await HandleKcPopup(page);
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);
@@ -112,7 +112,7 @@ test.describe('Guest Checkout @shortcode', () => {
 		await checkoutPage.placeOrder();
 
 		// A new window should open with the Klarna payment popup.
-		await HandleKpPopup(page);
+		await HandleKcPopup(page);
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);
@@ -143,7 +143,7 @@ test.describe('Guest Checkout @shortcode', () => {
 		await checkoutPage.placeOrder();
 
 		// A new window should open with the Klarna payment popup.
-		await HandleKpPopup(page);
+		await HandleKcPopup(page);
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);
@@ -177,7 +177,7 @@ test.describe('Guest Checkout @shortcode', () => {
 		await checkoutPage.placeOrder();
 
 		// A new window should open with the Klarna payment popup.
-		await HandleKpPopup(page);
+		await HandleKcPopup(page);
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);
@@ -211,7 +211,7 @@ test.describe('Guest Checkout @shortcode', () => {
 		await checkoutPage.placeOrder();
 
 		// A new window should open with the Klarna payment popup.
-		await HandleKpPopup(page);
+		await HandleKcPopup(page);
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);
@@ -245,7 +245,7 @@ test.describe('Guest Checkout @shortcode', () => {
 		await checkoutPage.placeOrder();
 
 		// A new window should open with the Klarna payment popup.
-		await HandleKpPopup(page);
+		await HandleKcPopup(page);
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);
@@ -279,7 +279,6 @@ test.describe('Guest Checkout @shortcode', () => {
 		await checkoutPage.placeOrder();
 
 		// A new window should open with the Klarna payment popup.
-		await HandleKpPopup(page);
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);
@@ -313,7 +312,6 @@ test.describe('Guest Checkout @shortcode', () => {
 		await checkoutPage.placeOrder();
 
 		// A new window should open with the Klarna payment popup.
-		await HandleKpPopup(page);
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);
@@ -347,7 +345,6 @@ test.describe('Guest Checkout @shortcode', () => {
 		await checkoutPage.placeOrder();
 
 		// A new window should open with the Klarna payment popup.
-		await HandleKpPopup(page);
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);

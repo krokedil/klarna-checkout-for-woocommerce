@@ -1,6 +1,6 @@
 import { AdminLogin, GetSystemReportData, GetWcApiClient, Setup } from '@krokedil/wc-test-helper';
 import { BrowserContext, chromium, FullConfig, Page } from '@playwright/test';
-import { SetKpSettings } from './utils/Utils';
+import { SetKcSettings } from './utils/Utils';
 
 const {
 	BASE_URL,
@@ -29,7 +29,7 @@ const globalSetup = async (config: FullConfig) => {
 	await AdminLogin(adminPage);
 
 	// Set Klarna settings.
-	await SetKpSettings(wcApiClient);
+	await SetKcSettings(wcApiClient);
 
 	// Get system report data, and save them to env variables.
 	await GetSystemReportData(wcApiClient);
