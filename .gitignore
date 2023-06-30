@@ -18,3 +18,5 @@ nightwatch.conf.js
 .DS_Store
 .vscode/settings.json
 .idea/
+
+/vendor
