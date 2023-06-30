@@ -1,6 +1,6 @@
 services:
   db:
-    container_name: kp_e2e_db
+    container_name: kc_e2e_db
     platform: linux/x86_64
     image: mysql
     restart: on-failure
@@ -30,7 +30,7 @@ services:
       retries: 10
       start_period: 5s
   wp:
-    container_name: kp_e2e_wp
+    container_name: kc_e2e_wp
     depends_on:
       db:
         condition: service_healthy
@@ -51,7 +51,7 @@ services:
       WORDPRESS_TABLE_PREFIX: wp_
       WC_VERSION: ${WC_VERSION-}
     volumes:
-      - "../../:/var/www/html/wp-content/plugins/klarna-payments-for-woocommerce"
+      - "../../:/var/www/html/wp-content/plugins/klarna-checkout-for-woocommerce"
       - "wordpress:/var/www/html"
     healthcheck:
       test: [ "CMD", 'curl', '-f', 'wp' ]
@@ -89,14 +89,14 @@ services:
         wp plugin install wp-mail-logging --activate
         wp theme install storefront --activate
         wp plugin install https://github.com/WP-API/Basic-Auth/archive/master.zip --activate
-        wp plugin activate klarna-payments-for-woocommerce
+        wp plugin activate klarna-checkout-for-woocommerce
         wp plugin install https://github.com/krokedil/klarna-order-management-for-woocommerce/archive/master.zip --activate
         wp option update woocommerce_default_country SE
         wp option update woocommerce_currency SEK
         wp post create --allow-root --post_type=page --post_title='Checkout Block' --post_status=publish --post_content='<!-- wp:woocommerce/checkout --><div class="wp-block-woocommerce-checkout wc-block-checkout is-loading"><!-- wp:woocommerce/checkout-fields-block --><div class="wp-block-woocommerce-checkout-fields-block"><!-- wp:woocommerce/checkout-express-payment-block --><div class="wp-block-woocommerce-checkout-express-payment-block"></div><!-- /wp:woocommerce/checkout-express-payment-block --><!-- wp:woocommerce/checkout-contact-information-block --><div class="wp-block-woocommerce-checkout-contact-information-block"></div><!-- /wp:woocommerce/checkout-contact-information-block --><!-- wp:woocommerce/checkout-shipping-address-block --><div class="wp-block-woocommerce-checkout-shipping-address-block"></div><!-- /wp:woocommerce/checkout-shipping-address-block --><!-- wp:woocommerce/checkout-billing-address-block --><div class="wp-block-woocommerce-checkout-billing-address-block"></div><!-- /wp:woocommerce/checkout-billing-address-block --><!-- wp:woocommerce/checkout-shipping-methods-block --><div class="wp-block-woocommerce-checkout-shipping-methods-block"></div><!-- /wp:woocommerce/checkout-shipping-methods-block --><!-- wp:woocommerce/checkout-payment-block --><div class="wp-block-woocommerce-checkout-payment-block"></div><!-- /wp:woocommerce/checkout-payment-block --><!-- wp:woocommerce/checkout-order-note-block --><div class="wp-block-woocommerce-checkout-order-note-block"></div><!-- /wp:woocommerce/checkout-order-note-block --><!-- wp:woocommerce/checkout-terms-block --><div class="wp-block-woocommerce-checkout-terms-block"></div><!-- /wp:woocommerce/checkout-terms-block --><!-- wp:woocommerce/checkout-actions-block --><div class="wp-block-woocommerce-checkout-actions-block"></div><!-- /wp:woocommerce/checkout-actions-block --></div><!-- /wp:woocommerce/checkout-fields-block --><!-- wp:woocommerce/checkout-totals-block --><div class="wp-block-woocommerce-checkout-totals-block"><!-- wp:woocommerce/checkout-order-summary-block --><div class="wp-block-woocommerce-checkout-order-summary-block"><!-- wp:woocommerce/checkout-order-summary-cart-items-block --><div class="wp-block-woocommerce-checkout-order-summary-cart-items-block"></div><!-- /wp:woocommerce/checkout-order-summary-cart-items-block --><!-- wp:woocommerce/checkout-order-summary-subtotal-block --><div class="wp-block-woocommerce-checkout-order-summary-subtotal-block"></div><!-- /wp:woocommerce/checkout-order-summary-subtotal-block --><!-- wp:woocommerce/checkout-order-summary-fee-block --><div class="wp-block-woocommerce-checkout-order-summary-fee-block"></div><!-- /wp:woocommerce/checkout-order-summary-fee-block --><!-- wp:woocommerce/checkout-order-summary-discount-block --><div class="wp-block-woocommerce-checkout-order-summary-discount-block"></div><!-- /wp:woocommerce/checkout-order-summary-discount-block --><!-- wp:woocommerce/checkout-order-summary-coupon-form-block --><div class="wp-block-woocommerce-checkout-order-summary-coupon-form-block"></div><!-- /wp:woocommerce/checkout-order-summary-coupon-form-block --><!-- wp:woocommerce/checkout-order-summary-shipping-block --><div class="wp-block-woocommerce-checkout-order-summary-shipping-block"></div><!-- /wp:woocommerce/checkout-order-summary-shipping-block --><!-- wp:woocommerce/checkout-order-summary-taxes-block --><div class="wp-block-woocommerce-checkout-order-summary-taxes-block"></div><!-- /wp:woocommerce/checkout-order-summary-taxes-block --></div><!-- /wp:woocommerce/checkout-order-summary-block --></div><!-- /wp:woocommerce/checkout-totals-block --></div>'  --porcelain
         exit 0
     volumes:
-      - "../../:/var/www/html/wp-content/plugins/klarna-payments-for-woocommerce"
+      - "../../:/var/www/html/wp-content/plugins/klarna-checkout-for-woocommerce"
       - "wordpress:/var/www/html"
 volumes:
   db:
