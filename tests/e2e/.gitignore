@@ -1,0 +1,9 @@
+states
+node_modules
+playwright-report
+test-results
+results.json
+.env
+/test-results/
+/playwright-report/
+/playwright/.cache/

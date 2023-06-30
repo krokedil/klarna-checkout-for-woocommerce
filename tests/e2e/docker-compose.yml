@@ -1,0 +1,103 @@
+services:
+  db:
+    container_name: kp_e2e_db
+    platform: linux/x86_64
+    image: mysql
+    restart: on-failure
+    environment:
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: wordpress
+    volumes:
+      - db:/var/lib/mysql
+    ports:
+      - "33066:3306"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          'mysqladmin',
+          'ping',
+          '-h',
+          'db',
+          '-u',
+          'root',
+          '-p$$MYSQL_ROOT_PASSWORD'
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+  wp:
+    container_name: kp_e2e_wp
+    depends_on:
+      db:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - WP_IMAGE=${WP_IMAGE:-wordpress:latest}
+    ports:
+      - "8080:80"
+    restart: on-failure
+    environment:
+      BASE_URL: http://localhost:8080
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wpdb
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_TABLE_PREFIX: wp_
+      WC_VERSION: ${WC_VERSION-}
+    volumes:
+      - "../../:/var/www/html/wp-content/plugins/klarna-payments-for-woocommerce"
+      - "wordpress:/var/www/html"
+    healthcheck:
+      test: [ "CMD", 'curl', '-f', 'wp' ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+  wp-cli:
+    depends_on:
+      db:
+        condition: service_healthy
+      wp:
+        condition: service_healthy
+    image: wordpress:cli
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wpdb
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_TABLE_PREFIX: wp_
+      WC_VERSION: ${WC_VERSION-}
+    restart: on-failure
+    user: xfs
+    command:
+      - /bin/bash
+      - -c
+      - |
+        wp core install --url='http://localhost:8080' --title='Krokedil E2E Test' --admin_user='admin' --admin_password='password' --admin_email='e2e@krokedil.se' --skip-email --skip-plugins --skip-themes
+        wp rewrite structure '/%postname%/' --hard
+        if [ -z "$${WC_VERSION}" ]; then
+          wp plugin install woocommerce --activate
+        else
+          wp plugin install woocommerce --version=$${WC_VERSION} --activate
+        fi
+        wp plugin install wp-mail-logging --activate
+        wp theme install storefront --activate
+        wp plugin install https://github.com/WP-API/Basic-Auth/archive/master.zip --activate
+        wp plugin activate klarna-payments-for-woocommerce
+        wp plugin install https://github.com/krokedil/klarna-order-management-for-woocommerce/archive/master.zip --activate
+        wp option update woocommerce_default_country SE
+        wp option update woocommerce_currency SEK
+        wp post create --allow-root --post_type=page --post_title='Checkout Block' --post_status=publish --post_content='<!-- wp:woocommerce/checkout --><div class="wp-block-woocommerce-checkout wc-block-checkout is-loading"><!-- wp:woocommerce/checkout-fields-block --><div class="wp-block-woocommerce-checkout-fields-block"><!-- wp:woocommerce/checkout-express-payment-block --><div class="wp-block-woocommerce-checkout-express-payment-block"></div><!-- /wp:woocommerce/checkout-express-payment-block --><!-- wp:woocommerce/checkout-contact-information-block --><div class="wp-block-woocommerce-checkout-contact-information-block"></div><!-- /wp:woocommerce/checkout-contact-information-block --><!-- wp:woocommerce/checkout-shipping-address-block --><div class="wp-block-woocommerce-checkout-shipping-address-block"></div><!-- /wp:woocommerce/checkout-shipping-address-block --><!-- wp:woocommerce/checkout-billing-address-block --><div class="wp-block-woocommerce-checkout-billing-address-block"></div><!-- /wp:woocommerce/checkout-billing-address-block --><!-- wp:woocommerce/checkout-shipping-methods-block --><div class="wp-block-woocommerce-checkout-shipping-methods-block"></div><!-- /wp:woocommerce/checkout-shipping-methods-block --><!-- wp:woocommerce/checkout-payment-block --><div class="wp-block-woocommerce-checkout-payment-block"></div><!-- /wp:woocommerce/checkout-payment-block --><!-- wp:woocommerce/checkout-order-note-block --><div class="wp-block-woocommerce-checkout-order-note-block"></div><!-- /wp:woocommerce/checkout-order-note-block --><!-- wp:woocommerce/checkout-terms-block --><div class="wp-block-woocommerce-checkout-terms-block"></div><!-- /wp:woocommerce/checkout-terms-block --><!-- wp:woocommerce/checkout-actions-block --><div class="wp-block-woocommerce-checkout-actions-block"></div><!-- /wp:woocommerce/checkout-actions-block --></div><!-- /wp:woocommerce/checkout-fields-block --><!-- wp:woocommerce/checkout-totals-block --><div class="wp-block-woocommerce-checkout-totals-block"><!-- wp:woocommerce/checkout-order-summary-block --><div class="wp-block-woocommerce-checkout-order-summary-block"><!-- wp:woocommerce/checkout-order-summary-cart-items-block --><div class="wp-block-woocommerce-checkout-order-summary-cart-items-block"></div><!-- /wp:woocommerce/checkout-order-summary-cart-items-block --><!-- wp:woocommerce/checkout-order-summary-subtotal-block --><div class="wp-block-woocommerce-checkout-order-summary-subtotal-block"></div><!-- /wp:woocommerce/checkout-order-summary-subtotal-block --><!-- wp:woocommerce/checkout-order-summary-fee-block --><div class="wp-block-woocommerce-checkout-order-summary-fee-block"></div><!-- /wp:woocommerce/checkout-order-summary-fee-block --><!-- wp:woocommerce/checkout-order-summary-discount-block --><div class="wp-block-woocommerce-checkout-order-summary-discount-block"></div><!-- /wp:woocommerce/checkout-order-summary-discount-block --><!-- wp:woocommerce/checkout-order-summary-coupon-form-block --><div class="wp-block-woocommerce-checkout-order-summary-coupon-form-block"></div><!-- /wp:woocommerce/checkout-order-summary-coupon-form-block --><!-- wp:woocommerce/checkout-order-summary-shipping-block --><div class="wp-block-woocommerce-checkout-order-summary-shipping-block"></div><!-- /wp:woocommerce/checkout-order-summary-shipping-block --><!-- wp:woocommerce/checkout-order-summary-taxes-block --><div class="wp-block-woocommerce-checkout-order-summary-taxes-block"></div><!-- /wp:woocommerce/checkout-order-summary-taxes-block --></div><!-- /wp:woocommerce/checkout-order-summary-block --></div><!-- /wp:woocommerce/checkout-totals-block --></div>'  --porcelain
+        exit 0
+    volumes:
+      - "../../:/var/www/html/wp-content/plugins/klarna-payments-for-woocommerce"
+      - "wordpress:/var/www/html"
+volumes:
+  db:
+  wordpress:
