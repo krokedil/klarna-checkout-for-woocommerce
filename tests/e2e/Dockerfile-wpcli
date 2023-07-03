@@ -1,0 +1,7 @@
+FROM wordpress:cli
+COPY bin/setup-wp.sh /setup-wp.sh
+USER root
+RUN apk update && apk add jq
+RUN chmod +x /setup-wp.sh
+ENTRYPOINT ["/setup-wp.sh"]
+USER xfs

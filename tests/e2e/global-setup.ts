@@ -1,9 +1,8 @@
 import { AdminLogin, GetSystemReportData, GetWcApiClient, Setup } from '@krokedil/wc-test-helper';
-import { BrowserContext, chromium, FullConfig, Page } from '@playwright/test';
+import { BrowserContext, chromium, FullConfig, Page, request } from '@playwright/test';
 import { SetKcSettings } from './utils/Utils';
 
 const {
-	BASE_URL,
 	CONSUMER_KEY,
 	CONSUMER_SECRET,
 } = process.env;
@@ -16,9 +15,16 @@ let guestPage: Page;
 
 
 const globalSetup = async (config: FullConfig) => {
-	const wcApiClient = await GetWcApiClient(BASE_URL ?? 'http://localhost:8080', CONSUMER_KEY ?? 'admin', CONSUMER_SECRET ?? 'password');
+	if (process.env.BASE_URL === undefined || process.env.CI === '1') {
+		// Get the base URL from ngrok and set it as an env variable.
+		process.env.BASE_URL = await getBaseUrl();
+	}
 
-	const { storageState, baseURL } = config.projects[0].use;
+	const baseURL = process.env.BASE_URL;
+
+	const wcApiClient = await GetWcApiClient(baseURL ?? 'http://localhost:8080', CONSUMER_KEY ?? 'admin', CONSUMER_SECRET ?? 'password');
+
+	const { storageState } = config.projects[0].use;
 
 	process.env.ADMINSTATE = `${storageState}/admin/state.json`;
 	process.env.GUESTSTATE = `${storageState}/guest/state.json`;
@@ -50,6 +56,19 @@ async function setupContexts(baseUrl: string, statesDir: string) {
 	adminPage = await adminContext.newPage();
 	guestContext = await chromium.launchPersistentContext(`${statesDir}/guest`, { headless: true, baseURL: baseUrl });
 	guestPage = await guestContext.newPage();
+}
+
+async function getBaseUrl() {
+	const client = await request.newContext({
+		baseURL: `http://localhost:4444/api/tunnels`,
+	});
+
+	const res = await client.get('');
+
+	const data = await res.json();
+
+	// Return the public url.
+	return data.tunnels[0].public_url;
 }
 
 export default globalSetup;
