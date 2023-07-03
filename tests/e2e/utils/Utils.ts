@@ -1,5 +1,4 @@
 import { APIRequestContext, Page, request } from "@playwright/test";
-import { KlarnaPopup } from "../pages/KlarnaPopup";
 
 const {
 	KLARNA_API_USERNAME,
@@ -36,17 +35,17 @@ export const SetKcSettings = async (wcApiClient: APIRequestContext) => {
 			settings: {
 				testmode: "yes",
 				logging: "yes",
-				test_merchant_id_se: KLARNA_API_USERNAME,
-				test_shared_secret_se: KLARNA_API_PASSWORD,
+				test_merchant_id_eu: KLARNA_API_USERNAME,
+				test_shared_secret_eu: KLARNA_API_PASSWORD
 			}
 		};
 
 		// Update settings.
-		await wcApiClient.post('payment_gateways/klarna_checkout', { data: settings });
+		await wcApiClient.post('payment_gateways/kco', { data: settings });
 	}
 }
 
-export const HandleKcPopup = async (page: Page) => {
-	const klarnaPopup = new KlarnaPopup(await page.waitForEvent('popup'));
-	await klarnaPopup.placeOrder();
-}
+// export const HandleKcPopup = async (page: Page) => {
+// 	const klarnaPopup = new KlarnaPopup(await page.waitForEvent('popup'));
+// 	await klarnaPopup.placeOrder();
+// }

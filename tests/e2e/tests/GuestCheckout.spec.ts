@@ -1,7 +1,6 @@
 import { test, expect, APIRequestContext } from '@playwright/test';
 import { GetWcApiClient, WcPages } from '@krokedil/wc-test-helper';
 import { VerifyOrderRecieved } from '../utils/VerifyOrder';
-import { KlarnaPopup } from '../pages/KlarnaPopup';
 import { gt, valid } from 'semver';
 import { HandleKcPopup } from '../utils/Utils';
 

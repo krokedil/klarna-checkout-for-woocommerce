@@ -1,7 +1,6 @@
 import { AdminLogin, GetWcApiClient, WcPages } from '@krokedil/wc-test-helper';
 import { test, expect, APIRequestContext } from '@playwright/test';
 import { gt, valid } from 'semver';
-import { KlarnaPopup } from '../pages/KlarnaPopup';
 
 const {
 	CI,
