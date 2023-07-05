@@ -37,11 +37,10 @@ test.describe('Guest Checkout @shortcode', () => {
 		await cartPage.addtoCart(['simple-25', 'simple-25', 'simple-25', 'simple-25', 'simple-25', 'simple-25']);
 
 		// Go to the checkout page and wait until order update is done
-		await Promise.all([ //Used to listen in time
-			KlarnaIFrame.WaitForCheckoutInitRequests(page),
-			checkoutPage.goto(),
-		]);
-		
+		await checkoutPage.goto();
+
+		await KlarnaIFrame.WaitForCheckoutInitRequests(page);
+
 		await HandleKcIFrame(page); // Handle the klarna Iframe
 		await HandleKcPopup(page);  // A new window should open with the Klarna payment popup.
 
@@ -306,7 +305,7 @@ test.describe('Guest Checkout @shortcode', () => {
 			KlarnaIFrame.WaitForCheckoutInitRequests(page),
 			checkoutPage.goto(),
 		]);
-		
+
 		// Apply coupon.
 		await checkoutPage.applyCoupon('fixed-10');
 
