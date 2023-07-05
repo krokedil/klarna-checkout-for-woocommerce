@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test';
 import { APIRequestContext } from 'playwright-chromium';
 import { VerifyOrderRecieved } from '../utils/VerifyOrder';
 import { HandleKcPopup, HandleKcIFrame } from '../utils/Utils';
+import { KlarnaIFrame } from '../pages/KlarnaIFrame';
 
 const {
 	CI,
@@ -12,7 +13,7 @@ const {
 } = process.env;
 
 test.describe('Customer Checkout @shortcode', () => {
-	test.skip(CI !== undefined, 'Skipping tests in CI environment since its currently not working and giving a false negative.') // @TODO - Fix this test for CI.
+	//test.skip(CI !== undefined, 'Skipping tests in CI environment since its currently not working and giving a false negative.') // @TODO - Fix this test for CI.
 
 	test.use({ storageState: process.env.GUESTSTATE });
 
@@ -96,10 +97,8 @@ test.describe('Customer Checkout @shortcode', () => {
 		await cartPage.addtoCart(['simple-25']);
 
 		// Go to the checkout page.
-		await Promise.all([ //Used to listen in time
-			page.waitForRequest('**/?wc-ajax=update_order_review'),
-			checkoutPage.goto(),
-		]);
+		await checkoutPage.goto();
+		await KlarnaIFrame.WaitForCheckoutInitRequests(page);
 
 		await HandleKcIFrame(page); // Handle the klarna Iframe
 		await HandleKcPopup(page);  // A new window should open with the Klarna payment popup.
