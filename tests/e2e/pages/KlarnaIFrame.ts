@@ -112,10 +112,12 @@ export class KlarnaIFrame {
         // Add separate shipping adress if requested to
         if ( separateShipping ) { 
             await this.ChangeShippingAddress(asCompany); 
+            await this.page.waitForRequest('**/?wc-ajax=update_order_review'); 
+            await this.WaitForIframeToLoad();
         }
 
-        // Press Pay order, so that the popup appears
-        await this.iframe.getByRole('button', { name: 'Pay order' }).click();
+        // Press Pay order, so that the popup appears, and also avoiding await to let other methods listen to events in time
+        this.iframe.getByRole('button', { name: 'Pay order' }).click(); 
 
         // Extra popup appears when paying as company
         if ( asCompany ) { 
