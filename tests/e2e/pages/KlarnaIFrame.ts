@@ -15,11 +15,11 @@ export class KlarnaIFrame {
     //getByLabel('Company name')
     //getByLabel('National Identification Number')
     //getByRole('button', { name: 'Pay order' })
-    
+
     async AddCorporationDetails() {
         await this.iframe.getByLabel('Buying as a:').click();
         await this.iframe.getByText('Organization/Company').click();
-        
+
         await this.iframe.getByLabel('Organization number').fill('002031-0132');
         await this.iframe.getByLabel('Company name').fill('Testcompany-se');
         // The filled in text dissapears TODO find better solution
@@ -35,15 +35,15 @@ export class KlarnaIFrame {
     async ChangeShippingAddress(asCompany: boolean) {
         //await this.iframe.locator('#shipping-option-content').click();
         await this.iframe.locator('#SHIPMO-container').click();
-        
+
         var fIframe = this.page.frameLocator('#klarna-fullscreen-iframe');
         await fIframe.getByLabel('Email address').fill('testmail.alternativ@test.com');
         await fIframe.getByLabel('ZIP code').fill('99999');
         await fIframe.getByLabel('First name').fill('Test');
-        
+
         await fIframe.getByLabel('Last name').fill('Mottagare');
         await fIframe.getByLabel('Last name').fill('Mottagare'); //TODO better solution
-        
+
         if (asCompany) await fIframe.getByLabel('Address', { exact: true }).fill('testgata');
         else await fIframe.getByLabel('AddressAdd C/O').fill('testgata');
 
@@ -54,11 +54,9 @@ export class KlarnaIFrame {
     }
 
     static async WaitForCheckoutInitRequests(page: Page){
-        await Promise.all([
-            page.waitForRequest('**/?wc-ajax=update_order_review'),
-            page.waitForRequest(/js.playground.klarna.com(?=.*initial)/),
-            page.waitForRequest(/js.playground.klarna.com(?!.*initial)/),
-        ]);
+        await page.waitForResponse(
+            response => response.url().match(/js.playground.klarna.com(?!.*initial)/) && response.status() === 200
+        );
     }
 
     async FillInPersonDetails() {
@@ -92,14 +90,14 @@ export class KlarnaIFrame {
         }
 
         await this.ConfirmBillingDetails();
-        
+
         await Promise.all([
             this.page.waitForRequest('**/?wc-ajax=update_order_review'),
             this.page.waitForRequest(/init_widget/)
         ]);
         await new Promise(f => setTimeout(f, 5000));
 
-        
+
         if ( separateShipping ) {
             await this.ChangeShippingAddress(asCompany);
         }
