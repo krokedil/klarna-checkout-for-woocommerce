@@ -59,7 +59,15 @@ export class KlarnaIFrame {
         );
     }
 
+    async WaitForIframeToLoad() {
+        await expect(this.iframe.locator('[data-cid="overlay-loading"]')).not.toBeVisible();
+        await this.page.waitForTimeout(500);
+    }
+
     async FillInPersonDetails() {
+        // Wait for no element with data-cid "overlay-loading" to be present
+        await this.WaitForIframeToLoad();
+
         // Fill in Email and postal code, then press continue
         await this.iframe.getByLabel('Email address').fill('checkout-se@testdrive.klarna.com');
         await this.iframe.getByLabel('Postal code').fill('12345');
