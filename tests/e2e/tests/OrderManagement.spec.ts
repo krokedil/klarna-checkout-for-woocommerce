@@ -151,7 +151,7 @@ test.describe('Order management @shortcode', () => {
 			const adminSingleOrder = new WcPages.AdminSingleOrder(page, orderId);
 			await adminSingleOrder.goto();
 			await adminSingleOrder.completeOrder();
-			await adminSingleOrder.refundFullOrder(order, false);
+			await adminSingleOrder.refundPartialOrder(order, false);
 			expect(await adminSingleOrder.hasOrderNoteWithText('refunded via Klarna')).toBe(true);
 		});
 	});
