@@ -40,13 +40,14 @@ export class KlarnaPopup {
         await this.page.waitForResponse(response => response.url().includes('/profile/seNoLogin') && response.status() === 200);
 
         // Wait for 200 response from /payment_methods call
-        const paymentMethodResponse = await this.page.waitForResponse(response => response.url().includes('/payment_methods') && response.status() === 200);
+        await this.page.waitForResponse(response => response.url().includes('/payment_methods') && response.status() === 200);
 
-        // Parse the response and check if a payment method is already selected.
-        const body = await paymentMethodResponse.json();
-        if (!body.payment_categories.some(category => category.selected)) {
+        // Check if the modal for selecting payment method is open.
+        if (await this.page.getByText("How do you want to pay").isVisible()) {
             // Select the first payment method.
-            await this.paymentMethodRadio.first().click();
+            await this.paymentMethodRadio.click();
+
+            // Click the select payment method button.
             await this.paymentMethodButton.click();
         }
 
