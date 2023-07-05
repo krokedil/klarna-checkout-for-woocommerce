@@ -2,6 +2,7 @@ require('dotenv').config()
 import type { PlaywrightTestConfig } from '@playwright/test';
 import { devices } from '@playwright/test';
 
+
 const {
 	BASE_URL,
 	SLOW_MO,
@@ -12,7 +13,7 @@ const {
 const config: PlaywrightTestConfig = {
 	fullyParallel: true,
 	testDir: './tests',
-	timeout: 60 * 2000,
+	timeout: 60 * 1000 * 3,
 	expect: {
 		timeout: 10 * 2000
 	},

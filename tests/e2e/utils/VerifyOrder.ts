@@ -12,7 +12,7 @@ export const VerifyOrderRecieved = async (orderRecievedPage: WcPages.OrderReceiv
 	expect(wcOrder.status).toBe(expectedStatus);
 
 	// Verify that the order has the correct payment method.
-	expect(wcOrder.payment_method).toBe('klarna_checkout');
+	expect(wcOrder.payment_method).toBe('kco');
 
 	// Get the Klarna order id from the transaction id.
 	const klarnaOrder = await GetKlarnaOrderOM(wcOrder, komClient);

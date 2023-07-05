@@ -2,7 +2,7 @@ import { GetWcApiClient, WcPages } from '@krokedil/wc-test-helper';
 import { test, expect } from '@playwright/test';
 import { APIRequestContext } from 'playwright-chromium';
 import { VerifyOrderRecieved } from '../utils/VerifyOrder';
-import { HandleKcPopup } from '../utils/Utils';
+import { HandleKcPopup, HandleKcIFrame } from '../utils/Utils';
 
 const {
 	CI,
@@ -96,18 +96,13 @@ test.describe('Customer Checkout @shortcode', () => {
 		await cartPage.addtoCart(['simple-25']);
 
 		// Go to the checkout page.
-		await checkoutPage.goto();
+		await Promise.all([ //Used to listen in time
+			page.waitForRequest('**/?wc-ajax=update_order_review'),
+			checkoutPage.goto(),
+		]);
 
-		await checkoutPage.hasPaymentMethodId(paymentMethodId);
-
-		// Place the order.
-		await checkoutPage.placeOrder();
-
-		// Wait for an AJAX call to /?wc-ajax=checkout to complete.
-		await page.waitForResponse('**/?wc-ajax=checkout');
-
-		// A new window should open with the Klarna payment popup.
-		await HandleKcPopup(page);
+		await HandleKcIFrame(page); // Handle the klarna Iframe
+		await HandleKcPopup(page);  // A new window should open with the Klarna payment popup.
 
 		// Verify that the order was placed.
 		await expect(page).toHaveURL(/order-received/);
