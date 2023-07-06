@@ -68,7 +68,7 @@ export class KlarnaIFrame {
         await this.page.waitForTimeout(500);
     }
 
-    async FillInPersonDetails() {
+    async FillInBillingDetails() {
         await this.WaitForIframeToLoad();
 
         // Fill in Email and postal code, then press continue
@@ -95,7 +95,7 @@ export class KlarnaIFrame {
 
     async HandleIFrame(separateShipping: boolean, asCompany: boolean) {
         // Fill in the required details
-        await this.FillInPersonDetails();
+        await this.FillInBillingDetails();
 
         // Add additional company details when paying as a company
         if ( asCompany ) {
@@ -124,4 +124,5 @@ export class KlarnaIFrame {
             await this.FillInPersonalIdNumPopup(); 
         }
     }
+
 }
