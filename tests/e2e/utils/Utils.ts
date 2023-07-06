@@ -60,6 +60,24 @@ export const HandleKcIFrame = async (page: Page, separateShipping: boolean = fal
 
 	await klarnaIFrame.HandleIFrame(separateShipping, asCompany);
 }
+export const HandleKcIframeWithoutDetails = async (page: Page) => {
+	const klarnaIFrame = new KlarnaIFrame(page);
+
+	//await klarnaIFrame.FillInPersonDetails();
+
+	// Press confirm buttons
+	await klarnaIFrame.ConfirmBillingDetails();
+
+	// Wait for checkoutbox to be fully loaded
+	//await klarnaIFrame.page.waitForRequest('**/?wc-ajax=update_order_review');
+	await klarnaIFrame.page.waitForRequest(/index.html/);
+	await klarnaIFrame.page.waitForRequest(/checkout\/orders/);
+	await klarnaIFrame.WaitForIframeToLoad();
+
+
+	// Press Pay order, so that the popup appears, and also avoiding await to let other methods listen to events in time
+	klarnaIFrame.iframe.getByRole('button', { name: 'Pay order' }).click();
+}
 
 // export const HandleKcPopup = async (page: Page) => {
 // 	const klarnaPopup = new KlarnaPopup(await page.waitForEvent('popup'));

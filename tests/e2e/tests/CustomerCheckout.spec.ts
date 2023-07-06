@@ -2,7 +2,7 @@ import { GetWcApiClient, WcPages } from '@krokedil/wc-test-helper';
 import { test, expect } from '@playwright/test';
 import { APIRequestContext } from 'playwright-chromium';
 import { VerifyOrderRecieved } from '../utils/VerifyOrder';
-import { HandleKcPopup, HandleKcIFrame } from '../utils/Utils';
+import { HandleKcPopup, HandleKcIFrame, HandleKcIframeWithoutDetails } from '../utils/Utils';
 import { KlarnaIFrame } from '../pages/KlarnaIFrame';
 
 const {
@@ -88,7 +88,7 @@ test.describe('Customer Checkout @shortcode', () => {
 		await page.context().clearCookies();
 	});
 
-	test('Customer can checkout with Klarna Checkout with prefilled address', async ({ page }) => {
+	test('Customer can checkout with Klarna Checkout with prefilled address', async ({ page }) => { //TODO fix test after instruction
 		const cartPage = new WcPages.Cart(page, wcApiClient);
 		const orderRecievedPage = new WcPages.OrderReceived(page, wcApiClient);
 		const checkoutPage = new WcPages.Checkout(page);
@@ -100,7 +100,7 @@ test.describe('Customer Checkout @shortcode', () => {
 		await checkoutPage.goto();
 		await KlarnaIFrame.WaitForCheckoutInitRequests(page);
 
-		await HandleKcIFrame(page); // Handle the klarna Iframe
+		await HandleKcIframeWithoutDetails(page); // Handle the klarna Iframe
 		await HandleKcPopup(page);  // A new window should open with the Klarna payment popup.
 
 		// Verify that the order was placed.
