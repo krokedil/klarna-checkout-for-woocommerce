@@ -355,12 +355,22 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function show_recurring_token( $order ) {
-		if ( 'shop_subscription' === $order->get_type() && $order->get_meta( '_kco_recurring_token', true ) ) {
+		if ( 'shop_subscription' === $order->get_type() ) {
+			$recurring_token = $order->get_meta( '_kco_recurring_token', true );
+			if ( empty( $recurring_token ) ) {
+				$parent          = $order->get_parent() ?? false;
+				$recurring_token = ! empty( $parent ) ? $parent->get_meta( '_kco_recurring_token', true ) : '';
+			}
+
+			if ( empty( $recurring_token ) ) {
+				return;
+			}
+
 			?>
 			<div class="order_data_column" style="clear:both; float:none; width:100%;">
 				<div class="address">
 					<p>
-						<strong><?php echo esc_html( 'Klarna recurring token' ); ?>:</strong><?php echo esc_html( $order->get_meta( '_kco_recurring_token', true ) ); ?>
+						<strong><?php echo esc_html( 'Klarna recurring token' ); ?>:</strong><?php echo esc_html( $recurring_token ); ?>
 					</p>
 				</div>
 				<div class="edit_address">
