@@ -246,8 +246,7 @@ class KCO_Subscription {
 				$wc_order->add_order_note( $note );
 
 				foreach ( $subscriptions as $subscription ) {
-					$subscription_order = wc_get_order( $subscription->get_id() );
-					$subscription_order->update_meta_data( '_kco_recurring_token', $recurring_token );
+					$subscription->update_meta_data( '_kco_recurring_token', $recurring_token );
 
 					// Do not overwrite any existing phone number in case the customer has changed payment method (and thus shipping details).
 					if ( empty( $subscription->get_shipping_phone() ) ) {
