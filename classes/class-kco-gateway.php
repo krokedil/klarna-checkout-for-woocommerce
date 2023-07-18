@@ -408,10 +408,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// ----- Extra Debug Logging Start ----- //
 			try {
 				$shipping_debug_log = array(
-					'kco_order_id'          => $klarna_order_id,
-					'wc_order_shipping'     => $order->get_shipping_method(),
-					'wc_session_shipping'   => WC()->session->get( 'chosen_shipping_methods' ),
-					'kco_order_shipping'    => $klarna_order['selected_shipping_option'],
+					'kco_order_id'           => $klarna_order_id,
+					'wc_order_shipping'      => $order->get_shipping_method(),
+					'wc_session_shipping'    => WC()->session->get( 'chosen_shipping_methods' ),
+					'kco_order_shipping'     => $klarna_order['selected_shipping_option'],
 					'kco_shipping_transient' => get_transient( "kss_data_$klarna_order_id" ),
 				);
 				$data               = json_encode( $shipping_debug_log );
@@ -422,7 +422,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// ----- Extra Debug Logging End ----- //
 
 			if ( ! $klarna_order ) {
-				return false;
+				return array(
+					'result' => 'error',
+				);
 			}
 
 			if ( $order_id && $klarna_order ) {
