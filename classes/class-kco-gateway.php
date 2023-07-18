@@ -423,7 +423,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// ----- Extra Debug Logging End ----- //
 
 			if ( ! $klarna_order ) {
-				return false;
+				return array(
+					'result' => 'error',
+				);
 			}
 
 			if ( $order_id && $klarna_order ) {
