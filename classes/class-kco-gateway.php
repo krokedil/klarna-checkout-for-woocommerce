@@ -411,13 +411,14 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					'kco_order_id'           => $klarna_order_id,
 					'wc_order_shipping'      => $order->get_shipping_method(),
 					'wc_session_shipping'    => WC()->session->get( 'chosen_shipping_methods' ),
-					'kco_order_shipping'     => $klarna_order['selected_shipping_option'],
+					// selected_shipping_option is only available if shipping is displayed in iframe.
+					'kco_order_shipping'     => $klarna_order['selected_shipping_option'] ?? 'N/A',
 					'kco_shipping_transient' => get_transient( "kss_data_$klarna_order_id" ),
 				);
 				$data               = json_encode( $shipping_debug_log );
 				KCO_Logger::log( "Extra shipping debug: $data" );
 			} catch ( Exception $e ) {
-				KCO_Logger::log( 'Extra shipping debug: Error generating log' );
+				KCO_Logger::log( 'Extra shipping debug: Error generating log due to ' . $e->getMessage() );
 			}
 			// ----- Extra Debug Logging End ----- //
 
