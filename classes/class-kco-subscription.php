@@ -246,8 +246,7 @@ class KCO_Subscription {
 				$wc_order->add_order_note( $note );
 
 				foreach ( $subscriptions as $subscription ) {
-					$subscription_order = wc_get_order( $subscription->get_id() );
-					$subscription_order->update_meta_data( '_kco_recurring_token', $recurring_token );
+					$subscription->update_meta_data( '_kco_recurring_token', $recurring_token );
 
 					// Do not overwrite any existing phone number in case the customer has changed payment method (and thus shipping details).
 					if ( empty( $subscription->get_shipping_phone() ) ) {
@@ -356,12 +355,22 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function show_recurring_token( $order ) {
-		if ( 'shop_subscription' === $order->get_type() && $order->get_meta( '_kco_recurring_token', true ) ) {
+		if ( 'shop_subscription' === $order->get_type() ) {
+			$recurring_token = $order->get_meta( '_kco_recurring_token', true );
+			if ( empty( $recurring_token ) ) {
+				$parent          = $order->get_parent() ?? false;
+				$recurring_token = ! empty( $parent ) ? $parent->get_meta( '_kco_recurring_token', true ) : '';
+			}
+
+			if ( empty( $recurring_token ) ) {
+				return;
+			}
+
 			?>
 			<div class="order_data_column" style="clear:both; float:none; width:100%;">
 				<div class="address">
 					<p>
-						<strong><?php echo esc_html( 'Klarna recurring token' ); ?>:</strong><?php echo esc_html( $order->get_meta( '_kco_recurring_token', true ) ); ?>
+						<strong><?php echo esc_html( 'Klarna recurring token' ); ?>:</strong><?php echo esc_html( $recurring_token ); ?>
 					</p>
 				</div>
 				<div class="edit_address">
