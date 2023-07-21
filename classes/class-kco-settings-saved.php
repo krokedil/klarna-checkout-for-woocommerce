@@ -50,40 +50,42 @@ class KCO_Settings_Saved {
 			return;
 		}
 
-		// Check EU Production.
-		if ( '' !== $options['merchant_id_eu'] ) {
-			$username = $options['merchant_id_eu'];
-			$password = $options['shared_secret_eu'];
+		if ( 'yes' !== $options['testmode'] ) {
+			// Check EU Production.
+			if ( '' !== $options['merchant_id_eu'] ) {
+				$username = $options['merchant_id_eu'];
+				$password = $options['shared_secret_eu'];
 
-			$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, false, 'EU' );
-			$this->process_test_response( $test_response, self::EU_PROD );
-		}
+				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, false, 'EU' );
+				$this->process_test_response( $test_response, self::EU_PROD );
+			}
 
-		// Check EU Test.
-		if ( '' !== $options['test_merchant_id_eu'] ) {
-			$username = $options['test_merchant_id_eu'];
-			$password = $options['test_shared_secret_eu'];
+			// Check US Production.
+			if ( '' !== $options['merchant_id_us'] ) {
+				$username = $options['merchant_id_us'];
+				$password = $options['shared_secret_us'];
 
-			$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true, 'EU' );
-			$this->process_test_response( $test_response, self::EU_TEST );
-		}
+				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, false, 'US' );
+				$this->process_test_response( $test_response, self::US_PROD );
+			}
+		} else {
+			// Check EU Test.
+			if ( '' !== $options['test_merchant_id_eu'] ) {
+				$username = $options['test_merchant_id_eu'];
+				$password = $options['test_shared_secret_eu'];
 
-		// Check US Production.
-		if ( '' !== $options['merchant_id_us'] ) {
-			$username = $options['merchant_id_us'];
-			$password = $options['shared_secret_us'];
+				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true, 'EU' );
+				$this->process_test_response( $test_response, self::EU_TEST );
+			}
 
-			$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, false, 'US' );
-			$this->process_test_response( $test_response, self::US_PROD );
-		}
+			// Check US Test.
+			if ( '' !== $options['test_merchant_id_us'] ) {
+				$username = $options['test_merchant_id_us'];
+				$password = $options['test_shared_secret_us'];
 
-		// Check US Test.
-		if ( '' !== $options['test_merchant_id_us'] ) {
-			$username = $options['test_merchant_id_us'];
-			$password = $options['test_shared_secret_us'];
-
-			$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true, 'US' );
-			$this->process_test_response( $test_response, self::US_TEST );
+				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true, 'US' );
+				$this->process_test_response( $test_response, self::US_TEST );
+			}
 		}
 
 		$this->maybe_handle_error();
@@ -108,7 +110,7 @@ class KCO_Settings_Saved {
 		if ( 401 === $code || 403 === $code ) {
 			switch ( $code ) {
 				case 401:
-					$message = "It seems like your Klarna $test credentials are incorrect, please verify or remove these credentials and save again. ";
+					$message = "Your Klarna $test credentials not authorized. Please verify the credentials and environment (production or test mode) or remove these credentials and save again. API credentials only work in either production or test, not both environments. ";
 					break;
 				case 403:
 					$message = "It seems like your Klarna $test API credentials are not working for the Klarna Checkout plugin, please verify your Klarna contract is for the Klarna Checkout solution.  If your Klarna contract is for standalone payment methods, please instead use the <a href='https://docs.woocommerce.com/document/klarna-payments/'>Klarna Payments for WooCommerce</a> plugin. ";
