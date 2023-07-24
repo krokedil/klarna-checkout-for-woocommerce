@@ -34,6 +34,7 @@ class KCO_Subscription {
 		add_action( 'wc_klarna_push_cb', array( $this, 'handle_push_cb_for_payment_method_change' ) );
 		add_action( 'init', array( $this, 'display_thankyou_message_for_payment_method_change' ) );
 		add_action( 'woocommerce_account_view-subscription_endpoint', array( $this, 'maybe_confirm_change_payment_method' ) );
+		add_filter( 'allowed_redirect_hosts', array( $this, 'extend_allowed_domains_list' ) );
 
 	}
 
@@ -515,6 +516,19 @@ class KCO_Subscription {
 		}
 
 		$subscription->save();
+	}
+
+	/**
+	 * Add Klarna hosted payment page as allowed external url for wp_safe_redirect.
+	 * We do this because WooCommerce Subscriptions use wp_safe_redirect when processing a payment method change request (from v5.1.0).
+	 *
+	 * @param array $hosts Domains that are allowed when wp_safe_redirect is used.
+	 * @return array
+	 */
+	public function extend_allowed_domains_list( $hosts ) {
+		$hosts[] = 'pay.playground.klarna.com';
+		$hosts[] = 'pay.klarna.com';
+		return $hosts;
 	}
 }
 new KCO_Subscription();
