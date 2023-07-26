@@ -235,8 +235,10 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function set_recurring_token_for_order( $order_id = null, $klarna_order = null ) {
-		$wc_order = wc_get_order( $order_id );
-		if ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
+		$wc_order        = wc_get_order( $order_id );
+		$recurring_order = $wc_order->get_meta( '_kco_recurring_order', true );
+
+		if ( 'yes' === $recurring_order || class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
 			$subscriptions   = wcs_get_subscriptions_for_order( $order_id, array( 'order_type' => 'any' ) );
 			$klarna_order_id = $wc_order->get_transaction_id();
 			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
@@ -248,6 +250,7 @@ class KCO_Subscription {
 
 				foreach ( $subscriptions as $subscription ) {
 					$subscription->update_meta_data( '_kco_recurring_token', $recurring_token );
+					$subscription->add_order_note( $note );
 
 					// Do not overwrite any existing phone number in case the customer has changed payment method (and thus shipping details).
 					if ( empty( $subscription->get_shipping_phone() ) ) {
