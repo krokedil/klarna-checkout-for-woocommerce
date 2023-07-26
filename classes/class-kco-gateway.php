@@ -508,6 +508,11 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// Set Klarna order ID.
 			$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
 
+			// Set recurring order.
+			$kco_recurring_order = isset( $klarna_order['recurring'] ) && true === $klarna_order['recurring'] ? 'yes' : 'no';
+			$order->update_meta_data( '_kco_recurring_order', sanitize_key( $kco_recurring_order ) );
+
+			// Set recurring token if it exists.
 			if ( isset( $klarna_order['recurring_token'] ) ) {
 				$order->update_meta_data( '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
 			}

@@ -54,6 +54,12 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2023.07.26    - version 2.11.4 =
+* Fix           - Resolved an issue related to redirection when changing or updating the subscription payment method. Now, Klarna's hosted payment page has been added to the list of allowed external URLs for 'wp_safe_redirect' function.
+* Fix           - Addressed an issue where the recurring token was not being saved appropriately. This was occurring because the orders containing subscriptions were not being correctly identified.
+* Tweak         - Removed the settings tab from the “Klarna Add-ons” page because its functionalities have been transferred to the plugin.
+* Tweak         - We will now validate the API credentials based on the active mode, whether it’s test or production. This enhancement should prevent the plugin from inaccurately attempting to verify production credentials when the test mode is in operation.
+
 = 2023.07.18    - version 2.11.3 =
 * Fix           - Fixed an issue where the recurring token was no longer being displayed in the billing fields.
 * Fix           - Fixed an undefined index warning that ocurred when the shipping was shown outside of the iframe.
