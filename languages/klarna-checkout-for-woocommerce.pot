@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2023-07-18 12:07+0000\n"
+"POT-Creation-Date: 2023-07-26 12:01+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -17,7 +17,7 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:173, ../classes/admin/class-klarna-for-woocommerce-addons.php:397
+#: ../klarna-checkout-for-woocommerce.php:173
 msgid "Settings"
 msgstr ""
 
@@ -439,15 +439,15 @@ msgstr ""
 msgid "Customer redirected to Klarna Hosted Payment Page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:583
+#: ../classes/class-kco-gateway.php:588
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:642
+#: ../classes/class-kco-gateway.php:647
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:664, ../classes/class-kco-gateway.php:686
+#: ../classes/class-kco-gateway.php:669, ../classes/class-kco-gateway.php:691
 msgid "Reference:"
 msgstr ""
 
@@ -455,36 +455,36 @@ msgstr ""
 msgid "Klarna Checkout for WooCommerce"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:268
+#: ../classes/class-kco-subscription.php:272
 msgid "Recurring token was missing from the Klarna order during the checkout process. Please contact Klarna for help."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:245
+#: ../classes/class-kco-subscription.php:248
 msgid "Recurring token for subscription: %s"
 msgstr ""
 
 #. translators: Error message.
-#: ../classes/class-kco-subscription.php:344
+#: ../classes/class-kco-subscription.php:348
 msgid "Subscription payment failed with Klarna. Message: %1$s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:337
+#: ../classes/class-kco-subscription.php:341
 msgid "Subscription payment made with Klarna. Klarna order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:381
+#: ../classes/class-kco-subscription.php:385
 msgid "Klarna recurring token"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:437
+#: ../classes/class-kco-subscription.php:441
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:431
+#: ../classes/class-kco-subscription.php:435
 msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:458
+#: ../classes/class-kco-subscription.php:462
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -534,27 +534,23 @@ msgstr ""
 msgid "It looks as if you don't have pretty permalinks enabled in WordPress. For Klarna checkout for WooCommerce to function properly, this needs to be enabled. "
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:81, ../classes/admin/class-klarna-for-woocommerce-addons.php:396
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:78
 msgid "Klarna Add-ons"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:130
-msgid "Please install an add-on to be able to see the settings."
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:186
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:177
 msgid "Install"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:186
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:177
 msgid "Not installed"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:189
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:180
 msgid "Activated"
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:192
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:183
 msgid "Deactivated"
 msgstr ""
 
