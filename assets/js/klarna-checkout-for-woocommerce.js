@@ -451,7 +451,7 @@ jQuery( function( $ ) {
 
   placeKlarnaOrder: function(callback) {
 			kco_wc.getKlarnaOrder().done( function(response) {
-				if(response.success ) {
+				if( response.success ) {
 					$( '.woocommerce-checkout-review-order-table' ).block({
 						message: null,
 						overlayCSS: {
@@ -466,8 +466,15 @@ jQuery( function( $ ) {
 						dataType: 'json',
 						success: function( data ) {
 							try {
-								if ( 'success' === data.result ) {
-									kco_wc.logToFile( 'Successfully placed order. Sending "should_proceed: true" to Klarna' );
+								if ('success' === data.result) {
+									let email = 'N/A'
+									if ('billing_address' in response.data && 'email' in response.data.billing_address) {
+										email = response.data.shipping_address.email;
+									} else if ('shipping_address' in response.data && 'email' in response.data.shipping_address) { 
+										email = response.data.shipping_address.email;
+									}
+
+									kco_wc.logToFile( 'Successfully placed order [' + email + ']. Sending "should_proceed: true" to Klarna' );
 									callback({ should_proceed: true });
 								} else {
 									throw 'Result failed';

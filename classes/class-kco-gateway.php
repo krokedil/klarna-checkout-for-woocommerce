@@ -104,7 +104,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return array
 		 */
 		public function process_payment( $order_id ) {
-			$order                 = wc_get_order( $order_id );
 			$change_payment_method = filter_input( INPUT_GET, 'change_payment_method', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			// Order-pay purchase (or subscription payment method change)
 			// 1. Redirect to receipt page.
@@ -422,7 +421,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 			// ----- Extra Debug Logging End ----- //
 
+			$order_number = $order->get_order_number() ?? $order_id ?? 'N/A';
+
 			if ( ! $klarna_order ) {
+				KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] failed to be processed due to: could not retrieve the Klarna order." );
 				return array(
 					'result' => 'error',
 				);
@@ -434,16 +436,18 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 				// Update the order with new confirmation page url.
 				$klarna_order = KCO_WC()->api->update_klarna_confirmation( $klarna_order_id, $klarna_order, $order_id );
-
 				$order->save();
+
 				// Let other plugins hook into this sequence.
 				do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
 
+				KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] was successfully processed." );
 				return array(
 					'result' => 'success',
 				);
 			}
 			// Return false if we get here. Something went wrong.
+			KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] failed to be processed due to: missing order_id or klarna_order." );
 			return array(
 				'result' => 'error',
 			);
