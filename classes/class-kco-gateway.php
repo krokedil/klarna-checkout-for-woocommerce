@@ -742,7 +742,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			// Set allowed payment methods for upsell based on country. https://developers.klarna.com/documentation/order-management/integration-guide/pre-delivery/#update-order-amount.
-			$allowed_payment_methods = array( 'INVOICE', 'INVOICE_BUSINESS', 'ACCOUNT' );
+			$allowed_payment_methods = array( 'INVOICE', 'B2B_INVOICE', 'BASE_ACCOUNT' );
 			switch ( wc_get_base_location()['country'] ) {
 				case 'SE':
 				case 'NO':
