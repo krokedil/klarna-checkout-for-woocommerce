@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 6.1.1
+Tested up to: 6.3
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 7.4.1
+WC tested up to: 8.0.1
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,33 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2023.07.26    - version 2.11.4 =
+* Fix           - Resolved an issue related to redirection when changing or updating the subscription payment method. Now, Klarna's hosted payment page has been added to the list of allowed external URLs for 'wp_safe_redirect' function.
+* Fix           - Addressed an issue where the recurring token was not being saved appropriately. This was occurring because the orders containing subscriptions were not being correctly identified.
+* Tweak         - Removed the settings tab from the “Klarna Add-ons” page because its functionalities have been transferred to the plugin.
+* Tweak         - We will now validate the API credentials based on the active mode, whether it’s test or production. This enhancement should prevent the plugin from inaccurately attempting to verify production credentials when the test mode is in operation.
+
+= 2023.07.18    - version 2.11.3 =
+* Fix           - Fixed an issue where the recurring token was no longer being displayed in the billing fields.
+* Fix           - Fixed an undefined index warning that ocurred when the shipping was shown outside of the iframe.
+* Fix           - When processing a payment, and the order is not found, we'll now return the response in the expected format. 
+
+= 2023.06.28    - version 2.11.2 =
+* Fix           - Fixed an issue with how we made our meta queries when trying to find orders based on a Klarna order ID.
+* Enhancement   - Added a validation to ensure that the order returned by our meta query actually is the correct order by verifying that the Klarna order ID stored matches the one we searched for.
+
+= 2023.06.26    - version 2.11.1 =
+* Fix           - Resolved a critical error that occurred in certain cases when an external payment method ("EPM") was used and the order ID couldn't be retrieved.
+
+= 2023.06.20    - version 2.11.0 =
+* Feature       - The plugin now supports WooCommerce's "High-Performance Order Storage" ("HPOS") feature.
+* Fix           - Corrected a typo in transient name.
+* Fix           - Addressed a typo in the name of the order status (thanks @bhrugesh96!).
+* Fix           - Resolved an issue where the checkout would crash if invalid customer data was processed in the frontend events.
+* Fix           - Fixed a problem where the order review and checkout form would get stuck in a "blocked" state when the customer closes the Klarna modal without completing the order.
+* Tweak         - Due to API changes, the upsell feature would sometimes fail when receiving an empty body response. This has now been resolved.
+* Enhancement   - Updated logging to include the browser's user agent.
+
 = 2023.05.15    - version 2.10.2 =
 * Fix           - Fixed an issue where the Klarna modal would prevent the page from scrolling to the WooCommerce error notice.
 * Fix           - Fixed an issue with the $checkout_flow variable being referenced without being defined.

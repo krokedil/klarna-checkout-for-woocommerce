@@ -52,9 +52,10 @@ function kco_create_or_update_order() {
 function kco_create_or_update_order_pay_for_order() {
 	global $wp;
 	$order_id = $wp->query_vars['order-pay'];
+	$order    = wc_get_order( $order_id );
 
-	if ( get_post_meta( $order_id, 'kco_order_id' ) ) { // Check if we have an order id.
-		$klarna_order_id = get_post_meta( $order_id, 'kco_order_id' );
+	if ( $order->get_meta( 'kco_order_id', true ) ) { // Check if we have an order id.
+		$klarna_order_id = $order->get_meta( 'kco_order_id', true );
 		// Try to update the order, if it fails try to create new order.
 		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id, $order_id, true );
 		if ( ! $klarna_order ) {
@@ -64,7 +65,8 @@ function kco_create_or_update_order_pay_for_order() {
 				// If failed then bail.
 				return;
 			}
-			update_post_meta( $order_id, 'kco_wc_order_id', $klarna_order['order_id'] );
+			$order->update_meta_data( 'kco_wc_order_id', $klarna_order['order_id'] );
+			$order->save();
 			return $klarna_order;
 		}
 		return $klarna_order;
@@ -74,7 +76,8 @@ function kco_create_or_update_order_pay_for_order() {
 		if ( ! $klarna_order ) {
 			return;
 		}
-		update_post_meta( $order_id, 'kco_wc_order_id', $klarna_order['order_id'] );
+		$order->update_meta_data( 'kco_wc_order_id', $klarna_order['order_id'] );
+		$order->save();
 		return $klarna_order;
 	}
 }
@@ -617,9 +620,9 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				KCO_Logger::log( $klarna_order_id . ': Fraud status pending for order ' . $order->get_order_number() . '. Order set to on-hold.' );
 			} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
 				// Cancel the order.
-				$order->set_status( 'canceled', __( 'Klarna Checkout order was rejected', 'klarna-checkout-for-woocommerce' ) );
+				$order->set_status( 'cancelled', __( 'Klarna Checkout order was rejected', 'klarna-checkout-for-woocommerce' ) );
 				$order->save();
-				KCO_Logger::log( $klarna_order_id . ': Fraud status rejected for order ' . $order->get_order_number() . '. Order canceled.' );
+				KCO_Logger::log( $klarna_order_id . ': Fraud status rejected for order ' . $order->get_order_number() . '. Order cancelled.' );
 			}
 		} else {
 			$order->set_status( 'on-hold', __( 'Waiting for verification from Klarnas push notification', 'klarna-checkout-for-woocommerce' ) );
@@ -673,11 +676,14 @@ function kco_convert_region( $region_string, $country_code ) {
  */
 function kco_maybe_save_surcharge( $order_id, $klarna_order ) {
 	if ( isset( $klarna_order['order_lines'] ) ) {
+		$order = wc_get_order( $order_id );
 		foreach ( $klarna_order['order_lines'] as $order_line ) {
 			if ( 'added-surcharge' === $order_line['reference'] ) {
-				update_post_meta( $order_id, '_kco_added_surcharge', wp_json_encode( $order_line ) );
+				$order->update_meta_data( '_kco_added_surcharge', wp_json_encode( $order_line ) );
 			}
 		}
+
+		$order->save();
 	}
 }
 
@@ -692,7 +698,9 @@ function kco_maybe_save_org_nr( $order_id, $klarna_order ) {
 	if ( isset( $klarna_order['customer'] ) && isset( $klarna_order['customer']['type'] ) && 'organization' === $klarna_order['customer']['type'] ) {
 		$org_nr = isset( $klarna_order['customer']['organization_registration_id'] ) ? $klarna_order['customer']['organization_registration_id'] : null;
 		if ( ! empty( $org_nr ) ) {
-			update_post_meta( $order_id, '_billing_org_nr', $org_nr );
+			$order = wc_get_order( $order_id );
+			$order->update_meta_data( '_billing_org_nr', $org_nr );
+			$order->save();
 		}
 	}
 }
@@ -708,12 +716,14 @@ function kco_maybe_save_reference( $order_id, $klarna_order ) {
 	if ( isset( $klarna_order['customer'] ) && isset( $klarna_order['customer']['type'] ) && 'organization' === $klarna_order['customer']['type'] ) {
 		$billing_reference  = isset( $klarna_order['billing_address']['attention'] ) ? $klarna_order['billing_address']['attention'] : null;
 		$shipping_reference = isset( $klarna_order['shipping_address']['attention'] ) ? $klarna_order['shipping_address']['attention'] : null;
+		$order              = wc_get_order( $order_id );
 		if ( ! empty( $billing_reference ) ) {
-			update_post_meta( $order_id, '_billing_reference', $billing_reference );
+			$order->update_meta_data( '_billing_reference', $billing_reference );
 		}
 		if ( ! empty( $shipping_reference ) ) {
-			update_post_meta( $order_id, '_shipping_reference', $shipping_reference );
+			$order->update_meta_data( '_shipping_reference', $shipping_reference );
 		}
+		$order->save();
 	}
 }
 
@@ -756,4 +766,45 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 	KCO_Logger::Log( "Set chosen shipping method for $klarna_order_id " . json_encode( $chosen_shipping_methods ) );
 
 	WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
+}
+
+/**
+ * Returns the WooCommerce order that has a matching Klarna order id saved as a meta field. If no order is found, returns false, and if many orders are found the newest one is returned.
+ * @param string $klarna_order_id
+ * @param string|null $date_after
+ * @return WC_Order|false
+ */
+function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
+	$args = array(
+		'meta_key'     => '_wc_klarna_order_id',
+		'meta_value'   => $klarna_order_id,
+		'meta_compare' => '=',
+		'order'        => 'DESC',
+		'orderby'      => 'date',
+		'limit'        => 1,
+	);
+
+	if ( $date_after ) {
+		$args['date_after'] = $date_after;
+	}
+
+	$orders = wc_get_orders( $args );
+
+	// If the orders array is empty, return false.
+	if ( empty( $orders ) ) {
+		return false;
+	}
+
+	// Get the first order in the array.
+	$order = reset( $orders );
+
+	// Validate that the order actuall has the metadata we're looking for, and that it is the same.
+	$meta_value = $order->get_meta( '_wc_klarna_order_id', true );
+
+	// If the meta value is not the same as the Klarna order id, return false.
+	if ( $meta_value !== $klarna_order_id ) {
+		return false;
+	}
+
+	return $order;
 }

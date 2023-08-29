@@ -70,15 +70,12 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		 * Add the Addons options page to WooCommerce.
 		 **/
 		public function options_page() {
-			$tab     = filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-			$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-			$this->add_page_tabs( $tab );
-			if ( empty( $tab ) || 'addons' === $tab ) {
-				$addon_content = self::get_addons();
-				?>
-				<div id="checkout-addons-heading" class="checkout-addons-heading">
-				<div class="checkout-addons-wrap">
-				<h1><?php esc_html_e( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ); ?></h1>
+			$section       = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+			$addon_content = self::get_addons();
+			?>
+			<div id="checkout-addons-heading" class="checkout-addons-heading">
+			<div class="checkout-addons-wrap">
+			<h1><?php esc_html_e( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ); ?></h1>
 			</div>
 			</div>
 				<?php if ( $addon_content->start ) : ?>
@@ -124,12 +121,6 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 				<?php endif; ?>
 			</div>
 				<?php
-			} elseif ( 'settings' === $tab ) {
-				do_action( 'klarna_addons_settings_tab', $section );
-				?>
-				<p><?php esc_html_e( 'Please install an add-on to be able to see the settings.', 'klarna-checkout-for-woocommerce' ); ?></p>
-				<?php
-			}
 		}
 
 		/**
@@ -380,29 +371,6 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			if ( is_object( $addons ) ) {
 				return $addons;
 			}
-		}
-
-		/**
-		 * Adds tabs to the Addons page.
-		 *
-		 * @param string $current Wich tab is to be selected.
-		 * @return void
-		 */
-		public function add_page_tabs( $current = 'addons' ) {
-			if ( empty( $current ) ) {
-				$current = 'addons';
-			}
-			$tabs = array(
-				'addons'   => __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ),
-				'settings' => __( 'Settings', 'klarna-checkout-for-woocommerce' ),
-			);
-			$html = '<h2 class="nav-tab-wrapper">';
-			foreach ( $tabs as $tab => $name ) {
-				$class = ( $tab === $current ) ? 'nav-tab-active' : '';
-				$html .= '<a class="nav-tab ' . $class . '" href="?page=checkout-addons&tab=' . $tab . '">' . $name . '</a>';
-			}
-			$html .= '</h2>';
-			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput
 		}
 	}
 }

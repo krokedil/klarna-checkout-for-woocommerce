@@ -68,26 +68,15 @@ class KCO_API_Callbacks {
 		// Used by Klarna_Checkout_Subscription::handle_push_cb_for_payment_method_change().
 		do_action( 'wc_klarna_push_cb', $klarna_order_id );
 
-		$query_args = array(
-			'fields'      => 'ids',
-			'post_type'   => wc_get_order_types(),
-			'post_status' => array_keys( wc_get_order_statuses() ),
-			'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-			'meta_value'  => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-		);
-
-		$orders = get_posts( $query_args );
-
-		// If zero matching orders were found, create backup order.
-		if ( empty( $orders ) ) {
+		$order = kco_get_order_by_klarna_id( $klarna_order_id );
+		if ( empty( $order ) ) {
 			// Backup order creation.
 			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Klarna order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 			return;
+
 		}
 
-		$order_id = $orders[0];
-		$order    = wc_get_order( $order_id );
-
+		$order_id = $order->get_id();
 		if ( $order ) {
 			// Get the Klarna order data.
 			$klarna_order = apply_filters(
@@ -139,28 +128,18 @@ class KCO_API_Callbacks {
 		 * 4. If WooCommerce order does exist, fire the hook.
 		 */
 
-		$order_id        = '';
 		$klarna_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		if ( ! empty( $klarna_order_id ) ) {
-			$klarna_order_id = $klarna_order_id;
-			$query_args      = array(
-				'fields'      => 'ids',
-				'post_type'   => wc_get_order_types(),
-				'post_status' => array_keys( wc_get_order_statuses() ),
-				'meta_key'    => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-				'meta_value'  => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- Slow DB Query is ok here, we need to limit to our meta key.
-			);
 
-			$orders = get_posts( $query_args );
+			$order = kco_get_order_by_klarna_id( $klarna_order_id );
 
-			// If zero matching orders were found, return.
-			if ( ! empty( $orders ) ) {
-				$order_id = $orders[0];
+			if ( ! empty( $order ) ) {
+				$order_id = $order->get_id();
 			}
 		}
 
-		if ( '' !== $order_id ) {
+		if ( isset( $order_id ) ) {
 			do_action( 'wc_klarna_notification_listener' );
 		} else {
 			$post_body = file_get_contents( 'php://input' );

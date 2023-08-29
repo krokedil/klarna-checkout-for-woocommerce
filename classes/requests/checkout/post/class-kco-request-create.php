@@ -337,12 +337,19 @@ class KCO_Request_Create extends KCO_Request {
 			$address['country'] = $order->get_shipping_country();
 		}
 
-		$shipping_email = ! empty( get_post_meta( $order->get_id(), '_shipping_email', true ) ) ? get_post_meta( $order->get_id(), '_shipping_email', true ) : $order->get_billing_email();
+		$shipping_email = ! empty( $order->get_meta( '_shipping_email', true ) ) ? $order->get_meta( '_shipping_email', true ) : $order->get_billing_email();
 		if ( $shipping_email ) {
 			$address['email'] = $shipping_email;
 		}
 
-		$shipping_phone = ! empty( get_post_meta( $order->get_id(), '_shipping_phone', true ) ) ? get_post_meta( $order->get_id(), '_shipping_phone', true ) : $order->get_billing_phone();
+		// NOTE: Since we declare support for WC v4+, and WC_Order::get_shipping_phone was only added in 5.6.0, we need to use get_meta instead.
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
+			$shipping_phone = $order->get_shipping_phone();
+		} else {
+			$shipping_phone = $order->get_meta( '_shipping_phone', true );
+		}
+
+		$shipping_phone = ! empty( $shipping_phone ) ? $shipping_phone : $order->get_billing_phone();
 		if ( $shipping_phone ) {
 			$address['phone'] = $shipping_phone;
 		}

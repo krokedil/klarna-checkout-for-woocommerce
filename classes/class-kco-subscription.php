@@ -34,6 +34,7 @@ class KCO_Subscription {
 		add_action( 'wc_klarna_push_cb', array( $this, 'handle_push_cb_for_payment_method_change' ) );
 		add_action( 'init', array( $this, 'display_thankyou_message_for_payment_method_change' ) );
 		add_action( 'woocommerce_account_view-subscription_endpoint', array( $this, 'maybe_confirm_change_payment_method' ) );
+		add_filter( 'allowed_redirect_hosts', array( $this, 'extend_allowed_domains_list' ) );
 
 	}
 
@@ -234,8 +235,10 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function set_recurring_token_for_order( $order_id = null, $klarna_order = null ) {
-		$wc_order = wc_get_order( $order_id );
-		if ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
+		$wc_order        = wc_get_order( $order_id );
+		$recurring_order = $wc_order->get_meta( '_kco_recurring_order', true );
+
+		if ( 'yes' === $recurring_order || class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) {
 			$subscriptions   = wcs_get_subscriptions_for_order( $order_id, array( 'order_type' => 'any' ) );
 			$klarna_order_id = $wc_order->get_transaction_id();
 			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
@@ -246,26 +249,34 @@ class KCO_Subscription {
 				$wc_order->add_order_note( $note );
 
 				foreach ( $subscriptions as $subscription ) {
-					update_post_meta( $subscription->get_id(), '_kco_recurring_token', $recurring_token );
+					$subscription->update_meta_data( '_kco_recurring_token', $recurring_token );
+					$subscription->add_order_note( $note );
 
 					// Do not overwrite any existing phone number in case the customer has changed payment method (and thus shipping details).
 					if ( empty( $subscription->get_shipping_phone() ) ) {
-						$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
-						$subscription->save();
+
+						// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
+						if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
+							$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
+						} else {
+							$subscription->update_meta_data( '_shipping_phone', $klarna_order['shipping_address']['phone'] );
+						}
 					}
+					$subscription->save();
 				}
 
 				// Also update the renewal order with the new recurring token.
-				update_post_meta( $order_id, '_kco_recurring_token', sanitize_key( $recurring_token ) );
+				$wc_order->update_meta_data( '_kco_recurring_token', sanitize_key( $recurring_token ) );
 
 			} else {
 				$wc_order->add_order_note( __( 'Recurring token was missing from the Klarna order during the checkout process. Please contact Klarna for help.', 'klarna-checkout-for-woocommerce' ) );
 				$wc_order->set_status( 'on-hold' );
-				$wc_order->save();
 				foreach ( $subscriptions as $subscription ) {
 					$subscription->set_status( 'on-hold' );
 				}
 			}
+
+			$wc_order->save();
 		}
 	}
 
@@ -278,8 +289,10 @@ class KCO_Subscription {
 	 */
 	public function set_recurring_token_for_subscription( $subscription_id = null, $klarna_order = null ) {
 		if ( isset( $klarna_order['recurring_token'] ) ) {
-			$recurring_token = $klarna_order['recurring_token'];
-			update_post_meta( $subscription_id, '_kco_recurring_token', $recurring_token );
+			$recurring_token    = $klarna_order['recurring_token'];
+			$subscription_order = wc_get_order( $subscription_id );
+			$subscription_order->update_meta_data( '_kco_recurring_token', $recurring_token );
+			$subscription_order->save();
 		}
 	}
 
@@ -293,30 +306,33 @@ class KCO_Subscription {
 		$order_id = $renewal_order->get_id();
 
 		$subscriptions   = wcs_get_subscriptions_for_renewal_order( $renewal_order->get_id() );
-		$recurring_token = get_post_meta( $order_id, '_kco_recurring_token', true );
+		$recurring_token = $renewal_order->get_meta( '_kco_recurring_token', true );
 
 		if ( empty( $recurring_token ) ) {
 			// Try getting it from parent order.
-			$recurring_token = get_post_meta( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ), '_kco_recurring_token', true );
-			update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
+			$recurring_token = wc_get_order( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ) )->get_meta( '_kco_recurring_token', true );
+			$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
 		}
 
 		if ( empty( $recurring_token ) ) {
 			// Try getting it from _klarna_recurring_token (the old Klarna plugin).
-			$recurring_token = get_post_meta( $order_id, '_klarna_recurring_token', true );
+			$recurring_token = $renewal_order->get_meta( '_klarna_recurring_token', true );
 
 			if ( empty( $recurring_token ) ) {
-				$recurring_token = get_post_meta( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ), '_klarna_recurring_token', true );
-				update_post_meta( $order_id, '_klarna_recurring_token', $recurring_token );
+				$recurring_token = wc_get_order( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ) )->get_meta( '_klarna_recurring_token', true );
+				$renewal_order->update_meta_data( '_klarna_recurring_token', $recurring_token );
 			}
 
 			if ( ! empty( $recurring_token ) ) {
-				update_post_meta( $order_id, '_kco_recurring_token', $recurring_token );
+				$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
 				foreach ( $subscriptions as $subscription ) {
-					update_post_meta( $subscription->get_id(), '_kco_recurring_token', $recurring_token );
+					$subscription_order = wc_get_order( $subscription->get_id() );
+					$subscription_order->update_meta_data( '_kco_recurring_token', $recurring_token );
+					$subscription_order->save();
 				}
 			}
 		}
+		$renewal_order->save();
 
 		$create_order_response = KCO_WC()->api->create_recurring_order( $order_id, $recurring_token );
 		if ( ! is_wp_error( $create_order_response ) ) {
@@ -343,12 +359,22 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function show_recurring_token( $order ) {
-		if ( 'shop_subscription' === $order->get_type() && $order->get_meta( '_kco_recurring_token' ) ) {
+		if ( 'shop_subscription' === $order->get_type() ) {
+			$recurring_token = $order->get_meta( '_kco_recurring_token', true );
+			if ( empty( $recurring_token ) ) {
+				$parent          = $order->get_parent() ?? false;
+				$recurring_token = ! empty( $parent ) ? $parent->get_meta( '_kco_recurring_token', true ) : '';
+			}
+
+			if ( empty( $recurring_token ) ) {
+				return;
+			}
+
 			?>
 			<div class="order_data_column" style="clear:both; float:none; width:100%;">
 				<div class="address">
 					<p>
-						<strong><?php echo esc_html( 'Klarna recurring token' ); ?>:</strong><?php echo esc_html( $order->get_meta( '_kco_recurring_token', true ) ); ?>
+						<strong><?php echo esc_html( 'Klarna recurring token' ); ?>:</strong><?php echo esc_html( $recurring_token ); ?>
 					</p>
 				</div>
 				<div class="edit_address">
@@ -377,8 +403,9 @@ class KCO_Subscription {
 	public function save_kco_recurring_token_update( $post_id, $post ) {
 		$klarna_recurring_token = filter_input( INPUT_POST, '_kco_recurring_token', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$order                  = wc_get_order( $post_id );
-		if ( 'shop_subscription' === $order->get_type() && get_post_meta( $post_id, '_kco_recurring_token' ) ) {
-			update_post_meta( $post_id, '_kco_recurring_token', $klarna_recurring_token );
+		if ( 'shop_subscription' === $order->get_type() && $order->get_meta( '_kco_recurring_token', true ) ) {
+			$order->update_meta_data( '_kco_recurring_token', $klarna_recurring_token );
+			$order->save();
 		}
 
 	}
@@ -400,7 +427,10 @@ class KCO_Subscription {
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( ! is_wp_error( $klarna_order ) ) {
 				if ( isset( $klarna_order['recurring_token'] ) && ! empty( $klarna_order['recurring_token'] ) ) {
-					update_post_meta( $subscription_id, '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
+					$subscription_order = wc_get_order( $subscription->get_id() );
+					$subscription_order->update_meta_data( '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
+					$subscription_order->save();
+
 					// translators: %s Klarna recurring token.
 					$note = sprintf( __( 'Payment method changed via Klarna Checkout. New recurring token for subscription: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['recurring_token'] ) );
 					$subscription->add_order_note( $note );
@@ -480,9 +510,28 @@ class KCO_Subscription {
 		$subscription->set_shipping_country( strtoupper( $klarna_order['shipping_address']['country'] ) );
 		$subscription->set_shipping_postcode( $klarna_order['shipping_address']['postal_code'] );
 		$subscription->set_shipping_city( $klarna_order['shipping_address']['city'] );
-		$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
+
+		// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
+			$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
+		} else {
+			$subscription->update_meta_data( '_shipping_phone', $klarna_order['shipping_address']['phone'] );
+		}
 
 		$subscription->save();
+	}
+
+	/**
+	 * Add Klarna hosted payment page as allowed external url for wp_safe_redirect.
+	 * We do this because WooCommerce Subscriptions use wp_safe_redirect when processing a payment method change request (from v5.1.0).
+	 *
+	 * @param array $hosts Domains that are allowed when wp_safe_redirect is used.
+	 * @return array
+	 */
+	public function extend_allowed_domains_list( $hosts ) {
+		$hosts[] = 'pay.playground.klarna.com';
+		$hosts[] = 'pay.klarna.com';
+		return $hosts;
 	}
 }
 new KCO_Subscription();
