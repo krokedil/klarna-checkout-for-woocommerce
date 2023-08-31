@@ -546,7 +546,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function show_thank_you_snippet( $order_id = null ) {
 			if ( $order_id ) {
 				$order = wc_get_order( $order_id );
-				$upsell_uuids    = $order->get_meta( '_ppu_upsell_uuids', true );
+				$upsell_uuids    = $order->get_meta( '_ppu_upsell_ids', true );
 				$has_been_upsold = ! empty( $upsell_uuids );
 
 				if ( is_object( $order ) && $order->get_transaction_id() ) {
