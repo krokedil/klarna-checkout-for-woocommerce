@@ -150,6 +150,7 @@ class KCO_Templates {
 				return;
 			}
 
+			wc_add_notice( __( 'Klarna Checkout is not available. Please choose a different payment option or contact the store for assistance.', 'klarna-checkout-for-woocommerce' ), 'error' );
 			$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 			// Do not redirect if KCO is the only available gateway to prevent infinite loop.
 			if ( 1 === count( $available_gateways ) ) {
