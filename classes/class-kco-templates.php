@@ -150,14 +150,23 @@ class KCO_Templates {
 				return;
 			}
 
-			$url = add_query_arg(
-				array(
-					'kco-order' => 'error',
-					'reason'    => base64_encode( __( 'Failed to load Klarna Checkout template file.', 'klarna-checkout-for-woocommerce' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
-				),
-				wc_get_cart_url()
-			);
-			wp_safe_redirect( $url );
+			$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
+			// Do not redirect if KCO is the only available gateway to prevent infinite loop.
+			if ( 1 === count( $available_gateways ) ) {
+				return;
+			}
+
+			// Select the second available gateway.
+			$first_gateway = reset( $available_gateways );
+			if ( 'kco' !== $first_gateway->id ) {
+				WC()->session->set( 'chosen_payment_method', $first_gateway->id );
+			} else {
+				$second_gateway = next( $available_gateways );
+				WC()->session->set( 'chosen_payment_method', $second_gateway->id );
+			}
+			WC()->payment_gateways()->set_current_gateway( $available_gateways );
+
+			wp_safe_redirect( wc_get_checkout_url() );
 			exit;
 		}
 	}
@@ -170,17 +179,17 @@ class KCO_Templates {
 	public function add_wc_form() {
 		?>
 		<div aria-hidden="true" id="kco-wc-form" style="position:absolute; top:-99999px; left:-99999px;">
-			<?php do_action( 'woocommerce_checkout_billing' ); ?>
-			<?php do_action( 'woocommerce_checkout_shipping' ); ?>
+		<?php do_action( 'woocommerce_checkout_billing' ); ?>
+		<?php do_action( 'woocommerce_checkout_shipping' ); ?>
 			<div id="kco-nonce-wrapper">
-				<?php
-				if ( version_compare( WOOCOMMERCE_VERSION, '3.4', '<' ) ) {
-					wp_nonce_field( 'woocommerce-process_checkout' );
-				} else {
-					wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' );
-				}
-				wc_get_template( 'checkout/terms.php' );
-				?>
+			<?php
+			if ( version_compare( WOOCOMMERCE_VERSION, '3.4', '<' ) ) {
+				wp_nonce_field( 'woocommerce-process_checkout' );
+			} else {
+				wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' );
+			}
+			wc_get_template( 'checkout/terms.php' );
+			?>
 			</div>
 			<input id="payment_method_kco" type="radio" class="input-radio" name="payment_method" value="kco" checked="checked" />		</div>
 		<?php
@@ -195,9 +204,9 @@ class KCO_Templates {
 	public function kco_wc_unrequire_wc_billing_state_field( $fields ) {
 		// Unrequire if chosen payment method is Klarna Checkout.
 		if ( null !== WC()->session && method_exists( WC()->session, 'get' ) &&
-			WC()->session->get( 'chosen_payment_method' ) &&
-			'kco' === WC()->session->get( 'chosen_payment_method' )
-			) {
+		WC()->session->get( 'chosen_payment_method' ) &&
+		'kco' === WC()->session->get( 'chosen_payment_method' )
+		) {
 			$fields['billing_state']['required'] = false;
 		}
 
@@ -213,9 +222,9 @@ class KCO_Templates {
 	public function kco_wc_unrequire_wc_shipping_state_field( $fields ) {
 		// Unrequire if chosen payment method is Klarna Checkout.
 		if ( null !== WC()->session && method_exists( WC()->session, 'get' ) &&
-			WC()->session->get( 'chosen_payment_method' ) &&
-			'kco' === WC()->session->get( 'chosen_payment_method' )
-			) {
+		WC()->session->get( 'chosen_payment_method' ) &&
+		'kco' === WC()->session->get( 'chosen_payment_method' )
+		) {
 			$fields['shipping_state']['required'] = false;
 		}
 
