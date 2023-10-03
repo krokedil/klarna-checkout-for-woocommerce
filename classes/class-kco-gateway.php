@@ -17,6 +17,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 	 */
 	class KCO_Gateway extends WC_Payment_Gateway {
 
+		public $testmode                   = false;
+	    public $logging                    = false;
+	    public $shipping_methods_in_iframe = false;
+
 		/**
 		 * KCO_Gateway constructor.
 		 */
