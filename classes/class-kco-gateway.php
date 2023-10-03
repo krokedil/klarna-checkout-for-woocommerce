@@ -546,12 +546,14 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function show_thank_you_snippet( $order_id = null ) {
 			if ( $order_id ) {
 				$order = wc_get_order( $order_id );
+				$upsell_uuids    = $order->get_meta( '_ppu_upsell_ids', true );
+				$has_been_upsold = ! empty( $upsell_uuids );
 
 				if ( is_object( $order ) && $order->get_transaction_id() ) {
 					$klarna_order_id = $order->get_transaction_id();
 
 					$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
-					if ( $klarna_order ) {
+					if ( $klarna_order && ! $has_been_upsold ) { // Don't show the snippet for upsold orders, since the iFrame wont be updated with the new orders lines.
 						echo kco_extract_script( $klarna_order['html_snippet'] ); // phpcs:ignore WordPress.Security.EscapeOutput -- Cant escape since this is the iframe snippet.
 					}
 
@@ -765,20 +767,17 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			// Set allowed payment methods for upsell based on country. https://developers.klarna.com/documentation/order-management/integration-guide/pre-delivery/#update-order-amount.
-			$allowed_payment_methods = array( 'INVOICE', 'INVOICE_BUSINESS', 'ACCOUNT' );
-			switch ( wc_get_base_location()['country'] ) {
-				case 'SE':
-				case 'NO':
-				case 'FI':
-				case 'DK':
+			$allowed_payment_methods = array( 'INVOICE', 'B2B_INVOICE', 'BASE_ACCOUNT', 'DIRECT_DEBIT' );
+			switch ( $klarna_order['billing_address']['country'] ) {
 				case 'AT':
 				case 'DE':
-					$allowed_payment_methods[] = 'DIRECT_DEBIT';
+				case 'DK':
+				case 'FI':
+				case 'FR':
+				case 'NL':
+				case 'NO':
+				case 'SE':
 					$allowed_payment_methods[] = 'FIXED_AMOUNT';
-					break;
-				case 'US':
-					$allowed_payment_methods[] = 'DEFERRED_INTEREST';
-					$allowed_payment_methods[] = 'DIRECT_DEBIT';
 					break;
 				case 'CH':
 					$allowed_payment_methods = array();
