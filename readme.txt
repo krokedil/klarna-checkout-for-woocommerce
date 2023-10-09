@@ -54,6 +54,12 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2023.10.09    - version 2.11.5 =
+* Fix           - Fixed deprecation warnings (thanks @jonasostrom!)
+* Fix           - Fixed issues related to "Smart Coupons" when the "apply before tax" setting is disabled.
+* Tweak         - Updated list of supported Upsell countries and methods.
+* Tweak         - Increased logging when issues do occur.
+
 = 2023.07.26    - version 2.11.4 =
 * Fix           - Resolved an issue related to redirection when changing or updating the subscription payment method. Now, Klarna's hosted payment page has been added to the list of allowed external URLs for 'wp_safe_redirect' function.
 * Fix           - Addressed an issue where the recurring token was not being saved appropriately. This was occurring because the orders containing subscriptions were not being correctly identified.
