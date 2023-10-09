@@ -19,7 +19,7 @@ class KCO_Checkout {
 	public function __construct() {
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'add_shipping_data_input' ) );
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_shipping_method' ), 9999 );
-		add_action( 'woocommerce_after_calculate_totals', array( $this, 'update_klarna_order' ), 9999 );
+		add_action( 'woocommerce_after_calculate_totals', array( $this, 'update_klarna_order' ), 99999 );
 
 		// Handle potential shipping selection errors.
 		add_filter( 'woocommerce_shipping_chosen_method', array( __CLASS__, 'maybe_register_shipping_error' ), 9999, 3 );

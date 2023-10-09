@@ -17,6 +17,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 	 */
 	class KCO_Gateway extends WC_Payment_Gateway {
 
+		public $testmode                   = false;
+	    public $logging                    = false;
+	    public $shipping_methods_in_iframe = false;
+
 		/**
 		 * KCO_Gateway constructor.
 		 */
@@ -104,7 +108,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return array
 		 */
 		public function process_payment( $order_id ) {
-			$order                 = wc_get_order( $order_id );
 			$change_payment_method = filter_input( INPUT_GET, 'change_payment_method', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			// Order-pay purchase (or subscription payment method change)
 			// 1. Redirect to receipt page.
@@ -422,7 +425,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 			// ----- Extra Debug Logging End ----- //
 
+			$order_number = $order->get_order_number() ?? $order_id ?? 'N/A';
+
 			if ( ! $klarna_order ) {
+				KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] failed to be processed due to: could not retrieve the Klarna order." );
 				return array(
 					'result' => 'error',
 				);
@@ -434,16 +440,18 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 				// Update the order with new confirmation page url.
 				$klarna_order = KCO_WC()->api->update_klarna_confirmation( $klarna_order_id, $klarna_order, $order_id );
-
 				$order->save();
+
 				// Let other plugins hook into this sequence.
 				do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
 
+				KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] was successfully processed." );
 				return array(
 					'result' => 'success',
 				);
 			}
 			// Return false if we get here. Something went wrong.
+			KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] failed to be processed due to: missing order_id or klarna_order." );
 			return array(
 				'result' => 'error',
 			);
@@ -542,12 +550,14 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function show_thank_you_snippet( $order_id = null ) {
 			if ( $order_id ) {
 				$order = wc_get_order( $order_id );
+				$upsell_uuids    = $order->get_meta( '_ppu_upsell_ids', true );
+				$has_been_upsold = ! empty( $upsell_uuids );
 
 				if ( is_object( $order ) && $order->get_transaction_id() ) {
 					$klarna_order_id = $order->get_transaction_id();
 
 					$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
-					if ( $klarna_order ) {
+					if ( $klarna_order && ! $has_been_upsold ) { // Don't show the snippet for upsold orders, since the iFrame wont be updated with the new orders lines.
 						echo kco_extract_script( $klarna_order['html_snippet'] ); // phpcs:ignore WordPress.Security.EscapeOutput -- Cant escape since this is the iframe snippet.
 					}
 
@@ -761,20 +771,17 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			// Set allowed payment methods for upsell based on country. https://developers.klarna.com/documentation/order-management/integration-guide/pre-delivery/#update-order-amount.
-			$allowed_payment_methods = array( 'INVOICE', 'INVOICE_BUSINESS', 'ACCOUNT' );
-			switch ( wc_get_base_location()['country'] ) {
-				case 'SE':
-				case 'NO':
-				case 'FI':
-				case 'DK':
+			$allowed_payment_methods = array( 'INVOICE', 'B2B_INVOICE', 'BASE_ACCOUNT', 'DIRECT_DEBIT' );
+			switch ( $klarna_order['billing_address']['country'] ) {
 				case 'AT':
 				case 'DE':
-					$allowed_payment_methods[] = 'DIRECT_DEBIT';
+				case 'DK':
+				case 'FI':
+				case 'FR':
+				case 'NL':
+				case 'NO':
+				case 'SE':
 					$allowed_payment_methods[] = 'FIXED_AMOUNT';
-					break;
-				case 'US':
-					$allowed_payment_methods[] = 'DEFERRED_INTEREST';
-					$allowed_payment_methods[] = 'DIRECT_DEBIT';
 					break;
 				case 'CH':
 					$allowed_payment_methods = array();

@@ -18,5 +18,8 @@
   },
   "dependencies": {
     "gulp": "^4.0.2"
+  },
+  "scripts": {
+    "build": "npx gulp CSS && npx gulp JS && npx gulp makePOT"
   }
 }
