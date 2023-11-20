@@ -237,13 +237,32 @@ class KCO_AJAX extends WC_AJAX {
 			$klarna_order['shipping_address']['region'] = kco_convert_region( $region, $country );
 		}
 
+		foreach ( $klarna_order as $field => $item ) {
+			if ( ! in_array( $field, array( 'customer', 'shipping_address', 'billing_address' ), true ) ) {
+				continue;
+			}
+
+			foreach ( $item as $k => $v ) {
+				// Remove all whitespace.
+				$v = preg_replace( '/\s/', '', $v );
+				if ( 'phone' === $k ) {
+					// Offset: exclude +DD (e.g., +46) from the masking pattern.
+					$offset = false !== strpos( $v, '+' ) ? strpos( $v, '+' ) + 3 : 0;
+					// Replace all but the first and last few characters.
+					$klarna_order[ $field ][ $k ] = empty( $v ) ? $v : substr_replace( $v, str_repeat( '*', strlen( $v ) - 2 - $offset ), $offset, strlen( $v ) - 2 - $offset );
+
+				} elseif ( 'date_of_birth' === $k ) {
+					$klarna_order[ $k ] = empty( $v ) ? $v : substr_replace( $v, str_repeat( '*', strlen( $v ) - 4 ), 2, strlen( $v ) - 4 );
+				}
+			}
+		}
+
 		wp_send_json_success(
 			array(
 				'billing_address'  => $klarna_order['billing_address'],
 				'shipping_address' => $klarna_order['shipping_address'],
 			)
 		);
-
 	}
 
 	/**
