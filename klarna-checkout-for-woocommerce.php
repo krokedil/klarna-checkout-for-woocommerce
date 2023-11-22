@@ -266,6 +266,33 @@ if ( ! class_exists( 'KCO' ) ) {
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
 			add_action( 'before_woocommerce_init', array( $this, 'declare_wc_compatibility' ) );
+
+			add_action(
+				'woocommerce_before_checkout_process',
+				function () {
+					if ( 'kco' !== WC()->session->get( 'chosen_payment_method' ) ) {
+						return;
+					}
+
+					$checkout_fields = WC()->checkout->get_checkout_fields();
+					$billing_fields  = array_keys( $checkout_fields['billing'] ?? array() );
+					$shipping_fields = array_keys( $checkout_fields['shipping'] ?? array() );
+
+					foreach ( array_merge( $billing_fields, $shipping_fields ) as $checkout_field ) {
+						add_filter(
+							'woocommerce_process_checkout_field_' . $checkout_field,
+							function ( $value ) {
+								$field = substr_replace( current_filter(), '', 0, strlen( 'woocommerce_process_checkout_field_' ) );
+								if ( isset( WC()->session->get( 'kco_wc_customer' )[ $field ] ) ) {
+									$v = WC()->session->get( 'kco_wc_customer' )[ $field ];
+									return empty( $v ) ? $value : $v;
+								}
+								return $value;
+							}
+						);
+					}
+				}
+			);
 		}
 
 		/**

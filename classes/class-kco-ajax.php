@@ -63,7 +63,7 @@ class KCO_AJAX extends WC_AJAX {
 
 		$values = array();
 		if ( isset( $_POST['checkout'] ) ) {
-			wp_parse_str( wp_unslash( $_POST['checkout'] ), $values );// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			wp_parse_str( wp_unslash( $_POST['checkout'] ), $values ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		}
 		$cart = $values['cart'];
 
@@ -147,41 +147,41 @@ class KCO_AJAX extends WC_AJAX {
 			$address = array_map( 'sanitize_text_field', wp_unslash( $_REQUEST['data'] ) );
 		}
 
-		$customer_data = array();
+		$klarna_order['shipping_address'] = array();
 
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
 		if ( isset( $address['email'] ) ) {
-			$customer_data['billing_email'] = $address['email'];
+			$klarna_order['shipping_address']['billing_email'] = $address['email'];
 		}
 
 		if ( isset( $address['postal_code'] ) ) {
-			$customer_data['billing_postcode']  = $address['postal_code'];
-			$customer_data['shipping_postcode'] = $address['postal_code'];
+			$klarna_order['shipping_address']['billing_postcode']  = $address['postal_code'];
+			$klarna_order['shipping_address']['shipping_postcode'] = $address['postal_code'];
 		}
 
 		if ( isset( $address['given_name'] ) ) {
-			$customer_data['billing_first_name']  = $address['given_name'];
-			$customer_data['shipping_first_name'] = $address['given_name'];
+			$klarna_order['shipping_address']['billing_first_name']  = $address['given_name'];
+			$klarna_order['shipping_address']['shipping_first_name'] = $address['given_name'];
 		}
 
 		if ( isset( $address['family_name'] ) ) {
-			$customer_data['billing_last_name']  = $address['family_name'];
-			$customer_data['shipping_last_name'] = $address['family_name'];
+			$klarna_order['shipping_address']['billing_last_name']  = $address['family_name'];
+			$klarna_order['shipping_address']['shipping_last_name'] = $address['family_name'];
 		}
 
 		if ( isset( $klarna_order['billing_address']['region'] ) ) {
-			$customer_data['billing_state']  = $klarna_order['billing_address']['region'];
-			$customer_data['shipping_state'] = $klarna_order['shipping_address']['region'];
+			$klarna_order['shipping_address']['billing_state']  = $klarna_order['billing_address']['region'];
+			$klarna_order['shipping_address']['shipping_state'] = $klarna_order['shipping_address']['region'];
 		}
 
 		if ( isset( $address['country'] ) && kco_wc_country_code_converter( $address['country'] ) ) {
-			$country                           = kco_wc_country_code_converter( $address['country'] );
-			$customer_data['billing_country']  = $country;
-			$customer_data['shipping_country'] = $country;
+			$country = kco_wc_country_code_converter( $address['country'] );
+			$klarna_order['shipping_address']['billing_country']  = $country;
+			$klarna_order['shipping_address']['shipping_country'] = $country;
 		}
 
-		WC()->customer->set_props( $customer_data );
+		WC()->customer->set_props( $klarna_order['shipping_address'] );
 		WC()->customer->save();
 
 		WC()->cart->calculate_shipping();
@@ -237,13 +237,47 @@ class KCO_AJAX extends WC_AJAX {
 			$klarna_order['shipping_address']['region'] = kco_convert_region( $region, $country );
 		}
 
-		wp_send_json_success(
+		WC()->session->set(
+			'kco_wc_customer',
 			array(
-				'billing_address'  => $klarna_order['billing_address'],
-				'shipping_address' => $klarna_order['shipping_address'],
+				'billing_first_name'  => $klarna_order['billing_address']['given_name'],
+				'billing_last_name'   => $klarna_order['billing_address']['family_name'],
+				'billing_email'       => $klarna_order['billing_address']['email'],
+				'billing_phone'       => $klarna_order['billing_address']['phone'],
+				'billing_address_1'   => $klarna_order['billing_address']['street_address'],
+				'billing_address_2'   => $klarna_order['billing_address']['street_address2'],
+				'billing_postcode'    => $klarna_order['billing_address']['postal_code'],
+				'billing_city'        => $klarna_order['billing_address']['city'],
+				'billing_state'       => $klarna_order['billing_address']['region'],
+				'billing_country'     => strtoupper( $klarna_order['billing_address']['country'] ),
+
+				'shipping_first_name' => $klarna_order['shipping_address']['given_name'],
+				'shipping_last_name'  => $klarna_order['shipping_address']['family_name'],
+				'shipping_email'      => $klarna_order['shipping_address']['email'],
+				'shipping_phone'      => $klarna_order['shipping_address']['phone'],
+				'shipping_address_1'  => $klarna_order['shipping_address']['street_address'],
+				'shipping_address_2'  => $klarna_order['shipping_address']['street_address2'],
+				'shipping_postcode'   => $klarna_order['shipping_address']['postal_code'],
+				'shipping_city'       => $klarna_order['shipping_address']['city'],
+				'shipping_state'      => $klarna_order['shipping_address']['region'],
+				'shipping_country'    => strtoupper( $klarna_order['shipping_address']['country'] ),
 			)
 		);
 
+		wp_send_json_success(
+			array(
+				'billing_address'  => array(
+					'postal_code' => $klarna_order['billing_address']['postal_code'],
+					'country'     => strtoupper( $klarna_order['billing_address']['country'] ),
+					'email'       => $klarna_order['billing_address']['email'],
+				),
+				'shipping_address' => array(
+					'postal_code' => $klarna_order['shipping_address']['postal_code'],
+					'country'     => strtoupper( $klarna_order['shipping_address']['country'] ),
+					'email'       => $klarna_order['shipping_address']['email'],
+				),
+			)
+		);
 	}
 
 	/**
