@@ -59,7 +59,7 @@ jQuery( function( $ ) {
 						if (!$('html').hasClass(modalClassName)) {
 							// Wait for the Klarna modal to disappear before scrolling up to show error notices.
 							const noticeClassName = kco_params.pay_for_order ? 'div.woocommerce-notices-wrapper' : 'form.checkout';
-							$('html, body').animate({
+							$('html, body').not(':animated').animate({
 								scrollTop: ($(noticeClassName).offset().top - 100)
 							}, 1000);
 
