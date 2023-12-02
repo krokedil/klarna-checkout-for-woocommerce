@@ -293,6 +293,41 @@ if ( ! class_exists( 'KCO' ) ) {
 					}
 				}
 			);
+
+			do_action(
+				'woocommerce_after_checkout_validation',
+				function ( $data, $errors ) {
+					// At this point, the order is still being processed. If the customer refreshes the page, WC will populate the checkout fields
+					// using the customer's data that was stored in the WC_Customer instance earlier. Before that happens, we have to ensure that the phone number
+					// has been removed from the WC_Customer instance so that it won't be included.
+					WC()->customer->set_billing_phone( '' );
+					WC()->customer->set_shipping_phone( '' );
+					WC()->customer->save();
+				}
+			);
+
+			add_action(
+				'woocommerce_checkout_order_processed',
+				function ( $order_id, $posted_data, $order ) {
+					if ( 'kco' !== $order->get_payment_method() ) {
+						return;
+					}
+
+					$customer = WC()->session->get( 'kco_wc_customer' );
+					if ( ! empty( $customer ) ) {
+
+						// Save the phone number to the customer object, not the order.
+						// If saved to the order, on refresh, the phone number will appear in the WC checkout fields.
+						// This is because if a WC_Order exist, which it does at this point, its data will be used to populate the checkout fields.
+						// Whereas with the WC_Customer object, its data will only be used when the payment processing is successful.
+						WC()->customer->set_billing_phone( $customer['billing_phone_number'] );
+						WC()->customer->set_shipping_phone( $customer['shipping_phone_number'] );
+						WC()->customer->save();
+					}
+				},
+				10,
+				3
+			);
 		}
 
 		/**
