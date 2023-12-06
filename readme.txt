@@ -54,6 +54,9 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2023.12.06    - version 2.11.6 =
+* Fix           - Added a check to ensure that a Klarna order is always, at most, processed once. This should prevent accidental order re-processing.
+
 = 2023.10.09    - version 2.11.5 =
 * Fix           - Fixed deprecation warnings (thanks @jonasostrom!)
 * Fix           - Fixed issues related to "Smart Coupons" when the "apply before tax" setting is disabled.
