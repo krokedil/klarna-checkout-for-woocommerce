@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 6.3
+Tested up to: 6.4.1
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 8.0.1
+WC tested up to: 8.3.1
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,9 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2023.12.06    - version 2.11.6 =
+* Fix           - Added a check to ensure that a Klarna order is always, at most, processed once. This should prevent accidental order re-processing.
+
 = 2023.10.09    - version 2.11.5 =
 * Fix           - Fixed deprecation warnings (thanks @jonasostrom!)
 * Fix           - Fixed issues related to "Smart Coupons" when the "apply before tax" setting is disabled.

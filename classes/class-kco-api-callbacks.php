@@ -85,7 +85,7 @@ class KCO_API_Callbacks {
 			);
 
 			// The Woo order was already created. Check if order status was set (in process_payment_handler).
-			if ( ! $order->has_status( array( 'processing', 'completed' ) ) ) {
+			if ( empty( $order->get_date_paid() ) ) {
 				if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
 					$order->payment_complete( $klarna_order_id );
 					// translators: Klarna order ID.
