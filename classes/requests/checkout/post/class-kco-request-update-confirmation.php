@@ -63,6 +63,7 @@ class KCO_Request_Update_Confirmation extends KCO_Request {
 			array(
 				'kco_confirm'  => 'yes',
 				'kco_order_id' => '{checkout.order.id}',
+				'order_id'     => $order_id,
 			),
 			$order->get_checkout_order_received_url()
 		);
