@@ -50,6 +50,7 @@ class KCO_Confirmation {
 	public function confirm_order() {
 		$kco_confirm     = filter_input( INPUT_GET, 'kco_confirm', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$klarna_order_id = filter_input( INPUT_GET, 'kco_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$order_id        = filter_input( INPUT_GET, 'order_id', FILTER_SANITIZE_NUMBER_INT );
 		$order_key       = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		// Return if we dont have our parameters set.
@@ -57,7 +58,12 @@ class KCO_Confirmation {
 			return;
 		}
 
-		$order_id = wc_get_order_id_by_order_key( $order_key );
+		if ( ! empty( $order_id ) ) {
+			$order    = wc_get_order( $order_id );
+			$order_id = ! empty( $order ) && hash_equals( $order->get_order_key(), $order_key ) ? absint( $order_id ) : wc_get_order_id_by_order_key( $order_key );
+		} else {
+			$order_id = wc_get_order_id_by_order_key( $order_key );
+		}
 
 		// Return if we cant find an order id.
 		if ( empty( $order_id ) ) {
