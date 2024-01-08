@@ -54,6 +54,10 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2024.01.08    - version 2.11.7 =
+* Enhancement   - Improved performance when redirecting to confirmation page.
+* Tweak         - If the template fails to load, the customer will now be notified about the reason. This should no longer prevent the customer from picking a different payment gateway when KCO is the default gateway.
+
 = 2023.12.06    - version 2.11.6 =
 * Fix           - Added a check to ensure that a Klarna order is always, at most, processed once. This should prevent accidental order re-processing.
 

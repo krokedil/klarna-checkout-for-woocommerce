@@ -1,4 +1,4 @@
-# Copyright (C) 2023 klarna-checkout-for-woocommerce
+# Copyright (C) 2024 klarna-checkout-for-woocommerce
 # This file is distributed under the same license as the klarna-checkout-for-woocommerce package.
 msgid ""
 msgstr ""
@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2023-12-06 14:11+0000\n"
+"POT-Creation-Date: 2024-01-08 08:59+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -42,15 +42,15 @@ msgstr ""
 msgid "The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:109
+#: ../classes/class-kco-confirmation.php:115
 msgid "Failed getting the order for the external payment."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:116
+#: ../classes/class-kco-confirmation.php:122
 msgid "Failed to find the payment method for the external payment."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:126
+#: ../classes/class-kco-confirmation.php:132
 msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
 
@@ -488,8 +488,8 @@ msgstr ""
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
-#: ../classes/class-kco-templates.php:156
-msgid "Failed to load Klarna Checkout template file."
+#: ../classes/class-kco-templates.php:153
+msgid "Klarna Checkout is not available. Please choose a different payment option or contact the store for assistance."
 msgstr ""
 
 #: ../includes/kco-functions.php:162
