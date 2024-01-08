@@ -82,6 +82,7 @@ class KCO_Merchant_URLs {
 				array(
 					'kco_confirm'  => 'yes',
 					'kco_order_id' => '{checkout.order.id}',
+					'order_id'     => $order_id,
 				),
 				$order->get_checkout_order_received_url()
 			);
@@ -123,7 +124,6 @@ class KCO_Merchant_URLs {
 		$shipping_option_update_url = str_replace( 'http:', 'https:', $shipping_option_update_url );
 
 		return apply_filters( 'kco_wc_shipping_option_update_url', $shipping_option_update_url );
-
 	}
 
 	/**
@@ -140,7 +140,6 @@ class KCO_Merchant_URLs {
 		$address_update_url = str_replace( 'http:', 'https:', $address_update_url );
 
 		return apply_filters( 'kco_wc_address_update_url', $address_update_url );
-
 	}
 
 	/**
