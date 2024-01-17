@@ -50,13 +50,14 @@ jQuery( function( $ ) {
 
 			// Handle events when the Klarna modal is closed when the purchase is not complete.
 			// Klarna does not provide an event listener for when the modal is closed.
+			let modalWasOpen = false;
+			const modalClassName = 'klarna-checkout-fso-open';
 			const observer = new MutationObserver(function (mutations) {
 
 				mutations.forEach(function (mutation) {
 					if ('attributes' === mutation.type && 'class' === mutation.attributeName) {
-						const modalClassName = 'klarna-checkout-fso-open';
 
-						if (!$('html').hasClass(modalClassName)) {
+						if (! $('html').hasClass(modalClassName) && modalWasOpen) {
 							// Wait for the Klarna modal to disappear before scrolling up to show error notices.
 							const noticeClassName = kco_params.pay_for_order ? 'div.woocommerce-notices-wrapper' : 'form.checkout';
 							$('html, body').animate({
@@ -65,7 +66,9 @@ jQuery( function( $ ) {
 
 							// Unlock the order review table and checkout form.
 							kco_wc.unblock();
-
+							modalWasOpen = false;
+						} else {
+							modalWasOpen = true;
 						}
 					}
 				});
