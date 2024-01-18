@@ -57,16 +57,18 @@ jQuery( function( $ ) {
 				mutations.forEach(function (mutation) {
 					if ('attributes' === mutation.type && 'class' === mutation.attributeName) {
 
-						if (! $('html').hasClass(modalClassName) && modalWasOpen) {
-							// Wait for the Klarna modal to disappear before scrolling up to show error notices.
-							const noticeClassName = kco_params.pay_for_order ? 'div.woocommerce-notices-wrapper' : 'form.checkout';
-							$('html, body').animate({
-								scrollTop: ($(noticeClassName).offset().top - 100)
-							}, 1000);
+						if (!$('html').hasClass(modalClassName)) {
+							if (modalWasOpen) {
+								// Wait for the Klarna modal to disappear before scrolling up to show error notices.
+								const noticeClassName = kco_params.pay_for_order ? 'div.woocommerce-notices-wrapper' : 'form.checkout';
+								$('html, body').animate({
+									scrollTop: ($(noticeClassName).offset().top - 100)
+								}, 1000);
 
-							// Unlock the order review table and checkout form.
-							kco_wc.unblock();
-							modalWasOpen = false;
+								// Unlock the order review table and checkout form.
+								kco_wc.unblock();
+								modalWasOpen = false;
+							}
 						} else {
 							modalWasOpen = true;
 						}
