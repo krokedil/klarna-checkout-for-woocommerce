@@ -181,7 +181,22 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE, DK, AT or NL, disable KCO.
 			if ( is_checkout() && class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
 				$available_recurring_countries = array( 'SE', 'NO', 'FI', 'DK', 'DE', 'AT', 'NL' );
-				if ( ! in_array( WC()->customer->get_billing_country(), $available_recurring_countries, true ) ) {
+				$country                       = WC()->customer->get_billing_country();
+				if ( empty( $country ) ) {
+					// If the billing country is not available, the "No location by default" setting is set.
+					// By default, if there is exactly one country the store sells to, it will be used by default.
+					// However, it still won't be set as the billing country until the customer has filled their billing address.
+					// In practice, the customer doesn't really have any other choice, so we can assume that it is selected country.
+					$countries = WC()->countries->get_allowed_countries();
+					if ( 1 === count( $countries ) ) {
+						$country = array_key_first( $countries );
+					} elseif ( 1 < count( $countries ) ) {
+						// If there is at least more than one allowed country, WC will let the customer pick a country on the checkout page.
+						// We'll wait until the customer has made a choice.
+						return false;
+					}
+				}
+				if ( ! in_array( $country, $available_recurring_countries, true ) ) {
 					return false;
 				}
 			}
