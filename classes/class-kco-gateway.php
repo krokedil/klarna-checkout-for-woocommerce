@@ -124,7 +124,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			// Order pay or redirect flow.
-			if ( is_wc_endpoint_url( 'order-pay' ) || isset( $this->settings['checkout_flow'] ) && 'redirect' === $this->settings['checkout_flow'] ) {
+			if ( is_wc_endpoint_url( 'order-pay' ) || 'redirect' === ( $this->settings['checkout_flow'] ?? 'embedded' ) ) {
 				$klarna_order = KCO_WC()->api->create_klarna_order( $order_id, 'redirect' );
 				if ( is_wp_error( $klarna_order ) ) {
 					wc_add_notice( $klarna_order->get_error_message(), 'error' );
@@ -213,6 +213,11 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			/* On the 'order-pay' page we redirect the customer to a hosted payment page, and therefore don't need need to enqueue any of the following assets. */
 			if ( ! is_checkout() || is_wc_endpoint_url( 'order-pay' ) ) {
+				return;
+			}
+
+			// If the redirect flow is selected, we do not need to load any custom scripts.
+			if ( 'redirect' === ( $this->settings['checkout_flow'] ?? 'embedded' ) ) {
 				return;
 			}
 
