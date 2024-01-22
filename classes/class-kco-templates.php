@@ -43,6 +43,13 @@ class KCO_Templates {
 	 * Plugin actions.
 	 */
 	public function __construct() {
+		$this->settings = get_option( 'woocommerce_kco_settings' );
+
+		// If the redirect flow is selected, we do not need to load the template.
+		if ( 'redirect' === ( $this->settings['checkout_flow'] ?? 'embedded' ) ) {
+			return;
+		}
+
 		// Override template if Klarna Checkout page.
 		add_filter( 'wc_get_template', array( $this, 'override_template' ), 999, 2 );
 		add_action( 'wp_footer', array( $this, 'check_that_kco_template_has_loaded' ) );
@@ -61,7 +68,6 @@ class KCO_Templates {
 		// Adds the required CSS classes for the checkout layout.
 		add_filter( 'body_class', array( $this, 'add_body_class' ) );
 
-		$this->settings = get_option( 'woocommerce_kco_settings' );
 	}
 
 	/**
@@ -84,11 +90,6 @@ class KCO_Templates {
 
 			// Don't use KCO template for pay for order orders.
 			if ( is_wc_endpoint_url( 'order-pay' ) ) {
-				return $template;
-			}
-
-			// The checkout flow is only available through a filter hook. We must check if it exists.
-			if ( isset( $this->settings['checkout_flow'] ) && 'redirect' === $this->settings['checkout_flow'] ) {
 				return $template;
 			}
 
@@ -149,11 +150,6 @@ class KCO_Templates {
 
 		// Exit early.
 		if ( ! is_checkout() ) {
-			return;
-		}
-
-		// If the redirect flow is selected, we do not need to load the template.
-		if ( isset( $this->settings['checkout_flow'] ) && 'redirect' === $this->settings['checkout_flow'] ) {
 			return;
 		}
 
