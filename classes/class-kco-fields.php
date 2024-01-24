@@ -357,10 +357,10 @@ class KCO_Fields {
 			$offset   = array_search( 'checkout_layout', array_keys( $settings ), true );
 			$settings = array_merge( array_slice( $settings, 0, $offset + 1, true ), array( 'checkout_flow' => $checkout_flow ), array_slice( $settings, $offset, null, true ) );
 		} else {
-			$option                    = 'woocommerce_kco_settings';
-			$settings                  = get_option( $option );
-			$settings['checkout_flow'] = 'embedded';
-			update_option( $option, $settings );
+			$option                           = 'woocommerce_kco_settings';
+			$stored_settings                  = get_option( $option );
+			$stored_settings['checkout_flow'] = 'embedded';
+			update_option( $option, $stored_settings );
 		}
 
 		$wc_version = defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
