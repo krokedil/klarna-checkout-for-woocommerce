@@ -14,9 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class KCO_Templates {
 
 	/**
+	 * The KCO plugin settings.
+	 *
+	 * @var array|false
+	 */
+	private $settings;
+
+	/**
 	 * The reference the *Singleton* instance of this class.
 	 *
-	 * @var $instance
+	 * @var KCO_Templates
 	 */
 	protected static $instance;
 
@@ -36,6 +43,13 @@ class KCO_Templates {
 	 * Plugin actions.
 	 */
 	public function __construct() {
+		$this->settings = get_option( 'woocommerce_kco_settings' );
+
+		// If the redirect flow is selected, we do not need to load the template.
+		if ( 'redirect' === ( $this->settings['checkout_flow'] ?? 'embedded' ) ) {
+			return;
+		}
+
 		// Override template if Klarna Checkout page.
 		add_filter( 'wc_get_template', array( $this, 'override_template' ), 999, 2 );
 		add_action( 'wp_footer', array( $this, 'check_that_kco_template_has_loaded' ) );
@@ -53,6 +67,7 @@ class KCO_Templates {
 
 		// Adds the required CSS classes for the checkout layout.
 		add_filter( 'body_class', array( $this, 'add_body_class' ) );
+
 	}
 
 	/**
@@ -132,7 +147,13 @@ class KCO_Templates {
 	 * payment method but the KCO template file hasn't been loaded.
 	 */
 	public function check_that_kco_template_has_loaded() {
-		if ( is_checkout() && array_key_exists( 'kco', WC()->payment_gateways->get_available_payment_gateways() ) && 'kco' === kco_wc_get_selected_payment_method() && ( method_exists( WC()->cart, 'needs_payment' ) && WC()->cart->needs_payment() ) ) {
+
+		// Exit early.
+		if ( ! is_checkout() ) {
+			return;
+		}
+
+		if ( array_key_exists( 'kco', WC()->payment_gateways->get_available_payment_gateways() ) && 'kco' === kco_wc_get_selected_payment_method() && ( method_exists( WC()->cart, 'needs_payment' ) && WC()->cart->needs_payment() ) ) {
 
 			// Get checkout object.
 			$checkout = WC()->checkout();
