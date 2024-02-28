@@ -618,8 +618,20 @@ jQuery( function ( $ ) {
 
 							$( "form.checkout" ).trigger( "update_checkout" )
 						},
-						change: function ( data ) {
-							kco_wc.log( "change", data )
+						change: function (data) {
+							// The change event is triggered when the user changes postal code, country or email in their billing address. It is also triggered for given/family name except in the AT & DE markets.
+
+							kco_wc.log("change", data)
+
+							var country = kco_wc.convertCountry(data.country.toUpperCase())
+							$("#billing_first_name").val("given_name" in data ? data.given_name : "")
+							$("#billing_last_name").val("family_name" in data ? data.family_name : "")
+							$("#billing_postcode").val("postal_code" in data ? data.postal_code : "")
+							$("#billing_country").val("country" in data ? country : "")
+							$("#billing_email").val("email" in data ? data.email : "")
+							$("#billing_country").change()
+							$("#billing_email").change()
+							$("#billing_email").blur()
 						},
 						order_total_change: function ( data ) {
 							kco_wc.log( "order_total_change", data )
