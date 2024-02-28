@@ -15,6 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class that gets the merchant data for the order.
  */
 class KCO_Request_Options {
+
+
+	/**
+	 * The plugin settings.
+	 *
+	 * @var array|false
+	 */
+	private $settings;
+
 	/**
 	 * Class constructor.
 	 */
@@ -25,6 +34,7 @@ class KCO_Request_Options {
 	/**
 	 * Gets merchant data for Klarna purchase.
 	 *
+	 * @param string $checkout_flow Embedded (default) or redirect.
 	 * @return array
 	 */
 	public function get_options( $checkout_flow = 'embedded' ) {
