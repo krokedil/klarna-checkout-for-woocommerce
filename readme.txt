@@ -54,6 +54,9 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2024.03.12    - version 2.12.1 =
+* Fix           - Bumped the plugin version.
+
 = 2024.01.29    - version 2.12.0 =
 * Feature       - Added a new checkout flow: redirect. The redirect flow replaces the current embedded checkout, and redirects the customer to [Klarna's hosted payment page](https://docs.klarna.com/hosted-payment-page/) ("HPP"). Please refer to [our documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/get-started/introduction/#checkout-flow-setting) on how to enable this setting.
 

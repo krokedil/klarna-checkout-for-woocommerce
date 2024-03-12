@@ -38,6 +38,40 @@ class KCO_Request_Cart {
 	public $separate_sales_tax = false;
 
 	/**
+	 * The cart total amount.
+	 *
+	 * @var int
+	 */
+	private $total_amount;
+
+	/**
+	 * The cart subtotal.
+	 *
+	 * @var int
+	 */
+	private $subtotal_amount;
+	/**
+	 * The cart total tax amount.
+	 *
+	 * @var int
+	 */
+	private $total_tax_amount;
+
+	/**
+	 * The cart subtotal.
+	 *
+	 * @var int
+	 */
+	private $subtotal_tax_amount;
+
+	/**
+	 * The quantity of the cart item being currently processed.
+	 *
+	 * @var int
+	 */
+	private $quantity;
+
+	/**
 	 * WC_Klarna_Payments_Order_Lines constructor.
 	 *
 	 * @param bool|string $shop_country Shop country.
@@ -178,7 +212,6 @@ class KCO_Request_Cart {
 				} else {
 					$product = wc_get_product( $cart_item['product_id'] );
 				}
-
 				$this->total_amount        = self::format_number( $cart_item['line_total'] );
 				$this->subtotal_amount     = self::format_number( $cart_item['line_subtotal'] );
 				$this->total_tax_amount    = self::format_number( array_sum( $cart_item['line_tax_data']['total'] ) );

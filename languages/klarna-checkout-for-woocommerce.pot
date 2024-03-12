@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2024-01-29 09:29+0000\n"
+"POT-Creation-Date: 2024-03-12 10:36+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -574,23 +574,23 @@ msgstr ""
 msgid "There was an error installing the addon. Please try again."
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:135
+#: ../classes/requests/helpers/class-kco-request-cart.php:169
 msgid "Surcharge"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:263, ../classes/requests/helpers/class-kco-request-cart.php:264
+#: ../classes/requests/helpers/class-kco-request-cart.php:296, ../classes/requests/helpers/class-kco-request-cart.php:297
 msgid "Sales Tax"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:296, ../classes/requests/helpers/class-kco-request-cart.php:293, ../classes/requests/helpers/class-kco-request-cart.php:365
+#: ../classes/requests/helpers/class-kco-request-cart.php:329, ../classes/requests/helpers/class-kco-request-cart.php:326, ../classes/requests/helpers/class-kco-request-cart.php:398
 msgid "Gift card"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:386, ../classes/requests/helpers/class-kco-request-cart.php:409
+#: ../classes/requests/helpers/class-kco-request-cart.php:419, ../classes/requests/helpers/class-kco-request-cart.php:442
 msgid "giftcard"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:715, ../classes/requests/helpers/class-kco-request-cart.php:743
+#: ../classes/requests/helpers/class-kco-request-cart.php:748, ../classes/requests/helpers/class-kco-request-cart.php:776
 msgid "Shipping"
 msgstr ""
 
