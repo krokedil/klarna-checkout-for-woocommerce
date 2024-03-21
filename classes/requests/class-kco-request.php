@@ -24,6 +24,20 @@ class KCO_Request {
 	protected $separate_sales_tax = false;
 
 	/**
+	 * The plugin settings.
+	 *
+	 * @var array|false
+	 */
+	protected $settings;
+
+	/**
+	 * The country of the store's base location.
+	 *
+	 * @var string
+	 */
+	protected $shop_country;
+
+	/**
 	 * Class constructor.
 	 */
 	public function __construct() {

@@ -339,6 +339,30 @@ class KCO_Fields {
 				'desc_tip'    => true,
 			),
 		);
+
+		// Insert the "Checkout flow" setting after the "Checkout layout" setting.
+		if ( apply_filters( 'kco_enable_redirected_flow', false ) ) {
+			$checkout_flow = array(
+				'title'       => __( 'Checkout flow', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'select',
+				'options'     => array(
+					'embedded' => __( 'Embedded', 'klarna-checkout-for-woocommerce' ),
+					'redirect' => __( 'Redirect', 'klarna-checkout-for-woocommerce' ),
+				),
+				'description' => __( '<strong>Embedded:</strong> the checkout is embedded in the WooCommerce checkout page and partially replaces the checkout form. <strong>Redirect:</strong> the customer is redirected to a payment page hosted by Klarna.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'embedded',
+				'desc_tip'    => true,
+			);
+
+			$offset   = array_search( 'checkout_layout', array_keys( $settings ), true );
+			$settings = array_merge( array_slice( $settings, 0, $offset + 1, true ), array( 'checkout_flow' => $checkout_flow ), array_slice( $settings, $offset, null, true ) );
+		} else {
+			$option                           = 'woocommerce_kco_settings';
+			$stored_settings                  = get_option( $option );
+			$stored_settings['checkout_flow'] = 'embedded';
+			update_option( $option, $stored_settings );
+		}
+
 		$wc_version = defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
 
 		if ( version_compare( $wc_version, '3.4', '>=' ) ) {

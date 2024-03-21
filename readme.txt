@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 6.3
+Tested up to: 6.4.3
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 8.0.1
+WC tested up to: 8.7.0
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,19 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2024.03.12    - version 2.12.1 =
+* Fix           - Bumped the plugin version.
+
+= 2024.01.29    - version 2.12.0 =
+* Feature       - Added a new checkout flow: redirect. The redirect flow replaces the current embedded checkout, and redirects the customer to [Klarna's hosted payment page](https://docs.klarna.com/hosted-payment-page/) ("HPP"). Please refer to [our documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/get-started/introduction/#checkout-flow-setting) on how to enable this setting.
+
+= 2024.01.08    - version 2.11.7 =
+* Enhancement   - Improved performance when redirecting to confirmation page.
+* Tweak         - If the template fails to load, the customer will now be notified about the reason. This should no longer prevent the customer from picking a different payment gateway when KCO is the default gateway.
+
+= 2023.12.06    - version 2.11.6 =
+* Fix           - Added a check to ensure that a Klarna order is always, at most, processed once. This should prevent accidental order re-processing.
+
 = 2023.10.09    - version 2.11.5 =
 * Fix           - Fixed deprecation warnings (thanks @jonasostrom!)
 * Fix           - Fixed issues related to "Smart Coupons" when the "apply before tax" setting is disabled.

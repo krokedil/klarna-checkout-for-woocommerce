@@ -1,4 +1,4 @@
-# Copyright (C) 2023 klarna-checkout-for-woocommerce
+# Copyright (C) 2024 klarna-checkout-for-woocommerce
 # This file is distributed under the same license as the klarna-checkout-for-woocommerce package.
 msgid ""
 msgstr ""
@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2023-10-09 08:18+0000\n"
+"POT-Creation-Date: 2024-03-12 10:36+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -42,15 +42,15 @@ msgstr ""
 msgid "The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:109
+#: ../classes/class-kco-confirmation.php:115
 msgid "Failed getting the order for the external payment."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:116
+#: ../classes/class-kco-confirmation.php:122
 msgid "Failed to find the payment method for the external payment."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:126
+#: ../classes/class-kco-confirmation.php:132
 msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
 
@@ -387,35 +387,51 @@ msgstr ""
 msgid "Checkout page radius border in pixels"
 msgstr ""
 
+#: ../classes/class-kco-fields.php:346
+msgid "Checkout flow"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:349
+msgid "Embedded"
+msgstr ""
+
 #: ../classes/class-kco-fields.php:350
+msgid "Redirect"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:352
+msgid "<strong>Embedded:</strong> the checkout is embedded in the WooCommerce checkout page and partially replaces the checkout form. <strong>Redirect:</strong> the customer is redirected to a payment page hosted by Klarna."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:374
 msgid "Checkout privacy policy text"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:351
+#: ../classes/class-kco-fields.php:375
 msgid "Select if you want to show the <em>Checkout privacy policy</em> text on the checkout page, and where you want to display it."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:355
+#: ../classes/class-kco-fields.php:379
 msgid "Do not display"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:356
+#: ../classes/class-kco-fields.php:380
 msgid "Display above checkout"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:357
+#: ../classes/class-kco-fields.php:381
 msgid "Display below checkout"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:361
+#: ../classes/class-kco-fields.php:385
 msgid "Terms and conditions checkbox"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:362
+#: ../classes/class-kco-fields.php:386
 msgid "Add a terms and conditions checkbox inside Klarna checkout iframe"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:364
+#: ../classes/class-kco-fields.php:388
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
@@ -427,27 +443,27 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:270
+#: ../classes/class-kco-gateway.php:275
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:273
+#: ../classes/class-kco-gateway.php:278
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:493
+#: ../classes/class-kco-gateway.php:498
 msgid "Customer redirected to Klarna Hosted Payment Page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:598
+#: ../classes/class-kco-gateway.php:603
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:657
+#: ../classes/class-kco-gateway.php:662
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:679, ../classes/class-kco-gateway.php:701
+#: ../classes/class-kco-gateway.php:684, ../classes/class-kco-gateway.php:706
 msgid "Reference:"
 msgstr ""
 
@@ -488,8 +504,8 @@ msgstr ""
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
-#: ../classes/class-kco-templates.php:156
-msgid "Failed to load Klarna Checkout template file."
+#: ../classes/class-kco-templates.php:174
+msgid "Klarna Checkout is not available. Please choose a different payment option or contact the store for assistance."
 msgstr ""
 
 #: ../includes/kco-functions.php:162
@@ -558,23 +574,23 @@ msgstr ""
 msgid "There was an error installing the addon. Please try again."
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:135
+#: ../classes/requests/helpers/class-kco-request-cart.php:169
 msgid "Surcharge"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:263, ../classes/requests/helpers/class-kco-request-cart.php:264
+#: ../classes/requests/helpers/class-kco-request-cart.php:296, ../classes/requests/helpers/class-kco-request-cart.php:297
 msgid "Sales Tax"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:296, ../classes/requests/helpers/class-kco-request-cart.php:293, ../classes/requests/helpers/class-kco-request-cart.php:365
+#: ../classes/requests/helpers/class-kco-request-cart.php:329, ../classes/requests/helpers/class-kco-request-cart.php:326, ../classes/requests/helpers/class-kco-request-cart.php:398
 msgid "Gift card"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:386, ../classes/requests/helpers/class-kco-request-cart.php:409
+#: ../classes/requests/helpers/class-kco-request-cart.php:419, ../classes/requests/helpers/class-kco-request-cart.php:442
 msgid "giftcard"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:715, ../classes/requests/helpers/class-kco-request-cart.php:743
+#: ../classes/requests/helpers/class-kco-request-cart.php:748, ../classes/requests/helpers/class-kco-request-cart.php:776
 msgid "Shipping"
 msgstr ""
 
