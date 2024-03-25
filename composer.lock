@@ -4,21 +4,93 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "93e09194408acf7c385f20b3ead4958d",
-    "packages": [],
-    "packages-dev": [
+    "content-hash": "fe07704cf770d0a483051a61c33b8bfa",
+    "packages": [
         {
-            "name": "squizlabs/php_codesniffer",
-            "version": "3.6.1",
+            "name": "krokedil/klarna-onsite-messaging",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
-                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "f268ca40d54617c6e06757f83f699775c9b3ff2e"
+                "url": "https://github.com/krokedil/klarna-onsite-messaging.git",
+                "reference": "12fd2a0328a9e52fe490742083c0a638f419cf8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/f268ca40d54617c6e06757f83f699775c9b3ff2e",
-                "reference": "f268ca40d54617c6e06757f83f699775c9b3ff2e",
+                "url": "https://api.github.com/repos/krokedil/klarna-onsite-messaging/zipball/12fd2a0328a9e52fe490742083c0a638f419cf8d",
+                "reference": "12fd2a0328a9e52fe490742083c0a638f419cf8d",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~7.4 || ~8.0"
+            },
+            "require-dev": {
+                "10up/wp_mock": "^1.0",
+                "php-stubs/woocommerce-stubs": "^8.3",
+                "wp-coding-standards/wpcs": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Krokedil\\KlarnaOnsiteMessaging\\": "src/"
+                }
+            },
+            "archive": {
+                "exclude": [
+                    "tests/*",
+                    "phpunit.xml",
+                    "composer-lock.json",
+                    ".github/*",
+                    ".gitignore",
+                    ".gitattributes"
+                ]
+            },
+            "scripts": {
+                "phpcs": [
+                    "phpcs --standard=phpcs.xml --extensions=php --ignore=vendor/,tests/"
+                ],
+                "phpcbf": [
+                    "phpcbf --standard=phpcs.xml --extensions=php --ignore=vendor/,tests/"
+                ],
+                "test": [
+                    "@php ./vendor/bin/phpunit --configuration phpunit.xml"
+                ],
+                "test-coverage-html": [
+                    "@php ./vendor/bin/phpunit --configuration phpunit.xml --coverage-html coverage"
+                ],
+                "test-coverage-clover": [
+                    "@php ./vendor/bin/phpunit --configuration phpunit.xml --coverage-clover coverage.xml"
+                ]
+            },
+            "license": [
+                "GPL-v3"
+            ],
+            "authors": [
+                {
+                    "name": "Krokedil AB",
+                    "email": "info@krokedil.se"
+                }
+            ],
+            "description": "Klarna On-Site Messaging for WooCommerce",
+            "support": {
+                "source": "https://github.com/krokedil/klarna-onsite-messaging/tree/develop",
+                "issues": "https://github.com/krokedil/klarna-onsite-messaging/issues"
+            },
+            "time": "2024-03-25T13:08:57+00:00"
+        }
+    ],
+    "packages-dev": [
+        {
+            "name": "squizlabs/php_codesniffer",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
+                "reference": "8b8ef253834ef826d0442c88a4b30688f60e4d7a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/8b8ef253834ef826d0442c88a4b30688f60e4d7a",
+                "reference": "8b8ef253834ef826d0442c88a4b30688f60e4d7a",
                 "shasum": ""
             },
             "require": {
@@ -28,11 +100,12 @@
                 "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
+                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.3.4"
             },
+            "default-branch": true,
             "bin": [
-                "bin/phpcs",
-                "bin/phpcbf"
+                "bin/phpcbf",
+                "bin/phpcs"
             ],
             "type": "library",
             "extra": {
@@ -47,21 +120,45 @@
             "authors": [
                 {
                     "name": "Greg Sherwood",
-                    "role": "lead"
+                    "role": "Former lead"
+                },
+                {
+                    "name": "Juliette Reinders Folmer",
+                    "role": "Current lead"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer/graphs/contributors"
                 }
             ],
             "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
-            "homepage": "https://github.com/squizlabs/PHP_CodeSniffer",
+            "homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
             "keywords": [
                 "phpcs",
-                "standards"
+                "standards",
+                "static analysis"
             ],
             "support": {
-                "issues": "https://github.com/squizlabs/PHP_CodeSniffer/issues",
-                "source": "https://github.com/squizlabs/PHP_CodeSniffer",
-                "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
+                "issues": "https://github.com/PHPCSStandards/PHP_CodeSniffer/issues",
+                "security": "https://github.com/PHPCSStandards/PHP_CodeSniffer/security/policy",
+                "source": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
+                "wiki": "https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki"
             },
-            "time": "2021-10-11T04:00:11+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/PHPCSStandards",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/jrfnl",
+                    "type": "github"
+                },
+                {
+                    "url": "https://opencollective.com/php_codesniffer",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2024-03-20T16:13:41+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
@@ -116,11 +213,13 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "krokedil/klarna-onsite-messaging": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.3.0"
 }

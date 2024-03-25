@@ -1,5 +1,15 @@
 {
+    "require": {
+        "krokedil/klarna-onsite-messaging": "dev-develop"
+    },
     "require-dev": {
         "wp-coding-standards/wpcs": "^2.3"
+    },
+   "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:krokedil/klarna-onsite-messaging.git"
     }
+  ],
+  "minimum-stability": "dev"       
 }
