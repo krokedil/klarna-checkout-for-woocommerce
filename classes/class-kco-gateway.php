@@ -139,7 +139,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// 1. Save Klarna data to the pending order.
 			// 2. Approve process payment sequence to customer can continue/complete payment.
 			return $this->process_embedded_payment_handler( $order_id );
-
 		}
 
 		/**
@@ -421,6 +420,12 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function process_embedded_payment_handler( $order_id ) {
 			// Get the Klarna order ID.
 			$order = wc_get_order( $order_id );
+
+			// If the order was placed using the store api, process it separately.
+			if ( 'store-api' === $order->get_created_via() ) {
+				return $this->process_store_api_order( $order );
+			}
+
 			if ( ! empty( $order ) ) {
 				$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
 			}
@@ -466,6 +471,15 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
 
 				KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] was successfully processed." );
+
+				// If the order was placed using the store-api, then return the result and redirect url.
+				if ( 'store-api' === $order->get_created_via() ) {
+					return array(
+						'result'   => 'success',
+						'redirect' => $order->get_checkout_order_received_url(),
+					);
+				}
+
 				return array(
 					'result' => 'success',
 				);
@@ -474,6 +488,20 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] failed to be processed due to: missing order_id or klarna_order." );
 			return array(
 				'result' => 'error',
+			);
+		}
+
+		/**
+		 * Process the payment for store-api orders.
+		 *
+		 * @param WC_Order $order The WooCommerce order object.
+		 *
+		 * @return array
+		 */
+		public function process_store_api_order( $order ) {
+			return array(
+				'result'   => 'success',
+				'redirect' => $order->get_checkout_order_received_url(),
 			);
 		}
 
