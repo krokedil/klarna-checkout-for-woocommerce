@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2024-03-12 10:36+0000\n"
+"POT-Creation-Date: 2024-05-15 08:25+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -443,27 +443,27 @@ msgstr ""
 msgid "The current Klarna Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:275
+#: ../classes/class-kco-gateway.php:290
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:278
+#: ../classes/class-kco-gateway.php:293
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:498
+#: ../classes/class-kco-gateway.php:514
 msgid "Customer redirected to Klarna Hosted Payment Page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:603
+#: ../classes/class-kco-gateway.php:619
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:662
+#: ../classes/class-kco-gateway.php:678
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:684, ../classes/class-kco-gateway.php:706
+#: ../classes/class-kco-gateway.php:700, ../classes/class-kco-gateway.php:722
 msgid "Reference:"
 msgstr ""
 

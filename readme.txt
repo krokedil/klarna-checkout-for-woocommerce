@@ -54,6 +54,10 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2024.05.15    - version 2.12.2 =
+* Tweak         - If the store serves exactly one country, and the default location is set to "No location by default", that country will be used to determine payment gateway availability. This should prevent issues with the billing country not being set.
+* Tweak         - Added the billing_address_change event which should ensure that the billing address is consistent between Woo, and what is seen in the Klarna form.
+
 = 2024.03.12    - version 2.12.1 =
 * Fix           - Bumped the plugin version.
 
