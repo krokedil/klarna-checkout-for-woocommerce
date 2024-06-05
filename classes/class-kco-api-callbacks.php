@@ -84,6 +84,15 @@ class KCO_API_Callbacks {
 				KCO_WC()->api->get_klarna_om_order( $klarna_order_id )
 			);
 
+			if( is_wp_error( $klarna_order ) ) {
+				KCO_WC()->logger->log( 'ERROR Push callback failed to get Klarna order data for Klarna order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
+				return;
+			}
+
+			if ( ! kco_validate_order_total( $klarna_order, $order ) ) {
+				return;
+			}
+
 			// The Woo order was already created. Check if order status was set (in process_payment_handler).
 			if ( empty( $order->get_date_paid() ) ) {
 				if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
