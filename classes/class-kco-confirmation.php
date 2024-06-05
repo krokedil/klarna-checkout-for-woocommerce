@@ -22,6 +22,7 @@ class KCO_Confirmation {
 	 * @var $instance
 	 */
 	protected static $instance;
+
 	/**
 	 * Returns the *Singleton* instance of this class.
 	 *
@@ -53,7 +54,7 @@ class KCO_Confirmation {
 		$order_id        = filter_input( INPUT_GET, 'order_id', FILTER_SANITIZE_NUMBER_INT );
 		$order_key       = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-		// Return if we dont have our parameters set.
+		// Return if we don't have our parameters set.
 		if ( empty( $kco_confirm ) || empty( $klarna_order_id ) || empty( $order_key ) ) {
 			return;
 		}
