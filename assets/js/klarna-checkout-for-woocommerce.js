@@ -436,7 +436,7 @@ jQuery( function ( $ ) {
 		 * @param {string} event
 		 */
 		failOrder: function ( event, error_message, callback ) {
-			callback( { should_proceed: false } )
+			callback( { should_proceed: false, message: $(error_message).text().trim() } )
 			kco_wc.validation = false
 			var className = kco_params.pay_for_order ? "div.woocommerce-notices-wrapper" : "form.checkout"
 			// Update the checkout and re-enable the form.
