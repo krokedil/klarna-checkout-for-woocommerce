@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2024-05-15 08:25+0000\n"
+"POT-Creation-Date: 2024-06-12 09:00+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -26,15 +26,15 @@ msgid "Support"
 msgstr ""
 
 #. translators: Klarna order ID.
-#: ../classes/class-kco-api-callbacks.php:99, ../includes/kco-functions.php:617
+#: ../classes/class-kco-api-callbacks.php:108, ../includes/kco-functions.php:621
 msgid "Klarna order is under review, order ID: %s."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:96
+#: ../classes/class-kco-api-callbacks.php:105
 msgid "Klarna Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:92, ../includes/kco-functions.php:609
+#: ../classes/class-kco-api-callbacks.php:101, ../includes/kco-functions.php:613
 msgid "Payment via Klarna Checkout, order ID: %s"
 msgstr ""
 
@@ -42,15 +42,15 @@ msgstr ""
 msgid "The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:115
+#: ../classes/class-kco-confirmation.php:116
 msgid "Failed getting the order for the external payment."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:122
+#: ../classes/class-kco-confirmation.php:123
 msgid "Failed to find the payment method for the external payment."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:132
+#: ../classes/class-kco-confirmation.php:133
 msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
 
@@ -512,12 +512,16 @@ msgstr ""
 msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:628
+#: ../includes/kco-functions.php:632
 msgid "Waiting for verification from Klarnas push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:623
+#: ../includes/kco-functions.php:627
 msgid "Klarna Checkout order was rejected"
+msgstr ""
+
+#: ../includes/kco-functions.php:671
+msgid "Klarna order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Klarna before processing."
 msgstr ""
 
 #: ../classes/admin/class-kco-admin-notices.php:91
