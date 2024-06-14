@@ -54,7 +54,8 @@ jQuery( function ( $ ) {
 			return
 		}
 
-		var regex = /[A-Za-z]{1,2}[0-9]{5}/
+		var regex =
+			/^([A-Za-z0-9]{1,2}[0-9]{5}|[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12})/
 
 		if ( ! regex.test( field.val() ) ) {
 			field.addClass( "bad_credential" )
