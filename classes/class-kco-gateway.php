@@ -86,6 +86,86 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 3 );
 			add_filter( 'kco_wc_api_request_args', array( $this, 'maybe_remove_kco_epm' ), 9999 );
+
+			// Prevent the Woo validation from proceeding if there is a discrepancy between Woo and Klarna.
+			add_action( 'woocommerce_after_checkout_validation', array( $this, 'validate_checkout' ), 10, 2 );
+		}
+
+		/**
+		 * Validate the data of the checkout fields matches the Klarna order.
+		 *
+		 * @param array     $data An array of posted data.
+		 * @param WP_Errors $errors Validation errors.
+		 * @return void
+		 */
+		public function validate_checkout( $data, &$errors ) {
+			if ( 'kco' !== WC()->session->get( 'chosen_payment_method' ) ) {
+				return;
+			}
+
+			$klarna_order_id = WC()->session->get( 'kco_wc_order_id', 'missing' );
+			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+			if ( is_wp_error( $klarna_order ) ) {
+				KCO_Logger::log( "[CHECKOUT VALIDATION]: Error getting Klarna order: {$klarna_order->get_error_message()}. For order ID: '$klarna_order_id'. Will not proceed with order." );
+				$errors->add( 'klarna_order', __( 'The Klarna order could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );
+				return;
+			}
+
+			$billing_address = array_filter(
+				$data,
+				function ( $field ) {
+					return strpos( $field, 'billing_' ) === 0;
+				},
+				ARRAY_FILTER_USE_KEY
+			);
+
+			$shipping_address = array_filter(
+				$data,
+				function ( $field ) {
+					return strpos( $field, 'shipping' ) === 0;
+				},
+				ARRAY_FILTER_USE_KEY
+			);
+
+			// Retrieve the address from Woo.
+			$address_fields = array( 'first_name', 'last_name', 'company', 'address_1', 'address_2', 'city', 'state', 'postcode', 'country' );
+
+			foreach ( $address_fields as $field ) {
+				$billing_field  = 'billing_' . $field;
+				$shipping_field = 'shipping_' . $field;
+
+				$wc_name = $field;
+				switch ( $field ) {
+					case 'first_name':
+						$field = 'given_name';
+						break;
+					case 'last_name':
+						$field = 'family_name';
+						break;
+					case 'company':
+						$field = 'organization_name';
+						break;
+					case 'address_1':
+						$field = 'street_address';
+						break;
+					case 'address_2':
+						$field = 'street_address2';
+						break;
+					case 'state':
+						$field = 'region';
+						break;
+					case 'postcode':
+						$field = 'postal_code';
+				}
+
+				if ( strtolower( $billing_address[ $billing_field ] ) !== strtolower( $klarna_order['billing_address'][ $field ] ?? '' ) ) {
+					$errors->add( $billing_field, __( 'Billing ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
+				}
+
+				if ( strtolower( $shipping_address[ $shipping_field ] ) !== strtolower( $klarna_order['shipping_address'][ $field ] ?? '' ) ) {
+					$errors->add( $shipping_field, __( 'Shipping ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
+				}
+			}
 		}
 
 
@@ -139,7 +219,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// 1. Save Klarna data to the pending order.
 			// 2. Approve process payment sequence to customer can continue/complete payment.
 			return $this->process_embedded_payment_handler( $order_id );
-
 		}
 
 		/**
