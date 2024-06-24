@@ -589,7 +589,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 		if ( ! is_wp_error( $klarna_order ) ) {
-			if ( ! kco_validate_order_total( $klarna_order, $order ) ) {
+			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_cart_content( $klarna_order, $order ) ) {
 				return;
 			}
 
@@ -675,6 +675,51 @@ function kco_validate_order_total( $klarna_order, $order ) {
 		);
 		$order->save();
 		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Validate the Klarna Checkout item quantities against the Woo order.
+ *
+ * @param array    $klarna_order The Klarna order.
+ * @param WC_Order $order The Woo order.
+ *
+ * @return bool
+ */
+function kco_validate_cart_content( $klarna_order, $order ) {
+	foreach ( $order->get_items() as $item ) {
+		// Only check quantity for product items.
+		if ( 'line_item' !== $item->get_type() ) {
+			continue;
+		}
+
+		// Assume the item is a mismatch until proven otherwise. This way, in the unlikely chance of not finding any matching item, we can set the order to on-hold.
+		$mismatch = true;
+
+		// Try the specific (variation id) before the general (product id).
+		$product_id = 0 !== $item->get_variation_id() ? $item->get_variation_id() : $item->get_product_id();
+		$product    = wc_get_product( $product_id );
+		$sku        = strval( $product->get_sku() ?? $product->get_id() );
+		foreach ( $klarna_order['order_lines'] as $klarna_order_item ) {
+			if ( $klarna_order_item['reference'] === $sku ) {
+				$mismatch = $klarna_order_item['quantity'] !== $item->get_quantity();
+			}
+		}
+
+		if ( $mismatch ) {
+			KCO_Logger::log( 'Order item quantity mismatch. Klarna Order item quantity: ' . $klarna_order_item['quantity'] . ' WC Order item quantity: ' . $item->get_quantity() . ' Klarna order ID: ' . $klarna_order['order_id'] . ' WC Order ID: ' . $order->get_id() );
+
+			$order->set_status(
+				'on-hold',
+				sprintf(
+					__( 'Klarna order item quantity does not match WooCommerce order item quantity. Please verify the order with Klarna before processing.', 'klarna-checkout-for-woocommerce' )
+				)
+			);
+			$order->save();
+			return false;
+		}
 	}
 
 	return true;
