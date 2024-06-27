@@ -94,8 +94,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		/**
 		 * Validate the data of the checkout fields matches the Klarna order.
 		 *
-		 * @param array     $data An array of posted data.
-		 * @param WP_Errors $errors Validation errors.
+		 * @param array    $data An array of posted data.
+		 * @param WP_Error $errors Validation errors.
 		 * @return void
 		 */
 		public function validate_checkout( $data, &$errors ) {
@@ -106,7 +106,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$klarna_order_id = WC()->session->get( 'kco_wc_order_id', 'missing' );
 			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( is_wp_error( $klarna_order ) ) {
-				KCO_Logger::log( "[CHECKOUT VALIDATION]: Error getting Klarna order: {$klarna_order->get_error_message()}. For order ID: '$klarna_order_id'. Will not proceed with order." );
+				KCO_Logger::log( "[CHECKOUT VALIDATION]: Error getting Klarna order: {$klarna_order->get_error_message()}. For Klarna order ID: '$klarna_order_id'. Will not proceed with order." );
 				$errors->add( 'klarna_order', __( 'The Klarna order could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );
 				return;
 			}
@@ -127,43 +127,41 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				ARRAY_FILTER_USE_KEY
 			);
 
-			// Retrieve the address from Woo.
-			$address_fields = array( 'first_name', 'last_name', 'company', 'address_1', 'address_2', 'city', 'state', 'postcode', 'country' );
+			// Mapping of the Woo/Klarna address fields.
+			$address_fields_key = array(
+				'first_name' => 'given_name',
+				'last_name'  => 'family_name',
+				'company'    => 'organization_name',
+				'address_1'  => 'street_address',
+				'address_2'  => 'street_address2',
+				'city'       => 'city',
+				'state'      => 'region',
+				'postcode'   => 'postal_code',
+				'country'    => 'country',
+			);
 
-			foreach ( $address_fields as $field ) {
-				$billing_field  = 'billing_' . $field;
-				$shipping_field = 'shipping_' . $field;
+			foreach ( $address_fields_key as $wc_name => $klarna_name ) {
+				$billing_field  = 'billing_' . $wc_name;
+				$shipping_field = 'shipping_' . $wc_name;
 
-				$wc_name = $field;
-				switch ( $field ) {
-					case 'first_name':
-						$field = 'given_name';
-						break;
-					case 'last_name':
-						$field = 'family_name';
-						break;
-					case 'company':
-						$field = 'organization_name';
-						break;
-					case 'address_1':
-						$field = 'street_address';
-						break;
-					case 'address_2':
-						$field = 'street_address2';
-						break;
-					case 'state':
-						$field = 'region';
-						break;
-					case 'postcode':
-						$field = 'postal_code';
+				if ( isset( $klarna_order['billing_address'][ $klarna_name ] ) ) {
+					// Remove all whitespace and convert to lowercase.
+					$billing_address[ $billing_field ]               = strtolower( preg_replace( '/\s+/', '', $billing_address[ $billing_field ] ) );
+					$klarna_order['billing_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['billing_address'][ $klarna_name ] ) );
+
+					if ( $billing_address[ $billing_field ] !== ( $klarna_order['billing_address'][ $klarna_name ] ?? '' ) ) {
+						$errors->add( $billing_field, __( 'Billing ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
+					}
 				}
 
-				if ( strtolower( $billing_address[ $billing_field ] ) !== strtolower( $klarna_order['billing_address'][ $field ] ?? '' ) ) {
-					$errors->add( $billing_field, __( 'Billing ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
-				}
+				if ( isset( $klarna_order['shipping_address'][ $klarna_name ] ) ) {
+					// Remove all whitespace and convert to lowercase.
+					$shipping_address[ $shipping_field ]              = strtolower( preg_replace( '/\s+/', '', $shipping_address[ $shipping_field ] ) );
+					$klarna_order['shipping_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['shipping_address'][ $klarna_name ] ) );
 
-				if ( strtolower( $shipping_address[ $shipping_field ] ) !== strtolower( $klarna_order['shipping_address'][ $field ] ?? '' ) ) {
-					$errors->add( $shipping_field, __( 'Shipping ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
+					if ( $shipping_address[ $shipping_field ] !== ( $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) ) {
+						$errors->add( $shipping_field, __( 'Shipping ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
+					}
 				}
 			}
 		}
