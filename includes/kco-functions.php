@@ -681,7 +681,7 @@ function kco_validate_order_total( $klarna_order, $order ) {
 }
 
 /**
- * Validate the Klarna Checkout item quantities against the Woo order.
+ * Validate that the Woo order matches the corresponding Klarna order.
  *
  * @param array    $klarna_order The Klarna order.
  * @param WC_Order $order The Woo order.
@@ -689,37 +689,38 @@ function kco_validate_order_total( $klarna_order, $order ) {
  * @return bool
  */
 function kco_validate_cart_content( $klarna_order, $order ) {
-	foreach ( $order->get_items() as $item ) {
-		// Only check quantity for product items.
-		if ( 'line_item' !== $item->get_type() ) {
-			continue;
+	$order_data = new KCO_Request_Order();
+
+	$mismatch = false;
+	foreach ( $order_data->get_order_lines( $order->get_id() ) as $order_line ) {
+		if ( $mismatch ) {
+			break;
 		}
 
-		// Assume the item is a mismatch until proven otherwise. This way, in the unlikely chance of not finding any matching item, we can set the order to on-hold.
-		$mismatch = true;
-
-		// Try the specific (variation id) before the general (product id).
-		$product_id = 0 !== $item->get_variation_id() ? $item->get_variation_id() : $item->get_product_id();
-		$product    = wc_get_product( $product_id );
-		$sku        = strval( $product->get_sku() ?? $product->get_id() );
+		$reference = $order_line['reference'];
 		foreach ( $klarna_order['order_lines'] as $klarna_order_item ) {
-			if ( $klarna_order_item['reference'] === $sku ) {
-				$mismatch = $klarna_order_item['quantity'] !== $item->get_quantity();
+			if ( $reference === $klarna_order_item['reference'] ) {
+				foreach ( $order_line as $key => $value ) {
+					if ( $klarna_order_item[ $key ] !== $value ) {
+						$mismatch = true;
+						break;
+					}
+				}
 			}
 		}
+	}
 
-		if ( $mismatch ) {
-			KCO_Logger::log( 'Order item quantity mismatch. Klarna Order item quantity: ' . $klarna_order_item['quantity'] . ' WC Order item quantity: ' . $item->get_quantity() . ' Klarna order ID: ' . $klarna_order['order_id'] . ' WC Order ID: ' . $order->get_id() );
+	if ( $mismatch ) {
+		KCO_Logger::log( 'The Klarna and Woo orders do not match. Klarna order ID: ' . $klarna_order['order_id'] . ' WC Order ID: ' . $order->get_id() );
 
-			$order->set_status(
-				'on-hold',
-				sprintf(
-					__( 'Klarna order item quantity does not match WooCommerce order item quantity. Please verify the order with Klarna before processing.', 'klarna-checkout-for-woocommerce' )
-				)
-			);
-			$order->save();
-			return false;
-		}
+		$order->set_status(
+			'on-hold',
+			sprintf(
+				__( 'A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order with Klarna before processing.', 'klarna-checkout-for-woocommerce' )
+			)
+		);
+		$order->save();
+		return false;
 	}
 
 	return true;
