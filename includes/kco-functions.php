@@ -589,7 +589,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 		if ( ! is_wp_error( $klarna_order ) ) {
-			if ( ! kco_validate_order_total( $klarna_order, $order ) ) {
+			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_cart_content( $klarna_order, $order ) ) {
 				return;
 			}
 
@@ -671,6 +671,52 @@ function kco_validate_order_total( $klarna_order, $order ) {
 				__( 'Klarna order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Klarna before processing.', 'klarna-checkout-for-woocommerce' ),
 				$klarna_order_total,
 				$order_total
+			)
+		);
+		$order->save();
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Validate that the Woo order matches the corresponding Klarna order.
+ *
+ * @param array    $klarna_order The Klarna order.
+ * @param WC_Order $order The Woo order.
+ *
+ * @return bool
+ */
+function kco_validate_cart_content( $klarna_order, $order ) {
+	$order_data = new KCO_Request_Order();
+
+	$mismatch = false;
+	foreach ( $order_data->get_order_lines( $order->get_id() ) as $order_line ) {
+		if ( $mismatch ) {
+			break;
+		}
+
+		$reference = $order_line['reference'];
+		foreach ( $klarna_order['order_lines'] as $klarna_order_item ) {
+			if ( $reference === $klarna_order_item['reference'] ) {
+				foreach ( $order_line as $key => $value ) {
+					if ( $klarna_order_item[ $key ] !== $value ) {
+						$mismatch = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	if ( $mismatch ) {
+		KCO_Logger::log( 'The Klarna and Woo orders do not match. Klarna order ID: ' . $klarna_order['order_id'] . ' WC Order ID: ' . $order->get_id() );
+
+		$order->set_status(
+			'on-hold',
+			sprintf(
+				__( 'A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order with Klarna before processing.', 'klarna-checkout-for-woocommerce' )
 			)
 		);
 		$order->save();

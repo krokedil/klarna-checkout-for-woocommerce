@@ -84,12 +84,12 @@ class KCO_API_Callbacks {
 				KCO_WC()->api->get_klarna_om_order( $klarna_order_id )
 			);
 
-			if( is_wp_error( $klarna_order ) ) {
+			if ( is_wp_error( $klarna_order ) ) {
 				KCO_WC()->logger->log( 'ERROR Push callback failed to get Klarna order data for Klarna order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 				return;
 			}
 
-			if ( ! kco_validate_order_total( $klarna_order, $order ) ) {
+			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_cart_content( $klarna_order, $order ) ) {
 				return;
 			}
 
