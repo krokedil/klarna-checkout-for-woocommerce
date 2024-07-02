@@ -89,7 +89,7 @@ class KCO_API_Callbacks {
 				return;
 			}
 
-			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_cart_content( $klarna_order, $order ) ) {
+			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
 				return;
 			}
 

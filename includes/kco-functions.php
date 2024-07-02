@@ -589,7 +589,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 		if ( ! is_wp_error( $klarna_order ) ) {
-			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_cart_content( $klarna_order, $order ) ) {
+			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
 				return;
 			}
 
@@ -688,26 +688,47 @@ function kco_validate_order_total( $klarna_order, $order ) {
  *
  * @return bool
  */
-function kco_validate_cart_content( $klarna_order, $order ) {
+function kco_validate_order_content( $klarna_order, $order ) {
 	$order_data = new KCO_Request_Order();
 
 	$mismatch = false;
-	foreach ( $order_data->get_order_lines( $order->get_id() ) as $order_line ) {
+	foreach ( $order->get_items() as $order_item ) {
+		$order_line = $order_data->get_order_line_items( $order_item );
 		if ( $mismatch ) {
 			break;
 		}
 
+		$match     = false;
 		$reference = $order_line['reference'];
 		foreach ( $klarna_order['order_lines'] as $klarna_order_item ) {
+			$match = false;
 			if ( $reference === $klarna_order_item['reference'] ) {
-				foreach ( $order_line as $key => $value ) {
-					if ( $klarna_order_item[ $key ] !== $value ) {
-						$mismatch = true;
-						break;
-					}
+				$match = true;
+				if ( $klarna_order_item['quantity'] !== $order_line['quantity'] ) {
+					$mismatch = true;
 				}
+
+				break;
 			}
 		}
+
+		// Check if the Woo item was not found in the Klarna order.
+		if ( ! $match ) {
+			$mismatch = true;
+		}
+	}
+
+	$shipping        = $order_data->get_order_line_shipping( $order );
+	$klarna_shipping = array_filter(
+		$klarna_order['order_lines'],
+		function ( $order_line ) {
+			return 'shipping_fee' === $order_line['type'];
+		}
+	);
+	$klarna_shipping = reset( $klarna_shipping );
+
+	if ( ( ! empty( $shipping ) && empty( $klarna_shipping ) ) || ( ! empty( $klarna_shipping ) && empty( $shipping ) ) || ( ! empty( $shipping ) && ! empty( $klarna_shipping ) && $shipping['reference'] !== $klarna_shipping['reference'] ) ) {
+		$mismatch = true;
 	}
 
 	if ( $mismatch ) {
@@ -716,7 +737,7 @@ function kco_validate_cart_content( $klarna_order, $order ) {
 		$order->set_status(
 			'on-hold',
 			sprintf(
-				__( 'A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order with Klarna before processing.', 'klarna-checkout-for-woocommerce' )
+				__( 'A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order in the Klarna merchant portal before processing.', 'klarna-checkout-for-woocommerce' )
 			)
 		);
 		$order->save();
