@@ -718,7 +718,7 @@ function kco_validate_order_content( $klarna_order, $order ) {
 		}
 	}
 
-	$shipping        = $order_data->get_order_line_shipping( $order );
+	$shipping        = ! empty( $order->get_shipping_method() ) ? $order_data->get_order_line_shipping( $order ) : false;
 	$klarna_shipping = array_filter(
 		$klarna_order['order_lines'],
 		function ( $order_line ) {
