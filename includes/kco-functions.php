@@ -727,14 +727,16 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	);
 	$klarna_shipping = reset( $klarna_shipping );
 
-	// For KSA, the reference in Woo, and Klarna will always differ.
-	if ( ! empty( $shipping ) && strpos( $shipping['reference'], 'klarna_kss' ) !== false ) {
-		$ksa_data              = json_decode( $order->get_meta( '_kco_kss_data' ), true );
-		$shipping['reference'] = $ksa_data['id'] ?? false;
-	}
-
-	if ( ( ! empty( $shipping ) && empty( $klarna_shipping ) ) || ( ! empty( $klarna_shipping ) && empty( $shipping ) ) || ( ! empty( $shipping ) && ! empty( $klarna_shipping ) && $shipping['reference'] !== $klarna_shipping['reference'] ) ) {
+	if ( ! empty( $klarna_shipping ) && empty( $shipping ) ) {
 		$mismatch = true;
+	} elseif ( empty( $klarna_shipping ) && ! empty( $shipping ) ) {
+		$mismatch = true;
+	} else {
+		// If KSA is enabled, we'll skip the control.
+		$is_ksa = strpos( $shipping['reference'], 'klarna_kss' ) !== false;
+		if ( ! $is_ksa && $shipping['reference'] !== $klarna_shipping['reference'] ) {
+			$mismatch = true;
+		}
 	}
 
 	if ( $mismatch ) {
