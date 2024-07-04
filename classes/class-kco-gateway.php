@@ -140,6 +140,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				ARRAY_FILTER_USE_KEY
 			);
 
+			$ship_to_different_address = $data['ship_to_different_address'];
 			foreach ( $address_fields_key as $wc_name => $klarna_name ) {
 				$billing_field  = 'billing_' . $wc_name;
 				$shipping_field = 'shipping_' . $wc_name;
