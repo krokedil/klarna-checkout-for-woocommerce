@@ -589,7 +589,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 		if ( ! is_wp_error( $klarna_order ) ) {
-			if ( ! kco_validate_order_total( $klarna_order, $order ) ) {
+			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
 				return;
 			}
 
@@ -671,6 +671,79 @@ function kco_validate_order_total( $klarna_order, $order ) {
 				__( 'Klarna order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Klarna before processing.', 'klarna-checkout-for-woocommerce' ),
 				$klarna_order_total,
 				$order_total
+			)
+		);
+		$order->save();
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Validate that the Woo order matches the corresponding Klarna order.
+ *
+ * @param array    $klarna_order The Klarna order.
+ * @param WC_Order $order The Woo order.
+ *
+ * @return bool
+ */
+function kco_validate_order_content( $klarna_order, $order ) {
+	$order_data = new KCO_Request_Order();
+
+	$mismatch = false;
+	foreach ( $order->get_items() as $order_item ) {
+		$order_line = $order_data->get_order_line_items( $order_item );
+		if ( $mismatch ) {
+			break;
+		}
+
+		$match     = false;
+		$reference = $order_line['reference'];
+		foreach ( $klarna_order['order_lines'] as $klarna_order_item ) {
+			$match = false;
+			if ( $reference === $klarna_order_item['reference'] ) {
+				$match = true;
+				if ( $klarna_order_item['quantity'] !== $order_line['quantity'] ) {
+					$mismatch = true;
+				}
+
+				break;
+			}
+		}
+
+		// Check if the Woo item was not found in the Klarna order.
+		if ( ! $match ) {
+			$mismatch = true;
+		}
+	}
+
+	$shipping        = ! empty( $order->get_shipping_method() ) ? $order_data->get_order_line_shipping( $order ) : false;
+	$klarna_shipping = array_filter(
+		$klarna_order['order_lines'],
+		function ( $order_line ) {
+			return 'shipping_fee' === $order_line['type'];
+		}
+	);
+	$klarna_shipping = reset( $klarna_shipping );
+
+	if ( empty( $klarna_shipping ) !== empty( $shipping ) ) {
+		$mismatch = true;
+	} elseif ( ! empty( $klarna_shipping ) && ! empty( $shipping ) ) {
+		// If KSA is enabled, we'll skip the control.
+		$is_ksa = strpos( $shipping['reference'], 'klarna_kss' ) !== false;
+		if ( ! $is_ksa && $shipping['reference'] !== $klarna_shipping['reference'] ) {
+			$mismatch = true;
+		}
+	}
+
+	if ( $mismatch ) {
+		KCO_Logger::log( 'The Klarna and Woo orders do not match. Klarna order ID: ' . $klarna_order['order_id'] . ' WC Order ID: ' . $order->get_id() );
+
+		$order->set_status(
+			'on-hold',
+			sprintf(
+				__( 'A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order in the Klarna merchant portal before processing.', 'klarna-checkout-for-woocommerce' )
 			)
 		);
 		$order->save();
