@@ -98,7 +98,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @param WP_Error $errors Validation errors.
 		 * @return void
 		 */
-		public function validate_checkout( $data, &$errors ) {
+		public function validate_checkout( $data, $errors ) {
 			if ( 'kco' !== WC()->session->get( 'chosen_payment_method' ) ) {
 				return;
 			}
@@ -154,10 +154,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					}
 				}
 
-				if ( isset( $klarna_order['shipping_address'][ $klarna_name ] ) ) {
+				if ( $ship_to_different_address ) {
 					// Remove all whitespace and convert to lowercase.
 					$shipping_address[ $shipping_field ]              = strtolower( preg_replace( '/\s+/', '', $shipping_address[ $shipping_field ] ) );
-					$klarna_order['shipping_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['shipping_address'][ $klarna_name ] ) );
+					$klarna_order['shipping_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) );
 
 					if ( $shipping_address[ $shipping_field ] !== ( $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) ) {
 						$errors->add( $shipping_field, __( 'Shipping ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
