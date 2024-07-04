@@ -98,7 +98,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @param WP_Error $errors Validation errors.
 		 * @return void
 		 */
-		public function validate_checkout( $data, &$errors ) {
+		public function validate_checkout( $data, $errors ) {
 			if ( 'kco' !== WC()->session->get( 'chosen_payment_method' ) ) {
 				return;
 			}
@@ -110,22 +110,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				$errors->add( 'klarna_order', __( 'The Klarna order could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );
 				return;
 			}
-
-			$billing_address = array_filter(
-				$data,
-				function ( $field ) {
-					return strpos( $field, 'billing_' ) === 0;
-				},
-				ARRAY_FILTER_USE_KEY
-			);
-
-			$shipping_address = array_filter(
-				$data,
-				function ( $field ) {
-					return strpos( $field, 'shipping' ) === 0;
-				},
-				ARRAY_FILTER_USE_KEY
-			);
 
 			// Mapping of the Woo/Klarna address fields.
 			$address_fields_key = array(
@@ -140,6 +124,23 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'country'    => 'country',
 			);
 
+			$billing_address = array_filter(
+				$data,
+				function ( $field ) use ( $address_fields_key ) {
+					return strpos( $field, 'billing_' ) === 0 && in_array( substr( $field, strlen( 'billing_' ) ), array_keys( $address_fields_key ), true );
+				},
+				ARRAY_FILTER_USE_KEY
+			);
+
+			$shipping_address = array_filter(
+				$data,
+				function ( $field ) use ( $address_fields_key ) {
+					return strpos( $field, 'shipping_' ) === 0 && in_array( substr( $field, strlen( 'shipping_' ) ), array_keys( $address_fields_key ), true );
+				},
+				ARRAY_FILTER_USE_KEY
+			);
+
+			$ship_to_different_address = $data['ship_to_different_address'];
 			foreach ( $address_fields_key as $wc_name => $klarna_name ) {
 				$billing_field  = 'billing_' . $wc_name;
 				$shipping_field = 'shipping_' . $wc_name;
@@ -154,10 +155,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					}
 				}
 
-				if ( isset( $klarna_order['shipping_address'][ $klarna_name ] ) ) {
+				if ( $ship_to_different_address ) {
 					// Remove all whitespace and convert to lowercase.
 					$shipping_address[ $shipping_field ]              = strtolower( preg_replace( '/\s+/', '', $shipping_address[ $shipping_field ] ) );
-					$klarna_order['shipping_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['shipping_address'][ $klarna_name ] ) );
+					$klarna_order['shipping_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) );
 
 					if ( $shipping_address[ $shipping_field ] !== ( $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) ) {
 						$errors->add( $shipping_field, __( 'Shipping ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
