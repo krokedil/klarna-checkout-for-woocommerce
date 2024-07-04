@@ -499,11 +499,11 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 */
 		public function process_embedded_payment_handler( $order_id ) {
 			// Get the Klarna order ID.
-			$order = wc_get_order( $order_id );
-			if ( ! empty( $order ) ) {
+			$order           = wc_get_order( $order_id );
+			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+			if ( empty( $klarna_order_id ) && ! empty( $order ) ) {
 				$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
 			}
-			$klarna_order_id = ! empty( $klarna_order_id ) ? $klarna_order_id : WC()->session->get( 'kco_wc_order_id' );
 
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
