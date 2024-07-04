@@ -54,6 +54,11 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2024.07.04    - version 2.12.6 =
+* Tweak         - WooCommerce checkout error messages will now also appear in the Klarna modal, replacing the generic "Something went wrong" message. Previously, they only appeared on the checkout page as notices, requiring the customer to close the modal before they can see them.
+* Tweak         - Added a discrepancy check for when the Woo and Klarna order may differ in total order amount.
+* Tweak         - Added a discrepancy check for when the Woo and Klarna order may differ in order items.
+
 = 2024.06.17    - version 2.12.5 =
 * Tweak         - Add support for the new Klarna API key format (thanks @didkan).
 
