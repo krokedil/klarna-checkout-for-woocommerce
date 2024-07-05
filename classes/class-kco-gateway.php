@@ -145,9 +145,17 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				$billing_field  = 'billing_' . $wc_name;
 				$shipping_field = 'shipping_' . $wc_name;
 
-				if ( 'country' === $wc_name && ! isset( $billing_address[ $billing_field ] ) ) {
-					$base_location                     = wc_get_base_location();
-					$billing_address[ $billing_field ] = $base_location['country'];
+				if ( 'country' === $wc_name ) {
+					$base_location = wc_get_base_location();
+					$country       = $base_location['country'];
+
+					if ( ! isset( $billing_address[ $billing_field ] ) ) {
+						$billing_address[ $billing_field ] = $country;
+					}
+
+					if ( ! isset( $shipping_address[ $shipping_field ] ) ) {
+						$shipping_address[ $shipping_field ] = $country;
+					}
 				}
 
 				if ( isset( $klarna_order['billing_address'][ $klarna_name ] ) ) {
