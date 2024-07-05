@@ -141,9 +141,16 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			);
 
 			$ship_to_different_address = $data['ship_to_different_address'];
+			$countries                 = WC()->countries->get_allowed_countries();
 			foreach ( $address_fields_key as $wc_name => $klarna_name ) {
 				$billing_field  = 'billing_' . $wc_name;
 				$shipping_field = 'shipping_' . $wc_name;
+
+				// If the default customer location is set to "No location by default" in the Woo settings, the billing country will not be set.
+				// By default, if there is exactly one country the store sells to, it will be used by default. Therefore, we can assume this is the billing country.
+				if ( 'country' === $wc_name && ! isset( $billing_address[ $billing_field ] ) && count( $countries ) === 1 ) {
+					$billing_address[ $billing_field ] = array_key_first( $countries );
+				}
 
 				if ( isset( $klarna_order['billing_address'][ $klarna_name ] ) ) {
 					// Remove all whitespace and convert to lowercase.
