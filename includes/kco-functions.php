@@ -733,8 +733,8 @@ function kco_validate_order_content( $klarna_order, $order ) {
 		// If KSA is enabled, we'll skip the control.
 		$is_ksa = strpos( $shipping['reference'], 'klarna_kss' ) !== false;
 
-		$klarna_reference = explode( ':', $klarna_shipping['reference'] )[0];
-		$woo_reference    = explode( ':', $shipping['reference'] )[0];
+		$klarna_reference = explode( ':', $klarna_shipping['reference'] ?? '' )[0];
+		$woo_reference    = explode( ':', $shipping['reference'] ?? '' )[0];
 
 		if ( ! $is_ksa && strpos( $woo_reference, $klarna_reference ) === false ) {
 			$mismatch = true;
