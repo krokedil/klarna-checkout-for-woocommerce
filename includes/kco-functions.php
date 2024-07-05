@@ -732,7 +732,11 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	} elseif ( ! empty( $klarna_shipping ) && ! empty( $shipping ) ) {
 		// If KSA is enabled, we'll skip the control.
 		$is_ksa = strpos( $shipping['reference'], 'klarna_kss' ) !== false;
-		if ( ! $is_ksa && $shipping['reference'] !== $klarna_shipping['reference'] ) {
+
+		$klarna_reference = explode( ':', $klarna_shipping['reference'] ?? '' )[0];
+		$woo_reference    = explode( ':', $shipping['reference'] ?? '' )[0];
+
+		if ( ! $is_ksa && strpos( $woo_reference, $klarna_reference ) === false ) {
 			$mismatch = true;
 		}
 	}
