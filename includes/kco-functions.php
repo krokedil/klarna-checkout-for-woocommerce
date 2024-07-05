@@ -733,8 +733,10 @@ function kco_validate_order_content( $klarna_order, $order ) {
 		// If KSA is enabled, we'll skip the control.
 		$is_ksa = strpos( $shipping['reference'], 'klarna_kss' ) !== false;
 
-		// We check if the Klarna reference is a substring of the Woo reference since the former is more general, whereas the latter may contain additional specific details (such as shipping id).
-		if ( ! $is_ksa && strpos( $shipping['reference'], $klarna_shipping['reference'] ) === false ) {
+		$klarna_reference = explode( ':', $klarna_shipping['reference'] )[0];
+		$woo_reference    = explode( ':', $shipping['reference'] )[0];
+
+		if ( ! $is_ksa && strpos( $woo_reference, $klarna_reference ) === false ) {
 			$mismatch = true;
 		}
 	}
