@@ -690,7 +690,9 @@ function kco_validate_order_total( $klarna_order, $order ) {
  */
 function kco_validate_order_content( $klarna_order, $order ) {
 	$order_data = new KCO_Request_Order();
+	$prefix     = "Klarna order ID: {$klarna_order['order_id']} | WC Order ID: {$order->get_order_number()}:";
 
+	// A match happens when the item reference and quantity matches in Woo and Klarna.
 	$mismatch = false;
 	foreach ( $order->get_items() as $order_item ) {
 		$order_line = $order_data->get_order_line_items( $order_item );
@@ -699,12 +701,14 @@ function kco_validate_order_content( $klarna_order, $order ) {
 		}
 
 		$match     = false;
+		$name      = $order_line['name'];
 		$reference = $order_line['reference'];
 		foreach ( $klarna_order['order_lines'] as $klarna_order_item ) {
 			$match = false;
 			if ( $reference === $klarna_order_item['reference'] ) {
 				$match = true;
 				if ( $klarna_order_item['quantity'] !== $order_line['quantity'] ) {
+					KCO_Logger::log( "$prefix WC order item reference: $reference ($name) has {$order_line['quantity']} expected {$klarna_order_item['quantity']}." );
 					$mismatch = true;
 				}
 
@@ -714,10 +718,12 @@ function kco_validate_order_content( $klarna_order, $order ) {
 
 		// Check if the Woo item was not found in the Klarna order.
 		if ( ! $match ) {
+			KCO_Logger::log( "$prefix WC order item reference: $reference ($name) was not found in the Klarna order." );
 			$mismatch = true;
 		}
 	}
 
+	// Retrieve the Woo shipping method, if any. In the Klarna order, we'll look for a shipping fee.
 	$shipping        = ! empty( $order->get_shipping_method() ) ? $order_data->get_order_line_shipping( $order ) : false;
 	$klarna_shipping = array_filter(
 		$klarna_order['order_lines'],
@@ -728,21 +734,25 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	$klarna_shipping = reset( $klarna_shipping );
 
 	if ( empty( $klarna_shipping ) !== empty( $shipping ) ) {
+		KCO_Logger::log( "$prefix Shipping method mismatch. Klarna: " . ( empty( $klarna_shipping ) ? 'none' : $klarna_shipping['reference'] ) . ', WC: ' . ( empty( $shipping ) ? 'none' : $shipping['reference'] ) . '.' );
 		$mismatch = true;
 	} elseif ( ! empty( $klarna_shipping ) && ! empty( $shipping ) ) {
 		// If KSA is enabled, we'll skip the control.
 		$is_ksa = strpos( $shipping['reference'], 'klarna_kss' ) !== false;
 
+		// Since there is no standard convention for the shipping reference, we try to match as close as possible. This will probably yield som false positives.
+		// There is also the convention that shipping method references use a colon to separate the method from the reference. Sometime what follows the colon matches in both systems, and sometimes not which why we only compare the first part which is consistent.
 		$klarna_reference = explode( ':', $klarna_shipping['reference'] ?? '' )[0];
 		$woo_reference    = explode( ':', $shipping['reference'] ?? '' )[0];
 
 		if ( ! $is_ksa && strpos( $woo_reference, $klarna_reference ) === false ) {
+			KCO_Logger::log( "$prefix Shipping method mismatch. Klarna: $klarna_reference ({$klarna_shipping['reference']}), WC: $woo_reference ({$shipping['reference']})." );
 			$mismatch = true;
 		}
 	}
 
 	if ( $mismatch ) {
-		KCO_Logger::log( 'The Klarna and Woo orders do not match. Klarna order ID: ' . $klarna_order['order_id'] . ' WC Order ID: ' . $order->get_id() );
+		KCO_Logger::log( "$prefix The Klarna and Woo orders do not match." );
 
 		$order->set_status(
 			'on-hold',
