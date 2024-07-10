@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2024-07-05 15:24+0000\n"
+"POT-Creation-Date: 2024-07-10 11:29+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -528,8 +528,22 @@ msgstr ""
 msgid "Klarna order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Klarna before processing."
 msgstr ""
 
-#: ../includes/kco-functions.php:750
+#: ../includes/kco-functions.php:696
 msgid "A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order in the Klarna merchant portal before processing."
+msgstr ""
+
+#. translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
+#: ../includes/kco-functions.php:715
+msgid "The product \"%1$s\" has a quantity mismatch. Expected %2$d found %3$d."
+msgstr ""
+
+#: ../includes/kco-functions.php:727
+msgid "The product \"%s\" was not found in the Klarna order."
+msgstr ""
+
+#. translators: %1$s: Klarna shipping method, %2$s: WooCommerce shipping method.
+#: ../includes/kco-functions.php:760, ../includes/kco-functions.php:745
+msgid "The shipping method does not match between the WooCommerce and Klarna orders. Expected \"%1$s\" found \"%2$s\"."
 msgstr ""
 
 #: ../classes/admin/class-kco-admin-notices.php:91
