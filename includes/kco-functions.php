@@ -692,6 +692,9 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	$order_data = new KCO_Request_Order();
 	$prefix     = "Klarna order ID: {$klarna_order['order_id']} | WC Order ID: {$order->get_order_number()}:";
 
+	// An array of notes to display to the merchant.
+	$notes = array( __( 'A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order in the Klarna merchant portal before processing.', 'klarna-checkout-for-woocommerce' ) );
+
 	// A match happens when the item reference and quantity matches in Woo and Klarna.
 	$mismatch = false;
 	foreach ( $order->get_items() as $order_item ) {
@@ -708,6 +711,8 @@ function kco_validate_order_content( $klarna_order, $order ) {
 			if ( $reference === $klarna_order_item['reference'] ) {
 				$match = true;
 				if ( $klarna_order_item['quantity'] !== $order_line['quantity'] ) {
+					// translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
+					$notes[] = sprintf( __( 'The product "%1$s" has a quantity mismatch. Expected %2$d found %3$d.', 'klarna-checkout-for-woocommerce' ), $name, $klarna_order_item['quantity'], $order_line['quantity'] );
 					KCO_Logger::log( "$prefix WC order item reference: $reference ($name) has {$order_line['quantity']} expected {$klarna_order_item['quantity']}." );
 					$mismatch = true;
 				}
@@ -719,6 +724,7 @@ function kco_validate_order_content( $klarna_order, $order ) {
 		// Check if the Woo item was not found in the Klarna order.
 		if ( ! $match ) {
 			KCO_Logger::log( "$prefix WC order item reference: $reference ($name) was not found in the Klarna order." );
+			$notes[]  = sprintf( __( 'The product "%s" was not found in the Klarna order.', 'klarna-checkout-for-woocommerce' ), $name );
 			$mismatch = true;
 		}
 	}
@@ -735,6 +741,7 @@ function kco_validate_order_content( $klarna_order, $order ) {
 
 	if ( empty( $klarna_shipping ) !== empty( $shipping ) ) {
 		KCO_Logger::log( "$prefix Shipping method mismatch. Klarna: " . ( empty( $klarna_shipping ) ? 'none' : $klarna_shipping['reference'] ) . ', WC: ' . ( empty( $shipping ) ? 'none' : $shipping['reference'] ) . '.' );
+		$notes[]  = __( 'The shipping method does not match between the WooCommerce and Klarna orders.', 'klarna-checkout-for-woocommerce' );
 		$mismatch = true;
 	} elseif ( ! empty( $klarna_shipping ) && ! empty( $shipping ) ) {
 		// If KSA is enabled, we'll skip the control.
@@ -747,6 +754,7 @@ function kco_validate_order_content( $klarna_order, $order ) {
 
 		if ( ! $is_ksa && strpos( $woo_reference, $klarna_reference ) === false ) {
 			KCO_Logger::log( "$prefix Shipping method mismatch. Klarna: $klarna_reference ({$klarna_shipping['reference']}), WC: $woo_reference ({$shipping['reference']})." );
+			$notes[]  = __( 'The shipping method does not match between the WooCommerce and Klarna orders.', 'klarna-checkout-for-woocommerce' );
 			$mismatch = true;
 		}
 	}
@@ -756,9 +764,7 @@ function kco_validate_order_content( $klarna_order, $order ) {
 
 		$order->set_status(
 			'on-hold',
-			sprintf(
-				__( 'A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order in the Klarna merchant portal before processing.', 'klarna-checkout-for-woocommerce' )
-			)
+			implode( ' ', $notes )
 		);
 		$order->save();
 		return false;
