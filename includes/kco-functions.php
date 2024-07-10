@@ -740,8 +740,11 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	$klarna_shipping = reset( $klarna_shipping );
 
 	if ( empty( $klarna_shipping ) !== empty( $shipping ) ) {
+
+		// translators: %1$s: Klarna shipping method or "none", %2$s: WooCommerce shipping method or "none".
+		$notes[] = sprintf( __( 'The shipping method does not match between the WooCommerce and Klarna orders. Expected "%1$s" found "%2$s".', 'klarna-checkout-for-woocommerce' ), empty( $klarna_shipping ) ? 'none' : $klarna_shipping['reference'], empty( $shipping ) ? 'none' : $shipping['reference'] );
+
 		KCO_Logger::log( "$prefix Shipping method mismatch. Klarna: " . ( empty( $klarna_shipping ) ? 'none' : $klarna_shipping['reference'] ) . ', WC: ' . ( empty( $shipping ) ? 'none' : $shipping['reference'] ) . '.' );
-		$notes[]  = __( 'The shipping method does not match between the WooCommerce and Klarna orders.', 'klarna-checkout-for-woocommerce' );
 		$mismatch = true;
 	} elseif ( ! empty( $klarna_shipping ) && ! empty( $shipping ) ) {
 		// If KSA is enabled, we'll skip the control.
@@ -753,8 +756,10 @@ function kco_validate_order_content( $klarna_order, $order ) {
 		$woo_reference    = explode( ':', $shipping['reference'] ?? '' )[0];
 
 		if ( ! $is_ksa && strpos( $woo_reference, $klarna_reference ) === false ) {
+			// translators: %1$s: Klarna shipping method, %2$s: WooCommerce shipping method.
+			$notes[] = sprintf( __( 'The shipping method does not match between the WooCommerce and Klarna orders. Expected "%1$s" found "%2$s".', 'klarna-checkout-for-woocommerce' ), $klarna_shipping['reference'], $shipping['reference'] );
+
 			KCO_Logger::log( "$prefix Shipping method mismatch. Klarna: $klarna_reference ({$klarna_shipping['reference']}), WC: $woo_reference ({$shipping['reference']})." );
-			$notes[]  = __( 'The shipping method does not match between the WooCommerce and Klarna orders.', 'klarna-checkout-for-woocommerce' );
 			$mismatch = true;
 		}
 	}
