@@ -4,80 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0451029fafb6136d4e348f00a2da25c6",
-    "packages": [
-        {
-            "name": "krokedil/klarna-onsite-messaging",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/krokedil/klarna-onsite-messaging.git",
-                "reference": "5f4f168d13a026f6b0da1671bcb370d6df89d7d7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/krokedil/klarna-onsite-messaging/zipball/5f4f168d13a026f6b0da1671bcb370d6df89d7d7",
-                "reference": "5f4f168d13a026f6b0da1671bcb370d6df89d7d7",
-                "shasum": ""
-            },
-            "require": {
-                "php": "~7.4 || ~8.0"
-            },
-            "require-dev": {
-                "10up/wp_mock": "^1.0",
-                "php-stubs/woocommerce-stubs": "^8.3",
-                "wp-coding-standards/wpcs": "^3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Krokedil\\KlarnaOnsiteMessaging\\": "src/"
-                }
-            },
-            "archive": {
-                "exclude": [
-                    "tests/*",
-                    "phpunit.xml",
-                    "composer-lock.json",
-                    ".github/*",
-                    ".gitignore",
-                    ".gitattributes"
-                ]
-            },
-            "scripts": {
-                "phpcs": [
-                    "phpcs --standard=phpcs.xml --extensions=php --ignore=vendor/,tests/"
-                ],
-                "phpcbf": [
-                    "phpcbf --standard=phpcs.xml --extensions=php --ignore=vendor/,tests/"
-                ],
-                "test": [
-                    "@php ./vendor/bin/phpunit --configuration phpunit.xml"
-                ],
-                "test-coverage-html": [
-                    "@php ./vendor/bin/phpunit --configuration phpunit.xml --coverage-html coverage"
-                ],
-                "test-coverage-clover": [
-                    "@php ./vendor/bin/phpunit --configuration phpunit.xml --coverage-clover coverage.xml"
-                ]
-            },
-            "license": [
-                "GPL-v3"
-            ],
-            "authors": [
-                {
-                    "name": "Krokedil AB",
-                    "email": "info@krokedil.se"
-                }
-            ],
-            "description": "Klarna On-Site Messaging for WooCommerce",
-            "support": {
-                "source": "https://github.com/krokedil/klarna-onsite-messaging/tree/1.0.2",
-                "issues": "https://github.com/krokedil/klarna-onsite-messaging/issues"
-            },
-            "time": "2024-05-13T08:40:49+00:00"
-        }
-    ],
+    "content-hash": "4957efedea148287618a3ed3347fc479",
+    "packages": [],
     "packages-dev": [
         {
             "name": "squizlabs/php_codesniffer",
@@ -209,6 +137,106 @@
                 "wiki": "https://github.com/WordPress/WordPress-Coding-Standards/wiki"
             },
             "time": "2020-05-13T23:57:56+00:00"
+        },
+        {
+            "name": "wpify/php-scoper",
+            "version": "0.16.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wpify/php-scoper.git",
+                "reference": "ea51e75cee3a2ff2ac1aedb1b3c0631147360149"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wpify/php-scoper/zipball/ea51e75cee3a2ff2ac1aedb1b3c0631147360149",
+                "reference": "ea51e75cee3a2ff2ac1aedb1b3c0631147360149",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0"
+            },
+            "bin": [
+                "bin/php-scoper.phar"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "mejta",
+                    "email": "daniel@mejta.net"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/wpify/php-scoper/issues",
+                "source": "https://github.com/wpify/php-scoper/tree/0.16.2"
+            },
+            "time": "2023-11-01T18:00:51+00:00"
+        },
+        {
+            "name": "wpify/scoper",
+            "version": "3.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wpify/scoper.git",
+                "reference": "bac861226cbb4d674213c89a63f7b79570033b31"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wpify/scoper/zipball/bac861226cbb4d674213c89a63f7b79570033b31",
+                "reference": "bac861226cbb4d674213c89a63f7b79570033b31",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.3",
+                "php": "^7.4 || ^8.0",
+                "wpify/php-scoper": "^0.16"
+            },
+            "require-dev": {
+                "composer/composer": "^2.6",
+                "jetbrains/phpstorm-stubs": "^v2023.2",
+                "johnpbloch/wordpress": "^6.3",
+                "nikic/php-parser": "^v4.17",
+                "woocommerce/action-scheduler": "^3.6",
+                "wpackagist-plugin/woocommerce": "^8.2",
+                "yahnis-elsts/plugin-update-checker": "^v5.2"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Wpify\\Scoper\\Plugin",
+                "wordpress-install-dir": "sources/wordpress",
+                "installer-paths": {
+                    "sources/plugin-{$name}/": [
+                        "type:wordpress-plugin"
+                    ],
+                    "sources/theme-{$name}/": [
+                        "type:wordpress-theme"
+                    ]
+                },
+                "textdomain": {
+                    "wpify-custom-fields": "some-new-textdomain"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Wpify\\Scoper\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel Mejta",
+                    "email": "daniel@mejta.net"
+                }
+            ],
+            "description": "Composer plugin that scopes WordPress and WooCommerce dependencies for usage in WordPress plugins and themes.",
+            "support": {
+                "issues": "https://github.com/wpify/scoper/issues",
+                "source": "https://github.com/wpify/scoper/tree/3.1.3"
+            },
+            "time": "2023-11-02T15:10:42+00:00"
         }
     ],
     "aliases": [],

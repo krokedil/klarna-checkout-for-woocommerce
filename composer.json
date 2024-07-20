@@ -1,14 +1,22 @@
 {
-    "require": {
-        "krokedil/klarna-onsite-messaging": "^1.0.2"
-    },
     "require-dev": {
-        "wp-coding-standards/wpcs": "^2.3"
+        "wp-coding-standards/wpcs": "^2.3",
+        "wpify/scoper": "^3.1"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:krokedil/klarna-onsite-messaging.git"
+    "config": {
+        "allow-plugins": {
+            "wpify/scoper": true
         }
-    ]
+    },
+    "extra": {
+        "wpify-scoper": {
+            "prefix": "KCO",
+            "folder": "dependencies",
+            "autorun": true,
+            "globals": [
+                "wordpress",
+                "woocommerce"
+            ]
+        }
+    }
 }

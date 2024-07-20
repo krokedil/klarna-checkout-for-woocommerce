@@ -18,3 +18,9 @@ nightwatch.conf.js
 .DS_Store
 .vscode/settings.json
 .idea/
+
+# wpify/scoper
+/vendor/
+/dependencies/*
+!dependencies/.gitkeep
+tmp*

@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Krokedil\KlarnaOnsiteMessaging\KlarnaOnsiteMessaging;
+use KCO\Krokedil\KlarnaOnsiteMessaging\KlarnaOnsiteMessaging;
 
 /**
  * Required minimums and constants
@@ -284,7 +284,7 @@ if ( ! class_exists( 'KCO' ) ) {
 				 * @return bool|mixed
 				 */
 		public function init_composer() {
-			$autoloader = KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
+			$autoloader = KCO_WC_PLUGIN_PATH . '/dependencies/autoload.php';
 
 			if ( ! is_readable( $autoloader ) ) {
 				self::missing_autoloader();
