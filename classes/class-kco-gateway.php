@@ -500,7 +500,12 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function process_embedded_payment_handler( $order_id ) {
 			// Get the Klarna order ID.
 			$order = wc_get_order( $order_id );
-			if ( ! empty( $order ) ) {
+
+			// For the initial subscription, the Klarna order ID should always exist in the session.
+			// This also applies to (pending) renewal subscription since existing Klarna order ID is no longer valid for the renewal, we must retrieve it from the session, not the order.
+			$is_subscription = function_exists( 'wcs_order_contains_subscription' ) && wcs_order_contains_subscription( $order, array( 'parent', 'resubscribe', 'switch', 'renewal' ) );
+
+			if ( ! empty( $order ) && ! $is_subscription ) {
 				$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
 			}
 			$klarna_order_id = ! empty( $klarna_order_id ) ? $klarna_order_id : WC()->session->get( 'kco_wc_order_id' );
