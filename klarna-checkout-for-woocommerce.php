@@ -5,7 +5,7 @@
  * Description: Klarna Checkout payment gateway for WooCommerce.
  * Author: Klarna
  * Author URI: https://klarna.com/
- * Version: 2.12.8
+ * Version: 2.12.9
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
@@ -37,7 +37,7 @@ use KCO\Krokedil\KlarnaOnsiteMessaging\KlarnaOnsiteMessaging;
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.12.8' );
+define( 'KCO_WC_VERSION', '2.12.9' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
