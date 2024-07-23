@@ -1,0 +1,13 @@
+{
+    "require": {
+        "krokedil/klarna-onsite-messaging": "^1.0.0"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:krokedil/klarna-onsite-messaging.git"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
