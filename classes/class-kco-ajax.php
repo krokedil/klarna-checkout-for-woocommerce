@@ -37,6 +37,7 @@ class KCO_AJAX extends WC_AJAX {
 			'kco_wc_set_session_value'              => true,
 			'kco_wc_get_klarna_order'               => true,
 			'kco_wc_log_js'                         => true,
+			'kco_customer_type_changed'             => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -243,7 +244,6 @@ class KCO_AJAX extends WC_AJAX {
 				'shipping_address' => $klarna_order['shipping_address'],
 			)
 		);
-
 	}
 
 	/**
@@ -262,6 +262,16 @@ class KCO_AJAX extends WC_AJAX {
 		$message         = "Frontend JS $klarna_order_id: $posted_message";
 		KCO_Logger::log( $message );
 		wp_send_json_success();
+	}
+
+	/**
+	 * Trigger 'kco_customer_type_changed' action.
+	 *
+	 * @return void
+	 */
+	public static function kco_customer_type_changed() {
+		$customer_type = isset( $_POST['customer_type'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_type'] ) ) : '';
+		do_action( 'kco_customer_type_changed', $customer_type );
 	}
 }
 KCO_AJAX::init();

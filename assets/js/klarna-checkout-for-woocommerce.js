@@ -670,6 +670,16 @@ jQuery( function ( $ ) {
 								kco_wc.placeKlarnaOrder( callback )
 							}
 						},
+						customer: function (customer) {
+							let customer_type = 'person' === customer.type ? 'b2c' : 'b2b'
+							$.ajax( {
+								url: kco_params.customer_type_changed_url,
+								type: "POST",
+								data: {
+									customer_type,
+								},
+							} )
+						}
 					} )
 				} )
 			}
