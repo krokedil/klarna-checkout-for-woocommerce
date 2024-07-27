@@ -360,6 +360,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'log_to_file_url'                 => WC_AJAX::get_endpoint( 'kco_wc_log_js' ),
 				'log_to_file_nonce'               => wp_create_nonce( 'kco_wc_log_js' ),
 				'submit_order'                    => WC_AJAX::get_endpoint( 'checkout' ),
+				'customer_type_changed_url'       => WC_AJAX::get_endpoint( 'kco_customer_type_changed' ),
 				'logging'                         => $this->logging,
 				'standard_woo_checkout_fields'    => $standard_woo_checkout_fields,
 				'is_confirmation_page'            => ( is_kco_confirmation() ) ? 'yes' : 'no',
