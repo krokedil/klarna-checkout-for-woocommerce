@@ -35,7 +35,6 @@ class KCO_Subscription {
 		add_action( 'init', array( $this, 'display_thankyou_message_for_payment_method_change' ) );
 		add_action( 'woocommerce_account_view-subscription_endpoint', array( $this, 'maybe_confirm_change_payment_method' ) );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'extend_allowed_domains_list' ) );
-
 	}
 
 	/**
@@ -366,10 +365,6 @@ class KCO_Subscription {
 				$recurring_token = ! empty( $parent ) ? $parent->get_meta( '_kco_recurring_token', true ) : '';
 			}
 
-			if ( empty( $recurring_token ) ) {
-				return;
-			}
-
 			?>
 			<div class="order_data_column" style="clear:both; float:none; width:100%;">
 				<div class="address">
@@ -384,6 +379,7 @@ class KCO_Subscription {
 								'id'            => '_kco_recurring_token',
 								'label'         => __( 'Klarna recurring token', 'klarna-checkout-for-woocommerce' ),
 								'wrapper_class' => '_billing_company_field',
+								'value'         => $recurring_token,
 							)
 						);
 					?>
@@ -407,7 +403,6 @@ class KCO_Subscription {
 			$order->update_meta_data( '_kco_recurring_token', $klarna_recurring_token );
 			$order->save();
 		}
-
 	}
 
 	/**
