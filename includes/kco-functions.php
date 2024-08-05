@@ -97,6 +97,7 @@ function kco_wc_show_snippet( $pay_for_order = false ) {
 
 	if ( isset( $klarna_order['html_snippet'] ) ) {
 		do_action( 'kco_wc_show_snippet', $klarna_order );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- We trust the HTML snippet.
 		echo kco_extract_script( $klarna_order['html_snippet'] );
 	}
 }

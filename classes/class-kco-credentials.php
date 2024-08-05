@@ -55,7 +55,7 @@ class KCO_Credentials {
 
 		$credentials = array(
 			'merchant_id'   => $this->settings[ $test_string . 'merchant_id_' . $country_string ],
-			'shared_secret' => htmlspecialchars_decode( $this->settings[ $test_string . 'shared_secret_' . $country_string ] ),
+			'shared_secret' => htmlspecialchars_decode( $this->settings[ $test_string . 'shared_secret_' . $country_string ], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 ),
 		);
 
 		return apply_filters( 'kco_wc_credentials_from_session', $credentials, $this->settings['testmode'] );
