@@ -358,7 +358,7 @@ class KCO_Fields {
 			$settings = array_merge( array_slice( $settings, 0, $offset + 1, true ), array( 'checkout_flow' => $checkout_flow ), array_slice( $settings, $offset, null, true ) );
 		} else {
 			$option                           = 'woocommerce_kco_settings';
-			$stored_settings                  = get_option( $option );
+			$stored_settings                  = get_option( $option, array() );
 			$stored_settings['checkout_flow'] = 'embedded';
 			update_option( $option, $stored_settings );
 		}
