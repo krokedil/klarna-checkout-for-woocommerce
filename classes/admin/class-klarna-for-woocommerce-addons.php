@@ -275,18 +275,16 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 						$new_action       = 'install';
 						$new_status_label = 'Not installed';
 						$new_action_label = 'Install';
-					} else {
-						if ( 'installed' === $result['status'] ) {
+					} elseif ( 'installed' === $result['status'] ) {
 							$new_status       = 'installed';
 							$new_action       = 'activate';
 							$new_status_label = 'Installed';
 							$new_action_label = 'Activate';
-						} else {
-							$new_status       = 'not-installed';
-							$new_action       = 'install';
-							$new_status_label = 'Not installed';
-							$new_action_label = 'Install';
-						}
+					} else {
+						$new_status       = 'not-installed';
+						$new_action       = 'install';
+						$new_status_label = 'Not installed';
+						$new_action_label = 'Install';
 					}
 				}
 			}
@@ -327,7 +325,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			}
 			$skin      = new Klarna_Skin();
 			$installer = new Plugin_Upgrader( $skin );
-			$result    = $installer->install( $url );
+			$result    = $installer->install( $url ); // nosemgrep: URL already escape, and user is authorized.
 
 			wp_cache_flush();
 			if ( is_wp_error( $result ) ) {
