@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "11d39ec56e6d97213a5d4b294242cbaf",
+    "content-hash": "bc044238adeb23799867c12de29ce897",
     "packages": [
         {
             "name": "krokedil/klarna-onsite-messaging",
@@ -76,6 +76,53 @@
                 "issues": "https://github.com/krokedil/klarna-onsite-messaging/issues"
             },
             "time": "2024-05-13T08:40:49+00:00"
+        },
+        {
+            "name": "krokedil/woocommerce",
+            "version": "1.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/krokedil/woocommerce.git",
+                "reference": "c603dc52f8e1d3d41ad9781a20744d4467a375b8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/krokedil/woocommerce/zipball/c603dc52f8e1d3d41ad9781a20744d4467a375b8",
+                "reference": "c603dc52f8e1d3d41ad9781a20744d4467a375b8",
+                "shasum": ""
+            },
+            "require-dev": {
+                "10up/wp_mock": "^1.0",
+                "php": "~7.1 || ~8.0",
+                "php-stubs/woocommerce-stubs": "^7.2",
+                "php-stubs/wordpress-stubs": "^6.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Krokedil\\WooCommerce\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Krokedil\\WooCommerce\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-V2"
+            ],
+            "authors": [
+                {
+                    "name": "Krokedil AB",
+                    "email": "info@krokedil.se"
+                }
+            ],
+            "description": "A library package for Krokedils plugins that contains helper methods when working with WooCommerce.",
+            "support": {
+                "source": "https://github.com/krokedil/woocommerce/tree/1.6.1",
+                "issues": "https://github.com/krokedil/woocommerce/issues"
+            },
+            "time": "2024-05-13T13:10:01+00:00"
         }
     ],
     "packages-dev": [],

@@ -33,6 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use KCO\Krokedil\KlarnaOnsiteMessaging\KlarnaOnsiteMessaging;
+use KCO\Krokedil\WooCommerce\KrokedilWooCommerce;
 
 /**
  * Required minimums and constants
@@ -98,6 +99,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var array $order_lines_from_order
 		 */
 		public $order_lines_from_order;
+
+		/**
+		 * The WooCommerce package from Krokedil.
+		 *
+		 * @var KrokedilWooCommerce
+		 */
+		public $krokedil = null;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -272,17 +280,23 @@ if ( ! class_exists( 'KCO' ) ) {
 			$this->merchant_urls = new KCO_Merchant_URLs();
 			$this->logger        = new KCO_Logger();
 			$this->api           = new KCO_API();
+			$this->krokedil      = new KrokedilWooCommerce(
+				array(
+					'slug'         => 'kco',
+					'price_format' => 'minor',
+				)
+			);
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
 			add_action( 'before_woocommerce_init', array( $this, 'declare_wc_compatibility' ) );
 		}
 
-				/**
-				 * Initialize composers autoloader.
-				 *
-				 * @return bool|mixed
-				 */
+		/**
+		 * Initialize composers autoloader.
+		 *
+		 * @return bool|mixed
+		 */
 		public function init_composer() {
 			$autoloader = KCO_WC_PLUGIN_PATH . '/dependencies/autoload.php';
 

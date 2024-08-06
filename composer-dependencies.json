@@ -1,11 +1,16 @@
 {
     "require": {
-        "krokedil/klarna-onsite-messaging": "^1.0.0"
+        "krokedil/klarna-onsite-messaging": "^1.0.0",
+        "krokedil/woocommerce": "^1.0"
     },
     "repositories": [
         {
             "type": "vcs",
             "url": "git@github.com:krokedil/klarna-onsite-messaging.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@github.com:krokedil/woocommerce.git"
         }
     ],
     "minimum-stability": "dev",
