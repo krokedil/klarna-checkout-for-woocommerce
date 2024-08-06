@@ -1,5 +1,22 @@
 {
     "require-dev": {
-        "wp-coding-standards/wpcs": "^2.3"
+        "wp-coding-standards/wpcs": "^2.3",
+        "wpify/scoper": "^3.1"
+    },
+    "config": {
+        "allow-plugins": {
+            "wpify/scoper": true
+        }
+    },
+    "extra": {
+        "wpify-scoper": {
+            "prefix": "KCO",
+            "folder": "dependencies",
+            "autorun": true,
+            "globals": [
+                "wordpress",
+                "woocommerce"
+            ]
+        }
     }
 }

@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "93e09194408acf7c385f20b3ead4958d",
+    "content-hash": "4957efedea148287618a3ed3347fc479",
     "packages": [],
     "packages-dev": [
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.6.1",
+            "version": "3.10.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "f268ca40d54617c6e06757f83f699775c9b3ff2e"
+                "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
+                "reference": "86e5f5dd9a840c46810ebe5ff1885581c42a3017"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/f268ca40d54617c6e06757f83f699775c9b3ff2e",
-                "reference": "f268ca40d54617c6e06757f83f699775c9b3ff2e",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/86e5f5dd9a840c46810ebe5ff1885581c42a3017",
+                "reference": "86e5f5dd9a840c46810ebe5ff1885581c42a3017",
                 "shasum": ""
             },
             "require": {
@@ -28,11 +28,11 @@
                 "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
+                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.3.4"
             },
             "bin": [
-                "bin/phpcs",
-                "bin/phpcbf"
+                "bin/phpcbf",
+                "bin/phpcs"
             ],
             "type": "library",
             "extra": {
@@ -47,21 +47,45 @@
             "authors": [
                 {
                     "name": "Greg Sherwood",
-                    "role": "lead"
+                    "role": "Former lead"
+                },
+                {
+                    "name": "Juliette Reinders Folmer",
+                    "role": "Current lead"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer/graphs/contributors"
                 }
             ],
             "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
-            "homepage": "https://github.com/squizlabs/PHP_CodeSniffer",
+            "homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
             "keywords": [
                 "phpcs",
-                "standards"
+                "standards",
+                "static analysis"
             ],
             "support": {
-                "issues": "https://github.com/squizlabs/PHP_CodeSniffer/issues",
-                "source": "https://github.com/squizlabs/PHP_CodeSniffer",
-                "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
+                "issues": "https://github.com/PHPCSStandards/PHP_CodeSniffer/issues",
+                "security": "https://github.com/PHPCSStandards/PHP_CodeSniffer/security/policy",
+                "source": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
+                "wiki": "https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki"
             },
-            "time": "2021-10-11T04:00:11+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/PHPCSStandards",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/jrfnl",
+                    "type": "github"
+                },
+                {
+                    "url": "https://opencollective.com/php_codesniffer",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2024-07-21T23:26:44+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
@@ -113,6 +137,106 @@
                 "wiki": "https://github.com/WordPress/WordPress-Coding-Standards/wiki"
             },
             "time": "2020-05-13T23:57:56+00:00"
+        },
+        {
+            "name": "wpify/php-scoper",
+            "version": "0.16.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wpify/php-scoper.git",
+                "reference": "ea51e75cee3a2ff2ac1aedb1b3c0631147360149"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wpify/php-scoper/zipball/ea51e75cee3a2ff2ac1aedb1b3c0631147360149",
+                "reference": "ea51e75cee3a2ff2ac1aedb1b3c0631147360149",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0"
+            },
+            "bin": [
+                "bin/php-scoper.phar"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "mejta",
+                    "email": "daniel@mejta.net"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/wpify/php-scoper/issues",
+                "source": "https://github.com/wpify/php-scoper/tree/0.16.2"
+            },
+            "time": "2023-11-01T18:00:51+00:00"
+        },
+        {
+            "name": "wpify/scoper",
+            "version": "3.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wpify/scoper.git",
+                "reference": "bac861226cbb4d674213c89a63f7b79570033b31"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wpify/scoper/zipball/bac861226cbb4d674213c89a63f7b79570033b31",
+                "reference": "bac861226cbb4d674213c89a63f7b79570033b31",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.3",
+                "php": "^7.4 || ^8.0",
+                "wpify/php-scoper": "^0.16"
+            },
+            "require-dev": {
+                "composer/composer": "^2.6",
+                "jetbrains/phpstorm-stubs": "^v2023.2",
+                "johnpbloch/wordpress": "^6.3",
+                "nikic/php-parser": "^v4.17",
+                "woocommerce/action-scheduler": "^3.6",
+                "wpackagist-plugin/woocommerce": "^8.2",
+                "yahnis-elsts/plugin-update-checker": "^v5.2"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Wpify\\Scoper\\Plugin",
+                "wordpress-install-dir": "sources/wordpress",
+                "installer-paths": {
+                    "sources/plugin-{$name}/": [
+                        "type:wordpress-plugin"
+                    ],
+                    "sources/theme-{$name}/": [
+                        "type:wordpress-theme"
+                    ]
+                },
+                "textdomain": {
+                    "wpify-custom-fields": "some-new-textdomain"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Wpify\\Scoper\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel Mejta",
+                    "email": "daniel@mejta.net"
+                }
+            ],
+            "description": "Composer plugin that scopes WordPress and WooCommerce dependencies for usage in WordPress plugins and themes.",
+            "support": {
+                "issues": "https://github.com/wpify/scoper/issues",
+                "source": "https://github.com/wpify/scoper/tree/3.1.3"
+            },
+            "time": "2023-11-02T15:10:42+00:00"
         }
     ],
     "aliases": [],
@@ -122,5 +246,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.6.0"
 }
