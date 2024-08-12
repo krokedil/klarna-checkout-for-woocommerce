@@ -60,7 +60,7 @@ jQuery( function ( $ ) {
 								const noticeClassName = kco_params.pay_for_order
 									? "div.woocommerce-notices-wrapper"
 									: "form.checkout"
-								$( "html, body" ).animate(
+								$('html, body').not(':animated').animate(
 									{
 										scrollTop: $( noticeClassName ).offset().top - 100,
 									},
