@@ -35,7 +35,7 @@ class KCO_Checkout {
 	public function add_shipping_data_input( $fields ) {
 		$default = '';
 
-		if ( is_checkout() ) {
+		if ( is_checkout() && WC()->session ) {
 			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 			$shipping_data   = get_transient( 'kss_data_' . $klarna_order_id );
 			$default         = wp_json_encode( $shipping_data );
