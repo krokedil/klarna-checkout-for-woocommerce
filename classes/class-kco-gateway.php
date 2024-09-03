@@ -145,6 +145,19 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				$billing_field  = 'billing_' . $wc_name;
 				$shipping_field = 'shipping_' . $wc_name;
 
+				if ( 'country' === $wc_name ) {
+					$base_location = wc_get_base_location();
+					$country       = $base_location['country'];
+
+					if ( ! isset( $billing_address[ $billing_field ] ) ) {
+						$billing_address[ $billing_field ] = $country;
+					}
+
+					if ( ! isset( $shipping_address[ $shipping_field ] ) ) {
+						$shipping_address[ $shipping_field ] = $country;
+					}
+				}
+
 				if ( isset( $klarna_order['billing_address'][ $klarna_name ] ) ) {
 					// Remove all whitespace and convert to lowercase.
 					$billing_address[ $billing_field ]               = strtolower( preg_replace( '/\s+/', '', $billing_address[ $billing_field ] ) );
@@ -360,6 +373,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'log_to_file_url'                 => WC_AJAX::get_endpoint( 'kco_wc_log_js' ),
 				'log_to_file_nonce'               => wp_create_nonce( 'kco_wc_log_js' ),
 				'submit_order'                    => WC_AJAX::get_endpoint( 'checkout' ),
+				'customer_type_changed_url'       => WC_AJAX::get_endpoint( 'kco_customer_type_changed' ),
 				'logging'                         => $this->logging,
 				'standard_woo_checkout_fields'    => $standard_woo_checkout_fields,
 				'is_confirmation_page'            => ( is_kco_confirmation() ) ? 'yes' : 'no',
@@ -500,7 +514,12 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function process_embedded_payment_handler( $order_id ) {
 			// Get the Klarna order ID.
 			$order = wc_get_order( $order_id );
-			if ( ! empty( $order ) ) {
+
+			// For the initial subscription, the Klarna order ID should always exist in the session.
+			// This also applies to (pending) renewal subscription since existing Klarna order ID is no longer valid for the renewal, we must retrieve it from the session, not the order.
+			$is_subscription = function_exists( 'wcs_order_contains_subscription' ) && wcs_order_contains_subscription( $order, array( 'parent', 'resubscribe', 'switch', 'renewal' ) );
+
+			if ( ! empty( $order ) && ! $is_subscription ) {
 				$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
 			}
 			$klarna_order_id = ! empty( $klarna_order_id ) ? $klarna_order_id : WC()->session->get( 'kco_wc_order_id' );
