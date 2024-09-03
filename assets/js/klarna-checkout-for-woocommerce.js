@@ -59,8 +59,8 @@ jQuery( function ( $ ) {
 								// Wait for the Klarna modal to disappear before checking if any errors are found.
 								const noticeClassName = kco_params.pay_for_order
 									? "div.woocommerce-notices-wrapper"
-									: "form.checkout";
-								const notices = $( noticeClassName );
+									: "form.checkout"
+								const notices = $( noticeClassName )
 
 								// Scroll to error notices if found.
 								if ( notices.length && notices.find( ".woocommerce-error" ).length ) {
@@ -68,8 +68,8 @@ jQuery( function ( $ ) {
 										{
 											scrollTop: notices.offset().top - 100,
 										},
-										1000
-									);
+										1000,
+									)
 								}
 
 								// Unlock the order review table and checkout form.
@@ -675,8 +675,8 @@ jQuery( function ( $ ) {
 								kco_wc.placeKlarnaOrder( callback )
 							}
 						},
-						customer: function (customer) {
-							let customer_type = 'person' === customer.type ? 'b2c' : 'b2b'
+						customer: function ( customer ) {
+							let customer_type = "person" === customer.type ? "b2c" : "b2b"
 							$.ajax( {
 								url: kco_params.customer_type_changed_url,
 								type: "POST",
@@ -684,7 +684,7 @@ jQuery( function ( $ ) {
 									customer_type,
 								},
 							} )
-						}
+						},
 					} )
 				} )
 			}

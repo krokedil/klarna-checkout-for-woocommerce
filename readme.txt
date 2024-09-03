@@ -54,6 +54,12 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2024.09.03    - version 2.13.0 =
+* Feature       - Added the ['kco_customer_type_changed'](https://docs.krokedil.com/klarna-checkout-for-woocommerce/customization/hooks-action-filter/#customer-type-changed) action hook that is triggered whenever the customer switches between organization and person in the checkout.
+* Tweak         - The view should no longer scroll up before the customer is redirected to the confirmation page unless an error notice has to be shown.
+* Tweak         – You can now overwrite the recurring payment token from the admin Subscription page.
+* Fix           - Fixed an issue where updating the payment method on a Klarna subscription would cause the renewal to fail.
+
 = 2024.07.22    - version 2.12.9 =
 * Tweak         - Adjusted the order comparison verification between Klarna and WooCommerce.
 

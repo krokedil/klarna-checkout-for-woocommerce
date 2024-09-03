@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2024-07-22 13:00+0000\n"
+"POT-Creation-Date: 2024-09-03 08:35+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -447,27 +447,27 @@ msgstr ""
 msgid "The Klarna order could not be retrieved from the session. Please try again."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:368
+#: ../classes/class-kco-gateway.php:382
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:371
+#: ../classes/class-kco-gateway.php:385
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:592
+#: ../classes/class-kco-gateway.php:611
 msgid "Customer redirected to Klarna Hosted Payment Page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:697
+#: ../classes/class-kco-gateway.php:716
 msgid "Order address should not be changed and any changes you make will not be reflected in Klarna system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:756
+#: ../classes/class-kco-gateway.php:775
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:778, ../classes/class-kco-gateway.php:800
+#: ../classes/class-kco-gateway.php:797, ../classes/class-kco-gateway.php:819
 msgid "Reference:"
 msgstr ""
 
@@ -475,36 +475,36 @@ msgstr ""
 msgid "Klarna Checkout for WooCommerce"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:272
+#: ../classes/class-kco-subscription.php:271
 msgid "Recurring token was missing from the Klarna order during the checkout process. Please contact Klarna for help."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:248
+#: ../classes/class-kco-subscription.php:247
 msgid "Recurring token for subscription: %s"
 msgstr ""
 
 #. translators: Error message.
-#: ../classes/class-kco-subscription.php:348
+#: ../classes/class-kco-subscription.php:347
 msgid "Subscription payment failed with Klarna. Message: %1$s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:341
+#: ../classes/class-kco-subscription.php:340
 msgid "Subscription payment made with Klarna. Klarna order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:385
+#: ../classes/class-kco-subscription.php:380
 msgid "Klarna recurring token"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:441
+#: ../classes/class-kco-subscription.php:436
 msgid "Could not retrieve new Klarna recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:435
+#: ../classes/class-kco-subscription.php:430
 msgid "Payment method changed via Klarna Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:462
+#: ../classes/class-kco-subscription.php:457
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -539,11 +539,6 @@ msgstr ""
 
 #: ../includes/kco-functions.php:727
 msgid "The product \"%s\" was not found in the Klarna order."
-msgstr ""
-
-#. translators: %1$s: Klarna shipping method, %2$s: WooCommerce shipping method.
-#: ../includes/kco-functions.php:760, ../includes/kco-functions.php:745
-msgid "The shipping method does not match between the WooCommerce and Klarna orders. Expected \"%1$s\" found \"%2$s\"."
 msgstr ""
 
 #: ../classes/admin/class-kco-admin-notices.php:91
