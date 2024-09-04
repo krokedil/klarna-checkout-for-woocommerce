@@ -696,8 +696,11 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	$notes = array( __( 'A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order in the Klarna merchant portal before processing.', 'klarna-checkout-for-woocommerce' ) );
 
 	// A match happens when the item reference and quantity matches in Woo and Klarna.
-	$mismatch = false;
-	foreach ( $order->get_items() as $order_item ) {
+	$mismatch           = false;
+	$items              = $order->get_items();
+	$klarna_order_items = $klarna_order['order_lines'];
+
+	foreach ( $items as $order_item ) {
 		$order_line = $order_data->get_order_line_items( $order_item );
 		if ( $mismatch ) {
 			break;
@@ -706,14 +709,31 @@ function kco_validate_order_content( $klarna_order, $order ) {
 		$match     = false;
 		$name      = $order_line['name'];
 		$reference = $order_line['reference'];
-		foreach ( $klarna_order['order_lines'] as $klarna_order_item ) {
-			$match = false;
+
+		foreach ( $klarna_order_items as $klarna_order_item ) {
 			if ( $reference === $klarna_order_item['reference'] ) {
 				$match = true;
-				if ( strval( $klarna_order_item['quantity'] ) !== strval( $order_line['quantity'] ) ) {
+
+				$quantity        = 0;
+				$klarna_quantity = 0;
+
+				foreach ( $items as $item ) {
+					$item = $order_data->get_order_line_items( $item );
+					if ( $item['reference'] === $reference ) {
+						$quantity += $item['quantity'];
+					}
+				}
+
+				foreach ( $klarna_order_items as $item ) {
+					if ( $item['reference'] === $reference ) {
+						$klarna_quantity += $item['quantity'];
+					}
+				}
+
+				if ( $quantity !== $klarna_quantity ) {
 					// translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
-					$notes[] = sprintf( __( 'The product "%1$s" has a quantity mismatch. Expected %2$d found %3$d.', 'klarna-checkout-for-woocommerce' ), $name, $klarna_order_item['quantity'], $order_line['quantity'] );
-					KCO_Logger::log( "$prefix WC order item reference: $reference ($name) has {$order_line['quantity']} expected {$klarna_order_item['quantity']}." );
+					$notes[] = sprintf( __( 'The product "%1$s" has a quantity mismatch. Expected %2$d found %3$d.', 'klarna-checkout-for-woocommerce' ), $name, $klarna_quantity, $quantity );
+					KCO_Logger::log( "$prefix WC order item reference: $reference ($name) has {$quantity} expected {$klarna_quantity}." );
 					$mismatch = true;
 				}
 
