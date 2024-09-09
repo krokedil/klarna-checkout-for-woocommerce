@@ -700,44 +700,48 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	$items              = $order->get_items();
 	$klarna_order_items = $klarna_order['order_lines'];
 
+	// Stack items with same reference.
+	$klarna_stack = array();
+	foreach ( $klarna_order_items as $klarna_order_item ) {
+		$type = $klarna_order_item['type'];
+		if ( in_array( $type, array( 'discount', 'shipping_fee', 'sales_tax', 'gift_card', 'store_credit', 'surcharge' ), true ) ) {
+			continue;
+		}
+
+		$reference = $klarna_order_item['reference'];
+		if ( isset( $klarna_stack[ $reference ] ) ) {
+			$klarna_stack[ $reference ]['quantity'] += $klarna_order_item['quantity'];
+		} else {
+			$klarna_stack[ $reference ] = array(
+				'quantity' => $klarna_order_item['quantity'],
+				'name'     => $klarna_order_item['name'],
+			);
+		}
+	}
+
+	$woo_stack = array();
 	foreach ( $items as $order_item ) {
-		$order_line = $order_data->get_order_line_items( $order_item );
+		$order_line               = $order_data->get_order_line_items( $order_item );
+		$reference                = $order_line['reference'];
+		$woo_stack[ $reference ] += $order_line['quantity'];
+	}
+
+	foreach ( $woo_stack as $reference => $quantity ) {
 		if ( $mismatch ) {
 			break;
 		}
 
-		$match     = false;
-		$name      = $order_line['name'];
-		$reference = $order_line['reference'];
+		$match       = false;
+		$klarna_item = $klarna_stack[ $reference ] ?? false;
+		if ( $klarna_item ) {
+			$match = true;
+			$name  = $klarna_item['name'];
 
-		foreach ( $klarna_order_items as $klarna_order_item ) {
-			if ( $reference === $klarna_order_item['reference'] ) {
-				$match = true;
-
-				$quantity        = 0;
-				$klarna_quantity = 0;
-
-				foreach ( $items as $item ) {
-					$item = $order_data->get_order_line_items( $item );
-					if ( $item['reference'] === $reference ) {
-						$quantity += $item['quantity'];
-					}
-				}
-
-				foreach ( $klarna_order_items as $item ) {
-					if ( $item['reference'] === $reference ) {
-						$klarna_quantity += $item['quantity'];
-					}
-				}
-
-				if ( $quantity !== $klarna_quantity ) {
-					// translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
-					$notes[] = sprintf( __( 'The product "%1$s" has a quantity mismatch. Expected %2$d found %3$d.', 'klarna-checkout-for-woocommerce' ), $name, $klarna_quantity, $quantity );
-					KCO_Logger::log( "$prefix WC order item reference: $reference ($name) has {$quantity} expected {$klarna_quantity}." );
-					$mismatch = true;
-				}
-
-				break;
+			if ( $quantity !== $klarna_item['quantity'] ) {
+				// translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
+				$notes[] = sprintf( __( 'The product "%1$s" has a quantity mismatch. Expected %2$d found %3$d.', 'klarna-checkout-for-woocommerce' ), $name, $klarna_item['quantity'], $quantity );
+				KCO_Logger::log( "$prefix WC order item reference: $reference ($name) has {$quantity} expected {$klarna_item['quantity']}." );
+				$mismatch = true;
 			}
 		}
 
