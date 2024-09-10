@@ -54,6 +54,12 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2024.09.10    - version 2.13.1 =
+* Fix           - Fixed compatibility with the "Product Bundles for WooCommerce" plugin.
+* Fix           - Fixed an issue where a quantity mismatch would occur when the product SKU is reused.
+* Fix           - Fixed an issue where checkout validation would fail due to different mapping of the "State" field between Woo and Klarna.
+* Tweak         - Added Germany (DE) to the list of countries that allow sale to B2B and B2C customers from the same checkout session.
+
 = 2024.09.03    - version 2.13.0 =
 * Feature       - Added the ['kco_customer_type_changed'](https://docs.krokedil.com/klarna-checkout-for-woocommerce/customization/hooks-action-filter/#customer-type-changed) action hook that is triggered whenever the customer switches between organization and person in the checkout.
 * Tweak         - The view should no longer scroll up before the customer is redirected to the confirmation page unless an error notice has to be shown.

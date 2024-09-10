@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2024-09-03 08:35+0000\n"
+"POT-Creation-Date: 2024-09-10 08:35+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -272,7 +272,7 @@ msgid "B2B & B2C (defaults to B2B)"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:249
-msgid "Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO and FI). You need to contact Klarna directly to activate this with your account."
+msgid "Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO, FI and DE). You need to contact Klarna directly to activate this with your account."
 msgstr ""
 
 #: ../classes/class-kco-fields.php:254
@@ -528,16 +528,16 @@ msgstr ""
 msgid "Klarna order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Klarna before processing."
 msgstr ""
 
-#: ../includes/kco-functions.php:696
+#: ../includes/kco-functions.php:701
 msgid "A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order in the Klarna merchant portal before processing."
 msgstr ""
 
 #. translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
-#: ../includes/kco-functions.php:715
+#: ../includes/kco-functions.php:747
 msgid "The product \"%1$s\" has a quantity mismatch. Expected %2$d found %3$d."
 msgstr ""
 
-#: ../includes/kco-functions.php:727
+#: ../includes/kco-functions.php:756
 msgid "The product \"%s\" was not found in the Klarna order."
 msgstr ""
 

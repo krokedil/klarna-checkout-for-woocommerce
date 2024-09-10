@@ -119,7 +119,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'address_1'  => 'street_address',
 				'address_2'  => 'street_address2',
 				'city'       => 'city',
-				'state'      => 'region',
+				// 'state'      => 'region',
 				'postcode'   => 'postal_code',
 				'country'    => 'country',
 			);

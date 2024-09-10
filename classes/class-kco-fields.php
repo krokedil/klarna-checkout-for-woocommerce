@@ -246,7 +246,7 @@ class KCO_Fields {
 					'B2CB' => __( 'B2C & B2B (defaults to B2C)', 'klarna-checkout-for-woocommerce' ),
 					'B2BC' => __( 'B2B & B2C (defaults to B2B)', 'klarna-checkout-for-woocommerce' ),
 				),
-				'description' => __( 'Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO and FI). You need to contact Klarna directly to activate this with your account.', 'klarna-checkout-for-woocommerce' ),
+				'description' => __( 'Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO, FI and DE). You need to contact Klarna directly to activate this with your account.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'B2C',
 				'desc_tip'    => false,
 			),
