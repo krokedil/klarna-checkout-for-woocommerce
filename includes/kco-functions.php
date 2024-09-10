@@ -689,6 +689,11 @@ function kco_validate_order_total( $klarna_order, $order ) {
  * @return bool
  */
 function kco_validate_order_content( $klarna_order, $order ) {
+	// Skip if WooCommerce Product Bundles plugin is installed.
+	if ( kco_is_bundle_plugin_installed() ) {
+		return true;
+	}
+
 	$order_data = new KCO_Request_Order();
 	$prefix     = "Klarna order ID: {$klarna_order['order_id']} | WC Order ID: {$order->get_order_number()}:";
 
@@ -919,4 +924,17 @@ function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
 	}
 
 	return $order;
+}
+
+/**
+ * Returns true if the WooCommerce Product Bundles plugin is installed.
+ *
+ * @return bool
+ */
+function kco_is_bundle_plugin_installed() {
+	if ( class_exists( 'WC_Product_Bundle' ) ) {
+		return true;
+	}
+
+	return false;
 }
