@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 6.6
+Tested up to: 6.6.1
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 9.0.2
+WC tested up to: 9.2.3
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,21 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2024.09.11    - version 2.13.2 =
+* Fix           - Fixed an undefined array key warning.
+
+= 2024.09.10    - version 2.13.1 =
+* Fix           - Fixed compatibility with the "Product Bundles for WooCommerce" plugin.
+* Fix           - Fixed an issue where a quantity mismatch would occur when the product SKU is reused.
+* Fix           - Fixed an issue where checkout validation would fail due to different mapping of the "State" field between Woo and Klarna.
+* Tweak         - Added Germany (DE) to the list of countries that allow sale to B2B and B2C customers from the same checkout session.
+
+= 2024.09.03    - version 2.13.0 =
+* Feature       - Added the ['kco_customer_type_changed'](https://docs.krokedil.com/klarna-checkout-for-woocommerce/customization/hooks-action-filter/#customer-type-changed) action hook that is triggered whenever the customer switches between organization and person in the checkout.
+* Tweak         - The view should no longer scroll up before the customer is redirected to the confirmation page unless an error notice has to be shown.
+* Tweak         – You can now overwrite the recurring payment token from the admin Subscription page.
+* Fix           - Fixed an issue where updating the payment method on a Klarna subscription would cause the renewal to fail.
+
 = 2024.07.22    - version 2.12.9 =
 * Tweak         - Adjusted the order comparison verification between Klarna and WooCommerce.
 

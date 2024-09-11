@@ -689,6 +689,11 @@ function kco_validate_order_total( $klarna_order, $order ) {
  * @return bool
  */
 function kco_validate_order_content( $klarna_order, $order ) {
+	// Skip if WooCommerce Product Bundles plugin is installed.
+	if ( kco_is_bundle_plugin_installed() ) {
+		return true;
+	}
+
 	$order_data = new KCO_Request_Order();
 	$prefix     = "Klarna order ID: {$klarna_order['order_id']} | WC Order ID: {$order->get_order_number()}:";
 
@@ -696,28 +701,57 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	$notes = array( __( 'A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order in the Klarna merchant portal before processing.', 'klarna-checkout-for-woocommerce' ) );
 
 	// A match happens when the item reference and quantity matches in Woo and Klarna.
-	$mismatch = false;
-	foreach ( $order->get_items() as $order_item ) {
+	$mismatch           = false;
+	$items              = $order->get_items();
+	$klarna_order_items = $klarna_order['order_lines'];
+
+	// Stack items with same reference.
+	$klarna_stack = array();
+	foreach ( $klarna_order_items as $klarna_order_item ) {
+		$type = $klarna_order_item['type'];
+		if ( in_array( $type, array( 'discount', 'shipping_fee', 'sales_tax', 'gift_card', 'store_credit', 'surcharge' ), true ) ) {
+			continue;
+		}
+
+		$reference = $klarna_order_item['reference'];
+		if ( isset( $klarna_stack[ $reference ] ) ) {
+			$klarna_stack[ $reference ]['quantity'] += $klarna_order_item['quantity'];
+		} else {
+			$klarna_stack[ $reference ] = array(
+				'quantity' => $klarna_order_item['quantity'],
+				'name'     => $klarna_order_item['name'],
+			);
+		}
+	}
+
+	$woo_stack = array();
+	foreach ( $items as $order_item ) {
 		$order_line = $order_data->get_order_line_items( $order_item );
+		$reference  = $order_line['reference'];
+
+		if ( isset( $woo_stack[ $reference ] ) ) {
+			$woo_stack[ $reference ] += $order_line['quantity'];
+		} else {
+			$woo_stack[ $reference ] = $order_line['quantity'];
+		}
+	}
+
+	foreach ( $woo_stack as $reference => $quantity ) {
 		if ( $mismatch ) {
 			break;
 		}
 
-		$match     = false;
-		$name      = $order_line['name'];
-		$reference = $order_line['reference'];
-		foreach ( $klarna_order['order_lines'] as $klarna_order_item ) {
-			$match = false;
-			if ( $reference === $klarna_order_item['reference'] ) {
-				$match = true;
-				if ( strval( $klarna_order_item['quantity'] ) !== strval( $order_line['quantity'] ) ) {
-					// translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
-					$notes[] = sprintf( __( 'The product "%1$s" has a quantity mismatch. Expected %2$d found %3$d.', 'klarna-checkout-for-woocommerce' ), $name, $klarna_order_item['quantity'], $order_line['quantity'] );
-					KCO_Logger::log( "$prefix WC order item reference: $reference ($name) has {$order_line['quantity']} expected {$klarna_order_item['quantity']}." );
-					$mismatch = true;
-				}
+		$match       = false;
+		$klarna_item = $klarna_stack[ $reference ] ?? false;
+		if ( $klarna_item ) {
+			$match = true;
+			$name  = $klarna_item['name'];
 
-				break;
+			if ( $quantity !== $klarna_item['quantity'] ) {
+				// translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
+				$notes[] = sprintf( __( 'The product "%1$s" has a quantity mismatch. Expected %2$d found %3$d.', 'klarna-checkout-for-woocommerce' ), $name, $klarna_item['quantity'], $quantity );
+				KCO_Logger::log( "$prefix WC order item reference: $reference ($name) has {$quantity} expected {$klarna_item['quantity']}." );
+				$mismatch = true;
 			}
 		}
 
@@ -919,4 +953,17 @@ function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
 	}
 
 	return $order;
+}
+
+/**
+ * Returns true if the WooCommerce Product Bundles plugin is installed.
+ *
+ * @return bool
+ */
+function kco_is_bundle_plugin_installed() {
+	if ( class_exists( 'WC_Product_Bundle' ) ) {
+		return true;
+	}
+
+	return false;
 }
