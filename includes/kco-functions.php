@@ -726,9 +726,14 @@ function kco_validate_order_content( $klarna_order, $order ) {
 
 	$woo_stack = array();
 	foreach ( $items as $order_item ) {
-		$order_line               = $order_data->get_order_line_items( $order_item );
-		$reference                = $order_line['reference'];
-		$woo_stack[ $reference ] += $order_line['quantity'];
+		$order_line = $order_data->get_order_line_items( $order_item );
+		$reference  = $order_line['reference'];
+
+		if ( isset( $woo_stack[ $reference ] ) ) {
+			$woo_stack[ $reference ] += $order_line['quantity'];
+		} else {
+			$woo_stack[ $reference ] = $order_line['quantity'];
+		}
 	}
 
 	foreach ( $woo_stack as $reference => $quantity ) {
