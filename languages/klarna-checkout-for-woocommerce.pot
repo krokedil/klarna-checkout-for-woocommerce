@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2024-09-10 08:35+0000\n"
+"POT-Creation-Date: 2024-09-11 12:45+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -533,11 +533,11 @@ msgid "A mismatch between the WooCommerce and Klarna orders was identified. Plea
 msgstr ""
 
 #. translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
-#: ../includes/kco-functions.php:747
+#: ../includes/kco-functions.php:752
 msgid "The product \"%1$s\" has a quantity mismatch. Expected %2$d found %3$d."
 msgstr ""
 
-#: ../includes/kco-functions.php:756
+#: ../includes/kco-functions.php:761
 msgid "The product \"%s\" was not found in the Klarna order."
 msgstr ""
 
