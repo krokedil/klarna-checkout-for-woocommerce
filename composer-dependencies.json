@@ -8,6 +8,17 @@
             "url": "git@github.com:krokedil/klarna-onsite-messaging.git"
         }
     ],
+    "config": {
+        "platform": {
+            "php": "7.4"
+        },
+        "allow-plugins": {
+            "wpify/scoper": true
+        },
+        "scripts": {
+            "wpify-scoper": "wpify-scoper"
+        }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }

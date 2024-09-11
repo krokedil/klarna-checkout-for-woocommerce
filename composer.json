@@ -6,11 +6,14 @@
     "config": {
         "allow-plugins": {
             "wpify/scoper": true
+        },
+        "platform": {
+            "php": "7.4"
         }
     },
     "extra": {
         "wpify-scoper": {
-            "prefix": "KCO",
+            "prefix": "KrokedilKCODeps",
             "folder": "dependencies",
             "autorun": true,
             "globals": [

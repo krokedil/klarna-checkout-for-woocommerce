@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use KCO\Krokedil\KlarnaOnsiteMessaging\KlarnaOnsiteMessaging;
+use KrokedilKCODeps\Krokedil\KlarnaOnsiteMessaging\KlarnaOnsiteMessaging;
 
 /**
  * Required minimums and constants
@@ -293,6 +293,7 @@ if ( ! class_exists( 'KCO' ) ) {
 
 			$autoloader_result = require $autoloader;
 			if ( ! $autoloader_result ) {
+				self::missing_autoloader();
 				return false;
 			}
 

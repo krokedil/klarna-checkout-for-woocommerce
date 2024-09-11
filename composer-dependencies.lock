@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "11d39ec56e6d97213a5d4b294242cbaf",
+    "content-hash": "d8005cfc348a7e59d79e0794919d4917",
     "packages": [
         {
             "name": "krokedil/klarna-onsite-messaging",
-            "version": "1.0.2",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/krokedil/klarna-onsite-messaging.git",
-                "reference": "5f4f168d13a026f6b0da1671bcb370d6df89d7d7"
+                "reference": "c864c0eb2a7fd8ccd57f7fa845219bcf72a88a2c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/krokedil/klarna-onsite-messaging/zipball/5f4f168d13a026f6b0da1671bcb370d6df89d7d7",
-                "reference": "5f4f168d13a026f6b0da1671bcb370d6df89d7d7",
+                "url": "https://api.github.com/repos/krokedil/klarna-onsite-messaging/zipball/c864c0eb2a7fd8ccd57f7fa845219bcf72a88a2c",
+                "reference": "c864c0eb2a7fd8ccd57f7fa845219bcf72a88a2c",
                 "shasum": ""
             },
             "require": {
@@ -72,10 +72,10 @@
             ],
             "description": "Klarna On-Site Messaging for WooCommerce",
             "support": {
-                "source": "https://github.com/krokedil/klarna-onsite-messaging/tree/1.0.2",
+                "source": "https://github.com/krokedil/klarna-onsite-messaging/tree/1.2.0",
                 "issues": "https://github.com/krokedil/klarna-onsite-messaging/issues"
             },
-            "time": "2024-05-13T08:40:49+00:00"
+            "time": "2024-09-11T09:30:15+00:00"
         }
     ],
     "packages-dev": [],
@@ -86,5 +86,8 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
+    "platform-overrides": {
+        "php": "7.4"
+    },
     "plugin-api-version": "2.6.0"
 }
