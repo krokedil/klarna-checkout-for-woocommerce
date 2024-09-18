@@ -32,6 +32,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use KrokedilKCODeps\Krokedil\KlarnaOnsiteMessaging\KlarnaOnsiteMessaging;
+
 /**
  * Required minimums and constants
  */
@@ -146,8 +148,16 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * Init the plugin after plugins_loaded so environment variables are set.
 		 */
 		public function init() {
+			if ( ! $this->init_composer() ) {
+				return;
+			}
+
 			// Init the gateway itself.
 			$this->init_gateways();
+
+			$settings = get_option( 'woocommerce_kco_settings', array() );
+			$kosm     = new KlarnaOnsiteMessaging( $settings );
+			add_filter( 'kco_wc_gateway_settings', array( $kosm->settings(), 'extend_settings' ) );
 
 			// Declare HPOS compatibility.
 			add_action(
@@ -266,6 +276,53 @@ if ( ! class_exists( 'KCO' ) ) {
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
 			add_action( 'before_woocommerce_init', array( $this, 'declare_wc_compatibility' ) );
+		}
+
+				/**
+				 * Initialize composers autoloader.
+				 *
+				 * @return bool|mixed
+				 */
+		public function init_composer() {
+			$autoloader = KCO_WC_PLUGIN_PATH . '/dependencies/autoload.php';
+
+			if ( ! is_readable( $autoloader ) ) {
+				self::missing_autoloader();
+				return false;
+			}
+
+			$autoloader_result = require $autoloader;
+			if ( ! $autoloader_result ) {
+				self::missing_autoloader();
+				return false;
+			}
+
+			return $autoloader_result;
+		}
+
+		/**
+		 * Checks if the autoloader is missing and displays an admin notice.
+		 *
+		 * @return void
+		 */
+		protected static function missing_autoloader() {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( // phpcs:ignore
+					esc_html__( 'Your installation of Klarna Checkout is not complete. If you installed this plugin directly from Github please refer to the README.DEV.md file in the plugin.', 'klarna-checkout-for-woocommerce' )
+				);
+			}
+			add_action(
+				'admin_notices',
+				function () {
+					?>
+					<div class="notice notice-error">
+						<p>
+							<?php echo esc_html__( 'Your installation of Klarna Checkout is not complete. If you installed this plugin directly from Github please refer to the README.DEV.md file in the plugin.', 'klarna-checkout-for-woocommerce' ); ?>
+						</p>
+					</div>
+					<?php
+				}
+			);
 		}
 
 		/**
