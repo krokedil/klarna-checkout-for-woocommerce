@@ -748,7 +748,7 @@ function kco_validate_order_content( $klarna_order, $order ) {
 			$match = true;
 			$name  = $klarna_item['name'];
 
-			if ( $quantity !== $klarna_item['quantity'] ) {
+			if ( strval( $quantity ) !== strval( $klarna_item['quantity'] ) ) {
 				// translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
 				$notes[] = sprintf( __( 'The product "%1$s" has a quantity mismatch. Expected %2$d found %3$d.', 'klarna-checkout-for-woocommerce' ), $name, $klarna_item['quantity'], $quantity );
 				KCO_Logger::log( "$prefix WC order item reference: $reference ($name) has {$quantity} expected {$klarna_item['quantity']}." );
