@@ -56,6 +56,7 @@ For help setting up and configuring Klarna Checkout for WooCommerce please refer
 == Changelog ==
 = 2024.09.23    - version 2.13.3 =
 * Tweak         - Adjusted the order comparison verification between Klarna and WooCommerce.
+* Fix           - Addressed Woo Quality Insights issues and recommendations.
 
 = 2024.09.11    - version 2.13.2 =
 * Fix           - Fixed an undefined array key warning.
