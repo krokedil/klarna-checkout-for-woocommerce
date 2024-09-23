@@ -2,7 +2,8 @@
 /node_modules
 /yarn.lock
 # wp-scopify dependencies
-/dependencies
+dependencies/*
+!dependencies/.gitkeep
 /vendor
 
 SyncToy_f76a6219-f902-4b34-8524-b4fd7b7279a4.dat
