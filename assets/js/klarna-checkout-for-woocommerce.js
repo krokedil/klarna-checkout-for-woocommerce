@@ -90,9 +90,11 @@ jQuery( function ( $ ) {
 		 * Unblock the checkout form and order review.
 		 */
 		unblock: function () {
+			kco_wc.kcoSuspend();
 			kco_wc.checkoutFormSelector.removeClass( "processing" )
 			$( ".woocommerce-checkout-review-order-table" ).unblock()
 			$( kco_wc.checkoutFormSelector ).unblock()
+			kco_wc.kcoResume();
 		},
 
 		/**
