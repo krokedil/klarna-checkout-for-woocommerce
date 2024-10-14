@@ -19,3 +19,10 @@ readme.dev.txt
 phpcs.ruleset.xml
 phpunit-docker.xml
 phpunit.xml
+composer-dependencies.json
+composer-dependencies.lock
+composer.json
+composer.lock
+/vendor
+/tmp*
+scoper.custom.php
