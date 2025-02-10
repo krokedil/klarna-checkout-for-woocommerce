@@ -54,6 +54,9 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.02.10    - version 2.13.4 =
+* Fix           - Added a refresh of the iframe as a checkout error is detected.
+
 = 2024.09.23    - version 2.13.3 =
 * Tweak         - Adjusted the order comparison verification between Klarna and WooCommerce.
 * Fix           - Addressed Woo Quality Insights issues and recommendations.
