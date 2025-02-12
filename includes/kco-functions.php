@@ -97,6 +97,7 @@ function kco_wc_show_snippet( $pay_for_order = false ) {
 
 	if ( isset( $klarna_order['html_snippet'] ) ) {
 		do_action( 'kco_wc_show_snippet', $klarna_order );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- We trust the HTML snippet.
 		echo kco_extract_script( $klarna_order['html_snippet'] );
 	}
 }
@@ -244,7 +245,7 @@ function kco_wc_prefill_consent() {
 		} else {
 			$button_text = 'Meine Adressdaten vorausfüllen';
 			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
-			$popup_text  = 'We use Klarna Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Klarna AB, enabling the provision of Klarna Checkout. These User Terms apply for the use of Klarna Checkout is available here: 
+			$popup_text  = 'We use Klarna Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Klarna AB, enabling the provision of Klarna Checkout. These User Terms apply for the use of Klarna Checkout is available here:
 			<a target="_blank" href="https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/en_us/checkout">https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/en_us/checkout</a>';
 		}
 		?>
@@ -589,6 +590,10 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 		if ( ! is_wp_error( $klarna_order ) ) {
+			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
+				return;
+			}
+
 			kco_maybe_save_surcharge( $order_id, $klarna_order );
 			kco_maybe_save_org_nr( $order_id, $klarna_order );
 			kco_maybe_save_reference( $order_id, $klarna_order );
@@ -630,6 +635,147 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 			KCO_Logger::log( $klarna_order_id . ': No order found in order management. Waiting for push verification. Order #' . $order->get_order_number() . ' set to on-hold.' );
 		}
 	}
+}
+
+/**
+ * Validate the Klarna Checkout order total against the WooCommerce order.
+ *
+ * @param array    $klarna_order The Klarna order.
+ * @param WC_Order $order The WooCommerce order.
+ *
+ * @return bool
+ */
+function kco_validate_order_total( $klarna_order, $order ) {
+	// Get the Klarna order total.
+	$klarna_order_total = $klarna_order['order_amount'];
+
+	// Get the WooCommerce order total.
+	$order_total = $order->get_total();
+
+	// Convert the WC Order total to be in minor units with zero decimal places.
+	$order_total = wc_format_decimal( $order_total * 100, array( 'decimals' => 0 ) );
+
+	// Get the difference between the two.
+	$diff = abs( $klarna_order_total - $order_total );
+
+	// If the difference is greater than 1, then log the error and return false.
+	if ( $diff > 1 ) {
+		KCO_Logger::log( 'Order total mismatch. Klarna Order total: ' . $klarna_order_total . ' WC Order total: ' . $order_total . ' Klarna order ID: ' . $klarna_order['order_id'] . ' WC Order ID: ' . $order->get_id() );
+
+		$klarna_order_total = wc_format_decimal( $klarna_order_total / 100, array( 'decimals' => 2 ) );
+		$order_total        = wc_format_decimal( $order_total / 100, array( 'decimals' => 2 ) );
+
+		// translators: 1: Klarna order total, 2: WooCommerce order total.
+		$order->set_status(
+			'on-hold',
+			sprintf(
+				__( 'Klarna order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Klarna before processing.', 'klarna-checkout-for-woocommerce' ),
+				$klarna_order_total,
+				$order_total
+			)
+		);
+		$order->save();
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Validate that the Woo order matches the corresponding Klarna order.
+ *
+ * @param array    $klarna_order The Klarna order.
+ * @param WC_Order $order The Woo order.
+ *
+ * @return bool
+ */
+function kco_validate_order_content( $klarna_order, $order ) {
+	// Skip if WooCommerce Product Bundles plugin is installed.
+	if ( kco_is_bundle_plugin_installed() ) {
+		return true;
+	}
+
+	$order_data = new KCO_Request_Order();
+	$prefix     = "Klarna order ID: {$klarna_order['order_id']} | WC Order ID: {$order->get_order_number()}:";
+
+	// An array of notes to display to the merchant.
+	$notes = array( __( 'A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order in the Klarna merchant portal before processing.', 'klarna-checkout-for-woocommerce' ) );
+
+	// A match happens when the item reference and quantity matches in Woo and Klarna.
+	$mismatch           = false;
+	$items              = $order->get_items();
+	$klarna_order_items = $klarna_order['order_lines'];
+
+	// Stack items with same reference.
+	$klarna_stack = array();
+	foreach ( $klarna_order_items as $klarna_order_item ) {
+		$type = $klarna_order_item['type'];
+		if ( in_array( $type, array( 'discount', 'shipping_fee', 'sales_tax', 'gift_card', 'store_credit', 'surcharge' ), true ) ) {
+			continue;
+		}
+
+		$reference = $klarna_order_item['reference'];
+		if ( isset( $klarna_stack[ $reference ] ) ) {
+			$klarna_stack[ $reference ]['quantity'] += $klarna_order_item['quantity'];
+		} else {
+			$klarna_stack[ $reference ] = array(
+				'quantity' => $klarna_order_item['quantity'],
+				'name'     => $klarna_order_item['name'],
+			);
+		}
+	}
+
+	$woo_stack = array();
+	foreach ( $items as $order_item ) {
+		$order_line = $order_data->get_order_line_items( $order_item );
+		$reference  = $order_line['reference'];
+
+		if ( isset( $woo_stack[ $reference ] ) ) {
+			$woo_stack[ $reference ] += $order_line['quantity'];
+		} else {
+			$woo_stack[ $reference ] = $order_line['quantity'];
+		}
+	}
+
+	foreach ( $woo_stack as $reference => $quantity ) {
+		if ( $mismatch ) {
+			break;
+		}
+
+		$match       = false;
+		$klarna_item = $klarna_stack[ $reference ] ?? false;
+		if ( $klarna_item ) {
+			$match = true;
+			$name  = $klarna_item['name'];
+
+			if ( strval( $quantity ) !== strval( $klarna_item['quantity'] ) ) {
+				// translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
+				$notes[] = sprintf( __( 'The product "%1$s" has a quantity mismatch. Expected %2$d found %3$d.', 'klarna-checkout-for-woocommerce' ), $name, $klarna_item['quantity'], $quantity );
+				KCO_Logger::log( "$prefix WC order item reference: $reference ($name) has {$quantity} expected {$klarna_item['quantity']}." );
+				$mismatch = true;
+			}
+		}
+
+		// Check if the Woo item was not found in the Klarna order.
+		if ( ! $match ) {
+			KCO_Logger::log( "$prefix WC order item reference: $reference ($name) was not found in the Klarna order." );
+			$notes[]  = sprintf( __( 'The product "%s" was not found in the Klarna order.', 'klarna-checkout-for-woocommerce' ), $name );
+			$mismatch = true;
+		}
+	}
+
+	if ( $mismatch ) {
+		KCO_Logger::log( "$prefix The Klarna and Woo orders do not match." );
+
+		$order->set_status(
+			'on-hold',
+			implode( ' ', $notes )
+		);
+		$order->save();
+		return false;
+	}
+
+	return true;
 }
 
 /**
@@ -770,7 +916,8 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 
 /**
  * Returns the WooCommerce order that has a matching Klarna order id saved as a meta field. If no order is found, returns false, and if many orders are found the newest one is returned.
- * @param string $klarna_order_id
+ *
+ * @param string      $klarna_order_id
  * @param string|null $date_after
  * @return WC_Order|false
  */
@@ -807,4 +954,17 @@ function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
 	}
 
 	return $order;
+}
+
+/**
+ * Returns true if the WooCommerce Product Bundles plugin is installed.
+ *
+ * @return bool
+ */
+function kco_is_bundle_plugin_installed() {
+	if ( class_exists( 'WC_Product_Bundle' ) ) {
+		return true;
+	}
+
+	return false;
 }

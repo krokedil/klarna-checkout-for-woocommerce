@@ -86,6 +86,98 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 3 );
 			add_filter( 'kco_wc_api_request_args', array( $this, 'maybe_remove_kco_epm' ), 9999 );
+
+			// Prevent the Woo validation from proceeding if there is a discrepancy between Woo and Klarna.
+			add_action( 'woocommerce_after_checkout_validation', array( $this, 'validate_checkout' ), 10, 2 );
+		}
+
+		/**
+		 * Validate the data of the checkout fields matches the Klarna order.
+		 *
+		 * @param array    $data An array of posted data.
+		 * @param WP_Error $errors Validation errors.
+		 * @return void
+		 */
+		public function validate_checkout( $data, $errors ) {
+			if ( 'kco' !== WC()->session->get( 'chosen_payment_method' ) ) {
+				return;
+			}
+
+			$klarna_order_id = WC()->session->get( 'kco_wc_order_id', 'missing' );
+			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+			if ( is_wp_error( $klarna_order ) ) {
+				KCO_Logger::log( "[CHECKOUT VALIDATION]: Error getting Klarna order: {$klarna_order->get_error_message()}. For Klarna order ID: '$klarna_order_id'. Will not proceed with order." );
+				$errors->add( 'klarna_order', __( 'The Klarna order could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );
+				return;
+			}
+
+			// Mapping of the Woo/Klarna address fields.
+			$address_fields_key = array(
+				'first_name' => 'given_name',
+				'last_name'  => 'family_name',
+				'company'    => 'organization_name',
+				'address_1'  => 'street_address',
+				'address_2'  => 'street_address2',
+				'city'       => 'city',
+				// 'state'      => 'region',
+				'postcode'   => 'postal_code',
+				'country'    => 'country',
+			);
+
+			$billing_address = array_filter(
+				$data,
+				function ( $field ) use ( $address_fields_key ) {
+					return strpos( $field, 'billing_' ) === 0 && in_array( substr( $field, strlen( 'billing_' ) ), array_keys( $address_fields_key ), true );
+				},
+				ARRAY_FILTER_USE_KEY
+			);
+
+			$shipping_address = array_filter(
+				$data,
+				function ( $field ) use ( $address_fields_key ) {
+					return strpos( $field, 'shipping_' ) === 0 && in_array( substr( $field, strlen( 'shipping_' ) ), array_keys( $address_fields_key ), true );
+				},
+				ARRAY_FILTER_USE_KEY
+			);
+
+			$ship_to_different_address = $data['ship_to_different_address'];
+			foreach ( $address_fields_key as $wc_name => $klarna_name ) {
+				$billing_field  = 'billing_' . $wc_name;
+				$shipping_field = 'shipping_' . $wc_name;
+
+				if ( 'country' === $wc_name ) {
+					$base_location = wc_get_base_location();
+					$country       = $base_location['country'];
+
+					if ( ! isset( $billing_address[ $billing_field ] ) ) {
+						$billing_address[ $billing_field ] = $country;
+					}
+
+					if ( ! isset( $shipping_address[ $shipping_field ] ) ) {
+						$shipping_address[ $shipping_field ] = $country;
+					}
+				}
+
+				if ( isset( $klarna_order['billing_address'][ $klarna_name ] ) ) {
+					// Remove all whitespace and convert to lowercase.
+					$billing_address[ $billing_field ]               = strtolower( preg_replace( '/\s+/', '', $billing_address[ $billing_field ] ) );
+					$klarna_order['billing_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['billing_address'][ $klarna_name ] ) );
+
+					if ( $billing_address[ $billing_field ] !== ( $klarna_order['billing_address'][ $klarna_name ] ?? '' ) ) {
+						$errors->add( $billing_field, __( 'Billing ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
+					}
+				}
+
+				if ( $ship_to_different_address ) {
+					// Remove all whitespace and convert to lowercase.
+					$shipping_address[ $shipping_field ]              = strtolower( preg_replace( '/\s+/', '', $shipping_address[ $shipping_field ] ) );
+					$klarna_order['shipping_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) );
+
+					if ( $shipping_address[ $shipping_field ] !== ( $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) ) {
+						$errors->add( $shipping_field, __( 'Shipping ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
+					}
+				}
+			}
 		}
 
 
@@ -139,7 +231,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// 1. Save Klarna data to the pending order.
 			// 2. Approve process payment sequence to customer can continue/complete payment.
 			return $this->process_embedded_payment_handler( $order_id );
-
 		}
 
 		/**
@@ -271,30 +362,32 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			$standard_woo_checkout_fields = apply_filters( 'kco_ignored_checkout_fields', array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'terms', 'terms-field', '_wp_http_referer', 'ship_to_different_address' ) );
 			$checkout_localize_params     = array(
-				'update_cart_url'              => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
-				'update_cart_nonce'            => wp_create_nonce( 'kco_wc_update_cart' ),
-				'update_shipping_url'          => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
-				'update_shipping_nonce'        => wp_create_nonce( 'kco_wc_update_shipping' ),
-				'change_payment_method_url'    => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
-				'change_payment_method_nonce'  => wp_create_nonce( 'kco_wc_change_payment_method' ),
-				'get_klarna_order_url'         => WC_AJAX::get_endpoint( 'kco_wc_get_klarna_order' ),
-				'get_klarna_order_nonce'       => wp_create_nonce( 'kco_wc_get_klarna_order' ),
-				'log_to_file_url'              => WC_AJAX::get_endpoint( 'kco_wc_log_js' ),
-				'log_to_file_nonce'            => wp_create_nonce( 'kco_wc_log_js' ),
-				'submit_order'                 => WC_AJAX::get_endpoint( 'checkout' ),
-				'logging'                      => $this->logging,
-				'standard_woo_checkout_fields' => $standard_woo_checkout_fields,
-				'is_confirmation_page'         => ( is_kco_confirmation() ) ? 'yes' : 'no',
-				'is_order_received_page'       => is_order_received_page() ? 'yes' : 'no',
-				'shipping_methods_in_iframe'   => $this->shipping_methods_in_iframe,
-				'required_fields_text'         => __( 'Please fill in all required checkout fields.', 'klarna-checkout-for-woocommerce' ),
-				'email_exists'                 => $email_exists,
-				'must_login_message'           => apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) ),
-				'timeout_message'              => __( 'Please try again, something went wrong with processing your order.', 'klarna-checkout-for-woocommerce' ),
-				'timeout_time'                 => apply_filters( 'kco_checkout_timeout_duration', 20 ),
-				'countries'                    => kco_get_country_codes(),
-				'pay_for_order'                => $pay_for_order,
-				'no_shipping_message'          => apply_filters( 'woocommerce_no_shipping_available_html', __( 'There are no shipping options available. Please ensure that your address has been entered correctly, or contact us if you need any help.', 'woocommerce' ) ),
+				'update_cart_url'                 => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
+				'update_cart_nonce'               => wp_create_nonce( 'kco_wc_update_cart' ),
+				'update_shipping_url'             => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
+				'update_shipping_nonce'           => wp_create_nonce( 'kco_wc_update_shipping' ),
+				'change_payment_method_url'       => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
+				'change_payment_method_nonce'     => wp_create_nonce( 'kco_wc_change_payment_method' ),
+				'get_klarna_order_url'            => WC_AJAX::get_endpoint( 'kco_wc_get_klarna_order' ),
+				'get_klarna_order_nonce'          => wp_create_nonce( 'kco_wc_get_klarna_order' ),
+				'log_to_file_url'                 => WC_AJAX::get_endpoint( 'kco_wc_log_js' ),
+				'log_to_file_nonce'               => wp_create_nonce( 'kco_wc_log_js' ),
+				'submit_order'                    => WC_AJAX::get_endpoint( 'checkout' ),
+				'customer_type_changed_url'       => WC_AJAX::get_endpoint( 'kco_customer_type_changed' ),
+				'logging'                         => $this->logging,
+				'standard_woo_checkout_fields'    => $standard_woo_checkout_fields,
+				'is_confirmation_page'            => ( is_kco_confirmation() ) ? 'yes' : 'no',
+				'is_order_received_page'          => is_order_received_page() ? 'yes' : 'no',
+				'shipping_methods_in_iframe'      => $this->shipping_methods_in_iframe,
+				'required_fields_text'            => __( 'Please fill in all required checkout fields.', 'klarna-checkout-for-woocommerce' ),
+				'email_exists'                    => $email_exists,
+				'must_login_message'              => apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) ),
+				'timeout_message'                 => __( 'Please try again, something went wrong with processing your order.', 'klarna-checkout-for-woocommerce' ),
+				'timeout_time'                    => apply_filters( 'kco_checkout_timeout_duration', 20 ),
+				'countries'                       => kco_get_country_codes(),
+				'pay_for_order'                   => $pay_for_order,
+				'no_shipping_message'             => apply_filters( 'woocommerce_no_shipping_available_html', __( 'There are no shipping options available. Please ensure that your address has been entered correctly, or contact us if you need any help.', 'woocommerce' ) ),
+				'woocommerce_ship_to_destination' => get_option( 'woocommerce_ship_to_destination' ),
 			);
 
 			if ( version_compare( WC_VERSION, '3.9', '>=' ) ) {
@@ -421,7 +514,12 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function process_embedded_payment_handler( $order_id ) {
 			// Get the Klarna order ID.
 			$order = wc_get_order( $order_id );
-			if ( ! empty( $order ) ) {
+
+			// For the initial subscription, the Klarna order ID should always exist in the session.
+			// This also applies to (pending) renewal subscription since existing Klarna order ID is no longer valid for the renewal, we must retrieve it from the session, not the order.
+			$is_subscription = function_exists( 'wcs_order_contains_subscription' ) && wcs_order_contains_subscription( $order, array( 'parent', 'resubscribe', 'switch', 'renewal' ) );
+
+			if ( ! empty( $order ) && ! $is_subscription ) {
 				$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
 			}
 			$klarna_order_id = ! empty( $klarna_order_id ) ? $klarna_order_id : WC()->session->get( 'kco_wc_order_id' );

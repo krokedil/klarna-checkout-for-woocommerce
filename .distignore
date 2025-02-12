@@ -4,6 +4,7 @@
 /node_modules
 /tests
 /languages/*-backup-*
+/vendor
 .editorconfig
 .distignore
 .gitignore

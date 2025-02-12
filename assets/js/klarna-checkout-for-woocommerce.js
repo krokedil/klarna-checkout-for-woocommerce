@@ -56,16 +56,21 @@ jQuery( function ( $ ) {
 					if ( "attributes" === mutation.type && "class" === mutation.attributeName ) {
 						if ( ! $( "html" ).hasClass( modalClassName ) ) {
 							if ( modalWasOpen ) {
-								// Wait for the Klarna modal to disappear before scrolling up to show error notices.
+								// Wait for the Klarna modal to disappear before checking if any errors are found.
 								const noticeClassName = kco_params.pay_for_order
 									? "div.woocommerce-notices-wrapper"
 									: "form.checkout"
-								$('html, body').not(':animated').animate(
-									{
-										scrollTop: $( noticeClassName ).offset().top - 100,
-									},
-									1000,
-								)
+								const notices = $( noticeClassName )
+
+								// Scroll to error notices if found.
+								if ( notices.length && notices.find( ".woocommerce-error" ).length ) {
+									$( "html, body" ).not(':animated').animate(
+										{
+											scrollTop: notices.offset().top - 100,
+										},
+										1000,
+									)
+								}
 
 								// Unlock the order review table and checkout form.
 								kco_wc.unblock()
@@ -85,9 +90,11 @@ jQuery( function ( $ ) {
 		 * Unblock the checkout form and order review.
 		 */
 		unblock: function () {
+			kco_wc.kcoSuspend();
 			kco_wc.checkoutFormSelector.removeClass( "processing" )
 			$( ".woocommerce-checkout-review-order-table" ).unblock()
 			$( kco_wc.checkoutFormSelector ).unblock()
+			kco_wc.kcoResume();
 		},
 
 		/**
@@ -436,10 +443,10 @@ jQuery( function ( $ ) {
 		 * @param {string} event
 		 */
 		failOrder: function ( event, error_message, callback ) {
-			callback( { should_proceed: false } )
+			callback( { should_proceed: false, message: $( error_message ).text().trim() } )
 			kco_wc.validation = false
 			var className = kco_params.pay_for_order ? "div.woocommerce-notices-wrapper" : "form.checkout"
-			// Update the checkout and renable the form.
+			// Update the checkout and re-enable the form.
 			$( "body" ).trigger( "update_checkout" )
 
 			// Print error messages, and trigger checkout_error, and scroll to notices.
@@ -470,11 +477,11 @@ jQuery( function ( $ ) {
 
 		/**
 		 * Logs messages to the console.
-		 * @param {string} message
+		 * @param {string} messages
 		 */
-		log: function ( message ) {
+		log: function ( ...messages ) {
 			if ( kco_params.logging ) {
-				console.log( message )
+				console.log( messages )
 			}
 		},
 
@@ -567,6 +574,7 @@ jQuery( function ( $ ) {
 			} )
 		},
 
+		update_checkout: $.Callbacks( "unique stopOnFalse" ),
 		/**
 		 * Initiates the script.
 		 */
@@ -585,40 +593,68 @@ jQuery( function ( $ ) {
 			kco_wc.bodyEl.on( "change", "input.qty", kco_wc.updateCart )
 			kco_wc.bodyEl.on( "change", 'input[name="payment_method"]', kco_wc.maybeChangeToKco )
 			kco_wc.bodyEl.on( "click", kco_wc.selectAnotherSelector, kco_wc.changeFromKco )
+			kco_wc.update_checkout.add( function () {
+				kco_wc.log( "fire update_checkout" )
+				$( "form.checkout" ).trigger( "update_checkout" )
+
+				// stopOnFalse ensure this callback won't be triggered more than once in a quick succession.
+				return false
+			} )
 
 			if ( "function" === typeof window._klarnaCheckout ) {
 				window._klarnaCheckout( function ( api ) {
 					api.on( {
 						shipping_address_change: function ( data ) {
-							kco_wc.log( "shipping_address_change" )
-							kco_wc.log( data )
+							// The shipping_address_change event is triggered when Checkout has detected a complete and valid shipping address for the customer. The shipping address will always be the same as billing address, unless a separate shipping address has been provided by the customer.
+							kco_wc.log( "shipping_address_change", data )
 
 							var country = kco_wc.convertCountry( data.country.toUpperCase() )
 
-							// Check if shipping address is enabled.
-							if ( $( "#shipping_first_name" ).length > 0 ) {
-								$( "#ship-to-different-address-checkbox" ).prop( "checked", true )
-								$( "#ship-to-different-address-checkbox" ).change()
-								$( "#ship-to-different-address-checkbox" ).blur()
-								$( "#shipping_first_name" ).val( "given_name" in data ? data.given_name : "" )
-								$( "#shipping_last_name" ).val( "family_name" in data ? data.family_name : "" )
-								$( "#shipping_postcode" ).val( "postal_code" in data ? data.postal_code : "" )
-								$( "#shipping_country" ).val( "country" in data ? country : "" )
-								$( "#shipping_country" ).change()
-							} else {
-								$( "#billing_first_name" ).val( "given_name" in data ? data.given_name : "" )
-								$( "#billing_last_name" ).val( "family_name" in data ? data.family_name : "" )
-								$( "#billing_postcode" ).val( "postal_code" in data ? data.postal_code : "" )
-								$( "#billing_country" ).val( "country" in data ? country : "" )
-								$( "#billing_email" ).val( "email" in data ? data.email : "" )
+							// 'billing' => Default to customer billing address
+							// 'shipping' => Default to customer shipping address
+							// 'billing_only' => Force shipping to the customer billing address only.
+							if ( "billing_only" === kco_params.woocommerce_ship_to_destination ) {
+								"given_name" in data && $( "#billing_first_name" ).val( data.given_name )
+								"family_name" in data && $( "#billing_last_name" ).val( data.family_name )
+								"postal_code" in data && $( "#billing_postcode" ).val( data.postal_code )
+								"country" in data && $( "#billing_country" ).val( country )
+								"email" in data && $( "#billing_email" ).val( data.email )
 								$( "#billing_country" ).change()
 								$( "#billing_email" ).change()
 								$( "#billing_email" ).blur()
-							}
 
-							$( "form.checkout" ).trigger( "update_checkout" )
+								kco_wc.update_checkout.fire()
+							} else {
+								$( "#ship-to-different-address-checkbox" ).prop( "checked", true )
+								$( "#ship-to-different-address-checkbox" ).change()
+								$( "#ship-to-different-address-checkbox" ).blur()
+								"given_name" in data && $( "#shipping_first_name" ).val( data.given_name )
+								"family_name" in data && $( "#shipping_last_name" ).val( data.family_name )
+								"postal_code" in data && $( "#shipping_postcode" ).val( data.postal_code )
+								"country" in data && $( "#shipping_country" ).val( country )
+								$( "#shipping_country" ).change()
+
+								$( "form.checkout" ).trigger( "update_checkout" )
+							}
+						},
+						billing_address_change: function ( data ) {
+							// The billing_address_change event is triggered when Checkout has detected a complete and valid billing address for the customer.
+							kco_wc.log( "billing_address_change", data )
+
+							var country = kco_wc.convertCountry( data.country.toUpperCase() )
+							"given_name" in data && $( "#billing_first_name" ).val( data.given_name )
+							"family_name" in data && $( "#billing_last_name" ).val( data.family_name )
+							"postal_code" in data && $( "#billing_postcode" ).val( data.postal_code )
+							"country" in data && $( "#billing_country" ).val( country )
+							"email" in data && $( "#billing_email" ).val( data.email )
+							$( "#billing_country" ).change()
+							$( "#billing_email" ).change()
+							$( "#billing_email" ).blur()
+
+							kco_wc.update_checkout.fire()
 						},
 						change: function ( data ) {
+							// The change event is triggered when the user changes postal code, country or email in their billing address. It is also triggered for given/family name except in the AT & DE markets.
 							kco_wc.log( "change", data )
 						},
 						order_total_change: function ( data ) {
@@ -640,6 +676,16 @@ jQuery( function ( $ ) {
 							} else {
 								kco_wc.placeKlarnaOrder( callback )
 							}
+						},
+						customer: function ( customer ) {
+							let customer_type = "person" === customer.type ? "b2c" : "b2b"
+							$.ajax( {
+								url: kco_params.customer_type_changed_url,
+								type: "POST",
+								data: {
+									customer_type,
+								},
+							} )
 						},
 					} )
 				} )
