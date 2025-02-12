@@ -64,7 +64,7 @@ jQuery( function ( $ ) {
 
 								// Scroll to error notices if found.
 								if ( notices.length && notices.find( ".woocommerce-error" ).length ) {
-									$( "html, body" ).animate(
+									$( "html, body" ).not(':animated').animate(
 										{
 											scrollTop: notices.offset().top - 100,
 										},
