@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 6.6.1
+Tested up to: 6.7.2
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 9.2.3
+WC tested up to: 9.7.1
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,9 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.03.14    - version 2.13.5 =
+* Fix           - Limit the max size of a log message from the frontend to 1000 to prevent large logs from being created.
+
 = 2025.02.10    - version 2.13.4 =
 * Fix           - Added a refresh of the iframe as a checkout error is detected.
 
