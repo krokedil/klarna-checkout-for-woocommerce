@@ -31,13 +31,15 @@ jQuery( function ( $ ) {
 		 * Triggers on document ready.
 		 */
 		documentReady: function () {
-			kco_wc.log( kco_params )
 			if ( 0 < kco_wc.paymentMethodEl.length ) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter( ":checked" ).val()
-			} else {
+			} else if( 0 < $('ul.wc_payment_methods').length ) {
 				kco_wc.paymentMethod = "kco"
+			} else {
+				return;
 			}
 
+			kco_wc.log( kco_params )
 			if ( "kco" === kco_wc.paymentMethod ) {
 				$( "#ship-to-different-address-checkbox" ).prop( "checked", true )
 			}
@@ -64,7 +66,7 @@ jQuery( function ( $ ) {
 
 								// Scroll to error notices if found.
 								if ( notices.length && notices.find( ".woocommerce-error" ).length ) {
-									$( "html, body" ).animate(
+									$( "html, body" ).not(':animated').animate(
 										{
 											scrollTop: notices.offset().top - 100,
 										},

@@ -54,6 +54,10 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.03.17    - version 2.13.6 =
+* Fix           - Fixed checkout scrollTo animations that were sometimes queued multiple times, potentially causing the checkout page to freeze - Thank you Oxyc for the fix!
+* Fix           - Fixed an issue where KCO-related JS was loaded even when no payment option was available at checkout.
+
 = 2025.03.14    - version 2.13.5 =
 * Fix           - Limit the max size of a log message from the frontend to 1000 to prevent large logs from being created.
 
