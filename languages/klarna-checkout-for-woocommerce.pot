@@ -1,4 +1,4 @@
-# Copyright (C) 2024 klarna-checkout-for-woocommerce
+# Copyright (C) 2025 klarna-checkout-for-woocommerce
 # This file is distributed under the same license as the klarna-checkout-for-woocommerce package.
 msgid ""
 msgstr ""
