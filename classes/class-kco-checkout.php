@@ -24,6 +24,7 @@ class KCO_Checkout {
 		// Handle potential shipping selection errors.
 		add_filter( 'woocommerce_shipping_chosen_method', array( __CLASS__, 'maybe_register_shipping_error' ), 9999, 3 );
 		add_action( 'woocommerce_shipping_method_chosen', array( __CLASS__, 'maybe_throw_shipping_error' ), 9999 );
+		add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 3 );
 	}
 
 	/**
@@ -196,5 +197,32 @@ class KCO_Checkout {
 
 		KCO_Logger::log( 'Checkout error - Printing shipping error message to the customer.' );
 		throw new Exception( __( 'The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again.', 'klarna-checkout-for-woocommerce' ) );
+	}
+
+	/**
+	 * Maybe change the needs payment for a WooCommerce order.
+	 *
+	 * @param bool     $wc_result The result WooCommerce had.
+	 * @param WC_Order $order The WooCommerce order.
+	 * @param array    $valid_order_statuses The valid order statuses.
+	 * @return bool
+	 */
+	public function maybe_change_needs_payment( $wc_result, $order, $valid_order_statuses ) {
+		// Only change for KCO orders.
+		if ( 'kco' !== $order->get_payment_method() ) {
+			return $wc_result;
+		}
+
+		// If we're not on the order-pay page, we don't need to change anything.
+		if ( ! is_wc_endpoint_url( 'order-pay' ) ) {
+			return $wc_result;
+		}
+
+		// Only if our filter is active and is set to false.
+		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
+			return $wc_result;
+		}
+
+		return true;
 	}
 } new KCO_Checkout();
