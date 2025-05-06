@@ -3,10 +3,10 @@ Contributors: klarna, krokedil, automattic
 Tags: woocommerce, klarna, ecommerce, e-commerce, checkout
 Donate link: https://klarna.com
 Requires at least: 4.0
-Tested up to: 6.7.2
+Tested up to: 6.8.1
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 9.7.1
+WC tested up to: 9.8.3
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,9 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.05.06    - version 2.13.8 =
+* Fix           - Fixed an issue where a 'Pay for Order' button sometimes appeared on the order received page even after payment was completed.
+
 = 2025.04.08    - version 2.13.7 =
 * Fix           - Fixed a settings related issue, that in certain cases could cause a critical error on fresh plugin installs.
 
