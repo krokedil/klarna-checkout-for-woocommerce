@@ -589,16 +589,9 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		return;
 	}
 
-	// A KCO order containing only free trial subscription(s) cannot be retrieved from OM, and thus acknowledged/confirmed. However, a customer token is created for the order, which is used to renew the subscription.
-	$free_trial_subscription = KCO_Subscription::is_free_trial_only_order( $order );
-	if ( $free_trial_subscription ) {
-		// translators: Klarna order ID.
-		$order->add_order_note( sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
-		$order->add_order_note( __( 'Customer token created. Free trial subscriptions do not exists in the merchant portal, but are associated with a customer token to allow renewing.', 'klarna-checkout-for-woocommerce' ) );
-		$order->payment_complete( $klarna_order_id );
-
-		KCO_Logger::log( "[CONFIRM]: Klarna order ID: $klarna_order_id, Order ID/number: {$order_id}/{$order->get_order_number()}, Free trial subscription order." );
-
+	$abort = apply_filters( 'kco_abort_confirm_order', false, $order, $klarna_order_id );
+	if ( $abort ) {
+		KCO_Logger::log( "[CONFIRM]: Klarna order ID: $klarna_order_id, Order ID/number: {$order_id}/{$order->get_order_number()} Order confirmation aborted." );
 		return;
 	}
 
