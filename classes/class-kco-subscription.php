@@ -528,6 +528,31 @@ class KCO_Subscription {
 		$hosts[] = 'pay.klarna.com';
 		return $hosts;
 	}
+
+	/**
+	 * Checks if a WC_Order only contains a free trial subscription.
+	 *
+	 * This function iterates through the order items and checks if all of the associated
+	 * products have a trial period defined in WooCommerce Subscriptions.
+	 *
+	 * @param WC_Order $order The WooCommerce order object to check.
+	 * @return bool True if the order contains only one free trial subscription product(s), false otherwise.
+	 */
+	public static function is_free_trial_only_order( $order ) {
+		if ( ! class_exists( 'WC_Subscriptions_Product' ) ) {
+			return false;
+		}
+
+		foreach ( $order->get_items() as $item ) {
+			$product = $item->get_product();
+
+			if ( ! $product || WC_Subscriptions_Product::get_trial_length( $product ) <= 0 ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }
 new KCO_Subscription();
 
