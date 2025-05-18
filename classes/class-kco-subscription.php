@@ -580,8 +580,16 @@ class KCO_Subscription {
 	public function maybe_abort_confirm_order( $should_abort, $order, $klarna_order_id ) {
 		$order_id = $order->get_id();
 
-		// A KCO order containing only free trial subscription(s) cannot be retrieved from OM, and thus acknowledged/confirmed. However, a customer token is created for the order, which is used to renew the subscription.
+		// Logger function with context.
+		$log = function ( $message ) use ( $order, $klarna_order_id, $order_id ) {
+			KCO_Logger::log( "[MAYBE_ABORT_CONFIRM_ORDER]: Klarna order ID: $klarna_order_id, Order ID (number): {$order_id} ({$order->get_order_number()}). Free trial subscription order. " . $message );
+		};
+
+		// Free trial subscriptions requires special handling:
+		// The order cannot be acknowledged nor have its merchant reference set, and It won't appear on the merchant portal.
 		if ( $this->is_free_trial_only_order( $order ) ) {
+			$log( 'Processing free trial subscription.' );
+
 			$this->set_order_as_captured( $order );
 
 			// translators: Klarna order ID.
@@ -589,7 +597,14 @@ class KCO_Subscription {
 			$order->add_order_note( __( 'Customer token created. Free trial subscriptions do not exists in the merchant portal, but are associated with a customer token to allow renewing.', 'klarna-checkout-for-woocommerce' ) );
 			$order->payment_complete( $klarna_order_id );
 
-			KCO_Logger::log( "[CONFIRM]: Klarna order ID: $klarna_order_id, Order ID/number: {$order_id}/{$order->get_order_number()}, Free trial subscription order." );
+			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+			if ( ! is_wp_error( $klarna_order ) ) {
+				// We're already hooking into this action to save the recurring token, but since we're aborting the kco_confirm_order early, we must trigger it instead.
+				do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
+			} else {
+				$error_message = $klarna_order->get_error_message();
+				$log( "Error: $error_message" );
+			}
 
 			return true;
 		}
