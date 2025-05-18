@@ -589,6 +589,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		return;
 	}
 
+	// Allow this process to be aborted to be handled elsewhere.
 	$abort = apply_filters( 'kco_abort_confirm_order', false, $order, $klarna_order_id );
 	if ( $abort ) {
 		KCO_Logger::log( "[CONFIRM]: Klarna order ID: $klarna_order_id, Order ID/number: {$order_id}/{$order->get_order_number()} Order confirmation aborted." );
