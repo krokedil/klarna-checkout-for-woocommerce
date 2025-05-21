@@ -323,10 +323,18 @@ class KCO_Request_Cart {
 					// the sum is discounted from order lines so we send it as 0 for reference.
 					if ( wc_tax_enabled() && 'yes' === $apply_before_tax ) {
 						$coupon_amount    = 0;
-						$coupon_reference = __( 'Gift card', 'klarna-checkout-for-woocommerce' ) . ' (amount: ' . WC()->cart->get_coupon_discount_amount( $coupon_key, 'no' === get_option( 'woocommerce_prices_include_tax' ) ) . ')';
+						$coupon_reference = sprintf(
+							/* translators: %s: coupon amount */
+							__( 'Gift card (amount: %s)', 'klarna-checkout-for-woocommerce' ),
+							WC()->cart->get_coupon_discount_amount( $coupon_key, 'no' === get_option( 'woocommerce_prices_include_tax' ) )
+						);
 					} else {
 						$coupon_amount    = - $coupon->get_amount() * 100;
-						$coupon_reference = __( 'Gift card', 'klarna-checkout-for-woocommerce' ) . ' (amount: ' . $coupon->get_amount() . ')';
+						$coupon_reference = sprintf(
+							/* translators: %s: coupon amount */
+							__( 'Gift card (amount: %s)', 'klarna-checkout-for-woocommerce' ),
+							$coupon->get_amount()
+						);
 					}
 					$coupon_tax_amount = - WC()->cart->get_coupon_discount_tax_amount( $coupon_key ) * 100;
 				} elseif ( 'US' === $this->shop_country ) {
@@ -339,7 +347,13 @@ class KCO_Request_Cart {
 					} else {
 						$coupon_type = 'Discount';
 					}
-					$coupon_reference = $coupon_type . ' (amount: ' . WC()->cart->get_coupon_discount_amount( $coupon_key ) . ', tax amount: ' . WC()->cart->get_coupon_discount_tax_amount( $coupon_key ) . ')';
+					$coupon_reference = sprintf(
+						/* translators: 1: coupon type, 2: amount, 3: tax amount */
+						__( '%1$s (amount: %2$s, tax amount: %3$s)', 'klarna-checkout-for-woocommerce' ),
+						$coupon_type,
+						WC()->cart->get_coupon_discount_amount( $coupon_key ),
+						WC()->cart->get_coupon_discount_tax_amount( $coupon_key )
+					);
 
 				}
 				// Add separate discount line item, but only if it's a smart coupon or country is US.
@@ -644,12 +658,10 @@ class KCO_Request_Cart {
 		$order_line_amount     = $this->total_amount + $this->total_tax_amount;
 		if ( $this->separate_sales_tax ) {
 			$item_discount_amount = $this->subtotal_amount - $this->total_amount;
-		} else {
-			if ( $order_line_amount < $order_line_max_amount ) {
+		} elseif ( $order_line_amount < $order_line_max_amount ) {
 				$item_discount_amount = $order_line_max_amount - $order_line_amount;
-			} else {
-				$item_discount_amount = 0;
-			}
+		} else {
+			$item_discount_amount = 0;
 		}
 
 		return round( $item_discount_amount );
