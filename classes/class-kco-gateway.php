@@ -648,11 +648,14 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$klarna_country = wc_get_base_location()['country'];
 			$order->update_meta_data( '_wc_klarna_country', $klarna_country );
 
-			// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
-			if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
-				$order->set_shipping_phone( sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
-			} else {
-				$order->update_meta_data( '_shipping_phone', sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+			if ( isset( $klarna_order['shipping_address']['phone'] ) ) {
+
+				// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
+				if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
+					$order->set_shipping_phone( sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+				} else {
+					$order->update_meta_data( '_shipping_phone', sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+				}
 			}
 
 			$order->update_meta_data( '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
