@@ -144,17 +144,18 @@ class KCO_Request {
 		}
 
 		// Check the status code, if its not between 200 and 299 then its an error.
-		if ( wp_remote_retrieve_response_code( $response ) < 200 || wp_remote_retrieve_response_code( $response ) > 299 ) {
-			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $request_args );
+		$code = wp_remote_retrieve_response_code( $response );
+		if ( $code < 200 || $code > 299 ) {
+			$data          = "URL: $request_url - " . wp_json_encode( $request_args );
 			$error_message = '';
 			// Get the error messages.
 			if ( null !== json_decode( $response['body'], true ) ) {
 				$errors = json_decode( $response['body'], true );
 				foreach ( $errors['error_messages'] as $error ) {
-					$error_message = $error_message . ' ' . $error;
+					$error_message = "$error_message $error";
 				}
 			}
-			return new WP_Error( wp_remote_retrieve_response_code( $response ), $response['body'] . $error_message, $data );
+			return new WP_Error( $code, $response['body'] . $error_message, $data );
 		}
 		return json_decode( wp_remote_retrieve_body( $response ), true );
 	}
