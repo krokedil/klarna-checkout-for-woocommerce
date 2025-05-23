@@ -231,17 +231,6 @@ jQuery( function ( $ ) {
 						if ( name === "shipping_email" ) {
 							kco_wc.shippingEmailExists = true
 						}
-
-						$( ".woocommerce-account-fields" ).appendTo( "#kco-extra-checkout-fields" )
-
-						const alreadyMoved = [
-							"account_username",
-							"account_password",
-						];
-
-						if( ! alreadyMoved.includes( name ) ) {
-							$( "p#" + name + "_field" ).appendTo( "#kco-extra-checkout-fields" )
-						}
 					} else {
 						$( 'input[name="' + name + '"]' )
 							.closest( "p" )
@@ -249,6 +238,7 @@ jQuery( function ( $ ) {
 					}
 				}
 			}
+			$( ".woocommerce-account-fields" ).appendTo( "#kco-extra-checkout-fields" )
 		},
 
 		/**
