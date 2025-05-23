@@ -35,6 +35,9 @@ class KCO_Subscription {
 		add_action( 'init', array( $this, 'display_thankyou_message_for_payment_method_change' ) );
 		add_action( 'woocommerce_account_view-subscription_endpoint', array( $this, 'maybe_confirm_change_payment_method' ) );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'extend_allowed_domains_list' ) );
+
+		// Determine whether the kco_confirm_order action should be aborted.
+		add_filter( 'kco_abort_confirm_order', array( $this, 'maybe_abort_confirm_order' ), 10, 3 );
 	}
 
 	/**
@@ -527,6 +530,86 @@ class KCO_Subscription {
 		$hosts[] = 'pay.playground.klarna.com';
 		$hosts[] = 'pay.klarna.com';
 		return $hosts;
+	}
+
+	/**
+	 * Flags an order as captured.
+	 *
+	 * This is required to prevent Klarna Order Management from attempting to process the order for capture when the customer sets the order to completed as there is nothing to capture.
+	 *
+	 * @param  WC_Order $order WooCommerce order.
+	 * @return void
+	 */
+	public function set_order_as_captured( $order ) {
+		$order->update_meta_data( '_wc_klarna_capture_id', 'trial' );
+		$order->save();
+	}
+
+	/**
+	 * Checks if a WC_Order only contains a free trial subscription.
+	 *
+	 * This function iterates through the order items and checks if all of the associated
+	 * products have a trial period defined in WooCommerce Subscriptions.
+	 *
+	 * @param WC_Order $order The WooCommerce order object to check.
+	 * @return bool True if the order contains only one free trial subscription product(s), false otherwise.
+	 */
+	public static function is_free_trial_only_order( $order ) {
+		if ( ! class_exists( 'WC_Subscriptions_Product' ) ) {
+			return false;
+		}
+
+		foreach ( $order->get_items() as $item ) {
+			$product = $item->get_product();
+
+			if ( ! $product || WC_Subscriptions_Product::get_trial_length( $product ) <= 0 ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Maybe abort the kco_confirm_order action.
+	 *
+	 * @param WC_Order $order The WooCommerce order object.
+	 * @param string   $klarna_order_id The Klarna order ID.
+	 * @return bool True if the action should be aborted, false otherwise.
+	 */
+	public function maybe_abort_confirm_order( $should_abort, $order, $klarna_order_id ) {
+		$order_id = $order->get_id();
+
+		// Logger function with context.
+		$log = function ( $message ) use ( $order, $klarna_order_id, $order_id ) {
+			KCO_Logger::log( "[MAYBE_ABORT_CONFIRM_ORDER]: Klarna order ID: $klarna_order_id, Order ID (number): {$order_id} ({$order->get_order_number()}). Free trial subscription order. " . $message );
+		};
+
+		// Free trial subscriptions requires special handling:
+		// The order cannot be acknowledged nor have its merchant reference set, and It won't appear on the merchant portal.
+		if ( $this->is_free_trial_only_order( $order ) ) {
+			$log( 'Processing free trial subscription.' );
+
+			$this->set_order_as_captured( $order );
+
+			// translators: Klarna order ID.
+			$order->add_order_note( sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
+			$order->add_order_note( __( 'Customer token created. Free trial subscriptions do not exists in the merchant portal, but are associated with a customer token to allow renewing.', 'klarna-checkout-for-woocommerce' ) );
+			$order->payment_complete( $klarna_order_id );
+
+			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+			if ( ! is_wp_error( $klarna_order ) ) {
+				// We're already hooking into this action to save the recurring token, but since we're aborting the kco_confirm_order early, we must trigger it instead.
+				do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
+			} else {
+				$error_message = $klarna_order->get_error_message();
+				$log( "Error: $error_message" );
+			}
+
+			return true;
+		}
+
+		return $should_abort;
 	}
 }
 new KCO_Subscription();

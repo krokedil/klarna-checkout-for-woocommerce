@@ -115,7 +115,7 @@ class KCO_Request_Order {
 	}
 
 	/**
-	 * Gets the formated order line shipping.
+	 * Gets the formatted order line shipping.
 	 *
 	 * @param WC_Order $order The WooCommerce order.
 	 * @return array
