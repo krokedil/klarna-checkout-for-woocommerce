@@ -110,7 +110,7 @@ class KCO_Checkout {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
 		// Store the status in case it is omitted from the response in the update request.
-		$status = $klarna_order['status'];
+		$status = $klarna_order['status'] ?? null;
 		if ( $klarna_order && 'checkout_incomplete' === $status ) {
 			// If it is, update order.
 			$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
