@@ -38,6 +38,46 @@ class KCO_Subscription {
 
 		// Determine whether the kco_confirm_order action should be aborted.
 		add_filter( 'kco_abort_confirm_order', array( $this, 'maybe_abort_confirm_order' ), 10, 3 );
+
+		// Allow free trial subscription orders to be processed.
+		add_filter( 'kco_is_available', array( $this, 'is_available' ) );
+
+		// Remove shipping package for free trials. See WC_Subscriptions_Cart::set_cart_shipping_packages().
+		add_filter( 'kco_wc_api_request_args', array( $this, 'remove_shipping_from_request' ) );
+	}
+
+	/**
+	 * Whether the gateway should be available if it contains a subscriptions.
+	 *
+	 * @param bool $is_available Whether the gateway is available.
+	 * @return bool
+	 */
+	public function is_available( $is_available ) {
+		if ( ! self::cart_has_subscription() ) {
+			return $is_available;
+		}
+
+		$zero_order = isset( WC()->cart ) && floatval( WC()->cart->total ) === 0.0;
+		if ( $zero_order && ! self::cart_has_only_free_trial() ) {
+			return false;
+		}
+
+		return $is_available;
+	}
+
+	/**
+	 * Removes shipping from the request if the cart has only free trial subscriptions.
+	 *
+	 * @param array $request_args The Klarna request arguments.
+	 * @return array
+	 */
+	public function remove_shipping_from_request( $request_args ) {
+		// WC Subscriptions will add these shipping packages for free trial which will cause the checkout to keep reloading since we detect a shipping option change, but these shipping options are not included in the request to Klarna, only in WC. These are only needed by WC to keep track of shipping associated with free trial subscription orders.
+		if ( self::cart_has_only_free_trial() ) {
+			$request_args['shipping_options'] = array();
+		}
+
+		return $request_args;
 	}
 
 	/**
@@ -568,6 +608,41 @@ class KCO_Subscription {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Whether the cart contains only free trial subscriptions.
+	 *
+	 * If invoked from anywhere but the checkout page, this will return FALSE.
+	 *
+	 * @return boolean
+	 */
+	public static function cart_has_only_free_trial() {
+		if ( ! is_checkout() ) {
+			return false;
+		}
+
+		return ( class_exists( 'WC_Subscriptions_Cart' ) ) ? WC_Subscriptions_Cart::all_cart_items_have_free_trial() : false;
+	}
+
+	/**
+	 * Check if a cart contains a subscription-related item.
+	 *
+	 * @return bool
+	 */
+	public static function cart_has_subscription() {
+		if ( ! is_checkout() ) {
+			return false;
+		}
+
+		return (
+		( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) ||
+		( function_exists( 'wcs_cart_contains_renewal' ) && wcs_cart_contains_renewal() ) ||
+		( function_exists( 'wcs_cart_contains_failed_renewal_order_payment' ) && wcs_cart_contains_failed_renewal_order_payment() ) ||
+		( function_exists( 'wcs_cart_contains_resubscribe' ) && wcs_cart_contains_resubscribe() ) ||
+		( function_exists( 'wcs_cart_contains_early_renewal' ) && wcs_cart_contains_early_renewal() ) ||
+		( function_exists( 'wcs_cart_contains_switches' ) && wcs_cart_contains_switches() )
+		);
 	}
 
 	/**
