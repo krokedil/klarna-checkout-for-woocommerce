@@ -231,7 +231,6 @@ jQuery( function ( $ ) {
 						if ( name === "shipping_email" ) {
 							kco_wc.shippingEmailExists = true
 						}
-						$( "p#" + name + "_field" ).appendTo( "#kco-extra-checkout-fields" )
 					} else {
 						$( 'input[name="' + name + '"]' )
 							.closest( "p" )
@@ -239,6 +238,8 @@ jQuery( function ( $ ) {
 					}
 				}
 			}
+			// Move the "Create an account?" form.
+			$(".woocommerce-account-fields").insertAfter( $("#createaccount").closest('p') )
 		},
 
 		/**
