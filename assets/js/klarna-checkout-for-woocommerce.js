@@ -239,7 +239,7 @@ jQuery( function ( $ ) {
 				}
 			}
 			// Move the "Create an account?" form.
-			$( ".woocommerce-account-fields" ).appendTo( "#kco-extra-checkout-fields" )
+			$(".woocommerce-account-fields").insertAfter( $("#createaccount").closest('p') )
 		},
 
 		/**
