@@ -260,11 +260,24 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
-		 * Checks if method should be available.
+		 * Whether the payment gateway is available.
+		 *
+		 * @filter kco_is_available
+		 *
+		 * @return boolean
+		 */
+		public function is_available() {
+			return apply_filters( 'kco_is_available', $this->check_availability() );
+		}
+
+		/**
+		 * Check if the gateway should be available.
+		 *
+		 * This function is extracted to create the 'kco_is_available' filter.
 		 *
 		 * @return bool
 		 */
-		public function is_available() {
+		private function check_availability() {
 			if ( 'yes' !== $this->enabled ) {
 				return false;
 			}
