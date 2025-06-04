@@ -102,8 +102,14 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
-			$klarna_order_id = WC()->session->get( 'kco_wc_order_id', 'missing' );
-			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+			if ( empty( $klarna_order_id ) ) {
+				KCO_Logger::log( '[CHECKOUT VALIDATION]: Klarna order ID is not set in the session. Will not proceed with order.' );
+				$errors->add( 'klarna_order_id', __( 'The Klarna order id could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );
+				return;
+			}
+
+			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( is_wp_error( $klarna_order ) ) {
 				KCO_Logger::log( "[CHECKOUT VALIDATION]: Error getting Klarna order: {$klarna_order->get_error_message()}. For Klarna order ID: '$klarna_order_id'. Will not proceed with order." );
 				$errors->add( 'klarna_order', __( 'The Klarna order could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );

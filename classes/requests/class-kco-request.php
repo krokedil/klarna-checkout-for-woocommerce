@@ -143,19 +143,23 @@ class KCO_Request {
 			return $response;
 		}
 
+		$body = wp_remote_retrieve_body( $response );
+		$code = wp_remote_retrieve_response_code( $response );
 		// Check the status code, if its not between 200 and 299 then its an error.
-		if ( wp_remote_retrieve_response_code( $response ) < 200 || wp_remote_retrieve_response_code( $response ) > 299 ) {
+		if ( $code < 200 || $code > 299 ) {
 			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $request_args );
 			$error_message = '';
 			// Get the error messages.
-			if ( null !== json_decode( $response['body'], true ) ) {
-				$errors = json_decode( $response['body'], true );
+			$errors = json_decode( $body, true );
+			if ( empty( $errors ) ) {
+				return new WP_Error( $code, 'received empty body', $data );
+			} elseif ( isset( $errors['error_messages'] ) && is_array( $errors['error_messages'] ) ) {
 				foreach ( $errors['error_messages'] as $error ) {
-					$error_message = $error_message . ' ' . $error;
+					$error_message = "$error_message  $error";
 				}
 			}
-			return new WP_Error( wp_remote_retrieve_response_code( $response ), $response['body'] . $error_message, $data );
+			return new WP_Error( $code, "$body $error_message", $data );
 		}
-		return json_decode( wp_remote_retrieve_body( $response ), true );
+		return json_decode( $body, true );
 	}
 }
