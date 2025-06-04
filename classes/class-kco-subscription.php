@@ -331,7 +331,6 @@ class KCO_Subscription {
 				}
 			}
 		}
-		$renewal_order->save();
 
 		$create_order_response = KCO_WC()->api->create_recurring_order( $order_id, $recurring_token );
 		if ( ! is_wp_error( $create_order_response ) ) {
@@ -349,6 +348,10 @@ class KCO_Subscription {
 				$subscription->payment_failed();
 			}
 		}
+
+		$settings = get_option( 'woocommerce_kco_settings', array() );
+		$renewal_order->update_meta_data( '_wc_klarna_environment', wc_string_to_bool( $settings['testmode'] ) ? 'test' : 'live' );
+		$renewal_order->save();
 	}
 
 	/**
