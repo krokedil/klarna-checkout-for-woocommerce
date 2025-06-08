@@ -35,6 +35,9 @@ class KCO_Subscription {
 		add_action( 'init', array( $this, 'display_thankyou_message_for_payment_method_change' ) );
 		add_action( 'woocommerce_account_view-subscription_endpoint', array( $this, 'maybe_confirm_change_payment_method' ) );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'extend_allowed_domains_list' ) );
+
+		// Since not all metadata is copied to the renewal subscription, we have to manually copy them over.
+		add_action( 'wcs_renewal_order_created', array( $this, 'copy_meta_fields_to_renewal_order' ), 10, 2 );
 	}
 
 	/**
@@ -352,11 +355,31 @@ class KCO_Subscription {
 				$related_subscription->payment_failed();
 			}
 		}
+	}
 
-		$env = $parent->get_meta( '_wc_klarna_environment', true );
+	/**
+	 * Copy meta fields to renewal order.
+	 *
+	 * This is triggered before 'woocommerce_scheduled_subscription_payment_*', thus before the renewal order is processed and can be used for preparing the renewal for further processing (e.g., setting the recurring token).
+	 *
+	 * @param  WC_Order        $renewal_order Woo renewal order.
+	 * @param  WC_Subscription $subscription Woo subscription.
+	 * @return WC_Order
+	 */
+	public function copy_meta_fields_to_renewal_order( $renewal_order, $subscription ) {
+		$parent_order = $subscription->get_parent();
+
+		// The environment used for the parent order.
+		$env = $parent_order->get_meta( '_wc_klarna_environment', true );
+		if ( empty( $env ) ) {
+			$settings = get_option( 'woocommerce_kco_settings', array() );
+			$env      = wc_string_to_bool( $settings['testmode'] ) ? 'test' : 'live';
+		}
+
 		$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
 
 		$renewal_order->save();
+		return $renewal_order;
 	}
 
 	/**
