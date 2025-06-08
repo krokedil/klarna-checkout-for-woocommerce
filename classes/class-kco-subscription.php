@@ -298,15 +298,19 @@ class KCO_Subscription {
 	/**
 	 * Creates an order in Klarna from the recurring token saved.
 	 *
-	 * @param string $renewal_total The total price for the order.
-	 * @param object $renewal_order The WooCommerce order for the renewal.
+	 * @param string   $renewal_total The total price for the order.
+	 * @param WC_Order $renewal_order The WooCommerce order for the renewal.
 	 */
 	public function trigger_scheduled_payment( $renewal_total, $renewal_order ) {
 		$order_id = $renewal_order->get_id();
 
-		$subscriptions   = wcs_get_subscriptions_for_renewal_order( $renewal_order->get_id() );
-		$recurring_token = $renewal_order->get_meta( '_kco_recurring_token', true );
+		$subscriptions = wcs_get_subscriptions_for_renewal_order( $renewal_order->get_id() );
 
+		// The new subscription that is created from the renewal order.
+		$subscription = array_pop( $subscriptions );
+		$parent       = $subscription->get_parent();
+
+		$recurring_token = $renewal_order->get_meta( '_kco_recurring_token', true );
 		if ( empty( $recurring_token ) ) {
 			// Try getting it from parent order.
 			$recurring_token = wc_get_order( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ) )->get_meta( '_kco_recurring_token', true );
@@ -324,8 +328,8 @@ class KCO_Subscription {
 
 			if ( ! empty( $recurring_token ) ) {
 				$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
-				foreach ( $subscriptions as $subscription ) {
-					$subscription_order = wc_get_order( $subscription->get_id() );
+				foreach ( $subscriptions as $related_subscription ) {
+					$subscription_order = wc_get_order( $related_subscription->get_id() );
 					$subscription_order->update_meta_data( '_kco_recurring_token', $recurring_token );
 					$subscription_order->save();
 				}
@@ -349,8 +353,9 @@ class KCO_Subscription {
 			}
 		}
 
-		$settings = get_option( 'woocommerce_kco_settings', array() );
-		$renewal_order->update_meta_data( '_wc_klarna_environment', wc_string_to_bool( $settings['testmode'] ) ? 'test' : 'live' );
+		$env = $parent->get_meta( '_wc_klarna_environment', true );
+		$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
+
 		$renewal_order->save();
 	}
 
