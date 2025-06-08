@@ -304,16 +304,16 @@ class KCO_Subscription {
 	public function trigger_scheduled_payment( $renewal_total, $renewal_order ) {
 		$order_id = $renewal_order->get_id();
 
-		$subscriptions = wcs_get_subscriptions_for_renewal_order( $renewal_order->get_id() );
+		$subscriptions = wcs_get_subscriptions_for_renewal_order( $order_id );
 
 		// The new subscription that is created from the renewal order.
-		$subscription = array_pop( $subscriptions );
+		$subscription = reset( $subscriptions );
 		$parent       = $subscription->get_parent();
 
 		$recurring_token = $renewal_order->get_meta( '_kco_recurring_token', true );
 		if ( empty( $recurring_token ) ) {
 			// Try getting it from parent order.
-			$recurring_token = wc_get_order( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ) )->get_meta( '_kco_recurring_token', true );
+			$recurring_token = $parent->get_meta( '_kco_recurring_token', true );
 			$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
 		}
 
@@ -322,7 +322,7 @@ class KCO_Subscription {
 			$recurring_token = $renewal_order->get_meta( '_klarna_recurring_token', true );
 
 			if ( empty( $recurring_token ) ) {
-				$recurring_token = wc_get_order( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ) )->get_meta( '_klarna_recurring_token', true );
+				$recurring_token = $parent->get_meta( '_klarna_recurring_token', true );
 				$renewal_order->update_meta_data( '_klarna_recurring_token', $recurring_token );
 			}
 
@@ -341,15 +341,15 @@ class KCO_Subscription {
 			$klarna_order_id = $create_order_response['order_id'];
 			// Translators: Klarna order id.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Klarna. Klarna order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
-			foreach ( $subscriptions as $subscription ) {
-				$subscription->payment_complete( $klarna_order_id );
+			foreach ( $subscriptions as $related_subscription ) {
+				$related_subscription->payment_complete( $klarna_order_id );
 			}
 		} else {
 			$error_message = $create_order_response->get_error_message();
 			// Translators: Error message.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Message: %1$s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
-			foreach ( $subscriptions as $subscription ) {
-				$subscription->payment_failed();
+			foreach ( $subscriptions as $related_subscription ) {
+				$related_subscription->payment_failed();
 			}
 		}
 
