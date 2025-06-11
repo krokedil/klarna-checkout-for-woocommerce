@@ -37,15 +37,16 @@ class KCO_Request_Shipping_Options {
 					continue;
 				}
 
+				$method_cost = floatval( $method->cost );
 				if ( $separate_sales_tax ) {
-					$method_price = intval( round( $method->cost, 2 ) * 100 );
+					$method_price = intval( round( $method_cost, 2 ) * 100 );
 				} else {
-					$method_price = intval( round( $method->cost + array_sum( $method->taxes ), 2 ) * 100 );
+					$method_price = intval( round( $method_cost + array_sum( $method->taxes ), 2 ) * 100 );
 				}
 
 				if ( array_sum( $method->taxes ) > 0 && ( ! $separate_sales_tax ) ) {
 					$method_tax_amount = intval( round( array_sum( $method->taxes ), 2 ) * 100 );
-					$method_tax_rate   = intval( round( ( array_sum( $method->taxes ) / $method->cost ) * 100, 2 ) * 100 );
+					$method_tax_rate   = intval( round( ( array_sum( $method->taxes ) / $method_cost ) * 100, 2 ) * 100 );
 				} else {
 					$method_tax_amount = 0;
 					$method_tax_rate   = 0;
