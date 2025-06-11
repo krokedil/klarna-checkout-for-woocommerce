@@ -23,16 +23,16 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $username, $password, $testmode, $endpoint ) {
-		$request_url       = $this->get_test_endpoint( $testmode, $endpoint ) . 'checkout/v3/orders';
+		$request_url       = $this->get_test_endpoint( $testmode, $endpoint, $username ) . 'checkout/v3/orders';
 		$request_args      = apply_filters( 'kco_wc_test_credentials', $this->get_request_args( $username, $password ) );
 		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
-		$formated_response = $this->process_response( $response, $request_args, $request_url );
+		$formatted_response = $this->process_response( $response, $request_args, $request_url );
 
 		// Log the request.
 		$log = KCO_Logger::format_log( null, 'POST', 'KCO test credentials', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $request_url );
 		KCO_Logger::log( $log );
-		return $formated_response;
+		return $formatted_response;
 	}
 
 	/**
@@ -88,12 +88,15 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	 *
 	 * @param bool   $testmode If its test mode or not.
 	 * @param string $endpoint The endpoint for the request.
+	 * @param string $username The username to use.
+	 *
 	 */
-	public function get_test_endpoint( $testmode, $endpoint ) {
+	public function get_test_endpoint( $testmode, $endpoint, $username ) {
 		$country_string = 'US' === $endpoint ? '-na' : '';
 		$test_string    = $testmode ? '.playground' : '';
+		$domain 		= KCO_Request::get_api_domain( $username );
 
-		return 'https://api' . $country_string . $test_string . '.klarna.com/';
+		return "https://api{$country_string}{$test_string}.{$domain}/";
 	}
 
 	/**
