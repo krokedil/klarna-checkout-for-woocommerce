@@ -53,14 +53,29 @@ class KCO_Request {
 	}
 
 	/**
+	 * Get the domain to use for the request based on the merchant ID.
+	 *
+	 * @param string $merchant_id The Klarna merchant ID.
+	 *
+	 * @return string The domain to use for the request.
+	 */
+	public static function get_api_domain( $merchant_id ) {
+		// If the merchant ID starts with either M or PM, we need to use the Kustom domain instead.
+		$pattern = '/^(M|PM)/';
+		$domain = preg_match( $pattern, $merchant_id ) ? 'kustom.co' : 'klarna.com';
+		return apply_filters( 'kco_api_domain', $domain );
+	}
+
+	/**
 	 * Gets Klarna API URL base.
 	 */
 	public function get_api_url_base() {
 		$base_location  = wc_get_base_location();
 		$country_string = 'US' === $base_location['country'] ? '-na' : '';
 		$test_string    = 'yes' === $this->settings['testmode'] ? '.playground' : '';
+		$domain = KCO_Request::get_api_domain( $this->get_merchant_id() );
 
-		return 'https://api' . $country_string . $test_string . '.klarna.com/';
+		return "https://api{$country_string}{$test_string}.{$domain}/";
 	}
 
 	/**
