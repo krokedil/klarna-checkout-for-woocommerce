@@ -1,6 +1,6 @@
 {
   "name": "klarna-checkout-for-woocommerce",
-  "version": "2.13.8",
+  "version": "2.13.9",
   "description": "Klarna Checkout for WooCommerce",
   "main": "gulpfile.js",
   "repository": "https://github.com/krokedil/klarna-checkout-for-woocommerce.git",
