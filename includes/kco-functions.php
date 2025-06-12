@@ -968,3 +968,33 @@ function kco_is_bundle_plugin_installed() {
 
 	return false;
 }
+
+/**
+ * Ensure that a value is numeric. If the value is not numeric, it will attempt to convert it.
+ * If the value is an empty value, it will be set to 0.
+ * If the value cannot be converted to a numeric value, it will return the default value.
+ *
+ * @param mixed     $value The value to ensure is numeric.
+ * @param float|int $default The default value to return if the value is not numeric and $throw_error is false. Default 0.
+ *
+ * @return float|int Returns the numeric value of the input, or the default value if the input is not numeric and cannot be converted.
+ */
+function kco_ensure_numeric( $value, $default = 0 ) {
+	if ( is_numeric( $value ) ) {
+		return floatval( $value );
+	}
+
+	// If the value is empty, return 0 instead of default to reflect that the value is not set.
+	if ( empty( $value ) ) {
+		return 0;
+	}
+
+	// Try to convert the value to a numeric value.
+	$converted_value = floatval( $value );
+
+	if ( is_numeric( $converted_value ) ) {
+		return $converted_value;
+	}
+
+	return $default; // Return the default value if the value is still not numeric.
+}
