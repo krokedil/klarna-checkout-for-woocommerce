@@ -89,12 +89,13 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	 * @param bool   $testmode If its test mode or not.
 	 * @param string $endpoint The endpoint for the request.
 	 * @param string $username The username to use.
+	 * @param string $password The password to use.
 	 *
 	 */
 	public function get_test_endpoint( $testmode, $endpoint, $username, $password ) {
 		$country_string = 'US' === $endpoint ? '-na' : '';
 		$test_string    = $testmode ? '.playground' : '';
-		$domain 		= KCO_Request::get_api_domain( $username, $password );
+		$domain 		= KCO_Request::get_api_domain( $password, $username );
 
 		return "https://api{$country_string}{$test_string}.{$domain}/";
 	}
