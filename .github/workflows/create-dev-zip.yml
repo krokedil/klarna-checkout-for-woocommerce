@@ -16,48 +16,34 @@ jobs:
       with:
         fetch-depth: 1
 
-    - name: Create composer cache directory
-      run: mkdir -p ~/.composer/cache
-
-    - name: Cache Composer dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.composer/cache
-        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-composer-
-
-    - name: Cache npm dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-npm-
-
     - name: Install dependencies and build project
       run: |
-        mkdir -p ~/.composer/cache
         composer install --prefer-dist --no-progress
         npm ci && npm run build
 
-    - name: Get branch name and commit hash
+    - name: Define variables branch name, commit hash and zip file name
       id: vars
       run: |
         BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
         COMMIT_HASH=$(git rev-parse --short HEAD)
-        ZIP_FILE_NAME="${{ env.PLUGIN_SLUG }}-dev-${BRANCH_NAME}-${COMMIT_HASH}.zip"
+        ZIP_FILE_NAME="${{ env.PLUGIN_SLUG }}-dev-${BRANCH_NAME}-${COMMIT_HASH}"
         echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
         echo "COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
         echo "ZIP_FILE_NAME=${ZIP_FILE_NAME}" >> $GITHUB_ENV
 
-    - name: Modify version, prepare zip directory, and create zip file
+    - name: Attach branch name and commit hash to plugin version
       run: |
         sed -i "s/^ \* Version: \(.*\)/ \* Version: \1-dev.${BRANCH_NAME}.${COMMIT_HASH}/" ${{ env.PLUGIN_SLUG }}.php
-        mkdir -p dev-zip-temp/${{ env.PLUGIN_SLUG }}
-        rsync -av --exclude-from='.distignore' --exclude='dev-zip-temp' . dev-zip-temp/${{ env.PLUGIN_SLUG }}
-        cd dev-zip-temp
-        zip -r ../${{ env.ZIP_FILE_NAME }} ${{ env.PLUGIN_SLUG }}
+
+    - name: Generate and upload plugin zip
+      uses: krokedil/action-wordpress-plugin-build-zip@krokedil-improvements
+      id: generate_and_upload_zip
+      env:
+        SLUG: ${{ env.PLUGIN_SLUG }}
+      with:
+        retention-days: 5 # Optional; defaults to 5
+        artifact-name: ${{ steps.vars.outputs.ZIP_FILE_NAME }} # Optional; defaults to the repository name
+        upload-plugin-artifact: true # Optional; defaults to true
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -68,7 +54,8 @@ jobs:
 
     - name: Upload to S3
       run: |
-        aws s3 cp ${{ env.ZIP_FILE_NAME }} s3://krokedil-plugin-dev-zip/${{ env.ZIP_FILE_NAME }}
+        zip -r ${{ env.ZIP_FILE_NAME }}.zip ./${{ steps.generate_and_upload_zip.outputs.zipfile-path }}
+        aws s3 cp ${{ env.ZIP_FILE_NAME }}.zip s3://krokedil-plugin-dev-zip/${{ env.ZIP_FILE_NAME }}
 
     - name: Add annotation to workflow run with dev zip url
       run: echo "::notice::Dev Zip Url available for 30 days, https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${{ env.ZIP_FILE_NAME }}"
