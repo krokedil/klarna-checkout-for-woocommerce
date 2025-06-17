@@ -311,7 +311,7 @@ class KCO_Request_Cart {
 	 */
 	public function process_coupons() {
 
-		foreach ( QOC_WC()->krokedil->compatibility()->giftcards() as $giftcards ) {
+		foreach ( KCO_WC()->krokedil->compatibility()->giftcards() as $giftcards ) {
 			if ( false !== ( strpos( get_class( $giftcards ), 'WCGiftCards', true ) ) && ! function_exists( 'WC_GC' ) ) {
 				continue;
 			}
