@@ -54,6 +54,9 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.06.17    - version 2.13.11 =
+* Tweak         - Updated API endpoints for merchants using Kustom credentials.
+
 = 2025.06.17    - version 2.13.10 =
 * Fix           - Fixed account login fields appearing by default with Klarna Checkout, even when "Create an account?" was unchecked.
 * Fix           - Fixed two undefined array key warnings.
