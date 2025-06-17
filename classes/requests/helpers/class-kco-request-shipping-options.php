@@ -31,6 +31,7 @@ class KCO_Request_Shipping_Options {
 			foreach ( $package['rates'] as $method ) {
 				$method_id   = $method->id;
 				$method_name = $method->label;
+				$method_cost = kco_ensure_numeric( $method->cost );
 
 				// Don't add the KSS shipping method as a shipping option. It should not be a valid fallback if it exists and the store uses a TMS system.
 				if ( false !== strpos( $method_id, 'klarna_kss' ) ) {
@@ -38,14 +39,14 @@ class KCO_Request_Shipping_Options {
 				}
 
 				if ( $separate_sales_tax ) {
-					$method_price = intval( round( $method->cost, 2 ) * 100 );
+					$method_price = intval( round( $method_cost, 2 ) * 100 );
 				} else {
-					$method_price = intval( round( $method->cost + array_sum( $method->taxes ), 2 ) * 100 );
+					$method_price = intval( round( $method_cost + array_sum( $method->taxes ), 2 ) * 100 );
 				}
 
 				if ( array_sum( $method->taxes ) > 0 && ( ! $separate_sales_tax ) ) {
 					$method_tax_amount = intval( round( array_sum( $method->taxes ), 2 ) * 100 );
-					$method_tax_rate   = intval( round( ( array_sum( $method->taxes ) / $method->cost ) * 100, 2 ) * 100 );
+					$method_tax_rate   = intval( round( ( array_sum( $method->taxes ) / $method_cost ) * 100, 2 ) * 100 );
 				} else {
 					$method_tax_amount = 0;
 					$method_tax_rate   = 0;
