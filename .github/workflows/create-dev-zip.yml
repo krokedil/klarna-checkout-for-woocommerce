@@ -54,8 +54,8 @@ jobs:
 
     - name: Upload to S3
       run: |
-        zip -r ${{ env.ZIP_FILE_NAME }}.zip ./${{ steps.generate_and_upload_zip.outputs.zipfile-path }}
-        aws s3 cp ${{ env.ZIP_FILE_NAME }}.zip s3://krokedil-plugin-dev-zip/${{ env.ZIP_FILE_NAME }}
+        zip -r ${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip ./${{ steps.generate_and_upload_zip.outputs.zipfile-path }}
+        aws s3 cp ${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip s3://krokedil-plugin-dev-zip/${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip
 
     - name: Add annotation to workflow run with dev zip url
-      run: echo "::notice::Dev Zip Url available for 30 days, https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${{ env.ZIP_FILE_NAME }}"
+      run: echo "::notice::Dev Zip Url available for 30 days, https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip"
