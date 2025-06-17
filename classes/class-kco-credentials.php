@@ -27,7 +27,27 @@ class KCO_Credentials {
 	 * KCO_Credentials constructor.
 	 */
 	public function __construct() {
-		$this->settings = get_option( 'woocommerce_kco_settings' );
+		$this->settings = get_option( 'woocommerce_kco_settings', array() );
+		add_filter( 'kco_api_domain', array( $this, 'maybe_set_api_domain' ) );
+	}
+
+	/**
+	 * Uses the setting to see if we should force the API domain or let the automatic function handle it.
+	 *
+	 * @param string $api_domain The API domain to use.
+	 *
+	 * @return string The domain to use for the request.
+	 */
+	public function maybe_set_api_domain( $api_domain ) {
+		$api_domain_setting = $this->settings['api_domain'] ?? '';
+
+		// If the setting is empty, use the value passed in the filter.
+		if ( empty( $api_domain_setting ) ) {
+			return $api_domain;
+		}
+
+		// If the setting is not empty, use the value from the setting.
+		return $api_domain_setting;
 	}
 
 	/**
