@@ -1,5 +1,21 @@
 {
     "require-dev": {
         "wp-coding-standards/wpcs": "^2.3"
+    },
+    "extra": {
+        "wpify-scoper": {
+            "prefix": "KrokedilKlarnaCheckoutDeps",
+            "folder": "dependencies",
+            "autorun": true,
+            "globals": [
+                "wordpress",
+                "woocommerce"
+            ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "wpify/scoper": true
+        }
     }
 }

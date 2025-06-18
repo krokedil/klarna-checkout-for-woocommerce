@@ -1,0 +1,19 @@
+{
+    "require": {
+        "php": ">=7.4",
+        "krokedil/woocommerce": "^1.0"
+    },
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:krokedil/woocommerce.git"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
