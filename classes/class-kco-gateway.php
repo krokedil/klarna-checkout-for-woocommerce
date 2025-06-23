@@ -102,8 +102,14 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
-			$klarna_order_id = WC()->session->get( 'kco_wc_order_id', 'missing' );
-			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+			if ( empty( $klarna_order_id ) ) {
+				KCO_Logger::log( '[CHECKOUT VALIDATION]: Klarna order ID is not set in the session. Will not proceed with order.' );
+				$errors->add( 'klarna_order_id', __( 'The Klarna order id could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );
+				return;
+			}
+
+			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( is_wp_error( $klarna_order ) ) {
 				KCO_Logger::log( "[CHECKOUT VALIDATION]: Error getting Klarna order: {$klarna_order->get_error_message()}. For Klarna order ID: '$klarna_order_id'. Will not proceed with order." );
 				$errors->add( 'klarna_order', __( 'The Klarna order could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );
@@ -372,7 +378,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				}
 			}
 
-			$standard_woo_checkout_fields = apply_filters( 'kco_ignored_checkout_fields', array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'terms', 'terms-field', '_wp_http_referer', 'ship_to_different_address' ) );
+			$standard_woo_checkout_fields = apply_filters( 'kco_ignored_checkout_fields', array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'terms', 'terms-field', '_wp_http_referer', 'ship_to_different_address', 'account_username', 'account_password' ) );
 			$checkout_localize_params     = array(
 				'update_cart_url'                 => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
 				'update_cart_nonce'               => wp_create_nonce( 'kco_wc_update_cart' ),
@@ -661,11 +667,14 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$klarna_country = wc_get_base_location()['country'];
 			$order->update_meta_data( '_wc_klarna_country', $klarna_country );
 
-			// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
-			if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
-				$order->set_shipping_phone( sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
-			} else {
-				$order->update_meta_data( '_shipping_phone', sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+			if ( isset( $klarna_order['shipping_address']['phone'] ) ) {
+
+				// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
+				if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
+					$order->set_shipping_phone( sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+				} else {
+					$order->update_meta_data( '_shipping_phone', sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+				}
 			}
 
 			$order->update_meta_data( '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
