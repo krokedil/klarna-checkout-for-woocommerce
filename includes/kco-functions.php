@@ -630,7 +630,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				KCO_Logger::log( $klarna_order_id . ': Fraud status rejected for order ' . $order->get_order_number() . '. Order cancelled.' );
 			}
 		} else {
-			$order->set_status( 'on-hold', __( 'Waiting for verification from Kustom's push notification', 'klarna-checkout-for-woocommerce' ) );
+			$order->set_status( 'on-hold', __( 'Waiting for verification from Kustom\'s push notification', 'klarna-checkout-for-woocommerce' ) );
 			$order->save();
 			KCO_Logger::log( $klarna_order_id . ': No order found in order management. Waiting for push verification. Order #' . $order->get_order_number() . ' set to on-hold.' );
 		}
