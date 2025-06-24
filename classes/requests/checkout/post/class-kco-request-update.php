@@ -16,7 +16,7 @@ class KCO_Request_Update extends KCO_Request {
 	/**
 	 * Makes the request.
 	 *
-	 * @param string $klarna_order_id The Klarna order id.
+	 * @param string $klarna_order_id The Kustom order id.
 	 * @param int    $order_id The WooCommerce order id.
 	 * @param bool   $force If true always update the order, even if not needed.
 	 * @return array
@@ -108,7 +108,7 @@ class KCO_Request_Update extends KCO_Request {
 		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {
 			$request_body['shipping_options'] = KCO_Request_Shipping_Options::get_shipping_options( $this->separate_sales_tax );
 		} elseif ( ! WC()->cart->needs_shipping() ) {
-			// If the order had a shipping option before but is removed now, same needs to be sent to klarna else it will retain the old shipping option.
+			// If the order had a shipping option before but is removed now, same needs to be sent to Kustomelse it will retain the old shipping option.
 			$request_body['shipping_options'] = array();
 		}
 

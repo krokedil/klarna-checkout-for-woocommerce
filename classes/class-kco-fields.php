@@ -1,6 +1,6 @@
 <?php
 /**
- * Class for Klarna Checkout gateway settings.
+ * Class for Kustom Checkout gateway settings.
  *
  * @package Klarna_Checkout/Classes
  */
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * KCO_Fields class.
  *
- * Klarna Checkout for WooCommerce settings fields.
+ * Kustom Checkout for WooCommerce settings fields.
  */
 class KCO_Fields {
 
@@ -23,7 +23,7 @@ class KCO_Fields {
 		$settings = array(
 			'enabled'                    => array(
 				'title'       => __( 'Enable/Disable', 'klarna-checkout-for-woocommerce' ),
-				'label'       => __( 'Enable Klarna Checkout', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Enable Kustom Checkout', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
 				'description' => '',
 				'default'     => 'no',
@@ -32,7 +32,7 @@ class KCO_Fields {
 				'title'       => __( 'Title', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'text',
 				'description' => __( 'Payment method title.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => 'Klarna',
+				'default'     => 'Kustom',
 				'desc_tip'    => true,
 			),
 			'description'                => array(
@@ -45,7 +45,7 @@ class KCO_Fields {
 			'select_another_method_text' => array(
 				'title'             => __( 'Other payment method button text', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
-				'description'       => __( 'Customize the <em>Select another payment method</em> button text that is displayed in checkout if using other payment methods than Klarna Checkout. Leave blank to use the default (and translatable) text.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Customize the <em>Select another payment method</em> button text that is displayed in checkout if using other payment methods than Kustom Checkout. Leave blank to use the default (and translatable) text.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => true,
 				'custom_attributes' => array(
@@ -53,9 +53,9 @@ class KCO_Fields {
 				),
 			),
 			'add_to_email'               => array(
-				'title'    => __( 'Add Klarna Post Purchase info to order email', 'klarna-checkout-for-woocommerce' ),
+				'title'    => __( 'Add Kustom Post Purchase info to order email', 'klarna-checkout-for-woocommerce' ),
 				'type'     => 'checkbox',
-				'label'    => __( 'This will add Klarnas Post Purchase information to the order emails that are sent. You can read more about this here: ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.klarna.com/guidelines/klarna-checkout-best-practices/post-purchase/order-confirmation/" target="_blank">Klarna URLs</a>',
+				'label'    => __( 'This will add Kustom's Post Purchase information to the order emails that are sent. You can read more about this here: ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.kustom.co/guidelines/klarna-checkout-best-practices/post-purchase/order-confirmation/" target="_blank">Kustom URLs</a>',
 				'default'  => 'no',
 				'desc_tip' => true,
 			),
@@ -80,25 +80,25 @@ class KCO_Fields {
 				'type'     => 'select',
 				'options'  => array(
 					'one_column_checkout' => __( 'One column checkout', 'klarna-checkout-for-woocommerce' ),
-					'two_column_right'    => __( 'Two column checkout (Klarna Checkout in right column)', 'klarna-checkout-for-woocommerce' ),
-					'two_column_left'     => __( 'Two column checkout (Klarna Checkout in left column)', 'klarna-checkout-for-woocommerce' ),
-					'two_column_left_sf'  => __( 'Two column checkout (Klarna Checkout in left column) - Storefront light', 'klarna-checkout-for-woocommerce' ),
+					'two_column_right'    => __( 'Two column checkout (Kustom Checkout in right column)', 'klarna-checkout-for-woocommerce' ),
+					'two_column_left'     => __( 'Two column checkout (Kustom Checkout in left column)', 'klarna-checkout-for-woocommerce' ),
+					'two_column_left_sf'  => __( 'Two column checkout (Kustom Checkout in left column) - Storefront light', 'klarna-checkout-for-woocommerce' ),
 				),
 				'default'  => 'two_column_right',
 				'desc_tip' => false,
 			),
-			'api_domain' => array(
+			'api_domain'                 => array(
 				'title'       => __( 'API Endpoint', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'select',
-				'description' => __( 'Select the API endpoint to use for Klarna Checkout. For stores that have created their API credentials through the Kustom portal, the API endpoint needs to be set to kustom.co instead of klarna.com. If you use the default option, the plugin will attempt to determine this automatically. But you can force the endpoint by using this setting if this is incorrect.', 'klarna-checkout-for-woocommerce' ),
+				'description' => __( 'Select the API endpoint to use for Kustom Checkout. For stores that have created their API credentials through the Kustom portal, the API endpoint needs to be set to kustom.co instead of klarna.com. If you use the default option, the plugin will attempt to determine this automatically. But you can force the endpoint by using this setting if this is incorrect.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'options'     => array(
-					__('Recommended', 'klarna-checkout-for-woocommerce') => array(
+					__( 'Recommended', 'klarna-checkout-for-woocommerce' ) => array(
 						'' => __( 'Use plugin logic (default)', 'klarna-checkout-for-woocommerce' ),
 					),
-					__('Force specific endpoint', 'klarna-checkout-for-woocommerce') => array(
+					__( 'Force specific endpoint', 'klarna-checkout-for-woocommerce' ) => array(
 						'klarna.com' => __( 'Force klarna.com endpoint', 'klarna-checkout-for-woocommerce' ),
-						'kustom.co' => __( 'Force kustom.co endpoint', 'klarna-checkout-for-woocommerce' ),
+						'kustom.co'  => __( 'Force kustom.co endpoint', 'klarna-checkout-for-woocommerce' ),
 					),
 				),
 			),
@@ -108,9 +108,9 @@ class KCO_Fields {
 				'type'  => 'title',
 			),
 			'merchant_id_eu'             => array(
-				'title'             => __( 'Production Klarna API Username', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Production Kustom API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
-				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => false,
 				'custom_attributes' => array(
@@ -118,9 +118,9 @@ class KCO_Fields {
 				),
 			),
 			'shared_secret_eu'           => array(
-				'title'             => __( 'Production Klarna API Password', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Production Kustom API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
-				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => false,
 				'custom_attributes' => array(
@@ -128,9 +128,9 @@ class KCO_Fields {
 				),
 			),
 			'test_merchant_id_eu'        => array(
-				'title'             => __( 'Test Klarna API Username', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Test Kustom API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
-				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => false,
 				'custom_attributes' => array(
@@ -138,9 +138,9 @@ class KCO_Fields {
 				),
 			),
 			'test_shared_secret_eu'      => array(
-				'title'             => __( 'Test Klarna API Password', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Test Kustom API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
-				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => false,
 				'custom_attributes' => array(
@@ -153,9 +153,9 @@ class KCO_Fields {
 				'type'  => 'title',
 			),
 			'merchant_id_us'             => array(
-				'title'             => __( 'Production Klarna API Username', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Production Kustom API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
-				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => false,
 				'custom_attributes' => array(
@@ -163,9 +163,9 @@ class KCO_Fields {
 				),
 			),
 			'shared_secret_us'           => array(
-				'title'             => __( 'Production Klarna API Password', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Production Kustom API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
-				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => false,
 				'custom_attributes' => array(
@@ -173,9 +173,9 @@ class KCO_Fields {
 				),
 			),
 			'test_merchant_id_us'        => array(
-				'title'             => __( 'Test Klarna API Username', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Test Kustom API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
-				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => false,
 				'custom_attributes' => array(
@@ -183,9 +183,9 @@ class KCO_Fields {
 				),
 			),
 			'test_shared_secret_us'      => array(
-				'title'             => __( 'Test Klarna API Password', 'klarna-checkout-for-woocommerce' ),
+				'title'             => __( 'Test Kustom API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
-				'description'       => __( 'Use API username and API password you downloaded in the Klarna Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
+				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
 				'default'           => '',
 				'desc_tip'          => false,
 				'custom_attributes' => array(
@@ -207,9 +207,9 @@ class KCO_Fields {
 			),
 			'shipping_methods_in_iframe' => array(
 				'title'       => __( 'Shipping methods in iframe', 'klarna-checkout-for-woocommerce' ),
-				'label'       => sprintf( __( 'Display Shipping methods in Klarna iframe.  If you are using the <b>Klarna Shipping Assistant</b> plugin, please follow the steps explained in the plugin documentation under the sections titled %1$s and %2$s', 'klarna-checkout-for-woocommerce' ), ( '<a href="https://docs.krokedil.com/klarna-for-woocommerce/additional-klarna-plugins/klarna-shipping-assistant/#configuration" target="_blank">configuration</a>' ), ( '<a href="https://docs.krokedil.com/klarna-for-woocommerce/additional-klarna-plugins/klarna-shipping-assistant/#tax-settings" target="_blank">tax settings</a>' ) ),
+				'label'       => sprintf( __( 'Display Shipping methods in Kustom iframe.  If you are using the <b>Kustom Shipping Assistant</b> plugin, please follow the steps explained in the plugin documentation under the sections titled %1$s and %2$s', 'klarna-checkout-for-woocommerce' ), ( '<a href="https://docs.krokedil.com/klarna-for-woocommerce/additional-klarna-plugins/klarna-shipping-assistant/#configuration" target="_blank">configuration</a>' ), ( '<a href="https://docs.krokedil.com/klarna-for-woocommerce/additional-klarna-plugins/klarna-shipping-assistant/#tax-settings" target="_blank">tax settings</a>' ) ),
 				'type'        => 'checkbox',
-				'description' => __( 'If this option is checked, selection of shipping methods is done in Klarna iframe. Shipping price and name of the selected shipping method will still be displayed in WooCommerce order review.', 'klarna-checkout-for-woocommerce' ),
+				'description' => __( 'If this option is checked, selection of shipping methods is done in Kustom iframe. Shipping price and name of the selected shipping method will still be displayed in WooCommerce order review.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
@@ -261,7 +261,7 @@ class KCO_Fields {
 					'B2CB' => __( 'B2C & B2B (defaults to B2C)', 'klarna-checkout-for-woocommerce' ),
 					'B2BC' => __( 'B2B & B2C (defaults to B2B)', 'klarna-checkout-for-woocommerce' ),
 				),
-				'description' => __( 'Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO, FI and DE). You need to contact Klarna directly to activate this with your account.', 'klarna-checkout-for-woocommerce' ),
+				'description' => __( 'Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO, FI and DE). You need to contact Kustom directly to activate this with your account.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'B2C',
 				'desc_tip'    => false,
 			),
@@ -292,7 +292,7 @@ class KCO_Fields {
 				'type'        => 'select',
 				'options'     => array(
 					'woo'    => __( 'In the WooCommerce order review', 'klarna-checkout-for-woocommerce' ),
-					'iframe' => __( 'In the Klarna Checkout iFrame', 'klarna-checkout-for-woocommerce' ),
+					'iframe' => __( 'In the Kustom Checkout iFrame', 'klarna-checkout-for-woocommerce' ),
 					'both'   => __( 'In both', 'klarna-checkout-for-woocommerce' ),
 				),
 				'description' => __( 'Select how you want to show the subtotal details on the checkout page.', 'klarna-checkout-for-woocommerce' ),
@@ -364,7 +364,7 @@ class KCO_Fields {
 					'embedded' => __( 'Embedded', 'klarna-checkout-for-woocommerce' ),
 					'redirect' => __( 'Redirect', 'klarna-checkout-for-woocommerce' ),
 				),
-				'description' => __( '<strong>Embedded:</strong> the checkout is embedded in the WooCommerce checkout page and partially replaces the checkout form. <strong>Redirect:</strong> the customer is redirected to a payment page hosted by Klarna.', 'klarna-checkout-for-woocommerce' ),
+				'description' => __( '<strong>Embedded:</strong> the checkout is embedded in the WooCommerce checkout page and partially replaces the checkout form. <strong>Redirect:</strong> the customer is redirected to a payment page hosted by Kustom', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'embedded',
 				'desc_tip'    => true,
 			);
@@ -398,7 +398,7 @@ class KCO_Fields {
 					);
 					$new_settings['add_terms_and_conditions_checkbox'] = array(
 						'title'       => __( 'Terms and conditions checkbox', 'klarna-checkout-for-woocommerce' ),
-						'label'       => __( 'Add a terms and conditions checkbox inside Klarna checkout iframe', 'klarna-checkout-for-woocommerce' ),
+						'label'       => __( 'Add a terms and conditions checkbox inside Kustom Checkout iframe', 'klarna-checkout-for-woocommerce' ),
 						'type'        => 'checkbox',
 						'description' => __( 'To change the text navigate to → Appearance → Customize → WooCommerce → Checkout.', 'klarna-checkout-for-woocommerce' ),
 						'default'     => 'no',

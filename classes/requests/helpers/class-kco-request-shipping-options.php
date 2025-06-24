@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class KCO_Request_Shipping_Options {
 	/**
-	 * Gets shipping options formatted for Klarna.
+	 * Gets shipping options formatted for Kustom
 	 *
 	 * @param bool $separate_sales_tax True if the sales tax should be separate.
 	 * @return array

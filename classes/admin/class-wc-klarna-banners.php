@@ -1,6 +1,6 @@
 <?php
 /**
- * Klarna banners file.
+ * Kustom banners file.
  *
  * @package  Klarna_Checkout/Classes
  */
@@ -40,7 +40,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 
 
 		/**
-		 * Loads Klarna banner in admin pages.
+		 * Loads Kustom banner in admin pages.
 		 */
 		public function klarna_banner() {
 			global $pagenow;
@@ -85,7 +85,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 					<div class="kb-left-group">
 						<div id="kb-left" class="kb-small-container">
 							<h1 id="left-main-title" class="container-title">Go live.</h1>
-							<p id="left-main-text" class="container-main-text">Before you can start to sell with Klarna you need your store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will need to verify the integration. Then you can go live with your store! If you wish to switch Klarna products then you’ll need the Klarna team to approve your store again.</p>
+							<p id="left-main-text" class="container-main-text">Before you can start to sell with Kustom you need your store to be approved by Kustom When the installation is done and you are ready to go live, Kustom will need to verify the integration. Then you can go live with your store! If you wish to switch Kustom products then you’ll need the Kustom team to approve your store again.</p>
 						</div>
 					</div>
 
@@ -168,7 +168,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 								</p>
 						<h1 id="krokdocs-sidebar-title">Support</h1>
 								<p id="krokdocs-sidebar-main-text">
-									If you have questions regarding a certain purchase you are welcome to contact <a href="http://klarna.com/merchant-support" target="_blank">Klarna</a>.
+									If you have questions regarding a certain purchase you are welcome to contact <a href="http://kustom.co/merchant-support" target="_blank">Kustom</a>.
 								</p>
 								<p id="krokdocs-sidebar-main-text">
 									If you have technical questions or questions regarding the configuration of the plugin you are welcome to contact <a href="https://www.krokedil.com/support" target="_blank">Krokedil</a>.
@@ -189,11 +189,11 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		}
 
 		/**
-		 * Hide Klarna banner in admin pages for.
+		 * Hide Kustom banner in admin pages for.
 		 */
 		public function hide_klarna_banner() {
 			set_transient( 'klarna_hide_banner', '1', 5 * DAY_IN_SECONDS );
-			wp_send_json_success( 'Hide Klarna banner.' );
+			wp_send_json_success( 'Hide Kustom banner.' );
 		}
 
 		/**
@@ -208,22 +208,22 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			$url_queries    = '?country=' . $country . '&products=kco&plugin=' . $plugin . '&pluginVersion=' . $plugin_version . '&platform=woocommerce&platformVersion=' . $wc_version;
 
 			if ( 'US' !== $country ) {
-				$url_base = 'https://eu.portal.klarna.com/signup/';
+				$url_base = 'https://eu.portal.kustom.co/signup/';
 				$url      = $url_base . $url_queries;
 			} else {
-				$url_base = 'https://us.portal.klarna.com/signup/';
+				$url_base = 'https://us.portal.kustom.co/signup/';
 				$url      = $url_base . $url_queries;
 			}
 			return $url;
 		}
 
 		/**
-		 * Returns the URL to the Klarna developers page for getting test credentials.
+		 * Returns the URL to the Kustom developers page for getting test credentials.
 		 *
 		 * @return string
 		 */
 		public static function get_playground_credentials_url() {
-			return 'https://developers.klarna.com/documentation/testing-environment/';
+			return 'https://developers.kustom.co/documentation/testing-environment/';
 		}
 	}
 

@@ -26,8 +26,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 */
 		public function __construct() {
 			$this->id                 = 'kco';
-			$this->method_title       = __( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' );
-			$this->method_description = __( 'The current Klarna Checkout replaces standard WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' );
+			$this->method_title       = __( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' );
+			$this->method_description = __( 'The current Kustom Checkout replaces standard WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' );
 			$this->has_fields         = false;
 			$this->supports           = apply_filters(
 				'kco_wc_supports',
@@ -86,12 +86,12 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			add_filter( 'kco_wc_api_request_args', array( $this, 'maybe_remove_kco_epm' ), 9999 );
 
-			// Prevent the Woo validation from proceeding if there is a discrepancy between Woo and Klarna.
+			// Prevent the Woo validation from proceeding if there is a discrepancy between Woo and Kustom
 			add_action( 'woocommerce_after_checkout_validation', array( $this, 'validate_checkout' ), 10, 2 );
 		}
 
 		/**
-		 * Validate the data of the checkout fields matches the Klarna order.
+		 * Validate the data of the checkout fields matches the Kustom order.
 		 *
 		 * @param array    $data An array of posted data.
 		 * @param WP_Error $errors Validation errors.
@@ -104,19 +104,19 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 			if ( empty( $klarna_order_id ) ) {
-				KCO_Logger::log( '[CHECKOUT VALIDATION]: Klarna order ID is not set in the session. Will not proceed with order.' );
-				$errors->add( 'klarna_order_id', __( 'The Klarna order id could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );
+				KCO_Logger::log( '[CHECKOUT VALIDATION]: Kustom order ID is not set in the session. Will not proceed with order.' );
+				$errors->add( 'klarna_order_id', __( 'The Kustom order id could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );
 				return;
 			}
 
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 			if ( is_wp_error( $klarna_order ) ) {
-				KCO_Logger::log( "[CHECKOUT VALIDATION]: Error getting Klarna order: {$klarna_order->get_error_message()}. For Klarna order ID: '$klarna_order_id'. Will not proceed with order." );
-				$errors->add( 'klarna_order', __( 'The Klarna order could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );
+				KCO_Logger::log( "[CHECKOUT VALIDATION]: Error getting Kustom order: {$klarna_order->get_error_message()}. For Kustom order ID: '$klarna_order_id'. Will not proceed with order." );
+				$errors->add( 'klarna_order', __( 'The Kustom order could not be retrieved from the session. Please try again.', 'klarna-checkout-for-woocommerce' ) );
 				return;
 			}
 
-			// Mapping of the Woo/Klarna address fields.
+			// Mapping of the Woo/Kustom address fields.
 			$address_fields_key = array(
 				'first_name' => 'given_name',
 				'last_name'  => 'family_name',
@@ -169,7 +169,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					$klarna_order['billing_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['billing_address'][ $klarna_name ] ) );
 
 					if ( $billing_address[ $billing_field ] !== ( $klarna_order['billing_address'][ $klarna_name ] ?? '' ) ) {
-						$errors->add( $billing_field, __( 'Billing ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
+						$errors->add( $billing_field, __( 'Billing ' . str_replace( '_', ' ', $wc_name ) . ' does not match Kustom order.', 'klarna-checkout-for-woocommerce' ) );
 					}
 				}
 
@@ -179,7 +179,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					$klarna_order['shipping_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) );
 
 					if ( $shipping_address[ $shipping_field ] !== ( $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) ) {
-						$errors->add( $shipping_field, __( 'Shipping ' . str_replace( '_', ' ', $wc_name ) . ' does not match Klarna order.', 'klarna-checkout-for-woocommerce' ) );
+						$errors->add( $shipping_field, __( 'Shipping ' . str_replace( '_', ' ', $wc_name ) . ' does not match Kustom order.', 'klarna-checkout-for-woocommerce' ) );
 					}
 				}
 			}
@@ -192,8 +192,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return string
 		 */
 		public function get_icon() {
-			$icon_src  = 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100';
-			$icon_html = '<img src="' . $icon_src . '" alt="Klarna Checkout" style="border-radius:0px" width="100"/>';
+			$icon_src  = 'https://cdn.kustom.co/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100';
+			$icon_html = '<img src="' . $icon_src . '" alt="Kustom Checkout" style="border-radius:0px" width="100"/>';
 			return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
 		}
 
@@ -233,13 +233,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			// Regular embedded purchase.
-			// 1. Save Klarna data to the pending order.
+			// 1. Save Kustom data to the pending order.
 			// 2. Approve process payment sequence to customer can continue/complete payment.
 			return $this->process_embedded_payment_handler( $order_id );
 		}
 
 		/**
-		 * This plugin doesn't handle order management, but it allows Klarna Order Management plugin to process refunds
+		 * This plugin doesn't handle order management, but it allows Kustom Order Management plugin to process refunds
 		 * and then return true or false.
 		 *
 		 * @param int      $order_id WooCommerce order ID.
@@ -510,18 +510,18 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
-		 * Process the payment with information from Klarna and return the result - for regular embedded checkout.
+		 * Process the payment with information from Kustom and return the result - for regular embedded checkout.
 		 *
 		 * @param  int $order_id WooCommerce order ID.
 		 *
 		 * @return mixed
 		 */
 		public function process_embedded_payment_handler( $order_id ) {
-			// Get the Klarna order ID.
+			// Get the Kustom order ID.
 			$order = wc_get_order( $order_id );
 
-			// For the initial subscription, the Klarna order ID should always exist in the session.
-			// This also applies to (pending) renewal subscription since existing Klarna order ID is no longer valid for the renewal, we must retrieve it from the session, not the order.
+			// For the initial subscription, the Kustom order ID should always exist in the session.
+			// This also applies to (pending) renewal subscription since existing Kustom order ID is no longer valid for the renewal, we must retrieve it from the session, not the order.
 			$is_subscription = function_exists( 'wcs_order_contains_subscription' ) && wcs_order_contains_subscription( $order, array( 'parent', 'resubscribe', 'switch', 'renewal' ) );
 
 			if ( ! empty( $order ) && ! $is_subscription ) {
@@ -551,7 +551,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$order_number = $order->get_order_number() ?? $order_id ?? 'N/A';
 
 			if ( ! $klarna_order ) {
-				KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] failed to be processed due to: could not retrieve the Klarna order." );
+				KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] failed to be processed due to: could not retrieve the Kustom order." );
 				return array(
 					'result' => 'error',
 				);
@@ -597,23 +597,23 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$hpp = KCO_WC()->api->create_klarna_hpp_url( $klarna_order['order_id'], $order_id );
 
 			if ( is_wp_error( $hpp ) ) {
-				wc_add_notice( 'Failed to create a HPP session with Klarna.', 'error' );
-				KCO_Logger::log( sprintf( 'Failed to create a HPP session with Klarna. Order %s|%s (Klarna ID: %s) OK. Redirecting to hosted payment page.', $order_id, $order->get_order_number(), $klarna_order['order_id'] ) );
+				wc_add_notice( 'Failed to create a HPP session with Kustom', 'error' );
+				KCO_Logger::log( sprintf( 'Failed to create a HPP session with Kustom Order %s|%s (Kustom ID: %s) OK. Redirecting to hosted payment page.', $order_id, $order->get_order_number(), $klarna_order['order_id'] ) );
 				return array(
 					'result' => 'error',
 				);
 			}
 
 			$hpp_redirect = $hpp['redirect_url'];
-			// Save Klarna HPP url & Session ID.
+			// Save Kustom HPP url & Session ID.
 			$order->update_meta_data( '_wc_klarna_hpp_url', sanitize_text_field( $hpp_redirect ) );
 			$order->update_meta_data( '_wc_klarna_hpp_session_id', sanitize_key( $hpp['session_id'] ) );
 			$order->save();
 
-			KCO_Logger::log( sprintf( 'Processing order %s|%s (Klarna ID: %s) OK. Redirecting to hosted payment page.', $order_id, $order->get_order_number(), $klarna_order['order_id'] ) );
+			KCO_Logger::log( sprintf( 'Processing order %s|%s (Kustom ID: %s) OK. Redirecting to hosted payment page.', $order_id, $order->get_order_number(), $klarna_order['order_id'] ) );
 
-			// All good. Redirect customer to Klarna Hosted payment page.
-			$order->add_order_note( __( 'Customer redirected to Klarna Hosted Payment Page.', 'klarna-checkout-for-woocommerce' ) );
+			// All good. Redirect customer to Kustom Hosted payment page.
+			$order->add_order_note( __( 'Customer redirected to Kustom Hosted Payment Page.', 'klarna-checkout-for-woocommerce' ) );
 
 			return array(
 				'result'   => 'success',
@@ -633,10 +633,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function save_metadata_to_order( $order_id, $klarna_order, $checkout_flow = 'embedded' ) {
 			$order = wc_get_order( $order_id );
 
-			// Set Klarna checkout flow.
+			// Set Kustom Checkout flow.
 			$order->update_meta_data( '_wc_klarna_checkout_flow', sanitize_text_field( $checkout_flow ) );
 
-			// Set Klarna order ID.
+			// Set Kustom order ID.
 			$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order['order_id'] ) );
 
 			// Set recurring order.
@@ -669,7 +669,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
-		 * Displays Klarna Checkout thank you iframe and clears Klarna order ID value from WC session.
+		 * Displays Kustom Checkout thank you iframe and clears Kustom order ID value from WC session.
 		 *
 		 * @param int $order_id WooCommerce order ID.
 		 */
@@ -689,7 +689,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 					// Check if we need to finalize purchase here. Should already been done in process_payment.
 					if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
-						KCO_Logger::log( $klarna_order_id . ': Confirm the klarna order from the thankyou page.' );
+						KCO_Logger::log( $klarna_order_id . ': Confirm the Kustomorder from the thankyou page.' );
 						kco_confirm_klarna_order( $order_id, $klarna_order_id );
 						WC()->cart->empty_cart();
 					}
@@ -707,7 +707,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function admin_footer_text( $text ) {
 			$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			if ( ! empty( $section ) && 'kco' === $section ) {
-				$text = 'If you like Klarna Checkout for WooCommerce, please consider <strong>assigning Krokedil as your integration partner.</strong>.';
+				$text = 'If you like Kustom Checkout for WooCommerce, please consider <strong>assigning Krokedil as your integration partner.</strong>.';
 			}
 
 			return $text;
@@ -721,7 +721,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function address_notice( $order ) {
 			if ( $this->id === $order->get_payment_method() ) {
 				echo '<div style="clear:both; margin: 10px 0; padding: 10px; border: 1px solid #B33A3A; font-size: 12px">';
-				esc_html_e( 'Order address should not be changed and any changes you make will not be reflected in Klarna system.', 'klarna-checkout-for-woocommerce' );
+				esc_html_e( 'Order address should not be changed and any changes you make will not be reflected in Kustom system.', 'klarna-checkout-for-woocommerce' );
 				echo '</div>';
 			}
 		}
@@ -849,7 +849,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
-		 * Check if upsell should be available for the Klarna order or not.
+		 * Check if upsell should be available for the Kustom order or not.
 		 *
 		 * @param int $order_id The WooCommerce order id.
 		 * @return bool
@@ -873,7 +873,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return false;
 			}
 
-			// Set allowed payment methods for upsell based on country. https://developers.klarna.com/documentation/order-management/integration-guide/pre-delivery/#update-order-amount.
+			// Set allowed payment methods for upsell based on country. https://developers.kustom.co/documentation/order-management/integration-guide/pre-delivery/#update-order-amount.
 			$allowed_payment_methods = array( 'INVOICE', 'B2B_INVOICE', 'BASE_ACCOUNT', 'DIRECT_DEBIT' );
 			switch ( $klarna_order['billing_address']['country'] ) {
 				case 'AT':
@@ -895,7 +895,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
-		 * Make an upsell request to Klarna.
+		 * Make an upsell request to Kustom
 		 *
 		 * @param int    $order_id The WooCommerce order id.
 		 * @param string $upsell_uuid The unique id for the upsell request.
@@ -905,7 +905,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$klarna_upsell_order = KCO_WC()->api->upsell_klarna_order( $order_id, $upsell_uuid );
 
 			if ( is_wp_error( $klarna_upsell_order ) ) {
-				$error = new WP_Error( '401', __( 'Klarna did not accept the new order amount, the order has not been updated' ) );
+				$error = new WP_Error( '401', __( 'Kustom did not accept the new order amount, the order has not been updated' ) );
 				return $error;
 			}
 

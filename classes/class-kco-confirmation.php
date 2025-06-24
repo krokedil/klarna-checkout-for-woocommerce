@@ -72,7 +72,7 @@ class KCO_Confirmation {
 		}
 
 		// Confirm the order.
-		KCO_Logger::log( $klarna_order_id . ': Confirm the klarna order from the confirmation page.' );
+		KCO_Logger::log( $klarna_order_id . ': Confirm the Kustomorder from the confirmation page.' );
 		kco_confirm_klarna_order( $order_id, $klarna_order_id );
 		kco_unset_sessions();
 	}
@@ -92,17 +92,17 @@ class KCO_Confirmation {
 	}
 
 	/**
-	 * Initiates a Klarna External Payment Method payment.
+	 * Initiates a Kustom External Payment Method payment.
 	 *
 	 * @param string $epm The name of the external payment method.
 	 * @param string $order_id The WooCommerce order id.
-	 * @param string $klarna_order_id The Klarna order id.
+	 * @param string $klarna_order_id The Kustom order id.
 	 * @return void
 	 */
 	public function run_kepm( $epm, $order_id, $klarna_order_id ) {
 		$order = wc_get_order( $order_id );
 
-		// Try to retrieve the WC_Order using the Klarna order id.
+		// Try to retrieve the WC_Order using the Kustom order id.
 		if ( empty( $order ) && ! empty( $klarna_order_id ) ) {
 			$order = kco_get_order_by_klarna_id( $klarna_order_id, '2 day ago' );
 
