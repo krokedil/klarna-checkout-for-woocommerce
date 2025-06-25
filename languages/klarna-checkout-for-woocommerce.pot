@@ -521,7 +521,7 @@ msgid "Subscription payment failed with Kustom. Message: %1$s"
 msgstr ""
 
 #: ../classes/class-kco-subscription.php:340
-msgid "Subscription payment made with Kustom Kustom order id: %s"
+msgid "Subscription payment made with Kustom. Kustom order id: %s"
 msgstr ""
 
 #: ../classes/class-kco-subscription.php:380

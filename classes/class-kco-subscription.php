@@ -337,7 +337,7 @@ class KCO_Subscription {
 		if ( ! is_wp_error( $create_order_response ) ) {
 			$klarna_order_id = $create_order_response['order_id'];
 			// Translators: Kustom order id.
-			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Kustom Kustom order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
+			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Kustom. Kustom order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
 			foreach ( $subscriptions as $subscription ) {
 				$subscription->payment_complete( $klarna_order_id );
 			}
