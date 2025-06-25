@@ -138,7 +138,7 @@ class KCO_AJAX extends WC_AJAX {
 
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
-		// Check if we have a Kustomorder id.
+		// Check if we have a Kustom order id.
 		if ( empty( $klarna_order_id ) ) {
 			wc_add_notice( 'Kustom order id is missing.', 'error' );
 			wp_send_json_error();
@@ -208,7 +208,7 @@ class KCO_AJAX extends WC_AJAX {
 	}
 
 	/**
-	 * Gets the Kustomorder from session.
+	 * Gets the Kustom order from session.
 	 *
 	 * @return void
 	 */

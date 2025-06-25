@@ -304,8 +304,8 @@ jQuery( function ( $ ) {
 		/**
 		 * Gets the Kustom order and starts the order submission
 		 */
-		getKustomOrder: function () {
-			console.log( "getKustomOrder" )
+		getKlarnaOrder: function () {
+			console.log( "getKlarnaOrder" )
 			kco_wc.preventPaymentMethodChange = true
 			$( ".woocommerce-checkout-review-order-table" ).block( {
 				message: null,
@@ -501,8 +501,8 @@ jQuery( function ( $ ) {
 			return Object.keys( kco_params.countries ).find( ( key ) => kco_params.countries[ key ] === country )
 		},
 
-		placeKustomOrder: function ( callback ) {
-			kco_wc.getKustomOrder().done( function ( response ) {
+		placeKlarnaOrder: function ( callback ) {
+			kco_wc.getKlarnaOrder().done( function ( response ) {
 				if ( response.success ) {
 					$( ".woocommerce-checkout-review-order-table" ).block( {
 						message: null,
@@ -679,7 +679,7 @@ jQuery( function ( $ ) {
 							if ( kco_params.pay_for_order ) {
 								callback( { should_proceed: true } )
 							} else {
-								kco_wc.placeKustomOrder( callback )
+								kco_wc.placeKlarnaOrder( callback )
 							}
 						},
 						customer: function ( customer ) {

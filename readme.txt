@@ -30,7 +30,7 @@ Installment, revolving and other flexible financing plans let customers pay when
 
 === How to Get Started ===
 * [Sign up for Kustom](https://www.kustom.co/international/business/woocommerce/).
-* [Install the plugin](https://wordpress.org/plugins/klarna-checkout-for-woocommerce/) on your site. During this process you will be asked to download [Kustom Order Management](https://wordpress.org/plugins/klarna-order-management-for-woocommerce/) so you can handle orders in Kustom directly from WooCommerce.
+* [Install the plugin](https://wordpress.org/plugins/klarna-checkout-for-woocommerce/) on your site. During this process you will be asked to download [Klarna Order Management](https://wordpress.org/plugins/klarna-order-management-for-woocommerce/) so you can handle orders in Kustom directly from WooCommerce.
 * Get your store approved by Kustom, and start selling.
 
 == Installation ==

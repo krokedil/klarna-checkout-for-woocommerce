@@ -2,7 +2,7 @@
 /**
  * API Callbacks class.
  *
- * @package Kustom_Checkout/Classes
+ * @package Klarna_Checkout/Classes
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -65,7 +65,7 @@ class KCO_API_Callbacks {
 		KCO_WC()->logger->log( 'Push callback hit for order: ' . $klarna_order_id );
 
 		// Let other plugins hook into the push notification.
-		// Used by Kustom_Checkout_Subscription::handle_push_cb_for_payment_method_change().
+		// Used by Klarna_Checkout_Subscription::handle_push_cb_for_payment_method_change().
 		do_action( 'wc_klarna_push_cb', $klarna_order_id );
 
 		$order = kco_get_order_by_klarna_id( $klarna_order_id );

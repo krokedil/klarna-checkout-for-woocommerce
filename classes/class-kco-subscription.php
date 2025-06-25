@@ -124,7 +124,7 @@ class KCO_Subscription {
 	}
 
 	/**
-	 * Marks the order as a recurring order for Kustom
+	 * Marks the order as a recurring order for Kustom.
 	 *
 	 * @param array $request_args The Kustom request arguments.
 	 * @return array

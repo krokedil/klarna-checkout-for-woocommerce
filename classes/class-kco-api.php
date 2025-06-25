@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * KCO_API class.
  *
- * Class that has functions for the Kustomcommunication.
+ * Class that has functions for the Kustom communication.
  */
 class KCO_API {
 	/**
@@ -260,7 +260,7 @@ class KCO_API {
 	}
 
 	/**
-	 * Make an upsell request to Kustom
+	 * Make an upsell request to Kustom.
 	 *
 	 * @param int    $order_id The WooCommerce order id.
 	 * @param string $upsell_uuid The unique id for the upsell request.

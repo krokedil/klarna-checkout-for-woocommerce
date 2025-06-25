@@ -701,7 +701,7 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	// An array of notes to display to the merchant.
 	$notes = array( __( 'A mismatch between the WooCommerce and Kustom orders was identified. Please verify the order in the Kustom merchant portal before processing.', 'klarna-checkout-for-woocommerce' ) );
 
-	// A match happens when the item reference and quantity matches in Woo and Kustom
+	// A match happens when the item reference and quantity matches in Woo and Kustom.
 	$mismatch           = false;
 	$items              = $order->get_items();
 	$klarna_order_items = $klarna_order['order_lines'];
@@ -781,8 +781,8 @@ function kco_validate_order_content( $klarna_order, $order ) {
 /**
  * Converts a region string to the expected country code format for WooCommerce.
  *
- * @param string $region_string The region string from Kustom
- * @param string $country_code The country code from Kustom
+ * @param string $region_string The region string from Kustom.
+ * @param string $country_code The country code from Kustom.
  * @return string
  */
 function kco_convert_region( $region_string, $country_code ) {

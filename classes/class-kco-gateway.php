@@ -239,7 +239,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
-		 * This plugin doesn't handle order management, but it allows Kustom Order Management plugin to process refunds
+		 * This plugin doesn't handle order management, but it allows Klarna Order Management plugin to process refunds
 		 * and then return true or false.
 		 *
 		 * @param int      $order_id WooCommerce order ID.
@@ -689,7 +689,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 					// Check if we need to finalize purchase here. Should already been done in process_payment.
 					if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
-						KCO_Logger::log( $klarna_order_id . ': Confirm the Kustomorder from the thankyou page.' );
+						KCO_Logger::log( $klarna_order_id . ': Confirm the Kustom order from the thankyou page.' );
 						kco_confirm_klarna_order( $order_id, $klarna_order_id );
 						WC()->cart->empty_cart();
 					}

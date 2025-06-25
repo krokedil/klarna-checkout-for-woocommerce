@@ -28,7 +28,7 @@ class KCO_Checkout {
 	}
 
 	/**
-	 * Add a hidden input field for the shipping data from Kustom
+	 * Add a hidden input field for the shipping data from Kustom.
 	 *
 	 * @param array $fields The WooCommerce checkout fields.
 	 * @return array

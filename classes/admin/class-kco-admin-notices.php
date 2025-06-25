@@ -152,7 +152,7 @@ class KCO_Admin_Notices {
 	}
 
 	/**
-	 * Show admin notice if old Kustom Upstream plugin is installed.
+	 * Show admin notice if old Klarna Upstream plugin is installed.
 	 */
 	public function check_klarna_upstream() {
 
@@ -166,7 +166,7 @@ class KCO_Admin_Notices {
 				<div class="kco-message notice woocommerce-message notice-error">
 				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_upstream' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
 				<?php // translators: %s: URL. ?>
-				<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'The <i>Kustom upstream for WooCommerce</i> plugin is now available as <i>Kustom On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Kustom upstream for WooCommerce</i> and then install and activate <i>Kustom On-site Messaging for WooCommerce</i> via the new <a href="%s">Kustom Add-ons page</a>. ', 'klarna-checkout-for-woocommerce' ), admin_url( '/admin.php?page=checkout-addons' ) ) . '<a href="https://docs.krokedil.com/article/259-klarna-on-site-messaging"> ' . __( 'Read more here. ', 'klarna-checkout-for-woocommerce' ) . '</a></p>' ) ); ?>
+				<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href="%s">Kustom Add-ons page</a>. ', 'klarna-checkout-for-woocommerce' ), admin_url( '/admin.php?page=checkout-addons' ) ) . '<a href="https://docs.krokedil.com/article/259-klarna-on-site-messaging"> ' . __( 'Read more here. ', 'klarna-checkout-for-woocommerce' ) . '</a></p>' ) ); ?>
 				</div>
 				<?php
 			}
