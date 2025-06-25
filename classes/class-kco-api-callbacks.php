@@ -110,7 +110,7 @@ class KCO_API_Callbacks {
 				}
 			}
 
-			// Acknowledge order in Kustom
+			// Acknowledge order in Kustom.
 			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
 
 			// Set the merchant references for the order.

@@ -437,7 +437,7 @@ class KCO_Subscription {
 				$subscription->add_order_note( $note );
 			}
 
-			// Acknowledge order in Kustom
+			// Acknowledge order in Kustom.
 			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
 			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $subscription_id );
 

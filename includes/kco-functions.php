@@ -601,7 +601,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 			// Let other plugins hook into this sequence.
 			do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
 
-			// Acknowledge order in Kustom
+			// Acknowledge order in Kustom.
 			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
 			// Set the merchant references for the order.
 			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
