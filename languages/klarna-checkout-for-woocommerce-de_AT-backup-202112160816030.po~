@@ -485,7 +485,7 @@ msgstr ""
 
 #. translators: Error message.
 #: ../classes/class-kco-subscription.php:291
-msgid "Subscription payment failed with Kustom Message: %1$s"
+msgid "Subscription payment failed with Kustom. Message: %1$s"
 msgstr ""
 
 #: ../classes/class-kco-subscription.php:284
