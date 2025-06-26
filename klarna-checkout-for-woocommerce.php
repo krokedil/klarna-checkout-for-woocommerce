@@ -4,7 +4,7 @@
  * Plugin URI: https://krokedil.com/kustom/
  * Description: Kustom Checkout payment gateway for WooCommerce.
  * Author: Kustom
- * Author URI: https://kustom.co/
+ * Author URI: https://klarna.com/
  * Version: 2.13.11
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages

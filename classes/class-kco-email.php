@@ -36,8 +36,8 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 			$settings     = get_option( 'woocommerce_kco_settings' );
 			$add_to_email = isset( $settings['add_to_email'] ) && 'yes' === $settings['add_to_email'] ? true : false;
 			if ( 'kco' === $gateway_used && $add_to_email ) {
-				$klarna_cs_url  = '<a href="https://www.kustom.co/customer-service">' . esc_html__( 'Kustom', 'klarna-checkout-for-woocommerce' ) . '</a>';
-				$klarna_app_url = '<a href="https://app.kustom.co/">' . esc_html__( 'Kustom App', 'klarna-checkout-for-woocommerce' ) . '</a>';
+				$klarna_cs_url  = '<a href="https://www.klarna.com/customer-service">' . esc_html__( 'Kustom', 'klarna-checkout-for-woocommerce' ) . '</a>';
+				$klarna_app_url = '<a href="https://app.klarna.com/">' . esc_html__( 'Kustom App', 'klarna-checkout-for-woocommerce' ) . '</a>';
 				?>
 				<p><?php echo esc_html__( 'Kustom order id:', 'klarna-checkout-for-woocommerce' ) . ' ' . esc_html( $order->get_transaction_id() ); ?></p>
 				<?php if ( ! $sent_to_admin ) { ?>

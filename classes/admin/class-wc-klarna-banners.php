@@ -168,7 +168,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 								</p>
 						<h1 id="krokdocs-sidebar-title">Support</h1>
 								<p id="krokdocs-sidebar-main-text">
-									If you have questions regarding a certain purchase you are welcome to contact <a href="http://kustom.co/merchant-support" target="_blank">Kustom</a>.
+									If you have questions regarding a certain purchase you are welcome to contact <a href="http://klarna.com/merchant-support" target="_blank">Kustom</a>.
 								</p>
 								<p id="krokdocs-sidebar-main-text">
 									If you have technical questions or questions regarding the configuration of the plugin you are welcome to contact <a href="https://www.krokedil.com/support" target="_blank">Krokedil</a>.
@@ -208,10 +208,10 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 			$url_queries    = '?country=' . $country . '&products=kco&plugin=' . $plugin . '&pluginVersion=' . $plugin_version . '&platform=woocommerce&platformVersion=' . $wc_version;
 
 			if ( 'US' !== $country ) {
-				$url_base = 'https://eu.portal.kustom.co/signup/';
+				$url_base = 'https://eu.portal.klarna.com/signup/';
 				$url      = $url_base . $url_queries;
 			} else {
-				$url_base = 'https://us.portal.kustom.co/signup/';
+				$url_base = 'https://us.portal.klarna.com/signup/';
 				$url      = $url_base . $url_queries;
 			}
 			return $url;
@@ -223,7 +223,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		 * @return string
 		 */
 		public static function get_playground_credentials_url() {
-			return 'https://developers.kustom.co/documentation/testing-environment/';
+			return 'https://developers.klarna.com/documentation/testing-environment/';
 		}
 	}
 

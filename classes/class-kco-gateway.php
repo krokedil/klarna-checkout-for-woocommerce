@@ -192,7 +192,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return string
 		 */
 		public function get_icon() {
-			$icon_src  = 'https://cdn.kustom.co/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100';
+			$icon_src  = 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100';
 			$icon_html = '<img src="' . $icon_src . '" alt="Kustom Checkout" style="border-radius:0px" width="100"/>';
 			return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
 		}
@@ -873,7 +873,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return false;
 			}
 
-			// Set allowed payment methods for upsell based on country. https://developers.kustom.co/documentation/order-management/integration-guide/pre-delivery/#update-order-amount.
+			// Set allowed payment methods for upsell based on country. https://developers.klarna.com/documentation/order-management/integration-guide/pre-delivery/#update-order-amount.
 			$allowed_payment_methods = array( 'INVOICE', 'B2B_INVOICE', 'BASE_ACCOUNT', 'DIRECT_DEBIT' );
 			switch ( $klarna_order['billing_address']['country'] ) {
 				case 'AT':
