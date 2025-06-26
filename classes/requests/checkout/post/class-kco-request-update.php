@@ -19,7 +19,7 @@ class KCO_Request_Update extends KCO_Request {
 	 * @param string $klarna_order_id The Klarna order id.
 	 * @param int    $order_id The WooCommerce order id.
 	 * @param bool   $force If true always update the order, even if not needed.
-	 * @return array|false
+	 * @return array|false|WP_Error
 	 */
 	public function request( $klarna_order_id, $order_id = null, $force = false ) {
 		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
