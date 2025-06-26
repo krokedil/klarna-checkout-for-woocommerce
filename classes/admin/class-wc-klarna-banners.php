@@ -109,7 +109,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 					<div class="kb-right-group">
 						<div id="klarna-logo-left-frame">
 							<img id="klarna-logo-left" class="klarna-logo-img"
-							src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png">
+							src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/kustom_logo_black.png">
 						</div>
 					</div>
 
@@ -150,7 +150,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		public static function settings_sidebar( $parent_options ) {
 			?>
 			<img id="klarna-settings-logo"
-				src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png" width="200"/>
+				src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/kustom_logo_black.png" width="200"/>
 
 			<div id="klarna-wrapper">
 				<div id="klarna-main">
