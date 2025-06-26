@@ -109,12 +109,17 @@ class KCO_Checkout {
 
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 		if ( ! $klarna_order ) {
+			KCO_Logger::log( "Klarna order could not be retrieved during update for ID: $klarna_order_id " );
 			return;
 		}
 
 		if ( 'checkout_incomplete' === $klarna_order['status'] ) {
 			// If it is, update order.
 			$updated_klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
+			if ( ! $updated_klarna_order ) {
+				KCO_Logger::log( "Klarna order could not be updated during update for ID: $klarna_order_id " );
+				return;
+			}
 		}
 
 		// If cart doesn't need payment anymore - reload the checkout page.
