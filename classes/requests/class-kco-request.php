@@ -53,14 +53,43 @@ class KCO_Request {
 	}
 
 	/**
+	 * Get the domain to use for the request based on the merchant ID.
+	 *
+	 * @param string $password The Klarna shared secret.
+	 * @param string $merchant_id The Klarna merchant ID.
+	 *
+	 * @return string The domain to use for the request.
+	 */
+	public static function get_api_domain( $password, $merchant_id ) {
+		// If the password starts with 'kco_', or the mid starts with 'M' or 'PM', use kustom.co, otherwise use klarna.com.
+		$password_pattern = '/^kco_/';
+		$mid_pattern      = '/^(M|PM)/';
+
+		$domain = 'klarna.com';
+		if ( preg_match( $password_pattern, $password ) || preg_match( $mid_pattern, $merchant_id ) ) {
+			$domain = 'kustom.co';
+		}
+
+		$domain = apply_filters( 'kco_api_domain', $domain, $merchant_id );
+
+		// Ensure the return domain is a valid string, and remove any leading or trailing whitespace or slashes.
+		if ( ! is_string( $domain ) || empty( $domain ) ) {
+			$domain = 'klarna.com';
+		}
+
+		return trim( $domain, " \t\n\r\0\x0B/" );
+	}
+
+	/**
 	 * Gets Klarna API URL base.
 	 */
 	public function get_api_url_base() {
 		$base_location  = wc_get_base_location();
 		$country_string = 'US' === $base_location['country'] ? '-na' : '';
 		$test_string    = 'yes' === $this->settings['testmode'] ? '.playground' : '';
+		$domain         = self::get_api_domain( $this->get_shared_secret(), $this->get_merchant_id() );
 
-		return 'https://api' . $country_string . $test_string . '.klarna.com/';
+		return "https://api{$country_string}{$test_string}.{$domain}/";
 	}
 
 	/**
@@ -143,20 +172,23 @@ class KCO_Request {
 			return $response;
 		}
 
-		// Check the status code, if its not between 200 and 299 then its an error.
+		$body = wp_remote_retrieve_body( $response );
 		$code = wp_remote_retrieve_response_code( $response );
+		// Check the status code, if its not between 200 and 299 then its an error.
 		if ( $code < 200 || $code > 299 ) {
-			$data          = "URL: $request_url - " . wp_json_encode( $request_args );
+			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $request_args );
 			$error_message = '';
 			// Get the error messages.
-			if ( null !== json_decode( $response['body'], true ) ) {
-				$errors = json_decode( $response['body'], true );
+			$errors = json_decode( $body, true );
+			if ( empty( $errors ) ) {
+				return new WP_Error( $code, 'received empty body', $data );
+			} elseif ( isset( $errors['error_messages'] ) && is_array( $errors['error_messages'] ) ) {
 				foreach ( $errors['error_messages'] as $error ) {
-					$error_message = "$error_message $error";
+					$error_message = "$error_message  $error";
 				}
 			}
-			return new WP_Error( $code, $response['body'] . $error_message, $data );
+			return new WP_Error( $code, "$body $error_message", $data );
 		}
-		return json_decode( wp_remote_retrieve_body( $response ), true );
+		return json_decode( $body, true );
 	}
 }

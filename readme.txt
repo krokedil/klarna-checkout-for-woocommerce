@@ -6,7 +6,7 @@ Requires at least: 4.0
 Tested up to: 6.8.1
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 9.8.3
+WC tested up to: 9.9.4
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -54,6 +54,17 @@ Klarna Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Klarna Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.06.17    - version 2.13.11 =
+* Tweak         - Updated API endpoints for merchants using Kustom credentials.
+
+= 2025.06.17    - version 2.13.10 =
+* Fix           - Fixed account login fields appearing by default with Klarna Checkout, even when "Create an account?" was unchecked.
+* Fix           - Fixed two undefined array key warnings.
+* Fix           - Fixed the gift card "Amount" string not being translatable.
+
+= 2025.06.12    - version 2.13.9 =
+* Fix           - Fixed a potential fatal error during checkout that could occur when the shipping option price was returned as a string that is not a valid number, caused by WooCommerce version 9.9.x.
+
 = 2025.05.06    - version 2.13.8 =
 * Fix           - Fixed an issue where a 'Pay for Order' button sometimes appeared on the order received page even after payment was completed.
 
