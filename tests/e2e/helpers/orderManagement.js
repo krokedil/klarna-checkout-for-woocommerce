@@ -113,7 +113,7 @@ const refundOrder = async (page, orderManagementType) => {
     await refundAmountDisplay.click({ clickCount: 3 })
 
 
-    // Refund By Klarna button
+    // Refund By Kustom button
     let orderTotal
     let orderTotalFields = await page.$$('.wc-order-refund-items > .wc-order-totals > tbody > tr')
 

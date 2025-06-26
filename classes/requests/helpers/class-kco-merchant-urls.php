@@ -1,6 +1,6 @@
 <?php
 /**
- * Class that formats metchant URLs for Klarnas API.
+ * Class that formats metchant URLs for Kustom's API.
  *
  * @package Klarna_Checkout/Classes
  */
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * KCO_Merchant_URLs class.
  *
- * Class that formats gets merchant URLs Klarna API.
+ * Class that formats gets merchant URLs Kustom API.
  */
 class KCO_Merchant_URLs {
 
@@ -173,7 +173,7 @@ class KCO_Merchant_URLs {
 	 * Get session ID.
 	 *
 	 * Gets WooCommerce session ID. Used to send in merchant url's to Klarn.
-	 * So we can retrieve the cart object in server to server calls from Klarna.
+	 * So we can retrieve the cart object in server to server calls from Kustom
 	 *
 	 * @return string
 	 */

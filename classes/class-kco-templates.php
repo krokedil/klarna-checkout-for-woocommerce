@@ -1,6 +1,6 @@
 <?php
 /**
- * Templates class for Klarna checkout.
+ * Templates class for Kustom Checkout.
  *
  * @package  Klarna_Checkout/Classes
  */
@@ -50,7 +50,7 @@ class KCO_Templates {
 			return;
 		}
 
-		// Override template if Klarna Checkout page.
+		// Override template if Kustom Checkout page.
 		add_filter( 'wc_get_template', array( $this, 'override_template' ), 999, 2 );
 		add_action( 'wp_footer', array( $this, 'check_that_kco_template_has_loaded' ) );
 
@@ -67,11 +67,10 @@ class KCO_Templates {
 
 		// Adds the required CSS classes for the checkout layout.
 		add_filter( 'body_class', array( $this, 'add_body_class' ) );
-
 	}
 
 	/**
-	 * Override checkout form template if Klarna Checkout is the selected payment method.
+	 * Override checkout form template if Kustom Checkout is the selected payment method.
 	 *
 	 * @param string $template      Template.
 	 * @param string $template_name Template name.
@@ -93,7 +92,7 @@ class KCO_Templates {
 				return $template;
 			}
 
-			// Klarna Checkout.
+			// Kustom Checkout.
 			if ( 'checkout/form-checkout.php' === $template_name ) {
 				$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 
@@ -103,7 +102,7 @@ class KCO_Templates {
 					$klarna_checkout_template = apply_filters( 'kco_locate_checkout_template', KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout.php', $template_name );
 				}
 
-				// Klarna checkout page.
+				// Kustom Checkout page.
 				if ( array_key_exists( 'kco', $available_gateways ) ) {
 					// If chosen payment method exists.
 					if ( 'kco' === WC()->session->get( 'chosen_payment_method' ) ) {
@@ -143,7 +142,7 @@ class KCO_Templates {
 	}
 
 	/**
-	 * Redirect customer to cart page if Klarna Checkout is the selected (or first)
+	 * Redirect customer to cart page if Kustom Checkout is the selected (or first)
 	 * payment method but the KCO template file hasn't been loaded.
 	 */
 	public function check_that_kco_template_has_loaded() {
@@ -171,7 +170,7 @@ class KCO_Templates {
 				return;
 			}
 
-			wc_add_notice( __( 'Klarna Checkout is not available. Please choose a different payment option or contact the store for assistance.', 'klarna-checkout-for-woocommerce' ), 'error' );
+			wc_add_notice( __( 'Kustom Checkout is not available. Please choose a different payment option or contact the store for assistance.', 'klarna-checkout-for-woocommerce' ), 'error' );
 			$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 			// Do not redirect if KCO is the only available gateway to prevent infinite loop.
 			if ( 1 === count( $available_gateways ) ) {
@@ -224,7 +223,7 @@ class KCO_Templates {
 	 * @return array $fields WC billing fields.
 	 */
 	public function kco_wc_unrequire_wc_billing_state_field( $fields ) {
-		// Unrequire if chosen payment method is Klarna Checkout.
+		// Unrequire if chosen payment method is Kustom Checkout.
 		if ( null !== WC()->session && method_exists( WC()->session, 'get' ) &&
 		WC()->session->get( 'chosen_payment_method' ) &&
 		'kco' === WC()->session->get( 'chosen_payment_method' )
@@ -242,7 +241,7 @@ class KCO_Templates {
 	 * @return array $fields WC shipping fields.
 	 */
 	public function kco_wc_unrequire_wc_shipping_state_field( $fields ) {
-		// Unrequire if chosen payment method is Klarna Checkout.
+		// Unrequire if chosen payment method is Kustom Checkout.
 		if ( null !== WC()->session && method_exists( WC()->session, 'get' ) &&
 		WC()->session->get( 'chosen_payment_method' ) &&
 		'kco' === WC()->session->get( 'chosen_payment_method' )

@@ -57,7 +57,7 @@ class KCO_Logger {
 	/**
 	 * Formats the log data to be logged.
 	 *
-	 * @param string $klarna_order_id The Klarna order id.
+	 * @param string $klarna_order_id The Kustom order id.
 	 * @param string $method The method.
 	 * @param string $title The title for the log.
 	 * @param array  $request_args The request args.

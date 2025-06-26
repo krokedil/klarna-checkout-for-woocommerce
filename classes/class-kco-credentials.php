@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class KCO_Credentials {
 
 	/**
-	 * Klarna Checkout for WooCommerce settings.
+	 * Kustom Checkout for WooCommerce settings.
 	 *
 	 * @var $settings
 	 */
@@ -51,7 +51,7 @@ class KCO_Credentials {
 	}
 
 	/**
-	 * Gets Klarna API credentials (merchant ID and shared secret) from user session.
+	 * Gets Kustom API credentials (merchant ID and shared secret) from user session.
 	 *
 	 * @return bool|array $credentials
 	 */

@@ -16,8 +16,8 @@ class KCO_Request_Update_Confirmation extends KCO_Request {
 	/**
 	 * Makes the request.
 	 *
-	 * @param string $klarna_order_id The Klarna order id.
-	 * @param array  $klarna_order The Klarna order to be modified.
+	 * @param string $klarna_order_id The Kustom order id.
+	 * @param array  $klarna_order The Kustom order to be modified.
 	 * @param int    $order_id The WooCommerce order id.
 	 * @return array
 	 */
@@ -37,13 +37,13 @@ class KCO_Request_Update_Confirmation extends KCO_Request {
 	/**
 	 * Gets the request body.
 	 *
-	 * @param array  $klarna_order The Klarna order to be modified.
+	 * @param array  $klarna_order The Kustom order to be modified.
 	 * @param string $order_id The WooCommerce order id.
 	 * @return array
 	 */
 	public function get_body( $klarna_order, $order_id ) {
 		$order = wc_get_order( $order_id );
-		// Use the old Klarna order from a get request to prevent changing more then we need.
+		// Use the old Kustom order from a get request to prevent changing more then we need.
 		$request_args                                  = array(
 			'purchase_country'    => $klarna_order['purchase_country'],
 			'purchase_currency'   => $klarna_order['purchase_currency'],
@@ -73,7 +73,7 @@ class KCO_Request_Update_Confirmation extends KCO_Request {
 	/**
 	 * Gets the request args for the API call.
 	 *
-	 * @param array  $klarna_order The Klarna order to be modified.
+	 * @param array  $klarna_order The Kustom order to be modified.
 	 * @param string $order_id The WooCommerce order id.
 	 * @return array
 	 */
