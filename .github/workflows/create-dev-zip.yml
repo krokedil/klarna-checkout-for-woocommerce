@@ -16,11 +16,6 @@ jobs:
       with:
         fetch-depth: 1
 
-    - name: Install dependencies and build project
-      run: |
-        composer install --prefer-dist --no-progress
-        npm ci && npm run build
-
     - name: Define variables branch name, commit hash and zip file name
       id: vars
       run: |
@@ -59,3 +54,6 @@ jobs:
 
     - name: Add annotation to workflow run with dev zip url
       run: echo "::notice::Dev Zip Url available for 30 days, https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip"
+
+    - name: Add a clickable link to the Job Summary
+      run: echo "For more details, visit our [documentation](https://docs.github.com/en/actions)." >> $GITHUB_STEP_SUMMARY
