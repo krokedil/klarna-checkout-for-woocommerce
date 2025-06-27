@@ -44,7 +44,7 @@ const minimalBlueprintJson = `{
     "login": true,
     "landingPage": "/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco&from=WCADMIN_PAYMENT_SETTINGS",
 }`;
-const PLAYGROUND_MINIMAL_URL = `https://playground.wordpress.net/#` . JSON.stringify(JSON.parse(minimalBlueprintJson));
+const PLAYGROUND_MINIMAL_URL = `https://playground.wordpress.net/#${JSON.stringify(JSON.parse(minimalBlueprintJson))}`;
 
 // Generate the Markdown content for the summary
 const markdownContent = `
