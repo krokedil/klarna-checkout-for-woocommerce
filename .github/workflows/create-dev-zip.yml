@@ -49,11 +49,15 @@ jobs:
 
     - name: Upload to S3
       run: |
-        zip -r ${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip ${{ steps.generate_and_upload_zip.outputs.zipfile-path }}/${{ env.PLUGIN_SLUG }}
+        cd ${{ steps.generate_and_upload_zip.outputs.zipfile-path }}
+        zip -r ../${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip ${{ env.PLUGIN_SLUG }}
         aws s3 cp ${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip s3://krokedil-plugin-dev-zip/${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip
 
     - name: Add annotation to workflow run with dev zip url
       run: echo "::notice::Dev Zip Url available for 30 days, https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip"
 
-    - name: Add a clickable link to the Job Summary
-      run: echo "For more details, visit our [documentation](https://docs.github.com/en/actions)." >> $GITHUB_STEP_SUMMARY
+    - name: Add a Job Summary with dev zip url and WordPress Playground links
+      env:
+        ZIP_FILE_NAME: ${{ steps.vars.outputs.ZIP_FILE_NAME }}
+      run: |
+        node .github/scripts/generate-dev-zip-job-summary.js
