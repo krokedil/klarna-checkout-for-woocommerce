@@ -39,14 +39,6 @@ const minimalBlueprintJson = `{
             "${S3_URL}"
         ],
     "steps": [
-		{
-			"step": "resetData"
-		},
-		{
-			"step": "writeFile",
-			"path": "/wordpress/wp-content/mu-plugins/rewrite.php",
-			"data": "<?php /* Use pretty permalinks */ add_action( 'after_setup_theme', function() { global $wp_rewrite; $wp_rewrite->set_permalink_structure('/%postname%/'); $wp_rewrite->flush_rules(); } );"
-		},
         {
             "step": "setSiteOptions",
             "options": {
@@ -68,15 +60,15 @@ const minimalBlueprintJson = `{
             "command": "wp wc product create --name='Simple product' --sku='simple-product' --regular_price='99.99' --virtual=false --downloadable=false --user='admin'"
         },
         {
-            "step": "php",
+            "step": "runPHP",
             "code": "<?php require_once 'wordpress/wp-load.php'; $page = get_page_by_path('sample-page'); if ($page) { update_option('woocommerce_terms_page_id', $page->ID); }"
         },
         {
-            "step": "php",
+            "step": "runPHP",
             "code": "<?php require_once 'wordpress/wp-load.php'; $shop_page_id = get_option('woocommerce_shop_page_id'); if ($shop_page_id) { update_option('page_on_front', $shop_page_id); update_option('show_on_front', 'page'); }"
         },
         {
-            "step": "php",
+            "step": "runPHP",
             "code": "<?php require_once 'wordpress/wp-load.php'; $checkout_page_id = get_option('woocommerce_checkout_page_id'); if ($checkout_page_id) { wp_update_post(['ID' => $checkout_page_id, 'post_content' => '[woocommerce_checkout]']); }"
         }
     ],
