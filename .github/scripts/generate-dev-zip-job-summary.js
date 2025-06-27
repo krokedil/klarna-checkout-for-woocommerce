@@ -75,7 +75,9 @@ const minimalBlueprintJson = `{
     "login": true,
     "landingPage": "${BLUEPRINT_LANDING_PAGE}"
 }`;
-const PLAYGROUND_MINIMAL_URL = `https://playground.wordpress.net/#${JSON.stringify(JSON.parse(minimalBlueprintJson))}`;
+const minifiedJson = JSON.stringify(JSON.parse(minimalBlueprintJson));
+const encodedJson = encodeURIComponent(minifiedJson);
+const PLAYGROUND_MINIMAL_URL = `https://playground.wordpress.net/#${encodedJson}`;
 
 // Generate the Markdown content for the summary
 const markdownContent = `
