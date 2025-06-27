@@ -13,12 +13,10 @@ if (!summaryFile) {
   process.exit(0); // Exit gracefully
 }
 
-// Define dev zip and other URLs used in the summary
-
-// Other URLs used in the summary
-
+// Define constants for the ZIP file name and S3 URL
 const ZIP_FILE_NAME = process.env.ZIP_FILE_NAME;
 const S3_URL = `https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${ZIP_FILE_NAME}.zip`;
+const BLUEPRINT_LANDING_PAGE = '/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco&from=WCADMIN_PAYMENT_SETTINGS';
 
 // Define playground minimal setup URL
 const minimalBlueprintJson = `{
@@ -27,22 +25,63 @@ const minimalBlueprintJson = `{
 		"php": "8.0",
 		"wp": "latest"
 	},
+    "phpExtensionBundles": [
+        "kitchen-sink"
+    ],
+    "features": {
+        "networking": true
+    },
+    "constants": {
+      "WP_DEBUG": true
+    },
     "plugins": [
             "woocommerce",
             "${S3_URL}"
         ],
     "steps": [
+		{
+			"step": "resetData"
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/wp-content/mu-plugins/rewrite.php",
+			"data": "<?php /* Use pretty permalinks */ add_action( 'after_setup_theme', function() { global $wp_rewrite; $wp_rewrite->set_permalink_structure('/%postname%/'); $wp_rewrite->flush_rules(); } );"
+		},
         {
             "step": "setSiteOptions",
             "options": {
+                "show_on_front": "page",
                 "woocommerce_onboarding_profile": {
                     "skipped": true
-                }
+                },
+                "woocommerce_default_country": "SE",
+                "woocommerce_currency": "SEK",
+                "woocommerce_price_num_decimals": "2"
             }
+        },
+        {
+            "step": "wp-cli",
+            "command": "wp transient delete _wc_activation_redirect"
+        },
+        {
+            "step": "wp-cli",
+            "command": "wp wc product create --name='Simple product' --sku='simple-product' --regular_price='99.99' --virtual=false --downloadable=false --user='admin'"
+        },
+        {
+            "step": "php",
+            "code": "<?php require_once 'wordpress/wp-load.php'; $page = get_page_by_path('sample-page'); if ($page) { update_option('woocommerce_terms_page_id', $page->ID); }"
+        },
+        {
+            "step": "php",
+            "code": "<?php require_once 'wordpress/wp-load.php'; $shop_page_id = get_option('woocommerce_shop_page_id'); if ($shop_page_id) { update_option('page_on_front', $shop_page_id); update_option('show_on_front', 'page'); }"
+        },
+        {
+            "step": "php",
+            "code": "<?php require_once 'wordpress/wp-load.php'; $checkout_page_id = get_option('woocommerce_checkout_page_id'); if ($checkout_page_id) { wp_update_post(['ID' => $checkout_page_id, 'post_content' => '[woocommerce_checkout]']); }"
         }
     ],
     "login": true,
-    "landingPage": "/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco&from=WCADMIN_PAYMENT_SETTINGS"
+    "landingPage": "${BLUEPRINT_LANDING_PAGE}"
 }`;
 const PLAYGROUND_MINIMAL_URL = `https://playground.wordpress.net/#${JSON.stringify(JSON.parse(minimalBlueprintJson))}`;
 
@@ -50,13 +89,12 @@ const PLAYGROUND_MINIMAL_URL = `https://playground.wordpress.net/#${JSON.stringi
 const markdownContent = `
 # Created dev zip
 Download created dev zip through URL below, which is available for 30 days:
-* [${ZIP_FILE_NAME}](${S3_URL})
+* [${ZIP_FILE_NAME}.zip](${S3_URL})
 
 Documentation about how to install the dev zip can be found [here](https://docs.krokedil.com/krokedil-general-support-info/installing-a-development-version/).
 ## Test dev zip using WordPress Playground
-You can test the created dev zip directly in [WordPress Playground](https://wordpress.org/playground/), through the links below:
-* [Minimal setup](${PLAYGROUND_MINIMAL_URL}) (Latest WP, PHP 8.0, WooCommerce and created dev zip)
-* [Advanced setup](#)
+You can test the created dev zip directly in [WordPress Playground](https://wordpress.org/playground/), which is a experimental project and functionality can be limited, through the links below:
+* [Test dev zip using WordPress Playground](${PLAYGROUND_MINIMAL_URL}) (Latest WP, PHP 8.0, WooCommerce and created dev zip)
 `;
 
 // Append the Markdown content to the summary file
