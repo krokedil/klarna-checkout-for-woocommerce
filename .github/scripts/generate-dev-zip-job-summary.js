@@ -94,7 +94,7 @@ const minimalBlueprintJson = `{
             "options": {
                 "activate": true
             }
-        },
+        }
     ],
     "login": true,
     "landingPage": "${BLUEPRINT_LANDING_PAGE}"
