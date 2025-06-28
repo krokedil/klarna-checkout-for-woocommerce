@@ -34,11 +34,25 @@ const minimalBlueprintJson = `{
     "constants": {
       "WP_DEBUG": true
     },
-    "plugins": [
-            "woocommerce",
-            "${S3_URL}"
-        ],
     "steps": [
+		{
+			"step": "resetData"
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/wp-content/mu-plugins/rewrite.php",
+			"data": "<?php /* Use pretty permalinks */ add_action( 'after_setup_theme', function() { global $wp_rewrite; $wp_rewrite->set_permalink_structure('/%postname%/'); $wp_rewrite->flush_rules(); } );"
+		},
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "wordpress.org/plugins",
+                "slug": "woocommerce"
+            },
+            "options": {
+                "activate": true
+            }
+        },
         {
             "step": "setSiteOptions",
             "options": {
@@ -61,7 +75,7 @@ const minimalBlueprintJson = `{
         },
         {
             "step": "runPHP",
-            "code": "<?php require_once 'wordpress/wp-load.php'; $page = get_page_by_path('sample-page'); if ($page) { update_option('woocommerce_terms_page_id', $page->ID); }"
+            "code": "<?php require_once 'wordpress/wp-load.php'; $page = get_page_by_path('refund_returns'); if ($page) { wp_publish_post($page->ID); update_option('woocommerce_terms_page_id', $page->ID); }"
         },
         {
             "step": "runPHP",
@@ -70,7 +84,17 @@ const minimalBlueprintJson = `{
         {
             "step": "runPHP",
             "code": "<?php require_once 'wordpress/wp-load.php'; $checkout_page_id = get_option('woocommerce_checkout_page_id'); if ($checkout_page_id) { wp_update_post(['ID' => $checkout_page_id, 'post_content' => '[woocommerce_checkout]']); }"
-        }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "url",
+                "url": "${S3_URL}"
+            },
+            "options": {
+                "activate": true
+            }
+        },
     ],
     "login": true,
     "landingPage": "${BLUEPRINT_LANDING_PAGE}"
