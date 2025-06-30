@@ -159,7 +159,7 @@ class KCO_API {
 	 * Checks for WP Errors and returns either the response as array or a false.
 	 *
 	 * @param array|WP_Error $response The response from the request.
-	 * @return mixed
+	 * @return array|false The response array or false if there was an error.
 	 */
 	private function check_for_api_error( $response ) {
 		if ( is_wp_error( $response ) ) {
