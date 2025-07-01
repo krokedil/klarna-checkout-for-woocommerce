@@ -13,11 +13,13 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 == DESCRIPTION ==
 
-*Checkout is an embedded checkout solution and includes all popular payment methods (Pay Now, Pay Later, Financing, Installments). With Checkout, Kustom is your single payment provider.*
+*The leading checkout in the Nordics, built for higher conversion and returning shoppers. Easy to integrate, supports Klarna and all popular payment methods, and includes built-in shipping.*
 
-Our complete checkout is a seamless and mobile optimized solution that delivers a best-in-class user experience that comes with all our payment methods. It also identifies the customer and enables one-click repeat purchases across Kustom’s merchant network, resulting in increased average order value, conversions, and loyalty.
+This all-in-one solution makes checkout effortless for you and your customers. Get access to all popular payment methods, including Klarna, and shipping integrations in a single setup. 
 
-This official Kustom extension also makes it easy for you to handle orders in WooCommerce after a purchase is complete. With a single click of a button, you can activate, update, refund and cancel orders directly from WooCommerce without logging into the Kustom administration.
+It’s easy to integrate, requires minimal maintenance, and is fully customizable to your business needs. Kustom, formerly known as Klarna Checkout, became an independent company in 2024 to provide merchants with an even better checkout solution. 
+
+As a standalone solution, Kustom can quickly adapt to merchants’ needs and expand its range of payment methods, markets, and features – all to maximize conversion and create a seamless checkout experience. Kustom has 24,000 connected merchants with sales in over 170 countries.
 
 === Pay Now (direct payments) ===
 Customers who want to pay in full at checkout can do it quickly and securely with a credit/debit card. Friction-free direct purchases while maximising the value for your business thanks to guaranteed payments. If they have a Kustom account they can save their details and enjoy one-click purchases from then on.
