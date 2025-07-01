@@ -16,7 +16,7 @@ class KCO_Request_Get_Order extends KCO_Request {
 	/**
 	 * Makes the request.
 	 *
-	 * @param string $klarna_order_id The Klarna order id.
+	 * @param string $klarna_order_id The Kustom order id.
 	 * @return array
 	 */
 	public function request( $klarna_order_id ) {

@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * KCO_AJAX class.
  *
- * Registers AJAX actions for Klarna Checkout for WooCommerce.
+ * Registers AJAX actions for Kustom Checkout for WooCommerce.
  *
  * @extends WC_AJAX
  */
@@ -102,7 +102,7 @@ class KCO_AJAX extends WC_AJAX {
 		$switch_to_klarna   = isset( $_POST['kco'] ) ? sanitize_text_field( wp_unslash( $_POST['kco'] ) ) : '';
 
 		if ( 'false' === $switch_to_klarna ) {
-			// Set chosen payment method to first gateway that is not Klarna Checkout for WooCommerce.
+			// Set chosen payment method to first gateway that is not Kustom Checkout for WooCommerce.
 			$first_gateway = reset( $available_gateways );
 			if ( 'kco' !== $first_gateway->id ) {
 				WC()->session->set( 'chosen_payment_method', $first_gateway->id );
@@ -138,9 +138,9 @@ class KCO_AJAX extends WC_AJAX {
 
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
-		// Check if we have a klarna order id.
+		// Check if we have a Kustom order id.
 		if ( empty( $klarna_order_id ) ) {
-			wc_add_notice( 'Klarna order id is missing.', 'error' );
+			wc_add_notice( 'Kustom order id is missing.', 'error' );
 			wp_send_json_error();
 		}
 
@@ -194,7 +194,7 @@ class KCO_AJAX extends WC_AJAX {
 			wp_send_json_error();
 		}
 
-		// If the Klarna order was false, there was no update needed. Don't change any address data.
+		// If the Kustom order was false, there was no update needed. Don't change any address data.
 		if ( ! $klarna_order ) {
 			wp_send_json_success( false );
 		}
@@ -208,7 +208,7 @@ class KCO_AJAX extends WC_AJAX {
 	}
 
 	/**
-	 * Gets the klarna order from session.
+	 * Gets the Kustom order from session.
 	 *
 	 * @return void
 	 */

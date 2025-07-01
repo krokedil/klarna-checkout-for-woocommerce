@@ -1,6 +1,6 @@
 <?php
 /**
- * Klarna Checkout page
+ * Kustom Checkout page
  *
  * Overrides /checkout/form-checkout.php.
  *

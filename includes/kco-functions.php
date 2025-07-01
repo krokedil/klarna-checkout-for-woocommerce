@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Gets a Klarna order. Either creates or updates existing order.
+ * Gets a Kustom order. Either creates or updates existing order.
  *
  * @return array|null If an order could not be created or updated, NULL is returned.
  */
@@ -45,7 +45,7 @@ function kco_create_or_update_order() {
 }
 
 /**
- * Creates or updates a Klarna order for the Pay for order feature.
+ * Creates or updates a Kustom order for the Pay for order feature.
  *
  * @return array|null If an order could not be created or updated, NULL is returned.
  */
@@ -83,7 +83,7 @@ function kco_create_or_update_order_pay_for_order() {
 }
 
 /**
- * Echoes Klarna Checkout iframe snippet.
+ * Echoes Kustom Checkout iframe snippet.
  *
  * @param bool $pay_for_order If this is for a pay for order page or not.
  * @return void
@@ -141,7 +141,7 @@ function kco_add_inline_script( $js ) {
 }
 
 /**
- * Shows order notes field in Klarna Checkout page.
+ * Shows order notes field in Kustom Checkout page.
  */
 function kco_wc_show_order_notes() {
 	$order_fields = WC()->checkout()->get_checkout_fields( 'order' );
@@ -153,7 +153,7 @@ function kco_wc_show_order_notes() {
 }
 
 /**
- * Shows select another payment method button in Klarna Checkout page.
+ * Shows select another payment method button in Kustom Checkout page.
  */
 function kco_wc_show_another_gateway_button() {
 	$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
@@ -238,15 +238,15 @@ function kco_wc_prefill_consent() {
 		if ( 'de_DE' === get_locale() || 'de_DE_formal' === get_locale() ) {
 			$button_text = 'Meine Adressdaten vorausfüllen';
 			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
-			$popup_text  = 'In unserem Kassenbereich nutzen wir Klarna Checkout. Dazu werden Ihre Daten, wie E-Mail-Adresse, Vor- und
-			Nachname, Geburtsdatum, Adresse und Telefonnummer, soweit erforderlich, automatisch an Klarna AB übertragen,
-			sobald Sie in den Kassenbereich gelangen. Die Nutzungsbedingungen für Klarna Checkout finden Sie hier:
-			<a href="https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/de_de/checkout" target="_blank">https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/de_de/checkout</a>';
+			$popup_text  = 'In unserem Kassenbereich nutzen wir Kustom Checkout. Dazu werden Ihre Daten, wie E-Mail-Adresse, Vor- und
+			Nachname, Geburtsdatum, Adresse und Telefonnummer, soweit erforderlich, automatisch an Kustom AB übertragen,
+			sobald Sie in den Kassenbereich gelangen. Die Nutzungsbedingungen für Kustom Checkout finden Sie hier:
+			<a href="https://www.kustom.co/legal' . $merchant_id . '/de_de/checkout" target="_blank">https://www.kustom.co/legal' . $merchant_id . '/de_de/checkout</a>';
 		} else {
 			$button_text = 'Meine Adressdaten vorausfüllen';
 			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
-			$popup_text  = 'We use Klarna Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Klarna AB, enabling the provision of Klarna Checkout. These User Terms apply for the use of Klarna Checkout is available here:
-			<a target="_blank" href="https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/en_us/checkout">https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/en_us/checkout</a>';
+			$popup_text  = 'We use Kustom Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Kustom AB, enabling the provision of Kustom Checkout. These User Terms apply for the use of Kustom Checkout is available here:
+			<a target="_blank" href="https://www.kustom.co/legal' . $merchant_id . '/en_us/checkout">https://www.kustom.co/legal' . $merchant_id . '/en_us/checkout</a>';
 		}
 		?>
 		<p><a class="button" href="<?php echo esc_attr( $consent_url ); ?>"><?php echo esc_html( $button_text ); ?></a></p>
@@ -261,7 +261,7 @@ function kco_wc_prefill_consent() {
 }
 
 /**
- * Converts 3-letter ISO returned from Klarna to 2-letter code used in WooCommerce.
+ * Converts 3-letter ISO returned from Kustom to 2-letter code used in WooCommerce.
  *
  * @param string $country Country code.
  */
@@ -572,10 +572,10 @@ function kco_unset_sessions() {
 }
 
 /**
- * Confirms and finishes the Klarna Order for processing.
+ * Confirms and finishes the Kustom Order for processing.
  *
  * @param int    $order_id The WooCommerce Order id.
- * @param string $klarna_order_id The Klarna Order id.
+ * @param string $klarna_order_id The Kustom Order id.
  * @return void
  */
 function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
@@ -586,7 +586,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 			return;
 		}
 
-		// Get the Klarna OM order.
+		// Get the Kustom OM order.
 		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 		if ( ! is_wp_error( $klarna_order ) ) {
@@ -601,7 +601,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 			// Let other plugins hook into this sequence.
 			do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
 
-			// Acknowledge order in Klarna.
+			// Acknowledge order in Kustom.
 			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
 			// Set the merchant references for the order.
 			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
@@ -610,27 +610,27 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 			// Check fraud status.
 			if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
 				// Payment complete and set transaction id.
-				// translators: Klarna order ID.
-				$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+				// translators: Kustom order ID.
+				$note = sprintf( __( 'Payment via Kustom Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
 				$order->add_order_note( $note );
 				$order->payment_complete( $klarna_order_id );
 				KCO_Logger::log( $klarna_order_id . ': Fraud status accepted for order ' . $order->get_order_number() . '. payment_complete triggered.' );
 				do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
 			} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
 				// Set status to on-hold.
-				// translators: Klarna order ID.
-				$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+				// translators: Kustom order ID.
+				$note = sprintf( __( 'Kustom order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
 				$order->set_status( 'on-hold', $note );
 				$order->save();
 				KCO_Logger::log( $klarna_order_id . ': Fraud status pending for order ' . $order->get_order_number() . '. Order set to on-hold.' );
 			} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
 				// Cancel the order.
-				$order->set_status( 'cancelled', __( 'Klarna Checkout order was rejected', 'klarna-checkout-for-woocommerce' ) );
+				$order->set_status( 'cancelled', __( 'Kustom Checkout order was rejected', 'klarna-checkout-for-woocommerce' ) );
 				$order->save();
 				KCO_Logger::log( $klarna_order_id . ': Fraud status rejected for order ' . $order->get_order_number() . '. Order cancelled.' );
 			}
 		} else {
-			$order->set_status( 'on-hold', __( 'Waiting for verification from Klarnas push notification', 'klarna-checkout-for-woocommerce' ) );
+			$order->set_status( 'on-hold', __( 'Waiting for verification from Kustom\'s push notification', 'klarna-checkout-for-woocommerce' ) );
 			$order->save();
 			KCO_Logger::log( $klarna_order_id . ': No order found in order management. Waiting for push verification. Order #' . $order->get_order_number() . ' set to on-hold.' );
 		}
@@ -638,15 +638,15 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 }
 
 /**
- * Validate the Klarna Checkout order total against the WooCommerce order.
+ * Validate the Kustom Checkout order total against the WooCommerce order.
  *
- * @param array    $klarna_order The Klarna order.
+ * @param array    $klarna_order The Kustom order.
  * @param WC_Order $order The WooCommerce order.
  *
  * @return bool
  */
 function kco_validate_order_total( $klarna_order, $order ) {
-	// Get the Klarna order total.
+	// Get the Kustom order total.
 	$klarna_order_total = $klarna_order['order_amount'];
 
 	// Get the WooCommerce order total.
@@ -660,16 +660,16 @@ function kco_validate_order_total( $klarna_order, $order ) {
 
 	// If the difference is greater than 1, then log the error and return false.
 	if ( $diff > 1 ) {
-		KCO_Logger::log( 'Order total mismatch. Klarna Order total: ' . $klarna_order_total . ' WC Order total: ' . $order_total . ' Klarna order ID: ' . $klarna_order['order_id'] . ' WC Order ID: ' . $order->get_id() );
+		KCO_Logger::log( 'Order total mismatch. Kustom Order total: ' . $klarna_order_total . ' WC Order total: ' . $order_total . ' Kustom order ID: ' . $klarna_order['order_id'] . ' WC Order ID: ' . $order->get_id() );
 
 		$klarna_order_total = wc_format_decimal( $klarna_order_total / 100, array( 'decimals' => 2 ) );
 		$order_total        = wc_format_decimal( $order_total / 100, array( 'decimals' => 2 ) );
 
-		// translators: 1: Klarna order total, 2: WooCommerce order total.
+		// translators: 1: Kustom order total, 2: WooCommerce order total.
 		$order->set_status(
 			'on-hold',
 			sprintf(
-				__( 'Klarna order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Klarna before processing.', 'klarna-checkout-for-woocommerce' ),
+				__( 'Kustom order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Kustom before processing.', 'klarna-checkout-for-woocommerce' ),
 				$klarna_order_total,
 				$order_total
 			)
@@ -682,9 +682,9 @@ function kco_validate_order_total( $klarna_order, $order ) {
 }
 
 /**
- * Validate that the Woo order matches the corresponding Klarna order.
+ * Validate that the Woo order matches the corresponding Kustom order.
  *
- * @param array    $klarna_order The Klarna order.
+ * @param array    $klarna_order The Kustom order.
  * @param WC_Order $order The Woo order.
  *
  * @return bool
@@ -696,12 +696,12 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	}
 
 	$order_data = new KCO_Request_Order();
-	$prefix     = "Klarna order ID: {$klarna_order['order_id']} | WC Order ID: {$order->get_order_number()}:";
+	$prefix     = "Kustom order ID: {$klarna_order['order_id']} | WC Order ID: {$order->get_order_number()}:";
 
 	// An array of notes to display to the merchant.
-	$notes = array( __( 'A mismatch between the WooCommerce and Klarna orders was identified. Please verify the order in the Klarna merchant portal before processing.', 'klarna-checkout-for-woocommerce' ) );
+	$notes = array( __( 'A mismatch between the WooCommerce and Kustom orders was identified. Please verify the order in the Kustom merchant portal before processing.', 'klarna-checkout-for-woocommerce' ) );
 
-	// A match happens when the item reference and quantity matches in Woo and Klarna.
+	// A match happens when the item reference and quantity matches in Woo and Kustom.
 	$mismatch           = false;
 	$items              = $order->get_items();
 	$klarna_order_items = $klarna_order['order_lines'];
@@ -756,16 +756,16 @@ function kco_validate_order_content( $klarna_order, $order ) {
 			}
 		}
 
-		// Check if the Woo item was not found in the Klarna order.
+		// Check if the Woo item was not found in the Kustom order.
 		if ( ! $match ) {
-			KCO_Logger::log( "$prefix WC order item reference: $reference ($name) was not found in the Klarna order." );
-			$notes[]  = sprintf( __( 'The product "%s" was not found in the Klarna order.', 'klarna-checkout-for-woocommerce' ), $name );
+			KCO_Logger::log( "$prefix WC order item reference: $reference ($name) was not found in the Kustom order." );
+			$notes[]  = sprintf( __( 'The product "%s" was not found in the Kustom order.', 'klarna-checkout-for-woocommerce' ), $name );
 			$mismatch = true;
 		}
 	}
 
 	if ( $mismatch ) {
-		KCO_Logger::log( "$prefix The Klarna and Woo orders do not match." );
+		KCO_Logger::log( "$prefix The Kustom and Woo orders do not match." );
 
 		$order->set_status(
 			'on-hold',
@@ -781,8 +781,8 @@ function kco_validate_order_content( $klarna_order, $order ) {
 /**
  * Converts a region string to the expected country code format for WooCommerce.
  *
- * @param string $region_string The region string from Klarna.
- * @param string $country_code The country code from Klarna.
+ * @param string $region_string The region string from Kustom.
+ * @param string $country_code The country code from Kustom.
  * @return string
  */
 function kco_convert_region( $region_string, $country_code ) {
@@ -817,7 +817,7 @@ function kco_convert_region( $region_string, $country_code ) {
  * Maybe saves the surcharge to the order so that it can be completed properly.
  *
  * @param int   $order_id The WooCommerce order id.
- * @param array $klarna_order The Klarna order.
+ * @param array $klarna_order The Kustom order.
  * @return void
  */
 function kco_maybe_save_surcharge( $order_id, $klarna_order ) {
@@ -837,7 +837,7 @@ function kco_maybe_save_surcharge( $order_id, $klarna_order ) {
  * Maybe saves the org number for a B2B purchase to the WooCommerce order.
  *
  * @param int   $order_id The WooCommerce order id.
- * @param array $klarna_order The Klarna order.
+ * @param array $klarna_order The Kustom order.
  * @return void
  */
 function kco_maybe_save_org_nr( $order_id, $klarna_order ) {
@@ -855,7 +855,7 @@ function kco_maybe_save_org_nr( $order_id, $klarna_order ) {
  * Maybe saves the references for a B2B purchase to the WooCommerce order.
  *
  * @param int   $order_id The WooCommerce order id.
- * @param array $klarna_order The Klarna order.
+ * @param array $klarna_order The Kustom order.
  * @return void
  */
 function kco_maybe_save_reference( $order_id, $klarna_order ) {
@@ -876,15 +876,15 @@ function kco_maybe_save_reference( $order_id, $klarna_order ) {
 /**
  * Undocumented function
  *
- * @param array|bool $data The shipping data from Klarna. False if not set.
- * @param array|bool $klarna_order The Klarna order if we have one already. False if we don't.
+ * @param array|bool $data The shipping data from Kustom False if not set.
+ * @param array|bool $klarna_order The Kustom order if we have one already. False if we don't.
  * @return void
  */
 function kco_update_wc_shipping( $data, $klarna_order = false ) {
 	// Set cart definition.
 	$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
-	// If we don't have a Klarna order, return void.
+	// If we don't have a Kustom order, return void.
 	if ( empty( $klarna_order_id ) ) {
 		return;
 	}
@@ -915,7 +915,7 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 }
 
 /**
- * Returns the WooCommerce order that has a matching Klarna order id saved as a meta field. If no order is found, returns false, and if many orders are found the newest one is returned.
+ * Returns the WooCommerce order that has a matching Kustom order id saved as a meta field. If no order is found, returns false, and if many orders are found the newest one is returned.
  *
  * @param string      $klarna_order_id
  * @param string|null $date_after
@@ -948,7 +948,7 @@ function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
 	// Validate that the order actuall has the metadata we're looking for, and that it is the same.
 	$meta_value = $order->get_meta( '_wc_klarna_order_id', true );
 
-	// If the meta value is not the same as the Klarna order id, return false.
+	// If the meta value is not the same as the Kustom order id, return false.
 	if ( $meta_value !== $klarna_order_id ) {
 		return false;
 	}

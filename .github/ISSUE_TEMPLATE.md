@@ -10,7 +10,7 @@ A clear description of what actually happens
 ### Steps to reproduce the behavior
 A step by step instruction for how to reproduce the error
 
-### Klarna plugin version
+### Kustom plugin version
 The version of the plugin were you encountered the issue
 
 ### WordPress version
@@ -27,4 +27,4 @@ If needed add any screenshots of the issue here that you might have.
 Make sure to try the following steps before you submit the issue
 * Update the plugin to the latest version and test again.
 * Test with the [Storefront](https://wordpress.org/themes/storefront/) theme.
-* Deactivate any other plugin except WooCommerce and Klarna Checkout for WooCommerce and test again.
+* Deactivate any other plugin except WooCommerce and Kustom Checkout for WooCommerce and test again.

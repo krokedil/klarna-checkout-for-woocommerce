@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class KCO_Request_Merchant_Data {
 	/**
-	 * Gets merchant data for Klarna purchase.
+	 * Gets merchant data for Kustom purchase.
 	 *
 	 * @return array
 	 */
