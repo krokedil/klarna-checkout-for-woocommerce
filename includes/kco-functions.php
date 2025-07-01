@@ -241,12 +241,12 @@ function kco_wc_prefill_consent() {
 			$popup_text  = 'In unserem Kassenbereich nutzen wir Kustom Checkout. Dazu werden Ihre Daten, wie E-Mail-Adresse, Vor- und
 			Nachname, Geburtsdatum, Adresse und Telefonnummer, soweit erforderlich, automatisch an Kustom AB übertragen,
 			sobald Sie in den Kassenbereich gelangen. Die Nutzungsbedingungen für Kustom Checkout finden Sie hier:
-			<a href="https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/de_de/checkout" target="_blank">https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/de_de/checkout</a>';
+			<a href="https://www.kustom.co/legal' . $merchant_id . '/de_de/checkout" target="_blank">https://www.kustom.co/legal' . $merchant_id . '/de_de/checkout</a>';
 		} else {
 			$button_text = 'Meine Adressdaten vorausfüllen';
 			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
 			$popup_text  = 'We use Kustom Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Kustom AB, enabling the provision of Kustom Checkout. These User Terms apply for the use of Kustom Checkout is available here:
-			<a target="_blank" href="https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/en_us/checkout">https://cdn.klarna.com/1.0/shared/content/legal/terms/' . $merchant_id . '/en_us/checkout</a>';
+			<a target="_blank" href="https://www.kustom.co/legal' . $merchant_id . '/en_us/checkout">https://www.kustom.co/legal' . $merchant_id . '/en_us/checkout</a>';
 		}
 		?>
 		<p><a class="button" href="<?php echo esc_attr( $consent_url ); ?>"><?php echo esc_html( $button_text ); ?></a></p>

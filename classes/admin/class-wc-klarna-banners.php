@@ -168,7 +168,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 								</p>
 						<h1 id="krokdocs-sidebar-title">Support</h1>
 								<p id="krokdocs-sidebar-main-text">
-									If you have questions regarding a certain purchase you are welcome to contact <a href="http://klarna.com/merchant-support" target="_blank">Kustom</a>.
+									If you have questions regarding a certain purchase you are welcome to contact <a href="https://help.kustom.co/en/" target="_blank">Kustom</a>.
 								</p>
 								<p id="krokdocs-sidebar-main-text">
 									If you have technical questions or questions regarding the configuration of the plugin you are welcome to contact <a href="https://www.krokedil.com/support" target="_blank">Krokedil</a>.

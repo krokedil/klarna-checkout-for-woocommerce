@@ -36,8 +36,7 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 			$settings     = get_option( 'woocommerce_kco_settings' );
 			$add_to_email = isset( $settings['add_to_email'] ) && 'yes' === $settings['add_to_email'] ? true : false;
 			if ( 'kco' === $gateway_used && $add_to_email ) {
-				$klarna_cs_url  = '<a href="https://www.klarna.com/customer-service">' . esc_html__( 'Kustom', 'klarna-checkout-for-woocommerce' ) . '</a>';
-				$klarna_app_url = '<a href="https://app.klarna.com/">' . esc_html__( 'Kustom App', 'klarna-checkout-for-woocommerce' ) . '</a>';
+				$klarna_cs_url = '<a href="https://help.kustom.co/en/">' . esc_html__( 'Kustom', 'klarna-checkout-for-woocommerce' ) . '</a>';
 				?>
 				<p><?php echo esc_html__( 'Kustom order id:', 'klarna-checkout-for-woocommerce' ) . ' ' . esc_html( $order->get_transaction_id() ); ?></p>
 				<?php if ( ! $sent_to_admin ) { ?>
@@ -50,8 +49,7 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 									'Your payment is processed by our partner %1$s. You will shortly receive instructions on how to complete your payment. You can manage all your payments via kustom.co or in the %2$s',
 									'klarna-checkout-for-woocommerce'
 								),
-								$klarna_cs_url,
-								$klarna_app_url
+								$klarna_cs_url
 							),
 							array( 'a' => array( 'href' => array() ) )
 						);

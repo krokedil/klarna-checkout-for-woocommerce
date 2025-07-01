@@ -171,7 +171,7 @@ class KCO_API_Callbacks {
 	 * Address update callback function.
 	 * Response must be sent to Kustom API.
 	 *
-	 * @link https://developers.klarna.com/api/#checkout-api-callbacks-address-update
+	 * @link https://docs.kustom.co/v3/checkout/additional-resources/server-side-callbacks#address-update
 	 * @ref  https://github.com/mmartche/coach/blob/30022c266089fc7499c54e149883e951c288dc9f/catalog/controller/extension/payment/klarna_checkout.php#L509
 	 */
 	public function address_update_cb() {

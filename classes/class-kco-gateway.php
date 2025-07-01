@@ -873,7 +873,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return false;
 			}
 
-			// Set allowed payment methods for upsell based on country. https://developers.klarna.com/documentation/order-management/integration-guide/pre-delivery/#update-order-amount.
+			// Set allowed payment methods for upsell based on country. https://docs.kustom.co/v3/order-management/manage-orders-with-the-api/view-and-change-orders#update-order-amount-1.
 			$allowed_payment_methods = array( 'INVOICE', 'B2B_INVOICE', 'BASE_ACCOUNT', 'DIRECT_DEBIT' );
 			switch ( $klarna_order['billing_address']['country'] ) {
 				case 'AT':

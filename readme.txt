@@ -29,7 +29,7 @@ Try it first, pay it later. Delayed payments for customers who like low friction
 Installment, revolving and other flexible financing plans let customers pay when they can and when they want.
 
 === How to Get Started ===
-* [Sign up for Kustom](https://www.klarna.com/international/business/woocommerce/).
+* [Sign up for Kustom](https://www.kustom.co/platforms-and-plugins#plugin-platforms).
 * [Install the plugin](https://wordpress.org/plugins/klarna-checkout-for-woocommerce/) on your site. During this process you will be asked to download [Klarna Order Management](https://wordpress.org/plugins/klarna-order-management-for-woocommerce/) so you can handle orders in Kustom directly from WooCommerce.
 * Get your store approved by Kustom, and start selling.
 
@@ -125,7 +125,7 @@ For help setting up and configuring Kustom Checkout for WooCommerce please refer
 * Fix           - Bumped the plugin version.
 
 = 2024.01.29    - version 2.12.0 =
-* Feature       - Added a new checkout flow: redirect. The redirect flow replaces the current embedded checkout, and redirects the customer to [Klarna's hosted payment page](https://docs.klarna.com/hosted-payment-page/) ("HPP"). Please refer to [our documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/get-started/introduction/#checkout-flow-setting) on how to enable this setting.
+* Feature       - Added a new checkout flow: redirect. The redirect flow replaces the current embedded checkout, and redirects the customer to [Klarna's hosted payment page](https://docs.kustom.co/v3/hosted-payment-page) ("HPP"). Please refer to [our documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/get-started/introduction/#checkout-flow-setting) on how to enable this setting.
 
 = 2024.01.08    - version 2.11.7 =
 * Enhancement   - Improved performance when redirecting to confirmation page.
