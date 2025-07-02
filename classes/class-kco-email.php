@@ -44,9 +44,9 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 						<?php
 						echo wp_kses(
 							sprintf(
-								// translators: 1. Kustom customer service URL. 2. Kustom's app url.
+								// translators: Kustom customer service URL.
 								__(
-									'Your payment is processed by our partner %1$s. You will shortly receive instructions on how to complete your payment. You can manage all your payments via kustom.co or in the %2$s',
+									'Your payment is processed by our partner %1$s. You will shortly receive instructions on how to complete your payment. You can manage all your payments via kustom.co.',
 									'klarna-checkout-for-woocommerce'
 								),
 								$klarna_cs_url
