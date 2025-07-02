@@ -63,7 +63,7 @@ class KCO_Request {
 	public static function get_api_domain( $password, $merchant_id ) {
 		// If the password starts with 'kco_', or the mid starts with 'M' or 'PM', use kustom.co, otherwise use klarna.com.
 		$password_pattern = '/^kco_/';
-		$mid_pattern = '/^(M|PM)/';
+		$mid_pattern      = '/^(M|PM)/';
 
 		$domain = 'klarna.com';
 		if ( preg_match( $password_pattern, $password ) || preg_match( $mid_pattern, $merchant_id ) ) {
@@ -87,7 +87,7 @@ class KCO_Request {
 		$base_location  = wc_get_base_location();
 		$country_string = 'US' === $base_location['country'] ? '-na' : '';
 		$test_string    = 'yes' === $this->settings['testmode'] ? '.playground' : '';
-		$domain = KCO_Request::get_api_domain( $this->get_shared_secret(), $this->get_merchant_id() );
+		$domain         = self::get_api_domain( $this->get_shared_secret(), $this->get_merchant_id() );
 
 		return "https://api{$country_string}{$test_string}.{$domain}/";
 	}
