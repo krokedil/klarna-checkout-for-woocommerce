@@ -76,7 +76,7 @@ async function getExistingSites() {
   return json.data || [];
 }
 
-// Create a new InstaWP site
+// Create a new InstaWP site and wait for it to be ready if needed
 async function createNewSite(normalizedUrl) {
   const payload = {
     configuration_id: 5141,
@@ -91,7 +91,44 @@ async function createNewSite(normalizedUrl) {
     path: '/api/v2/sites',
     body: JSON.stringify(payload),
   });
-  return json.data || json;
+  const siteData = json.data || json;
+  // If the API returns a task_id, wait for the site to be ready
+  if (siteData.task_id) {
+    // Wait for site to be ready
+    for (let i = 1; i <= 30; i++) {
+      console.log(`Checking site status (attempt ${i})...`);
+      try {
+        const statusRes = await instawpApiRequest({
+          method: 'GET',
+          path: `/api/v2/tasks/${siteData.task_id}/status`,
+        });
+        // Log the response for debugging
+        console.log('--- Response from InstaWP (task status) ---');
+        console.log(JSON.stringify(statusRes, null, 2));
+        console.log('------------------------------------------');
+        const taskStatus = statusRes?.data?.status;
+        const siteId = statusRes?.data?.resource_id;
+        console.log(`Task status: ${taskStatus}, site_id: ${siteId}`);
+        if (taskStatus === 'completed' && siteId && siteId !== 'null') {
+          console.log('Site is ready!');
+          // Fetch the site details after it's ready
+          const sites = await getExistingSites();
+          const found = sites.find(site => String(site.id) === String(siteId));
+          if (found) {
+            return found;
+          } else {
+            throw new Error('Site was created but could not be found after readiness check.');
+          }
+        }
+      } catch (err) {
+        console.error('Error checking site status:', err);
+      }
+      await new Promise(res => setTimeout(res, 10000));
+    }
+    throw new Error('Timed out waiting for site to be ready.');
+  }
+  // Fallback: use the returned site info directly
+  return siteData;
 }
 
 // Generic helper for InstaWP command execution
@@ -119,16 +156,7 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = []) 
 
   try {
     let siteid, siteurl, siteCreated = false;
-
-
-    // Helper to create a new site (with or without normalizedUrl)
-    async function createAndAssignSite(urlArg) {
-      const newSite = await createNewSite(urlArg);
-      siteid = newSite.id;
-      siteurl = newSite.wp_url || '';
-      siteCreated = true;
-    }
-
+    
     if (normalizedUrl) {
       // If a URL is provided, try to find an existing site
       const sites = await getExistingSites();
@@ -144,18 +172,27 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = []) 
         siteurl = matches[0].url;
         siteCreated = false;
       } else {
-        // No matching site found, create a new one with the normalized URL
-        await createAndAssignSite(normalizedUrl);
+        // No matching site found, create a new one with the normalized URL and wait for it to be ready
+        const newSite = await createNewSite(normalizedUrl);
+        siteid = newSite.id;
+        siteurl = newSite.wp_url || newSite.url || '';
+        siteCreated = true;
       }
     } else {
-      // No URL provided, always create a new site with empty site_name
-      await createAndAssignSite('');
+      // No URL provided, always create a new site with empty site_name and wait for it to be ready
+      const newSite = await createNewSite('');
+      siteid = newSite.id;
+      siteurl = newSite.wp_url || newSite.url || '';
+      siteCreated = true;
     }
 
     // Only run setup commands if a new site was created
     if (siteCreated) {
+      // Command 2344: setup-default-site
       await triggerInstaWpCommand(siteid, 2344);
+      // Command 2334: apply WooCommerce blueprint
       await triggerInstaWpCommand(siteid, 2334, [{ wc_blueprint_json_public_url: PLUGIN_WC_BLUEPRINT_URL }]);
+      // Command 2417: apply credentials blueprint (API keys from secrets)
       await triggerInstaWpCommand(siteid, 2417, [{ wc_blueprint_json_string: PLUGIN_CREDENTIALS_WC_BLUEPRINT_JSON }]);
     }
 
