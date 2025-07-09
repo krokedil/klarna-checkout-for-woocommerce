@@ -1,6 +1,6 @@
 <?php
 /**
- * Klarna banners file.
+ * Kustom banners file.
  *
  * @package  Klarna_Checkout/Classes
  */
@@ -40,7 +40,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 
 
 		/**
-		 * Loads Klarna banner in admin pages.
+		 * Loads Kustom banner in admin pages.
 		 */
 		public function klarna_banner() {
 			global $pagenow;
@@ -85,7 +85,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 					<div class="kb-left-group">
 						<div id="kb-left" class="kb-small-container">
 							<h1 id="left-main-title" class="container-title">Go live.</h1>
-							<p id="left-main-text" class="container-main-text">Before you can start to sell with Klarna you need your store to be approved by Klarna. When the installation is done and you are ready to go live, Klarna will need to verify the integration. Then you can go live with your store! If you wish to switch Klarna products then you’ll need the Klarna team to approve your store again.</p>
+							<p id="left-main-text" class="container-main-text">Before you can start to sell with Kustom you need your store to be approved by Kustom When the installation is done and you are ready to go live, Kustom will need to verify the integration. Then you can go live with your store! If you wish to switch Kustom products then you’ll need the Kustom team to approve your store again.</p>
 						</div>
 					</div>
 
@@ -109,7 +109,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 					<div class="kb-right-group">
 						<div id="klarna-logo-left-frame">
 							<img id="klarna-logo-left" class="klarna-logo-img"
-							src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png">
+							src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/kustom_logo_black.png">
 						</div>
 					</div>
 
@@ -150,7 +150,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		public static function settings_sidebar( $parent_options ) {
 			?>
 			<img id="klarna-settings-logo"
-				src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/klarna_logo_black.png" width="200"/>
+				src="<?php echo esc_url( KCO_WC_PLUGIN_URL ); ?>/assets/img/kustom_logo_black.png" width="200"/>
 
 			<div id="klarna-wrapper">
 				<div id="klarna-main">
@@ -168,7 +168,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 								</p>
 						<h1 id="krokdocs-sidebar-title">Support</h1>
 								<p id="krokdocs-sidebar-main-text">
-									If you have questions regarding a certain purchase you are welcome to contact <a href="http://klarna.com/merchant-support" target="_blank">Klarna</a>.
+									If you have questions regarding a certain purchase you are welcome to contact <a href="https://help.kustom.co/en/" target="_blank">Kustom</a>.
 								</p>
 								<p id="krokdocs-sidebar-main-text">
 									If you have technical questions or questions regarding the configuration of the plugin you are welcome to contact <a href="https://www.krokedil.com/support" target="_blank">Krokedil</a>.
@@ -189,11 +189,11 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		}
 
 		/**
-		 * Hide Klarna banner in admin pages for.
+		 * Hide Kustom banner in admin pages for.
 		 */
 		public function hide_klarna_banner() {
 			set_transient( 'klarna_hide_banner', '1', 5 * DAY_IN_SECONDS );
-			wp_send_json_success( 'Hide Klarna banner.' );
+			wp_send_json_success( 'Hide Kustom banner.' );
 		}
 
 		/**
@@ -218,7 +218,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		}
 
 		/**
-		 * Returns the URL to the Klarna developers page for getting test credentials.
+		 * Returns the URL to the Kustom developers page for getting test credentials.
 		 *
 		 * @return string
 		 */

@@ -1,6 +1,6 @@
 <?php
 /**
- * Klarna Checkout fallback order received page, used when WC checkout form submission fails.
+ * Kustom Checkout fallback order received page, used when WC checkout form submission fails.
  *
  * Overrides /checkout/thankyou.php.
  *

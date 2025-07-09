@@ -16,7 +16,7 @@ class KCO_Request_Create_HPP extends KCO_Request {
 	/**
 	 * Makes the request.
 	 *
-	 * @param string $session_id The Klarna Checkout session id.
+	 * @param string $session_id The Kustom Checkout session id.
 	 * @param int    $order_id The WooCommerce order id.
 	 * @return array
 	 */
@@ -38,7 +38,7 @@ class KCO_Request_Create_HPP extends KCO_Request {
 	/**
 	 * Gets the request args for the API call.
 	 *
-	 * @param string $session_id The Klarna Payment session id.
+	 * @param string $session_id The Kustom Payment session id.
 	 * @param int    $order_id The WooCommerce order id.
 	 * @return array
 	 */
@@ -55,7 +55,7 @@ class KCO_Request_Create_HPP extends KCO_Request {
 	/**
 	 * Gets the request body for the API call.
 	 *
-	 * @param string $session_id The Klarna Checkout session id.
+	 * @param string $session_id The Kustom Checkout session id.
 	 * @param int    $order_id The WooCommerce order id.
 	 * @return string
 	 */

@@ -1,9 +1,9 @@
 <?php // phpcs:ignore
 /**
- * Plugin Name: Klarna Checkout for WooCommerce
- * Plugin URI: https://krokedil.com/klarna/
- * Description: Klarna Checkout payment gateway for WooCommerce.
- * Author: Klarna
+ * Plugin Name: Kustom Checkout for WooCommerce
+ * Plugin URI: https://krokedil.com/kustom/
+ * Description: Kustom Checkout payment gateway for WooCommerce.
+ * Author: Kustom
  * Author URI: https://klarna.com/
  * Version: 2.13.11
  * Text Domain: klarna-checkout-for-woocommerce

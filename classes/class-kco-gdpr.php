@@ -29,15 +29,15 @@ class KCO_GDPR {
 			// @codingStandardsIgnoreStart
 			$content =
 				__(
-					'When you place an order in the webstore with Klarna Checkout as the choosen payment method, ' .
-					'information about the products in the order (name, price, quantity, SKU) is sent to Klarna. ' .
-					'When the purchase is finalized Klarna sends your billing and shipping address back to the webstore. ' .
+					'When you place an order in the webstore with Kustom Checkout as the choosen payment method, ' .
+					'information about the products in the order (name, price, quantity, SKU) is sent to Kustom.' .
+					'When the purchase is finalized Kustom sends your billing and shipping address back to the webstore. ' .
 					'This data plus an unique identifier for the purchase is then stored as billing and shipping data in the order in WooCommerce.',
 					'klarna-checkout-for-woocommerce'
 				);
 			// @codingStandardsIgnoreEnd
 			wp_add_privacy_policy_content(
-				__( 'Klarna Checkout for WooCommerce', 'klarna-checkout-for-woocommerce' ),
+				__( 'Kustom Checkout for WooCommerce', 'klarna-checkout-for-woocommerce' ),
 				wp_kses_post( wpautop( $content ) )
 			);
 		}

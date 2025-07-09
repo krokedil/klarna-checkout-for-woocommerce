@@ -13,8 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 <table class="wc_status_table widefat" cellspacing="0">
 	<thead>
 	<tr>
-		<th colspan="6" data-export-label="Klarna Checkout Request Log">
-			<h2><?php esc_html_e( 'Klarna Checkout', 'klarna-checkout-for-woocommerce' ); ?><?php echo wc_help_tip( esc_html__( 'Klarna Checkout System Status.', 'klarna-checkout-for-woocommerce' ) ); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></h2>
+		<th colspan="6" data-export-label="Kustom Checkout Request Log">
+			<h2><?php esc_html_e( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ); ?><?php echo wc_help_tip( esc_html__( 'Kustom Checkout System Status.', 'klarna-checkout-for-woocommerce' ) ); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></h2>
 		</th>
 	</tr>
 

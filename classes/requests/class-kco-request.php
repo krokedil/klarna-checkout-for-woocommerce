@@ -55,8 +55,8 @@ class KCO_Request {
 	/**
 	 * Get the domain to use for the request based on the merchant ID.
 	 *
-	 * @param string $password The Klarna shared secret.
-	 * @param string $merchant_id The Klarna merchant ID.
+	 * @param string $password The Kustom shared secret.
+	 * @param string $merchant_id The Kustom merchant ID.
 	 *
 	 * @return string The domain to use for the request.
 	 */
@@ -81,7 +81,7 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Klarna API URL base.
+	 * Gets Kustom API URL base.
 	 */
 	public function get_api_url_base() {
 		$base_location  = wc_get_base_location();
@@ -93,7 +93,7 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Klarna API request headers.
+	 * Gets Kustom API request headers.
 	 *
 	 * @return array
 	 */
@@ -105,7 +105,7 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Klarna merchant ID.
+	 * Gets Kustom merchant ID.
 	 *
 	 * @return string
 	 */
@@ -116,7 +116,7 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Klarna shared secret.
+	 * Gets Kustom shared secret.
 	 *
 	 * @return string
 	 */
@@ -127,7 +127,7 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Klarna API request headers.
+	 * Gets Kustom API request headers.
 	 *
 	 * @return string
 	 */
@@ -139,7 +139,7 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets country for Klarna purchase.
+	 * Gets country for Kustom purchase.
 	 *
 	 * @return string
 	 */

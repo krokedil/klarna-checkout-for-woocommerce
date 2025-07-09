@@ -110,13 +110,13 @@ class KCO_Settings_Saved {
 		if ( 401 === $code || 403 === $code ) {
 			switch ( $code ) {
 				case 401:
-					$message = "Your Klarna $test credentials not authorized. Please verify the credentials and environment (production or test mode) or remove these credentials and save again. API credentials only work in either production or test, not both environments. ";
+					$message = "Your Kustom $test credentials not authorized. Please verify the credentials and environment (production or test mode) or remove these credentials and save again. API credentials only work in either production or test, not both environments. ";
 					break;
 				case 403:
-					$message = "It seems like your Klarna $test API credentials are not working for the Klarna Checkout plugin, please verify your Klarna contract is for the Klarna Checkout solution.  If your Klarna contract is for standalone payment methods, please instead use the <a href='https://docs.woocommerce.com/document/klarna-payments/'>Klarna Payments for WooCommerce</a> plugin. ";
+					$message = "It seems like your Kustom $test API credentials are not working for the Kustom Checkout plugin, please verify your Kustom contract is for the Kustom Checkout solution.  If your Kustom contract is for standalone payment methods, please instead use the <a href='https://docs.woocommerce.com/document/klarna-payments/'>Kustom Payments for WooCommerce</a> plugin. ";
 					break;
 			}
-			$message        .= "API error code: $code, Klarna API error message: $error_message";
+			$message        .= "API error code: $code, Kustom API error message: $error_message";
 			$this->message[] = $message;
 			$this->error     = true;
 		}
@@ -151,7 +151,6 @@ class KCO_Settings_Saved {
 		}
 		$this->message[] = 'It looks like you have test mode active but no test credentials added. Please either turn off test mode or add test credentials.';
 		$this->error     = true;
-
 	}
 
 	/**
