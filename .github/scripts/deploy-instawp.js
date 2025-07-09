@@ -106,47 +106,56 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = []) 
 
 // Main logic
 (async () => {
-  // Validate required environment variables
-  if (!INSTA_WP_URL || !INSTAWP_API_TOKEN) {
-    console.error('INSTA_WP_URL and INSTAWP_API_TOKEN must be set.');
+  // Validate required environment variables (only INSTAWP_API_TOKEN is required)
+  if (!INSTAWP_API_TOKEN) {
+    console.error('INSTAWP_API_TOKEN must be set.');
     process.exit(1);
   }
 
-  // Get zip file name and normalize the target site URL (strip protocol and trailing slash)
+  // Get zip file name
   const ZIP_FILE_NAME = process.env.ZIP_FILE_NAME;
-  const normalizedUrl = INSTA_WP_URL.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  // Normalize the target site URL (strip protocol and trailing slash), or empty string if not set
+  const normalizedUrl = INSTA_WP_URL ? INSTA_WP_URL.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
 
   try {
-    // Fetch all existing InstaWP sites for the user
-    const sites = await getExistingSites();
-
-    // Try to find a site that matches the normalized URL
-    const matches = sites.filter(site => {
-      if (!site.url) return false;
-      const url = site.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-      return url.toLowerCase() === normalizedUrl.toLowerCase();
-    });
-
     let siteid, siteurl, siteCreated = false;
 
-    if (matches.length > 0) {
-      // Site already exists, use its ID and URL
-      siteid = matches[0].id;
-      siteurl = matches[0].url;
-      siteCreated = false;
-    } else {
-      // No matching site found, create a new one
-      const newSite = await createNewSite(normalizedUrl);
+
+    // Helper to create a new site (with or without normalizedUrl)
+    async function createAndAssignSite(urlArg) {
+      const newSite = await createNewSite(urlArg);
       siteid = newSite.id;
       siteurl = newSite.wp_url || '';
       siteCreated = true;
+    }
 
-      // Run InstaWP commands to set up the new site
-      // 1. Command 2344: setup-default-site
+    if (normalizedUrl) {
+      // If a URL is provided, try to find an existing site
+      const sites = await getExistingSites();
+      const matches = sites.filter(site => {
+        if (!site.url) return false;
+        const url = site.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        return url.toLowerCase() === normalizedUrl.toLowerCase();
+      });
+
+      if (matches.length > 0) {
+        // Site already exists, use its ID and URL
+        siteid = matches[0].id;
+        siteurl = matches[0].url;
+        siteCreated = false;
+      } else {
+        // No matching site found, create a new one with the normalized URL
+        await createAndAssignSite(normalizedUrl);
+      }
+    } else {
+      // No URL provided, always create a new site with empty site_name
+      await createAndAssignSite('');
+    }
+
+    // Only run setup commands if a new site was created
+    if (siteCreated) {
       await triggerInstaWpCommand(siteid, 2344);
-      // 2. Command 2334: apply WooCommerce blueprint
       await triggerInstaWpCommand(siteid, 2334, [{ wc_blueprint_json_public_url: PLUGIN_WC_BLUEPRINT_URL }]);
-      // 3. Command 2417: apply credentials blueprint (API keys from secrets)
       await triggerInstaWpCommand(siteid, 2417, [{ wc_blueprint_json_string: PLUGIN_CREDENTIALS_WC_BLUEPRINT_JSON }]);
     }
 
