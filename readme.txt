@@ -6,7 +6,7 @@ Requires at least: 4.0
 Tested up to: 6.8.1
 Requires PHP: 7.0
 WC requires at least: 4.0.0
-WC tested up to: 9.9.4
+WC tested up to: 9.9.5
 Stable tag: trunk
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -50,6 +50,10 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.07.09    - version 2.14.0 =
+* Feature       - Updated visual rebranding to align with the Kustom brand identity.
+* Fix           - Fixed a PHP warning triggered when handling carts with only free trial subscriptions, where an update request was aborted but not properly handled.
+
 = 2025.06.17    - version 2.13.11 =
 * Tweak         - Updated API endpoints for merchants using Kustom credentials.
 

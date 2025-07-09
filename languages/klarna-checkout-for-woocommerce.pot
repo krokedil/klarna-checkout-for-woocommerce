@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2025-06-24 14:53+0000\n"
+"POT-Creation-Date: 2025-07-09 09:35+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -38,7 +38,7 @@ msgstr ""
 msgid "Payment via Kustom Checkout, order ID: %s"
 msgstr ""
 
-#: ../classes/class-kco-checkout.php:199
+#: ../classes/class-kco-checkout.php:205
 msgid "The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again."
 msgstr ""
 
@@ -58,17 +58,13 @@ msgstr ""
 msgid "Kustom"
 msgstr ""
 
-#: ../classes/class-kco-email.php:40
-msgid "Kustom App"
-msgstr ""
-
-#: ../classes/class-kco-email.php:42
+#: ../classes/class-kco-email.php:41
 msgid "Kustom order id:"
 msgstr ""
 
-#. translators: 1. Kustom customer service URL. 2. Kustom's app url.
-#: ../classes/class-kco-email.php:49
-msgid "Your payment is processed by our partner %1$s. You will shortly receive instructions on how to complete your payment. You can manage all your payments via kustom.co or in the %2$s"
+#. translators: Kustom customer service URL.
+#: ../classes/class-kco-email.php:48
+msgid "Your payment is processed by our partner %1$s. You will shortly receive instructions on how to complete your payment. You can manage all your payments via kustom.co."
 msgstr ""
 
 #: ../classes/class-kco-fields.php:25
@@ -596,7 +592,7 @@ msgstr ""
 
 #. translators: %s: URL.
 #: ../classes/admin/class-kco-admin-notices.php:169
-msgid "The <i>Kustom upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Kustom upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href=\"%s\">Kustom Add-ons page</a>. "
+msgid "The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href=\"%s\">Kustom Add-ons page</a>. "
 msgstr ""
 
 #: ../classes/admin/class-kco-admin-notices.php:232
