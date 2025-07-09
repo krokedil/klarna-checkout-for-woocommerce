@@ -197,7 +197,7 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = []) 
     // Only run setup commands if a new site was created
     if (siteCreated) {
       // Command 2344: setup-default-site
-      await triggerInstaWpCommand(siteid, 2344);
+      //await triggerInstaWpCommand(siteid, 2344);
       // Command 2334: apply WooCommerce blueprint
       await triggerInstaWpCommand(siteid, 2334, [{ wc_blueprint_json_public_url: PLUGIN_WC_BLUEPRINT_URL }]);
       // Command 2417: apply credentials blueprint (API keys from secrets)
