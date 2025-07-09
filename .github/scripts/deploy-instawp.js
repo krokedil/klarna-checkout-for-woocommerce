@@ -60,6 +60,14 @@ function instawpApiRequest({ method, path, body }) {
             resolve(data);
           }
         } else {
+          // Enhanced error logging for debugging
+          console.error('InstaWP API error:', {
+            method,
+            path,
+            body,
+            statusCode: res.statusCode,
+            response: data
+          });
           reject(new Error(`InstaWP API error: ${res.statusCode} - ${data}`));
         }
       });
