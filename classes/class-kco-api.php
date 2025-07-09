@@ -45,8 +45,8 @@ class KCO_API {
 	/**
 	 * Gets a Kustom Checkout order
 	 *
-	 * @param string $klarna_order_id The Kustom Checkout order id.
-	 * @return mixed
+	 * @param string $klarna_order_id The Klarna Checkout order id.
+	 * @return array|false
 	 */
 	public function get_klarna_order( $klarna_order_id ) {
 		$request  = new KCO_Request_Retrieve();
@@ -158,8 +158,8 @@ class KCO_API {
 	/**
 	 * Checks for WP Errors and returns either the response as array or a false.
 	 *
-	 * @param array $response The response from the request.
-	 * @return mixed
+	 * @param array|WP_Error $response The response from the request.
+	 * @return array|false The response array or false if there was an error.
 	 */
 	private function check_for_api_error( $response ) {
 		if ( is_wp_error( $response ) ) {
