@@ -63,8 +63,8 @@ jobs:
     - name: Deploy dev zip to existing InstaWP site or create a new one
       id: deploy_instawp
       env:
-        INSTA_WP_URL: ${{ env.INSTA_WP_URL }}
-        INSTAWP_API_TOKEN: ${{ env.INSTAWP_API_TOKEN }}
+        INSTA_WP_URL: ${{ github.event.inputs.instawp_url }}
+        INSTAWP_API_TOKEN: ${{ secrets.INSTAWP_API_TOKEN }}
         E2E_API_KEY: ${{ secrets.E2E_API_KEY }}
         E2E_API_SECRET: ${{ secrets.E2E_API_SECRET }}
       run: |
