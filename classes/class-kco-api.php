@@ -12,11 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * KCO_API class.
  *
- * Class that has functions for the klarna communication.
+ * Class that has functions for the Kustom communication.
  */
 class KCO_API {
 	/**
-	 * Creates a Klarna Checkout order.
+	 * Creates a Kustom Checkout order.
 	 *
 	 * @param int $order_id The WooCommerce order id.
 	 * @return mixed
@@ -29,9 +29,9 @@ class KCO_API {
 	}
 
 	/**
-	 * Creates a Klarna HPP session.
+	 * Creates a Kustom HPP session.
 	 *
-	 * @param string $session_id The Klarna Checkout session to use for the HPP request.
+	 * @param string $session_id The Kustom Checkout session to use for the HPP request.
 	 * @param int    $order_id The WooCommerce order id to use for the HPP request.
 	 * @return mixed
 	 */
@@ -43,10 +43,10 @@ class KCO_API {
 	}
 
 	/**
-	 * Gets a Klarna Checkout order
+	 * Gets a Kustom Checkout order
 	 *
 	 * @param string $klarna_order_id The Klarna Checkout order id.
-	 * @return mixed
+	 * @return array|false
 	 */
 	public function get_klarna_order( $klarna_order_id ) {
 		$request  = new KCO_Request_Retrieve();
@@ -56,9 +56,9 @@ class KCO_API {
 
 
 	/**
-	 * Updates a Klarna Checkout order.
+	 * Updates a Kustom Checkout order.
 	 *
-	 * @param string $klarna_order_id The Klarna Checkout order id.
+	 * @param string $klarna_order_id The Kustom Checkout order id.
 	 * @param int    $order_id The WooCommerce order id.
 	 * @param bool   $force If true always update the order, even if not needed.
 	 * @return mixed
@@ -87,9 +87,9 @@ class KCO_API {
 	}
 
 	/**
-	 * Sets the merchant reference for the Klarna order. Goes to the order management API.
+	 * Sets the merchant reference for the Kustom order. Goes to the order management API.
 	 *
-	 * @param string $klarna_order_id The Klarna Checkout order id.
+	 * @param string $klarna_order_id The Kustom Checkout order id.
 	 * @param int    $order_id The WooCommerce order id.
 	 * @return mixed
 	 */
@@ -101,9 +101,9 @@ class KCO_API {
 	}
 
 	/**
-	 * Acknowledges the order with Klarna. Goes to the order management API.
+	 * Acknowledges the order with Kustom Goes to the order management API.
 	 *
-	 * @param string $klarna_order_id The Klarna Checkout order id.
+	 * @param string $klarna_order_id The Kustom Checkout order id.
 	 * @return mixed
 	 */
 	public function acknowledge_klarna_order( $klarna_order_id ) {
@@ -114,10 +114,10 @@ class KCO_API {
 	}
 
 	/**
-	 * Acknowledges the order with Klarna. Goes to the order management API.
+	 * Acknowledges the order with Kustom Goes to the order management API.
 	 *
 	 * @param int    $order_id The WooCommerce order id.
-	 * @param string $recurring_token The Klarna recurring token.
+	 * @param string $recurring_token The Kustom recurring token.
 	 * @return mixed
 	 */
 	public function create_recurring_order( $order_id, $recurring_token ) {
@@ -128,9 +128,9 @@ class KCO_API {
 	}
 
 	/**
-	 * Acknowledges the order with Klarna. Goes to the order management API.
+	 * Acknowledges the order with Kustom Goes to the order management API.
 	 *
-	 * @param string $klarna_order_id The Klarna Checkout order id.
+	 * @param string $klarna_order_id The Kustom Checkout order id.
 	 * @return mixed
 	 */
 	public function get_klarna_om_order( $klarna_order_id ) {
@@ -141,10 +141,10 @@ class KCO_API {
 	}
 
 	/**
-	 * Acknowledges the order with Klarna. Goes to the order management API.
+	 * Acknowledges the order with Kustom Goes to the order management API.
 	 *
-	 * @param string $klarna_order_id The Klarna Checkout order id.
-	 * @param array  $klarna_order The Klarna order.
+	 * @param string $klarna_order_id The Kustom Checkout order id.
+	 * @param array  $klarna_order The Kustom order.
 	 * @param int    $order_id The WooCommerce order id.
 	 * @return mixed
 	 */
@@ -158,8 +158,8 @@ class KCO_API {
 	/**
 	 * Checks for WP Errors and returns either the response as array or a false.
 	 *
-	 * @param array $response The response from the request.
-	 * @return mixed
+	 * @param array|WP_Error $response The response from the request.
+	 * @return array|false The response array or false if there was an error.
 	 */
 	private function check_for_api_error( $response ) {
 		if ( is_wp_error( $response ) ) {
@@ -179,7 +179,7 @@ class KCO_API {
 		wc_deprecated_function( 'get_order', '2.0.0', 'get_klarna_order' );
 		$klarna_order = $this->get_klarna_order( WC()->session->get( 'kco_wc_order_id' ) );
 
-		// Make Klarna order an object.
+		// Make Kustom order an object.
 		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		return $klarna_order;
 	}
@@ -187,7 +187,7 @@ class KCO_API {
 	/**
 	 * Deprecated function, adds support for the request_pre_get_order function.
 	 *
-	 * @param  string $klarna_order_id Klarna order ID.
+	 * @param  string $klarna_order_id Kustom order ID.
 	 * @param  string $order_id WooCommerce order ID. Passed if request happens after WooCommerce has been created.
 	 * @return object
 	 */
@@ -195,7 +195,7 @@ class KCO_API {
 		wc_deprecated_function( 'request_pre_get_order', '2.0.0', 'get_klarna_order' );
 		$klarna_order = $this->get_klarna_order( $klarna_order_id );
 
-		// Make Klarna order an object.
+		// Make Kustom order an object.
 		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		return $klarna_order;
 	}
@@ -203,7 +203,7 @@ class KCO_API {
 	/**
 	 * Deprecated function, adds support for the request_post_get_order function.
 	 *
-	 * @param  string $klarna_order_id Klarna order ID.
+	 * @param  string $klarna_order_id Kustom order ID.
 	 * @param  string $order_id WooCommerce order ID. Passed if request happens after WooCommerce has been created.
 	 * @return object
 	 */
@@ -211,7 +211,7 @@ class KCO_API {
 		wc_deprecated_function( 'request_post_get_order', '2.0.0', 'get_klarna_order' );
 		$klarna_order = $this->get_klarna_order( $klarna_order_id );
 
-		// Make Klarna order an object.
+		// Make Kustom order an object.
 		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		return $klarna_order;
 	}
@@ -225,7 +225,7 @@ class KCO_API {
 		wc_deprecated_function( 'request_post_get_order', '2.0.0', 'create_klarna_order' );
 		$klarna_order = $this->create_klarna_order();
 
-		// Make Klarna order an object.
+		// Make Kustom order an object.
 		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		return $klarna_order;
 	}
@@ -239,7 +239,7 @@ class KCO_API {
 		wc_deprecated_function( 'request_pre_update_order', '2.0.0', 'update_klarna_order' );
 		$klarna_order = $this->create_klarna_order();
 
-		// Make Klarna order an object.
+		// Make Kustom order an object.
 		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		return $klarna_order;
 	}
@@ -247,11 +247,11 @@ class KCO_API {
 	/**
 	 * Deprecated function, adds support for the get_snippet function.
 	 *
-	 * @param array $klarna_order The Klarna checkout order.
+	 * @param array $klarna_order The Kustom Checkout order.
 	 * @return object
 	 */
 	public function get_snippet( $klarna_order ) {
-		// Make Klarna order an object.
+		// Make Kustom order an object.
 		$klarna_order = json_decode( wp_json_encode( $klarna_order ) );
 		if ( ! is_wp_error( $klarna_order ) ) {
 			return $klarna_order->html_snippet;
@@ -260,7 +260,7 @@ class KCO_API {
 	}
 
 	/**
-	 * Make an upsell request to Klarna.
+	 * Make an upsell request to Kustom.
 	 *
 	 * @param int    $order_id The WooCommerce order id.
 	 * @param string $upsell_uuid The unique id for the upsell request.
