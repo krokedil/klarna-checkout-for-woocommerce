@@ -219,8 +219,13 @@ class KCO_Checkout {
 			return $wc_result;
 		}
 
-		// If we're not on the order-pay page, we don't need to change anything.
-		if ( ! is_wc_endpoint_url( 'order-pay' ) ) {
+		// If we are on the order-received page, we don't need to change anything.
+		if ( is_wc_endpoint_url( 'order-received' ) ) {
+			return $wc_result;
+		}
+
+		// If we're not on the order-pay page or the checkout page, we should not change the needs payment.
+		if ( ! is_wc_endpoint_url( 'order-pay' ) && ! is_checkout() ) {
 			return $wc_result;
 		}
 
