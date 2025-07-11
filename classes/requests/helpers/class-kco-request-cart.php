@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * KCO_Request_Cart class.
  *
- * Class that formats WooCommerce cart contents for Klarna API.
+ * Class that formats WooCommerce cart contents for Kustom API.
  */
 class KCO_Request_Cart {
 
@@ -115,7 +115,7 @@ class KCO_Request_Cart {
 	}
 
 	/**
-	 * Gets order amount for Klarna API.
+	 * Gets order amount for Kustom API.
 	 *
 	 * @return int
 	 */
@@ -135,7 +135,7 @@ class KCO_Request_Cart {
 	}
 
 	/**
-	 * Gets order amount for Klarna API.
+	 * Gets order amount for Kustom API.
 	 *
 	 * @return int
 	 */
@@ -180,7 +180,7 @@ class KCO_Request_Cart {
 	}
 
 	/**
-	 * Gets order tax amount for Klarna API.
+	 * Gets order tax amount for Kustom API.
 	 *
 	 * @param array $order_lines Order lines from cart.
 	 * @return int
@@ -202,7 +202,7 @@ class KCO_Request_Cart {
 
 
 	/**
-	 * Process WooCommerce cart to Klarna Payments order lines.
+	 * Process WooCommerce cart to Kustom Payments order lines.
 	 */
 	public function process_cart() {
 		foreach ( WC()->cart->get_cart() as $cart_item ) {
@@ -263,7 +263,7 @@ class KCO_Request_Cart {
 	}
 
 	/**
-	 * Process WooCommerce shipping to Klarna Payments order lines.
+	 * Process WooCommerce shipping to Kustom Payments order lines.
 	 */
 	public function process_shipping() {
 		$settings = get_option( 'woocommerce_kco_settings' );
@@ -429,7 +429,7 @@ class KCO_Request_Cart {
 	 *
 	 * @param  array  $cart_item Cart item.
 	 * @param  object $product   Product object.
-	 * @return integer $item_tax_rate Item tax percentage formatted for Klarna.
+	 * @return integer $item_tax_rate Item tax percentage formatted for Kustom
 	 */
 	public function get_item_tax_rate( $cart_item, $product ) {
 		if ( $product->is_taxable() && $cart_item['line_subtotal_tax'] > 0 ) {
@@ -717,7 +717,7 @@ class KCO_Request_Cart {
 	}
 
 	/**
-	 * Format the value as needed for the Klarna plugin.
+	 * Format the value as needed for the Kustom plugin.
 	 *
 	 * @param int|float $value The unformated value.
 	 * @return int

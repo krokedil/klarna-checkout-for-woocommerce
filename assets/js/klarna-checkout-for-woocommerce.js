@@ -22,7 +22,7 @@ jQuery( function ( $ ) {
 		timeout: null,
 		interval: null,
 
-		// True or false if we need to update the Klarna order. Set to false on initial page load.
+		// True or false if we need to update the Kustom order. Set to false on initial page load.
 		klarnaUpdateNeeded: false,
 		shippingEmailExists: false,
 		shippingPhoneExists: false,
@@ -33,10 +33,10 @@ jQuery( function ( $ ) {
 		documentReady: function () {
 			if ( 0 < kco_wc.paymentMethodEl.length ) {
 				kco_wc.paymentMethod = kco_wc.paymentMethodEl.filter( ":checked" ).val()
-			} else if( 0 < $('ul.wc_payment_methods').length ) {
+			} else if ( 0 < $( "ul.wc_payment_methods" ).length ) {
 				kco_wc.paymentMethod = "kco"
 			} else {
-				return;
+				return
 			}
 
 			kco_wc.log( kco_params )
@@ -49,8 +49,8 @@ jQuery( function ( $ ) {
 				kco_wc.updateShipping( false )
 			}
 
-			// Handle events when the Klarna modal is closed when the purchase is not complete.
-			// Klarna does not provide an event listener for when the modal is closed.
+			// Handle events when the Kustom modal is closed when the purchase is not complete.
+			// Kustom does not provide an event listener for when the modal is closed.
 			let modalWasOpen = false
 			const modalClassName = "klarna-checkout-fso-open"
 			const observer = new MutationObserver( function ( mutations ) {
@@ -58,7 +58,7 @@ jQuery( function ( $ ) {
 					if ( "attributes" === mutation.type && "class" === mutation.attributeName ) {
 						if ( ! $( "html" ).hasClass( modalClassName ) ) {
 							if ( modalWasOpen ) {
-								// Wait for the Klarna modal to disappear before checking if any errors are found.
+								// Wait for the Kustom modal to disappear before checking if any errors are found.
 								const noticeClassName = kco_params.pay_for_order
 									? "div.woocommerce-notices-wrapper"
 									: "form.checkout"
@@ -66,12 +66,14 @@ jQuery( function ( $ ) {
 
 								// Scroll to error notices if found.
 								if ( notices.length && notices.find( ".woocommerce-error" ).length ) {
-									$( "html, body" ).not(':animated').animate(
-										{
-											scrollTop: notices.offset().top - 100,
-										},
-										1000,
-									)
+									$( "html, body" )
+										.not( ":animated" )
+										.animate(
+											{
+												scrollTop: notices.offset().top - 100,
+											},
+											1000,
+										)
 								}
 
 								// Unlock the order review table and checkout form.
@@ -92,15 +94,15 @@ jQuery( function ( $ ) {
 		 * Unblock the checkout form and order review.
 		 */
 		unblock: function () {
-			kco_wc.kcoSuspend();
+			kco_wc.kcoSuspend()
 			kco_wc.checkoutFormSelector.removeClass( "processing" )
 			$( ".woocommerce-checkout-review-order-table" ).unblock()
 			$( kco_wc.checkoutFormSelector ).unblock()
-			kco_wc.kcoResume();
+			kco_wc.kcoResume()
 		},
 
 		/**
-		 * Resumes the Klarna Iframe
+		 * Resumes the Kustom Iframe
 		 * @param {boolean} autoResumeBool
 		 */
 		kcoSuspend: function ( autoResumeBool ) {
@@ -239,7 +241,7 @@ jQuery( function ( $ ) {
 				}
 			}
 			// Move the "Create an account?" form.
-			$(".woocommerce-account-fields").insertAfter( $("#createaccount").closest('p') )
+			$( ".woocommerce-account-fields" ).insertAfter( $( "#createaccount" ).closest( "p" ) )
 		},
 
 		/**
@@ -300,7 +302,7 @@ jQuery( function ( $ ) {
 		},
 
 		/**
-		 * Gets the Klarna order and starts the order submission
+		 * Gets the Kustom order and starts the order submission
 		 */
 		getKlarnaOrder: function () {
 			console.log( "getKlarnaOrder" )
@@ -441,7 +443,7 @@ jQuery( function ( $ ) {
 		},
 
 		/**
-		 * Fails the order with Klarna on a checkout error and timeout.
+		 * Fails the order with Kustom on a checkout error and timeout.
 		 * @param {function} callback
 		 * @param {string} event
 		 */
@@ -463,7 +465,7 @@ jQuery( function ( $ ) {
 		},
 
 		/**
-		 * Logs the message to the klarna checkout log in WooCommerce.
+		 * Logs the message to the Kustom Checkout log in WooCommerce.
 		 * @param {string} message
 		 */
 		logToFile: function ( message ) {
@@ -533,7 +535,7 @@ jQuery( function ( $ ) {
 									kco_wc.logToFile(
 										"Successfully placed order [" +
 											email +
-											']. Sending "should_proceed: true" to Klarna',
+											']. Sending "should_proceed: true" to Kustom',
 									)
 									callback( { should_proceed: true } )
 								} else {
@@ -569,7 +571,7 @@ jQuery( function ( $ ) {
 				} else {
 					kco_wc.failOrder(
 						"get_order",
-						'<div class="woocommerce-error">' + "Failed to get the order from Klarna." + "</div>",
+						'<div class="woocommerce-error">' + "Failed to get the order from Kustom" + "</div>",
 						callback,
 					)
 				}
@@ -673,7 +675,7 @@ jQuery( function ( $ ) {
 						},
 						validation_callback: function ( data, callback ) {
 							kco_wc.validation = true
-							kco_wc.logToFile( "validation_callback from Klarna triggered" )
+							kco_wc.logToFile( "validation_callback from Kustom triggered" )
 							if ( kco_params.pay_for_order ) {
 								callback( { should_proceed: true } )
 							} else {

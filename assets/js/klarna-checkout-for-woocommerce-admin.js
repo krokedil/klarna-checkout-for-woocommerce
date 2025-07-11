@@ -60,7 +60,7 @@ jQuery( function ( $ ) {
 		if ( ! regex.test( field.val() ) ) {
 			field.addClass( "bad_credential" )
 			$( 'button[name="save"]' ).attr( "disabled", "disabled" )
-			window.alert( "Please verify your Klarna Credentials." )
+			window.alert( "Please verify your Kustom Credentials." )
 			return
 		}
 	}
