@@ -279,7 +279,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			$this->krokedil      = new KrokedilWooCommerce(
 				array(
 					'slug'         => 'kco',
-					'price_format' => 'major',
+					'price_format' => 'minor',
 				)
 			);
 
