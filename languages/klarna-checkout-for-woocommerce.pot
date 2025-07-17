@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2025-07-09 09:35+0000\n"
+"POT-Creation-Date: 2025-07-17 08:41+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -538,6 +538,94 @@ msgstr ""
 
 #: ../classes/class-kco-templates.php:173
 msgid "Kustom Checkout is not available. Please choose a different payment option or contact the store for assistance."
+msgstr ""
+
+#: ../classes/class-kco-validation-callback.php:369
+msgid "The order could not be verified, please reload checkout page and try again."
+msgstr ""
+
+#: ../includes/kco-address-schema.php:12
+msgid "Klarna Checkout address data"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:17
+msgid "Klarna Checkout billing address data"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:22
+msgid "Klarna Checkout billing address given name"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:27
+msgid "Klarna Checkout billing address family name"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:32
+msgid "Klarna Checkout billing address email"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:37
+msgid "Klarna Checkout billing address phone"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:42
+msgid "Klarna Checkout billing address street address"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:47
+msgid "Klarna Checkout billing address postal code"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:52
+msgid "Klarna Checkout billing address city"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:57
+msgid "Klarna Checkout billing address region"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:62
+msgid "Klarna Checkout billing address country"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:69
+msgid "Klarna Checkout shipping address data"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:74
+msgid "Klarna Checkout shipping address given name"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:79
+msgid "Klarna Checkout shipping address family name"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:84
+msgid "Klarna Checkout shipping address email"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:89
+msgid "Klarna Checkout shipping address phone"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:94
+msgid "Klarna Checkout shipping address street address"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:99
+msgid "Klarna Checkout shipping address postal code"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:104
+msgid "Klarna Checkout shipping address city"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:109
+msgid "Klarna Checkout shipping address region"
+msgstr ""
+
+#: ../includes/kco-address-schema.php:114
+msgid "Klarna Checkout shipping address country"
 msgstr ""
 
 #: ../includes/kco-functions.php:163
