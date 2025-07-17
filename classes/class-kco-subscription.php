@@ -524,10 +524,9 @@ class KCO_Subscription {
 	 * @return array
 	 */
 	public function extend_allowed_domains_list( $hosts ) {
-		$hosts[] = 'pay.playground.klarna.co';
-		$hosts[] = 'pay.klarna.co';
+		$hosts[] = 'pay.playground.klarna.com';
+		$hosts[] = 'pay.klarna.com';
 		return $hosts;
 	}
 }
 new KCO_Subscription();
-
