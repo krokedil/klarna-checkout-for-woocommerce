@@ -1,4 +1,6 @@
 <?php
+
+use Krokedil\KustomCheckout\Utility\BlocksUtility;
 /**
  * Templates class for Kustom Checkout.
  *
@@ -147,8 +149,8 @@ class KCO_Templates {
 	 */
 	public function check_that_kco_template_has_loaded() {
 
-		// Exit early.
-		if ( ! is_checkout() ) {
+		// Exit early if we are not on the checkout page, or if the checkout blocks are enabled.
+		if ( ! is_checkout() || BlocksUtility::is_checkout_block_enabled() ) {
 			return;
 		}
 
