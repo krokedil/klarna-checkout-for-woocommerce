@@ -1,5 +1,12 @@
 {
     "require-dev": {
-        "wp-coding-standards/wpcs": "^2.3"
+        "wp-coding-standards/wpcs": "^2.3",
+        "php-stubs/woocommerce-stubs": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Krokedil\\KustomCheckout\\": "src/",
+            "Krokedil\\KustomCheckout\\Blocks\\": "blocks/src/"
+        }
     }
 }
