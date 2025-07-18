@@ -23,8 +23,6 @@ class RedirectFlow extends CheckoutFlow {
 
 		$hpp_redirect = $hpp['redirect_url'];
 
-		error_log( 'Redirecting to: ' .  var_export( $hpp_redirect, true ) );
-
 		// Save Kustom HPP url & Session ID.
 		$order->update_meta_data( '_wc_klarna_hpp_url', sanitize_text_field( $hpp_redirect ) );
 		$order->update_meta_data( '_wc_klarna_hpp_session_id', sanitize_key( $hpp['session_id'] ) );

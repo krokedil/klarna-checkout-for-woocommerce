@@ -115,7 +115,6 @@ class BlockExtension {
 	public function register_method() {
 		if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
 			if ( ! file_exists( __DIR__ . '/Checkout/CheckoutBlock.php' ) ) {
-				error_log( 'CheckoutBlock.php does not exist' );
 				return;
 			}
 
