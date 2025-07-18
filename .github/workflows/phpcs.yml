@@ -21,7 +21,7 @@ jobs:
         run: |
           curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
           php phpcs.phar --version
-          git clone -b master https://github.com/WordPress/WordPress-Coding-Standards.git wpcs
+          git clone -b main https://github.com/WordPress/WordPress-Coding-Standards.git wpcs
           php phpcs.phar --config-set installed_paths wpcs
           php phpcs.phar -i
 
