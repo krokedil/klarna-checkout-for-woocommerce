@@ -13,8 +13,9 @@ import { registerPaymentMethod } from "@woocommerce/blocks-registry";
 // @ts-ignore - Cant avoid this issue, but its loaded in by Webpack
 import { getSetting } from "@woocommerce/settings";
 import { useKcoIframe } from "./hooks/useKcoIframe";
-import { decode } from "punycode";
 
+// Declare wc and _klarnaCheckout on the window object to avoid TypeScript errors when using them later.
+// _klarnaCheckout is added by the Klarna Checkout script, and wc is added by WooCommerce blocks.
 declare global {
   interface Window {
     _klarnaCheckout: any;
@@ -36,12 +37,27 @@ const canMakePayment = (): Boolean => {
   return true;
 };
 
+/**
+ * Kustom Checkout component properties.
+ *
+ * @property {string} [activePaymentMethod] - The currently active payment method.
+ * @property {Object} [billing] - The billing information from WooCommerce.
+ * @property {Object} [cartData] - The cart data containing items and totals from WooCommerce.
+ */
 type KustomCheckoutProps = {
   activePaymentMethod?: string;
   billing?: any;
   cartData?: any;
 };
 
+/**
+ * Kustom Checkout component for WooCommerce blocks.
+ *
+ * Loads the useKcoIframe hook that manages the Kustom Checkout iframe, and its interaction with checkout page.
+ *
+ * @param {KustomCheckoutProps} props - The properties passed to the component.
+ * @returns {JSX.Element|null} The rendered component or null if no description is provided.
+ */
 const KustomCheckout = (props: KustomCheckoutProps): JSX.Element => {
   const { activePaymentMethod, billing, cartData } = props;
   const { isActive, suspendKCO, resumeKCO } = useKcoIframe(
@@ -49,25 +65,29 @@ const KustomCheckout = (props: KustomCheckoutProps): JSX.Element => {
     activePaymentMethod,
     cartData
   );
+
   useEffect(() => {
-    if (!isActive) {
-      return;
-    }
+    if (!isActive) return; // If Kustom Checkout we don't want to do anything.
+
+    // Suspend and resume the Kustom Checkout iframe when the cart total items change, this forces the iframe to reload with the new cart data.
     suspendKCO();
     resumeKCO();
   }, [billing.cartTotalItems]);
 
-  if (description !== "") {
-    return (
-      <div className="wc-block-components-klarna-checkout">
-        <p>{description}</p>
-      </div>
-    );
-  }
+  if (description === "") return null; // If the description is empty, we don't want to render anything.
 
-  return null;
+  return (
+    <div className="wc-block-components-klarna-checkout">
+      <p>{description}</p>
+    </div>
+  );
 };
 
+/**
+ * Label component for the Kustom Checkout payment method.
+ *
+ * @returns JSX.Element - A label component for the Kustom Checkout payment method.
+ */
 const Label = (): JSX.Element => {
   return (
     <div
@@ -85,6 +105,11 @@ const Label = (): JSX.Element => {
   );
 };
 
+/**
+ * Options for registering the Kustom Checkout payment method.
+ *
+ * @see https://github.com/woocommerce/woocommerce/blob/9c8608c214bc9df3b28d5dbc766a3750da07ff42/docs/block-development/cart-and-checkout-blocks/checkout-payment-methods/payment-method-integration.md#registration
+ */
 const options = {
   name: "kco",
   label: <Label />,
