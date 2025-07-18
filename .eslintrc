@@ -30,6 +30,8 @@
         "*/build/",
         "node_modules/",
         "vendor/",
-        "assets/"
+        "assets/",
+        "gulpfile.js",
+        "webpack.config.js"
     ]
 }
