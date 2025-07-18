@@ -126,7 +126,7 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @return void
 		 */
 		private function __clone() {
-			wc_doing_it_wrong( __FUNCTION__, __( 'Nope' ), '1.0' );
+			wc_doing_it_wrong( __FUNCTION__, __( 'Nope', 'klarna-checkout-for-woocommerce' ), '1.0' );
 		}
 
 		/**
@@ -136,7 +136,7 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @return void
 		 */
 		public function __wakeup() {
-			wc_doing_it_wrong( __FUNCTION__, __( 'Nope' ), '1.0' );
+			wc_doing_it_wrong( __FUNCTION__, __( 'Nope', 'klarna-checkout-for-woocommerce' ), '1.0' );
 		}
 
 		/**
@@ -411,6 +411,6 @@ if ( ! class_exists( 'KCO' ) ) {
  *
  * @return KCO
  */
-function KCO_WC() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
+function KCO_WC() { // phpcs:ignore
 	return KCO::get_instance();
 }
