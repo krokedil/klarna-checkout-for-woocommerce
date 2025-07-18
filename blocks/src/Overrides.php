@@ -2,6 +2,7 @@
 namespace Krokedil\KustomCheckout\Blocks;
 
 use Automattic\WooCommerce\StoreApi\Utilities\JsonWebToken;
+use Krokedil\KustomCheckout\Blocks\Api\Controllers\OrderController;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -78,15 +79,8 @@ class Overrides {
 	 */
 	private function override_merchant_urls( &$args, $draft_order ) {
 		$args['merchant_urls'] = KCO_WC()->merchant_urls->get_urls( $draft_order->get_id() );
-
 		// Set the validation callback URL for the block checkout.
-		$args['merchant_urls']['validation'] = add_query_arg(
-			array(
-				'kco_validation' => 'yes',
-				'kco_order_id'   => '{checkout.order.id}',
-			),
-			site_url( '/wc-api/kco-block-validation' )
-		);
+		$args['merchant_urls']['validation'] = OrderController::get_validate_endpoint();
 	}
 
 	/**

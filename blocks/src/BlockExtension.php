@@ -1,24 +1,28 @@
 <?php
 namespace Krokedil\KustomCheckout\Blocks;
 
+use Krokedil\KustomCheckout\Blocks\Api\Registry;
 use Krokedil\KustomCheckout\Blocks\Checkout\CheckoutBlock;
 use Krokedil\KustomCheckout\Blocks\Schema\AddressSchema;
+use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Automattic\WooCommerce\StoreApi\Schemas\V1\CartSchema;
 use Exception;
-use Krokedil\KustomCheckout\Utility\BlocksUtility;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Class BlockExtension
+ * Class BlockExtension.
+ *
+ * Handles all block registration with WooCommerce, and loading of the blocks dependencies,
+ * and registers the needed callback hooks for the WooCommerce Store API thats needed.
  */
 class BlockExtension {
 	/**
-	 * Validation callback instance.
+	 * Order controller instance.
 	 *
-	 * @var ValidationCallback
+	 * @var Registry
 	 */
-	private $validation_callback;
+	private $api_registry;
 
 	/**
 	 * Overrides instance.
@@ -33,6 +37,16 @@ class BlockExtension {
 	 * @return void
 	 */
 	public function __construct() {
+		// Initialize the checkout block dependencies.
+		$this->init_checkout_block();
+	}
+
+	/**
+	 * Initialize checkout block dependencies.
+	 *
+	 * @return void
+	 */
+	public function init_checkout_block() {
 		if ( ! BlocksUtility::is_checkout_block_enabled() ) {
 			return;
 		}
@@ -40,10 +54,9 @@ class BlockExtension {
 		add_action( 'woocommerce_blocks_loaded', array( $this, 'register_callbacks' ) );
 		add_action( 'woocommerce_blocks_loaded', array( $this, 'register_method' ) );
 
-		// Initialize the validation callback.
-		$this->validation_callback = new ValidationCallback();
-		// Initialize the overrides.
+		// Load dependencies for the checkout block.
 		$this->overrides = new Overrides();
+		$this->api_registry = new Registry();
 	}
 
 	/**
