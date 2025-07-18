@@ -1,6 +1,9 @@
 <?php
 namespace Krokedil\KustomCheckout\Utility;
 
+/**
+ * Utility class for helper functions related to blocks.
+ */
 class BlocksUtility {
 	/**
 	 * Check if the checkout block is present on the checkout page.

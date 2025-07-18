@@ -1,9 +1,19 @@
 <?php
 namespace Krokedil\KustomCheckout\CheckoutFlow;
 
+use Exception;
+
+/**
+ * Class for processing the redirect checkout flow on the shortcode checkout page and pay for order pages.
+ */
 class RedirectFlow extends CheckoutFlow {
 	/**
-	 * @inheritDoc
+	 * Process the payment for the WooCommerce order.
+	 *
+	 * @param \WC_Order $order The WooCommerce order to be processed.
+	 *
+	 * @return array
+	 * @throws Exception If there is an error during the payment processing.
 	 */
 	public function process( $order ) {
 		$klarna_order = KCO_WC()->api->create_klarna_order( $order->get_id(), 'redirect' );

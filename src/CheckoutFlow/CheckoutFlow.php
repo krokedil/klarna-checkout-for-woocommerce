@@ -5,6 +5,9 @@ use Exception;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
+/**
+ * Abstract class for processing different checkout flows.
+ */
 abstract class CheckoutFlow {
 	/**
 	 * Process the payment depending on the flow that should be used.
@@ -12,6 +15,7 @@ abstract class CheckoutFlow {
 	 * @param int $order_id The WooCommerce order id.
 	 *
 	 * @return array
+	 * @throws Exception If there is an error during the payment processing.
 	 */
 	public static function process_payment( $order_id ) {
 		try {
@@ -89,7 +93,7 @@ abstract class CheckoutFlow {
 		$klarna_order_id = ! empty( $klarna_order_id ) ? $klarna_order_id : WC()->session->get( 'kco_wc_order_id' );
 
 		if ( empty( $klarna_order_id ) ) {
-			throw new Exception( __( 'Klarna order ID not found.', 'klarna-checkout-for-woocommerce' ) );
+			throw new Exception( __( 'Klarna order ID not found.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
 		}
 
 		return $klarna_order_id;
@@ -113,7 +117,7 @@ abstract class CheckoutFlow {
 				'kco_order_shipping'     => $klarna_order['selected_shipping_option'] ?? 'N/A',
 				'kco_shipping_transient' => get_transient( "kss_data_$klarna_order_id" ),
 			);
-			$data               = json_encode( $shipping_debug_log );
+			$data               = wp_json_encode( $shipping_debug_log );
 			\KCO_Logger::log( "Extra shipping debug: $data" );
 		} catch ( Exception $e ) {
 			\KCO_Logger::log( 'Extra shipping debug: Error generating log due to ' . $e->getMessage() );
@@ -137,13 +141,13 @@ abstract class CheckoutFlow {
 	 * @param string $klarna_order_id The Klarna order ID.
 	 *
 	 * @return array
-	 * @throws Exception If the Klarna order is not found or if there is an error
+	 * @throws Exception If the Klarna order is not found or if there is an error.
 	 */
 	public function get_klarna_order( $klarna_order_id ) {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
 		if ( is_wp_error( $klarna_order ) || empty( $klarna_order ) ) {
-			throw new Exception( __( 'Klarna order not found or an error occurred.', 'klarna-checkout-for-woocommerce' ) );
+			throw new Exception( __( 'Klarna order not found or an error occurred.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
 		}
 
 		return $klarna_order;

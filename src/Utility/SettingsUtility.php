@@ -1,6 +1,9 @@
 <?php
 namespace Krokedil\KustomCheckout\Utility;
 
+/**
+ * Utility class for helper functions related to plugin settings.
+ */
 class SettingsUtility {
 	/**
 	 * Holds the settings for the plugin.
@@ -15,7 +18,7 @@ class SettingsUtility {
 	 * @return array
 	 */
 	public static function get_settings() {
-		if ( self::$settings === null ) {
+		if ( null === self::$settings ) {
 			self::$settings = get_option( 'woocommerce_kco_settings', array() );
 
 			// Merge with default values, and ensure all settings are present.
@@ -29,15 +32,15 @@ class SettingsUtility {
 	/**
 	 * Get the value of a specific setting.
 	 *
-	 * @param string $key
-	 * @param mixed  $default
+	 * @param string $key           The key of the setting to retrieve.
+	 * @param mixed  $default_value The default value to return if the setting is not found.
 	 *
 	 * @return mixed
 	 */
-	public static function get_setting( $key, $default = null ) {
+	public static function get_setting( $key, $default_value = null ) {
 		$settings = self::get_settings();
 
-		$value = $settings[ $key ] ?? $default;
+		$value = $settings[ $key ] ?? $default_value;
 
 		return $value;
 	}

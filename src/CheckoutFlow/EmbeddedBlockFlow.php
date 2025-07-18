@@ -1,9 +1,19 @@
 <?php
 namespace Krokedil\KustomCheckout\CheckoutFlow;
 
+use Exception;
+
+/**
+ * Class for processing the embedded checkout flow on the blocks checkout page.
+ */
 class EmbeddedBlockFlow extends CheckoutFlow {
 	/**
-	 * @inheritDoc
+	 * Process the payment for the WooCommerce order.
+	 *
+	 * @param \WC_Order $order The WooCommerce order to be processed.
+	 *
+	 * @return array
+	 * @throws Exception If there is an error during the payment processing.
 	 */
 	public function process( $order ) {
 		$klarna_order_id = $this->get_klarna_order_id( $order );
