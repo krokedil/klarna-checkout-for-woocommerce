@@ -8,16 +8,48 @@ use Exception;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Class ValidationCallback
+ * Class OrderValidation.
+ *
+ * Handles the order validation and submission for Kustom Checkout orders placed with the block checkout.
+ * Ensures the order is valid, and able to be submitted to WooCommerce.
  */
-class ValidationCallback {
+class OrderValidation {
 	/**
-	 * Class constructor.
+	 * Validate the Klarna order.
+	 *
+	 * @param string $klarna_order_id The Klarna order ID.
 	 *
 	 * @return void
+	 * @throws Exception If the request is invalid or the order could not be verified.
 	 */
-	public function __construct() {
-		add_action( 'woocommerce_api_kco-block-validation', array( $this, 'validate_kco_order' ) );
+	public static function validate_kco_order( $klarna_order_id ) {
+		if ( empty( $klarna_order_id ) ) {
+			throw new Exception( 'Could not validate the order, please try again.', 400 );
+		}
+
+		$klarna_order         = self::get_klarna_order( $klarna_order_id );
+		$merchant_reference   = $klarna_order['merchant_reference2']; // Get the merchant reference from the klarna order.
+		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
+
+		// If the merchant reference or klarna merchant data is empty, throw an exception.
+		if ( empty( $merchant_reference ) || empty( $klarna_merchant_data ) ) {
+			throw new Exception( 'Could not validate the order, please try again.', 400 );
+		}
+
+		// Get the order from the merchant reference.
+		$order = self::get_wc_order( $merchant_reference );
+
+		self::validate_wc_order( $order );
+
+		// Attempt to submit the order to WooCommerce using the store api.
+		$updated_order = self::submit_wc_order( $klarna_order, $order );
+
+		// Compare the order hashes to the once stored in the merchant data to ensure the order is valid.
+		self::validate_hash( $klarna_merchant_data['wc_cart_hash'], $updated_order->get_cart_hash() );
+		self::validate_hash( $klarna_merchant_data['wc_shipping_hash'], $updated_order->get_meta( '_shipping_hash' ) );
+		self::validate_hash( $klarna_merchant_data['wc_fees_hash'], $updated_order->get_meta( '_fees_hash' ) );
+		self::validate_hash( $klarna_merchant_data['wc_coupons_hash'], $updated_order->get_meta( '_coupons_hash' ) );
+		self::validate_hash( $klarna_merchant_data['wc_taxes_hash'], $updated_order->get_meta( '_taxes_hash' ) );
 	}
 
 	/**
@@ -29,9 +61,9 @@ class ValidationCallback {
 	 * @return void
 	 * @throws Exception If the hashes do not match.
 	 */
-	private function validate_hash( $klarna_hash, $wc_hash ) {
+	private static function validate_hash( $klarna_hash, $wc_hash ) {
 		if ( $klarna_hash !== $wc_hash ) {
-			throw new Exception( 'Invalid request, hashes do not match.' );
+			throw new Exception( 'Could not validate the order, please try again.', 401 );
 		}
 	}
 
@@ -44,7 +76,7 @@ class ValidationCallback {
 	 * @return void
 	 * @throws Exception If the hashes do not match.
 	 */
-	private function validate_hashes( $klarna_order, $session ) {
+	private static function validate_hashes( $klarna_order, $session ) {
 		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
 
 		// Calculate the hashes for the cart and coupons applied in the session.
@@ -56,8 +88,8 @@ class ValidationCallback {
 		$klarna_coupons_hash = $klarna_merchant_data['wc_coupons_hash'] ?? '';
 
 		// Compare the strings and ensure they are the same.
-		$this->validate_hash( $klarna_cart_hash, $wc_cart_hash );
-		$this->validate_hash( $klarna_coupons_hash, $wc_coupons_hash );
+		self::validate_hash( $klarna_cart_hash, $wc_cart_hash );
+		self::validate_hash( $klarna_coupons_hash, $wc_coupons_hash );
 	}
 
 	/**
@@ -68,11 +100,11 @@ class ValidationCallback {
 	 * @return \WC_Order
 	 * @throws Exception If the order could not be found.
 	 */
-	private function get_wc_order( $merchant_reference ) {
+	private static function get_wc_order( $merchant_reference ) {
 		$order = wc_get_order( $merchant_reference );
 
 		if ( ! $order ) {
-			throw new Exception( 'Could not find the WooCommerce order.' );
+			throw new Exception( 'Could not find the order, please try again.', 404 );
 		}
 
 		return $order;
@@ -81,20 +113,16 @@ class ValidationCallback {
 	/**
 	 * Get the Klarna order and ensure that its valid.
 	 *
+	 * @param string $klarna_order_id The Klarna order ID.
+	 *
 	 * @return array
 	 * @throws Exception If the request is invalid or the Klarna order could not be found.
 	 */
-	private function get_klarna_order() {
-		$klarna_order_id = sanitize_text_field( wp_unslash( $_GET['kco_order_id'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-		if ( empty( $klarna_order_id ) ) {
-			throw new Exception( 'Invalid request, klarna order id missing from the callback.' );
-		}
-
+	private static function get_klarna_order( $klarna_order_id ) {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
 		if ( ! $klarna_order || is_wp_error( $klarna_order ) ) {
-			throw new Exception( 'Could not find the Klarna order.' );
+			throw new Exception( 'Could not find the order, please try again.', 404 );
 		}
 
 		return $klarna_order;
@@ -109,7 +137,7 @@ class ValidationCallback {
 	 * @return void
 	 * @throws Exception If the prices do not match.
 	 */
-	private function validate_price( $klarna_price, $wc_price ) {
+	private static function validate_price( $klarna_price, $wc_price ) {
 		// Divide the Klarna price by 100, to make it a floating point number.
 		$klarna_price = floatval( $klarna_price ) / 100;
 
@@ -117,19 +145,19 @@ class ValidationCallback {
 		$wc_price     = wc_format_decimal( $wc_price, wc_get_price_decimals() );
 
 		if ( $klarna_price !== $wc_price ) {
-			throw new Exception( 'Prices do not match.' );
+			throw new Exception( 'Failed to validate the order, please try again', 401 );
 		}
 	}
 
 	/**
 	 * Validate the order totals to ensure the order is valid.
 	 *
-	 * @param array    $klarna_order The Klarna order.
+	 * @param array     $klarna_order The Klarna order.
 	 * @param \WC_Order $order The WooCommerce order.
 	 *
 	 * @return void
 	 */
-	private function validate_order_totals( $klarna_order, $order ) {
+	private static function validate_order_totals( $klarna_order, $order ) {
 		$selected_shipping                   = $klarna_order['selected_shipping_option'] ?? array();
 		$klarna_order_amount                 = $klarna_order['order_amount'] ?? 0;
 		$klarna_order_tax_amount             = $klarna_order['order_tax_amount'] ?? 0;
@@ -139,8 +167,8 @@ class ValidationCallback {
 		$klarna_total     = $klarna_order_amount + $klarna_selected_shipping_price;
 		$klarna_tax_total = $klarna_order_tax_amount + $klarna_selected_shipping_tax_amount;
 
-		$this->validate_price( $klarna_total, $order->get_total() );
-		$this->validate_price( $klarna_tax_total, $order->get_total_tax() );
+		self::validate_price( $klarna_total, $order->get_total() );
+		self::validate_price( $klarna_tax_total, $order->get_total_tax() );
 	}
 
 	/**
@@ -151,10 +179,10 @@ class ValidationCallback {
 	 * @return void
 	 * @throws Exception If the order is invalid.
 	 */
-	private function validate_wc_order( $order ) {
+	private static function validate_wc_order( $order ) {
 		// Check if the order is paid.
 		if ( $order->is_paid() ) {
-			throw new Exception( 'Order is already paid.' );
+			throw new Exception( 'Order is already paid.', 400 );
 		}
 	}
 
@@ -166,17 +194,17 @@ class ValidationCallback {
 	 * @return SessionHandler
 	 * @throws Exception If the cart could not be loaded.
 	 */
-	private function load_wc_session( $klarna_order ) {
+	private static function load_wc_session( $klarna_order ) {
 		// Get the wc_cart_token from the klarna order merchant data.
 		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
 		$wc_cart_token        = $klarna_merchant_data['wc_cart_token'] ?? '';
 
 		if ( empty( $wc_cart_token ) ) {
-			throw new Exception( 'Invalid request, cart token is missing.' );
+			throw new Exception( 'Failed to validate the order, please try again.', 400 );
 		}
 
 		if ( ! JsonWebToken::validate( $wc_cart_token, '@' . wp_salt() ) ) {
-			throw new Exception( 'Invalid request, cart token is invalid.' );
+			throw new Exception( 'Failed to validate the order, please try again.', 401 );
 		}
 
 		// Set the CartToken header to the server session.
@@ -195,10 +223,10 @@ class ValidationCallback {
 	 * @param array    $klarna_order The Klarna order.
 	 * @param \WC_Order $order The WooCommerce order.
 	 *
-	 * @return void
+	 * @return \WC_Order The updated WooCommerce order after submission.
 	 * @throws Exception If the order could not be submitted.
 	 */
-	private function submit_wc_order( $klarna_order, $order ) {
+	private static function submit_wc_order( $klarna_order, $order ) {
 		$settings                = get_option( 'woocommerce_kco_settings', array() );
 		$klarna_billing_address  = $klarna_order['billing_address'] ?? array();
 		$klarna_shipping_address = $klarna_order['shipping_address'] ?? array();
@@ -319,54 +347,6 @@ class ValidationCallback {
 			throw new Exception( 'Could not find the WooCommerce order.' );
 		}
 
-		// Compare the order hashes to the once stored in the merchant data to ensure the order is valid.
-		$this->validate_hash( $klarna_merchant_data['wc_cart_hash'], $updated_order->get_cart_hash() );
-		$this->validate_hash( $klarna_merchant_data['wc_shipping_hash'], $updated_order->get_meta( '_shipping_hash' ) );
-		$this->validate_hash( $klarna_merchant_data['wc_fees_hash'], $updated_order->get_meta( '_fees_hash' ) );
-		$this->validate_hash( $klarna_merchant_data['wc_coupons_hash'], $updated_order->get_meta( '_coupons_hash' ) );
-		$this->validate_hash( $klarna_merchant_data['wc_taxes_hash'], $updated_order->get_meta( '_taxes_hash' ) );
-	}
-
-	/**
-	 * Validate the Klarna order.
-	 *
-	 * @return void
-	 * @throws Exception If the request is invalid or the order could not be verified.
-	 */
-	public function validate_kco_order() {
-		try {
-			// phpcs:disable WordPress.Security.NonceVerification.Recommended
-			if ( ! isset( $_GET['kco_validation'] ) || 'yes' !== $_GET['kco_validation'] ) {
-				throw new Exception( 'Invalid request, missing kco_validation.' );
-			}
-			// phpcs:enable WordPress.Security.NonceVerification.Recommended
-
-			$klarna_order = $this->get_klarna_order();
-
-			// Get the merchant reference from the klarna order.
-			$merchant_reference = $klarna_order['merchant_reference2'];
-
-			// Get the order from the merchant reference.
-			$order = $this->get_wc_order( $merchant_reference );
-
-			$this->validate_wc_order( $order );
-
-			// Attempt to submit the order to WooCommerce using the store api.
-			$this->submit_wc_order( $klarna_order, $order );
-
-			header( 'HTTP/1.1 200 OK' );
-			die();
-		} catch ( Exception $e ) {
-			$klarna_order_id = sanitize_text_field( wp_unslash( $_GET['kco_order_id'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			\KCO_Logger::log( "$klarna_order_id - Failed order validation: " . $e->getMessage() );
-			echo wp_json_encode(
-				array(
-					'error_type' => 'approval_failed',
-					'error_text' => __( 'The order could not be verified, please reload checkout page and try again.', 'klarna-checkout-for-woocommerce' ),
-				)
-			);
-			header( 'HTTP/1.1 400 Bad Request' );
-			die();
-		}
+		return $updated_order;
 	}
 }
