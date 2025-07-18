@@ -19,7 +19,7 @@ class SettingsUtility {
 			self::$settings = get_option( 'woocommerce_kco_settings', array() );
 
 			// Merge with default values, and ensure all settings are present.
-			$defaults = self::get_default_values();
+			$defaults       = self::get_default_values();
 			self::$settings = wp_parse_args( self::$settings, $defaults );
 		}
 
@@ -30,7 +30,7 @@ class SettingsUtility {
 	 * Get the value of a specific setting.
 	 *
 	 * @param string $key
-	 * @param mixed $default
+	 * @param mixed  $default
 	 *
 	 * @return mixed
 	 */

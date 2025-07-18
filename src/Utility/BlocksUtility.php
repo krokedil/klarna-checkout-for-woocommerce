@@ -8,6 +8,6 @@ class BlocksUtility {
 	 * @return bool
 	 */
 	public static function is_checkout_block_enabled() {
-    	return \WC_Blocks_Utils::has_block_in_page( wc_get_page_id('checkout'), 'woocommerce/checkout' );
+		return \WC_Blocks_Utils::has_block_in_page( wc_get_page_id( 'checkout' ), 'woocommerce/checkout' );
 	}
 }

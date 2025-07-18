@@ -41,7 +41,7 @@ class OrderController extends Controller {
 	 * @return \WP_REST_Response
 	 */
 	public function validate( $request ) {
-		try{
+		try {
 			// Get the Klarna order id from the request.
 			$klarna_order_id = $request->get_param( 'id' );
 
@@ -81,7 +81,7 @@ class OrderController extends Controller {
 	 * Return a WP_REST_Response for an error.
 	 *
 	 * @param \Exception $e The exception that was thrown.
-	 * @param bool $generic_message If true, use a generic error message.
+	 * @param bool       $generic_message If true, use a generic error message.
 	 *
 	 * @return \WP_REST_Response
 	 */
@@ -89,7 +89,7 @@ class OrderController extends Controller {
 		return new \WP_REST_Response(
 			array(
 				'error_type' => 'approval_failed',
-				'error_text' => $generic_message ? __( 'Failed to validate your order, please try again.', 'kco-block' ) : $e->getMessage()
+				'error_text' => $generic_message ? __( 'Failed to validate your order, please try again.', 'klarna-checkout-for-woocommerce' ) : $e->getMessage(),
 			),
 			400
 		);

@@ -72,7 +72,7 @@ class Overrides {
 	/**
 	 * Override the merchant URLs for the Klarna Checkout API.
 	 *
-	 * @param array    $args The request arguments.
+	 * @param array     $args The request arguments.
 	 * @param \WC_Order $draft_order The WooCommerce order.
 	 *
 	 * @return void
@@ -86,7 +86,7 @@ class Overrides {
 	/**
 	 * Set the merchant reference for the Klarna Checkout API.
 	 *
-	 * @param array    $args The request arguments.
+	 * @param array     $args The request arguments.
 	 * @param \WC_Order $draft_order The WooCommerce order.
 	 *
 	 * @return void

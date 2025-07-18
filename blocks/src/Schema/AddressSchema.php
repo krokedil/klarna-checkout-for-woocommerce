@@ -1,6 +1,9 @@
 <?php
 namespace Krokedil\KustomCheckout\Blocks\Schema;
 
+/**
+ * Schema for the Kustom Checkout address data extension for the WooCommerce Store API.
+ */
 class AddressSchema {
 	/**
 	 * Returns the schema for the Klarna Checkout address data.

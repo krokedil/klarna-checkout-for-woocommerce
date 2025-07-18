@@ -220,7 +220,7 @@ class OrderValidation {
 	/**
 	 * Submit the WooCommerce order.
 	 *
-	 * @param array    $klarna_order The Klarna order.
+	 * @param array     $klarna_order The Klarna order.
 	 * @param \WC_Order $order The WooCommerce order.
 	 *
 	 * @return \WC_Order The updated WooCommerce order after submission.
@@ -286,7 +286,6 @@ class OrderValidation {
 				'state'      => $klarna_shipping_address['region'] ?? '',
 				'postcode'   => $klarna_shipping_address['postal_code'] ?? '',
 				'country'    => $klarna_shipping_address['country'] ?? '',
-				// 'phone'      => $klarna_shipping_address['phone'] ?? '',
 			),
 		);
 

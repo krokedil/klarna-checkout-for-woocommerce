@@ -55,7 +55,7 @@ class BlockExtension {
 		add_action( 'woocommerce_blocks_loaded', array( $this, 'register_method' ) );
 
 		// Load dependencies for the checkout block.
-		$this->overrides = new Overrides();
+		$this->overrides    = new Overrides();
 		$this->api_registry = new Registry();
 	}
 

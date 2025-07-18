@@ -12,7 +12,6 @@ class EmbeddedFlow extends CheckoutFlow {
 
 		$this->debug_log_shipping( $klarna_order_id, $order );
 
-
 		$this->save_order_metadata( $order, $klarna_order, 'embedded', false );
 		$klarna_order = KCO_WC()->api->update_klarna_confirmation( $klarna_order_id, $klarna_order, $order->get_id() );
 		$order->save();

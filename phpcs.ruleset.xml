@@ -5,6 +5,7 @@
     <!-- Exclude vendor and node_modules from all rules -->
     <exclude-pattern>*/node_modules/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>blocks/build/</exclude-pattern>
 
     <!-- Exclude the tests folder -->
     <exclude-pattern>tests/*</exclude-pattern>
@@ -27,31 +28,26 @@
 
     <!--  Remove WordPress.Files.FileName.InvalidClassFileName checks to allow for PSR-4 naming convention -->
     <rule ref="WordPress.Files.FileName.InvalidClassFileName">
-        <exclude-pattern>src/</exclude-pattern>
-		<exclude-pattern>blocks/src/</exclude-pattern>
+		<exclude-pattern>src/</exclude-pattern>
     </rule>
 
     <!-- Remove WordPress.Files.FileName.NotHyphenatedLowercase checks to allow for PSR-4 naming convention -->
     <rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
-        <exclude-pattern>src/</exclude-pattern>
-		<exclude-pattern>blocks/src/</exclude-pattern>
+		<exclude-pattern>src/</exclude-pattern>
     </rule>
 
     <!-- Remove need for package tag in file block comments -->
     <rule ref="Squiz.Commenting.FileComment.MissingPackageTag">
-        <exclude-pattern>src/</exclude-pattern>
-		<exclude-pattern>blocks/src/</exclude-pattern>
+		<exclude-pattern>src/</exclude-pattern>
     </rule>
 
     <!-- Remove need for file comment -->
     <rule ref="Squiz.Commenting.FileComment.Missing">
-        <exclude-pattern>src/</exclude-pattern>
-		<exclude-pattern>blocks/src/</exclude-pattern>
+		<exclude-pattern>src/</exclude-pattern>
     </rule>
 
     <!-- Allow the usage of shorthand arrays -->
     <rule ref="Universal.Arrays.DisallowShortArraySyntax.Found">
-        <exclude-pattern>src/</exclude-pattern>
-		<exclude-pattern>blocks/src/</exclude-pattern>
+		<exclude-pattern>src/</exclude-pattern>
     </rule>
 </ruleset>

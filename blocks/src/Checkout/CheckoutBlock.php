@@ -61,7 +61,7 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 	 */
 	public function is_admin() {
 		// If we are on the block render endpoint, then this is an admin request.
-		$is_edit_context = isset( $_GET['action'] ) && 'edit' === $_GET['action'];
+		$is_edit_context = isset( $_GET['action'] ) && 'edit' === $_GET['action']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$is_admin        = $is_edit_context;
 
 		return $is_admin;
@@ -119,7 +119,7 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 			'shippingInIframe' => 'yes' === $this->settings['shipping_methods_in_iframe'],
 			'countryCodes'     => kco_get_country_codes(),
 			'iconUrl'          => $icon_url,
-			'features '         => $this->get_supported_features(),
+			'features '        => $this->get_supported_features(),
 		);
 	}
 }

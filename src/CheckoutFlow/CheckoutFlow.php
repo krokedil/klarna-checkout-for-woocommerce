@@ -14,7 +14,7 @@ abstract class CheckoutFlow {
 	 * @return array
 	 */
 	public static function process_payment( $order_id ) {
-		try{
+		try {
 			$order = wc_get_order( $order_id );
 
 			if ( ! $order ) {
@@ -25,7 +25,7 @@ abstract class CheckoutFlow {
 			\KCO_Logger::log( sprintf( 'Processing order %s|%s with flow %s.', $order->get_id(), $order->get_order_number(), get_class( $handler ) ) );
 
 			return $handler->process( $order );
-		} catch( Exception $e ) {
+		} catch ( Exception $e ) {
 			return self::error_response( $e->getMessage() );
 		}
 	}
@@ -68,7 +68,7 @@ abstract class CheckoutFlow {
 	 * @return array
 	 * @throws Exception If there is an error during the payment processing.
 	 */
-	public abstract function process( $order );
+	abstract public function process( $order );
 
 	/**
 	 * Get the Klarna order id for the order.
@@ -98,7 +98,7 @@ abstract class CheckoutFlow {
 	/**
 	 * Log extra shipping debug information.
 	 *
-	 * @param string $klarna_order_id The Klarna order ID.
+	 * @param string    $klarna_order_id The Klarna order ID.
 	 * @param \WC_Order $order The WooCommerce order.
 	 *
 	 * @return void
