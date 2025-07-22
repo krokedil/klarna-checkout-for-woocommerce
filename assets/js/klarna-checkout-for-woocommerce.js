@@ -39,6 +39,11 @@ jQuery( function ( $ ) {
 				return
 			}
 
+			// If the payment method is not KCO, we don't need to do anything.
+			if ( "kco" !== kco_wc.paymentMethod ) {
+				return
+			}
+
 			kco_wc.log( kco_params )
 			if ( "kco" === kco_wc.paymentMethod ) {
 				$( "#ship-to-different-address-checkbox" ).prop( "checked", true )
@@ -233,6 +238,7 @@ jQuery( function ( $ ) {
 						if ( name === "shipping_email" ) {
 							kco_wc.shippingEmailExists = true
 						}
+						$( "p#" + name + "_field" ).appendTo( "#kco-extra-checkout-fields" )
 					} else {
 						$( 'input[name="' + name + '"]' )
 							.closest( "p" )
