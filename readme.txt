@@ -1,6 +1,6 @@
 === Kustom Checkout for WooCommerce ===
-Contributors: kustom, klarna, krokedil, automattic
-Tags: woocommerce, kustom, klarna, ecommerce, e-commerce, checkout
+Contributors: kustom, krokedil, automattic
+Tags: woocommerce, ecommerce, e-commerce, checkout, klarna
 Donate link: https://kustom.co
 Requires at least: 5.0
 Tested up to: 6.8.2
