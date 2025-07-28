@@ -1,0 +1,71 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "5536213c2cd4ccefad434060079eb310",
+    "packages": [
+        {
+            "name": "krokedil/woocommerce",
+            "version": "1.8.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/krokedil/woocommerce.git",
+                "reference": "d008878feeba072cb952d95cadd68ad93cbae727"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/krokedil/woocommerce/zipball/d008878feeba072cb952d95cadd68ad93cbae727",
+                "reference": "d008878feeba072cb952d95cadd68ad93cbae727",
+                "shasum": ""
+            },
+            "require-dev": {
+                "10up/wp_mock": "^1.0",
+                "php": "~7.4 || ~8.0",
+                "php-stubs/woocommerce-stubs": "^7.2",
+                "php-stubs/wordpress-stubs": "^6.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Krokedil\\WooCommerce\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Krokedil\\WooCommerce\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-V2"
+            ],
+            "authors": [
+                {
+                    "name": "Krokedil AB",
+                    "email": "info@krokedil.se"
+                }
+            ],
+            "description": "A library package for Krokedils plugins that contains helper methods when working with WooCommerce.",
+            "support": {
+                "source": "https://github.com/krokedil/woocommerce/tree/1.8.1",
+                "issues": "https://github.com/krokedil/woocommerce/issues"
+            },
+            "time": "2025-06-03T09:31:00+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": {},
+    "prefer-stable": true,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=7.4"
+    },
+    "platform-dev": {},
+    "platform-overrides": {
+        "php": "7.4"
+    },
+    "plugin-api-version": "2.6.0"
+}
