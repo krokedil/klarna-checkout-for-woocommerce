@@ -175,14 +175,16 @@ class KCO_Merchant_URLs {
 	 * Get session ID.
 	 *
 	 * Gets WooCommerce session ID. Used to send in merchant url's to Klarn.
-	 * So we can retrieve the cart object in server to server calls from Kustom
+	 * So we can retrieve the cart object in server to server calls from Kustom.
 	 *
 	 * @return string
 	 */
 	private function get_session_id() {
 		foreach ( $_COOKIE as $key => $value ) {
 			if ( strpos( $key, 'wp_woocommerce_session_' ) !== false ) {
-				$session_id = explode( '||', $value );
+				// Prior to WooCommerce 10.0, the session data was `||`-separated. Now it is `|`-separated instead.
+				// Since we only need the first part of the session data, we can safely use `|` as a separator.
+				$session_id = explode( '|', $value );
 				return $session_id[0];
 			}
 		}
