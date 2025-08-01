@@ -631,7 +631,6 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 			// translators: Klarna order ID.
 			$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
 			$order->set_status( 'on-hold', $note );
-			$order->save();
 			KCO_Logger::log( $klarna_order_id . ': Fraud status pending for order ' . $order->get_order_number() . '. Order set to on-hold.' );
 		} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
 			// Cancel the order.
@@ -640,9 +639,10 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		}
 	} else {
 		$order->set_status( 'on-hold', __( 'Waiting for verification from Klarnas push notification', 'klarna-checkout-for-woocommerce' ) );
-		$order->save();
 		KCO_Logger::log( $klarna_order_id . ': No order found in order management. Waiting for push verification. Order #' . $order->get_order_number() . ' set to on-hold.' );
 	}
+
+	$order->save();
 }
 
 /**
