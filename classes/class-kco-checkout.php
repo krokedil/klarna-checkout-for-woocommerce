@@ -28,7 +28,7 @@ class KCO_Checkout {
 	}
 
 	/**
-	 * Add a hidden input field for the shipping data from Klarna.
+	 * Add a hidden input field for the shipping data from Kustom.
 	 *
 	 * @param array $fields The WooCommerce checkout fields.
 	 * @return array
@@ -52,7 +52,7 @@ class KCO_Checkout {
 	}
 
 	/**
-	 * Update the shipping method in WooCommerce based on what Klarna has sent us.
+	 * Update the shipping method in WooCommerce based on what Kustom has sent us.
 	 *
 	 * @return void
 	 */
@@ -88,7 +88,7 @@ class KCO_Checkout {
 	}
 
 	/**
-	 * Update the Klarna order after calculations from WooCommerce has run.
+	 * Update the Kustom order after calculations from WooCommerce has run.
 	 *
 	 * @return void
 	 */
@@ -103,20 +103,26 @@ class KCO_Checkout {
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
 		if ( empty( $klarna_order_id ) ) {
-			KCO_Logger::log( 'Missing WC session kco_wc_order_id during update Klarna order sequence.' );
+			KCO_Logger::log( 'Missing WC session kco_wc_order_id during update Kustom order sequence.' );
 			return;
 		}
 
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+		if ( ! $klarna_order ) {
+			KCO_Logger::log( "Klarna order could not be retrieved during update for ID: $klarna_order_id " );
+			return;
+		}
 
-		if ( $klarna_order && 'checkout_incomplete' === $klarna_order['status'] ) {
+		$updated_klarna_order = false;
+		if ( 'checkout_incomplete' === $klarna_order['status'] ) {
 			// If it is, update order.
-			$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
+			$updated_klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 		}
 
 		// If cart doesn't need payment anymore - reload the checkout page.
 		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
-			if ( ! WC()->cart->needs_payment() && 'checkout_incomplete' === $klarna_order['status'] ) {
+			$status = $updated_klarna_order ? $updated_klarna_order['status'] : $klarna_order['status'];
+			if ( ! WC()->cart->needs_payment() && 'checkout_incomplete' === $status ) {
 				WC()->session->reload_checkout = true;
 			}
 		}
@@ -155,7 +161,7 @@ class KCO_Checkout {
 			return $default;
 		}
 
-		// The Klarna Shipping Service sets the chosen shipping method to the method without the instance ID, so if $chosen method === 'klarna_kss' return $default.
+		// The Kustom Shipping Service sets the chosen shipping method to the method without the instance ID, so if $chosen method === 'klarna_kss' return $default.
 		if ( 'klarna_kss' === $chosen_method ) {
 			return $default;
 		}

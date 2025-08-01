@@ -53,18 +53,47 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Klarna API URL base.
+	 * Get the domain to use for the request based on the merchant ID.
+	 *
+	 * @param string $password The Kustom shared secret.
+	 * @param string $merchant_id The Kustom merchant ID.
+	 *
+	 * @return string The domain to use for the request.
+	 */
+	public static function get_api_domain( $password, $merchant_id ) {
+		// If the password starts with 'kco_', or the mid starts with 'M' or 'PM', use kustom.co, otherwise use klarna.com.
+		$password_pattern = '/^kco_/';
+		$mid_pattern      = '/^(M|PM)/';
+
+		$domain = 'klarna.com';
+		if ( preg_match( $password_pattern, $password ) || preg_match( $mid_pattern, $merchant_id ) ) {
+			$domain = 'kustom.co';
+		}
+
+		$domain = apply_filters( 'kco_api_domain', $domain, $merchant_id );
+
+		// Ensure the return domain is a valid string, and remove any leading or trailing whitespace or slashes.
+		if ( ! is_string( $domain ) || empty( $domain ) ) {
+			$domain = 'klarna.com';
+		}
+
+		return trim( $domain, " \t\n\r\0\x0B/" );
+	}
+
+	/**
+	 * Gets Kustom API URL base.
 	 */
 	public function get_api_url_base() {
 		$base_location  = wc_get_base_location();
 		$country_string = 'US' === $base_location['country'] ? '-na' : '';
 		$test_string    = 'yes' === $this->settings['testmode'] ? '.playground' : '';
+		$domain         = self::get_api_domain( $this->get_shared_secret(), $this->get_merchant_id() );
 
-		return 'https://api' . $country_string . $test_string . '.klarna.com/';
+		return "https://api{$country_string}{$test_string}.{$domain}/";
 	}
 
 	/**
-	 * Gets Klarna API request headers.
+	 * Gets Kustom API request headers.
 	 *
 	 * @return array
 	 */
@@ -76,7 +105,7 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Klarna merchant ID.
+	 * Gets Kustom merchant ID.
 	 *
 	 * @return string
 	 */
@@ -87,7 +116,7 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Klarna shared secret.
+	 * Gets Kustom shared secret.
 	 *
 	 * @return string
 	 */
@@ -98,7 +127,7 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Klarna API request headers.
+	 * Gets Kustom API request headers.
 	 *
 	 * @return string
 	 */
@@ -110,7 +139,7 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets country for Klarna purchase.
+	 * Gets country for Kustom purchase.
 	 *
 	 * @return string
 	 */

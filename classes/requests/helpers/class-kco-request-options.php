@@ -32,7 +32,7 @@ class KCO_Request_Options {
 	}
 
 	/**
-	 * Gets merchant data for Klarna purchase.
+	 * Gets merchant data for Kustom purchase.
 	 *
 	 * @param string $checkout_flow Embedded (default) or redirect.
 	 * @return array
@@ -223,7 +223,7 @@ class KCO_Request_Options {
 	}
 
 	/**
-	 * Gets country for Klarna purchase.
+	 * Gets country for Kustom purchase.
 	 *
 	 * @return string
 	 */
@@ -240,7 +240,7 @@ class KCO_Request_Options {
 	}
 
 	/**
-	 * Inserts a checkbox with description in the Klarna frame.
+	 * Inserts a checkbox with description in the Kustom frame.
 	 *
 	 * @return array
 	 */
