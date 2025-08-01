@@ -492,7 +492,7 @@ jQuery( function ( $ ) {
 		 */
 		log: function ( ...messages ) {
 			if ( kco_params.logging ) {
-				console.log( messages )
+				console.log( ...messages )
 			}
 		},
 
