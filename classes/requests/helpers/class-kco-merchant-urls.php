@@ -183,8 +183,13 @@ class KCO_Merchant_URLs {
 		foreach ( $_COOKIE as $key => $value ) {
 			if ( strpos( $key, 'wp_woocommerce_session_' ) !== false ) {
 				// Prior to WooCommerce 10.0, the session data was `||`-separated. Now it is `|`-separated instead.
-				// Since we only need the first part of the session data, we can safely use `|` as a separator.
-				$session_id = explode( '|', $value );
+				$session_id =
+				// Re-index to receive the same array structure as if it was separated by `||`.
+				array_values(
+				// Filter to remove the empty values that will occur due to splitting on `|`.
+					array_filter( explode( '|', $value ) )
+				);
+
 				return $session_id[0];
 			}
 		}
