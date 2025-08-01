@@ -378,8 +378,8 @@ class KCO_Subscription {
 		}
 
 		$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
+		$renewal_order->save_meta_data();
 
-		$renewal_order->save();
 		return $renewal_order;
 	}
 
