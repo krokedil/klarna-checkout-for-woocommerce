@@ -332,9 +332,8 @@ class KCO_Subscription {
 			if ( ! empty( $recurring_token ) ) {
 				$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
 				foreach ( $subscriptions as $related_subscription ) {
-					$subscription_order = wc_get_order( $related_subscription->get_id() );
-					$subscription_order->update_meta_data( '_kco_recurring_token', $recurring_token );
-					$subscription_order->save();
+					$related_subscription->update_meta_data( '_kco_recurring_token', $recurring_token );
+					$related_subscription->save_meta_data();
 				}
 			}
 		}
