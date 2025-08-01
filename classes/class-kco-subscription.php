@@ -318,24 +318,26 @@ class KCO_Subscription {
 			// Try getting it from parent order.
 			$recurring_token = $parent->get_meta( '_kco_recurring_token', true );
 			$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
-		}
-
-		if ( empty( $recurring_token ) ) {
-			// Try getting it from _klarna_recurring_token (the old Klarna plugin).
-			$recurring_token = $renewal_order->get_meta( '_klarna_recurring_token', true );
 
 			if ( empty( $recurring_token ) ) {
-				$recurring_token = $parent->get_meta( '_klarna_recurring_token', true );
-				$renewal_order->update_meta_data( '_klarna_recurring_token', $recurring_token );
-			}
+				// Try getting it from _klarna_recurring_token (the old Klarna plugin).
+				$recurring_token = $renewal_order->get_meta( '_klarna_recurring_token', true );
 
-			if ( ! empty( $recurring_token ) ) {
-				$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
-				foreach ( $subscriptions as $related_subscription ) {
-					$related_subscription->update_meta_data( '_kco_recurring_token', $recurring_token );
-					$related_subscription->save_meta_data();
+				if ( empty( $recurring_token ) ) {
+					$recurring_token = $parent->get_meta( '_klarna_recurring_token', true );
+					$renewal_order->update_meta_data( '_klarna_recurring_token', $recurring_token );
+				}
+
+				if ( ! empty( $recurring_token ) ) {
+					$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
+					foreach ( $subscriptions as $related_subscription ) {
+						$related_subscription->update_meta_data( '_kco_recurring_token', $recurring_token );
+						$related_subscription->save_meta_data();
+					}
 				}
 			}
+
+			$renewal_order->save_meta_data();
 		}
 
 		$create_order_response = KCO_WC()->api->create_recurring_order( $order_id, $recurring_token );
