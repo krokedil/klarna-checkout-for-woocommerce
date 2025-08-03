@@ -7,7 +7,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 	/**
 	 * Klarna_Checkout_For_WooCommerce_Addons class.
 	 *
-	 * Handles Klarna Checkout addons page.
+	 * Handles Kustom Checkout addons page.
 	 */
 	class Klarna_For_WooCommerce_Addons {
 
@@ -63,7 +63,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 		 * Add the Addons menu to WooCommerce
 		 **/
 		public function add_menu() {
-			add_submenu_page( 'woocommerce', __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ), __( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ), 'manage_woocommerce', 'checkout-addons', array( $this, 'options_page' ) );
+			add_submenu_page( 'woocommerce', __( 'Kustom Add-ons', 'klarna-checkout-for-woocommerce' ), __( 'Kustom Add-ons', 'klarna-checkout-for-woocommerce' ), 'manage_woocommerce', 'checkout-addons', array( $this, 'options_page' ) );
 		}
 
 		/**
@@ -75,7 +75,7 @@ if ( ! class_exists( 'Klarna_For_WooCommerce_Addons' ) ) {
 			?>
 			<div id="checkout-addons-heading" class="checkout-addons-heading">
 			<div class="checkout-addons-wrap">
-			<h1><?php esc_html_e( 'Klarna Add-ons', 'klarna-checkout-for-woocommerce' ); ?></h1>
+			<h1><?php esc_html_e( 'Kustom Add-ons', 'klarna-checkout-for-woocommerce' ); ?></h1>
 			</div>
 			</div>
 				<?php if ( $addon_content->start ) : ?>

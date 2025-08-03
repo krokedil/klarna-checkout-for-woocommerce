@@ -17,7 +17,7 @@ class KCO_Request_Create_Recurring extends KCO_Request {
 	 * Makes the request.
 	 *
 	 * @param int    $order_id The WooCommerce order id.
-	 * @param string $recurring_token The Klarna recurring token.
+	 * @param string $recurring_token The Kustom recurring token.
 	 * @return array
 	 */
 	public function request( $order_id = null, $recurring_token = null ) {

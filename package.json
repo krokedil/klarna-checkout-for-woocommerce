@@ -1,7 +1,7 @@
 {
   "name": "klarna-checkout-for-woocommerce",
-  "version": "2.13.8",
-  "description": "Klarna Checkout for WooCommerce",
+  "version": "2.14.0",
+  "description": "Kustom Checkout for WooCommerce",
   "main": "gulpfile.js",
   "repository": "https://github.com/krokedil/klarna-checkout-for-woocommerce.git",
   "author": "Krokedil AB",
@@ -21,8 +21,8 @@
     "gulp": "^4.0.2"
   },
   "scripts": {
-    "lint": "npx prettier assets/js --paren-spacing --tab-width 4 --print-width 120 --no-semi --write",
-    "lint:check": "yarn prettier assets/js --paren-spacing --tab-width 4 --print-width 120 --no-semi --debug-check",
+    "lint": "npx wp-prettier assets/js --paren-spacing --tab-width 4 --print-width 120 --no-semi --write",
+    "lint:check": "npx wp-prettier assets/js --paren-spacing --tab-width 4 --print-width 120 --no-semi --debug-check",
     "build": "npx gulp CSS && npm run lint:check && npm run lint && npx gulp JS && npx gulp makePOT"
   }
 }

@@ -52,12 +52,12 @@ class KCO_API_Callbacks {
 	public function push_cb() {
 		/**
 		 * 1. Handle POST request
-		 * 2. Request the order from Klarna
+		 * 2. Request the order from Kustom
 		 * 4. Acknowledge the order
 		 * 5. Send merchant_reference1
 		 */
 		$klarna_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		// Do nothing if there's no Klarna Checkout order ID.
+		// Do nothing if there's no Kustom Checkout order ID.
 		if ( empty( $klarna_order_id ) ) {
 			return;
 		}
@@ -71,21 +71,21 @@ class KCO_API_Callbacks {
 		$order = kco_get_order_by_klarna_id( $klarna_order_id );
 		if ( empty( $order ) ) {
 			// Backup order creation.
-			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Klarna order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
+			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 			return;
 
 		}
 
 		$order_id = $order->get_id();
 		if ( $order ) {
-			// Get the Klarna order data.
+			// Get the Kustom order data.
 			$klarna_order = apply_filters(
 				'kco_wc_api_callbacks_push_klarna_order',
 				KCO_WC()->api->get_klarna_om_order( $klarna_order_id )
 			);
 
 			if ( is_wp_error( $klarna_order ) ) {
-				KCO_WC()->logger->log( 'ERROR Push callback failed to get Klarna order data for Klarna order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
+				KCO_WC()->logger->log( 'ERROR Push callback failed to get Kustom order data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 				return;
 			}
 
@@ -97,20 +97,20 @@ class KCO_API_Callbacks {
 			if ( empty( $order->get_date_paid() ) ) {
 				if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
 					$order->payment_complete( $klarna_order_id );
-					// translators: Klarna order ID.
-					$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+					// translators: Kustom order ID.
+					$note = sprintf( __( 'Payment via Kustom Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
 					$order->add_order_note( $note );
 					do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
 				} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
-					$order->update_status( 'on-hold', __( 'Klarna Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
+					$order->update_status( 'on-hold', __( 'Kustom Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
 				} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
-					// translators: Klarna order ID.
-					$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+					// translators: Kustom order ID.
+					$note = sprintf( __( 'Kustom order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
 					$order->update_status( 'on-hold', $note );
 				}
 			}
 
-			// Acknowledge order in Klarna.
+			// Acknowledge order in Kustom.
 			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
 
 			// Set the merchant references for the order.
@@ -118,7 +118,7 @@ class KCO_API_Callbacks {
 
 		} else {
 			// Backup order creation.
-			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Klarna order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
+			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 		}
 	}
 
@@ -127,9 +127,9 @@ class KCO_API_Callbacks {
 	 */
 	public function notification_cb() {
 		/**
-		 * Notification callback URL has Klarna Order ID (kco_wc_order_id) in it.
+		 * Notification callback URL has Kustom Order ID (kco_wc_order_id) in it.
 		 *
-		 * 1. Get Klarna Order ID
+		 * 1. Get Kustom Order ID
 		 * 2. Try to find matching WooCommerce order, to see if it was created
 		 * 3. If WooCommerce order does not exist, that means regular creation failed AND confirmation callback
 		 *    either hasn't happened yet or failed. In this case, schedule a single event, 5 minutes from now
@@ -160,8 +160,8 @@ class KCO_API_Callbacks {
 	/**
 	 * Punted notification callback.
 	 *
-	 * @param string $klarna_order_id Klarna order ID.
-	 * @param array  $data Klarna order data.
+	 * @param string $klarna_order_id Kustom order ID.
+	 * @param array  $data Kustom order data.
 	 */
 	public function kco_wc_punted_notification_cb( $klarna_order_id, $data ) {
 		do_action( 'wc_klarna_notification_listener', $klarna_order_id, $data );
@@ -169,9 +169,9 @@ class KCO_API_Callbacks {
 
 	/**
 	 * Address update callback function.
-	 * Response must be sent to Klarna API.
+	 * Response must be sent to Kustom API.
 	 *
-	 * @link https://developers.klarna.com/api/#checkout-api-callbacks-address-update
+	 * @link https://docs.kustom.co/v3/checkout/additional-resources/server-side-callbacks#address-update
 	 * @ref  https://github.com/mmartche/coach/blob/30022c266089fc7499c54e149883e951c288dc9f/catalog/controller/extension/payment/klarna_checkout.php#L509
 	 */
 	public function address_update_cb() {
