@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
 WC requires at least: 5.6.0
-WC tested up to: 10.0.3
-Stable tag: 2.14.1
+WC tested up to: 10.0.4
+Stable tag: 2.14.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,9 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.08.04    - version 2.14.2 =
+* Fix           - Fixed compatibility issue with WooCommerce 10.x for session data handling.
+
 = 2025.07.22    - version 2.14.1 =
 * Fix           - Restore logic to display custom billing and shipping fields next to KCO checkout.
 
