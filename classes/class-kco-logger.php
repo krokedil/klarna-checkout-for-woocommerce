@@ -33,7 +33,7 @@ class KCO_Logger {
 			if ( empty( self::$log ) ) {
 				self::$log = new WC_Logger();
 			}
-			self::$log->add( 'klarna-checkout-for-woocommerce', wp_json_encode( $message ) );
+			self::$log->add( 'kustom-checkout-for-woocommerce', wp_json_encode( $message ) );
 		}
 
 		if ( isset( $data['response']['code'] ) && ( $data['response']['code'] < 200 || $data['response']['code'] > 299 ) ) {
