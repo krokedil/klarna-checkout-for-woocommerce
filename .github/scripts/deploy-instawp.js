@@ -140,8 +140,12 @@ async function createNewSite(normalizedUrl) {
 }
 
 // Generic helper for InstaWP command execution
-async function triggerInstaWpCommand(siteid, command_id, commandArguments = []) {
-  const body = JSON.stringify({ command_id, commandArguments });
+async function triggerInstaWpCommand(siteid, command_id, commandArguments = undefined) {
+  let payload = { command_id };
+  if (Array.isArray(commandArguments) && commandArguments.length > 0) {
+    payload.commandArguments = commandArguments;
+  }
+  const body = JSON.stringify(payload);
   await instawpApiRequest({
     method: 'POST',
     path: `/api/v2/sites/${siteid}/execute-command`,
@@ -197,7 +201,7 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = []) 
     // Only run setup commands if a new site was created
     if (siteCreated) {
       // Command 2344: setup-default-site
-      //await triggerInstaWpCommand(siteid, 2344);
+      await triggerInstaWpCommand(siteid, 2344);
       // Command 2334: apply WooCommerce blueprint
       await triggerInstaWpCommand(siteid, 2334, [{ wc_blueprint_json_public_url: PLUGIN_WC_BLUEPRINT_URL }]);
       // Command 2417: apply credentials blueprint (API keys from secrets)
