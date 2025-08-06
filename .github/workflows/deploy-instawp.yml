@@ -67,6 +67,7 @@ jobs:
         INSTAWP_API_TOKEN: ${{ secrets.INSTAWP_API_TOKEN }}
         E2E_API_KEY: ${{ secrets.E2E_API_KEY }}
         E2E_API_SECRET: ${{ secrets.E2E_API_SECRET }}
+        ZIP_FILE_NAME: ${{ steps.vars.outputs.ZIP_FILE_NAME }}
       run: |
         node .github/scripts/deploy-instawp.js
 

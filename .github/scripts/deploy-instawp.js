@@ -9,6 +9,10 @@ const INSTA_WP_URL = process.env.INSTA_WP_URL;
 const INSTAWP_API_TOKEN = process.env.INSTAWP_API_TOKEN;
 const GITHUB_ENV = process.env.GITHUB_ENV;
 const GITHUB_OUTPUT = process.env.GITHUB_OUTPUT;
+const ZIP_FILE_NAME = process.env.ZIP_FILE_NAME;
+
+// Set if WooCommerce checkout should use checkout block or shortcode
+const USE_CHECKOUT_BLOCK = false; // true = use checkout block, false = use shortcode
 
 // Blueprint URL for WooCommerce KCO (Klarna Checkout) default settings
 const PLUGIN_WC_BLUEPRINT_URL = 'https://raw.githubusercontent.com/krokedil/instawp-commands/refs/heads/main/assets/wc-blueprints/wc-blueprint-kco-default.json';
@@ -161,8 +165,6 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
     process.exit(1);
   }
 
-  // Get zip file name
-  const ZIP_FILE_NAME = process.env.ZIP_FILE_NAME;
   // Normalize the target site URL (strip protocol and trailing slash), or empty string if not set
   const normalizedUrl = INSTA_WP_URL ? INSTA_WP_URL.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
 
@@ -206,10 +208,16 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
       await triggerInstaWpCommand(siteid, 2334, [{ wc_blueprint_json_public_url: PLUGIN_WC_BLUEPRINT_URL }]);
       // Command 2417: apply credentials blueprint (API keys from secrets)
       await triggerInstaWpCommand(siteid, 2417, [{ wc_blueprint_json_string: PLUGIN_CREDENTIALS_WC_BLUEPRINT_JSON }]);
+
+      // Check if WooCommerce checkout block should be used, if not switch to using the shortcode
+      if (!USE_CHECKOUT_BLOCK) {
+        // Command 2549: apply WooCommerce checkout shortcode
+        await triggerInstaWpCommand(siteid, 2549);
+      }
     }
 
     // Always upload the dev zip to the site (Command 2301)
-    await triggerInstaWpCommand(siteid, 2301, [{ dev_zip_public_url: `https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${ZIP_FILE_NAME}` }]);
+    await triggerInstaWpCommand(siteid, 2301, [{ dev_zip_public_url: `https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${ZIP_FILE_NAME}.zip` }]);
 
     // Set GitHub Actions outputs and environment variables for downstream steps
     if (GITHUB_ENV) fs.appendFileSync(GITHUB_ENV, `INSTA_WP_SITE_ID=${siteid}\n`);
