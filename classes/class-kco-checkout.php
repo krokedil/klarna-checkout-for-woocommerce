@@ -25,6 +25,7 @@ class KCO_Checkout {
 		add_filter( 'woocommerce_shipping_chosen_method', array( __CLASS__, 'maybe_register_shipping_error' ), 9999, 3 );
 		add_action( 'woocommerce_shipping_method_chosen', array( __CLASS__, 'maybe_throw_shipping_error' ), 9999 );
 		add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 3 );
+		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'maybe_change_needs_payment_cart' ), 999, 2 );
 	}
 
 	/**
@@ -230,5 +231,18 @@ class KCO_Checkout {
 		}
 
 		return true;
+	}
+
+	public function maybe_change_needs_payment_cart( $needs_payment, $cart ) {
+		if ( ! class_exists( 'KCO' ) ) {
+			return $needs_payment;
+		}
+
+		// See if filter to always show payment methods is applied.
+		if ( ! apply_filters( 'kco_check_if_needs_payment', true ) ) {
+			return true;
+		}
+
+		return $needs_payment;
 	}
 } new KCO_Checkout();
