@@ -234,15 +234,12 @@ class KCO_Checkout {
 	}
 
 	public function maybe_change_needs_payment_cart( $needs_payment, $cart ) {
-		if ( ! class_exists( 'KCO' ) ) {
+
+		// Only if our filter is active and is set to false.
+		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
 			return $needs_payment;
 		}
 
-		// See if filter to always show payment methods is applied.
-		if ( ! apply_filters( 'kco_check_if_needs_payment', true ) ) {
-			return true;
-		}
-
-		return $needs_payment;
+		return true;
 	}
 } new KCO_Checkout();
