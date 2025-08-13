@@ -233,6 +233,13 @@ class KCO_Checkout {
 		return true;
 	}
 
+	/**
+	 * Maybe change the needs payment status for the cart.
+	 *
+	 * @param bool    $needs_payment The current needs payment status.
+	 * @param WC_Cart $cart The WooCommerce cart.
+	 * @return bool
+	 */
 	public function maybe_change_needs_payment_cart( $needs_payment, $cart ) {
 
 		// Only if our filter is active and is set to false.
