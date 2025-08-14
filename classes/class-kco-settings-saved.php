@@ -113,7 +113,7 @@ class KCO_Settings_Saved {
 					$message = "Your Kustom $test credentials not authorized. Please verify the credentials and environment (production or test mode) or remove these credentials and save again. API credentials only work in either production or test, not both environments. ";
 					break;
 				case 403:
-					$message = "It seems like your Kustom $test API credentials are not working for the Kustom Checkout plugin, please verify your Kustom contract is for the Kustom Checkout solution.  If your Kustom contract is for standalone payment methods, please instead use the <a href='https://docs.woocommerce.com/document/klarna-payments/'>Kustom Payments for WooCommerce</a> plugin. ";
+					$message = "It seems like your Kustom $test API credentials are not working for the Kustom Checkout plugin, please verify your Kustom contract is for the Kustom Checkout solution.";
 					break;
 			}
 			$message        .= "API error code: $code, Kustom API error message: $error_message";
