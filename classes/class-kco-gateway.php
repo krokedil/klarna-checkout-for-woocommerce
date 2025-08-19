@@ -103,8 +103,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			$checkout_flow = $this->settings['checkout_flow'] ?? 'embedded';
+			// Validation for the redirect flow is made at a later stage.
 			if ( 'redirect' === $checkout_flow ) {
-				kco_create_or_update_order();
+				return;
 			}
 
 			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
