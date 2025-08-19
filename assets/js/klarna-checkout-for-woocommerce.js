@@ -27,6 +27,8 @@ jQuery( function ( $ ) {
 		shippingEmailExists: false,
 		shippingPhoneExists: false,
 
+		redirectAttemptCount: 0,
+
 		/**
 		 * Triggers on document ready.
 		 */
@@ -492,7 +494,7 @@ jQuery( function ( $ ) {
 		 */
 		log: function ( ...messages ) {
 			if ( kco_params.logging ) {
-				console.log( messages )
+				console.log( ...messages )
 			}
 		},
 
@@ -697,6 +699,21 @@ jQuery( function ( $ ) {
 									customer_type,
 								},
 							} )
+						},
+						// https://docs.kustom.co/v3/checkout/additional-resources/client-side-events#the-load_confirmation-event
+						redirect_initiated: ( trigger ) => {
+							kco_wc.log( "redirect_initiated", trigger )
+							if ( kco_wc.redirectAttemptCount >= 1 ) {
+								kco_wc.logToFile(
+									`Redirect was initiated by Kustom, but the user was not redirected. This is attempt ${ redirectAttemptCount }.`,
+								)
+							} else {
+								kco_wc.logToFile(
+									`Redirect initiated by Kustom, the user is about to be redirected to the confirmation page.`,
+								)
+							}
+
+							kco_wc.redirectAttemptCount += 1
 						},
 					} )
 				} )
