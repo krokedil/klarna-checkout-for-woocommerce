@@ -561,7 +561,7 @@ function kco_print_error_message( $wp_error ) {
 }
 
 /**
- * Unsets the sessions used by the plguin.
+ * Unsets the sessions used by the plugin.
  *
  * @return void
  */
@@ -579,62 +579,70 @@ function kco_unset_sessions() {
  * @return void
  */
 function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
-	if ( $order_id ) {
-		$order = wc_get_order( $order_id );
-		// If the order is already completed, return.
-		if ( ! empty( $order->get_date_paid() ) ) {
+	if ( ! $order_id ) {
+		return;
+	}
+
+	$order = wc_get_order( $order_id );
+	// If the order is already completed, return.
+	if ( ! empty( $order->get_date_paid() ) ) {
+		return;
+	}
+
+	// Allow this process to be aborted to be handled elsewhere.
+	$abort = apply_filters( 'kco_abort_confirm_order', false, $order, $klarna_order_id );
+	if ( $abort ) {
+		KCO_Logger::log( "[CONFIRM]: Klarna order ID: $klarna_order_id, Order ID/number: {$order_id}/{$order->get_order_number()} Order confirmation aborted." );
+		return;
+	}
+
+	// Get the Klarna OM order.
+	$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
+
+	if ( ! empty( $klarna_order ) || ! is_wp_error( $klarna_order ) ) {
+		if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
 			return;
 		}
 
-		// Get the Kustom OM order.
-		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
+		kco_maybe_save_surcharge( $order_id, $klarna_order );
+		kco_maybe_save_org_nr( $order_id, $klarna_order );
+		kco_maybe_save_reference( $order_id, $klarna_order );
 
-		if ( ! is_wp_error( $klarna_order ) ) {
-			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
-				return;
-			}
+		// Let other plugins hook into this sequence.
+		do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
 
-			kco_maybe_save_surcharge( $order_id, $klarna_order );
-			kco_maybe_save_org_nr( $order_id, $klarna_order );
-			kco_maybe_save_reference( $order_id, $klarna_order );
-
-			// Let other plugins hook into this sequence.
-			do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
-
-			// Acknowledge order in Kustom.
-			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
-			// Set the merchant references for the order.
-			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
-			// Empty cart to be safe.
-			WC()->cart->empty_cart();
-			// Check fraud status.
-			if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
-				// Payment complete and set transaction id.
-				// translators: Kustom order ID.
-				$note = sprintf( __( 'Payment via Kustom Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
-				$order->add_order_note( $note );
-				$order->payment_complete( $klarna_order_id );
-				KCO_Logger::log( $klarna_order_id . ': Fraud status accepted for order ' . $order->get_order_number() . '. payment_complete triggered.' );
-				do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
-			} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
-				// Set status to on-hold.
-				// translators: Kustom order ID.
-				$note = sprintf( __( 'Kustom order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
-				$order->set_status( 'on-hold', $note );
-				$order->save();
-				KCO_Logger::log( $klarna_order_id . ': Fraud status pending for order ' . $order->get_order_number() . '. Order set to on-hold.' );
-			} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
-				// Cancel the order.
-				$order->set_status( 'cancelled', __( 'Kustom Checkout order was rejected', 'klarna-checkout-for-woocommerce' ) );
-				$order->save();
-				KCO_Logger::log( $klarna_order_id . ': Fraud status rejected for order ' . $order->get_order_number() . '. Order cancelled.' );
-			}
-		} else {
-			$order->set_status( 'on-hold', __( 'Waiting for verification from Kustom\'s push notification', 'klarna-checkout-for-woocommerce' ) );
-			$order->save();
-			KCO_Logger::log( $klarna_order_id . ': No order found in order management. Waiting for push verification. Order #' . $order->get_order_number() . ' set to on-hold.' );
+		// Acknowledge order in Klarna.
+		KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+		// Set the merchant references for the order.
+		KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
+		// Empty cart to be safe.
+		WC()->cart->empty_cart();
+		// Check fraud status.
+		if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
+			// Payment complete and set transaction id.
+			// translators: Klarna order ID.
+			$note = sprintf( __( 'Payment via Klarna Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+			$order->add_order_note( $note );
+			$order->payment_complete( $klarna_order_id );
+			KCO_Logger::log( $klarna_order_id . ': Fraud status accepted for order ' . $order->get_order_number() . '. payment_complete triggered.' );
+			do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
+		} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
+			// Set status to on-hold.
+			// translators: Klarna order ID.
+			$note = sprintf( __( 'Klarna order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+			$order->set_status( 'on-hold', $note );
+			KCO_Logger::log( $klarna_order_id . ': Fraud status pending for order ' . $order->get_order_number() . '. Order set to on-hold.' );
+		} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
+			// Cancel the order.
+			$order->set_status( 'cancelled', __( 'Klarna Checkout order was rejected', 'klarna-checkout-for-woocommerce' ) );
+			KCO_Logger::log( $klarna_order_id . ': Fraud status rejected for order ' . $order->get_order_number() . '. Order cancelled.' );
 		}
+	} else {
+		$order->set_status( 'on-hold', __( 'Waiting for verification from Klarnas push notification', 'klarna-checkout-for-woocommerce' ) );
+		KCO_Logger::log( $klarna_order_id . ': No order found in order management. Waiting for push verification. Order #' . $order->get_order_number() . ' set to on-hold.' );
 	}
+
+	$order->save();
 }
 
 /**
