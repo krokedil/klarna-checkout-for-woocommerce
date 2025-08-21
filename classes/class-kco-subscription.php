@@ -35,6 +35,9 @@ class KCO_Subscription {
 		add_action( 'init', array( $this, 'display_thankyou_message_for_payment_method_change' ) );
 		add_action( 'woocommerce_account_view-subscription_endpoint', array( $this, 'maybe_confirm_change_payment_method' ) );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'extend_allowed_domains_list' ) );
+
+		// Since not all metadata is copied to the renewal subscription, we have to manually copy them over.
+		add_action( 'wcs_renewal_order_created', array( $this, 'copy_meta_fields_to_renewal_order' ), 10, 2 );
 	}
 
 	/**
@@ -298,44 +301,49 @@ class KCO_Subscription {
 	/**
 	 * Creates an order in Kustom from the recurring token saved.
 	 *
-	 * @param string $renewal_total The total price for the order.
-	 * @param object $renewal_order The WooCommerce order for the renewal.
+	 * @param string   $renewal_total The total price for the order.
+	 * @param WC_Order $renewal_order The WooCommerce order for the renewal.
 	 */
 	public function trigger_scheduled_payment( $renewal_total, $renewal_order ) {
 		$order_id = $renewal_order->get_id();
 
-		$subscriptions   = wcs_get_subscriptions_for_renewal_order( $renewal_order->get_id() );
-		$recurring_token = $renewal_order->get_meta( '_kco_recurring_token', true );
+		$subscriptions = wcs_get_subscriptions_for_renewal_order( $order_id );
 
+		// The new subscription that is created from the renewal order.
+		$subscription = reset( $subscriptions );
+		$parent       = $subscription->get_parent();
+
+		$recurring_token = $renewal_order->get_meta( '_kco_recurring_token', true );
 		if ( empty( $recurring_token ) ) {
 			// Try getting it from parent order.
-			$recurring_token = wc_get_order( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ) )->get_meta( '_kco_recurring_token', true );
+			$recurring_token = $parent->get_meta( '_kco_recurring_token', true );
 			$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
-		}
-
-		if ( empty( $recurring_token ) ) {
-			// Try getting it from _klarna_recurring_token (the old Kustom plugin).
-			$recurring_token = $renewal_order->get_meta( '_klarna_recurring_token', true );
 
 			if ( empty( $recurring_token ) ) {
-				$recurring_token = wc_get_order( WC_Subscriptions_Renewal_Order::get_parent_order_id( $order_id ) )->get_meta( '_klarna_recurring_token', true );
-				$renewal_order->update_meta_data( '_klarna_recurring_token', $recurring_token );
-			}
+				// Try getting it from _klarna_recurring_token (the old Klarna plugin).
+				$recurring_token = $renewal_order->get_meta( '_klarna_recurring_token', true );
 
-			if ( ! empty( $recurring_token ) ) {
-				$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
-				foreach ( $subscriptions as $subscription ) {
-					$subscription_order = wc_get_order( $subscription->get_id() );
-					$subscription_order->update_meta_data( '_kco_recurring_token', $recurring_token );
-					$subscription_order->save();
+				if ( empty( $recurring_token ) ) {
+					$recurring_token = $parent->get_meta( '_klarna_recurring_token', true );
+					$renewal_order->update_meta_data( '_klarna_recurring_token', $recurring_token );
+				}
+
+				if ( ! empty( $recurring_token ) ) {
+					$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
+					foreach ( $subscriptions as $related_subscription ) {
+						$related_subscription->update_meta_data( '_kco_recurring_token', $recurring_token );
+						$related_subscription->save_meta_data();
+					}
 				}
 			}
+
+			$renewal_order->save_meta_data();
 		}
-		$renewal_order->save();
 
 		$create_order_response = KCO_WC()->api->create_recurring_order( $order_id, $recurring_token );
 		if ( ! is_wp_error( $create_order_response ) ) {
 			$klarna_order_id = $create_order_response['order_id'];
+      
 			// Translators: Kustom order id.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Kustom. Kustom order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
 			foreach ( $subscriptions as $subscription ) {
@@ -344,11 +352,36 @@ class KCO_Subscription {
 		} else {
 			$error_message = $create_order_response->get_error_message();
 			// Translators: Error message.
-			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Kustom. Message: %1$s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
-			foreach ( $subscriptions as $subscription ) {
-				$subscription->payment_failed();
+			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Message: %1$s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
+			foreach ( $subscriptions as $related_subscription ) {
+				$related_subscription->payment_failed();
 			}
 		}
+	}
+
+	/**
+	 * Copy meta fields to renewal order.
+	 *
+	 * This is triggered before 'woocommerce_scheduled_subscription_payment_*', thus before the renewal order is processed and can be used for preparing the renewal for further processing (e.g., setting the recurring token).
+	 *
+	 * @param  WC_Order        $renewal_order Woo renewal order.
+	 * @param  WC_Subscription $subscription Woo subscription.
+	 * @return WC_Order
+	 */
+	public function copy_meta_fields_to_renewal_order( $renewal_order, $subscription ) {
+		$parent_order = $subscription->get_parent();
+
+		// The environment used for the parent order.
+		$env = $parent_order->get_meta( '_wc_klarna_environment', true );
+		if ( empty( $env ) ) {
+			$settings = get_option( 'woocommerce_kco_settings', array() );
+			$env      = wc_string_to_bool( $settings['testmode'] ) ? 'test' : 'live';
+		}
+
+		$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
+		$renewal_order->save_meta_data();
+
+		return $renewal_order;
 	}
 
 	/**
