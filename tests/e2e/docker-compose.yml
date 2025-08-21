@@ -28,7 +28,7 @@ services:
       - "../../:/var/www/html/wp-content/plugins/klarna-checkout-for-woocommerce"
       - "wordpress:/var/www/html"
   wordpress-cli:
-    image: wordpress:cli-php7.4
+    image: wordpress:cli
     networks:
       - kronet
     env_file:

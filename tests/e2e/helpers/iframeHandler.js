@@ -136,16 +136,14 @@ const completeOrder = async (page, kcoIframe) => {
 			await fullscreenIframe.click('[data-cid="payment-selector-method.invoice"]');
 		}
 
-		await page.waitForTimeout(0.25 * timeOutTime);
+		await page.waitForTimeout(2 * timeOutTime);
 
 		if (await fullscreenIframe.$("[data-cid='button.buy_button']")) {
 			await fullscreenIframe.click('[data-cid="button.buy_button"]');
 		}
 
 		await page.waitForTimeout(1 * timeOutTime);
-
-
-
+		
 		if (await fullscreenIframe.$("[id='nin']")) {
 			let inputField = await fullscreenIframe.$("[id='nin']");
 			await inputField.click({ clickCount: 3 });
@@ -164,7 +162,7 @@ const completeOrder = async (page, kcoIframe) => {
 			await page.waitForTimeout(2 * timeOutTime);
 
 			if (await fullscreenIframe.$('[id="error-dialog__footer-button-wrapper"]')) {
-
+				
 				await fullscreenIframe.click('[id="error-dialog__footer-button-wrapper"]');
 				await page.waitForTimeout(3 * timeOutTime);
 
