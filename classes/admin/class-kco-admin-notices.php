@@ -125,7 +125,7 @@ class KCO_Admin_Notices {
 			<div class="kco-message notice woocommerce-message notice-error">
 			<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_autoptimize' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
 			<?php // translators: %s: URL. ?>
-			<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Kustom Checkout plugin. You can deactivate this feature in the  <a href="%s">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>). ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.krokedil.com/article/301-klarna-checkout-optimizing-your-woocommerce-cart-checkout-when-using-an-iframe-based-checkout">' . __( 'Read more here. ', 'klarna-checkout-for-woocommerce' ) . '</a></p>' ) ); ?>
+			<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Kustom Checkout plugin. You can deactivate this feature in the  <a href="%s">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>). ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.krokedil.com/krokedil-general-support-info/optimizing-your-checkout-when-using-an-iframe-based-checkout">' . __( 'Read more here. ', 'klarna-checkout-for-woocommerce' ) . '</a></p>' ) ); ?>
 			</div>
 			<?php
 		}
@@ -144,7 +144,7 @@ class KCO_Admin_Notices {
 				?>
 				<div class="kco-message notice woocommerce-message notice-error">
 				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_optimize' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
-				<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks as if you have a Optimizing or Caching plugin installed. Please make sure to not enable these features on the checkout page, as this can cause issues with Kustom Checkout. The checkout page should never be minified, concatenated, or cached. ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.krokedil.com/article/301-klarna-checkout-optimizing-your-woocommerce-cart-checkout-when-using-an-iframe-based-checkout">' . __( 'Read more here. ', 'klarna-checkout-for-woocommerce' ) . '</a></p>' ) ); ?>
+				<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks as if you have a Optimizing or Caching plugin installed. Please make sure to not enable these features on the checkout page, as this can cause issues with Kustom Checkout. The checkout page should never be minified, concatenated, or cached. ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.krokedil.com/krokedil-general-support-info/optimizing-your-checkout-when-using-an-iframe-based-checkout">' . __( 'Read more here. ', 'klarna-checkout-for-woocommerce' ) . '</a></p>' ) ); ?>
 				</div>
 				<?php
 			}

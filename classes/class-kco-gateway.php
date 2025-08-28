@@ -106,6 +106,12 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
+			$checkout_flow = $this->settings['checkout_flow'] ?? 'embedded';
+			// Validation for the redirect flow is made at a later stage.
+			if ( 'redirect' === $checkout_flow ) {
+				return;
+			}
+
 			$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 			if ( empty( $klarna_order_id ) ) {
 				KCO_Logger::log( '[CHECKOUT VALIDATION]: Kustom order ID is not set in the session. Will not proceed with order.' );
