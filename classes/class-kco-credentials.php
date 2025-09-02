@@ -29,6 +29,7 @@ class KCO_Credentials {
 	public function __construct() {
 		$this->settings = get_option( 'woocommerce_kco_settings', array() );
 		add_filter( 'kco_api_domain', array( $this, 'maybe_set_api_domain' ) );
+		add_action( 'update_option_woocommerce_kco_settings', array( $this, 'update_settings' ), 10, 2 );
 	}
 
 	/**
@@ -39,8 +40,7 @@ class KCO_Credentials {
 	 * @return string The domain to use for the request.
 	 */
 	public function maybe_set_api_domain( $api_domain ) {
-		$settings           = get_option( 'woocommerce_kco_settings', array() );
-		$api_domain_setting = $settings['api_domain'] ?? '';
+		$api_domain_setting = $this->settings['api_domain'] ?? '';
 
 		// If the setting is empty, use the value passed in the filter.
 		if ( empty( $api_domain_setting ) ) {
@@ -80,5 +80,15 @@ class KCO_Credentials {
 		);
 
 		return apply_filters( 'kco_wc_credentials_from_session', $credentials, $this->settings['testmode'] );
+	}
+
+	/**
+	 * Updates the settings property when the WooCommerce settings are updated.
+	 *
+	 * @param mixed $old_value The old value of the option.
+	 * @param mixed $value The new value of the option.
+	 */
+	public function update_settings( $old_value, $value ) {
+		$this->settings = $value;
 	}
 }
