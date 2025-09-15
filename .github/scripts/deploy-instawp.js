@@ -4,13 +4,6 @@
 const https = require('https');
 const fs = require('fs');
 
-// Logging helpers for GitHub Actions
-function logInfo(msg) { console.log(`[INFO] ${msg}`); }
-function logWarn(msg) { console.warn(`[WARN] ${msg}`); }
-function logError(msg) { console.error(`::error::${msg}`); }
-function logGroupStart(name) { console.log(`::group::${name}`); }
-function logGroupEnd() { console.log('::endgroup::'); }
-
 // Environment variables from GitHub Actions
 const INSTA_WP_URL = process.env.INSTA_WP_URL;
 const INSTAWP_API_TOKEN = process.env.INSTAWP_API_TOKEN;
@@ -20,6 +13,22 @@ const ZIP_FILE_NAME = process.env.ZIP_FILE_NAME;
 
 // Set if WooCommerce checkout should use checkout block or shortcode
 const USE_CHECKOUT_BLOCK = false; // true = use checkout block, false = use shortcode
+
+// Validate required environment variables at the top
+const REQUIRED_ENVS = [
+  'INSTAWP_API_TOKEN',
+  'ZIP_FILE_NAME',
+];
+const missingEnvs = REQUIRED_ENVS.filter((env) => !process.env[env]);
+if (missingEnvs.length > 0) {
+  console.error(`Missing required environment variables: ${missingEnvs.join(', ')}`);
+  process.exit(1);
+}
+
+// Helper to normalize URLs (strip protocol and trailing slash)
+function normalizeUrl(url) {
+  return url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
+}
 
 // Blueprint URL for WooCommerce KCO (Klarna Checkout) default settings
 const PLUGIN_WC_BLUEPRINT_URL = 'https://raw.githubusercontent.com/krokedil/instawp-commands/refs/heads/main/assets/wc-blueprints/wc-blueprint-kco-default.json';
@@ -48,7 +57,8 @@ const INSTA_WP_API_HEADERS = {
   'Content-Type': 'application/json',
 };
 
-// Generic request helper
+
+// Generic request helper (no logging)
 function instawpApiRequest({ method, path, body }) {
   const options = {
     hostname: INSTA_WP_API_HOST,
@@ -85,12 +95,31 @@ function instawpApiRequest({ method, path, body }) {
   });
 }
 
+// API call wrapper with logging
+async function apiCall({ method, path, body, logLabel }) {
+  logGroupStart(logLabel || `API Request: ${method} ${path}`);
+  if (body) {
+    logInfo('Payload:');
+    try { console.log(typeof body === 'string' ? body : JSON.stringify(body, null, 2)); } catch {}
+  }
+  let response;
+  try {
+    response = await instawpApiRequest({ method, path, body });
+  } catch (err) {
+    logError(`API call failed: ${err && err.message ? err.message : err}`);
+    logGroupEnd();
+    throw err;
+  }
+  logGroupStart('API Response');
+  console.log(JSON.stringify(response, null, 2));
+  logGroupEnd();
+  logGroupEnd();
+  return response;
+}
+
 // Fetch all existing InstaWP sites for the user
 async function getExistingSites() {
-  const json = await instawpApiRequest({ method: 'GET', path: '/api/v2/sites?per_page=300' });
-  logGroupStart('Get sites response');
-  console.log(JSON.stringify(json, null, 2));
-  logGroupEnd();
+  const json = await apiCall({ method: 'GET', path: '/api/v2/sites?per_page=300', logLabel: 'Get sites' });
   return json.data || [];
 }
 
@@ -104,20 +133,14 @@ async function createNewSite(normalizedUrl) {
     is_reserved: false,
     expiry_hours: 1,
   };
-  // If a normalized URL is provided, set that as the site_name
   if (normalizedUrl) payload.site_name = normalizedUrl;
   logInfo(`Create site payload: ${JSON.stringify(payload)}`);
-
-  // Make the API request to create the site
-  const json = await instawpApiRequest({
+  const json = await apiCall({
     method: 'POST',
     path: '/api/v2/sites',
     body: JSON.stringify(payload),
+    logLabel: 'Site creation',
   });
-  logGroupStart('Site creation response');
-  console.log(JSON.stringify(json, null, 2));
-  logGroupEnd();
-  // Save the response to a variable
   const siteData = json.data || json;
   
   // If the API returns a task_id, wait for the site to be ready
@@ -138,16 +161,9 @@ async function createNewSite(normalizedUrl) {
         logInfo(`Task status: ${taskStatus}, site_id: ${siteId}`);
         if (taskStatus === 'completed' && siteId && siteId !== 'null') {
           logInfo('Site is ready!');
-          const sites = await getExistingSites();
-          const found = sites.find(site => String(site.id) === String(siteId));
-          if (found) {
-            logGroupEnd();
-            return found;
-          } else {
-            logError('Site was created but could not be found after readiness check.');
-            logGroupEnd();
-            throw new Error('Site was created but could not be found after readiness check.');
-          }
+          logGroupEnd();
+          // Return the siteData from the original creation response, updated with the final siteId if needed
+          return { ...siteData, id: siteId };
         }
       } catch (err) {
         logError('Error checking site status: ' + (err && err.stack ? err.stack : err));
@@ -168,37 +184,24 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
   if (Array.isArray(commandArguments) && commandArguments.length > 0) {
     payload.commandArguments = commandArguments;
   }
-  const body = JSON.stringify(payload);
-  try {
-    logInfo(`Triggering InstaWP command ${command_id} for site ${siteid}`);
-    logGroupStart('Command payload');
-    console.log(body);
-    logGroupEnd();
-  } catch (_) {}
-  const resp = await instawpApiRequest({
+  logInfo(`Triggering InstaWP command ${command_id} for site ${siteid}`);
+  await apiCall({
     method: 'POST',
     path: `/api/v2/sites/${siteid}/execute-command`,
-    body,
+    body: JSON.stringify(payload),
+    logLabel: `Command ${command_id}`,
   });
-  logGroupStart(`Command ${command_id} response`);
-  console.log(JSON.stringify(resp, null, 2));
-  logGroupEnd();
 }
+
 
 // Main logic
 (async () => {
-  // Validate required environment variables (only INSTAWP_API_TOKEN is required)
-  if (!INSTAWP_API_TOKEN) {
-    console.error('INSTAWP_API_TOKEN must be set.');
-    process.exit(1);
-  }
-
   // Normalize the target site URL (strip protocol and trailing slash), or empty string if not set
-  const normalizedUrl = INSTA_WP_URL ? INSTA_WP_URL.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
+  const normalizedUrl = normalizeUrl(INSTA_WP_URL);
 
   try {
     let siteid, siteurl, siteCreated = false;
-    
+
     if (normalizedUrl) {
       // If a URL is provided, try to find an existing site
       const sites = await getExistingSites();
@@ -237,7 +240,6 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
       await triggerInstaWpCommand(siteid, 2334, [{ wc_blueprint_json_public_url: PLUGIN_WC_BLUEPRINT_URL }]);
       logInfo('Command 2417: apply credentials blueprint');
       await triggerInstaWpCommand(siteid, 2417, [{ wc_blueprint_json_string: PLUGIN_CREDENTIALS_WC_BLUEPRINT_JSON }]);
-      
       if (!USE_CHECKOUT_BLOCK) {
         logInfo('Command 2549: apply WooCommerce checkout shortcode');
         await triggerInstaWpCommand(siteid, 2549);
@@ -265,3 +267,10 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
     process.exit(1);
   }
 })();
+
+// Logging helpers for GitHub Actions
+function logInfo(msg) { console.log(`[INFO] ${msg}`); }
+function logWarn(msg) { console.warn(`[WARN] ${msg}`); }
+function logError(msg) { console.error(`::error::${msg}`); }
+function logGroupStart(name) { console.log(`::group::${name}`); }
+function logGroupEnd() { console.log('::endgroup::'); }
