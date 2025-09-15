@@ -88,6 +88,9 @@ function instawpApiRequest({ method, path, body }) {
 // Fetch all existing InstaWP sites for the user
 async function getExistingSites() {
   const json = await instawpApiRequest({ method: 'GET', path: '/api/v2/sites?per_page=300' });
+  logGroupStart('Get sites response');
+  console.log(JSON.stringify(json, null, 2));
+  logGroupEnd();
   return json.data || [];
 }
 
@@ -111,7 +114,9 @@ async function createNewSite(normalizedUrl) {
     path: '/api/v2/sites',
     body: JSON.stringify(payload),
   });
-
+  logGroupStart('Site creation response');
+  console.log(JSON.stringify(json, null, 2));
+  logGroupEnd();
   // Save the response to a variable
   const siteData = json.data || json;
   
@@ -170,11 +175,14 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
     console.log(body);
     logGroupEnd();
   } catch (_) {}
-  await instawpApiRequest({
+  const resp = await instawpApiRequest({
     method: 'POST',
     path: `/api/v2/sites/${siteid}/execute-command`,
     body,
   });
+  logGroupStart(`Command ${command_id} response`);
+  console.log(JSON.stringify(resp, null, 2));
+  logGroupEnd();
 }
 
 // Main logic
