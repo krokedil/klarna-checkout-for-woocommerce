@@ -43,8 +43,7 @@ class KCO_Settings_Saved {
 	 * @return void
 	 */
 	public function update_settings() {
-		$kco_credentials           = new KCO_Credentials();
-		$kco_credentials->settings = get_option( 'woocommerce_kco_settings', array() );
+		KCO_WC()->credentials->settings = get_option( 'woocommerce_kco_settings', array() );
 	}
 
 	/**
