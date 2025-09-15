@@ -34,7 +34,7 @@ class KCO_Settings_Saved {
 	public function __construct() {
 		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'update_settings' ), 10 );
 		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'check_if_test_credentials_exists' ), 15 );
-		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'check_api_credentials' ), 15 );
+		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'check_api_credentials' ), 20 );
 	}
 
 	/**
