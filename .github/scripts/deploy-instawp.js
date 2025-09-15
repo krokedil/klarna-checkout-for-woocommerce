@@ -231,6 +231,10 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
       siteCreated = true;
     }
 
+    // Always upload the dev zip to the site (Command 2301)
+    logInfo('Command 2301: upload dev zip');
+    await triggerInstaWpCommand(siteid, 2301, [{ dev_zip_public_url: `https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${ZIP_FILE_NAME}.zip` }]);
+
     // Only run setup commands if a new site was created
     if (siteCreated) {
       logGroupStart('InstaWP setup commands');
@@ -246,10 +250,6 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
       }
       logGroupEnd();
     }
-
-    // Always upload the dev zip to the site (Command 2301)
-    logInfo('Command 2301: upload dev zip');
-    await triggerInstaWpCommand(siteid, 2301, [{ dev_zip_public_url: `https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${ZIP_FILE_NAME}.zip` }]);
 
     // Set GitHub Actions outputs and environment variables for downstream steps
     if (GITHUB_ENV) fs.appendFileSync(GITHUB_ENV, `INSTA_WP_SITE_ID=${siteid}\n`);
