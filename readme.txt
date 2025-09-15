@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
 WC requires at least: 5.6.0
-WC tested up to: 10.0.4
-Stable tag: 2.14.2
+WC tested up to: 10.1.2
+Stable tag: 2.14.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,14 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.09.15    - version 2.14.3 =
+* Fix           - Resolved issue with Pay for order, when enabling shipping in iframe.
+* Fix           - Resolves the redirect checkout flow not working as intended.
+* Fix           - Resolved the ‘kco_check_if_needs_payment’ filter not working as intended.
+* Fix           - Resolved ‘environment’ in the order management meta box being set as ‘Unknown’ for subscription renewal orders.
+* Tweak         - Updated some text and dead links, to reflect the rebrand to Kustom.
+* Tweak         - Improved logging for the confirmation page redirect.
+
 = 2025.08.04    - version 2.14.2 =
 * Fix           - Fixed compatibility issue with WooCommerce 10.x for session data handling.
 
