@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2025-08-04 08:25+0000\n"
+"POT-Creation-Date: 2025-09-15 08:03+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -38,7 +38,7 @@ msgstr ""
 msgid "Payment via Kustom Checkout, order ID: %s"
 msgstr ""
 
-#: ../classes/class-kco-checkout.php:205
+#: ../classes/class-kco-checkout.php:206
 msgid "The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again."
 msgstr ""
 
@@ -467,35 +467,35 @@ msgstr ""
 msgid "The current Kustom Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:108
+#: ../classes/class-kco-gateway.php:114
 msgid "The Kustom order id could not be retrieved from the session. Please try again."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:115
+#: ../classes/class-kco-gateway.php:121
 msgid "The Kustom order could not be retrieved from the session. Please try again."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:387
+#: ../classes/class-kco-gateway.php:393
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:390
+#: ../classes/class-kco-gateway.php:396
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:616
+#: ../classes/class-kco-gateway.php:622
 msgid "Customer redirected to Kustom Hosted Payment Page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:724
+#: ../classes/class-kco-gateway.php:730
 msgid "Order address should not be changed and any changes you make will not be reflected in Kustom system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:783
+#: ../classes/class-kco-gateway.php:789
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:805, ../classes/class-kco-gateway.php:827
+#: ../classes/class-kco-gateway.php:811, ../classes/class-kco-gateway.php:833
 msgid "Reference:"
 msgstr ""
 
@@ -503,36 +503,36 @@ msgstr ""
 msgid "Kustom Checkout for WooCommerce"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:271
+#: ../classes/class-kco-subscription.php:274
 msgid "Recurring token was missing from the Kustom order during the checkout process. Please contact Kustom for help."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:247
+#: ../classes/class-kco-subscription.php:250
 msgid "Recurring token for subscription: %s"
 msgstr ""
 
 #. translators: Error message.
-#: ../classes/class-kco-subscription.php:347
-msgid "Subscription payment failed with Kustom. Message: %1$s"
+#: ../classes/class-kco-subscription.php:355
+msgid "Subscription payment failed with Klarna. Message: %1$s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:340
+#: ../classes/class-kco-subscription.php:348
 msgid "Subscription payment made with Kustom. Kustom order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:380
+#: ../classes/class-kco-subscription.php:413
 msgid "Kustom recurring token"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:436
+#: ../classes/class-kco-subscription.php:469
 msgid "Could not retrieve new Kustom recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:430
+#: ../classes/class-kco-subscription.php:463
 msgid "Payment method changed via Kustom Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:457
+#: ../classes/class-kco-subscription.php:490
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
