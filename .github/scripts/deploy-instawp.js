@@ -97,13 +97,19 @@ async function createNewSite(normalizedUrl) {
     is_reserved: false,
     expiry_hours: 1,
   };
+  // If a normalized URL is provided, set that as the site_name
   if (normalizedUrl) payload.site_name = normalizedUrl;
+
+  // Make the API request to create the site
   const json = await instawpApiRequest({
     method: 'POST',
     path: '/api/v2/sites',
     body: JSON.stringify(payload),
   });
+
+  // Save the response to a variable
   const siteData = json.data || json;
+  
   // If the API returns a task_id, wait for the site to be ready
   if (siteData.task_id) {
     // Wait for site to be ready
