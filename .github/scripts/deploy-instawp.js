@@ -1,8 +1,15 @@
 // .github/scripts/deploy-instawp.js
-// This script manages InstaWP site detection, creation, and triggers dev zip upload for a given URL.
+// Orchestrates InstaWP site detection/creation and dev-zip deployment.
 
 const https = require('https');
 const fs = require('fs');
+
+// Logging helpers for GitHub Actions
+function logInfo(msg) { console.log(`[INFO] ${msg}`); }
+function logWarn(msg) { console.warn(`[WARN] ${msg}`); }
+function logError(msg) { console.error(`::error::${msg}`); }
+function logGroupStart(name) { console.log(`::group::${name}`); }
+function logGroupEnd() { console.log('::endgroup::'); }
 
 // Environment variables from GitHub Actions
 const INSTA_WP_URL = process.env.INSTA_WP_URL;
@@ -64,19 +71,15 @@ function instawpApiRequest({ method, path, body }) {
             resolve(data);
           }
         } else {
-          // Enhanced error logging for debugging
-          console.error('InstaWP API error:', {
-            method,
-            path,
-            body,
-            statusCode: res.statusCode,
-            response: data
-          });
+          logError(`InstaWP API error: ${JSON.stringify({ method, path, statusCode: res.statusCode, response: data })}`);
           reject(new Error(`InstaWP API error: ${res.statusCode} - ${data}`));
         }
       });
     });
-    req.on('error', reject);
+    req.on('error', (err) => {
+      logError('Network error: ' + (err && err.stack ? err.stack : err));
+      reject(err);
+    });
     if (body) req.write(body);
     req.end();
   });
@@ -90,6 +93,7 @@ async function getExistingSites() {
 
 // Create a new InstaWP site and wait for it to be ready if needed
 async function createNewSite(normalizedUrl) {
+  logGroupStart('Create InstaWP site');
   const payload = {
     configuration_id: 5141,
     team_id: 4875,
@@ -99,6 +103,7 @@ async function createNewSite(normalizedUrl) {
   };
   // If a normalized URL is provided, set that as the site_name
   if (normalizedUrl) payload.site_name = normalizedUrl;
+  logInfo(`Create site payload: ${JSON.stringify(payload)}`);
 
   // Make the API request to create the site
   const json = await instawpApiRequest({
@@ -112,40 +117,43 @@ async function createNewSite(normalizedUrl) {
   
   // If the API returns a task_id, wait for the site to be ready
   if (siteData.task_id) {
-    // Wait for site to be ready
+    logInfo(`Creation is asynchronous (task_id=${siteData.task_id}). Waiting for readiness...`);
     for (let i = 1; i <= 30; i++) {
-      console.log(`Checking site status (attempt ${i})...`);
+      logInfo(`Checking site status (attempt ${i})...`);
       try {
         const statusRes = await instawpApiRequest({
           method: 'GET',
           path: `/api/v2/tasks/${siteData.task_id}/status`,
         });
-        // Log the response for debugging
-        console.log('--- Response from InstaWP (task status) ---');
+        logGroupStart('Task status response');
         console.log(JSON.stringify(statusRes, null, 2));
-        console.log('------------------------------------------');
+        logGroupEnd();
         const taskStatus = statusRes?.data?.status;
         const siteId = statusRes?.data?.resource_id;
-        console.log(`Task status: ${taskStatus}, site_id: ${siteId}`);
+        logInfo(`Task status: ${taskStatus}, site_id: ${siteId}`);
         if (taskStatus === 'completed' && siteId && siteId !== 'null') {
-          console.log('Site is ready!');
-          // Fetch the site details after it's ready
+          logInfo('Site is ready!');
           const sites = await getExistingSites();
           const found = sites.find(site => String(site.id) === String(siteId));
           if (found) {
+            logGroupEnd();
             return found;
           } else {
+            logError('Site was created but could not be found after readiness check.');
+            logGroupEnd();
             throw new Error('Site was created but could not be found after readiness check.');
           }
         }
       } catch (err) {
-        console.error('Error checking site status:', err);
+        logError('Error checking site status: ' + (err && err.stack ? err.stack : err));
       }
       await new Promise(res => setTimeout(res, 10000));
     }
+    logError('Timed out waiting for site to be ready.');
+    logGroupEnd();
     throw new Error('Timed out waiting for site to be ready.');
   }
-  // Fallback: use the returned site info directly
+  logGroupEnd();
   return siteData;
 }
 
@@ -156,6 +164,12 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
     payload.commandArguments = commandArguments;
   }
   const body = JSON.stringify(payload);
+  try {
+    logInfo(`Triggering InstaWP command ${command_id} for site ${siteid}`);
+    logGroupStart('Command payload');
+    console.log(body);
+    logGroupEnd();
+  } catch (_) {}
   await instawpApiRequest({
     method: 'POST',
     path: `/api/v2/sites/${siteid}/execute-command`,
@@ -208,21 +222,23 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
 
     // Only run setup commands if a new site was created
     if (siteCreated) {
-      // Command 2344: setup-default-site
+      logGroupStart('InstaWP setup commands');
+      logInfo('Command 2344: setup-default-site');
       await triggerInstaWpCommand(siteid, 2344);
-      // Command 2334: apply WooCommerce blueprint
+      logInfo('Command 2334: apply WooCommerce blueprint');
       await triggerInstaWpCommand(siteid, 2334, [{ wc_blueprint_json_public_url: PLUGIN_WC_BLUEPRINT_URL }]);
-      // Command 2417: apply credentials blueprint (API keys from secrets)
+      logInfo('Command 2417: apply credentials blueprint');
       await triggerInstaWpCommand(siteid, 2417, [{ wc_blueprint_json_string: PLUGIN_CREDENTIALS_WC_BLUEPRINT_JSON }]);
-
-      // Check if WooCommerce checkout block should be used, if not switch to using the shortcode
+      
       if (!USE_CHECKOUT_BLOCK) {
-        // Command 2549: apply WooCommerce checkout shortcode
+        logInfo('Command 2549: apply WooCommerce checkout shortcode');
         await triggerInstaWpCommand(siteid, 2549);
       }
+      logGroupEnd();
     }
 
     // Always upload the dev zip to the site (Command 2301)
+    logInfo('Command 2301: upload dev zip');
     await triggerInstaWpCommand(siteid, 2301, [{ dev_zip_public_url: `https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${ZIP_FILE_NAME}.zip` }]);
 
     // Set GitHub Actions outputs and environment variables for downstream steps
@@ -237,7 +253,7 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
     console.log(`${siteCreated ? 'Created new' : 'Found'} site with siteid: ${siteid}, siteurl: ${siteurl}`);
   } catch (e) {
     // Log errors and exit with failure
-    console.error('Error:', e);
+    logError('Unhandled error: ' + (e && e.stack ? e.stack : e));
     process.exit(1);
   }
 })();
