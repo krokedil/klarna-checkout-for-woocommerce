@@ -4,8 +4,8 @@
 /node_modules
 /tests
 /languages/*-backup-*
-/vendor
 .editorconfig
+.eslintrc
 .distignore
 .gitignore
 readme.md
@@ -20,3 +20,4 @@ readme.dev.txt
 phpcs.ruleset.xml
 phpunit-docker.xml
 phpunit.xml
+pnpm-lock.yaml

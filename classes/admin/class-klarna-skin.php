@@ -27,7 +27,6 @@ class Klarna_Skin extends WP_Upgrader_Skin {
 	public function __construct( $args = array() ) {
 
 		parent::__construct();
-
 	}
 
 	/**
@@ -42,7 +41,6 @@ class Klarna_Skin extends WP_Upgrader_Skin {
 		if ( is_object( $upgrader ) ) {
 			$this->upgrader =& $upgrader;
 		}
-
 	}
 
 	/**
@@ -55,7 +53,6 @@ class Klarna_Skin extends WP_Upgrader_Skin {
 	public function set_result( $result ) {
 
 		$this->result = $result;
-
 	}
 
 	/**
@@ -87,7 +84,6 @@ class Klarna_Skin extends WP_Upgrader_Skin {
 			echo wp_json_encode( array( 'error' => esc_html__( 'There was an error installing the addon. Please try again.', 'klarna-checkout-for-woocommerce' ) ) );
 			die;
 		}
-
 	}
 
 	/**
@@ -102,7 +98,5 @@ class Klarna_Skin extends WP_Upgrader_Skin {
 	 * @return void
 	 */
 	public function feedback( $string, ...$args ) {
-
 	}
-
 }
