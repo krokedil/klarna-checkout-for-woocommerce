@@ -30,7 +30,6 @@ class OrderValidation {
 		$klarna_order         = self::get_klarna_order( $klarna_order_id );
 		$merchant_reference   = $klarna_order['merchant_reference2']; // Get the merchant reference from the klarna order.
 		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-
 		// If the merchant reference or klarna merchant data is empty, throw an exception.
 		if ( empty( $merchant_reference ) || empty( $klarna_merchant_data ) ) {
 			throw new Exception( 'Could not validate the order, please try again.', 400 );
@@ -39,6 +38,9 @@ class OrderValidation {
 		// Get the order from the merchant reference.
 		$order = self::get_wc_order( $merchant_reference );
 
+		// Set the klarna order id in the order meta data.
+		$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
+		$order->save_meta_data();
 		self::validate_wc_order( $order );
 
 		// Attempt to submit the order to WooCommerce using the store api.
@@ -241,6 +243,7 @@ class OrderValidation {
 		$body = array(
 			'key'              => $order->get_order_key(),
 			'payment_method'   => 'kco',
+			'billing_email'    => $klarna_billing_address['email'] ?? '',
 			'payment_data'     => array(
 				array(
 					'key'   => '_wc_klarna_checkout_flow',
@@ -303,7 +306,6 @@ class OrderValidation {
 				'value' => $klarna_order['recurring_token'],
 			);
 		}
-
 		// Set the request args.
 		$request_args = array(
 			'method'  => 'POST',
