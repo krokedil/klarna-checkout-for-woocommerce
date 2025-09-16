@@ -66,6 +66,7 @@ export const showElements = (toShow: string[]): void => {
 export const addIframe = (htmlContent: string): HTMLDivElement => {
 	// Create a new div for the htmlContent, and set it as the inner HTML.
 	const kcoWrapper = document.createElement('div');
+	kcoWrapper.id = 'kco-wrapper';
 	kcoWrapper.className =
 		'wc-block-checkout__klarna-checkout wc-block-components-klarna-checkout-block';
 	kcoWrapper.innerHTML = htmlContent;

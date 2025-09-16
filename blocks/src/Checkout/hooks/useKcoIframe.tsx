@@ -1,4 +1,4 @@
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import {
 	addIframe,
 	getElementsToHide,
@@ -31,20 +31,148 @@ export const useKcoIframe = (
 	_cartData: any
 ) => {
 	const [isActive, setIsActive] = useState(selectedPaymentMethod === 'kco');
+	const [htmlContent, setHtmlContent] = useState<string | null>(null);
+	const [scriptContent, setScriptContent] = useState<string | null>(null);
 	const { snippet, shippingInIframe, countryCodes } = settings;
 	const elementsToHide = getElementsToHide(shippingInIframe);
 
-	// Return the snippet, but since its an iframe we need to ensure react prints it properly.
-	const scriptMatch = snippet.match(/<script.*?>([\s\S]*?)<\/script>/);
-	const scriptContent = scriptMatch ? scriptMatch[1] : '';
-	const htmlContent = snippet.replace(/<script.*<\/script>/, '');
+	/**
+	 * Extracts HTML content and script content from the Kustom Checkout snippet.
+	 *
+	 * @return {Object} containing htmlContent and scriptContent extracted from the snippet.
+	 */
+	const getHtmlAndScriptContent = useCallback(() => {
+		// Return the snippet, but since its an iframe we need to ensure react prints it properly.
+		const scriptMatch = snippet.match(/<script.*?>([\s\S]*?)<\/script>/);
+		const scriptContentText = scriptMatch ? scriptMatch[1] : '';
+		const htmlContentText = snippet.replace(/<script.*<\/script>/, '');
+		return { htmlContentText, scriptContentText };
+	}, [snippet]);
+
+	/**
+	 * Suspend the Kustom Checkout iframe.
+	 *
+	 * @param {boolean} autoResume - Whether to automatically resume the Kustom Checkout iframe after suspending it.
+	 * @return {void}
+	 */
+	const suspendKCO = useCallback((autoResume: boolean = true): void => {
+		// If the Kustom Checkout script hasn't loaded yet, do nothing.
+		if ('function' !== typeof window._klarnaCheckout) {
+			return;
+		}
+
+		window._klarnaCheckout(function (api: any) {
+			api.suspend({ autoResume });
+		});
+	}, []);
+
+	/**
+	 * Resume the Kustom Checkout iframe.
+	 *
+	 * @return {void}
+	 */
+	const resumeKCO = useCallback((): void => {
+		// If the Kustom Checkout script hasn't loaded yet, do nothing.
+		if ('function' !== typeof window._klarnaCheckout) {
+			return;
+		}
+
+		window._klarnaCheckout(function (api: any) {
+			api.resume();
+		});
+	}, []);
+
+	/**
+	 * Convert an alpha3 country code to an alpha2 country code.
+	 *
+	 * @param {string} countryCode - The alpha3 country code to convert to alpha2.
+	 * @return {string} - The alpha2 country code, or an empty string if not found.
+	 */
+	const getAlpha2CountryCodeFromAlpha3 = useCallback(
+		(countryCode: string): string => {
+			// Find the key for the value that matches the country code passed.
+			const alpha2CountryCode = Object.keys(countryCodes).find(
+				(key) => countryCodes[key] === countryCode.toUpperCase()
+			);
+
+			return alpha2CountryCode || '';
+		},
+		[countryCodes]
+	);
+
+	/**
+	 * Handle changes to the shipping address in the Kustom Checkout iframe.
+	 * Sends a request to update the shipping address in the WooCommerce cart,
+	 * using the extensionCartUpdate function.
+	 *
+	 * @param {any} address - The shipping address object containing country and other details.
+	 * @return {Promise<void>}
+	 */
+	const onShippingAddressChanged = useCallback(
+		async (address: any): Promise<void> => {
+			suspendKCO();
+
+			// Convert the country in the address to an alpha2 country code.
+			const countryCode = getAlpha2CountryCodeFromAlpha3(address.country);
+			address.country = countryCode;
+
+			const response = extensionCartUpdate({
+				namespace: 'kco-block',
+				data: {
+					action: 'shipping_address_changed',
+					...address,
+				},
+			})
+				.then(() => {})
+				.catch((_error: any) => {})
+				.finally(() => {});
+
+			return response;
+		},
+		[getAlpha2CountryCodeFromAlpha3, suspendKCO]
+	);
+
+	/**
+	 * Handle changes to the shipping option in the Kustom Checkout iframe.
+	 * Sends a request to update the shipping option in the WooCommerce cart,
+	 * using the extensionCartUpdate function.
+	 *
+	 * @param {any} option - The selected shipping option.
+	 * @return {Promise<void>}
+	 */
+	const onShippingOptionChanged = useCallback(
+		async (option: any): Promise<void> => {
+			suspendKCO();
+
+			const response = extensionCartUpdate({
+				namespace: 'kco-block',
+				data: {
+					action: 'shipping_option_changed',
+					...option,
+				},
+			})
+				.then((_response: any) => {})
+				.catch((_error: any) => {})
+				.finally(() => {});
+
+			return response;
+		},
+		[suspendKCO]
+	);
+
+	useEffect(() => {
+		const { htmlContentText, scriptContentText } =
+			getHtmlAndScriptContent();
+		setHtmlContent(htmlContentText);
+		setScriptContent(scriptContentText);
+	}, [snippet, getHtmlAndScriptContent]);
 
 	/**
 	 * Register the Kustom Checkout events needed for the integration.
 	 *
 	 * @return {void}
 	 */
-	const registerKCOEvents = () => {
+	const registerKCOEvents = useCallback(() => {
 		// Register listeners for the Klarna Checkout events.
 		if ('function' !== typeof window._klarnaCheckout) {
 			return;
@@ -58,9 +186,7 @@ export const useKcoIframe = (
 				 * @param {any} _data - The data passed by the Kustom Checkout iframe.
 				 * @return {void}
 				 */
-				load: (_data: any) => {
-					hideElements(elementsToHide);
-				},
+				load: (_data: any) => {},
 				/**
 				 * This event is triggered when the shipping address is changed in the Kustom Checkout iframe.
 				 * It updates the shipping address in the WooCommerce cart.
@@ -93,109 +219,18 @@ export const useKcoIframe = (
 				/* eslint-enable jsdoc/require-jsdoc */
 			});
 		});
-	};
-
-	/**
-	 * Suspend the Kustom Checkout iframe.
-	 *
-	 * @param {boolean} autoResume - Whether to automatically resume the Kustom Checkout iframe after suspending it.
-	 * @return {void}
-	 */
-	const suspendKCO = (autoResume: boolean = true): void => {
-		window._klarnaCheckout(function (api: any) {
-			api.suspend({ autoResume });
-		});
-	};
-
-	/**
-	 * Resume the Kustom Checkout iframe.
-	 *
-	 * @return {void}
-	 */
-	const resumeKCO = (): void => {
-		window._klarnaCheckout(function (api: any) {
-			api.resume();
-		});
-	};
-
-	/**
-	 * Convert an alpha3 country code to an alpha2 country code.
-	 *
-	 * @param {string} countryCode - The alpha3 country code to convert to alpha2.
-	 * @return {string} - The alpha2 country code, or an empty string if not found.
-	 */
-	const getAlpha2CountryCodeFromAlpha3 = (countryCode: string): string => {
-		// Find the key for the value that matches the country code passed.
-		const alpha2CountryCode = Object.keys(countryCodes).find(
-			(key) => countryCodes[key] === countryCode.toUpperCase()
-		);
-
-		return alpha2CountryCode || '';
-	};
-
-	/**
-	 * Handle changes to the shipping address in the Kustom Checkout iframe.
-	 * Sends a request to update the shipping address in the WooCommerce cart,
-	 * using the extensionCartUpdate function.
-	 *
-	 * @param {any} address - The shipping address object containing country and other details.
-	 * @return {Promise<void>}
-	 */
-	const onShippingAddressChanged = async (address: any): Promise<void> => {
-		suspendKCO();
-
-		// Convert the country in the address to an alpha2 country code.
-		const countryCode = getAlpha2CountryCodeFromAlpha3(address.country);
-		address.country = countryCode;
-
-		const response = extensionCartUpdate({
-			namespace: 'kco-block',
-			data: {
-				action: 'shipping_address_changed',
-				...address,
-			},
-		})
-			.then(() => {})
-			.catch((_error: any) => {})
-			.finally(() => {});
-
-		return response;
-	};
-
-	/**
-	 * Handle changes to the shipping option in the Kustom Checkout iframe.
-	 * Sends a request to update the shipping option in the WooCommerce cart,
-	 * using the extensionCartUpdate function.
-	 *
-	 * @param {any} option - The selected shipping option.
-	 * @return {Promise<void>}
-	 */
-	const onShippingOptionChanged = async (option: any): Promise<void> => {
-		suspendKCO();
-
-		const response = extensionCartUpdate({
-			namespace: 'kco-block',
-			data: {
-				action: 'shipping_option_changed',
-				...option,
-			},
-		})
-			.then((_response: any) => {})
-			.catch((_error: any) => {})
-			.finally(() => {});
-
-		return response;
-	};
+	}, [onShippingAddressChanged, onShippingOptionChanged]);
 
 	useEffect(() => {
 		if (!isActive) return; // If Kustom Checkout is not active, don't load the script or iframe.
-
 		if (htmlContent) {
+			hideElements(elementsToHide);
 			// Add the iframe and script to the WooCommerce checkout page.
 			const kcoWrapper = addIframe(htmlContent);
 			const script = document.createElement('script');
 			script.textContent = scriptContent;
 			document.body.appendChild(script);
+			registerKCOEvents();
 
 			// On unmount.
 			return () => {
@@ -205,17 +240,13 @@ export const useKcoIframe = (
 				document.body.removeChild(script);
 			};
 		}
-	});
-
-	useEffect(() => {
-		if (!isActive) return; // If Kustom Checkout is not active, do not register events.
-		if (htmlContent) registerKCOEvents(); // Register the Kustom Checkout events only if the HTML content is available.
-	});
-
-	// If the payment method is active, hide the elements that are not needed from the WooCommerce checkout page.
-	if (isActive) {
-		hideElements(elementsToHide);
-	}
+	}, [
+		isActive,
+		htmlContent,
+		scriptContent,
+		elementsToHide,
+		registerKCOEvents,
+	]);
 
 	return { isActive, elementsToHide, suspendKCO, resumeKCO };
 };
