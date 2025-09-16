@@ -32,8 +32,18 @@ class KCO_Settings_Saved {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'check_if_test_credentials_exists' ), 10 );
-		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'check_api_credentials' ), 10 );
+		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'update_settings' ), 10 );
+		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'check_if_test_credentials_exists' ), 15 );
+		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'check_api_credentials' ), 20 );
+	}
+
+	/**
+	 * Updates the settings in the KCO_Credentials class.
+	 *
+	 * @return void
+	 */
+	public function update_settings() {
+		KCO_WC()->credentials->settings = get_option( 'woocommerce_kco_settings', array() );
 	}
 
 	/**
