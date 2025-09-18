@@ -1,34 +1,9 @@
 // .github/scripts/deploy-instawp.js
 // Orchestrates InstaWP site detection/creation and dev-zip deployment.
 
+// import required modules
 const https = require('https');
 const fs = require('fs');
-
-// Environment variables from GitHub Actions
-const INSTA_WP_URL = process.env.INSTA_WP_URL;
-const INSTAWP_API_TOKEN = process.env.INSTAWP_API_TOKEN;
-const GITHUB_ENV = process.env.GITHUB_ENV;
-const GITHUB_OUTPUT = process.env.GITHUB_OUTPUT;
-const ZIP_FILE_NAME = process.env.ZIP_FILE_NAME;
-
-// Set if WooCommerce checkout should use checkout block or shortcode
-const USE_CHECKOUT_BLOCK = false; // true = use checkout block, false = use shortcode
-
-// Validate required environment variables at the top
-const REQUIRED_ENVS = [
-  'INSTAWP_API_TOKEN',
-  'ZIP_FILE_NAME',
-];
-const missingEnvs = REQUIRED_ENVS.filter((env) => !process.env[env]);
-if (missingEnvs.length > 0) {
-  console.error(`Missing required environment variables: ${missingEnvs.join(', ')}`);
-  process.exit(1);
-}
-
-// Helper to normalize URLs (strip protocol and trailing slash)
-function normalizeUrl(url) {
-  return url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
-}
 
 // Blueprint URL for WooCommerce KCO (Klarna Checkout) default settings
 const PLUGIN_WC_BLUEPRINT_URL = 'https://raw.githubusercontent.com/krokedil/instawp-commands/refs/heads/main/assets/wc-blueprints/wc-blueprint-kco-default.json';
@@ -48,6 +23,31 @@ const PLUGIN_CREDENTIALS_WC_BLUEPRINT_JSON = JSON.stringify({
   ]
 });
 
+// Set if WooCommerce checkout should use checkout block or shortcode
+const USE_CHECKOUT_BLOCK = false; // true = use checkout block, false = use shortcode
+
+// Environment variables from GitHub Actions
+const INSTA_WP_URL = process.env.INSTA_WP_URL;
+const INSTAWP_API_TOKEN = process.env.INSTAWP_API_TOKEN;
+const GITHUB_ENV = process.env.GITHUB_ENV;
+const GITHUB_OUTPUT = process.env.GITHUB_OUTPUT;
+const ZIP_FILE_NAME = process.env.ZIP_FILE_NAME;
+
+// Validate required environment variables at the top
+const REQUIRED_ENVS = [
+  'INSTAWP_API_TOKEN',
+  'ZIP_FILE_NAME',
+];
+const missingEnvs = REQUIRED_ENVS.filter((env) => !process.env[env]);
+if (missingEnvs.length > 0) {
+  console.error(`Missing required environment variables: ${missingEnvs.join(', ')}`);
+  process.exit(1);
+}
+
+// Helper to normalize URLs (strip protocol and trailing slash)
+function normalizeUrl(url) {
+  return url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
+}
 
 // Centralized request options
 const INSTA_WP_API_HOST = 'app.instawp.io';
@@ -57,8 +57,29 @@ const INSTA_WP_API_HEADERS = {
   'Content-Type': 'application/json',
 };
 
+// API call wrapper with logging
+async function apiCall({ method, path, body, logLabel }) {
+  logGroupStart(logLabel || `API Request: ${method} ${path}`);
+  if (body) {
+    logInfo('Payload:');
+    try { console.log(typeof body === 'string' ? body : JSON.stringify(body, null, 2)); } catch {}
+  }
+  let response;
+  try {
+    response = await instawpApiRequest({ method, path, body });
+  } catch (err) {
+    logError(`API call failed: ${err && err.message ? err.message : err}`);
+    logGroupEnd();
+    throw err;
+  }
+  logGroupStart('API Response');
+  console.log(JSON.stringify(response, null, 2));
+  logGroupEnd();
+  logGroupEnd();
+  return response;
+}
 
-// Generic request helper (no logging)
+// Generic request helper for InstaWP API
 function instawpApiRequest({ method, path, body }) {
   const options = {
     hostname: INSTA_WP_API_HOST,
@@ -93,28 +114,6 @@ function instawpApiRequest({ method, path, body }) {
     if (body) req.write(body);
     req.end();
   });
-}
-
-// API call wrapper with logging
-async function apiCall({ method, path, body, logLabel }) {
-  logGroupStart(logLabel || `API Request: ${method} ${path}`);
-  if (body) {
-    logInfo('Payload:');
-    try { console.log(typeof body === 'string' ? body : JSON.stringify(body, null, 2)); } catch {}
-  }
-  let response;
-  try {
-    response = await instawpApiRequest({ method, path, body });
-  } catch (err) {
-    logError(`API call failed: ${err && err.message ? err.message : err}`);
-    logGroupEnd();
-    throw err;
-  }
-  logGroupStart('API Response');
-  console.log(JSON.stringify(response, null, 2));
-  logGroupEnd();
-  logGroupEnd();
-  return response;
 }
 
 // Fetch all existing InstaWP sites for the user
@@ -193,6 +192,12 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
   });
 }
 
+// Logging helpers for GitHub Actions
+function logInfo(msg) { console.log(`[INFO] ${msg}`); }
+function logWarn(msg) { console.warn(`[WARN] ${msg}`); }
+function logError(msg) { console.error(`::error::${msg}`); }
+function logGroupStart(name) { console.log(`::group::${name}`); }
+function logGroupEnd() { console.log('::endgroup::'); }
 
 // Main logic
 (async () => {
@@ -267,10 +272,3 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
     process.exit(1);
   }
 })();
-
-// Logging helpers for GitHub Actions
-function logInfo(msg) { console.log(`[INFO] ${msg}`); }
-function logWarn(msg) { console.warn(`[WARN] ${msg}`); }
-function logError(msg) { console.error(`::error::${msg}`); }
-function logGroupStart(name) { console.log(`::group::${name}`); }
-function logGroupEnd() { console.log('::endgroup::'); }
