@@ -19,6 +19,33 @@ class Overrides {
 	 */
 	public function __construct() {
 		add_filter( 'kco_wc_api_request_args', array( $this, 'override_request_body' ), 10, 2 );
+
+		// Important: Needs to be on a priority before 100, since WCS will process the order at 100.
+		// @TODO: Commented out for now until we can verify with WooCommerce why Subscriptions are not processed correctly when placing an order through the store api endpoint.
+		//add_filter( 'woocommerce_store_api_checkout_order_processed', array( $this, 'maybe_calculate_recurring_carts' ), 90 );
+	}
+
+	/**
+	 * Maybe calculate recurring carts.
+	 *
+	 * @param \WC_Order $order The WooCommerce order.
+	 *
+	 * @return \WC_Order
+	 */
+	public function maybe_calculate_recurring_carts( $order ) {
+		// Only do this if the order is placed with Kustom Checkout, and the class exists.
+		if ( $order->get_payment_method() !== 'kco' || ! class_exists( 'WC_Subscriptions_Cart' ) ) {
+			return $order;
+		}
+
+		// Get the cart from WooCommerce and the cart total.
+		$cart  = WC()->cart;
+		$total = $cart->get_total( 'edit' );
+
+		// Trigger the calculation of recurring carts so they are set on the cart object before WCS tries to process the order.
+		\WC_Subscriptions_Cart::calculate_subscription_totals( $total, $cart );
+
+		return $order;
 	}
 
 	/**

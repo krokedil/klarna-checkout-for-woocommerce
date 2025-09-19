@@ -55,6 +55,26 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 	}
 
 	/**
+	 * Returns an array of supported features.
+	 *
+	 * @return string[]
+	 */
+	public function get_supported_features() {
+		// Get the supported features from the Kustom gateway.
+		$gateway = \WC_Payment_Gateways::instance()->get_available_payment_gateways()[ $this->name ] ?? null;
+		if ( ! empty( $gateway ) && property_exists( $gateway, 'supports' ) ) {
+			$features = $gateway->supports;
+
+			// Filter out any subscription related features for now until the support for it is verified.
+			$features = array_filter( $features, function( $feature ) {
+				return strpos( $feature, 'subscription' ) === false;
+			} );
+
+		}
+		return [ 'products' ];
+	}
+
+	/**
 	 * Checks if we are currently on the admin pages when loading the blocks.
 	 *
 	 * @return boolean
@@ -96,7 +116,7 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 				'shippingInIframe' => 'yes' === $this->settings['shipping_methods_in_iframe'],
 				'countryCodes'     => kco_get_country_codes(),
 				'iconUrl'          => $icon_url,
-				'supports'         => $this->get_supported_features(),
+				'features'         => $this->get_supported_features(),
 			);
 		}
 
@@ -119,7 +139,7 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 			'shippingInIframe' => 'yes' === $this->settings['shipping_methods_in_iframe'],
 			'countryCodes'     => kco_get_country_codes(),
 			'iconUrl'          => $icon_url,
-			'features '        => $this->get_supported_features(),
+			'features'         => $this->get_supported_features(),
 		);
 	}
 }

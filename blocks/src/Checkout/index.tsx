@@ -30,7 +30,6 @@ const title: string = decodeEntities(settings.title || 'Kustom Checkout');
 const description: string = decodeEntities(settings.description || '');
 const iconUrl: string = decodeEntities(settings.iconUrl || '');
 const features: string[] = settings.features || [];
-
 /**
  * Checks if the Kustom Checkout can make a payment.
  *
@@ -128,7 +127,7 @@ const options = {
 	placeOrderButtonLabel: 'Pay with Kustom Checkout',
 	canMakePayment,
 	ariaLabel: title,
-	supports: features,
+	supports: { features },
 };
 
 registerPaymentMethod(options);
