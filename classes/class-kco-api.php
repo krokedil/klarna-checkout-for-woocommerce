@@ -73,7 +73,7 @@ class KCO_API {
 			// Data is returned as both json and string. Let's try to grab only the json data.
 			$extracted_response = strstr( $response->get_error_message(), '}', true ) . '}';
 			$extracted_response = json_decode( $extracted_response );
-			if ( 'READ_ONLY_ORDER' === $extracted_response->error_code ) {
+			if ( is_object( $extracted_response ) && 'READ_ONLY_ORDER' === $extracted_response->error_code ?? false ) {
 				$order = kco_get_order_by_klarna_id( $klarna_order_id, '2 day ago' );
 
 				if ( ! empty( $order ) ) {
