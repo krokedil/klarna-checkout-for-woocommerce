@@ -304,14 +304,14 @@ class OrderValidation {
 
 		// If the klarna order is a recurring order.
 		if ( isset( $klarna_order['recurring'] ) ) {
-			$body[] = array(
+			$body['payment_data'][] = array(
 				'key'   => '_kco_recurring_order',
 				'value' => $klarna_order['recurring'] ? 'yes' : 'no',
 			);
 		}
 
 		if ( isset( $klarna_order['recurring_token'] ) ) {
-			$body[] = array(
+			$body['payment_data'][] = array(
 				'key'   => '_kco_recurring_token',
 				'value' => $klarna_order['recurring_token'],
 			);
