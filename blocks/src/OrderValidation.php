@@ -292,6 +292,16 @@ class OrderValidation {
 			),
 		);
 
+		// Set the billing company name if it exists.
+		if ( isset( $klarna_billing_address['organization_name'] ) ) {
+			$body['billing_address']['company'] = $klarna_billing_address['organization_name'];
+		}
+
+		// Set the shipping company name if it exists.
+		if ( isset( $klarna_shipping_address['organization_name'] ) ) {
+			$body['shipping_address']['company'] = $klarna_shipping_address['organization_name'];
+		}
+
 		// If the klarna order is a recurring order.
 		if ( isset( $klarna_order['recurring'] ) ) {
 			$body[] = array(
