@@ -45,14 +45,14 @@ abstract class CheckoutFlow {
 		$order_pay      = is_wc_endpoint_url( 'order-pay' );
 		$blocks_enabled = BlocksUtility::is_checkout_block_enabled();
 
-		// If the checkout block is enabled, use the embedded block flow no matter the setting.
-		if ( $blocks_enabled ) {
-			return new EmbeddedBlockFlow();
-		}
-
 		// If we are on the change_payment or order_pay pages, use the redirect flow no matter the setting.
 		if ( $change_payment || $order_pay ) {
 			return new RedirectFlow();
+		}
+
+		// If the checkout block is enabled, use the embedded block flow no matter the setting.
+		if ( $blocks_enabled ) {
+			return new EmbeddedBlockFlow();
 		}
 
 		switch ( $flow_setting ) {
