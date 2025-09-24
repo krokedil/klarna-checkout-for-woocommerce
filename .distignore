@@ -20,4 +20,8 @@ readme.dev.txt
 phpcs.ruleset.xml
 phpunit-docker.xml
 phpunit.xml
+tmp*
+readme.dev.md
+.prettierignore
+scoper.custom.php
 pnpm-lock.yaml

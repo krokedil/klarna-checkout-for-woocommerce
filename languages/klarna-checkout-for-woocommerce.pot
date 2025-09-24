@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2025-09-24 06:46+0000\n"
+"POT-Creation-Date: 2025-09-15 08:03+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -17,20 +17,12 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:129, ../klarna-checkout-for-woocommerce.php:139
-msgid "Nope"
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:182
+#: ../klarna-checkout-for-woocommerce.php:173
 msgid "Settings"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:183
+#: ../klarna-checkout-for-woocommerce.php:174
 msgid "Support"
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:386, ../klarna-checkout-for-woocommerce.php:396
-msgid "Your installation of Kustom Checkout for WooCommerce is not complete. If you installed this plugin directly from Github please refer to the README.DEV.md file in the plugin."
 msgstr ""
 
 #. translators: Kustom order ID.
@@ -467,39 +459,43 @@ msgstr ""
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:33, ../includes/admin/views/status-report.php:17
+#: ../classes/class-kco-gateway.php:29, ../includes/admin/views/status-report.php:17
 msgid "Kustom Checkout"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:34
+#: ../classes/class-kco-gateway.php:30
 msgid "The current Kustom Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:118
+#: ../classes/class-kco-gateway.php:114
 msgid "The Kustom order id could not be retrieved from the session. Please try again."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:125
+#: ../classes/class-kco-gateway.php:121
 msgid "The Kustom order could not be retrieved from the session. Please try again."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:372
+#: ../classes/class-kco-gateway.php:393
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:375
+#: ../classes/class-kco-gateway.php:396
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:550
+#: ../classes/class-kco-gateway.php:622
+msgid "Customer redirected to Kustom Hosted Payment Page."
+msgstr ""
+
+#: ../classes/class-kco-gateway.php:730
 msgid "Order address should not be changed and any changes you make will not be reflected in Kustom system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:609
+#: ../classes/class-kco-gateway.php:789
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:631, ../classes/class-kco-gateway.php:653
+#: ../classes/class-kco-gateway.php:811, ../classes/class-kco-gateway.php:833
 msgid "Reference:"
 msgstr ""
 
@@ -540,7 +536,7 @@ msgstr ""
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
-#: ../classes/class-kco-templates.php:175
+#: ../classes/class-kco-templates.php:173
 msgid "Kustom Checkout is not available. Please choose a different payment option or contact the store for assistance."
 msgstr ""
 
@@ -623,112 +619,8 @@ msgstr ""
 msgid "Deactivated"
 msgstr ""
 
-#: ../classes/admin/class-klarna-skin.php:84
+#: ../classes/admin/class-klarna-skin.php:87
 msgid "There was an error installing the addon. Please try again."
-msgstr ""
-
-#: ../src/CheckoutFlow/CheckoutFlow.php:25
-msgid "Invalid order ID."
-msgstr ""
-
-#: ../src/CheckoutFlow/CheckoutFlow.php:96
-msgid "Klarna order ID not found."
-msgstr ""
-
-#: ../src/CheckoutFlow/CheckoutFlow.php:150
-msgid "Klarna order not found or an error occurred."
-msgstr ""
-
-#: ../src/CheckoutFlow/CheckoutFlow.php:215
-msgid "There was an error processing your payment. Please try again."
-msgstr ""
-
-#: ../src/CheckoutFlow/RedirectFlow.php:44
-msgid "Customer redirected to Kustom Hosted Payment Page."
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:16
-msgid "Klarna Checkout address data"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:21
-msgid "Klarna Checkout billing address data"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:26
-msgid "Klarna Checkout billing address given name"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:31
-msgid "Klarna Checkout billing address family name"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:36
-msgid "Klarna Checkout billing address email"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:41
-msgid "Klarna Checkout billing address phone"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:46
-msgid "Klarna Checkout billing address street address"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:51
-msgid "Klarna Checkout billing address postal code"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:56
-msgid "Klarna Checkout billing address city"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:61
-msgid "Klarna Checkout billing address region"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:66
-msgid "Klarna Checkout billing address country"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:73
-msgid "Klarna Checkout shipping address data"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:78
-msgid "Klarna Checkout shipping address given name"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:83
-msgid "Klarna Checkout shipping address family name"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:88
-msgid "Klarna Checkout shipping address email"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:93
-msgid "Klarna Checkout shipping address phone"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:98
-msgid "Klarna Checkout shipping address street address"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:103
-msgid "Klarna Checkout shipping address postal code"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:108
-msgid "Klarna Checkout shipping address city"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:113
-msgid "Klarna Checkout shipping address region"
-msgstr ""
-
-#: ../blocks/src/Schema/AddressSchema.php:118
-msgid "Klarna Checkout shipping address country"
 msgstr ""
 
 #: ../classes/requests/helpers/class-kco-request-cart.php:169
@@ -786,8 +678,4 @@ msgstr ""
 
 #: ../includes/admin/views/status-report.php:32
 msgid "Correlation ID"
-msgstr ""
-
-#: ../blocks/src/Api/Controllers/OrderController.php:92
-msgid "Failed to validate your order, please try again."
 msgstr ""

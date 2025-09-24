@@ -44,6 +44,7 @@ jobs:
     - name: Install dependencies and build project
       run: |
         mkdir -p ~/.composer/cache
+        composer install --prefer-dist --no-progress
         composer install --prefer-dist --no-progress --no-dev
         pnpm i && pnpm build
 
