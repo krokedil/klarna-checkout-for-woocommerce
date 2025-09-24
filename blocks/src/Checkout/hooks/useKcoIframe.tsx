@@ -163,11 +163,13 @@ export const useKcoIframe = (
 			})
 				.then((_response: any) => {})
 				.catch((_error: any) => {})
-				.finally(() => {});
+				.finally(() => {
+					resumeKCO();
+				});
 
 			return response;
 		},
-		[suspendKCO]
+		[suspendKCO, resumeKCO]
 	);
 
 	useEffect(() => {
@@ -240,9 +242,12 @@ export const useKcoIframe = (
 			scriptRef.current = document.createElement('script');
 			scriptRef.current.textContent = scriptContent;
 			document.body.appendChild(scriptRef.current);
-			registerKCOEvents();
 			prevIsActive.current = isActive;
 		}
+
+		// Always attempt to register the events.
+		registerKCOEvents();
+
 		// On unmount, if Kustom Checkout is not active, we need to remove the iframe and show the WC form again.
 		return () => {
 			if (isKcoActive()) return; // If KCO is the selected payment method we don't need to do anything.
