@@ -66,9 +66,12 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 			$features = $gateway->supports;
 
 			// Filter out any subscription related features for now until the support for it is verified.
-			$features = array_filter( $features, function( $feature ) {
-				return strpos( $feature, 'subscription' ) === false;
-			} );
+			$features = array_filter(
+				$features,
+				function ( $feature ) {
+					return strpos( $feature, 'subscription' ) === false;
+				}
+			);
 
 		}
 		return [ 'products' ];
