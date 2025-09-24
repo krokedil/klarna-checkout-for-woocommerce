@@ -378,16 +378,16 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @return mixed
 		 */
 		private static function init_composer() {
-			$autoloader               = KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
-			$autoloader_dependencies  = KCO_WC_PLUGIN_PATH . '/dependencies/autoload.php';
+			$autoloader              = KCO_WC_PLUGIN_PATH . '/vendor/autoload.php';
+			$autoloader_dependencies = KCO_WC_PLUGIN_PATH . '/dependencies/autoload.php';
 
-			if ( ! is_readable( $autoloader ) || ! is_readable( $autoloader_dependencies  ) ) {
+			if ( ! is_readable( $autoloader ) || ! is_readable( $autoloader_dependencies ) ) {
 				self::missing_autoloader();
 				return false;
 			}
 
 			$autoloader_result              = require $autoloader;
-			$autoloader_dependencies_result = require $autoloader_dependencies ;
+			$autoloader_dependencies_result = require $autoloader_dependencies;
 
 			if ( ! $autoloader_result || ! $autoloader_dependencies_result ) {
 				return false;
