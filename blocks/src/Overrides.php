@@ -22,7 +22,7 @@ class Overrides {
 
 		// Important: Needs to be on a priority before 100, since WCS will process the order at 100.
 		// @TODO: Commented out for now until we can verify with WooCommerce why Subscriptions are not processed correctly when placing an order through the store api endpoint.
-		// add_filter( 'woocommerce_store_api_checkout_order_processed', array( $this, 'maybe_calculate_recurring_carts' ), 90 );
+		// add_filter( 'woocommerce_store_api_checkout_order_processed', array( $this, 'maybe_calculate_recurring_carts' ), 90 );.
 	}
 
 	/**
