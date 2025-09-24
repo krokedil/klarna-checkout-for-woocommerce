@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	addIframe,
 	getElementsToHide,
 	hideElements,
 	removeIframe,
 	showElements,
+	isKcoActive,
 } from '../lib';
 // @ts-ignore - Cant avoid this issue, but its loaded in by Webpack
 // eslint-disable-next-line import/no-unresolved
@@ -30,11 +31,20 @@ export const useKcoIframe = (
 	selectedPaymentMethod: string,
 	_cartData: any
 ) => {
-	const [isActive, setIsActive] = useState(selectedPaymentMethod === 'kco');
+	const [isActive, setIsActive] = useState(
+		isKcoActive() || selectedPaymentMethod === 'kco'
+	);
 	const [htmlContent, setHtmlContent] = useState<string | null>(null);
 	const [scriptContent, setScriptContent] = useState<string | null>(null);
 	const { snippet, shippingInIframe, countryCodes } = settings;
 	const elementsToHide = getElementsToHide(shippingInIframe);
+
+	// Keep track of previous active state to avoid unnecessary updates.
+	const prevIsActive = useRef<boolean>();
+
+	// Refs to store the iframe wrapper and script elements for cleanup.
+	const kcoWrapperRef = useRef<HTMLDivElement | null>(null);
+	const scriptRef = useRef<HTMLScriptElement | null>(null);
 
 	/**
 	 * Extracts HTML content and script content from the Kustom Checkout snippet.
@@ -222,24 +232,29 @@ export const useKcoIframe = (
 	}, [onShippingAddressChanged, onShippingOptionChanged]);
 
 	useEffect(() => {
-		if (!isActive) return; // If Kustom Checkout is not active, don't load the script or iframe.
-		if (htmlContent) {
+		// Only show the iframe if the Kustom Checkout is active, we have the content and it was not active before.
+		if (isActive && htmlContent && !prevIsActive.current) {
 			hideElements(elementsToHide);
 			// Add the iframe and script to the WooCommerce checkout page.
-			const kcoWrapper = addIframe(htmlContent);
-			const script = document.createElement('script');
-			script.textContent = scriptContent;
-			document.body.appendChild(script);
+			kcoWrapperRef.current = addIframe(htmlContent);
+			scriptRef.current = document.createElement('script');
+			scriptRef.current.textContent = scriptContent;
+			document.body.appendChild(scriptRef.current);
 			registerKCOEvents();
-
-			// On unmount.
-			return () => {
-				// Show the WC form again and remove the iframe.
-				removeIframe(kcoWrapper);
-				showElements(elementsToHide);
-				document.body.removeChild(script);
-			};
+			prevIsActive.current = isActive;
 		}
+		// On unmount, if Kustom Checkout is not active, we need to remove the iframe and show the WC form again.
+		return () => {
+			if (isKcoActive()) return; // If KCO is the selected payment method we don't need to do anything.
+			// Show the WC form again and remove the iframe.
+			if (kcoWrapperRef.current) removeIframe(kcoWrapperRef.current);
+
+			showElements(elementsToHide);
+			document.body.removeChild(scriptRef.current);
+			kcoWrapperRef.current = null;
+			scriptRef.current = null;
+			prevIsActive.current = isActive;
+		};
 	}, [
 		isActive,
 		htmlContent,

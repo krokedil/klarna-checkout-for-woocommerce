@@ -95,3 +95,18 @@ export const addIframe = (htmlContent: string): HTMLDivElement => {
 export const removeIframe = (kcoWrapper: HTMLDivElement): void => {
 	kcoWrapper.remove();
 };
+
+/**
+ * Test if Kustom Checkout is the active payment method.
+ *
+ * @return {boolean} - True if Kustom Checkout is the active payment method, false otherwise.
+ */
+export const isKcoActive = (): boolean => {
+	const selectedPaymentMethod = (
+		document.querySelector(
+			'input[name="radio-control-wc-payment-method-options"]:checked'
+		) as HTMLInputElement | null
+	)?.value;
+
+	return selectedPaymentMethod === 'kco';
+};
