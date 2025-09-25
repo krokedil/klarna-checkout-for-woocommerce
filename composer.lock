@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fff9461e994b6bb8590da6ae9e07c12f",
+    "content-hash": "81b86fb818253fe99c59612a126d8ff7",
     "packages": [],
     "packages-dev": [
         {
@@ -522,6 +522,106 @@
                 }
             ],
             "time": "2025-07-24T20:08:31+00:00"
+        },
+        {
+            "name": "wpify/php-scoper",
+            "version": "0.16.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wpify/php-scoper.git",
+                "reference": "ea51e75cee3a2ff2ac1aedb1b3c0631147360149"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wpify/php-scoper/zipball/ea51e75cee3a2ff2ac1aedb1b3c0631147360149",
+                "reference": "ea51e75cee3a2ff2ac1aedb1b3c0631147360149",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0"
+            },
+            "bin": [
+                "bin/php-scoper.phar"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "mejta",
+                    "email": "daniel@mejta.net"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/wpify/php-scoper/issues",
+                "source": "https://github.com/wpify/php-scoper/tree/0.16.2"
+            },
+            "time": "2023-11-01T18:00:51+00:00"
+        },
+        {
+            "name": "wpify/scoper",
+            "version": "3.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wpify/scoper.git",
+                "reference": "bac861226cbb4d674213c89a63f7b79570033b31"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wpify/scoper/zipball/bac861226cbb4d674213c89a63f7b79570033b31",
+                "reference": "bac861226cbb4d674213c89a63f7b79570033b31",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.3",
+                "php": "^7.4 || ^8.0",
+                "wpify/php-scoper": "^0.16"
+            },
+            "require-dev": {
+                "composer/composer": "^2.6",
+                "jetbrains/phpstorm-stubs": "^v2023.2",
+                "johnpbloch/wordpress": "^6.3",
+                "nikic/php-parser": "^v4.17",
+                "woocommerce/action-scheduler": "^3.6",
+                "wpackagist-plugin/woocommerce": "^8.2",
+                "yahnis-elsts/plugin-update-checker": "^v5.2"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Wpify\\Scoper\\Plugin",
+                "textdomain": {
+                    "wpify-custom-fields": "some-new-textdomain"
+                },
+                "installer-paths": {
+                    "sources/theme-{$name}/": [
+                        "type:wordpress-theme"
+                    ],
+                    "sources/plugin-{$name}/": [
+                        "type:wordpress-plugin"
+                    ]
+                },
+                "wordpress-install-dir": "sources/wordpress"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Wpify\\Scoper\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel Mejta",
+                    "email": "daniel@mejta.net"
+                }
+            ],
+            "description": "Composer plugin that scopes WordPress and WooCommerce dependencies for usage in WordPress plugins and themes.",
+            "support": {
+                "issues": "https://github.com/wpify/scoper/issues",
+                "source": "https://github.com/wpify/scoper/tree/3.1.3"
+            },
+            "time": "2023-11-02T15:10:42+00:00"
         }
     ],
     "aliases": [],
