@@ -21,6 +21,14 @@ jobs:
       with:
         fetch-depth: 1
 
+    # Build the plugin with dev dependencies to scope the dependency packages.
+    - name: Composer Install (Dev)
+      run: composer install
+
+    # Build the plugin for release.
+    - name: Composer Install (Prod)
+      run: composer install --no-dev
+
     - name: Define variables branch name, commit hash and zip file name
       id: vars
       run: |
