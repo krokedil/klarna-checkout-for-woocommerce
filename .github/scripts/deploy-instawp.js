@@ -11,12 +11,12 @@ const PLUGIN_WC_BLUEPRINT_URL = 'https://raw.githubusercontent.com/krokedil/inst
 // Set KCO Test Klarna API Username and Test Klarna API Password (option patch format)
 const PLUGIN_CREDENTIALS_OPTION_PATCHES = JSON.stringify([
   {
-    option: "woocommerce_kco_settings",
+    option_name: "woocommerce_kco_settings",
     key: "test_merchant_id_eu",
     value: process.env.E2E_API_KEY || ''
   },
   {
-    option: "woocommerce_kco_settings",
+    option_name: "woocommerce_kco_settings",
     key: "test_shared_secret_eu",
     value: process.env.E2E_API_SECRET || ''
   }

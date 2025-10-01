@@ -22,7 +22,7 @@ const siteNewOrExisting = siteCreated === 'true' ? 'new' : 'existing';
 // Generate the Markdown content for the summary
 const markdownContent = `
 # Deploy to InstaWP
-Dev zip has been deployed to ${siteNewOrExisting} InstaWP site [${siteUrl}](${siteUrl}) ([InstaWP dashboard link](https://app.instawp.io/sites/${siteId}/staging-dashboard?tab=all)).
+Dev zip has been deployed to ${siteNewOrExisting} InstaWP site [${siteUrl}](${siteUrl}) ([InstaWP dashboard link](https://app.instawp.io/sites/${siteId}/dashboard?tab=all)).
 `;
 
 // Append the Markdown content to the summary file
