@@ -253,7 +253,7 @@ function logGroupEnd() { console.log('::endgroup::'); }
       try {
         const optionPatches = JSON.parse(PLUGIN_CREDENTIALS_OPTION_PATCHES);
         for (const patch of optionPatches) {
-          logInfo(`Command 2679: patch option '${patch.option}' key '${patch.key}'`);
+          logInfo(`Command 2679: patch option '${patch.option_name}' key '${patch.key}'`);
           await triggerInstaWpCommand(siteid, 2679, [patch]);
         }
       } catch (e) {

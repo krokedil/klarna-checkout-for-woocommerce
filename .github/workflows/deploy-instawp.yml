@@ -78,7 +78,7 @@ jobs:
 
     - name: Delete zip from S3
       run: |
-        aws s3 rm s3://krokedil-plugin-dev-zip/${{ steps.vars.outputs.zip_file_name }}
+        aws s3 rm s3://krokedil-plugin-dev-zip/${{ steps.vars.outputs.ZIP_FILE_NAME }}
 
     - name: Add InstaWP deploy job summary
       env:
