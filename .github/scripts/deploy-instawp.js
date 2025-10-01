@@ -22,6 +22,9 @@ const PLUGIN_CREDENTIALS_OPTION_PATCHES = JSON.stringify([
   }
 ]);
 
+// Set what the payment gateway id is
+const PAYMENT_GATEWAY_ID = 'kco';
+
 // Set if WooCommerce checkout should use checkout block or shortcode
 const USE_CHECKOUT_BLOCK = false; // true = use checkout block, false = use shortcode
 
@@ -257,6 +260,9 @@ function logGroupEnd() { console.log('::endgroup::'); }
         logError('Failed to process PLUGIN_CREDENTIALS_OPTION_PATCHES: ' + (e && e.message ? e.message : e));
         throw e;
       }
+      // Set payment gateway order using command 2681
+      logInfo(`Command 2681: set payment gateway order for '${PAYMENT_GATEWAY_ID}'`);
+      await triggerInstaWpCommand(siteid, 2681, [{ payment_gateway_id: PAYMENT_GATEWAY_ID, order: 1 }]);
       if (!USE_CHECKOUT_BLOCK) {
         logInfo('Command 2549: apply WooCommerce checkout shortcode');
         await triggerInstaWpCommand(siteid, 2549);
