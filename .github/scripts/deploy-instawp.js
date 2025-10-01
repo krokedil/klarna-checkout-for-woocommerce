@@ -8,20 +8,19 @@ const fs = require('fs');
 // Blueprint URL for WooCommerce KCO (Klarna Checkout) default settings
 const PLUGIN_WC_BLUEPRINT_URL = 'https://raw.githubusercontent.com/krokedil/instawp-commands/refs/heads/main/assets/wc-blueprints/wc-blueprint-kco-default.json';
 
-// Set KCO Test Klarna API Username and Test Klarna API Password
-const PLUGIN_CREDENTIALS_WC_BLUEPRINT_JSON = JSON.stringify({
-  steps: [
-    {
-      step: "setSiteOptions",
-      options: {
-        woocommerce_kco_settings: {
-          test_merchant_id_eu: process.env.E2E_API_KEY || '',
-          test_shared_secret_eu: process.env.E2E_API_SECRET || '',
-        }
-      }
-    }
-  ]
-});
+// Set KCO Test Klarna API Username and Test Klarna API Password (option patch format)
+const PLUGIN_CREDENTIALS_OPTION_PATCHES = JSON.stringify([
+  {
+    option: "woocommerce_kco_settings",
+    key: "test_merchant_id_eu",
+    value: process.env.E2E_API_KEY || ''
+  },
+  {
+    option: "woocommerce_kco_settings",
+    key: "test_shared_secret_eu",
+    value: process.env.E2E_API_SECRET || ''
+  }
+]);
 
 // Set if WooCommerce checkout should use checkout block or shortcode
 const USE_CHECKOUT_BLOCK = false; // true = use checkout block, false = use shortcode
@@ -247,8 +246,17 @@ function logGroupEnd() { console.log('::endgroup::'); }
       await triggerInstaWpCommand(siteid, 2344);
       logInfo('Command 2334: apply WooCommerce blueprint');
       await triggerInstaWpCommand(siteid, 2334, [{ wc_blueprint_json_public_url: PLUGIN_WC_BLUEPRINT_URL }]);
-      logInfo('Command 2417: apply credentials blueprint');
-      await triggerInstaWpCommand(siteid, 2417, [{ wc_blueprint_json_string: PLUGIN_CREDENTIALS_WC_BLUEPRINT_JSON }]);
+      // Apply credential option patches via command 2679 (one command per option patch)
+      try {
+        const optionPatches = JSON.parse(PLUGIN_CREDENTIALS_OPTION_PATCHES);
+        for (const patch of optionPatches) {
+          logInfo(`Command 2679: patch option '${patch.option}' key '${patch.key}'`);
+          await triggerInstaWpCommand(siteid, 2679, [patch]);
+        }
+      } catch (e) {
+        logError('Failed to process PLUGIN_CREDENTIALS_OPTION_PATCHES: ' + (e && e.message ? e.message : e));
+        throw e;
+      }
       if (!USE_CHECKOUT_BLOCK) {
         logInfo('Command 2549: apply WooCommerce checkout shortcode');
         await triggerInstaWpCommand(siteid, 2549);
