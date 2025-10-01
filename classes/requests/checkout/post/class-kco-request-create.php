@@ -17,7 +17,7 @@ class KCO_Request_Create extends KCO_Request {
 	 * Makes the request.
 	 *
 	 * @param int    $order_id The WooCommerce order id.
-	 * @param string $checkout_flow Embedded in checkout page or redirect via Klarna HPP.
+	 * @param string $checkout_flow Embedded in checkout page or redirect via Kustom HPP.
 	 * @return array
 	 */
 	public function request( $order_id = null, $checkout_flow = 'embedded' ) {
@@ -39,7 +39,7 @@ class KCO_Request_Create extends KCO_Request {
 	 * Gets the request body.
 	 *
 	 * @param int    $order_id The WooCommerce order id.
-	 * @param string $checkout_flow Embedded in checkout page or redirect via Klarna HPP.
+	 * @param string $checkout_flow Embedded in checkout page or redirect via Kustom HPP.
 	 * @return array
 	 */
 	public function get_body( $order_id, $checkout_flow ) {
@@ -80,10 +80,8 @@ class KCO_Request_Create extends KCO_Request {
 					if ( ! empty( $shipping_address ) ) {
 						$request_body['shipping_address '] = $shipping_address;
 					}
-				} else {
-					if ( ! empty( $billing_address ) ) {
+				} elseif ( ! empty( $billing_address ) ) {
 						$request_body['shipping_address'] = $billing_address;
-					}
 				}
 			}
 		} else {
@@ -366,7 +364,7 @@ class KCO_Request_Create extends KCO_Request {
 	 * Gets the request args for the API call.
 	 *
 	 * @param int    $order_id The WooCommerce order id.
-	 * @param string $checkout_flow Embedded in checkout page or redirect via Klarna HPP.
+	 * @param string $checkout_flow Embedded in checkout page or redirect via Kustom HPP.
 	 * @return array
 	 */
 	protected function get_request_args( $order_id, $checkout_flow ) {

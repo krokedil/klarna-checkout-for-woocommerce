@@ -16,10 +16,10 @@ class KCO_Request_Update extends KCO_Request {
 	/**
 	 * Makes the request.
 	 *
-	 * @param string $klarna_order_id The Klarna order id.
+	 * @param string $klarna_order_id The Kustom order id.
 	 * @param int    $order_id The WooCommerce order id.
 	 * @param bool   $force If true always update the order, even if not needed.
-	 * @return array
+	 * @return array|false|WP_Error
 	 */
 	public function request( $klarna_order_id, $order_id = null, $force = false ) {
 		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
@@ -31,14 +31,14 @@ class KCO_Request_Update extends KCO_Request {
 		}
 		WC()->session->set( 'kco_update_md5', md5( wp_json_encode( $request_args ) ) );
 
-		$response          = wp_remote_request( $request_url, $request_args );
-		$code              = wp_remote_retrieve_response_code( $response );
-		$formated_response = $this->process_response( $response, $request_args, $request_url );
+		$response           = wp_remote_request( $request_url, $request_args );
+		$code               = wp_remote_retrieve_response_code( $response );
+		$formatted_response = $this->process_response( $response, $request_args, $request_url );
 
 		// Log the request.
 		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO update order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $request_url );
 		KCO_Logger::log( $log );
-		return $formated_response;
+		return $formatted_response;
 	}
 
 	/**
@@ -108,7 +108,7 @@ class KCO_Request_Update extends KCO_Request {
 		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {
 			$request_body['shipping_options'] = KCO_Request_Shipping_Options::get_shipping_options( $this->separate_sales_tax );
 		} elseif ( ! WC()->cart->needs_shipping() ) {
-			// If the order had a shipping option before but is removed now, same needs to be sent to klarna else it will retain the old shipping option.
+			// If the order had a shipping option before but is removed now, same needs to be sent to Kustom else it will retain the old shipping option.
 			$request_body['shipping_options'] = array();
 		}
 

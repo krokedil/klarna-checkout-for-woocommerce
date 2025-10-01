@@ -1,6 +1,6 @@
 <?php
 /**
- * Class that formats metchant URLs for Klarnas API.
+ * Class that formats metchant URLs for Kustom's API.
  *
  * @package Klarna_Checkout/Classes
  */
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * KCO_Merchant_URLs class.
  *
- * Class that formats gets merchant URLs Klarna API.
+ * Class that formats gets merchant URLs Kustom API.
  */
 class KCO_Merchant_URLs {
 
@@ -101,11 +101,13 @@ class KCO_Merchant_URLs {
 	private function get_push_url() {
 		$session_id = $this->get_session_id();
 
-		$push_url = home_url(
-			sprintf(
-				'/wc-api/KCO_WC_Push/?kco-action=push&kco_wc_order_id={checkout.order.id}&kco_session_id=%s',
-				$session_id
-			)
+		$push_url = add_query_arg(
+			array(
+				'kco-action'      => 'push',
+				'kco_wc_order_id' => '{checkout.order.id}',
+				'kco_session_id'  => $session_id,
+			),
+			home_url( '/wc-api/KCO_WC_Push/' )
 		);
 
 		return apply_filters( 'kco_wc_push_url', $push_url );
@@ -173,14 +175,21 @@ class KCO_Merchant_URLs {
 	 * Get session ID.
 	 *
 	 * Gets WooCommerce session ID. Used to send in merchant url's to Klarn.
-	 * So we can retrieve the cart object in server to server calls from Klarna.
+	 * So we can retrieve the cart object in server to server calls from Kustom.
 	 *
 	 * @return string
 	 */
 	private function get_session_id() {
 		foreach ( $_COOKIE as $key => $value ) {
 			if ( strpos( $key, 'wp_woocommerce_session_' ) !== false ) {
-				$session_id = explode( '||', $value );
+				// Prior to WooCommerce 10.0, the session data was `||`-separated. Now it is `|`-separated instead.
+				$session_id =
+				// Re-index to receive the same array structure as if it was separated by `||`.
+				array_values(
+				// Filter to remove the empty values that will occur due to splitting on `|`.
+					array_filter( explode( '|', $value ) )
+				);
+
 				return $session_id[0];
 			}
 		}

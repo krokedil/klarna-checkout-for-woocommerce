@@ -33,13 +33,13 @@ To create a new test, simply add a line to the tests.json file and include the f
 - name: The name that you want the test to have in the logs that are printed out after the test is done. It is good to mention in the name what the test actually includes.
 - loggedIn: Set this to `true` or `false`. True for if the customer is not a guest, but should be logged in to an account. And false if the customer is a guest for this test.
 - inclusiveTax: `"yes"` or `"no"` depending on if you want prices to be entered inclusive of tax in WooCommerce. This can be good to change depending on what you want to test for different calculation results. A product that costs 100 with taxes inclusive will always be 100. But with this set to no, the end price in the cart will be 125 if the tax amount is 25%.
-- shippingInIframe: `"yes"` or `"no"`. For Klarna checkout we have the option to include shipping options in the iframe or not.
+- shippingInIframe: `"yes"` or `"no"`. For Kustom Checkout we have the option to include shipping options in the iframe or not.
 - products: An array of the names of the products you wish to add to the cart for the test.
 - shippingMethod: The shipping method name/id that you wish to use for the test. Send an empty string ( `""` ) if you don't wish to add one.
 - coupons: Same as products, but send in the coupon codes that you want to apply to the cart during checkout.
 - customerType: `"person"` or `"company"`. Person for B2C tests, and Company for B2B tests.
-- expectedTotal: A float value of the expected price that you expect the test to return. We will check the Klarna order to make sure this matches at the end.
-- expectedOrderLines: A int of how many order lines you expect the test to return. We will check the Klarna order to make sure this matches at the end.
+- expectedTotal: A float value of the expected price that you expect the test to return. We will check the Kustom order to make sure this matches at the end.
+- expectedOrderLines: A int of how many order lines you expect the test to return. We will check the Kustom order to make sure this matches at the end.
 
 ## Order management testing
 Should you require to test the possibilities of refunding and canceling a created order, modify the value of `orderManagement` key in the `/config/tests.json` file to one of the following:

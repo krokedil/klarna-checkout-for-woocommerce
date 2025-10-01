@@ -5,8 +5,8 @@ const timeOutTime = 2500;
 const KCOSettingsArray = {
 	woocommerce_kco_settings: {
 		enabled: "yes",
-		title: "Klarna",
-		description: "Klarna Checkout for WooCommerce Test",
+		title: "Kustom",
+		description: "Kustom Checkout for WooCommerce Test",
 		select_another_method_text: "",
 		testmode: "yes",
 		logging: "yes",

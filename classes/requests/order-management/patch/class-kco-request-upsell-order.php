@@ -1,6 +1,6 @@
 <?php
 /**
- * Upsell a Klarna Order
+ * Upsell a Kustom Order
  *
  * @package Klarna_Checkout/Classes/Request/Order-Management/Patch
  */
@@ -16,7 +16,7 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 	/**
 	 * Makes the request.
 	 *
-	 * @param string $klarna_order_id The Klarna order id.
+	 * @param string $klarna_order_id The Kustom order id.
 	 * @param string $order_id The WooCommerce order id.
 	 * @param string $upsell_uuid The unique id for the upsell request.
 	 * @return array
@@ -70,7 +70,7 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 	/**
 	 * Checks response for any error. We might need this to handle special cases with headers.
 	 *
-	 * @TODO follow up with klarna on how a rejected message looks.
+	 * @TODO follow up with Kustom on how a rejected message looks.
 	 *
 	 * @param object $response The response.
 	 * @param array  $request_args The request args.

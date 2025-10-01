@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * KCO_Request_Cart class.
  *
- * Class that formats WooCommerce cart contents for Klarna API.
+ * Class that formats WooCommerce cart contents for Kustom API.
  */
 class KCO_Request_Cart {
 
@@ -115,7 +115,7 @@ class KCO_Request_Cart {
 	}
 
 	/**
-	 * Gets order amount for Klarna API.
+	 * Gets order amount for Kustom API.
 	 *
 	 * @return int
 	 */
@@ -135,7 +135,7 @@ class KCO_Request_Cart {
 	}
 
 	/**
-	 * Gets order amount for Klarna API.
+	 * Gets order amount for Kustom API.
 	 *
 	 * @return int
 	 */
@@ -180,7 +180,7 @@ class KCO_Request_Cart {
 	}
 
 	/**
-	 * Gets order tax amount for Klarna API.
+	 * Gets order tax amount for Kustom API.
 	 *
 	 * @param array $order_lines Order lines from cart.
 	 * @return int
@@ -202,7 +202,7 @@ class KCO_Request_Cart {
 
 
 	/**
-	 * Process WooCommerce cart to Klarna Payments order lines.
+	 * Process WooCommerce cart to Kustom Payments order lines.
 	 */
 	public function process_cart() {
 		foreach ( WC()->cart->get_cart() as $cart_item ) {
@@ -263,7 +263,7 @@ class KCO_Request_Cart {
 	}
 
 	/**
-	 * Process WooCommerce shipping to Klarna Payments order lines.
+	 * Process WooCommerce shipping to Kustom Payments order lines.
 	 */
 	public function process_shipping() {
 		$settings = get_option( 'woocommerce_kco_settings' );
@@ -310,162 +310,26 @@ class KCO_Request_Cart {
 	 * Process smart coupons.
 	 */
 	public function process_coupons() {
-		if ( ! empty( WC()->cart->get_coupons() ) ) {
-			foreach ( WC()->cart->get_coupons() as $coupon_key => $coupon ) {
-				$coupon_reference  = '';
-				$coupon_amount     = 0;
-				$coupon_tax_amount = '';
 
-				// Smart coupons are processed as real line items, cart and product discounts sent for reference only.
-				if ( 'smart_coupon' === $coupon->get_discount_type() ) {
-					$apply_before_tax = get_option( 'woocommerce_smart_coupon_apply_before_tax', 'no' );
-					// If Smart coupon is applied before tax calculation,
-					// the sum is discounted from order lines so we send it as 0 for reference.
-					if ( wc_tax_enabled() && 'yes' === $apply_before_tax ) {
-						$coupon_amount    = 0;
-						$coupon_reference = sprintf(
-							/* translators: %s: coupon amount */
-							__( 'Gift card (amount: %s)', 'klarna-checkout-for-woocommerce' ),
-							WC()->cart->get_coupon_discount_amount( $coupon_key, 'no' === get_option( 'woocommerce_prices_include_tax' ) )
-						);
-					} else {
-						$coupon_amount    = - $coupon->get_amount() * 100;
-						$coupon_reference = sprintf(
-							/* translators: %s: coupon amount */
-							__( 'Gift card (amount: %s)', 'klarna-checkout-for-woocommerce' ),
-							$coupon->get_amount()
-						);
-					}
-					$coupon_tax_amount = - WC()->cart->get_coupon_discount_tax_amount( $coupon_key ) * 100;
-				} elseif ( 'US' === $this->shop_country ) {
-					$coupon_amount     = 0;
-					$coupon_tax_amount = 0;
-					if ( $coupon->is_type( 'fixed_cart' ) || $coupon->is_type( 'percent' ) ) {
-						$coupon_type = 'Cart discount';
-					} elseif ( $coupon->is_type( 'fixed_product' ) || $coupon->is_type( 'percent_product' ) ) {
-						$coupon_type = 'Product discount';
-					} else {
-						$coupon_type = 'Discount';
-					}
-					$coupon_reference = sprintf(
-						/* translators: 1: coupon type, 2: amount, 3: tax amount */
-						__( '%1$s (amount: %2$s, tax amount: %3$s)', 'klarna-checkout-for-woocommerce' ),
-						$coupon_type,
-						WC()->cart->get_coupon_discount_amount( $coupon_key ),
-						WC()->cart->get_coupon_discount_tax_amount( $coupon_key )
-					);
-
-				}
-				// Add separate discount line item, but only if it's a smart coupon or country is US.
-				if ( 'US' === $this->shop_country && 'smart_coupon' !== $coupon->get_discount_type() ) {
-					$discount            = array(
-						'type'                  => 'discount',
-						'reference'             => substr( (string) $coupon_key, 0, 64 ),
-						'name'                  => $coupon_reference,
-						'quantity'              => 1,
-						'unit_price'            => $coupon_amount,
-						'tax_rate'              => 0,
-						'total_amount'          => $coupon_amount,
-						'total_discount_amount' => 0,
-						'total_tax_amount'      => $coupon_tax_amount,
-					);
-					$this->order_lines[] = $discount;
-				}
-
-				if ( 'smart_coupon' === $coupon->get_discount_type() ) {
-					$discount            = array(
-						'type'                  => 'gift_card',
-						'reference'             => substr( (string) $coupon_key, 0, 64 ),
-						'name'                  => $coupon_reference,
-						'quantity'              => 1,
-						'unit_price'            => $coupon_amount,
-						'tax_rate'              => 0,
-						'total_amount'          => $coupon_amount,
-						'total_discount_amount' => 0,
-						'total_tax_amount'      => 0,
-					);
-					$this->order_lines[] = $discount;
-				}
+		foreach ( KCO_WC()->krokedil->compatibility()->giftcards() as $giftcards ) {
+			if ( false !== ( strpos( get_class( $giftcards ), 'WCGiftCards', true ) ) && ! function_exists( 'WC_GC' ) ) {
+				continue;
 			}
-		}
 
-		/**
-		 * WooCommerce Gift Cards compatibility.
-		 */
-		if ( class_exists( 'WC_GC_Gift_Cards' ) ) {
-			/**
-			 * Use the applied giftcards.
-			 *
-			 * @var WC_GC_Gift_Card_Data $wc_gc_gift_card_data
-			*/
-			$totals_before_giftcard = round( WC()->cart->get_subtotal() + WC()->cart->get_shipping_total() + WC()->cart->get_subtotal_tax() + WC()->cart->get_shipping_tax(), wc_get_price_decimals() );
-			$giftcards              = WC_GC()->giftcards->get();
-			$giftcards_used         = WC_GC()->giftcards->cover_balance( $totals_before_giftcard, WC_GC()->giftcards->get_applied_giftcards_from_session() );
+			$retrieved_giftcards = $giftcards->get_cart_giftcards();
+			foreach ( $retrieved_giftcards as $retrieved_giftcard ) {
 
-			foreach ( WC_GC()->giftcards->get_applied_giftcards_from_session() as $wc_gc_gift_card_data ) {
-				$gift_card_code   = $wc_gc_gift_card_data->get_data()['code'];
-				$gift_card_amount = - $giftcards_used['total_amount'] * 100;
-
-				$gift_card = array(
+				$this->order_lines[] = array(
 					'type'                  => 'gift_card',
-					'reference'             => $gift_card_code,
-					'name'                  => __( 'Gift card', 'klarna-checkout-for-woocommerce' ),
-					'quantity'              => 1,
+					'reference'             => $retrieved_giftcard->get_sku(),
+					'name'                  => $retrieved_giftcard->get_name(),
+					'quantity'              => $retrieved_giftcard->get_quantity(),
 					'tax_rate'              => 0,
 					'total_discount_amount' => 0,
 					'total_tax_amount'      => 0,
-					'unit_price'            => $gift_card_amount,
-					'total_amount'          => $gift_card_amount,
+					'unit_price'            => $retrieved_giftcard->get_total_amount(),
+					'total_amount'          => $retrieved_giftcard->get_total_amount(),
 				);
-
-				$this->order_lines[] = $gift_card;
-
-			}
-		}
-
-		// YITH Gift Cards.
-		if ( ! empty( WC()->cart->applied_gift_cards ) ) {
-			foreach ( WC()->cart->applied_gift_cards as $coupon_key => $code ) {
-				$coupon_reference  = '';
-				$coupon_amount     = isset( WC()->cart->applied_gift_cards_amounts[ $code ] ) ? - WC()->cart->applied_gift_cards_amounts[ $code ] * 100 : 0;
-				$coupon_tax_amount = '';
-				$label             = apply_filters( 'yith_ywgc_cart_totals_gift_card_label', esc_html( __( 'Gift card:', 'yith-woocommerce-gift-cards' ) . ' ' . $code ), $code );
-				$giftcard_sku      = apply_filters( 'kco_yith_gift_card_sku', esc_html( __( 'giftcard', 'klarna-checkout-for-woocommerce' ) ), $code );
-
-				$gift_card           = array(
-					'type'                  => 'gift_card',
-					'reference'             => $giftcard_sku,
-					'name'                  => $label,
-					'quantity'              => 1,
-					'unit_price'            => $coupon_amount,
-					'tax_rate'              => 0,
-					'total_amount'          => $coupon_amount,
-					'total_discount_amount' => 0,
-					'total_tax_amount'      => 0,
-				);
-				$this->order_lines[] = $gift_card;
-			}
-		}
-
-		// PW Gift Cards.
-		if ( ! empty( WC()->session->get( 'pw-gift-card-data' ) ) ) {
-			$pw_gift_cards = WC()->session->get( 'pw-gift-card-data' );
-			foreach ( $pw_gift_cards['gift_cards'] as $code => $value ) {
-				$coupon_amount       = $value * 100 * -1;
-				$label               = esc_html__( 'Gift card', 'pw-woocommerce-gift-cards' ) . ' ' . $code;
-				$giftcard_sku        = apply_filters( 'kco_pw_gift_card_sku', esc_html__( 'giftcard', 'klarna-checkout-for-woocommerce' ), $code );
-				$gift_card           = array(
-					'type'                  => 'gift_card',
-					'reference'             => $giftcard_sku,
-					'name'                  => $label,
-					'quantity'              => 1,
-					'unit_price'            => $coupon_amount,
-					'tax_rate'              => 0,
-					'total_amount'          => $coupon_amount,
-					'total_discount_amount' => 0,
-					'total_tax_amount'      => 0,
-				);
-				$this->order_lines[] = $gift_card;
 			}
 		}
 	}
@@ -565,7 +429,7 @@ class KCO_Request_Cart {
 	 *
 	 * @param  array  $cart_item Cart item.
 	 * @param  object $product   Product object.
-	 * @return integer $item_tax_rate Item tax percentage formatted for Klarna.
+	 * @return integer $item_tax_rate Item tax percentage formatted for Kustom
 	 */
 	public function get_item_tax_rate( $cart_item, $product ) {
 		if ( $product->is_taxable() && $cart_item['line_subtotal_tax'] > 0 ) {
@@ -853,7 +717,7 @@ class KCO_Request_Cart {
 	}
 
 	/**
-	 * Format the value as needed for the Klarna plugin.
+	 * Format the value as needed for the Kustom plugin.
 	 *
 	 * @param int|float $value The unformated value.
 	 * @return int

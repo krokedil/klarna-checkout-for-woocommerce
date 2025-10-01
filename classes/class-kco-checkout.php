@@ -25,10 +25,11 @@ class KCO_Checkout {
 		add_filter( 'woocommerce_shipping_chosen_method', array( __CLASS__, 'maybe_register_shipping_error' ), 9999, 3 );
 		add_action( 'woocommerce_shipping_method_chosen', array( __CLASS__, 'maybe_throw_shipping_error' ), 9999 );
 		add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 3 );
+		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'maybe_change_needs_payment_cart' ), 999, 2 );
 	}
 
 	/**
-	 * Add a hidden input field for the shipping data from Klarna.
+	 * Add a hidden input field for the shipping data from Kustom.
 	 *
 	 * @param array $fields The WooCommerce checkout fields.
 	 * @return array
@@ -52,7 +53,7 @@ class KCO_Checkout {
 	}
 
 	/**
-	 * Update the shipping method in WooCommerce based on what Klarna has sent us.
+	 * Update the shipping method in WooCommerce based on what Kustom has sent us.
 	 *
 	 * @return void
 	 */
@@ -88,7 +89,7 @@ class KCO_Checkout {
 	}
 
 	/**
-	 * Update the Klarna order after calculations from WooCommerce has run.
+	 * Update the Kustom order after calculations from WooCommerce has run.
 	 *
 	 * @return void
 	 */
@@ -103,20 +104,26 @@ class KCO_Checkout {
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
 		if ( empty( $klarna_order_id ) ) {
-			KCO_Logger::log( 'Missing WC session kco_wc_order_id during update Klarna order sequence.' );
+			KCO_Logger::log( 'Missing WC session kco_wc_order_id during update Kustom order sequence.' );
 			return;
 		}
 
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+		if ( ! $klarna_order ) {
+			KCO_Logger::log( "Klarna order could not be retrieved during update for ID: $klarna_order_id " );
+			return;
+		}
 
-		if ( $klarna_order && 'checkout_incomplete' === $klarna_order['status'] ) {
+		$updated_klarna_order = false;
+		if ( 'checkout_incomplete' === $klarna_order['status'] ) {
 			// If it is, update order.
-			$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
+			$updated_klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 		}
 
 		// If cart doesn't need payment anymore - reload the checkout page.
 		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
-			if ( ! WC()->cart->needs_payment() && 'checkout_incomplete' === $klarna_order['status'] ) {
+			$status = $updated_klarna_order ? $updated_klarna_order['status'] : $klarna_order['status'];
+			if ( ! WC()->cart->needs_payment() && 'checkout_incomplete' === $status ) {
 				WC()->session->reload_checkout = true;
 			}
 		}
@@ -155,7 +162,7 @@ class KCO_Checkout {
 			return $default;
 		}
 
-		// The Klarna Shipping Service sets the chosen shipping method to the method without the instance ID, so if $chosen method === 'klarna_kss' return $default.
+		// The Kustom Shipping Service sets the chosen shipping method to the method without the instance ID, so if $chosen method === 'klarna_kss' return $default.
 		if ( 'klarna_kss' === $chosen_method ) {
 			return $default;
 		}
@@ -213,14 +220,36 @@ class KCO_Checkout {
 			return $wc_result;
 		}
 
-		// If we're not on the order-pay page, we don't need to change anything.
-		if ( ! is_wc_endpoint_url( 'order-pay' ) ) {
+		// If we are on the order-received page, we don't need to change anything.
+		if ( is_wc_endpoint_url( 'order-received' ) ) {
+			return $wc_result;
+		}
+
+		// If we're not on the order-pay page or the checkout page, we should not change the needs payment.
+		if ( ! is_wc_endpoint_url( 'order-pay' ) && ! is_checkout() ) {
 			return $wc_result;
 		}
 
 		// Only if our filter is active and is set to false.
 		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
 			return $wc_result;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Maybe change the needs payment status for the cart.
+	 *
+	 * @param bool    $needs_payment The current needs payment status.
+	 * @param WC_Cart $cart The WooCommerce cart.
+	 * @return bool
+	 */
+	public function maybe_change_needs_payment_cart( $needs_payment, $cart ) {
+
+		// Only if our filter is active and is set to false.
+		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
+			return $needs_payment;
 		}
 
 		return true;
