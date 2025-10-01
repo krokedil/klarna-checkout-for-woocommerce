@@ -7,9 +7,6 @@ on:
         description: 'InstaWP site URL to deploy to (e.g. qliro-sandbox.krokedil.site).'
         required: false
         default: ''
-  push:
-    branches:
-      - '**'
 
 jobs:
   build:

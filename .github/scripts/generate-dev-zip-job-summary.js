@@ -105,11 +105,11 @@ const PLAYGROUND_MINIMAL_URL = `https://playground.wordpress.net/#${minifiedJson
 // Generate the Markdown content for the summary
 const markdownContent = `
 # Created dev zip
-Download created dev zip through URL below, which is available for 30 days:
+Download or share URL for created dev zip through the link below, which is available for 30 days:
 * [${ZIP_FILE_NAME}.zip](${S3_URL})
 
 Documentation about how to install the dev zip can be found [here](https://docs.krokedil.com/krokedil-general-support-info/installing-a-development-version/).
-## Test dev zip using WordPress Playground
+## Test dev zip using WordPress Playground (experimental)
 You can test the created dev zip directly in [WordPress Playground](https://wordpress.org/playground/), which is a experimental project and functionality can be limited, through the links below:
 * [Test dev zip using WordPress Playground](${PLAYGROUND_MINIMAL_URL}) (Latest WP, PHP 8.0, WooCommerce and created dev zip)
 `;
