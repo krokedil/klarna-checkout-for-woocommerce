@@ -53,6 +53,7 @@ For help setting up and configuring Kustom Checkout for WooCommerce please refer
 = 2025.10.13    - version 2.15.0 =
 * Feature       - Added a gift card package integration for improved compatibility with multiple WooCommerce gift card plugins.
 * Fix           - Fixed a PHP warning that could occur when processing error responses during order updates.
+* Fix           - Removed unused code for better maintainability.
 
 = 2025.09.16    - version 2.14.4 =
 * Fix           - Ensured warnings about invalid API credentials are displayed correctly when saving plugin settings.
