@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2025-09-16 08:49+0000\n"
+"POT-Creation-Date: 2025-10-13 10:20+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -17,12 +17,16 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:173
+#: ../klarna-checkout-for-woocommerce.php:182
 msgid "Settings"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:174
+#: ../klarna-checkout-for-woocommerce.php:183
 msgid "Support"
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:390, ../klarna-checkout-for-woocommerce.php:400
+msgid "Your installation of Klarna Checkout for WooCommerce is not complete. If you installed this plugin directly from Github please refer to the README.DEV.md file in the plugin."
 msgstr ""
 
 #. translators: Kustom order ID.
@@ -631,24 +635,7 @@ msgstr ""
 msgid "Sales Tax"
 msgstr ""
 
-#. translators: 1: coupon type, 2: amount, 3: tax amount
-#: ../classes/requests/helpers/class-kco-request-cart.php:352
-msgid "%1$s (amount: %2$s, tax amount: %3$s)"
-msgstr ""
-
-#: ../classes/requests/helpers/class-kco-request-cart.php:335, ../classes/requests/helpers/class-kco-request-cart.php:328
-msgid "Gift card (amount: %s)"
-msgstr ""
-
-#: ../classes/requests/helpers/class-kco-request-cart.php:412
-msgid "Gift card"
-msgstr ""
-
-#: ../classes/requests/helpers/class-kco-request-cart.php:433, ../classes/requests/helpers/class-kco-request-cart.php:456
-msgid "giftcard"
-msgstr ""
-
-#: ../classes/requests/helpers/class-kco-request-cart.php:760, ../classes/requests/helpers/class-kco-request-cart.php:788
+#: ../classes/requests/helpers/class-kco-request-cart.php:624, ../classes/requests/helpers/class-kco-request-cart.php:652
 msgid "Shipping"
 msgstr ""
 
