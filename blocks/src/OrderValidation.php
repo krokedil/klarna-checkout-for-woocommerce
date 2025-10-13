@@ -183,7 +183,7 @@ class OrderValidation {
 	 */
 	private static function validate_wc_order( $order ) {
 		// Check if the order is paid.
-		if ( $order->is_paid() ) {
+		if ( ! empty( $order->get_date_paid() ) ) {
 			throw new Exception( 'Order is already paid.', 400 );
 		}
 	}
