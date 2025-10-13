@@ -85,7 +85,13 @@ abstract class CheckoutFlow {
 	public function get_klarna_order_id( $order ) {
 		// For the initial subscription, the Kustom order ID should always exist in the session.
 		// This also applies to (pending) renewal subscription since existing Kustom order ID is no longer valid for the renewal, we must retrieve it from the session, not the order.
-		$is_subscription = function_exists( 'wcs_order_contains_subscription' ) && wcs_order_contains_subscription( $order, array( 'parent', 'resubscribe', 'switch', 'renewal' ) );
+		$is_subscription = false;
+		if ( function_exists( 'wcs_order_contains_subscription' ) && wcs_order_contains_subscription( $order, array( 'parent', 'resubscribe', 'switch', 'renewal' ) ) ) {
+			$is_subscription = true;
+		} else if ( function_exists( 'wcs_is_subscription' ) && wcs_is_subscription( $order ) ) {
+			$is_subscription = true;
+		}
+
 
 		if ( ! empty( $order ) && ! $is_subscription ) {
 			$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
