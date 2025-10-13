@@ -64,7 +64,7 @@ class OrderValidation {
 	 * @throws Exception If the hashes do not match.
 	 */
 	private static function validate_hash( $klarna_hash, $wc_hash ) {
-		if ( $klarna_hash !== $wc_hash ) {
+		if ( ! hash_equals( $klarna_hash, $wc_hash ) ) {
 			throw new Exception( 'Could not validate the order, please try again.', 401 );
 		}
 	}
