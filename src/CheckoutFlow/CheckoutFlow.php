@@ -138,7 +138,7 @@ abstract class CheckoutFlow {
 	 * @return string
 	 */
 	public function get_order_number( $order ) {
-		return $order->get_order_number() ?? $order_id ?? 'N/A';
+		return $order->get_order_number() ?? $order->get_id() ?? 'N/A';
 	}
 
 	/**
