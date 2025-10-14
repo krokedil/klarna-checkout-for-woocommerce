@@ -88,7 +88,7 @@ abstract class CheckoutFlow {
 		$is_subscription = false;
 		if ( function_exists( 'wcs_order_contains_subscription' ) && wcs_order_contains_subscription( $order, array( 'parent', 'resubscribe', 'switch', 'renewal' ) ) ) {
 			$is_subscription = true;
-		} else if ( function_exists( 'wcs_is_subscription' ) && wcs_is_subscription( $order ) ) {
+		} elseif ( function_exists( 'wcs_is_subscription' ) && wcs_is_subscription( $order ) ) {
 			$is_subscription = true;
 		}
 
