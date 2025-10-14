@@ -21,8 +21,23 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 	 */
 	class KCO_Gateway extends WC_Payment_Gateway {
 
-		public $testmode                   = false;
-		public $logging                    = false;
+		/**
+		 * Whether the gateway is enabled or not.
+		 *
+		 * @var bool $enabled
+		 */
+		public $testmode = false;
+		/**
+		 * Whether logging is enabled or not.
+		 *
+		 * @var bool $logging
+		 */
+		public $logging = false;
+		/**
+		 * Whether to show shipping methods in the iframe or not.
+		 *
+		 * @var bool $shipping_methods_in_iframe
+		 */
 		public $shipping_methods_in_iframe = false;
 
 		/**
@@ -90,7 +105,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			add_filter( 'kco_wc_api_request_args', array( $this, 'maybe_remove_kco_epm' ), 9999 );
 
-			// Prevent the Woo validation from proceeding if there is a discrepancy between Woo and Kustom
+			// Prevent the Woo validation from proceeding if there is a discrepancy between Woo and Kustom.
 			add_action( 'woocommerce_after_checkout_validation', array( $this, 'validate_checkout' ), 10, 2 );
 		}
 
@@ -134,7 +149,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'address_1'  => 'street_address',
 				'address_2'  => 'street_address2',
 				'city'       => 'city',
-				// 'state'      => 'region',
 				'postcode'   => 'postal_code',
 				'country'    => 'country',
 			);
@@ -178,8 +192,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					$billing_address[ $billing_field ]               = strtolower( preg_replace( '/\s+/', '', $billing_address[ $billing_field ] ) );
 					$klarna_order['billing_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['billing_address'][ $klarna_name ] ) );
 
-					if ( $billing_address[ $billing_field ] !== ( $klarna_order['billing_address'][ $klarna_name ] ?? '' ) ) {
-						$errors->add( $billing_field, __( 'Billing ' . str_replace( '_', ' ', $wc_name ) . ' does not match Kustom order.', 'klarna-checkout-for-woocommerce' ) );
+					if ( ( $klarna_order['billing_address'][ $klarna_name ] ?? '' ) !== $billing_address[ $billing_field ] ) {
+						$field_name = str_replace( '_', ' ', $wc_name );
+						// translators: %s is the field name.
+						$errors->add( $billing_field, sprintf( __( 'Billing %s does not match Kustom order.', 'klarna-checkout-for-woocommerce' ), $field_name ) );
 					}
 				}
 
@@ -188,8 +204,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					$shipping_address[ $shipping_field ]              = strtolower( preg_replace( '/\s+/', '', $shipping_address[ $shipping_field ] ) );
 					$klarna_order['shipping_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) );
 
-					if ( $shipping_address[ $shipping_field ] !== ( $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) ) {
-						$errors->add( $shipping_field, __( 'Shipping ' . str_replace( '_', ' ', $wc_name ) . ' does not match Kustom order.', 'klarna-checkout-for-woocommerce' ) );
+					if ( ( $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) !== $shipping_address[ $shipping_field ] ) {
+						$field_name = str_replace( '_', ' ', $wc_name );
+						// translators: %s is the field name.
+						$errors->add( $shipping_field, sprintf( __( 'Shipping %s does not match Kustom order.', 'klarna-checkout-for-woocommerce' ), $field_name ) );
 					}
 				}
 			}
@@ -567,15 +585,15 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		/**
 		 * Add kco-shipping-display body class.
 		 *
-		 * @param array $class Array of classes.
+		 * @param array $classes Array of classes.
 		 *
 		 * @return array
 		 */
-		public function add_body_class( $class ) {
+		public function add_body_class( $classes ) {
 			if ( is_checkout() && 'yes' === $this->shipping_methods_in_iframe ) {
 				// Don't display KCO Shipping Display body classes if we have a cart that doesn't needs payment.
 				if ( null !== WC()->cart && method_exists( WC()->cart, 'needs_payment' ) && ! WC()->cart->needs_payment() ) {
-					return $class;
+					return $classes;
 				}
 
 				$first_gateway = '';
@@ -587,10 +605,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					$first_gateway = key( $available_payment_gateways );
 				}
 				if ( 'kco' === $first_gateway ) {
-					$class[] = 'kco-shipping-display';
+					$classes[] = 'kco-shipping-display';
 				}
 			}
-			return $class;
+			return $classes;
 		}
 
 		/**
@@ -725,13 +743,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 *
 		 * @param int    $order_id The WooCommerce order id.
 		 * @param string $upsell_uuid The unique id for the upsell request.
-		 * @return bool
+		 * @return bool|WP_Error
 		 */
 		public function upsell( $order_id, $upsell_uuid ) {
 			$klarna_upsell_order = KCO_WC()->api->upsell_klarna_order( $order_id, $upsell_uuid );
 
 			if ( is_wp_error( $klarna_upsell_order ) ) {
-				$error = new WP_Error( '401', __( 'Kustom did not accept the new order amount, the order has not been updated' ) );
+				$error = new WP_Error( '401', __( 'Kustom did not accept the new order amount, the order has not been updated', 'klarna-checkout-for-woocommerce' ) );
 				return $error;
 			}
 

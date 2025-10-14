@@ -26,5 +26,9 @@
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "wpify/scoper": true
         }
+    },
+    "scripts": {
+        "phpcs": "@php ./vendor/bin/phpcs --standard=phpcs.ruleset.xml **/*.php",
+        "phpcbf": "@php ./vendor/bin/phpcbf --standard=phpcs.ruleset.xml **/*.php"
     }
 }
