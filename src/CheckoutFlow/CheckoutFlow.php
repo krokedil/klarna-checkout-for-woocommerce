@@ -92,7 +92,6 @@ abstract class CheckoutFlow {
 			$is_subscription = true;
 		}
 
-
 		if ( ! empty( $order ) && ! $is_subscription ) {
 			$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
 		}
