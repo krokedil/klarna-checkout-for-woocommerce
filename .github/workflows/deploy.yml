@@ -9,6 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+
+    # Build the plugin with dev dependencies to scope the dependency packages.
+    - name: Composer Install (Dev)
+      run: composer install
+
+    # Build the plugin for release.
+    - name: Composer Install (Prod)
+      run: composer install --no-dev
+
     # Install SVN ( Subversion )
     - name: Install SVN ( Subversion )
       run: |
