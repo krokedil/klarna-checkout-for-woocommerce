@@ -24,10 +24,10 @@ on:
     outputs:
       zip_file_name:
         description: Built dev zip base name (without .zip)
-        value: ${{ jobs.build.outputs.zip_file_name }}
+        value: ${{ jobs.build_dev_zip.outputs.zip_file_name }}
       aws_s3_public_url:
         description: Public S3 URL (only valid if aws_upload was true)
-        value: ${{ jobs.build.outputs.aws_s3_public_url }}
+        value: ${{ jobs.build_dev_zip.outputs.aws_s3_public_url }}
 
 jobs:
   build_dev_zip:
