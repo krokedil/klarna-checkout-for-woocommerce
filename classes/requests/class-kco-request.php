@@ -181,7 +181,7 @@ class KCO_Request {
 			// Get the error messages.
 			$errors = json_decode( $body, true );
 			if ( empty( $errors ) ) {
-				return new WP_Error( $code, 'received empty body', $data );
+				return json_decode( $body, true );
 			} elseif ( isset( $errors['error_messages'] ) && is_array( $errors['error_messages'] ) ) {
 				foreach ( $errors['error_messages'] as $error ) {
 					$error_message = "$error_message  $error";
