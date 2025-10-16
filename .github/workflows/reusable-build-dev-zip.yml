@@ -49,13 +49,15 @@ jobs:
           SHORT_SHA="${GITHUB_SHA:0:7}"
           ZIP_FILE_NAME="${{ inputs.plugin_slug }}-dev-${BRANCH_SAFE}-${SHORT_SHA}${{ inputs.zip_file_suffix }}"
           echo "ZIP_FILE_NAME=${ZIP_FILE_NAME}" >> $GITHUB_OUTPUT
+          echo "BRANCH_SAFE=${BRANCH_SAFE}" >> $GITHUB_OUTPUT
 
       - name: Plugin production build steps (Composer dual install)
         run: bash .github/scripts/prod-build-steps.sh
 
       - name: Apply dev version suffix
         run: |
-          sed -i "s/^ \* Version: \(.*\)/ \* Version: \1-dev.${GITHUB_REF_NAME}.${GITHUB_SHA:0:7}/" ${{ inputs.plugin_slug }}.php
+          # Use sanitized branch name for version suffix to avoid invalid characters.
+          sed -i "s/^ \* Version: \(.*\)/ \* Version: \1-dev.${{ steps.vars.outputs.BRANCH_SAFE }}.${GITHUB_SHA:0:7}/" ${{ inputs.plugin_slug }}.php
 
       - name: Build plugin zip and upload as artifact
         id: generate
