@@ -29,7 +29,6 @@ const AWS_S3_PUBLIC_URL = process.env.AWS_S3_PUBLIC_URL;
 // Validate required environment variables at the top
 const REQUIRED_ENVS = [
   'INSTAWP_API_TOKEN',
-  'ZIP_FILE_NAME',
   'AWS_S3_PUBLIC_URL',
 ];
 const missingEnvs = REQUIRED_ENVS.filter((env) => !process.env[env]);
