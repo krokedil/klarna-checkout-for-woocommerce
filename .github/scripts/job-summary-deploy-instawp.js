@@ -1,4 +1,4 @@
-// .github/scripts/generate-instawp-deploy-job-summary.js
+// .github/scripts/job-summary-deploy-instawp.js
 // This script generates a summary for the InstaWP deploy job in GitHub Actions.
 
 // Import the 'fs' (file system) module to write to files
