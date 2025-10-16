@@ -45,6 +45,13 @@ jobs:
         run: |
           node .github/scripts/deploy-instawp.js
 
+      - name: Configure AWS credentials (for S3 delete)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP }}
+          aws-region: eu-north-1
+
       - name: Delete zip from S3
         run: |
           aws s3 rm s3://krokedil-plugin-dev-zip/${{ needs.build_zip.outputs.zip_file_name }}.zip
