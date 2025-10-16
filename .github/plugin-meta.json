@@ -1,0 +1,27 @@
+{
+  "slug": "klarna-checkout-for-woocommerce",
+  "instawp": {
+    "plugin_wc_blueprint_url": "https://raw.githubusercontent.com/krokedil/instawp-commands/refs/heads/main/assets/wc-blueprints/wc-blueprint-kco-default.json",
+    "plugin_credentials_option_patches": [
+        {
+            "option_name": "woocommerce_kco_settings",
+            "key": "test_merchant_id_eu",
+            "env_var_value": "E2E_API_KEY"
+        },
+        {
+            "option_name": "woocommerce_kco_settings",
+            "key": "test_shared_secret_eu",
+            "env_var_value": "E2E_API_SECRET"
+        }
+    ],
+    "payment_gateway_id": "kco",
+    "use_checkout_block": false
+  },
+  "playground": {
+	"preferredVersions": {
+		"php": "8.0",
+		"wp": "latest"
+	},
+    "landingPage": "/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco&from=WCADMIN_PAYMENT_SETTINGS"
+  }
+}

@@ -4,65 +4,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  plugin_meta:
+    uses: ./.github/workflows/reusable-get-plugin-meta.yml
+
+  build_zip:
+    needs: plugin_meta
+    uses: ./.github/workflows/reusable-build-dev-zip.yml
+    with:
+      plugin_slug: ${{ needs.plugin_meta.outputs.plugin_slug }}
+      aws_upload: true
+
+  summary:
     runs-on: ubuntu-latest
-
-    env:
-      PLUGIN_SLUG: klarna-checkout-for-woocommerce
-
+    needs: [plugin_meta, build_zip]
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 1
+      # Checkout needed to be able to execute the job summary script in the next step
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-    # Build the plugin with dev dependencies to scope the dependency packages.
-    - name: Composer Install (Dev)
-      run: composer install
-
-    # Build the plugin for release.
-    - name: Composer Install (Prod)
-      run: composer install --no-dev
- 
-    - name: Define variables branch name, commit hash and zip file name
-      id: vars
-      run: |
-        BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
-        COMMIT_HASH=$(git rev-parse --short HEAD)
-        ZIP_FILE_NAME="${{ env.PLUGIN_SLUG }}-dev-${BRANCH_NAME}-${COMMIT_HASH}"
-        echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
-        echo "COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
-        echo "ZIP_FILE_NAME=${ZIP_FILE_NAME}" >> $GITHUB_OUTPUT
-
-    - name: Attach branch name and commit hash to plugin version
-      run: |
-        sed -i "s/^ \* Version: \(.*\)/ \* Version: \1-dev.${BRANCH_NAME}.${COMMIT_HASH}/" ${{ env.PLUGIN_SLUG }}.php
-
-    - name: Generate and upload plugin zip
-      uses: krokedil/action-wordpress-plugin-build-zip@krokedil-improvements
-      id: generate_and_upload_zip
-      env:
-        SLUG: ${{ env.PLUGIN_SLUG }}
-      with:
-        retention-days: 5 # Optional; defaults to 5
-        artifact-name: ${{ steps.vars.outputs.ZIP_FILE_NAME }} # Optional; defaults to the repository name
-        upload-plugin-artifact: true # Optional; defaults to true
-
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP }}
-        aws-region: eu-north-1
-
-    - name: Upload to S3
-      run: |
-        cd ${{ steps.generate_and_upload_zip.outputs.zipfile-path }}
-        zip -r ../${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip ${{ env.PLUGIN_SLUG }}
-        aws s3 cp ../${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip s3://krokedil-plugin-dev-zip/${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip
-
-    - name: Add a Job Summary with dev zip url and WordPress Playground links
-      env:
-        ZIP_FILE_NAME: ${{ steps.vars.outputs.ZIP_FILE_NAME }}
-      run: |
-        node .github/scripts/generate-dev-zip-job-summary.js
+      - name: Add job summary
+        env:
+          ZIP_FILE_NAME: ${{ needs.build_zip.outputs.zip_file_name }}
+          AWS_S3_PUBLIC_URL: ${{ needs.build_zip.outputs.aws_s3_public_url }}
+          PLUGIN_META_JSON: ${{ needs.plugin_meta.outputs.plugin_meta_json }}
+        run: node .github/scripts/job-summary-create-dev-zip.js

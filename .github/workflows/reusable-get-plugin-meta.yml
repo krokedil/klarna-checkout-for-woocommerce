@@ -1,0 +1,34 @@
+name: Reusable Get Plugin Meta
+
+on:
+  workflow_call:
+    outputs:
+      plugin_slug:
+        description: 'Plugin slug from plugin-meta.json'
+        value: ${{ jobs.meta.outputs.plugin_slug }}
+      plugin_meta_json:
+        description: 'Full plugin-meta.json content (compact JSON)'
+        value: ${{ jobs.meta.outputs.plugin_meta_json }}
+jobs:
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      plugin_slug: ${{ steps.read_meta.outputs.plugin_slug }}
+      plugin_meta_json: ${{ steps.read_meta.outputs.plugin_meta_json }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Read plugin metadata from plugin-meta.json
+        id: read_meta
+        run: |
+          if [ ! -f .github/plugin-meta.json ]; then
+            echo '::error::Missing .github/plugin-meta.json' >&2
+            exit 1
+          fi
+          slug=$(jq -r '.slug' .github/plugin-meta.json)
+          [ -z "$slug" ] || [ "$slug" = "null" ] && echo '::error::Missing .slug in .github/plugin-meta.json' >&2 && exit 1
+          meta_json=$(jq -c '.' .github/plugin-meta.json)
+          echo "plugin_slug=$slug" >> "$GITHUB_OUTPUT"
+          echo "plugin_meta_json=$meta_json" >> "$GITHUB_OUTPUT"
