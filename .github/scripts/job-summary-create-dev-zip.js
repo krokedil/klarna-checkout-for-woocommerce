@@ -89,7 +89,7 @@ Download or share URL for created dev zip through the link below, which is avail
 
 Documentation about how to install the dev zip can be found [here](https://docs.krokedil.com/krokedil-general-support-info/installing-a-development-version/).
 ## Test dev zip using WordPress Playground (experimental)
-You can test the created dev zip directly in [WordPress Playground](https://wordpress.org/playground/), which is a experimental project and functionality can be limited, through the links below:
+You can test the created dev zip directly in [WordPress Playground](https://wordpress.org/playground/), which is an experimental project and functionality can be limited, through the links below:
 * [Test dev zip using WordPress Playground](${PLAYGROUND_MINIMAL_URL}) (WP ${preferredVersions.wp}, PHP ${preferredVersions.php}, WooCommerce and created dev zip)
 `;
 
