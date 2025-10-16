@@ -45,8 +45,9 @@ jobs:
         id: vars
         run: |
           BRANCH_NAME="${GITHUB_REF_NAME:-${GITHUB_REF#refs/heads/}}"
+          BRANCH_SAFE="${BRANCH_NAME//[^A-Za-z0-9._-]/-}"
           SHORT_SHA="${GITHUB_SHA:0:7}"
-          ZIP_FILE_NAME="${{ inputs.plugin_slug }}-dev-${BRANCH_NAME}-${SHORT_SHA}${{ inputs.zip_file_suffix }}"
+          ZIP_FILE_NAME="${{ inputs.plugin_slug }}-dev-${BRANCH_SAFE}-${SHORT_SHA}${{ inputs.zip_file_suffix }}"
           echo "ZIP_FILE_NAME=${ZIP_FILE_NAME}" >> $GITHUB_OUTPUT
 
       - name: Plugin production build steps (Composer dual install)
