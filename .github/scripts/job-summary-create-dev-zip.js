@@ -1,4 +1,4 @@
-// .github/scripts/generate-dev-zip-job-summary.js
+// .github/scripts/job-summary-create-dev-zip.js
 // This script generates the job summary for the GitHub Actions workflow.
 
 // Import the 'fs' (file system) module to write to files
