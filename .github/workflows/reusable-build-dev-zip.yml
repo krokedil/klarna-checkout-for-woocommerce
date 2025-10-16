@@ -1,0 +1,80 @@
+name: Reusable Build Dev Zip
+on:
+  workflow_call:
+    inputs:
+      plugin_slug:
+        required: true
+        type: string
+        description: "Plugin directory slug (main folder & primary PHP file base name)."
+      aws_upload:
+        required: false
+        type: boolean
+        default: false
+        description: "If true, package zip and upload to S3 bucket (adds aws_s3_public_url output)."
+      zip_file_suffix:
+        required: false
+        type: string
+        default: ""
+        description: "Optional suffix appended to the base zip name; include leading dash yourself (e.g. -temp, -beta1). Leave empty for none."
+    outputs:
+      zip_file_name:
+        description: Built dev zip base name (without .zip)
+        value: ${{ jobs.build.outputs.zip_file_name }}
+      aws_s3_public_url:
+        description: Public S3 URL (only valid if aws_upload was true)
+        value: ${{ jobs.build.outputs.aws_s3_public_url }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      zip_file_name: ${{ steps.vars.outputs.ZIP_FILE_NAME }}
+      aws_s3_public_url: ${{ steps.compute_url.outputs.AWS_S3_PUBLIC_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Derive variables
+        id: vars
+        run: |
+          BRANCH_NAME="${GITHUB_REF_NAME:-${GITHUB_REF#refs/heads/}}"
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          ZIP_FILE_NAME="${{ inputs.plugin_slug }}-dev-${BRANCH_NAME}-${SHORT_SHA}${{ inputs.zip_file_suffix }}"
+          echo "ZIP_FILE_NAME=${ZIP_FILE_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Plugin production build steps (Composer dual install)
+        run: bash .github/scripts/plugin-production-build-steps.sh
+
+      - name: Apply dev version suffix
+        run: |
+          sed -i "s/^ \* Version: \(.*\)/ \* Version: \1-dev.${GITHUB_REF_NAME}.${GITHUB_SHA:0:7}/" ${{ inputs.plugin_slug }}.php
+
+      - name: Build plugin zip and upload as artifact
+        id: generate
+        uses: krokedil/action-wordpress-plugin-build-zip@krokedil-improvements
+        env:
+          SLUG: ${{ inputs.plugin_slug }}
+        with:
+          upload-plugin-artifact: true
+          retention-days: 1
+          artifact-name: ${{ steps.vars.outputs.ZIP_FILE_NAME }}
+
+      - name: Configure AWS credentials
+        if: inputs.aws_upload == true
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP }}
+          aws-region: eu-north-1
+
+      - name: Upload zip to S3
+        id: compute_url
+        if: inputs.aws_upload == true
+        run: |
+          set -euo pipefail
+          cd "${{ steps.generate.outputs.zipfile-path }}"
+          zip -r "../${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip" "${{ inputs.plugin_slug }}"
+          aws s3 cp "${{ steps.generate.outputs.zipfile-path }}/../${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip" "s3://krokedil-plugin-dev-zip/${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip"
+          echo "AWS_S3_PUBLIC_URL=https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip" >> $GITHUB_OUTPUT

@@ -5,40 +5,32 @@
 const https = require('https');
 const fs = require('fs');
 
-// Blueprint URL for WooCommerce KCO (Klarna Checkout) default settings
-const PLUGIN_WC_BLUEPRINT_URL = 'https://raw.githubusercontent.com/krokedil/instawp-commands/refs/heads/main/assets/wc-blueprints/wc-blueprint-kco-default.json';
-
-// Set KCO Test Klarna API Username and Test Klarna API Password (option patch format)
-const PLUGIN_CREDENTIALS_OPTION_PATCHES = JSON.stringify([
-  {
-    option_name: "woocommerce_kco_settings",
-    key: "test_merchant_id_eu",
-    value: process.env.E2E_API_KEY || ''
-  },
-  {
-    option_name: "woocommerce_kco_settings",
-    key: "test_shared_secret_eu",
-    value: process.env.E2E_API_SECRET || ''
-  }
-]);
-
-// Set what the payment gateway id is
-const PAYMENT_GATEWAY_ID = 'kco';
-
-// Set if WooCommerce checkout should use checkout block or shortcode
-const USE_CHECKOUT_BLOCK = false; // true = use checkout block, false = use shortcode
+// Shared metadata parsing (minimal helper)
+const { loadMeta, safeGet } = require('./lib/plugin-meta');
+let META;
+try { META = loadMeta({ requireEnv: true }); } catch (e) { console.error(e.message); process.exit(1); }
+// Inline domain-specific derivations using safeGet
+const PLUGIN_WC_BLUEPRINT_URL = safeGet(META, 'instawp.plugin_wc_blueprint_url', '');
+const PAYMENT_GATEWAY_ID = safeGet(META, 'instawp.payment_gateway_id', undefined);
+const USE_CHECKOUT_BLOCK = safeGet(META, 'instawp.use_checkout_block', undefined);
+const PLUGIN_CREDENTIALS_OPTION_PATCHES = (safeGet(META, 'instawp.plugin_credentials_option_patches', []) || []).map(p => ({
+  option_name: p.option_name,
+  key: p.key,
+  value: process.env[p.env_var_value] || ''
+}));
 
 // Environment variables from GitHub Actions
 const INSTA_WP_URL = process.env.INSTA_WP_URL;
 const INSTAWP_API_TOKEN = process.env.INSTAWP_API_TOKEN;
 const GITHUB_ENV = process.env.GITHUB_ENV;
 const GITHUB_OUTPUT = process.env.GITHUB_OUTPUT;
-const ZIP_FILE_NAME = process.env.ZIP_FILE_NAME;
+const AWS_S3_PUBLIC_URL = process.env.AWS_S3_PUBLIC_URL;
 
 // Validate required environment variables at the top
 const REQUIRED_ENVS = [
   'INSTAWP_API_TOKEN',
   'ZIP_FILE_NAME',
+  'AWS_S3_PUBLIC_URL',
 ];
 const missingEnvs = REQUIRED_ENVS.filter((env) => !process.env[env]);
 if (missingEnvs.length > 0) {
@@ -194,6 +186,16 @@ async function triggerInstaWpCommand(siteid, command_id, commandArguments = unde
   });
 }
 
+// Conditional wrapper: executes command only if condition true, otherwise logs skipMessage
+async function maybeTriggerCommand({ siteid, command_id, condition, args = [], skipMessage }) {
+  if (!condition) {
+    if (skipMessage) logInfo(skipMessage);
+    return { skipped: true };
+  }
+  await triggerInstaWpCommand(siteid, command_id, args);
+  return { skipped: false };
+}
+
 // Logging helpers for GitHub Actions
 function logInfo(msg) { console.log(`[INFO] ${msg}`); }
 function logWarn(msg) { console.warn(`[WARN] ${msg}`); }
@@ -239,34 +241,57 @@ function logGroupEnd() { console.log('::endgroup::'); }
     }
 
     // Always upload the dev zip to the site (Command 2301)
-    logInfo('Command 2301: upload dev zip');
-    await triggerInstaWpCommand(siteid, 2301, [{ dev_zip_public_url: `https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${ZIP_FILE_NAME}.zip` }]);
+    await triggerInstaWpCommand(siteid, 2301, [{ dev_zip_public_url: AWS_S3_PUBLIC_URL }]);
 
     // Only run setup commands if a new site was created
     if (siteCreated) {
-      logGroupStart('InstaWP setup commands');
-      logInfo('Command 2344: setup-default-site');
+      logGroupStart('InstaWP setup commands for new site');
+      // Basic setup commands
       await triggerInstaWpCommand(siteid, 2344);
-      logInfo('Command 2334: apply WooCommerce blueprint');
-      await triggerInstaWpCommand(siteid, 2334, [{ wc_blueprint_json_public_url: PLUGIN_WC_BLUEPRINT_URL }]);
-      // Apply credential option patches via command 2679 (one command per option patch)
-      try {
-        const optionPatches = JSON.parse(PLUGIN_CREDENTIALS_OPTION_PATCHES);
-        for (const patch of optionPatches) {
-          logInfo(`Command 2679: patch option '${patch.option_name}' key '${patch.key}'`);
-          await triggerInstaWpCommand(siteid, 2679, [patch]);
+
+      // WooCommerce blueprint
+      await maybeTriggerCommand({
+        siteid,
+        command_id: 2334,
+        condition: !!PLUGIN_WC_BLUEPRINT_URL,
+        args: [{ wc_blueprint_json_public_url: PLUGIN_WC_BLUEPRINT_URL }],
+        skipMessage: 'Skipping WooCommerce blueprint (no PLUGIN_WC_BLUEPRINT_URL configured)'
+      });
+
+      // Credential patches
+      if (PLUGIN_CREDENTIALS_OPTION_PATCHES.length === 0) {
+        logInfo('Skipping credential option patches (none configured)');
+      } else {
+        for (const patch of PLUGIN_CREDENTIALS_OPTION_PATCHES) {
+          await maybeTriggerCommand({
+            siteid,
+            command_id: 2679,
+            condition: !!patch.value,
+            args: [patch],
+            skipMessage: `Skipping credential patch for ${patch.option_name}.${patch.key} (empty value)`
+          });
         }
-      } catch (e) {
-        logError('Failed to process PLUGIN_CREDENTIALS_OPTION_PATCHES: ' + (e && e.message ? e.message : e));
-        throw e;
       }
-      // Set payment gateway order using command 2681
-      logInfo(`Command 2681: set payment gateway order for '${PAYMENT_GATEWAY_ID}'`);
-      await triggerInstaWpCommand(siteid, 2681, [{ payment_gateway_id: PAYMENT_GATEWAY_ID, order: 1 }]);
-      if (!USE_CHECKOUT_BLOCK) {
-        logInfo('Command 2549: apply WooCommerce checkout shortcode');
-        await triggerInstaWpCommand(siteid, 2549);
-      }
+
+      // Payment gateway setup
+      await maybeTriggerCommand({
+        siteid,
+        command_id: 2681,
+        condition: !!PAYMENT_GATEWAY_ID,
+        args: [{ payment_gateway_id: PAYMENT_GATEWAY_ID, order: 1 }],
+        skipMessage: 'Skipping payment gateway order (no PAYMENT_GATEWAY_ID in metadata)'
+      });
+
+      // Checkout block setup
+      await maybeTriggerCommand({
+        siteid,
+        command_id: 2549,
+        condition: USE_CHECKOUT_BLOCK === false,
+        args: [],
+        skipMessage: USE_CHECKOUT_BLOCK === true
+          ? 'Skipping checkout shortcode (USE_CHECKOUT_BLOCK=true)'
+          : 'Skipping checkout shortcode (USE_CHECKOUT_BLOCK not specified)'
+      });
       logGroupEnd();
     }
 
