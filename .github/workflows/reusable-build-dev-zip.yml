@@ -81,5 +81,5 @@ jobs:
           set -euo pipefail
           cd "${{ steps.generate.outputs.zipfile-path }}"
           zip -r "../${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip" "${{ inputs.plugin_slug }}"
-          aws s3 cp "${{ steps.generate.outputs.zipfile-path }}/../${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip" "s3://krokedil-plugin-dev-zip/${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip"
+          aws s3 cp "../${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip" "s3://krokedil-plugin-dev-zip/${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip"
           echo "AWS_S3_PUBLIC_URL=https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${{ steps.vars.outputs.ZIP_FILE_NAME }}.zip" >> $GITHUB_OUTPUT
