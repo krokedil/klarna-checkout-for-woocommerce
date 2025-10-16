@@ -19,6 +19,7 @@ jobs:
     uses: ./.github/workflows/reusable-build-dev-zip.yml
     with:
       plugin_slug: ${{ needs.plugin_meta.outputs.plugin_slug }}
+      aws_upload: true
 
   deploy:
     runs-on: ubuntu-latest
