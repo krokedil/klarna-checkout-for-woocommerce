@@ -5,12 +5,12 @@ on:
     outputs:
       plugin_slug:
         description: 'Plugin slug from plugin-meta.json'
-        value: ${{ jobs.meta.outputs.plugin_slug }}
+        value: ${{ jobs.get_plugin_meta.outputs.plugin_slug }}
       plugin_meta_json:
         description: 'Full plugin-meta.json content (compact JSON)'
-        value: ${{ jobs.meta.outputs.plugin_meta_json }}
+        value: ${{ jobs.get_plugin_meta.outputs.plugin_meta_json }}
 jobs:
-  meta:
+  get_plugin_meta:
     runs-on: ubuntu-latest
     outputs:
       plugin_slug: ${{ steps.read_meta.outputs.plugin_slug }}

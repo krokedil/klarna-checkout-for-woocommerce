@@ -30,7 +30,7 @@ on:
         value: ${{ jobs.build.outputs.aws_s3_public_url }}
 
 jobs:
-  build:
+  build_dev_zip:
     runs-on: ubuntu-latest
     outputs:
       zip_file_name: ${{ steps.vars.outputs.ZIP_FILE_NAME }}
