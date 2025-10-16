@@ -45,7 +45,7 @@ jobs:
           echo "ZIP_FILE_NAME=${ZIP_FILE_NAME}" >> $GITHUB_OUTPUT
 
       - name: Plugin production build steps (Composer dual install)
-        run: bash .github/scripts/plugin-production-build-steps.sh
+        run: bash .github/scripts/prod-build-steps.sh
 
       - name: Apply dev version suffix
         run: |

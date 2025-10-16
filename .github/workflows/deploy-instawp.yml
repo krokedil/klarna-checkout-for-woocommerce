@@ -1,6 +1,8 @@
 name: Deploy to InstaWP
 
 on:
+  push:
+    branches: ['**']
   workflow_dispatch:
     inputs:
       instawp_url:

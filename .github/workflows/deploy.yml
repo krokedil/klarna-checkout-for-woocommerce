@@ -16,7 +16,7 @@ jobs:
 
     # Build plugin for production use
     - name: Plugin production build steps (Composer dual install)
-      run: bash .github/scripts/plugin-production-build-steps.sh
+      run: bash .github/scripts/prod-build-steps.sh
 
     # Install SVN ( Subversion )
     - name: Install SVN ( Subversion )
