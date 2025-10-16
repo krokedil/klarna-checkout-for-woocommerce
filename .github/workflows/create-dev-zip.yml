@@ -13,6 +13,9 @@ jobs:
     with:
       plugin_slug: ${{ needs.plugin_meta.outputs.plugin_slug }}
       aws_upload: true
+    secrets:
+      AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP: ${{ secrets.AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP }}
+      AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP: ${{ secrets.AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP }}
 
   summary:
     runs-on: ubuntu-latest

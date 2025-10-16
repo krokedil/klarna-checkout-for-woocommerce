@@ -16,6 +16,11 @@ on:
         type: string
         default: ""
         description: "Optional suffix appended to the base zip name; include leading dash yourself (e.g. -temp, -beta1). Leave empty for none."
+    secrets:
+      AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP:
+        required: false
+      AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP:
+        required: false
     outputs:
       zip_file_name:
         description: Built dev zip base name (without .zip)
