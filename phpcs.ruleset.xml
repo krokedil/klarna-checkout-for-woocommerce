@@ -1,9 +1,59 @@
 <?xml version="1.0"?>
-<ruleset name="WordPress Coding Standards for Plugins">
-	<description>Generally-applicable sniffs for WordPress plugins</description>
-	<config name="installed_paths" value="vendor/wp-coding-standards/wpcs" />
-	<rule ref="WordPress" />
+<ruleset name="Krokedil Coding Standards">
+    <description>WooCommerce dev PHP_CodeSniffer ruleset.</description>
 
-	<exclude-pattern>*/node_modules/*</exclude-pattern>
-	<exclude-pattern>*/vendor/*</exclude-pattern>
+    <!-- Exclude vendor and node_modules from all rules -->
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/dependencies/*</exclude-pattern>
+    <exclude-pattern>blocks/build/</exclude-pattern>
+
+    <!-- Exclude the tests folder -->
+    <exclude-pattern>tests/*</exclude-pattern>
+
+    <config name="minimum_supported_wp_version" value="6.2" />
+    <config name="testVersion" value="7.3-" />
+
+    <!-- Use Wordpress Coding standards -->
+    <rule ref="WordPress" />
+
+    <!-- Enforce the correct text-domain -->
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="klarna-checkout-for-woocommerce" />
+                <element value="woocommerce" />
+            </property>
+        </properties>
+    </rule>
+
+    <!--  Remove WordPress.Files.FileName.InvalidClassFileName checks to allow for PSR-4 naming convention -->
+    <rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>src/</exclude-pattern>
+		<exclude-pattern>blocks/</exclude-pattern>
+    </rule>
+
+    <!-- Remove WordPress.Files.FileName.NotHyphenatedLowercase checks to allow for PSR-4 naming convention -->
+    <rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>src/</exclude-pattern>
+		<exclude-pattern>blocks/</exclude-pattern>
+    </rule>
+
+    <!-- Remove need for package tag in file block comments -->
+    <rule ref="Squiz.Commenting.FileComment.MissingPackageTag">
+		<exclude-pattern>src/</exclude-pattern>
+		<exclude-pattern>blocks/</exclude-pattern>
+    </rule>
+
+    <!-- Remove need for file comment -->
+    <rule ref="Squiz.Commenting.FileComment.Missing">
+		<exclude-pattern>src/</exclude-pattern>
+		<exclude-pattern>blocks/</exclude-pattern>
+    </rule>
+
+    <!-- Allow the usage of shorthand arrays -->
+    <rule ref="Universal.Arrays.DisallowShortArraySyntax.Found">
+		<exclude-pattern>src/</exclude-pattern>
+		<exclude-pattern>blocks/</exclude-pattern>
+    </rule>
 </ruleset>

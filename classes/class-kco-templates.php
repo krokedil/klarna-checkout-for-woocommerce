@@ -8,6 +8,9 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use Krokedil\KustomCheckout\Utility\BlocksUtility;
+
 /**
  * KCO_Templates class.
  */
@@ -147,8 +150,8 @@ class KCO_Templates {
 	 */
 	public function check_that_kco_template_has_loaded() {
 
-		// Exit early.
-		if ( ! is_checkout() ) {
+		// Exit early if we are not on the checkout page, or if the checkout blocks are enabled.
+		if ( ! is_checkout() || BlocksUtility::is_checkout_block_enabled() ) {
 			return;
 		}
 
@@ -263,16 +266,16 @@ class KCO_Templates {
 		/**
 		 * Add checkout page body class, depending on checkout page layout settings.
 		 *
-		 * @param array $class CSS classes used in body tag.
+		 * @param array $css_class CSS classes used in body tag.
 		 * @return array The same input array with the addition of our custom classes.
 		 */
-	public function add_body_class( $class ) {
+	public function add_body_class( $css_class ) {
 		if ( ! is_checkout() || is_wc_endpoint_url( 'order-received' ) ) {
-			return $class;
+			return $css_class;
 		}
 
 		if ( method_exists( WC()->cart, 'needs_payment' ) && ! WC()->cart->needs_payment() ) {
-			return $class;
+			return $css_class;
 		}
 
 		$settings        = get_option( 'woocommerce_kco_settings' );
@@ -288,18 +291,18 @@ class KCO_Templates {
 		}
 
 		if ( 'kco' === $first_gateway && 'two_column_left' === $checkout_layout ) {
-			$class[] = 'kco-two-column-left';
+			$css_class[] = 'kco-two-column-left';
 		}
 
 		if ( 'kco' === $first_gateway && 'two_column_left_sf' === $checkout_layout ) {
-			$class[] = 'kco-two-column-left-sf';
+			$css_class[] = 'kco-two-column-left-sf';
 		}
 
 		if ( 'kco' === $first_gateway && 'one_column_checkout' === $checkout_layout ) {
-			$class[] = 'kco-one-selected';
+			$css_class[] = 'kco-one-selected';
 		}
 
-		return $class;
+		return $css_class;
 	}
 }
 

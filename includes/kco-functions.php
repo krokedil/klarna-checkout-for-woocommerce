@@ -108,7 +108,7 @@ function kco_wc_show_snippet( $pay_for_order = false ) {
  * The extracted JavaScript is inserted in kco_add_inline_script. This is required since certain themes escapes the HTML snippet,
  * which renders its content (and thus the script) useless.
  *
- * @param string $html_snippet
+ * @param string $html_snippet The HTML snippet containing the script tag.
  * @return string The HTML snippet without the script tag (and its content).
  */
 function kco_extract_script( $html_snippet ) {
@@ -135,7 +135,7 @@ function kco_extract_script( $html_snippet ) {
  */
 function kco_add_inline_script( $js ) {
 	$js = preg_replace( '/<\/?script[^>]*>/', '', $js[0] );
-	wp_register_script( 'kco-script', '', array(), '', true );
+	wp_register_script( 'kco-script', '', array(), false, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters -- Ignore no version number since we have no actual file.
 	wp_enqueue_script( 'kco-script' );
 	wp_add_inline_script( 'kco-script', $js, 'before' );
 }
@@ -669,6 +669,7 @@ function kco_validate_order_total( $klarna_order, $order ) {
 		$order->set_status(
 			'on-hold',
 			sprintf(
+				// translators: 1: Kustom order total, 2: WooCommerce order total.
 				__( 'Kustom order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Kustom before processing.', 'klarna-checkout-for-woocommerce' ),
 				$klarna_order_total,
 				$order_total
@@ -759,6 +760,7 @@ function kco_validate_order_content( $klarna_order, $order ) {
 		// Check if the Woo item was not found in the Kustom order.
 		if ( ! $match ) {
 			KCO_Logger::log( "$prefix WC order item reference: $reference ($name) was not found in the Kustom order." );
+			// translators: %s: Product name.
 			$notes[]  = sprintf( __( 'The product "%s" was not found in the Kustom order.', 'klarna-checkout-for-woocommerce' ), $name );
 			$mismatch = true;
 		}
@@ -909,7 +911,7 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 	$chosen_shipping_methods   = array();
 	$chosen_shipping_methods[] = wc_clean( $data['id'] );
 
-	KCO_Logger::Log( "Set chosen shipping method for $klarna_order_id " . json_encode( $chosen_shipping_methods ) );
+	KCO_Logger::Log( "Set chosen shipping method for $klarna_order_id " . wp_json_encode( $chosen_shipping_methods ) );
 
 	WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
 }
@@ -917,14 +919,14 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 /**
  * Returns the WooCommerce order that has a matching Kustom order id saved as a meta field. If no order is found, returns false, and if many orders are found the newest one is returned.
  *
- * @param string      $klarna_order_id
- * @param string|null $date_after
+ * @param string      $klarna_order_id The Kustom order id.
+ * @param string|null $date_after Optional. Date after which the order was created. Format 'YYYY-MM-DD'. Default null.
  * @return WC_Order|false
  */
 function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
 	$args = array(
-		'meta_key'     => '_wc_klarna_order_id',
-		'meta_value'   => $klarna_order_id,
+		'meta_key'     => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- We need to query by meta key.
+		'meta_value'   => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- We need to query by meta value.
 		'meta_compare' => '=',
 		'order'        => 'DESC',
 		'orderby'      => 'date',
@@ -979,7 +981,7 @@ function kco_is_bundle_plugin_installed() {
  *
  * @return float|int Returns the numeric value of the input, or the default value if the input is not numeric and cannot be converted.
  */
-function kco_ensure_numeric( $value, $default = 0 ) {
+function kco_ensure_numeric( $value, $default = 0 ) { //phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames -- We want to use "default" here
 	if ( is_numeric( $value ) ) {
 		return floatval( $value );
 	}
