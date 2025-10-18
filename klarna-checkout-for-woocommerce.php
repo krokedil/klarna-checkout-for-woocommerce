@@ -5,7 +5,7 @@
  * Description: Kustom Checkout payment gateway for WooCommerce.
  * Author: Kustom
  * Author URI: https://klarna.com/
- * Version: 2.15.0
+ * Version: 2.16.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.15.0' );
+define( 'KCO_WC_VERSION', '2.16.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
