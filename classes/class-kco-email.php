@@ -18,7 +18,7 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 		 * Class constructor.
 		 */
 		public function __construct() {
-			add_action( 'woocommerce_email_after_order_table', array( $this, 'add_klarna_data_to_mail' ), 10, 4 );
+			add_action( 'woocommerce_email_after_order_table', array( $this, 'add_klarna_data_to_mail' ), 10, 2 );
 		}
 
 		/**
@@ -26,12 +26,10 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 		 *
 		 * @param WC_Order $order The WooCommerce order.
 		 * @param bool     $sent_to_admin If the email is being sent to the admin, and not the customer.
-		 * @param bool     $plain_text If the email is as plain text or HTML.
-		 * @param WC_Email $email The current WooCommerce email object.
 		 *
 		 * @return void
 		 */
-		public function add_klarna_data_to_mail( $order, $sent_to_admin, $plain_text, $email ) {
+		public function add_klarna_data_to_mail( $order, $sent_to_admin ) {
 			$gateway_used = $order->get_payment_method();
 			$settings     = get_option( 'woocommerce_kco_settings' );
 			$add_to_email = isset( $settings['add_to_email'] ) && 'yes' === $settings['add_to_email'] ? true : false;

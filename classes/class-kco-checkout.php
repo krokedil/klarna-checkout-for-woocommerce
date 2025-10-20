@@ -24,8 +24,8 @@ class KCO_Checkout {
 		// Handle potential shipping selection errors.
 		add_filter( 'woocommerce_shipping_chosen_method', array( __CLASS__, 'maybe_register_shipping_error' ), 9999, 3 );
 		add_action( 'woocommerce_shipping_method_chosen', array( __CLASS__, 'maybe_throw_shipping_error' ), 9999 );
-		add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 3 );
-		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'maybe_change_needs_payment_cart' ), 999, 2 );
+		add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 2 );
+		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'maybe_change_needs_payment_cart' ), 999, 1 );
 	}
 
 	/**
@@ -141,7 +141,7 @@ class KCO_Checkout {
 	 *
 	 * @return string
 	 */
-	public static function maybe_register_shipping_error( $default, $rates, $chosen_method ) {
+	public static function maybe_register_shipping_error( $default, $rates, $chosen_method ) { //phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames -- We want to use "default" here
 		// Only do this if we are during the checkout process.
 		if ( did_action( 'woocommerce_checkout_process' ) <= 0 ) {
 			return $default;
@@ -203,7 +203,7 @@ class KCO_Checkout {
 		}
 
 		KCO_Logger::log( 'Checkout error - Printing shipping error message to the customer.' );
-		throw new Exception( __( 'The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again.', 'klarna-checkout-for-woocommerce' ) );
+		throw new Exception( __( 'The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
 	}
 
 	/**
@@ -211,10 +211,9 @@ class KCO_Checkout {
 	 *
 	 * @param bool     $wc_result The result WooCommerce had.
 	 * @param WC_Order $order The WooCommerce order.
-	 * @param array    $valid_order_statuses The valid order statuses.
 	 * @return bool
 	 */
-	public function maybe_change_needs_payment( $wc_result, $order, $valid_order_statuses ) {
+	public function maybe_change_needs_payment( $wc_result, $order ) {
 		// Only change for KCO orders.
 		if ( 'kco' !== $order->get_payment_method() ) {
 			return $wc_result;
@@ -241,11 +240,10 @@ class KCO_Checkout {
 	/**
 	 * Maybe change the needs payment status for the cart.
 	 *
-	 * @param bool    $needs_payment The current needs payment status.
-	 * @param WC_Cart $cart The WooCommerce cart.
+	 * @param bool $needs_payment The current needs payment status.
 	 * @return bool
 	 */
-	public function maybe_change_needs_payment_cart( $needs_payment, $cart ) {
+	public function maybe_change_needs_payment_cart( $needs_payment ) {
 
 		// Only if our filter is active and is set to false.
 		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
@@ -254,4 +252,5 @@ class KCO_Checkout {
 
 		return true;
 	}
-} new KCO_Checkout();
+}
+new KCO_Checkout();

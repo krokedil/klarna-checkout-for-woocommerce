@@ -207,6 +207,7 @@ class KCO_Fields {
 			),
 			'shipping_methods_in_iframe' => array(
 				'title'       => __( 'Shipping methods in iframe', 'klarna-checkout-for-woocommerce' ),
+				// translators: 1: Configuration link, 2: Tax settings link.
 				'label'       => sprintf( __( 'Display Shipping methods in Kustom iframe.  If you are using the <b>Kustom Shipping Assistant</b> plugin, please follow the steps explained in the plugin documentation under the sections titled %1$s and %2$s', 'klarna-checkout-for-woocommerce' ), ( '<a href="https://docs.krokedil.com/klarna-for-woocommerce/additional-klarna-plugins/klarna-shipping-assistant/#configuration" target="_blank">configuration</a>' ), ( '<a href="https://docs.krokedil.com/klarna-for-woocommerce/additional-klarna-plugins/klarna-shipping-assistant/#tax-settings" target="_blank">tax settings</a>' ) ),
 				'type'        => 'checkbox',
 				'description' => __( 'If this option is checked, selection of shipping methods is done in Kustom iframe. Shipping price and name of the selected shipping method will still be displayed in WooCommerce order review.', 'klarna-checkout-for-woocommerce' ),
