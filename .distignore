@@ -4,8 +4,8 @@
 /node_modules
 /tests
 /languages/*-backup-*
-/vendor
 .editorconfig
+.eslintrc
 .distignore
 .gitignore
 readme.md
@@ -24,3 +24,4 @@ tmp*
 readme.dev.md
 .prettierignore
 scoper.custom.php
+pnpm-lock.yaml

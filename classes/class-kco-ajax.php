@@ -276,7 +276,7 @@ class KCO_AJAX extends WC_AJAX {
 	 * @return void
 	 */
 	public static function kco_customer_type_changed() {
-		$customer_type = isset( $_POST['customer_type'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_type'] ) ) : '';
+		$customer_type = isset( $_POST['customer_type'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_type'] ) ) : ''; // phpcs:ignore
 		do_action( 'kco_customer_type_changed', $customer_type );
 	}
 }

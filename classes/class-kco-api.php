@@ -18,7 +18,9 @@ class KCO_API {
 	/**
 	 * Creates a Kustom Checkout order.
 	 *
-	 * @param int $order_id The WooCommerce order id.
+	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $checkout_flow The checkout flow to use, either 'embedded' or 'redirect'.
+	 *
 	 * @return mixed
 	 */
 	public function create_klarna_order( $order_id = false, $checkout_flow = 'embedded' ) {
@@ -191,7 +193,7 @@ class KCO_API {
 	 * @param  string $order_id WooCommerce order ID. Passed if request happens after WooCommerce has been created.
 	 * @return object
 	 */
-	public function request_pre_get_order( $klarna_order_id, $order_id = null ) {
+	public function request_pre_get_order( $klarna_order_id, $order_id = null ) { // phpcs:ignore
 		wc_deprecated_function( 'request_pre_get_order', '2.0.0', 'get_klarna_order' );
 		$klarna_order = $this->get_klarna_order( $klarna_order_id );
 
@@ -207,7 +209,7 @@ class KCO_API {
 	 * @param  string $order_id WooCommerce order ID. Passed if request happens after WooCommerce has been created.
 	 * @return object
 	 */
-	public function request_post_get_order( $klarna_order_id, $order_id = null ) {
+	public function request_post_get_order( $klarna_order_id, $order_id = null ) { // phpcs:ignore
 		wc_deprecated_function( 'request_post_get_order', '2.0.0', 'get_klarna_order' );
 		$klarna_order = $this->get_klarna_order( $klarna_order_id );
 

@@ -1,0 +1,37 @@
+{
+    "extends": [
+        "plugin:@wordpress/eslint-plugin/recommended",
+        "plugin:jsdoc/recommended"
+    ],
+    "rules": {
+        "jsdoc/require-jsdoc": [
+            "error",
+            {
+                "require": {
+                    "FunctionDeclaration": true,
+                    "MethodDefinition": true,
+                    "ClassDeclaration": true,
+                    "ArrowFunctionExpression": true,
+                    "FunctionExpression": true
+                }
+            }
+        ],
+        "jsdoc/require-param-description": "error",
+        "jsdoc/require-returns-description": "error",
+        "jsdoc/valid-types": "error"
+    },
+    "overrides": [
+        {
+            "files": ["*.ts", "*.tsx"],
+            "rules": {"jsdoc/no-undefined-types": "off"}
+        }
+    ],
+    "ignorePatterns": [
+        "*/build/",
+        "node_modules/",
+        "vendor/",
+        "assets/",
+        "gulpfile.js",
+        "webpack.config.js"
+    ]
+}
