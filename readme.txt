@@ -1,13 +1,13 @@
 === Kustom Checkout for WooCommerce ===
-Contributors: kustom, klarna, krokedil, automattic
-Tags: woocommerce, kustom, klarna, ecommerce, e-commerce, checkout
+Contributors: kustom, krokedil, automattic
+Tags: woocommerce, ecommerce, e-commerce, checkout, klarna
 Donate link: https://kustom.co
 Requires at least: 5.0
-Tested up to: 6.8.2
+Tested up to: 6.8.3
 Requires PHP: 7.4
 WC requires at least: 5.6.0
-WC tested up to: 10.1.2
-Stable tag: 2.14.3
+WC tested up to: 10.2.2
+Stable tag: 2.16.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,17 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.10.20    - version 2.16.0 =
+* Feature       - Added support for the WooCommerce checkout block.
+
+= 2025.10.15    - version 2.15.0 =
+* Feature       - Added a gift card package integration for improved compatibility with multiple WooCommerce gift card plugins.
+* Fix           - Fixed a PHP warning that could occur when processing error responses during order updates.
+* Fix           - Removed unused code for better maintainability.
+
+= 2025.09.16    - version 2.14.4 =
+* Fix           - Ensured warnings about invalid API credentials are displayed correctly when saving plugin settings.
+
 = 2025.09.15    - version 2.14.3 =
 * Fix           - Resolved issue with Pay for order, when enabling shipping in iframe.
 * Fix           - Resolves the redirect checkout flow not working as intended.
