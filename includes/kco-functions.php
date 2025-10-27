@@ -15,6 +15,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array|null If an order could not be created or updated, NULL is returned.
  */
 function kco_create_or_update_order() {
+	// Make sure cart is initialized.
+	if ( ! WC()->cart ) {
+		return;
+	}
+
 	// Need to calculate these here, because WooCommerce hasn't done it yet.
 	WC()->cart->calculate_fees();
 	WC()->cart->calculate_shipping();
