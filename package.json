@@ -39,7 +39,15 @@
     "gulp-watch": "5.0.1",
     "gulp-wp-pot": "2.0.7",
     "prettier": "^3.6.2",
-    "pump": "1.0.2"
+    "pump": "1.0.2",
+
+    "@playwright/test": "^1.51.1",
+    "@types/node": "^22.14.1",
+    "@wp-playground/cli": "1.1.1",
+    "vitest": "^3.1.1"
+  },
+  "dependencies": {
+    "unzipper": "^0.12.3"
   },
   "scripts": {
     "start:webpack": "wp-scripts start",
@@ -48,6 +56,10 @@
     "lint:css:fix": "wp-scripts lint-style --fix",
     "lint:js": "wp-scripts lint-js",
     "lint:js:fix": "wp-scripts lint-js --fix",
-    "build": "npx gulp CSS && npm run lint:js:fix && npx gulp JS && npx gulp makePOT && npx wp-scripts build"
+    "build": "npx gulp CSS && npm run lint:js:fix && npx gulp JS && npx gulp makePOT && npx wp-scripts build",
+    "test": "vitest run --config=tests/integration/vitest.config.ts && npx playwright test --config=tests/end-to-end/playwright.config.ts",
+    "test:integration": "vitest --config=tests/integration/vitest.config.ts",
+    "test:e2e": "npx playwright test --ui --config=tests/end-to-end/playwright.config.ts",
+    "server": "npx @wp-playground/cli server --mount=.:/wordpress/wp-content/plugins/klarna-checkout-for-woocommerce --blueprint=tests/blueprint.json"
   }
 }

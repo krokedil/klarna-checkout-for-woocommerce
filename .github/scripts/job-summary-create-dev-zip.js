@@ -36,8 +36,6 @@ assertField(preferredVersions, 'wp', 'playground.preferredVersions.wp required')
 const playgroundBlueprintObj = {
   $schema: 'https://playground.wordpress.net/blueprint-schema.json',
   preferredVersions: preferredVersions,
-  phpExtensionBundles: ['kitchen-sink'],
-  features: { networking: true },
   constants: { WP_DEBUG: true },
   steps: [
     { step: 'resetData' },
