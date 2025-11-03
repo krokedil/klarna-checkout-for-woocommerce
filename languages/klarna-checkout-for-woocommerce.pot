@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2025-10-18 19:43+0000\n"
+"POT-Creation-Date: 2025-11-03 09:42+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -34,7 +34,7 @@ msgid "Your installation of Kustom Checkout for WooCommerce is not complete. If 
 msgstr ""
 
 #. translators: Kustom order ID.
-#: ../classes/class-kco-api-callbacks.php:108, ../includes/kco-functions.php:622
+#: ../classes/class-kco-api-callbacks.php:108, ../includes/kco-functions.php:627
 msgid "Kustom order is under review, order ID: %s."
 msgstr ""
 
@@ -42,7 +42,7 @@ msgstr ""
 msgid "Kustom Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:101, ../includes/kco-functions.php:614
+#: ../classes/class-kco-api-callbacks.php:101, ../includes/kco-functions.php:619
 msgid "Payment via Kustom Checkout, order ID: %s"
 msgstr ""
 
@@ -555,38 +555,38 @@ msgstr ""
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
-#: ../classes/class-kco-templates.php:176
+#: ../classes/class-kco-templates.php:177
 msgid "Kustom Checkout is not available. Please choose a different payment option or contact the store for assistance."
 msgstr ""
 
-#: ../includes/kco-functions.php:163
+#: ../includes/kco-functions.php:168
 msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:633
+#: ../includes/kco-functions.php:638
 msgid "Waiting for verification from Kustom's push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:628
+#: ../includes/kco-functions.php:633
 msgid "Kustom Checkout order was rejected"
 msgstr ""
 
 #. translators: 1: Kustom order total, 2: WooCommerce order total.
-#: ../includes/kco-functions.php:673
+#: ../includes/kco-functions.php:678
 msgid "Kustom order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Kustom before processing."
 msgstr ""
 
-#: ../includes/kco-functions.php:703
+#: ../includes/kco-functions.php:708
 msgid "A mismatch between the WooCommerce and Kustom orders was identified. Please verify the order in the Kustom merchant portal before processing."
 msgstr ""
 
 #. translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
-#: ../includes/kco-functions.php:754
+#: ../includes/kco-functions.php:759
 msgid "The product \"%1$s\" has a quantity mismatch. Expected %2$d found %3$d."
 msgstr ""
 
 #. translators: %s: Product name.
-#: ../includes/kco-functions.php:764
+#: ../includes/kco-functions.php:769
 msgid "The product \"%s\" was not found in the Kustom order."
 msgstr ""
 

@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 6.8.3
 Requires PHP: 7.4
 WC requires at least: 5.6.0
-WC tested up to: 10.2.2
-Stable tag: 2.16.0
+WC tested up to: 10.3.4
+Stable tag: 2.16.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,11 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.11.03    - version 2.16.1 =
+* Fix           - Fixed a fatal error that could occur when editing certain admin pages (e.g., Widgets) if the WooCommerce checkout block was enabled.
+* Fix           - Fixed an issue where "Kustom Checkout is not available" was shown when paying for guest orders with shipping enabled in the iframe on the Pay for order page.
+* Fix           - Fixed an issue where the ‘kco_wc_api_request_args’ filter was not applied when an upsell was added to the order.
+
 = 2025.10.20    - version 2.16.0 =
 * Feature       - Added support for the WooCommerce checkout block.
 
