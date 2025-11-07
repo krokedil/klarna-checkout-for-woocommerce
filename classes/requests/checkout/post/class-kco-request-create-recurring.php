@@ -52,6 +52,7 @@ class KCO_Request_Create_Recurring extends KCO_Request {
 			'order_tax_amount'    => $order_data->get_total_tax(),
 			'merchant_reference1' => $order->get_order_number(),
 			'merchant_reference2' => $order->get_id(),
+			'auto_capture'        => apply_filters( 'kco_wc_renewal_auto_capture', false, $order_id ),
 		);
 
 		return $request_body;
