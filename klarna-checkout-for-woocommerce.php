@@ -29,6 +29,7 @@
  */
 
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
+use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -113,6 +114,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var KrokedilWooCommerce
 		 */
 		public $krokedil = null;
+
+		/**
+		 * Reference to pickup points class.
+		 *
+		 * @var PickupPoints $pickup_points
+		 */
+		public $pickup_points;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -290,6 +298,7 @@ if ( ! class_exists( 'KCO' ) ) {
 					'price_format' => 'minor',
 				)
 			);
+			$this->pickup_points = new PickupPoints();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
