@@ -1,7 +1,8 @@
 {
     "require": {
         "php": ">=7.4",
-        "krokedil/woocommerce": "^1.0"
+        "krokedil/woocommerce": "^1.0",
+        "krokedil/shipping": "dev-develop-add-krokedil-carrier"
     },
     "config": {
         "platform": {
@@ -12,6 +13,10 @@
         {
             "type": "vcs",
             "url": "git@github.com:krokedil/woocommerce.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@github.com:krokedil/shipping.git"
         }
     ],
     "minimum-stability": "dev",

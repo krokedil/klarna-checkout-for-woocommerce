@@ -4,8 +4,72 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5536213c2cd4ccefad434060079eb310",
+    "content-hash": "47cd71ff0c5bc7f5a304a4faeda20ae1",
     "packages": [
+        {
+            "name": "krokedil/shipping",
+            "version": "dev-develop-add-krokedil-carrier",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/krokedil/shipping.git",
+                "reference": "33fcf6e790c887d7cfbd3f4fcb60ca9ea4b03f60"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/krokedil/shipping/zipball/33fcf6e790c887d7cfbd3f4fcb60ca9ea4b03f60",
+                "reference": "33fcf6e790c887d7cfbd3f4fcb60ca9ea4b03f60",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~7.4 || ~8.0",
+                "psr/container": "2.0.x-dev"
+            },
+            "require-dev": {
+                "10up/wp_mock": "dev-trunk",
+                "clean/phpdoc-md": "dev-master",
+                "php-stubs/woocommerce-stubs": "dev-master",
+                "php-stubs/wordpress-stubs": "*",
+                "phpunit/phpunit": "^9.6",
+                "wp-coding-standards/wpcs": "dev-develop"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Krokedil\\Shipping\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Krokedil\\Shipping\\Tests\\": "tests/"
+                }
+            },
+            "archive": {
+                "exclude": [
+                    "tests/*",
+                    "docs/*",
+                    "phpunit.xml",
+                    "phpcs.xml",
+                    ".phpdoc-md",
+                    "composer-lock.json",
+                    ".gitignore",
+                    ".gitattributes"
+                ]
+            },
+            "scripts": {
+                "phpunit": [
+                    "./vendor/bin/phpunit --bootstrap tests/bootstrap.php"
+                ],
+                "createdocs": [
+                    "./vendor/bin/phpdoc-md"
+                ]
+            },
+            "description": "Shipping method extensions from Krokedil",
+            "support": {
+                "source": "https://github.com/krokedil/shipping/tree/develop-add-krokedil-carrier",
+                "issues": "https://github.com/krokedil/shipping/issues"
+            },
+            "time": "2025-11-10T14:47:50+00:00"
+        },
         {
             "name": "krokedil/woocommerce",
             "version": "1.9.0",
@@ -52,12 +116,68 @@
                 "issues": "https://github.com/krokedil/woocommerce/issues"
             },
             "time": "2025-08-29T14:16:04+00:00"
+        },
+        {
+            "name": "psr/container",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/container.git",
+                "reference": "707984727bd5b2b670e59559d3ed2500240cf875"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/container/zipball/707984727bd5b2b670e59559d3ed2500240cf875",
+                "reference": "707984727bd5b2b670e59559d3ed2500240cf875",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Container\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common Container Interface (PHP FIG PSR-11)",
+            "homepage": "https://github.com/php-fig/container",
+            "keywords": [
+                "PSR-11",
+                "container",
+                "container-interface",
+                "container-interop",
+                "psr"
+            ],
+            "support": {
+                "issues": "https://github.com/php-fig/container/issues",
+                "source": "https://github.com/php-fig/container"
+            },
+            "time": "2023-09-22T11:11:30+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "krokedil/shipping": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
