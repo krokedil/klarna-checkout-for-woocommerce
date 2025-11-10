@@ -238,6 +238,9 @@ class KCO_AJAX extends WC_AJAX {
 			$klarna_order['shipping_address']['region'] = kco_convert_region( $region, $country );
 		}
 
+		// Maybe set the selected pickup point.
+		kco_maybe_set_selected_pickup_point( $klarna_order );
+
 		wp_send_json_success(
 			array(
 				'billing_address'  => $klarna_order['billing_address'],

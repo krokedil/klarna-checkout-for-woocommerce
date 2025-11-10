@@ -141,6 +141,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
+			// Maybe set the selected pickup point.
+			kco_maybe_set_selected_pickup_point( $klarna_order );
+
 			// Mapping of the Woo/Kustom address fields.
 			$address_fields_key = array(
 				'first_name' => 'given_name',
