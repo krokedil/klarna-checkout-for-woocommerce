@@ -35,6 +35,7 @@ function kco_create_or_update_order() {
 				return;
 			}
 			WC()->session->set( 'kco_wc_order_id', $klarna_order['order_id'] );
+			set_transient( "kustom_customer_id_{$klarna_order['order_id']}", WC()->session->get_customer_id(), WEEK_IN_SECONDS * 2 );
 			return $klarna_order;
 		}
 		return $klarna_order;
@@ -45,6 +46,7 @@ function kco_create_or_update_order() {
 			return;
 		}
 		WC()->session->set( 'kco_wc_order_id', $klarna_order['order_id'] );
+		set_transient( "kustom_customer_id_{$klarna_order['order_id']}", WC()->session->get_customer_id(), WEEK_IN_SECONDS * 2 );
 		return $klarna_order;
 	}
 }
