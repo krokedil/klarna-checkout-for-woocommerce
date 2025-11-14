@@ -1,0 +1,26 @@
+name: Deploy Plugin Dev Zip to InstaWP
+
+on:
+  # Uncomment the push on any commit below to test the action easily.
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+    inputs:
+        instawp_url:
+            required: false
+            type: string
+            default: ''
+            description: 'InstaWP site URL to deploy to (e.g. qliro-sandbox.krokedil.site). If URL does not exist, a new InstaWP site will be created.'
+
+jobs:
+  build:
+    uses: krokedil/krokedil-wp-ci/.github/workflows/deploy-plugin-dev-zip-instawp.yml@main
+    with:
+      instawp_url: ${{ inputs.instawp_url }}
+    secrets:
+      AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP: ${{ secrets.AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP }}
+      AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP: ${{ secrets.AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP }}
+      INSTAWP_API_TOKEN: ${{ secrets.INSTAWP_API_TOKEN }}
+      E2E_API_KEY: ${{ secrets.E2E_API_KEY }}
+      E2E_API_SECRET: ${{ secrets.E2E_API_SECRET }}
