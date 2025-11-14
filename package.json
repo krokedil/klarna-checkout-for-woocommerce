@@ -48,6 +48,7 @@
     "lint:css:fix": "wp-scripts lint-style --fix",
     "lint:js": "wp-scripts lint-js",
     "lint:js:fix": "wp-scripts lint-js --fix",
-    "build": "npx gulp CSS && npm run lint:js:fix && npx gulp JS && npx gulp makePOT && npx wp-scripts build"
+    "build": "npx gulp CSS && npm run lint:js:fix && npx gulp JS && npx gulp makePOT && npx wp-scripts build",
+    "build:prod": "composer install && composer install --no-dev"
   }
 }
