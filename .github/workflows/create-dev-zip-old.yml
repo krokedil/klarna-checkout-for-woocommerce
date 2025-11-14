@@ -1,0 +1,35 @@
+name: Create Dev Zip
+
+on:
+  workflow_dispatch:
+
+jobs:
+  plugin_meta:
+    uses: ./.github/workflows/reusable-get-plugin-meta.yml
+
+  build:
+    needs: plugin_meta
+    uses: ./.github/workflows/reusable-build-dev-zip.yml
+    with:
+      plugin_slug: ${{ needs.plugin_meta.outputs.plugin_slug }}
+      aws_upload: true
+    secrets:
+      AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP: ${{ secrets.AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP }}
+      AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP: ${{ secrets.AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP }}
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: [plugin_meta, build]
+    steps:
+      # Checkout needed to be able to execute the job summary script in the next step
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Add job summary
+        env:
+          ZIP_FILE_NAME: ${{ needs.build.outputs.zip_file_name }}
+          AWS_S3_PUBLIC_URL: ${{ needs.build.outputs.aws_s3_public_url }}
+          PLUGIN_META_JSON: ${{ needs.plugin_meta.outputs.plugin_meta_json }}
+        run: node .github/scripts/job-summary-create-dev-zip.js
