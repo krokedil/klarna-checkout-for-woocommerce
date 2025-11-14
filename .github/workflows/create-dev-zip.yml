@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_zip:
+  build:
     uses: krokedil/krokedil-wp-ci/.github/workflows/create-plugin-dev-zip.yml@main
     with:
       aws_upload: true
