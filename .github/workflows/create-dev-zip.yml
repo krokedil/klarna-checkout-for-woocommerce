@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    uses: krokedil/krokedil-wp-ci/.github/workflows/create-plugin-dev-zip.yml@main
+    uses: krokedil/krokedil-wp-ci/.github/workflows/create-plugin-dev-zip.yml@v1
     with:
       aws_upload: true
     secrets:
