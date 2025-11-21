@@ -1,5 +1,6 @@
 {
   "slug": "klarna-checkout-for-woocommerce",
+  "distribution-platform": "wordpress-org",
   "instawp": {
     "plugin_wc_blueprint_url": "https://raw.githubusercontent.com/krokedil/instawp-commands/refs/heads/main/assets/wc-blueprints/wc-blueprint-kco-default.json",
     "plugin_credentials_option_patches": [
