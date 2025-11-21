@@ -4,9 +4,13 @@ on:
     branches:
     - master
 jobs:
+  plugin_meta:
+    uses: krokedil/krokedil-wp-ci/.github/workflows/get-plugin-meta.yml@v1
+
   trunk:
     name: Push to trunk
     runs-on: ubuntu-latest
+    needs: plugin_meta
     steps:
     - uses: actions/checkout@master
     - name: WordPress.org plugin asset/readme update
@@ -14,4 +18,4 @@ jobs:
       env:
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-        SLUG: klarna-checkout-for-woocommerce
+        SLUG: ${{ needs.plugin_meta.outputs.plugin_slug }}

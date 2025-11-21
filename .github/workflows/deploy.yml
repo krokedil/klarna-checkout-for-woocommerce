@@ -5,7 +5,7 @@ on:
     - "*"
 jobs:
   plugin_meta:
-    uses: ./.github/workflows/reusable-get-plugin-meta.yml
+    uses: krokedil/krokedil-wp-ci/.github/workflows/get-plugin-meta.yml@v1
 
   tag:
     name: New tag
@@ -15,8 +15,8 @@ jobs:
     - uses: actions/checkout@master
 
     # Build plugin for production use
-    - name: Plugin production build steps (Composer dual install)
-      run: bash .github/scripts/prod-build-steps.sh
+    - name: Plugin production build steps
+      run: npm run build:prod
 
     # Install SVN ( Subversion )
     - name: Install SVN ( Subversion )
