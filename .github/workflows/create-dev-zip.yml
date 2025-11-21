@@ -2,9 +2,9 @@ name: Create Plugin Dev Zip
 
 on:
   # Uncomment the push on any commit below to test the action easily.
-  push:
-    branches:
-      - '**'
+  # push:
+  #   branches:
+  #     - '**'
   workflow_dispatch:
 
 jobs:
