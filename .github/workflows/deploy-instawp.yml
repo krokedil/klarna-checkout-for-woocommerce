@@ -7,11 +7,11 @@ on:
   #     - '**'
   workflow_dispatch:
     inputs:
-        instawp_url:
-            required: false
-            type: string
-            default: ''
-            description: 'InstaWP site URL to deploy to (e.g. qliro-sandbox.krokedil.site). If URL does not exist, a new InstaWP site will be created.'
+      instawp_url:
+        required: false
+        type: string
+        default: ''
+        description: 'InstaWP site URL to deploy to (e.g. qliro-sandbox.krokedil.site). If URL does not exist, a new InstaWP site will be created.'
 
 jobs:
   build:
