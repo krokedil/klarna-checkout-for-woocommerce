@@ -172,6 +172,9 @@ if ( ! class_exists( 'KCO' ) ) {
 				function () {
 					if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
 						\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+
+						// Declare compatibility with cart and checkout blocks. See https://developer.woocommerce.com/2023/11/06/faq-extending-cart-and-checkout-blocks.
+						\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, true );
 					}
 				}
 			);
