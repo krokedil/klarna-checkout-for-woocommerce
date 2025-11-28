@@ -239,7 +239,20 @@ class KCO_Request_Cart {
 
 				// Product type.
 				if ( $product->is_downloadable() || $product->is_virtual() ) {
-					$klarna_item['type'] = 'digital';
+					// If bundle, check bundled items for physical products before assigning digital type.
+					if ( is_a( $product, 'WC_Product_Bundle' ) ) {
+						$bundled_items       = $product->get_bundled_items();
+						$non_downloadable    = array_filter(
+							$bundled_items,
+							function ( $bundled_item ) {
+								$bundled_product = $bundled_item->get_product();
+								return $bundled_product && ! ( $bundled_product->is_downloadable() || $bundled_product->is_virtual() );
+							}
+						);
+						$klarna_item['type'] = empty( $non_downloadable ) ? 'digital' : 'physical';
+					} else {
+						$klarna_item['type'] = 'digital';
+					}
 				} else {
 					$klarna_item['type'] = 'physical';
 				}
