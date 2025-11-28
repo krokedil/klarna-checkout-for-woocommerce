@@ -273,9 +273,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE, DK, AT or NL, disable KCO.
-			if ( is_checkout() && class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
+			if ( is_checkout() && KCO_Subscription::cart_has_subscription() ) {
 				$available_recurring_countries = apply_filters(
-					//This filter allows you to add or remove countries from the list of countries eligible for subscription purchases.
+					// This filter allows you to add or remove countries from the list of countries eligible for subscription purchases.
 					'kco_wc_available_recurring_countries',
 					array( 'SE', 'NO', 'FI', 'DK', 'DE', 'AT', 'NL' )
 				);
