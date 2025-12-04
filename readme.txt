@@ -3,11 +3,11 @@ Contributors: kustom, krokedil, automattic
 Tags: woocommerce, ecommerce, e-commerce, checkout, klarna
 Donate link: https://kustom.co
 Requires at least: 5.0
-Tested up to: 6.8.3
+Tested up to: 6.9
 Requires PHP: 7.4
 WC requires at least: 5.6.0
-WC tested up to: 10.3.4
-Stable tag: 2.16.1
+WC tested up to: 10.3.6
+Stable tag: 2.16.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -15,9 +15,9 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 *The leading checkout in the Nordics, built for higher conversion and returning shoppers. Easy to integrate, supports Klarna and all popular payment methods, and includes built-in shipping.*
 
-This all-in-one solution makes checkout effortless for you and your customers. Get access to all popular payment methods, including Klarna, and shipping integrations in a single setup. 
+This all-in-one solution makes checkout effortless for you and your customers. Get access to all popular payment methods, including Klarna, and shipping integrations in a single setup.
 
-It’s easy to integrate, requires minimal maintenance, and is fully customizable to your business needs. Kustom, formerly known as Klarna Checkout, became an independent company in 2024 to provide merchants with an even better checkout solution. 
+It’s easy to integrate, requires minimal maintenance, and is fully customizable to your business needs. Kustom, formerly known as Klarna Checkout, became an independent company in 2024 to provide merchants with an even better checkout solution.
 
 As a standalone solution, Kustom can quickly adapt to merchants’ needs and expand its range of payment methods, markets, and features – all to maximize conversion and create a seamless checkout experience. Kustom has 24,000 connected merchants with sales in over 170 countries.
 
@@ -50,6 +50,10 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.12.04    - version 2.16.2 =
+* Fix           - Fixed an issue that caused order emails to not be sent when placed through the WooCommerce block checkout.
+* Fix           - Fixed an issue that could happen if the thankyou page action for the gateway was triggered twice, causing the thankyou page iframe to render twice.
+
 = 2025.11.03    - version 2.16.1 =
 * Fix           - Fixed a fatal error that could occur when editing certain admin pages (e.g., Widgets) if the WooCommerce checkout block was enabled.
 * Fix           - Fixed an issue where "Kustom Checkout is not available" was shown when paying for guest orders with shipping enabled in the iframe on the Pay for order page.
