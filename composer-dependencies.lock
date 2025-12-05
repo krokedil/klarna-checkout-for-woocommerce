@@ -4,8 +4,53 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5536213c2cd4ccefad434060079eb310",
+    "content-hash": "1f7f66bc321d11b45c70caef328f3121",
     "packages": [
+        {
+            "name": "krokedil/settings-page",
+            "version": "dev-develop",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/krokedil/settings-page.git",
+                "reference": "e85fbd12e2f89a3c15f58e678ac06e6be1ae5e36"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/krokedil/settings-page/zipball/e85fbd12e2f89a3c15f58e678ac06e6be1ae5e36",
+                "reference": "e85fbd12e2f89a3c15f58e678ac06e6be1ae5e36",
+                "shasum": ""
+            },
+            "require-dev": {
+                "php-stubs/woocommerce-stubs": "dev-master",
+                "wp-coding-standards/wpcs": "dev-develop"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Krokedil\\SettingsPage\\": "src/"
+                }
+            },
+            "scripts": {
+                "makepot": [
+                    "wp --allow-root i18n make-pot ./src ./languages/krokedil-settings.pot --domain=krokedil-settings"
+                ]
+            },
+            "license": [
+                "GPL-V2"
+            ],
+            "authors": [
+                {
+                    "name": "Krokedil AB",
+                    "email": "info@krokedil.se"
+                }
+            ],
+            "description": "A package to help setup settings pages in WordPress and WooCommerce for Krokedil plugins to add the Addons and Support tabs",
+            "support": {
+                "source": "https://github.com/krokedil/settings-page/tree/develop",
+                "issues": "https://github.com/krokedil/settings-page/issues"
+            },
+            "time": "2025-10-29T07:29:01+00:00"
+        },
         {
             "name": "krokedil/woocommerce",
             "version": "1.9.0",
@@ -57,13 +102,15 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "krokedil/settings-page": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.4"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
         "php": "7.4"
     },
