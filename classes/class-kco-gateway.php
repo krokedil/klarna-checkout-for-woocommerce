@@ -8,6 +8,8 @@
 use Krokedil\KustomCheckout\CheckoutFlow\CheckoutFlow;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
+use KrokedilKlarnaCheckoutDeps\Krokedil\SettingsPage\SettingsPage;
+use KrokedilKlarnaCheckoutDeps\Krokedil\SettingsPage\Gateway;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -306,12 +308,25 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * Add sidebar to the settings page.
 		 */
 		public function admin_options() {
-			ob_start();
-			parent::admin_options();
-			$parent_options = ob_get_contents();
-			ob_end_clean();
+			$args = $this->get_settings_page_args();
+
+			if ( empty( $args ) ) {
+				ob_start();
+				parent::admin_options();
+				$parent_options = ob_get_contents();
+				ob_end_clean();
+				WC_Klarna_Banners::settings_sidebar( $parent_options );
+			} else {
+				$args['icon']            = KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_black.png';
+				$gateway_page            = new Gateway( $this, $args );
+				$args['general_content'] = array( $gateway_page, 'output' );
+				$settings_page           = ( SettingsPage::get_instance() )
+				->set_plugin_name( 'Kustom Checkout for WooCommerce' )
+				->register_page( $this->id, $args, $this )
+				->output( $this->id );
+			}
+
 			KCO_Settings_Saved::maybe_show_errors();
-			WC_Klarna_Banners::settings_sidebar( $parent_options );
 		}
 
 		/**
@@ -758,6 +773,41 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			return true;
+		}
+
+		/**
+		 * Read the settings page arguments from remote or local storage.
+		 * If the args are stored locally, they are fetched from the transient cache.
+		 * If they are not available locally, they are fetched from the remote source and stored in the transient cache.
+		 * If the remote source is not available, the function returns null, and default settings page will be used instead.
+		 *
+		 * @return array|null
+		 */
+		private function get_settings_page_args() {
+			$args = false; // get_transient( 'kustom_checkout_settings_page_config' );
+			if ( ! $args ) {
+				$args = wp_remote_get( 'https://krokedil-settings-page-configs.s3.eu-north-1.amazonaws.com/develop/configs/kustom-checkout-for-woocommerce.json' );
+
+				if ( is_wp_error( $args ) ) {
+					KP_Logger::log( 'Failed to fetch Kustom Checkout settings page config from remote source.' );
+					return null;
+				}
+
+				$args = wp_remote_retrieve_body( $args );
+				set_transient( 'kustom_checkout_settings_page_config', $args, 60 * 60 * 24 ); // 24 hours lifetime.
+			}
+
+			return json_decode( $args, true );
+		}
+
+		/**
+		 * Callable function for the general content for the settings page.
+		 *
+		 * @return void
+		 */
+		public function settings_page_content() {
+			KP_Settings_Page::header_html();
+			echo $this->generate_settings_html( $this->get_form_fields(), false ); // phpcs:ignore
 		}
 	}
 }
