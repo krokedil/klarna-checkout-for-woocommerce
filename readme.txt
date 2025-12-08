@@ -53,7 +53,6 @@ For help setting up and configuring Kustom Checkout for WooCommerce please refer
 = 2025.12.08    - version 2.16.3 =
 * Enhancement   - Added 'kco_wc_available_recurring_countries' filter for limiting subscription support to certain countries.
 * Tweak         - Declare compatibility with cart and checkout blocks.
-* Tweak         - Removed the previous requirement for an explicit filter for zero‑total carts. Carts containing subscriptions are now supported even if the total amount is zero, which also resolves the issue of the checkout reloading when Kustom is the only available gateway.
 * Fix           - Fixed an issue where certain subscription products were incorrectly treated as regular products.
 
 = 2025.12.04    - version 2.16.2 =
