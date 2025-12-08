@@ -7,7 +7,7 @@ Tested up to: 6.9
 Requires PHP: 7.4
 WC requires at least: 5.6.0
 WC tested up to: 10.3.6
-Stable tag: 2.16.2
+Stable tag: 2.16.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,12 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2025.12.08    - version 2.16.3 =
+* Enhancement   - Added 'kco_wc_available_recurring_countries' filter for limiting subscription support to certain countries.
+* Tweak         - Declare compatibility with cart and checkout blocks.
+* Tweak         - Removed the previous requirement for an explicit filter for zero‑total carts. Carts containing subscriptions are now supported even if the total amount is zero, which also resolves the issue of the checkout reloading when Kustom is the only available gateway.
+* Fix           - Fixed an issue where certain subscription products were incorrectly treated as regular products.
+
 = 2025.12.04    - version 2.16.2 =
 * Fix           - Fixed an issue that caused order emails to not be sent when placed through the WooCommerce block checkout.
 * Fix           - Fixed an issue that could happen if the thankyou page action for the gateway was triggered twice, causing the thankyou page iframe to render twice.

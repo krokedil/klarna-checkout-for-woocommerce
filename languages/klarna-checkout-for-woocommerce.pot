@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2025-11-03 09:42+0000\n"
+"POT-Creation-Date: 2025-12-08 01:04+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -21,15 +21,15 @@ msgstr ""
 msgid "Nope"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:190
+#: ../klarna-checkout-for-woocommerce.php:193
 msgid "Settings"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:191
+#: ../klarna-checkout-for-woocommerce.php:194
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:407, ../klarna-checkout-for-woocommerce.php:417
+#: ../klarna-checkout-for-woocommerce.php:410, ../klarna-checkout-for-woocommerce.php:420
 msgid "Your installation of Kustom Checkout for WooCommerce is not complete. If you installed this plugin directly from Github please refer to the README.DEV.md file in the plugin."
 msgstr ""
 
@@ -494,27 +494,27 @@ msgstr ""
 msgid "Shipping %s does not match Kustom order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:390
+#: ../classes/class-kco-gateway.php:394
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:393
+#: ../classes/class-kco-gateway.php:397
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:568
+#: ../classes/class-kco-gateway.php:577
 msgid "Order address should not be changed and any changes you make will not be reflected in Kustom system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:627
+#: ../classes/class-kco-gateway.php:636
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:649, ../classes/class-kco-gateway.php:671
+#: ../classes/class-kco-gateway.php:658, ../classes/class-kco-gateway.php:680
 msgid "Reference:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:752
+#: ../classes/class-kco-gateway.php:761
 msgid "Kustom did not accept the new order amount, the order has not been updated"
 msgstr ""
 
@@ -522,36 +522,36 @@ msgstr ""
 msgid "Kustom Checkout for WooCommerce"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:274
+#: ../classes/class-kco-subscription.php:280
 msgid "Recurring token was missing from the Kustom order during the checkout process. Please contact Kustom for help."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:250
+#: ../classes/class-kco-subscription.php:256
 msgid "Recurring token for subscription: %s"
 msgstr ""
 
 #. translators: Error message.
-#: ../classes/class-kco-subscription.php:355
+#: ../classes/class-kco-subscription.php:361
 msgid "Subscription payment failed with Klarna. Message: %1$s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:348
+#: ../classes/class-kco-subscription.php:354
 msgid "Subscription payment made with Kustom. Kustom order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:413
+#: ../classes/class-kco-subscription.php:419
 msgid "Kustom recurring token"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:468
+#: ../classes/class-kco-subscription.php:474
 msgid "Could not retrieve new Kustom recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:462
+#: ../classes/class-kco-subscription.php:468
 msgid "Payment method changed via Kustom Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:489
+#: ../classes/class-kco-subscription.php:495
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -658,6 +658,10 @@ msgstr ""
 
 #: ../src/CheckoutFlow/CheckoutFlow.php:220
 msgid "There was an error processing your payment. Please try again."
+msgstr ""
+
+#: ../src/CheckoutFlow/EmbeddedBlockFlow.php:27
+msgid "Kustom order placed, waiting for confirmation"
 msgstr ""
 
 #: ../src/CheckoutFlow/RedirectFlow.php:44
