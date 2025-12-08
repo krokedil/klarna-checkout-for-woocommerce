@@ -5,7 +5,7 @@
  * Description: Kustom Checkout payment gateway for WooCommerce.
  * Author: Kustom
  * Author URI: https://klarna.com/
- * Version: 2.16.2
+ * Version: 2.16.3
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.16.2' );
+define( 'KCO_WC_VERSION', '2.16.3' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -172,6 +172,9 @@ if ( ! class_exists( 'KCO' ) ) {
 				function () {
 					if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
 						\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+
+						// Declare compatibility with cart and checkout blocks. See https://developer.woocommerce.com/2023/11/06/faq-extending-cart-and-checkout-blocks.
+						\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, true );
 					}
 				}
 			);
