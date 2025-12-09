@@ -268,7 +268,6 @@ class KCO_Request_Cart {
 	public function process_shipping() {
 		$settings = get_option( 'woocommerce_kco_settings' );
 		if ( ! wc_string_to_bool( $settings['shipping_methods_in_iframe'] ?? 'no' ) ) {
-
 			if ( WC()->shipping->get_packages() && ! empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
 				$shipping            = array(
 					'type'             => 'shipping_fee',
@@ -609,7 +608,7 @@ class KCO_Request_Cart {
 	 * @return string $shipping_name Name for selected shipping method.
 	 */
 	public function get_shipping_name() {
-		$shipping_packages = WC()->shipping->get_packages();
+		$shipping_packages = $this->get_shipping_packages();
 		foreach ( $shipping_packages as $i => $package ) {
 			$chosen_method = isset( WC()->session->chosen_shipping_methods[ $i ] ) ? WC()->session->chosen_shipping_methods[ $i ] : '';
 			if ( '' !== $chosen_method ) {
@@ -637,7 +636,7 @@ class KCO_Request_Cart {
 	 * @return string $shipping_reference Reference for selected shipping method.
 	 */
 	public function get_shipping_reference() {
-		$shipping_packages = WC()->shipping->get_packages();
+		$shipping_packages = $this->get_shipping_packages();
 		foreach ( $shipping_packages as $i => $package ) {
 			$chosen_method = isset( WC()->session->chosen_shipping_methods[ $i ] ) ? WC()->session->chosen_shipping_methods[ $i ] : '';
 			if ( '' !== $chosen_method ) {
@@ -725,5 +724,36 @@ class KCO_Request_Cart {
 	 */
 	public static function format_number( $value ) {
 		return intval( round( round( $value, wc_get_price_decimals() ) * 100 ) );
+	}
+
+	/**
+	 * Get shipping packages excluding free trial items.
+	 *
+	 * @return array
+	 */
+	private function get_shipping_packages() {
+		$packages = WC()->shipping->get_packages();
+		foreach ( $packages as $index => $package ) {
+			// Remove shipping package for free trials. See WC_Subscriptions_Cart::set_cart_shipping_packages().
+			foreach ( $package['contents'] as $cart_item_key => $cart_item ) {
+				if ( class_exists( 'WC_Subscriptions_Product' ) && \WC_Subscriptions_Product::get_trial_length( $cart_item['data'] ) > 0 ) {
+					unset( $packages[ $index ]['contents'][ $cart_item_key ] );
+				}
+			}
+
+			if ( empty( $packages[ $index ]['contents'] ) ) {
+				unset( $packages[ $index ] );
+			}
+
+			// Skip shipping lines for free trials.
+			if ( class_exists( 'WC_Subscriptions_Cart' ) && \WC_Subscriptions_Cart::cart_contains_subscription() ) {
+				$pattern = '/_after_a_\d+_\w+_trial/';
+				if ( preg_match( $pattern, $index ) ) {
+					unset( $packages[ $index ] );
+				}
+			}
+		}
+
+		return $packages;
 	}
 }
