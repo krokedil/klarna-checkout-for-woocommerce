@@ -24,8 +24,29 @@ class KCO_Request_Shipping_Options {
 			return array();
 		}
 
+		$packages = WC()->shipping->get_packages();
+		foreach ( $packages as $index => $package ) {
+			// Remove shipping package for free trials. See WC_Subscriptions_Cart::set_cart_shipping_packages().
+			foreach ( $package['contents'] as $cart_item_key => $cart_item ) {
+				if ( class_exists( 'WC_Subscriptions_Product' ) && \WC_Subscriptions_Product::get_trial_length( $cart_item['data'] ) > 0 ) {
+					unset( $packages[ $index ]['contents'][ $cart_item_key ] );
+				}
+			}
+
+			if ( empty( $packages[ $index ]['contents'] ) ) {
+				unset( $packages[ $index ] );
+			}
+
+			// Skip shipping lines for free trials.
+			if ( class_exists( 'WC_Subscriptions_Cart' ) && \WC_Subscriptions_Cart::cart_contains_subscription() ) {
+				$pattern = '/_after_a_\d+_\w+_trial/';
+				if ( preg_match( $pattern, $index ) ) {
+					unset( $packages[ $index ] );
+				}
+			}
+		}
+
 		$shipping_options = array();
-		$packages         = WC()->shipping->get_packages();
 		foreach ( $packages as $i => $package ) {
 			$chosen_method = isset( WC()->session->chosen_shipping_methods[ $i ] ) ? WC()->session->chosen_shipping_methods[ $i ] : '';
 			foreach ( $package['rates'] as $method ) {
