@@ -267,7 +267,8 @@ class KCO_Request_Cart {
 	 */
 	public function process_shipping() {
 		$settings = get_option( 'woocommerce_kco_settings' );
-		if ( ! isset( $settings['shipping_methods_in_iframe'] ) || 'no' === $settings['shipping_methods_in_iframe'] ) {
+		if ( ! wc_string_to_bool( $settings['shipping_methods_in_iframe'] ?? 'no' ) ) {
+
 			if ( WC()->shipping->get_packages() && ! empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
 				$shipping            = array(
 					'type'             => 'shipping_fee',
