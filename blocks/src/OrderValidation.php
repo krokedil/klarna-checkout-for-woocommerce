@@ -348,7 +348,7 @@ class OrderValidation {
 		// Submit the order to the store api.
 		$response = wp_remote_post( $request_url, $request_args );
 		if ( is_wp_error( $response ) ) {
-			$log = \KCO_Logger::format_log($klarna_id, 'POST', '[Blocks] - Submit WC Order', $request_args, array( 'error' => $response->get_error_message() ), $response->get_error_code(), $request_url );
+			$log = \KCO_Logger::format_log( $klarna_id, 'POST', '[Blocks] - Submit WC Order', $request_args, array( 'error' => $response->get_error_message() ), $response->get_error_code(), $request_url );
 			\KCO_Logger::log( $log );
 			throw new Exception( 'Could not submit the order to WooCommerce.' );
 		}
@@ -358,19 +358,19 @@ class OrderValidation {
 		// Check if the response is not a 2xx.
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( 200 > $response_code || 300 <= $response_code ) {
-			$log = \KCO_Logger::format_log($klarna_id, 'POST', '[Blocks] - Submit WC Order', $request_args, $order_response, $response_code, $request_url );
+			$log = \KCO_Logger::format_log( $klarna_id, 'POST', '[Blocks] - Submit WC Order', $request_args, $order_response, $response_code, $request_url );
 			\KCO_Logger::log( $log );
 			throw new Exception( 'Could not submit the order to WooCommerce.' );
 		}
 
-		$updated_order  = wc_get_order( $order_response['order_id'] ?? null );
+		$updated_order = wc_get_order( $order_response['order_id'] ?? null );
 
 		if ( ! $updated_order ) {
 			\KCO_Logger::log( "[Blocks] - Could not find the WooCommerce order for Klarna order $klarna_id." );
 			throw new Exception( 'Could not find the WooCommerce order.' );
 		}
 
-		$log = \KCO_Logger::format_log($klarna_id, 'POST', '[Blocks] - Submit WC Order', $request_args, $order_response, $response_code, $request_url );
+		$log = \KCO_Logger::format_log( $klarna_id, 'POST', '[Blocks] - Submit WC Order', $request_args, $order_response, $response_code, $request_url );
 		\KCO_Logger::log( $log );
 
 		return $updated_order;
