@@ -1,4 +1,4 @@
-# Copyright (C) 2025 klarna-checkout-for-woocommerce
+# Copyright (C) 2026 klarna-checkout-for-woocommerce
 # This file is distributed under the same license as the klarna-checkout-for-woocommerce package.
 msgid ""
 msgstr ""
@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2025-12-08 01:04+0000\n"
+"POT-Creation-Date: 2026-01-08 22:26+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
