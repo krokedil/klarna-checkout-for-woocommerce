@@ -537,6 +537,11 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @param int $order_id WooCommerce order ID.
 		 */
 		public function show_thank_you_snippet( $order_id = null ) {
+			// If the action has already been run, don't try to print the snippet again.
+			if ( did_action( 'woocommerce_thankyou_kco' ) > 1 ) {
+				return;
+			}
+
 			if ( $order_id ) {
 				$order           = wc_get_order( $order_id );
 				$upsell_uuids    = $order->get_meta( '_ppu_upsell_ids', true );
