@@ -75,7 +75,7 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 				'headers'    => array(
 					'Authorization'  => 'Basic ' . base64_encode( $username . ':' . $password ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Base64 used to calculate auth header.
 					'Content-Type'   => 'application/json',
-					'kustom-partner' => 'KUSTOM_WC_PARTNER_ID',
+					'kustom-partner' => 'PG000651',
 				),
 				'user-agent' => $this->get_user_agent(),
 				'method'     => 'POST',

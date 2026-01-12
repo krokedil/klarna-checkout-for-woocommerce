@@ -321,10 +321,9 @@ class OrderValidation {
 			'method'  => 'POST',
 			'timeout' => 30,
 			'headers' => array(
-				'Content-Type'   => 'application/json',
-				'CartToken'      => sanitize_text_field( wp_unslash( $wc_cart_token ) ),
-				'Nonce'          => $wc_nonce,
-				'kustom-partner' => 'KUSTOM_WC_PARTNER_ID',
+				'Content-Type' => 'application/json',
+				'CartToken'    => sanitize_text_field( wp_unslash( $wc_cart_token ) ),
+				'Nonce'        => $wc_nonce,
 			),
 			'body'    => wp_json_encode( $body ),
 		);

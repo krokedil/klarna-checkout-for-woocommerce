@@ -73,7 +73,7 @@ class KCO_Request {
 			return array(
 				'Authorization'  => 'Basic ' . base64_encode( $this->get_merchant_id() . ':' . $this->get_shared_secret() ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Base64 used to calculate auth header.
 				'Content-Type'   => 'application/json',
-				'kustom-partner' => 'KUSTOM_WC_PARTNER_ID',
+				'kustom-partner' => 'PG000651',
 			);
 	}
 
