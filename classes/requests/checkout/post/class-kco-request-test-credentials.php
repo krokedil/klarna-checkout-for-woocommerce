@@ -71,16 +71,17 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	 * @return array
 	 */
 	protected function get_request_args( $username, $password ) {
-		return array(
-			'headers'    => array(
-				'Authorization' => 'Basic ' . base64_encode( $username . ':' . $password ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Base64 used to calculate auth header.
-				'Content-Type'  => 'application/json',
-			),
-			'user-agent' => $this->get_user_agent(),
-			'method'     => 'POST',
-			'body'       => wp_json_encode( $this->get_body() ),
-			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
-		);
+			return array(
+				'headers'    => array(
+					'Authorization'  => 'Basic ' . base64_encode( $username . ':' . $password ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Base64 used to calculate auth header.
+					'Content-Type'   => 'application/json',
+					'kustom-partner' => 'PG000651',
+				),
+				'user-agent' => $this->get_user_agent(),
+				'method'     => 'POST',
+				'body'       => wp_json_encode( $this->get_body() ),
+				'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
+			);
 	}
 
 	/**
@@ -94,7 +95,7 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	public function get_test_endpoint( $testmode, $endpoint, $username, $password ) {
 		$country_string = 'US' === $endpoint ? '-na' : '';
 		$test_string    = $testmode ? '.playground' : '';
-		$domain         = KCO_Request::get_api_domain( $password, $username );
+		$domain         = 'kustom.co';
 
 		return "https://api{$country_string}{$test_string}.{$domain}/";
 	}

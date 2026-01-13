@@ -94,24 +94,6 @@ class KCO_Fields {
 				'default'  => 'two_column_right',
 				'desc_tip' => false,
 			),
-			'api_domain'                 => array(
-				'title'       => __( 'API Endpoint', 'klarna-checkout-for-woocommerce' ),
-				'type'        => 'select',
-				'description' => __( 'Select the API endpoint to use for Kustom Checkout. For stores that have created their API credentials through the Kustom portal, the API endpoint needs to be set to kustom.co instead of klarna.com. If you use the default option, the plugin will attempt to determine this automatically. But you can force the endpoint by using this setting if this is incorrect.', 'klarna-checkout-for-woocommerce' ),
-				'default'     => '',
-				'options'     => array(
-					__( 'Recommended', 'klarna-checkout-for-woocommerce' ) => array(
-						'' => __( 'Use plugin logic (default)', 'klarna-checkout-for-woocommerce' ),
-					),
-					__( 'Force specific endpoint', 'klarna-checkout-for-woocommerce' ) => array(
-						'klarna.com' => __( 'Force klarna.com endpoint', 'klarna-checkout-for-woocommerce' ),
-						'kustom.co'  => __( 'Force kustom.co endpoint', 'klarna-checkout-for-woocommerce' ),
-					),
-				),
-			),
-			'general_end'                => array(
-				'type' => 'krokedil_section_end',
-			),
 			// EU.
 			'credentials_eu'             => array(
 				'title' => 'API Credentials Europe',
