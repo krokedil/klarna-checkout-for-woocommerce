@@ -277,7 +277,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE, DK, AT or NL, disable KCO.
 			if ( is_checkout() && KCO_Subscription::cart_has_subscription() ) {
 				$available_recurring_countries = apply_filters(
-					// This filter allows you to add or remove countries from the list of countries eligible for subscription purchases.
+				// This filter allows you to add or remove countries from the list of countries eligible for subscription purchases.
 					'kco_wc_available_recurring_countries',
 					array( 'SE', 'NO', 'FI', 'DK', 'DE', 'AT', 'NL' )
 				);
@@ -648,9 +648,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					?>
 					<p>
 						<strong>
-							<?php esc_html_e( 'Organisation number:', 'klarna-checkout-for-woocommerce' ); ?>
+						<?php esc_html_e( 'Organisation number:', 'klarna-checkout-for-woocommerce' ); ?>
 						</strong>
-						<?php echo esc_html( $org_nr ); ?>
+					<?php echo esc_html( $org_nr ); ?>
 					</p>
 					<?php
 				}
@@ -670,9 +670,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					?>
 					<p>
 						<strong>
-							<?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?>
+						<?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?>
 						</strong>
-						<?php echo esc_html( $reference ); ?>
+					<?php echo esc_html( $reference ); ?>
 					</p>
 					<?php
 				}
@@ -692,9 +692,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					?>
 					<p>
 						<strong>
-							<?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?>
+						<?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?>
 						</strong>
-						<?php echo esc_html( $reference ); ?>
+					<?php echo esc_html( $reference ); ?>
 					</p>
 					<?php
 				}
@@ -813,6 +813,53 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function settings_page_content() {
 			KP_Settings_Page::header_html();
 			echo $this->generate_settings_html( $this->get_form_fields(), false ); // phpcs:ignore
+		}
+
+		/**
+		 * Get the full list of form fields, with custom section start and end types.
+		 *
+		 * @return array
+		 */
+		public function get_form_fields() {
+			$form_fields        = $this->form_fields;
+			$parsed_form_fields = array();
+
+			$has_section_end = true;
+			$previous_key    = 'none';
+
+			foreach ( $form_fields as $key => $value ) {
+				$type = isset( $value['type'] ) ? $value['type'] : '';
+				// Replace any title types with the custom type krokedil_section_start.
+				if ( 'title' === $type || 'krokedil_section_start' === $type ) {
+					// If we don't have a section end when we find a new title, add one before it.
+					if ( ! $has_section_end ) {
+						$parsed_form_fields[ 'section_end_' . $previous_key ] = array(
+							'type' => 'krokedil_section_end',
+						);
+					}
+
+					$value['type']   = 'krokedil_section_start';
+					$value['id']     = $key;
+					$has_section_end = false;
+					$previous_key    = $key;
+				} elseif ( 'sectionend' === $type ) { // Replace any sectionend types with the custom type krokedil_section_end.
+					$has_section_end = true;
+					$value['type']   = 'krokedil_section_end';
+				} elseif ( 'krokedil_section_end' === $type ) {
+					$has_section_end = true;
+				}
+
+				$parsed_form_fields[ $key ] = $value;
+			}
+
+			// If we don't have a section end at the end of the form, add one.
+			if ( ! $has_section_end ) {
+				$parsed_form_fields['section_end_final'] = array(
+					'type' => 'krokedil_section_end',
+				);
+			}
+
+			return $parsed_form_fields;
 		}
 	}
 }
