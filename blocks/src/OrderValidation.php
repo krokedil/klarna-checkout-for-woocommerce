@@ -40,7 +40,12 @@ class OrderValidation {
 
 		// Set the klarna order id in the order meta data.
 		$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
-		$order->save_meta_data();
+
+		// Set the customers billing email from the klarna order.
+		$order->set_billing_email( $klarna_order['billing_address']['email'] ?? '' );
+
+		$order->save();
+
 		self::validate_wc_order( $order );
 
 		// Attempt to submit the order to WooCommerce using the store api.
@@ -232,11 +237,11 @@ class OrderValidation {
 		$settings                = get_option( 'woocommerce_kco_settings', array() );
 		$klarna_billing_address  = $klarna_order['billing_address'] ?? array();
 		$klarna_shipping_address = $klarna_order['shipping_address'] ?? array();
-
-		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-		$wc_cart_token        = $klarna_merchant_data['wc_cart_token'] ?? '';
-		$wc_nonce             = $klarna_merchant_data['wc_nonce'] ?? '';
-		$wp_logged_in_cookie  = $klarna_merchant_data['wp_logged_in_cookie'] ?? null;
+		$klarna_id               = $klarna_order['order_id'];
+		$klarna_merchant_data    = json_decode( $klarna_order['merchant_data'], true ) ?? array();
+		$wc_cart_token           = $klarna_merchant_data['wc_cart_token'] ?? '';
+		$wc_nonce                = $klarna_merchant_data['wc_nonce'] ?? '';
+		$wp_logged_in_cookie     = $klarna_merchant_data['wp_logged_in_cookie'] ?? null;
 
 		$request_url = rest_url( 'wc/store/v1/checkout/' . $order->get_id() );
 
@@ -251,7 +256,7 @@ class OrderValidation {
 				),
 				array(
 					'key'   => '_wc_klarna_order_id',
-					'value' => $klarna_order['order_id'],
+					'value' => $klarna_id,
 				),
 				array(
 					'key'   => '_wc_klarna_environment',
@@ -277,7 +282,7 @@ class OrderValidation {
 				'city'       => $klarna_billing_address['city'] ?? '',
 				'state'      => $klarna_billing_address['region'] ?? '',
 				'postcode'   => $klarna_billing_address['postal_code'] ?? '',
-				'country'    => $klarna_billing_address['country'] ?? '',
+				'country'    => strtoupper( $klarna_billing_address['country'] ?? '' ),
 				'email'      => $klarna_billing_address['email'] ?? '',
 				'phone'      => $klarna_billing_address['phone'] ?? '',
 			),
@@ -288,7 +293,7 @@ class OrderValidation {
 				'city'       => $klarna_shipping_address['city'] ?? '',
 				'state'      => $klarna_shipping_address['region'] ?? '',
 				'postcode'   => $klarna_shipping_address['postal_code'] ?? '',
-				'country'    => $klarna_shipping_address['country'] ?? '',
+				'country'    => strtoupper( $klarna_shipping_address['country'] ?? '' ),
 			),
 		);
 
@@ -316,13 +321,14 @@ class OrderValidation {
 				'value' => $klarna_order['recurring_token'],
 			);
 		}
+
 		// Set the request args.
 		$request_args = array(
 			'method'  => 'POST',
 			'timeout' => 30,
 			'headers' => array(
 				'Content-Type' => 'application/json',
-				'CartToken'    => sanitize_text_field( wp_unslash( $wc_cart_token ) ),
+				'Cart-Token'   => sanitize_text_field( wp_unslash( $wc_cart_token ) ),
 				'Nonce'        => $wc_nonce,
 			),
 			'body'    => wp_json_encode( $body ),
@@ -342,21 +348,30 @@ class OrderValidation {
 		// Submit the order to the store api.
 		$response = wp_remote_post( $request_url, $request_args );
 		if ( is_wp_error( $response ) ) {
-			throw new Exception( 'Could not submit the order to WooCommerce.' );
-		}
-
-		// Check if the response is not a 2xx.
-		$response_code = wp_remote_retrieve_response_code( $response );
-		if ( 200 > $response_code || 300 <= $response_code ) {
+			$log = \KCO_Logger::format_log( $klarna_id, 'POST', '[Blocks] - Submit WC Order', $request_args, array( 'error' => $response->get_error_message() ), $response->get_error_code(), $request_url );
+			\KCO_Logger::log( $log );
 			throw new Exception( 'Could not submit the order to WooCommerce.' );
 		}
 
 		$order_response = json_decode( wp_remote_retrieve_body( $response ), true );
-		$updated_order  = wc_get_order( $order_response['order_id'] ?? null );
+
+		// Check if the response is not a 2xx.
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( 200 > $response_code || 300 <= $response_code ) {
+			$log = \KCO_Logger::format_log( $klarna_id, 'POST', '[Blocks] - Submit WC Order', $request_args, $order_response, $response_code, $request_url );
+			\KCO_Logger::log( $log );
+			throw new Exception( 'Could not submit the order to WooCommerce.' );
+		}
+
+		$updated_order = wc_get_order( $order_response['order_id'] ?? null );
 
 		if ( ! $updated_order ) {
+			\KCO_Logger::log( "[Blocks] - Could not find the WooCommerce order for Klarna order $klarna_id." );
 			throw new Exception( 'Could not find the WooCommerce order.' );
 		}
+
+		$log = \KCO_Logger::format_log( $klarna_id, 'POST', '[Blocks] - Submit WC Order', $request_args, $order_response, $response_code, $request_url );
+		\KCO_Logger::log( $log );
 
 		return $updated_order;
 	}
