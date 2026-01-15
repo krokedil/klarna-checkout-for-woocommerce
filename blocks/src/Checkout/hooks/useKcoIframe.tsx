@@ -172,6 +172,36 @@ export const useKcoIframe = (
 		[suspendKCO, resumeKCO]
 	);
 
+	/**
+	 * Handle changes to the shipping option in the Kustom Checkout iframe.
+	 * Sends a request to update the shipping option in the WooCommerce cart,
+	 * using the extensionCartUpdate function.
+	 *
+	 * @param {any} option - The selected shipping option.
+	 * @return {Promise<void>}
+	 */
+	const onLoad = useCallback(
+		async (option: any): Promise<void> => {
+			suspendKCO();
+
+			const response = extensionCartUpdate({
+				namespace: 'kco-block',
+				data: {
+					action: 'load',
+					...option,
+				},
+			})
+				.then((_response: any) => {})
+				.catch((_error: any) => {})
+				.finally(() => {
+					resumeKCO();
+				});
+
+			return response;
+		},
+		[suspendKCO, resumeKCO]
+	);
+
 	useEffect(() => {
 		const { htmlContentText, scriptContentText } =
 			getHtmlAndScriptContent();
@@ -198,7 +228,7 @@ export const useKcoIframe = (
 				 * @param {any} _data - The data passed by the Kustom Checkout iframe.
 				 * @return {void}
 				 */
-				load: (_data: any) => {},
+				load: onLoad,
 				/**
 				 * This event is triggered when the shipping address is changed in the Kustom Checkout iframe.
 				 * It updates the shipping address in the WooCommerce cart.
@@ -231,7 +261,7 @@ export const useKcoIframe = (
 				/* eslint-enable jsdoc/require-jsdoc */
 			});
 		});
-	}, [onShippingAddressChanged, onShippingOptionChanged]);
+	}, [onShippingAddressChanged, onShippingOptionChanged, onLoad]);
 
 	useEffect(() => {
 		// Only show the iframe if the Kustom Checkout is active, we have the content and it was not active before.

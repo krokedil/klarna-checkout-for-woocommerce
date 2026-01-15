@@ -102,6 +102,9 @@ class BlockExtension {
 			case 'shipping_option_changed':
 				kco_update_wc_shipping( $data );
 				break;
+			case 'load':
+				// No action needed here for now. We just want to trigger an update of the WooCommerce cart.
+				break;
 			default:
 				break;
 		}
