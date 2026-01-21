@@ -51,8 +51,19 @@ class BlockExtension {
 			return;
 		}
 
-		add_action( 'woocommerce_blocks_loaded', array( $this, 'register_callbacks' ) );
-		add_action( 'woocommerce_blocks_loaded', array( $this, 'register_method' ) );
+		if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+			if ( file_exists( __DIR__ . '/Checkout/CheckoutBlock.php' ) ) {
+				require_once __DIR__ . '/Checkout/CheckoutBlock.php';
+				add_action(
+					'woocommerce_blocks_payment_method_type_registration',
+					function ( $payment_method_registry ) {
+						$payment_method_registry->register( new CheckoutBlock() );
+					}
+				);
+			}
+		}
+
+		$this->register_callbacks();
 
 		// Load dependencies for the checkout block.
 		$this->overrides    = new Overrides();
@@ -107,27 +118,6 @@ class BlockExtension {
 				break;
 			default:
 				break;
-		}
-	}
-
-	/**
-	 * Register the payment method with the instance of the class.
-	 *
-	 * @return void
-	 */
-	public function register_method() {
-		if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
-			if ( ! file_exists( __DIR__ . '/Checkout/CheckoutBlock.php' ) ) {
-				return;
-			}
-
-			require_once __DIR__ . '/Checkout/CheckoutBlock.php';
-			add_action(
-				'woocommerce_blocks_payment_method_type_registration',
-				function ( $payment_method_registry ) {
-					$payment_method_registry->register( new CheckoutBlock() );
-				}
-			);
 		}
 	}
 
