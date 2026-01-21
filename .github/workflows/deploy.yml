@@ -2,30 +2,32 @@ name: Deploy to WordPress.org
 on:
   push:
     tags:
-    - "*"
+      - "*"
 jobs:
+  plugin_meta:
+    uses: krokedil/krokedil-wp-ci/.github/workflows/get-plugin-meta.yml@v1
+
   tag:
     name: New tag
     runs-on: ubuntu-latest
+    needs: plugin_meta
     steps:
-    - uses: actions/checkout@master
+      - uses: actions/checkout@master
 
-    # Build the plugin with dev dependencies to scope the dependency packages.
-    - name: Composer Install (Dev)
-      run: composer install
+      # Build plugin for production use
+      - name: Plugin production build steps
+        run: npm run build:prod
 
-    # Build the plugin for release.
-    - name: Composer Install (Prod)
-      run: composer install --no-dev
+      # Install SVN ( Subversion )
+      - name: Install SVN ( Subversion )
+        run: |
+          sudo apt-get update
+          sudo apt-get install subversion
 
-    # Install SVN ( Subversion )
-    - name: Install SVN ( Subversion )
-      run: |
-        sudo apt-get update
-        sudo apt-get install subversion
-    - name: WordPress Plugin Deploy
-      uses: 10up/action-wordpress-plugin-deploy@master
-      env:
-        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-        SLUG: klarna-checkout-for-woocommerce
+      # Deploy to WordPress.org
+      - name: WordPress Plugin Deploy
+        uses: 10up/action-wordpress-plugin-deploy@master
+        env:
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SLUG: ${{ needs.plugin_meta.outputs.plugin_slug }}
