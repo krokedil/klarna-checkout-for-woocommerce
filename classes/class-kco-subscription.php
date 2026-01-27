@@ -381,7 +381,7 @@ class KCO_Subscription {
 		$env = $parent_order->get_meta( '_wc_klarna_environment' );
 		if ( empty( $env ) ) {
 			$settings = get_option( 'woocommerce_kco_settings', array() );
-			$env      = wc_string_to_bool( $settings['testmode'] ) ? 'test' : 'live';
+			$env      = wc_string_to_bool( $settings['testmode'] ?? 'yes' ) ? 'test' : 'live';
 		}
 		$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
 
