@@ -385,11 +385,14 @@ class KCO_Subscription {
 		}
 		$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
 
-		$kss_data      = $parent_order->get_meta( '_kco_kss_data' );
-		$kss_reference = $parent_order->get_meta( '_kco_kss_reference' );
+		$kss_data = $parent_order->get_meta( '_kco_kss_data' );
 		if ( ! empty( $kss_data ) ) {
 			$renewal_order->update_meta_data( '_kco_kss_data', $kss_data );
-			! empty( $kss_reference ) && $renewal_order->update_meta_data( '_kco_kss_reference', $kss_reference );
+		}
+
+		$kss_reference = $parent_order->get_meta( '_kco_kss_reference' );
+		if ( ! empty( $kss_reference ) ) {
+			$renewal_order->update_meta_data( '_kco_kss_reference', $kss_reference );
 		}
 
 		$renewal_order->save_meta_data();
