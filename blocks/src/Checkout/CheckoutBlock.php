@@ -127,7 +127,7 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 		$error = false;
 
 		$klarna_order = kco_create_or_update_order();
-		$snippet      = $klarna_order['snippet'] ?? false;
+		$snippet      = $klarna_order['html_snippet'] ?? false;
 
 		return array(
 			'title'            => $this->get_setting( 'title' ),
