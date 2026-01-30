@@ -123,17 +123,17 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 			);
 		}
 
-		// TODO: The $klarna_order will always return null if the request fails, not a WP_Error. We'll need to do some substantial code refactoring to have it return WP_Error. For now, we can only rely on what the logs say.
-		$error = false;
-
 		$klarna_order = kco_create_or_update_order();
 		$snippet      = $klarna_order['html_snippet'] ?? false;
+
+		// TODO: The $klarna_order will always return null if the request fails, not a WP_Error. We'll need to do some substantial code refactoring to have it return WP_Error. For now, we can only rely on what the logs say.
+		$error = ! $snippet;
 
 		return array(
 			'title'            => $this->get_setting( 'title' ),
 			'description'      => $this->get_setting( 'description' ),
 			// Since we do not have access to the actual error message, we'll just return a generic error message here..
-			'error'            => __( 'Something went wrong.', 'klarna-checkout-for-woocommerce' ),
+			'error'            => $error ? __( 'Something went wrong.', 'klarna-checkout-for-woocommerce' ) : false,
 			'snippet'          => $snippet,
 			'shippingInIframe' => 'yes' === $this->settings['shipping_methods_in_iframe'],
 			'countryCodes'     => kco_get_country_codes(),
