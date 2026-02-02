@@ -6,12 +6,19 @@ on:
   #   branches:
   #     - '**'
   workflow_dispatch:
+    inputs:
+      test_php_versions:
+        required: false
+        type: string
+        default: "8.3"
+        description: "PHP versions used for basic testing of the plugin dev zip: 8.4,8.3,8.2,8.1,8.0,7.4 (comma-separated) or 'all'."
 
 jobs:
   build:
-    uses: krokedil/krokedil-wp-ci/.github/workflows/create-plugin-dev-zip.yml@v1
+    uses: krokedil/krokedil-wp-ci/.github/workflows/deploy-plugin-dev-zip-instawp.yml@develop-tests
     with:
       aws_upload: true
+      test_php_versions: ${{ inputs.test_php_versions }}
     secrets:
       AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP: ${{ secrets.AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP }}
       AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP: ${{ secrets.AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP }}
