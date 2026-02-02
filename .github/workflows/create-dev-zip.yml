@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    uses: krokedil/krokedil-wp-ci/.github/workflows/deploy-plugin-dev-zip-instawp.yml@develop-tests
+    uses: krokedil/krokedil-wp-ci/.github/workflows/create-plugin-dev-zip.yml@develop-tests
     with:
       aws_upload: true
       test_php_versions: ${{ inputs.test_php_versions }}
