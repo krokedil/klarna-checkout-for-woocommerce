@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    uses: krokedil/krokedil-wp-ci/.github/workflows/deploy-plugin-dev-zip-instawp.yml@v1
+    uses: krokedil/krokedil-wp-ci/.github/workflows/deploy-plugin-dev-zip-instawp.yml@develop-tests
     with:
       instawp_url: ${{ inputs.instawp_url }}
     secrets:
