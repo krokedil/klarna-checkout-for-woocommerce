@@ -1,0 +1,64 @@
+{
+  "name": "Kustom Checkout for WooCommerce",
+  "slug": "klarna-checkout-for-woocommerce",
+  "distributionPlatform": "wordpress-org",
+  "requiresPlugins": ["woocommerce"],
+  "instawp": {
+    "pluginWcBlueprintUrl": "https://raw.githubusercontent.com/krokedil/instawp-commands/refs/heads/main/assets/wc-blueprints/wc-blueprint-kco-default.json",
+    "pluginCredentialsOptionPatches": [
+      {
+        "optionName": "woocommerce_kco_settings",
+        "key": "test_merchant_id_eu",
+        "envVarValue": "E2E_API_KEY"
+      },
+      {
+        "optionName": "woocommerce_kco_settings",
+        "key": "test_shared_secret_eu",
+        "envVarValue": "E2E_API_SECRET"
+      }
+    ],
+    "paymentGatewayId": "kco",
+    "useCheckoutBlock": false
+  },
+  "playground": {
+    "preferredVersions": {
+      "php": "8.0",
+      "wp": "latest"
+    },
+    "landingPage": "/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco&from=WCADMIN_PAYMENT_SETTINGS"
+  },
+  "pluginDevZipE2e": {
+    "pages": [
+      {
+        "url": "/wp-admin/admin.php?page=wc-settings&tab=checkout",
+        "assertions": [
+          {
+            "selector": "tr[data-gateway_id=\"kco\"] a.wc-payment-gateway-method-title",
+            "text": "Klarna Checkout",
+            "match": "contains"
+          }
+        ]
+      },
+      {
+        "url": "/wp-admin/admin.php?page=wc-settings&tab=checkout&section=kco&from=WCADMIN_PAYMENT_SETTINGS",
+        "assertions": [
+          {
+            "selector": "h2.wc-admin-header",
+            "text": "Kustom Checkout",
+            "match": "contains"
+          }
+        ]
+      },
+      {
+        "url": "/wp-admin/admin.php?page=checkout-addons",
+        "assertions": [
+          {
+            "selector": "#checkout-addons-heading h1",
+            "text": "Kustom Add-ons",
+            "match": "contains"
+          }
+        ]
+      }
+    ]
+  }
+}
