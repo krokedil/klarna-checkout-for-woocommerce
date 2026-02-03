@@ -223,7 +223,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 */
 		public function get_icon() {
 			$icon_src  = KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_black.png';
-			$icon_html = '<img src="' . $icon_src . '" alt="Kustom Checkout" style="border-radius:0px"/>';
+			$icon_html = '<img src="' . $icon_src . '" alt="Kustom Checkout" style="border-radius:0px" width="87"/>';
 			return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
 		}
 
