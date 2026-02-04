@@ -64,7 +64,6 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 		$gateway = \WC_Payment_Gateways::instance()->get_available_payment_gateways()[ $this->name ] ?? null;
 		if ( ! empty( $gateway ) && property_exists( $gateway, 'supports' ) ) {
 			$features = $gateway->supports;
-			);
 		}
 		return $features ?? array( 'products' );
 	}
