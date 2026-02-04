@@ -41,15 +41,21 @@ class KCO_Subscription {
 	}
 
 	/**
-	 * Checks the cart if it has a subscription product in it.
+	 * Check if a cart contains a subscription.
 	 *
 	 * @return bool
 	 */
-	public function check_if_subscription() {
-		if ( class_exists( 'WC_Subscriptions_Cart' ) && ( WC_Subscriptions_Cart::cart_contains_subscription() || wcs_cart_contains_renewal() ) ) {
-			return true;
+	public static function cart_has_subscription() {
+		if ( ! is_checkout() ) {
+			return false;
 		}
-		return false;
+
+		return ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) ||
+			( function_exists( 'wcs_cart_contains_renewal' ) && wcs_cart_contains_renewal() ) ||
+			( function_exists( 'wcs_cart_contains_failed_renewal_order_payment' ) && wcs_cart_contains_failed_renewal_order_payment() ) ||
+			( function_exists( 'wcs_cart_contains_resubscribe' ) && wcs_cart_contains_resubscribe() ) ||
+			( function_exists( 'wcs_cart_contains_early_renewal' ) && wcs_cart_contains_early_renewal() ) ||
+			( function_exists( 'wcs_cart_contains_switches' ) && wcs_cart_contains_switches() );
 	}
 
 	/**
@@ -74,7 +80,7 @@ class KCO_Subscription {
 	 * @return array
 	 */
 	public function create_extra_merchant_data( $request_args ) {
-		if ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
+		if ( self::cart_has_subscription() ) {
 			$subscription_product_id = false;
 			if ( ! empty( WC()->cart->cart_contents ) ) {
 				foreach ( WC()->cart->cart_contents as $cart_item ) {
@@ -135,7 +141,7 @@ class KCO_Subscription {
 	public function set_recurring( $request_args ) {
 
 		// Check if we have a subscription product. If yes set recurring field.
-		if ( $this->check_if_subscription() || $this->is_kco_subs_change_payment_method() ) {
+		if ( self::cart_has_subscription() || $this->is_kco_subs_change_payment_method() ) {
 			$request_args['recurring'] = true;
 		}
 
@@ -372,13 +378,23 @@ class KCO_Subscription {
 		$parent_order = $subscription->get_parent();
 
 		// The environment used for the parent order.
-		$env = $parent_order->get_meta( '_wc_klarna_environment', true );
+		$env = $parent_order->get_meta( '_wc_klarna_environment' );
 		if ( empty( $env ) ) {
-			$settings = get_option( 'woocommerce_kco_settings', array() );
-			$env      = wc_string_to_bool( $settings['testmode'] ) ? 'test' : 'live';
+			$settings = get_option( 'woocommerce_kco_settings' );
+			$env      = wc_string_to_bool( $settings['testmode'] ?? 'yes' ) ? 'test' : 'live';
+		}
+		$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
+
+		$kss_data = $parent_order->get_meta( '_kco_kss_data' );
+		if ( ! empty( $kss_data ) ) {
+			$renewal_order->update_meta_data( '_kco_kss_data', $kss_data );
 		}
 
-		$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
+		$kss_reference = $parent_order->get_meta( '_kco_kss_reference' );
+		if ( ! empty( $kss_reference ) ) {
+			$renewal_order->update_meta_data( '_kco_kss_reference', $kss_reference );
+		}
+
 		$renewal_order->save_meta_data();
 
 		return $renewal_order;

@@ -23,6 +23,9 @@ class EmbeddedBlockFlow extends CheckoutFlow {
 		$this->debug_log_shipping( $klarna_order_id, $order );
 		$this->save_order_metadata( $order, $klarna_order, 'embedded' );
 
+		// Set the order status to pending to trigger emails to be sent once it has been confirmed by Kustom.
+		$order->update_status( 'pending', __( 'Kustom order placed, waiting for confirmation', 'klarna-checkout-for-woocommerce' ) );
+
 		do_action( 'kco_wc_process_payment', $order->get_id(), $klarna_order );
 		\KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] was successfully processed." );
 

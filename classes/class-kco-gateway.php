@@ -8,6 +8,8 @@
 use Krokedil\KustomCheckout\CheckoutFlow\CheckoutFlow;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
+use KrokedilKlarnaCheckoutDeps\Krokedil\SettingsPage\SettingsPage;
+use KrokedilKlarnaCheckoutDeps\Krokedil\SettingsPage\Gateway;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -276,9 +278,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE, DK, AT or NL, disable KCO.
-			if ( is_checkout() && class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) {
-				$available_recurring_countries = array( 'SE', 'NO', 'FI', 'DK', 'DE', 'AT', 'NL' );
-				$country                       = WC()->customer->get_billing_country();
+			if ( is_checkout() && KCO_Subscription::cart_has_subscription() ) {
+				$available_recurring_countries = apply_filters(
+				// This filter allows you to add or remove countries from the list of countries eligible for subscription purchases.
+					'kco_wc_available_recurring_countries',
+					array( 'SE', 'NO', 'FI', 'DK', 'DE', 'AT', 'NL' )
+				);
+				$country = WC()->customer->get_billing_country();
 				if ( empty( $country ) ) {
 					// If the billing country is not available, the "No location by default" setting is set.
 					// By default, if there is exactly one country the store sells to, it will be used by default.
@@ -305,12 +311,25 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * Add sidebar to the settings page.
 		 */
 		public function admin_options() {
-			ob_start();
-			parent::admin_options();
-			$parent_options = ob_get_contents();
-			ob_end_clean();
+			$args = $this->get_settings_page_args();
+
+			if ( empty( $args ) ) {
+				ob_start();
+				parent::admin_options();
+				$parent_options = ob_get_contents();
+				ob_end_clean();
+				WC_Klarna_Banners::settings_sidebar( $parent_options );
+			} else {
+				$args['icon']            = KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_black.png';
+				$gateway_page            = new Gateway( $this, $args );
+				$args['general_content'] = array( $gateway_page, 'output' );
+				$settings_page           = ( SettingsPage::get_instance() )
+				->set_plugin_name( 'Kustom Checkout for WooCommerce' )
+				->register_page( $this->id, $args, $this )
+				->output( $this->id );
+			}
+
 			KCO_Settings_Saved::maybe_show_errors();
-			WC_Klarna_Banners::settings_sidebar( $parent_options );
 		}
 
 		/**
@@ -521,6 +540,11 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @param int $order_id WooCommerce order ID.
 		 */
 		public function show_thank_you_snippet( $order_id = null ) {
+			// If the action has already been run, don't try to print the snippet again.
+			if ( did_action( 'woocommerce_thankyou_kco' ) > 1 ) {
+				return;
+			}
+
 			if ( $order_id ) {
 				$order           = wc_get_order( $order_id );
 				$upsell_uuids    = $order->get_meta( '_ppu_upsell_ids', true );
@@ -627,9 +651,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					?>
 					<p>
 						<strong>
-							<?php esc_html_e( 'Organisation number:', 'klarna-checkout-for-woocommerce' ); ?>
+						<?php esc_html_e( 'Organisation number:', 'klarna-checkout-for-woocommerce' ); ?>
 						</strong>
-						<?php echo esc_html( $org_nr ); ?>
+					<?php echo esc_html( $org_nr ); ?>
 					</p>
 					<?php
 				}
@@ -649,9 +673,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					?>
 					<p>
 						<strong>
-							<?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?>
+						<?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?>
 						</strong>
-						<?php echo esc_html( $reference ); ?>
+					<?php echo esc_html( $reference ); ?>
 					</p>
 					<?php
 				}
@@ -671,9 +695,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					?>
 					<p>
 						<strong>
-							<?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?>
+						<?php esc_html_e( 'Reference:', 'klarna-checkout-for-woocommerce' ); ?>
 						</strong>
-						<?php echo esc_html( $reference ); ?>
+					<?php echo esc_html( $reference ); ?>
 					</p>
 					<?php
 				}
@@ -757,6 +781,88 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			return true;
+		}
+
+		/**
+		 * Read the settings page arguments from remote or local storage.
+		 * If the args are stored locally, they are fetched from the transient cache.
+		 * If they are not available locally, they are fetched from the remote source and stored in the transient cache.
+		 * If the remote source is not available, the function returns null, and default settings page will be used instead.
+		 *
+		 * @return array|null
+		 */
+		private function get_settings_page_args() {
+			$args = get_transient( 'kustom_checkout_settings_page_config' );
+			if ( ! $args ) {
+				$args = wp_remote_get( 'https://krokedil-settings-page-configs.s3.eu-north-1.amazonaws.com/main/configs/kustom-checkout-for-woocommerce.json' );
+
+				if ( is_wp_error( $args ) ) {
+					KP_Logger::log( 'Failed to fetch Kustom Checkout settings page config from remote source.' );
+					return null;
+				}
+
+				$args = wp_remote_retrieve_body( $args );
+				set_transient( 'kustom_checkout_settings_page_config', $args, 60 * 60 * 24 ); // 24 hours lifetime.
+			}
+
+			return json_decode( $args, true );
+		}
+
+		/**
+		 * Callable function for the general content for the settings page.
+		 *
+		 * @return void
+		 */
+		public function settings_page_content() {
+			KP_Settings_Page::header_html();
+			echo $this->generate_settings_html( $this->get_form_fields(), false ); // phpcs:ignore
+		}
+
+		/**
+		 * Get the full list of form fields, with custom section start and end types.
+		 *
+		 * @return array
+		 */
+		public function get_form_fields() {
+			$form_fields        = $this->form_fields;
+			$parsed_form_fields = array();
+
+			$has_section_end = true;
+			$previous_key    = 'none';
+
+			foreach ( $form_fields as $key => $value ) {
+				$type = isset( $value['type'] ) ? $value['type'] : '';
+				// Replace any title types with the custom type krokedil_section_start.
+				if ( 'title' === $type || 'krokedil_section_start' === $type ) {
+					// If we don't have a section end when we find a new title, add one before it.
+					if ( ! $has_section_end ) {
+						$parsed_form_fields[ 'section_end_' . $previous_key ] = array(
+							'type' => 'krokedil_section_end',
+						);
+					}
+
+					$value['type']   = 'krokedil_section_start';
+					$value['id']     = $key;
+					$has_section_end = false;
+					$previous_key    = $key;
+				} elseif ( 'sectionend' === $type ) { // Replace any sectionend types with the custom type krokedil_section_end.
+					$has_section_end = true;
+					$value['type']   = 'krokedil_section_end';
+				} elseif ( 'krokedil_section_end' === $type ) {
+					$has_section_end = true;
+				}
+
+				$parsed_form_fields[ $key ] = $value;
+			}
+
+			// If we don't have a section end at the end of the form, add one.
+			if ( ! $has_section_end ) {
+				$parsed_form_fields['section_end_final'] = array(
+					'type' => 'krokedil_section_end',
+				);
+			}
+
+			return $parsed_form_fields;
 		}
 	}
 }
