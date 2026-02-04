@@ -3,11 +3,11 @@ Contributors: kustom, krokedil, automattic
 Tags: woocommerce, ecommerce, e-commerce, checkout, klarna
 Donate link: https://kustom.co
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 6.9.1
 Requires PHP: 7.4
 WC requires at least: 5.6.0
 WC tested up to: 10.4.3
-Stable tag: 2.17.0
+Stable tag: 2.18.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,12 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026.02.04    - version 2.18.0 =
+* Feature       - Added a support tab in the settings, featuring a HelpScout beacon.
+* Enhancement   - Enhanced the appearance and usability of the settings page.
+* Fix           - Fixed an issue where Kustom Shipping Assistant (KSA) was incompatible with subscription renewals.
+* Fix           - Fixed a PHP warning that could occur when editing the block checkout page in the admin area.
+
 = 2026.01.21    - version 2.17.0 =
 * Feature       - Updated integration to use only Kustom API endpoints.
 * Fix           - Resolved an issue where Express checkout was not functioning correctly.
