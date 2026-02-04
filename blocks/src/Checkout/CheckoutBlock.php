@@ -64,17 +64,9 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 		$gateway = \WC_Payment_Gateways::instance()->get_available_payment_gateways()[ $this->name ] ?? null;
 		if ( ! empty( $gateway ) && property_exists( $gateway, 'supports' ) ) {
 			$features = $gateway->supports;
-
-			// Filter out any subscription related features for now until the support for it is verified.
-			$features = array_filter(
-				$features,
-				function ( $feature ) {
-					return strpos( $feature, 'subscription' ) === false;
-				}
 			);
-
 		}
-		return array( 'products' );
+		return $features ?? array( 'products' );
 	}
 
 	/**
