@@ -222,8 +222,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return string
 		 */
 		public function get_icon() {
-			$icon_src  = KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_black.png';
-			$icon_html = '<img src="' . $icon_src . '" alt="Kustom Checkout" style="border-radius:0px" width="87"/>';
+			$current_country = WC()->customer ? WC()->customer->get_billing_country() : null;
+			$icon_html       = $this->get_gateway_icon_html( $current_country );
 			return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
 		}
 
@@ -860,6 +860,26 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			return $parsed_form_fields;
+		}
+
+		/**
+		 * Get the HTML for the gateway icon.
+		 *
+		 * @param string|null $country The country code to get a specific icon for.
+		 *
+		 * @return string
+		 */
+		private function get_gateway_icon_html( $country ) {
+			switch ( $country ) {
+				case 'SE':
+					return '<img src="' . KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_se.png" alt="Kustom Checkout" style="border-radius:0px; max-width: 90%;"/>';
+				case 'NO':
+					return '<img src="' . KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_no.png" alt="Kustom Checkout" style="border-radius:0px; max-width: 90%;"/>';
+				case 'FI':
+					return '<img src="' . KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_fi.png" alt="Kustom Checkout" style="border-radius:0px; max-width: 90%;"/>';
+				default:
+					return '<img src="https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100" alt="Kustom Checkout" style="border-radius:0px" width="100"/>';
+			}
 		}
 	}
 }
