@@ -21,6 +21,13 @@ class KCO_Fields {
 	 */
 	public static function fields() {
 		$settings = array(
+			// general.
+			'general'                    => array(
+				'title'       => __( 'General configuration', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'krokedil_section_start',
+				'id'          => 'general',
+				'description' => __( 'Get started with Kustom Checkout by configuring the settings below.', 'klarna-checkout-for-woocommerce' ),
+			),
 			'enabled'                    => array(
 				'title'       => __( 'Enable/Disable', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Kustom Checkout', 'klarna-checkout-for-woocommerce' ),
@@ -89,8 +96,9 @@ class KCO_Fields {
 			),
 			// EU.
 			'credentials_eu'             => array(
-				'title' => '<img src="' . KCO_WC_PLUGIN_URL . '/assets/img/flags/eu.svg height="12" /> API Credentials Europe',
-				'type'  => 'title',
+				'title' => 'API Credentials Europe',
+				'type'  => 'krokedil_section_start',
+				'id'    => 'credentials_eu',
 			),
 			'merchant_id_eu'             => array(
 				'title'             => __( 'Production Kustom API Username', 'klarna-checkout-for-woocommerce' ),
@@ -132,10 +140,13 @@ class KCO_Fields {
 					'autocomplete' => 'new-password',
 				),
 			),
+			'credentials_eu_end'         => array(
+				'type' => 'krokedil_section_end',
+			),
 			// US.
 			'credentials_us'             => array(
-				'title' => '<img src="' . KCO_WC_PLUGIN_URL . '/assets/img/flags/us.svg height="12" /> API Credentials United States',
-				'type'  => 'title',
+				'title' => 'API Credentials United States',
+				'type'  => 'krokedil_section_start',
 			),
 			'merchant_id_us'             => array(
 				'title'             => __( 'Production Kustom API Username', 'klarna-checkout-for-woocommerce' ),
@@ -177,10 +188,14 @@ class KCO_Fields {
 					'autocomplete' => 'new-password',
 				),
 			),
+			'credentials_us_end'         => array(
+				'type' => 'krokedil_section_end',
+			),
 			// Shipping.
 			'shipping_section'           => array(
 				'title' => __( 'Shipping settings', 'klarna-checkout-for-woocommerce' ),
-				'type'  => 'title',
+				'type'  => 'krokedil_section_start',
+				'id'    => 'shipping_section',
 			),
 			'allow_separate_shipping'    => array(
 				'title'       => __( 'Separate shipping address', 'klarna-checkout-for-woocommerce' ),
@@ -210,10 +225,14 @@ class KCO_Fields {
 					'autocomplete' => 'off',
 				),
 			),
+			'shipping_section_end'       => array(
+				'type' => 'krokedil_section_end',
+			),
 			// Checkout.
 			'checkout_section'           => array(
 				'title' => __( 'Checkout settings', 'klarna-checkout-for-woocommerce' ),
-				'type'  => 'title',
+				'type'  => 'krokedil_section_start',
+				'id'    => 'checkout_section',
 			),
 			'send_product_urls'          => array(
 				'title'    => __( 'Product URLs', 'klarna-checkout-for-woocommerce' ),
@@ -285,10 +304,14 @@ class KCO_Fields {
 				'default'     => 'woo',
 				'desc_tip'    => false,
 			),
+			'checkout_section_end'       => array(
+				'type' => 'krokedil_section_end',
+			),
 			// Checkout iframe settings.
 			'color_settings_title'       => array(
 				'title' => __( 'Color Settings', 'klarna-checkout-for-woocommerce' ),
-				'type'  => 'title',
+				'type'  => 'krokedil_section_start',
+				'id'    => 'color_settings_title',
 			),
 			'color_button'               => array(
 				'title'       => __( 'Checkout button color', 'klarna-checkout-for-woocommerce' ),
@@ -338,6 +361,9 @@ class KCO_Fields {
 				'description' => __( 'Checkout page radius border in pixels', 'klarna-checkout-for-woocommerce' ),
 				'default'     => '',
 				'desc_tip'    => true,
+			),
+			'color_settings_end'         => array(
+				'type' => 'krokedil_section_end',
 			),
 		);
 

@@ -4,20 +4,65 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5536213c2cd4ccefad434060079eb310",
+    "content-hash": "e58ddc859fdf625bb6684be217612442",
     "packages": [
         {
-            "name": "krokedil/woocommerce",
-            "version": "1.9.0",
+            "name": "krokedil/settings-page",
+            "version": "1.3.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/krokedil/woocommerce.git",
-                "reference": "5867595f76b16f17d971d7e668f6cd3a7038ab0a"
+                "url": "https://github.com/krokedil/settings-page.git",
+                "reference": "2d50b3b3d539d9418a3e2d699d3829e9a5c0566c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/krokedil/woocommerce/zipball/5867595f76b16f17d971d7e668f6cd3a7038ab0a",
-                "reference": "5867595f76b16f17d971d7e668f6cd3a7038ab0a",
+                "url": "https://api.github.com/repos/krokedil/settings-page/zipball/2d50b3b3d539d9418a3e2d699d3829e9a5c0566c",
+                "reference": "2d50b3b3d539d9418a3e2d699d3829e9a5c0566c",
+                "shasum": ""
+            },
+            "require-dev": {
+                "php-stubs/woocommerce-stubs": "dev-master",
+                "wp-coding-standards/wpcs": "dev-develop"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Krokedil\\SettingsPage\\": "src/"
+                }
+            },
+            "scripts": {
+                "makepot": [
+                    "wp --allow-root i18n make-pot ./src ./languages/krokedil-settings.pot --domain=krokedil-settings"
+                ]
+            },
+            "license": [
+                "GPL-V2"
+            ],
+            "authors": [
+                {
+                    "name": "Krokedil AB",
+                    "email": "info@krokedil.se"
+                }
+            ],
+            "description": "A package to help setup settings pages in WordPress and WooCommerce for Krokedil plugins to add the Addons and Support tabs",
+            "support": {
+                "source": "https://github.com/krokedil/settings-page/tree/1.3.2",
+                "issues": "https://github.com/krokedil/settings-page/issues"
+            },
+            "time": "2026-01-23T10:41:25+00:00"
+        },
+        {
+            "name": "krokedil/woocommerce",
+            "version": "1.9.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/krokedil/woocommerce.git",
+                "reference": "4f87f20eaa89ebdba21868011e395dacdecd06df"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/krokedil/woocommerce/zipball/4f87f20eaa89ebdba21868011e395dacdecd06df",
+                "reference": "4f87f20eaa89ebdba21868011e395dacdecd06df",
                 "shasum": ""
             },
             "require-dev": {
@@ -48,22 +93,22 @@
             ],
             "description": "A library package for Krokedils plugins that contains helper methods when working with WooCommerce.",
             "support": {
-                "source": "https://github.com/krokedil/woocommerce/tree/1.9.0",
+                "source": "https://github.com/krokedil/woocommerce/tree/1.9.1",
                 "issues": "https://github.com/krokedil/woocommerce/issues"
             },
-            "time": "2025-08-29T14:16:04+00:00"
+            "time": "2025-12-18T12:51:08+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.4"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
         "php": "7.4"
     },

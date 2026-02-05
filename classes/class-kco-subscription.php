@@ -378,13 +378,23 @@ class KCO_Subscription {
 		$parent_order = $subscription->get_parent();
 
 		// The environment used for the parent order.
-		$env = $parent_order->get_meta( '_wc_klarna_environment', true );
+		$env = $parent_order->get_meta( '_wc_klarna_environment' );
 		if ( empty( $env ) ) {
-			$settings = get_option( 'woocommerce_kco_settings', array() );
-			$env      = wc_string_to_bool( $settings['testmode'] ) ? 'test' : 'live';
+			$settings = get_option( 'woocommerce_kco_settings' );
+			$env      = wc_string_to_bool( $settings['testmode'] ?? 'yes' ) ? 'test' : 'live';
+		}
+		$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
+
+		$kss_data = $parent_order->get_meta( '_kco_kss_data' );
+		if ( ! empty( $kss_data ) ) {
+			$renewal_order->update_meta_data( '_kco_kss_data', $kss_data );
 		}
 
-		$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
+		$kss_reference = $parent_order->get_meta( '_kco_kss_reference' );
+		if ( ! empty( $kss_reference ) ) {
+			$renewal_order->update_meta_data( '_kco_kss_reference', $kss_reference );
+		}
+
 		$renewal_order->save_meta_data();
 
 		return $renewal_order;
