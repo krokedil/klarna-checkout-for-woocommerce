@@ -50,7 +50,7 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
-= 2026.02.04    - version 2.18.0 =
+= 2026.02.05    - version 2.18.0 =
 * Feature       - Added a support tab in the settings, featuring a HelpScout beacon.
 * Enhancement   - Enhanced the appearance and usability of the settings page.
 * Fix           - Fixed an issue where Kustom Shipping Assistant (KSA) was incompatible with subscription renewals.
