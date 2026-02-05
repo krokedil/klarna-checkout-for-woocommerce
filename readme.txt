@@ -55,6 +55,7 @@ For help setting up and configuring Kustom Checkout for WooCommerce please refer
 * Enhancement   - Enhanced the appearance and usability of the settings page.
 * Fix           - Fixed an issue where Kustom Shipping Assistant (KSA) was incompatible with subscription renewals.
 * Fix           - Fixed a PHP warning that could occur when editing the block checkout page in the admin area.
+* Fix           - Fixed a PHP deprecation warning.
 
 = 2026.01.21    - version 2.17.0 =
 * Feature       - Updated integration to use only Kustom API endpoints.
