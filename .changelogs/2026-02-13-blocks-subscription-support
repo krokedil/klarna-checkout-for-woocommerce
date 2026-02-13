@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: yes
+
+Resolved an issue where subscription orders were not processed correctly when using the blocks-based checkout.
