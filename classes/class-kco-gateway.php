@@ -223,7 +223,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 */
 		public function get_icon() {
 			$current_country = WC()->customer ? WC()->customer->get_billing_country() : null;
-			$icon_html       = $this->get_gateway_icon_html( $current_country );
+
+			// If the billing country is not available, use the store's base country.
+			if ( empty( $current_country ) ) {
+				$current_country = WC()->countries->get_base_country();
+			}
+
+			$icon_html = $this->get_gateway_icon_html( $current_country );
 			return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
 		}
 
