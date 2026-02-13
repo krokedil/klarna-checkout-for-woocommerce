@@ -28,7 +28,16 @@
         }
     },
     "scripts": {
-        "phpcs": "@php ./vendor/bin/phpcs --standard=phpcs.ruleset.xml **/*.php",
-        "phpcbf": "@php ./vendor/bin/phpcbf --standard=phpcs.ruleset.xml **/*.php"
+        "get-changelog": "bash .github/scripts/new-version.sh",
+        "update-version": "bash .github/scripts/new-version.sh update",
+        "create-changelog": "bash .github/scripts/new-changelog.sh",
+        "pre-release-check": [
+            "bash .github/scripts/check-changelog-master.sh",
+            "bash .github/scripts/check-version-and-compat.sh"
+        ],
+        "lint": "vendor/bin/phpcs . --standard=phpcs.xml --extensions=php -q",
+        "lint:fix": "vendor/bin/phpcbf . --standard=phpcs.xml --extensions=php -q",
+        "lint:changes": "git diff --name-only HEAD~1 | grep '\\.php$' | xargs vendor/bin/phpcs --standard=phpcs.xml --extensions=php -q",
+        "lint:fix:changes": "git diff --name-only HEAD~1 | grep '\\.php$' | xargs vendor/bin/phpcbf --standard=phpcs.xml --extensions=php -q"
     }
 }
