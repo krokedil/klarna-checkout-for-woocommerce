@@ -878,13 +878,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		private function get_gateway_icon_html( $country ) {
 			switch ( $country ) {
 				case 'SE':
-					return '<img src="' . KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_se.png" alt="Kustom Checkout" style="border-radius:0px; max-width: 90%;"/>';
+					return '<img src="' . esc_url( KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_se.png' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px; max-width: 90%;"  width="250"/>';
 				case 'NO':
-					return '<img src="' . KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_no.png" alt="Kustom Checkout" style="border-radius:0px; max-width: 90%;"/>';
+					return '<img src="' . esc_url( KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_no.png' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px; max-width: 90%;"  width="250"/>';
 				case 'FI':
-					return '<img src="' . KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_fi.png" alt="Kustom Checkout" style="border-radius:0px; max-width: 90%;"/>';
+					return '<img src="' . esc_url( KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_fi.png' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px; max-width: 90%;"  width="250"/>';
 				default:
-					return '<img src="https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100" alt="Kustom Checkout" style="border-radius:0px" width="100"/>';
+					return '<img src="' . esc_url( 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px" width="100"/>';
 			}
 		}
 	}
