@@ -4,7 +4,7 @@ on:
     types: [opened, synchronize, reopened]
     branches: [master]
     paths:
-      - "test-plugin.php"
+      - "klarna-checkout-for-woocommerce.php"
       - "readme.txt"
 permissions:
   contents: read
