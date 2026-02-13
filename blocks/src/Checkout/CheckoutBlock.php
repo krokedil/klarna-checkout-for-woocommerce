@@ -61,11 +61,12 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 	 */
 	public function get_supported_features() {
 		// Get the supported features from the Kustom gateway.
-		$gateway = \WC_Payment_Gateways::instance()->get_available_payment_gateways()[ $this->name ] ?? null;
+		$gateway  = \WC_Payment_Gateways::instance()->get_available_payment_gateways()[ $this->name ] ?? null;
+		$features = array();
 		if ( ! empty( $gateway ) && property_exists( $gateway, 'supports' ) ) {
 			$features = $gateway->supports;
 		}
-		return $features ?? array( 'products' );
+		return $features;
 	}
 
 	/**
