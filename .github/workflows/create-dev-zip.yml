@@ -1,81 +1,24 @@
-name: Create Dev Zip
+name: Create Plugin Dev Zip
 
 on:
+  # Uncomment the push on any commit below to test the action easily.
+  # push:
+  #   branches:
+  #     - '**'
   workflow_dispatch:
+    inputs:
+      test_php_versions:
+        required: false
+        type: string
+        default: "8.3"
+        description: "PHP versions used for basic testing of the plugin dev zip: 8.4,8.3,8.2,8.1,8.0,7.4 (comma-separated) or 'all'."
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
-    env:
-      PLUGIN_SLUG: klarna-checkout-for-woocommerce
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 1
-
-    - name: Create composer cache directory
-      run: mkdir -p ~/.composer/cache
-
-    - name: Cache Composer dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.composer/cache
-        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-composer-
-
-    - name: Cache pnpm dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.pnpm
-        key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-
-
-    - name: Install PNPM
-      uses: pnpm/action-setup@v2
-      with:
-        run_install: false
-        version: 9
-
-    - name: Install dependencies and build project
-      run: |
-        mkdir -p ~/.composer/cache
-        composer install --prefer-dist --no-progress
-        composer install --prefer-dist --no-progress --no-dev
-        pnpm i && pnpm build
-
-    - name: Get branch name and commit hash
-      id: vars
-      run: |
-        BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
-        COMMIT_HASH=$(git rev-parse --short HEAD)
-        ZIP_FILE_NAME="${{ env.PLUGIN_SLUG }}-dev-${BRANCH_NAME}-${COMMIT_HASH}.zip"
-        echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
-        echo "COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
-        echo "ZIP_FILE_NAME=${ZIP_FILE_NAME}" >> $GITHUB_ENV
-
-    - name: Modify version, prepare zip directory, and create zip file
-      run: |
-        sed -i "s/^ \* Version: \(.*\)/ \* Version: \1-dev.${BRANCH_NAME}.${COMMIT_HASH}/" ${{ env.PLUGIN_SLUG }}.php
-        mkdir -p dev-zip-temp/${{ env.PLUGIN_SLUG }}
-        rsync -av --exclude-from='.distignore' --exclude='dev-zip-temp' . dev-zip-temp/${{ env.PLUGIN_SLUG }}
-        cd dev-zip-temp
-        zip -r ../${{ env.ZIP_FILE_NAME }} ${{ env.PLUGIN_SLUG }}
-
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP }}
-        aws-region: eu-north-1
-
-    - name: Upload to S3
-      run: |
-        aws s3 cp ${{ env.ZIP_FILE_NAME }} s3://krokedil-plugin-dev-zip/${{ env.ZIP_FILE_NAME }}
-
-    - name: Add annotation to workflow run with dev zip url
-      run: echo "::notice::Dev Zip Url available for 30 days, https://krokedil-plugin-dev-zip.s3.eu-north-1.amazonaws.com/${{ env.ZIP_FILE_NAME }}"
+    uses: krokedil/krokedil-wp-ci/.github/workflows/create-plugin-dev-zip.yml@develop-tests
+    with:
+      aws_upload: true
+      test_php_versions: ${{ inputs.test_php_versions }}
+    secrets:
+      AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP: ${{ secrets.AWS_ACCESS_KEY_ID_KROKEDIL_PLUGIN_DEV_ZIP }}
+      AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP: ${{ secrets.AWS_SECRET_ACCESS_KEY_KROKEDIL_PLUGIN_DEV_ZIP }}
