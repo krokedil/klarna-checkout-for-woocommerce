@@ -1,0 +1,68 @@
+name: PHPCS Check
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [develop, master]
+    paths:
+      - '**.php'
+      - 'phpcs.xml'
+      - 'composer.json'
+      - 'composer.lock'
+
+permissions:
+  contents: read
+concurrency:
+  group: pr-develop-phpcs-check-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  phpcs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.1', '8.4'] # Check minimum, recommended, and latest supported PHP versions for WordPress/WooCommerce
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, xml, curl, json, zip
+          tools: composer
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Get changed PHP files
+        id: changed-files
+        run: |
+          # Get list of changed PHP files (Added, Copied, Modified, Renamed)
+          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }}...HEAD | grep '\.php$' || true)
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No PHP files changed in this PR"
+            echo "has_php_files=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changed PHP files:"
+            echo "$CHANGED_FILES"
+            echo "has_php_files=true" >> $GITHUB_OUTPUT
+            # Save to a file to avoid issues with spaces/special chars in filenames
+            echo "$CHANGED_FILES" > changed_files.txt
+          fi
+
+      - name: Run PHPCS on changed files
+        if: steps.changed-files.outputs.has_php_files == 'true'
+        run: |
+          # Read files from the saved list and run PHPCS
+          xargs -a changed_files.txt vendor/bin/phpcs -s --standard=phpcs.xml

@@ -616,7 +616,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function add_body_class( $classes ) {
 			if ( is_checkout() && 'yes' === $this->shipping_methods_in_iframe ) {
 				// Don't display KCO Shipping Display body classes if we have a cart that doesn't needs payment.
-				if ( null !== WC()->cart && method_exists( WC()->cart, 'needs_payment' ) && ! WC()->cart->needs_payment() ) {
+				if ( ! kco_cart_needs_payment() ) {
 					return $classes;
 				}
 

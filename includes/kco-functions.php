@@ -1005,3 +1005,15 @@ function kco_ensure_numeric( $value, $default = 0 ) { //phpcs:ignore Universal.N
 
 	return $default; // Return the default value if the value is still not numeric.
 }
+
+/**
+ * Checks if the cart needs payment.
+ *
+ * @return bool
+ */
+function kco_cart_needs_payment() {
+	$needs_payment = isset( WC()->cart ) ? method_exists( WC()->cart, 'needs_payment' ) && WC()->cart->needs_payment() : false;
+
+	// A subscription in the cart always needs payment.
+	return $needs_payment || KCO_Subscription::cart_has_subscription();
+}

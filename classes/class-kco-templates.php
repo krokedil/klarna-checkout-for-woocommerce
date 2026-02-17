@@ -85,7 +85,7 @@ class KCO_Templates {
 			$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			// Don't display KCO template if we have a cart that doesn't needs payment.
 			if ( apply_filters( 'kco_check_if_needs_payment', true ) && ! is_wc_endpoint_url( 'order-pay' ) ) {
-				if ( ! WC()->cart->needs_payment() ) {
+				if ( ! kco_cart_needs_payment() ) {
 					return $template;
 				}
 			}
@@ -155,7 +155,7 @@ class KCO_Templates {
 			return;
 		}
 
-		if ( array_key_exists( 'kco', WC()->payment_gateways->get_available_payment_gateways() ) && 'kco' === kco_wc_get_selected_payment_method() && ( method_exists( WC()->cart, 'needs_payment' ) && WC()->cart->needs_payment() ) ) {
+		if ( array_key_exists( 'kco', WC()->payment_gateways->get_available_payment_gateways() ) && 'kco' === kco_wc_get_selected_payment_method() && kco_cart_needs_payment() ) {
 
 			// Get checkout object.
 			$checkout = WC()->checkout();
@@ -275,7 +275,7 @@ class KCO_Templates {
 			return $css_class;
 		}
 
-		if ( method_exists( WC()->cart, 'needs_payment' ) && ! WC()->cart->needs_payment() ) {
+		if ( ! kco_cart_needs_payment() ) {
 			return $css_class;
 		}
 
