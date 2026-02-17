@@ -190,11 +190,9 @@ class KCO_Request_Cart {
 		foreach ( $order_lines as $order_line ) {
 			if ( 'sales_tax' === $order_line['type'] && $this->separate_sales_tax ) {
 				$total_tax_amount = $order_line['total_amount'];
-			} else {
 				// Add all order lines but exclude gift cards.
-				if ( 'gift_card' !== $order_line['type'] ) {
-					$total_tax_amount += $order_line['total_tax_amount'];
-				}
+			} elseif ( 'gift_card' !== $order_line['type'] ) {
+				$total_tax_amount += $order_line['total_tax_amount'];
 			}
 		}
 		return round( $total_tax_amount );
@@ -222,11 +220,11 @@ class KCO_Request_Cart {
 					'reference'             => $this->get_item_reference( $product ),
 					'name'                  => $this->get_item_name( $cart_item ),
 					'quantity'              => $this->get_item_quantity( $cart_item ),
-					'unit_price'            => $this->get_item_price( $cart_item ),
+					'unit_price'            => $this->get_item_price(),
 					'tax_rate'              => $this->get_item_tax_rate( $cart_item, $product ),
-					'total_amount'          => $this->get_item_total_amount( $cart_item, $product ),
+					'total_amount'          => $this->get_item_total_amount(),
 					'total_tax_amount'      => $this->get_item_tax_amount( $cart_item, $product ),
-					'total_discount_amount' => $this->get_item_discount_amount( $cart_item, $product ),
+					'total_discount_amount' => $this->get_item_discount_amount(),
 				);
 
 				if ( class_exists( 'WC_Subscriptions_Product' ) && WC_Subscriptions_Product::is_subscription( $product ) ) {
@@ -459,10 +457,9 @@ class KCO_Request_Cart {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array $cart_item Cart item.
 	 * @return integer $item_price Cart item price.
 	 */
-	public function get_item_price( $cart_item ) {
+	public function get_item_price() {
 		if ( $this->separate_sales_tax ) {
 			$item_subtotal = $this->subtotal_amount / $this->quantity;
 		} else {
@@ -512,11 +509,9 @@ class KCO_Request_Cart {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array      $cart_item Cart item.
-	 * @param  WC_Product $product WooCommerce product.
 	 * @return integer $item_discount_amount Cart item discount.
 	 */
-	public function get_item_discount_amount( $cart_item, $product ) {
+	public function get_item_discount_amount() {
 
 		$order_line_max_amount = $this->subtotal_amount + $this->subtotal_tax_amount;
 		$order_line_amount     = $this->total_amount + $this->total_tax_amount;
@@ -584,11 +579,9 @@ class KCO_Request_Cart {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array      $cart_item Cart item.
-	 * @param  WC_Product $product WooCommerce product.
 	 * @return integer $item_total_amount Cart item total amount.
 	 */
-	public function get_item_total_amount( $cart_item, $product ) {
+	public function get_item_total_amount() {
 
 		if ( $this->separate_sales_tax ) {
 			$item_total_amount = $this->total_amount;
