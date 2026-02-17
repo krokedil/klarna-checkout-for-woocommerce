@@ -26,10 +26,10 @@ class BlocksUtility {
 	 * @return boolean
 	 */
 	private static function is_editing_checkout_page() {
-		$post_id         = isset( $_GET['post'] ) ? intval( sanitize_text_field( wp_unslash( $_GET['post'] ) ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$is_edit_context = isset( $_GET['action'] ) && 'edit' === $_GET['action']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$is_admin        = $is_edit_context;
+		$post_id_raw     = filter_input( INPUT_GET, 'post', FILTER_SANITIZE_NUMBER_INT );
+		$post_id         = $post_id_raw ? absint( $post_id_raw ) : null;
+		$is_edit_context = 'edit' === filter_input( INPUT_GET, 'action', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-		return $is_admin && wc_get_page_id( 'checkout' ) === $post_id;
+		return $is_edit_context && wc_get_page_id( 'checkout' ) === $post_id;
 	}
 }
