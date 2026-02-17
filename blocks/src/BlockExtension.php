@@ -47,6 +47,10 @@ class BlockExtension {
 	 * @return void
 	 */
 	public function init_checkout_block() {
+		if ( ! BlocksUtility::is_checkout_block_enabled() ) {
+			return;
+		}
+
 		add_action( 'woocommerce_blocks_loaded', array( $this, 'register_callbacks' ) );
 		add_action( 'woocommerce_blocks_loaded', array( $this, 'register_method' ) );
 
