@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
 WC requires at least: 5.6.0
-WC tested up to: 10.4.3
-Stable tag: 2.17.0
+WC tested up to: 10.5.2
+Stable tag: 2.18.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,17 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-02-17    - version 2.18.1 =
+* Fix           - Fixed an issue where subscriptions with a free trial could cause an infinite loop during checkout.
+* Fix           - Fixed a compatibility issue with Kustom Shipping Assistant (KSA) and subscription renewals.
+
+= 2026.02.05    - version 2.18.0 =
+* Feature       - Added a support tab in the settings, featuring a HelpScout beacon.
+* Enhancement   - Enhanced the appearance and usability of the settings page.
+* Fix           - Fixed an issue where Kustom Shipping Assistant (KSA) was incompatible with subscription renewals.
+* Fix           - Fixed a PHP warning that could occur when editing the block checkout page in the admin area.
+* Fix           - Fixed a PHP deprecation warning.
+
 = 2026.01.21    - version 2.17.0 =
 * Feature       - Updated integration to use only Kustom API endpoints.
 * Fix           - Resolved an issue where Express checkout was not functioning correctly.

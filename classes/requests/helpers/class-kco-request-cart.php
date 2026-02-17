@@ -190,11 +190,9 @@ class KCO_Request_Cart {
 		foreach ( $order_lines as $order_line ) {
 			if ( 'sales_tax' === $order_line['type'] && $this->separate_sales_tax ) {
 				$total_tax_amount = $order_line['total_amount'];
-			} else {
 				// Add all order lines but exclude gift cards.
-				if ( 'gift_card' !== $order_line['type'] ) {
-					$total_tax_amount += $order_line['total_tax_amount'];
-				}
+			} elseif ( 'gift_card' !== $order_line['type'] ) {
+				$total_tax_amount += $order_line['total_tax_amount'];
 			}
 		}
 		return round( $total_tax_amount );
@@ -222,11 +220,11 @@ class KCO_Request_Cart {
 					'reference'             => $this->get_item_reference( $product ),
 					'name'                  => $this->get_item_name( $cart_item ),
 					'quantity'              => $this->get_item_quantity( $cart_item ),
-					'unit_price'            => $this->get_item_price( $cart_item ),
+					'unit_price'            => $this->get_item_price(),
 					'tax_rate'              => $this->get_item_tax_rate( $cart_item, $product ),
-					'total_amount'          => $this->get_item_total_amount( $cart_item, $product ),
+					'total_amount'          => $this->get_item_total_amount(),
 					'total_tax_amount'      => $this->get_item_tax_amount( $cart_item, $product ),
-					'total_discount_amount' => $this->get_item_discount_amount( $cart_item, $product ),
+					'total_discount_amount' => $this->get_item_discount_amount(),
 				);
 
 				if ( class_exists( 'WC_Subscriptions_Product' ) && WC_Subscriptions_Product::is_subscription( $product ) ) {
@@ -267,7 +265,7 @@ class KCO_Request_Cart {
 	 */
 	public function process_shipping() {
 		$settings = get_option( 'woocommerce_kco_settings' );
-		if ( ! isset( $settings['shipping_methods_in_iframe'] ) || 'no' === $settings['shipping_methods_in_iframe'] ) {
+		if ( ! wc_string_to_bool( $settings['shipping_methods_in_iframe'] ?? 'no' ) ) {
 			if ( WC()->shipping->get_packages() && ! empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
 				$shipping            = array(
 					'type'             => 'shipping_fee',
@@ -459,10 +457,9 @@ class KCO_Request_Cart {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array $cart_item Cart item.
 	 * @return integer $item_price Cart item price.
 	 */
-	public function get_item_price( $cart_item ) {
+	public function get_item_price() {
 		if ( $this->separate_sales_tax ) {
 			$item_subtotal = $this->subtotal_amount / $this->quantity;
 		} else {
@@ -512,11 +509,9 @@ class KCO_Request_Cart {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array      $cart_item Cart item.
-	 * @param  WC_Product $product WooCommerce product.
 	 * @return integer $item_discount_amount Cart item discount.
 	 */
-	public function get_item_discount_amount( $cart_item, $product ) {
+	public function get_item_discount_amount() {
 
 		$order_line_max_amount = $this->subtotal_amount + $this->subtotal_tax_amount;
 		$order_line_amount     = $this->total_amount + $this->total_tax_amount;
@@ -584,11 +579,9 @@ class KCO_Request_Cart {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @param  array      $cart_item Cart item.
-	 * @param  WC_Product $product WooCommerce product.
 	 * @return integer $item_total_amount Cart item total amount.
 	 */
-	public function get_item_total_amount( $cart_item, $product ) {
+	public function get_item_total_amount() {
 
 		if ( $this->separate_sales_tax ) {
 			$item_total_amount = $this->total_amount;
@@ -608,7 +601,7 @@ class KCO_Request_Cart {
 	 * @return string $shipping_name Name for selected shipping method.
 	 */
 	public function get_shipping_name() {
-		$shipping_packages = WC()->shipping->get_packages();
+		$shipping_packages = $this->get_shipping_packages();
 		foreach ( $shipping_packages as $i => $package ) {
 			$chosen_method = isset( WC()->session->chosen_shipping_methods[ $i ] ) ? WC()->session->chosen_shipping_methods[ $i ] : '';
 			if ( '' !== $chosen_method ) {
@@ -636,7 +629,7 @@ class KCO_Request_Cart {
 	 * @return string $shipping_reference Reference for selected shipping method.
 	 */
 	public function get_shipping_reference() {
-		$shipping_packages = WC()->shipping->get_packages();
+		$shipping_packages = $this->get_shipping_packages();
 		foreach ( $shipping_packages as $i => $package ) {
 			$chosen_method = isset( WC()->session->chosen_shipping_methods[ $i ] ) ? WC()->session->chosen_shipping_methods[ $i ] : '';
 			if ( '' !== $chosen_method ) {
@@ -724,5 +717,36 @@ class KCO_Request_Cart {
 	 */
 	public static function format_number( $value ) {
 		return intval( round( round( $value, wc_get_price_decimals() ) * 100 ) );
+	}
+
+	/**
+	 * Get shipping packages excluding free trial items.
+	 *
+	 * @return array
+	 */
+	private function get_shipping_packages() {
+		$packages = WC()->shipping->get_packages();
+		foreach ( $packages as $index => $package ) {
+			// Remove shipping package for free trials. See WC_Subscriptions_Cart::set_cart_shipping_packages().
+			foreach ( $package['contents'] as $cart_item_key => $cart_item ) {
+				if ( class_exists( 'WC_Subscriptions_Product' ) && \WC_Subscriptions_Product::get_trial_length( $cart_item['data'] ) > 0 ) {
+					unset( $packages[ $index ]['contents'][ $cart_item_key ] );
+				}
+			}
+
+			if ( empty( $packages[ $index ]['contents'] ) ) {
+				unset( $packages[ $index ] );
+			}
+
+			// Skip shipping lines for free trials.
+			if ( class_exists( 'WC_Subscriptions_Cart' ) && \WC_Subscriptions_Cart::cart_contains_subscription() ) {
+				$pattern = '/_after_a_\d+_\w+_trial/';
+				if ( preg_match( $pattern, $index ) ) {
+					unset( $packages[ $index ] );
+				}
+			}
+		}
+
+		return $packages;
 	}
 }
