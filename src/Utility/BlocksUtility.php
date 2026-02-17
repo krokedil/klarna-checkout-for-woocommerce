@@ -21,14 +21,23 @@ class BlocksUtility {
 	}
 
 	/**
-	 * Checks if we are currently on the admin pages when loading the blocks.
+	 * Checks if we are currently editing the checkout page in the admin area.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	private static function is_editing_checkout_page() {
 		$post_id_raw     = filter_input( INPUT_GET, 'post', FILTER_SANITIZE_NUMBER_INT );
 		$post_id         = $post_id_raw ? absint( $post_id_raw ) : null;
 		$is_edit_context = 'edit' === filter_input( INPUT_GET, 'action', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		$is_admin_context = is_admin();
+		if ( ! $is_admin_context || ! $is_edit_context || null === $post_id ) {
+			return false;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return false;
+		}
 
 		return $is_edit_context && wc_get_page_id( 'checkout' ) === $post_id;
 	}
