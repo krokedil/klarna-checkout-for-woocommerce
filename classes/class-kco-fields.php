@@ -279,10 +279,11 @@ class KCO_Fields {
 				'desc_tip'    => true,
 			),
 			'prefill_consent'            => array(
-				'title'   => __( 'Show prefill consent notice', 'klarna-checkout-for-woocommerce' ),
-				'label'   => __( 'Only applicable for stores based in Germany and Austria', 'klarna-checkout-for-woocommerce' ),
-				'type'    => 'checkbox',
-				'default' => 'yes',
+				'title'       => __( 'Show prefill consent notice', 'klarna-checkout-for-woocommerce' ),
+				'description' => __( 'Only applicable for stores based in Germany and Austria.', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Show a notice in the checkout asking for consent to prefill the checkout form', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'default'     => 'yes',
 			),
 			'quantity_fields'            => array(
 				'title'       => __( 'Display quantity fields', 'klarna-checkout-for-woocommerce' ),
