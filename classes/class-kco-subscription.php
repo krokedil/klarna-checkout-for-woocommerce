@@ -38,6 +38,27 @@ class KCO_Subscription {
 
 		// Since not all metadata is copied to the renewal subscription, we have to manually copy them over.
 		add_action( 'wcs_renewal_order_created', array( $this, 'copy_meta_fields_to_renewal_order' ), 10, 2 );
+
+		// This is required for non-trial, free subscriptions products to be processed in KCO, since WC Subscriptions does not consider them as needing payment.
+		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'allow_processing_free_subscription' ) );
+	}
+
+
+	/**
+	 * Allow processing free subscription products in KCO.
+	 *
+	 * @param bool $needs_payment Whether the cart needs payment or not.
+	 * @return bool
+	 */
+	public function allow_processing_free_subscription( $needs_payment ) {
+		$is_processing = did_action( 'woocommerce_checkout_order_processed' ) !== 0;
+
+		// Avoid additional checks if we already know that payment is needed.
+		if ( $needs_payment || ! $is_processing ) {
+			return $needs_payment;
+		}
+
+		return self::cart_has_subscription() ? true : $needs_payment;
 	}
 
 	/**
