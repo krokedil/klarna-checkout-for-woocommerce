@@ -831,7 +831,7 @@ function kco_maybe_save_surcharge( $order_id, $klarna_order ) {
 	if ( isset( $klarna_order['order_lines'] ) ) {
 		$order = wc_get_order( $order_id );
 		foreach ( $klarna_order['order_lines'] as $order_line ) {
-			if ( 'added-surcharge' === $order_line['reference'] ) {
+			if ( 'added-surcharge' === ( $order_line['reference'] ?? '' ) ) {
 				$order->update_meta_data( '_kco_added_surcharge', wp_json_encode( $order_line ) );
 			}
 		}
