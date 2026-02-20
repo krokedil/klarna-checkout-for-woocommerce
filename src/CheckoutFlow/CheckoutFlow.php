@@ -18,20 +18,16 @@ abstract class CheckoutFlow {
 	 * @throws Exception If there is an error during the payment processing.
 	 */
 	public static function process_payment( $order_id ) {
-		try {
-			$order = wc_get_order( $order_id );
+		$order = wc_get_order( $order_id );
 
-			if ( ! $order ) {
-				throw new Exception( __( 'Invalid order ID.', 'klarna-checkout-for-woocommerce' ) );
-			}
-			$handler = self::get_handler();
-
-			\KCO_Logger::log( sprintf( 'Processing order %s|%s with flow %s.', $order->get_id(), $order->get_order_number(), get_class( $handler ) ) );
-
-			return $handler->process( $order );
-		} catch ( Exception $e ) {
-			return self::error_response( $e->getMessage() );
+		if ( ! $order ) {
+			throw new Exception( __( 'Invalid order ID.', 'klarna-checkout-for-woocommerce' ) );
 		}
+		$handler = self::get_handler();
+
+		\KCO_Logger::log( sprintf( 'Processing order %s|%s with flow %s.', $order->get_id(), $order->get_order_number(), get_class( $handler ) ) );
+
+		return $handler->process( $order );
 	}
 
 	/**

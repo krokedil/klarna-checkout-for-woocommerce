@@ -19,7 +19,7 @@ class RedirectFlow extends CheckoutFlow {
 		$klarna_order = KCO_WC()->api->create_klarna_order( $order->get_id(), 'redirect' );
 
 		if ( is_wp_error( $klarna_order ) ) {
-			return $this->error_response( $klarna_order->get_error_message() );
+			throw new Exception( $klarna_order->get_error_message() );
 		}
 
 		$this->save_order_metadata( $order, $klarna_order, 'redirect', false );
@@ -28,7 +28,7 @@ class RedirectFlow extends CheckoutFlow {
 
 		if ( is_wp_error( $hpp ) ) {
 			\KCO_Logger::log( sprintf( 'Failed to create a HPP session with Kustom Order %s|%s (Kustom ID: %s) OK. Redirecting to hosted payment page.', $order->get_id(), $order->get_order_number(), $klarna_order['order_id'] ) );
-			return $this->error_response( $hpp->get_error_message() );
+			throw new Exception( $hpp->get_error_message() );
 		}
 
 		$hpp_redirect = $hpp['redirect_url'];
