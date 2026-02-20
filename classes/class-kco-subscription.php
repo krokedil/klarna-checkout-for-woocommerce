@@ -56,6 +56,16 @@ class KCO_Subscription {
 			return $needs_payment;
 		}
 
+		if ( ! self::cart_has_subscription() ) {
+			return $needs_payment;
+		}
+
+		// Ensure we only change needs_payment for WC is determining whether it should be processed with or without gateway payment.
+		$is_processing = did_action( 'woocommerce_checkout_order_processed' ) !== 0;
+		if ( ! $is_processing ) {
+			return $needs_payment;
+		}
+
 		// Only modify needs_payment when KCO is the chosen payment method.
 		$chosen_payment_method = WC()->session
 		? WC()->session->get( 'chosen_payment_method' )
@@ -65,13 +75,7 @@ class KCO_Subscription {
 			return $needs_payment;
 		}
 
-		// Avoid additional checks if we already know that payment is needed.
-		$is_processing = did_action( 'woocommerce_checkout_order_processed' ) !== 0;
-		if ( ! $is_processing ) {
-			return $needs_payment;
-		}
-
-		return self::cart_has_subscription() ? true : $needs_payment;
+		return true;
 	}
 
 	/**
