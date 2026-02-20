@@ -51,10 +51,23 @@ class KCO_Subscription {
 	 * @return bool
 	 */
 	public function allow_processing_free_subscription( $needs_payment ) {
-		$is_processing = did_action( 'woocommerce_checkout_order_processed' ) !== 0;
+		// Avoid additional checks if we already know that payment is needed.
+		if ( $needs_payment ) {
+			return $needs_payment;
+		}
+
+		// Only modify needs_payment when KCO is the chosen payment method.
+		$chosen_payment_method = WC()->session
+		? WC()->session->get( 'chosen_payment_method' )
+		: null;
+
+		if ( 'kco' !== $chosen_payment_method ) {
+			return $needs_payment;
+		}
 
 		// Avoid additional checks if we already know that payment is needed.
-		if ( $needs_payment || ! $is_processing ) {
+		$is_processing = did_action( 'woocommerce_checkout_order_processed' ) !== 0;
+		if ( ! $is_processing ) {
 			return $needs_payment;
 		}
 
