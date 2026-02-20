@@ -18,8 +18,8 @@ class RedirectFlow extends CheckoutFlow {
 	public function process( $order ) {
 		$klarna_order = KCO_WC()->api->create_klarna_order( $order->get_id(), 'redirect' );
 
-		if ( is_wp_error( $klarna_order ) ) {
-			throw new Exception( $klarna_order->get_error_message() );
+		if ( empty( $klarna_order ) ) {
+			throw new Exception( __( "We couldn't create your payment session right now. Please try again in a moment or contact us if the issue continues.", 'klarna-checkout-for-woocommerce' ) );
 		}
 
 		$this->save_order_metadata( $order, $klarna_order, 'redirect', false );
