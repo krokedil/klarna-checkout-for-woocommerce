@@ -208,7 +208,7 @@ class KCO_Fields {
 			'shipping_methods_in_iframe' => array(
 				'title'       => __( 'Shipping methods in iframe', 'klarna-checkout-for-woocommerce' ),
 				// translators: 1: Configuration link, 2: Tax settings link.
-				'label'       => sprintf( __( 'Display Shipping methods in Kustom iframe.  If you are using the <b>Kustom Shipping Assistant</b> plugin, please follow the steps explained in the plugin documentation under the sections titled %1$s and %2$s', 'klarna-checkout-for-woocommerce' ), ( '<a href="https://docs.krokedil.com/klarna-for-woocommerce/additional-klarna-plugins/klarna-shipping-assistant/#configuration" target="_blank">configuration</a>' ), ( '<a href="https://docs.krokedil.com/klarna-for-woocommerce/additional-klarna-plugins/klarna-shipping-assistant/#tax-settings" target="_blank">tax settings</a>' ) ),
+				'label'       => sprintf( __( 'Display Shipping methods in Kustom iframe.  If you are using the <b>Kustom Shipping Assistant</b> plugin, please follow the steps explained in the plugin documentation under the sections titled %1$s and %2$s', 'klarna-checkout-for-woocommerce' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#configuration" target="_blank">configuration</a>' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#tax-settings" target="_blank">tax settings</a>' ) ),
 				'type'        => 'checkbox',
 				'description' => __( 'If this option is checked, selection of shipping methods is done in Kustom iframe. Shipping price and name of the selected shipping method will still be displayed in WooCommerce order review.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'no',
@@ -279,10 +279,11 @@ class KCO_Fields {
 				'desc_tip'    => true,
 			),
 			'prefill_consent'            => array(
-				'title'   => __( 'Show prefill consent notice', 'klarna-checkout-for-woocommerce' ),
-				'label'   => __( 'Only applicable for stores based in Germany and Austria', 'klarna-checkout-for-woocommerce' ),
-				'type'    => 'checkbox',
-				'default' => 'yes',
+				'title'       => __( 'Show prefill consent notice', 'klarna-checkout-for-woocommerce' ),
+				'description' => __( 'Only applicable for stores based in Germany and Austria.', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Show a notice in the checkout asking for consent to prefill the checkout form', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'default'     => 'yes',
 			),
 			'quantity_fields'            => array(
 				'title'       => __( 'Display quantity fields', 'klarna-checkout-for-woocommerce' ),
