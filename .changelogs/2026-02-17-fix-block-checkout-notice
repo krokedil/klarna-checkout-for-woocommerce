@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Resolved issue where the "checkout block not supported" notice temporarily appeared when switching from shortcode to block checkout on the admin edit page.
