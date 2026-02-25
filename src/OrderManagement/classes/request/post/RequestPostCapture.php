@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * POST request class for order capture
  */
-class KOM_Request_Post_Capture extends KOM_Request_Post {
+class RequestPostCapture extends RequestPost {
 	/**
 	 * Class constructor.
 	 *
@@ -64,7 +64,6 @@ class KOM_Request_Post_Capture extends KOM_Request_Post {
 		}
 
 		return apply_filters( 'kom_order_capture_args', $data, $this->order_id );
-
 	}
 
 	/**

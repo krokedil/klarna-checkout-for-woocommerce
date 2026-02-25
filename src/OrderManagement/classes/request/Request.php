@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Base class for all request classes.
  */
-abstract class KOM_Request {
+abstract class Request {
 	/**
 	 * The request method.
 	 *

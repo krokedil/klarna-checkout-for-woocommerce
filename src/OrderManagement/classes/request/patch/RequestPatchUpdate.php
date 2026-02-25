@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * PATCH request class for order line updates.
  */
-class KOM_Request_Patch_Update extends KOM_Request_Patch {
+class RequestPatchUpdate extends RequestPatch {
 	/**
 	 * Class constructor.
 	 *

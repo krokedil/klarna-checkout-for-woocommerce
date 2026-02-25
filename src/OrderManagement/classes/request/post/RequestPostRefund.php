@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * POST request class for order refund
  */
-class KOM_Request_Post_Refund extends KOM_Request_Post {
+class RequestPostRefund extends RequestPost {
 
 
 	/**

@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Base class for all request classes.
  */
-abstract class KOM_Request_Get extends KOM_Request {
+abstract class RequestGet extends Request {
 	/**
 	 * Class constructor.
 	 *
@@ -21,4 +21,3 @@ abstract class KOM_Request_Get extends KOM_Request {
 		$this->method = 'GET';
 	}
 }
-

@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Get Order request class for orders
  */
-class KOM_Request_Get_Order extends KOM_Request_Get {
+class RequestGetOrder extends RequestGet {
 	/**
 	 * Class constructor.
 	 *
@@ -30,4 +30,3 @@ class KOM_Request_Get_Order extends KOM_Request_Get {
 		return $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $this->klarna_order_id;
 	}
 }
-

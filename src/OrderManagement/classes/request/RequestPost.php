@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * POST request class
  */
-abstract class KOM_Request_Post extends KOM_Request {
+abstract class RequestPost extends Request {
 	/**
 	 * Class constructor.
 	 *
@@ -21,4 +21,3 @@ abstract class KOM_Request_Post extends KOM_Request {
 		$this->method = 'POST';
 	}
 }
-
