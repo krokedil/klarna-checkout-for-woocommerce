@@ -266,7 +266,7 @@ class RequestPostRefund extends RequestPost {
 
 				$return_fee = array(
 					'type'             => 'return_fee',
-					'name'             => __( 'Return fee', 'klarna-order-management-for-woocommerce' ),
+					'name'             => __( 'Return fee', 'klarna-checkout-for-woocommerce' ),
 					'quantity'         => 1,
 					'unit_price'       => round( -1 * ( abs( $this->return_fee['amount'] + $this->return_fee['tax_amount'] ) * 100 ) ),
 					'tax_rate'         => $return_fee_tax_rate,

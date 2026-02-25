@@ -49,7 +49,7 @@ class MetaBox {
 			$order_id = kom_get_the_ID();
 			$order    = wc_get_order( $order_id );
 			if ( in_array( $order->get_payment_method(), array( 'kco', 'klarna_payments' ), true ) ) {
-				add_meta_box( 'kom_meta_box', __( 'Klarna Order Management', 'klarna-order-management-for-woocommerce' ), array( $this, 'kom_meta_box_content' ), $post_type, 'side', 'core' );
+				add_meta_box( 'kom_meta_box', __( 'Klarna Order Management', 'klarna-checkout-for-woocommerce' ), array( $this, 'kom_meta_box_content' ), $post_type, 'side', 'core' );
 			}
 		}
 	}
@@ -64,7 +64,7 @@ class MetaBox {
 		$order    = wc_get_order( $order_id );
 		// Check if the order has been paid.
 		if ( empty( $order->get_date_paid() ) && ! in_array( $order->get_status(), array( 'on-hold' ), true ) ) {
-			$this->print_error_content( __( 'The payment has not been finalized with Klarna.', 'klarna-order-management-for-woocommerce' ) );
+			$this->print_error_content( __( 'The payment has not been finalized with Klarna.', 'klarna-checkout-for-woocommerce' ) );
 			return;
 		}
 		// False if automatic settings are enabled, true if not. If true then show the option.
@@ -73,7 +73,7 @@ class MetaBox {
 			$klarna_order = WC_Klarna_Order_Management::get_instance()->retrieve_klarna_order( $order_id );
 
 			if ( is_wp_error( $klarna_order ) ) {
-				$this->print_error_content( __( 'Failed to retrieve the order from Klarna.', 'klarna-order-management-for-woocommerce' ) );
+				$this->print_error_content( __( 'Failed to retrieve the order from Klarna.', 'klarna-checkout-for-woocommerce' ) );
 				return;
 			}
 
@@ -129,17 +129,17 @@ class MetaBox {
 			<?php if ( $klarna_order ) : ?>
 
 				<strong>
-					<?php esc_html_e( 'Klarna Environment: ', 'klarna-order-management-for-woocommerce' ); ?>
+					<?php esc_html_e( 'Klarna Environment: ', 'klarna-checkout-for-woocommerce' ); ?>
 				</strong>
 				<?php echo ( esc_html( apply_filters( 'kom_meta_environment', $environment ) ) ); ?><br />
 
 				<strong>
-					<?php esc_html_e( 'Klarna order status: ', 'klarna-order-management-for-woocommerce' ); ?>
+					<?php esc_html_e( 'Klarna order status: ', 'klarna-checkout-for-woocommerce' ); ?>
 				</strong>
 				<?php echo ( esc_html( apply_filters( 'kom_meta_order_status', $klarna_order->status ) ) ); ?><br />
 
 				<strong>
-					<?php esc_html_e( 'Initial Payment method: ', 'klarna-order-management-for-woocommerce' ); ?>
+					<?php esc_html_e( 'Initial Payment method: ', 'klarna-checkout-for-woocommerce' ); ?>
 				</strong>
 				<?php echo ( esc_html( apply_filters( 'kom_meta_payment_method', $klarna_order->initial_payment_method->description ) ) ); ?></br>
 
@@ -188,7 +188,7 @@ class MetaBox {
 				<div class="kom_order_sync--box">
 					<div class="kom_order_sync--toggle">
 						<p><label>Order management
-								<?php echo wc_help_tip( __( 'Disable this to turn off the automatic synchronization with the Klarna Merchant Portal. When disabled, any changes in either system have to be done manually.', 'klarna-order-management-for-woocommerce' ) ); //phpcs:ignore -- string literal. ?>
+								<?php echo wc_help_tip( __( 'Disable this to turn off the automatic synchronization with the Klarna Merchant Portal. When disabled, any changes in either system have to be done manually.', 'klarna-checkout-for-woocommerce' ) ); //phpcs:ignore -- string literal. ?>
 							</label></p>
 						<span class="woocommerce-input-toggle woocommerce-input-toggle--<?php echo esc_attr( $kom_disconnected_status ); ?>"></span>
 					</div>
@@ -309,7 +309,7 @@ class MetaBox {
 	 */
 	public function output_option_capture( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_capture( $order_id, $klarna_order, $actions ) ) {
-			$this->print_option( 'kom_capture', __( 'Capture order', 'klarna-order-management-for-woocommerce' ) );
+			$this->print_option( 'kom_capture', __( 'Capture order', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -323,7 +323,7 @@ class MetaBox {
 	 */
 	public function output_tip_capture( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_capture( $order_id, $klarna_order, $actions ) ) {
-			$this->print_tip_fragment( __( 'Capture order', 'klarna-order-management-for-woocommerce' ), __( 'Activates the order with Klarna.', 'klarna-order-management-for-woocommerce' ) );
+			$this->print_tip_fragment( __( 'Capture order', 'klarna-checkout-for-woocommerce' ), __( 'Activates the order with Klarna.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -337,7 +337,7 @@ class MetaBox {
 	 */
 	public function output_option_cancel( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_cancel( $order_id, $klarna_order, $actions ) ) {
-			$this->print_option( 'kom_cancel', __( 'Cancel order', 'klarna-order-management-for-woocommerce' ) );
+			$this->print_option( 'kom_cancel', __( 'Cancel order', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -351,7 +351,7 @@ class MetaBox {
 	 */
 	public function output_tip_cancel( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_cancel( $order_id, $klarna_order, $actions ) ) {
-			$this->print_tip_fragment( __( 'Cancel order', 'klarna-order-management-for-woocommerce' ), __( 'Cancels the order with Klarna.', 'klarna-order-management-for-woocommerce' ) );
+			$this->print_tip_fragment( __( 'Cancel order', 'klarna-checkout-for-woocommerce' ), __( 'Cancels the order with Klarna.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -365,7 +365,7 @@ class MetaBox {
 	 */
 	public function output_option_sync( $order_id, $klarna_order, $actions ) {
 		if ( $actions['sync'] ) {
-			$this->print_option( 'kom_sync', __( 'Sync Klarna order', 'klarna-order-management-for-woocommerce' ) );
+			$this->print_option( 'kom_sync', __( 'Sync Klarna order', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -379,7 +379,7 @@ class MetaBox {
 	 */
 	public function output_tip_sync( $order_id, $klarna_order, $actions ) {
 		if ( $actions['sync'] ) {
-			$this->print_tip_fragment( __( 'Sync Klarna order', 'klarna-order-management-for-woocommerce' ), __( 'Gets the order data from Klarna and saves it to the WooCommerce order.', 'klarna-order-management-for-woocommerce' ) );
+			$this->print_tip_fragment( __( 'Sync Klarna order', 'klarna-checkout-for-woocommerce' ), __( 'Gets the order data from Klarna and saves it to the WooCommerce order.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 

@@ -27,21 +27,21 @@ class Assets {
 	 * @return void
 	 */
 	public function enqueue_admin() {
-		wp_enqueue_style( 'kom-admin-style', WC_KLARNA_ORDER_MANAGEMENT_CHECKOUT_URL . '/assets/css/klarna-order-management.css', array(), WC_KLARNA_ORDER_MANAGEMENT_VERSION );
+		wp_enqueue_style( 'kom-admin-style', KCO_WC_PLUGIN_URL . '/assets/css/klarna-order-management.css', array(), KCO_WC_VERSION );
 
 		// Script Params.
 		$params = array(
 			'ajax_url'                                => admin_url( 'admin-ajax.php' ),
-			'with_return_fee_text'                    => __( 'minus a return fee of', 'klarna-order-management-for-woocommerce' ),
-			'refund_amount_less_than_return_fee_text' => __( 'Refund amount is less than the return fee.', 'klarna-order-management-for-woocommerce' ),
+			'with_return_fee_text'                    => __( 'minus a return fee of', 'klarna-checkout-for-woocommerce' ),
+			'refund_amount_less_than_return_fee_text' => __( 'Refund amount is less than the return fee.', 'klarna-checkout-for-woocommerce' ),
 		);
 
 		// Checkout script.
 		wp_register_script(
 			'kom-admin-js',
-			WC_KLARNA_ORDER_MANAGEMENT_CHECKOUT_URL . '/assets/js/klarna-order-management.js',
+			KCO_WC_PLUGIN_URL . '/assets/js/klarna-order-management.js',
 			array( 'jquery' ),
-			WC_KLARNA_ORDER_MANAGEMENT_VERSION,
+			KCO_WC_VERSION,
 			true
 		);
 

@@ -77,7 +77,7 @@ class Logger {
 			),
 			'timestamp'      => date( 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions -- Date is not used for display.
 			'stack'          => self::get_stack(),
-			'plugin_version' => WC_KLARNA_ORDER_MANAGEMENT_VERSION,
+			'plugin_version' => KCO_WC_VERSION,
 		);
 	}
 
