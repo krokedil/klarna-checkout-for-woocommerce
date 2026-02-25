@@ -4,7 +4,7 @@
  *
  * Handles the functionality for the KOM meta box.
  *
- * @package WC_Klarna_Order_Management
+ * @package OrderManagement
  * @since   1.0.0
  */
 
@@ -70,7 +70,7 @@ class MetaBox {
 		// False if automatic settings are enabled, true if not. If true then show the option.
 		if ( ! empty( $order->get_transaction_id() ) || ! empty( $order->get_meta( '_wc_klarna_order_id', true ) ) ) {
 
-			$klarna_order = WC_Klarna_Order_Management::get_instance()->retrieve_klarna_order( $order_id );
+			$klarna_order = OrderManagement::get_instance()->retrieve_klarna_order( $order_id );
 
 			if ( is_wp_error( $klarna_order ) ) {
 				$this->print_error_content( __( 'Failed to retrieve the order from Klarna.', 'klarna-checkout-for-woocommerce' ) );
@@ -90,7 +90,7 @@ class MetaBox {
 	public function print_standard_content( $klarna_order ) {
 		$order_id   = kom_get_the_ID();
 		$order      = wc_get_order( $order_id );
-		$settings   = WC_Klarna_Order_Management::get_instance()->settings->get_settings( $order_id );
+		$settings   = OrderManagement::get_instance()->settings->get_settings( $order_id );
 		$session_id = $order->get_meta( '_kp_session_id' );
 
 		$actions            = array();
@@ -145,7 +145,7 @@ class MetaBox {
 
 				<?php
 				if ( ! empty( $session_id ) ) :
-					WC_Klarna_Order_Management_Scheduled_Actions::print_scheduled_actions( $session_id );
+					OrderManagement_Scheduled_Actions::print_scheduled_actions( $session_id );
 				endif;
 				?>
 
@@ -427,15 +427,15 @@ class MetaBox {
 		// If we get here, process the action.
 		// Capture order.
 		if ( 'kom_capture' === $kom_action ) {
-			WC_Klarna_Order_Management::get_instance()->capture_klarna_order( $post_id, true );
+			OrderManagement::get_instance()->capture_klarna_order( $post_id, true );
 		}
 		// Cancel order.
 		if ( 'kom_cancel' === $kom_action ) {
-			WC_Klarna_Order_Management::get_instance()->cancel_klarna_order( $post_id, true );
+			OrderManagement::get_instance()->cancel_klarna_order( $post_id, true );
 		}
 		// Sync order.
 		if ( 'kom_sync' === $kom_action ) {
-			$klarna_order = WC_Klarna_Order_Management::get_instance()->retrieve_klarna_order( $post_id );
+			$klarna_order = OrderManagement::get_instance()->retrieve_klarna_order( $post_id );
 			WC_Klarna_Sellers_App::populate_klarna_order( $post_id, $klarna_order );
 		}
 	}

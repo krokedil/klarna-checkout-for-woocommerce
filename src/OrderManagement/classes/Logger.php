@@ -28,11 +28,11 @@ class Logger {
 	 */
 	public static function log( $data, $order_id = null ) {
 		// Use default $order_id, and return rather than causing a fatal error if the $order_id is forgotten.
-		if ( empty( $order_id ) || ! class_exists( 'WC_Klarna_Order_Management' ) ) {
+		if ( empty( $order_id ) || ! class_exists( 'OrderManagement' ) ) {
 			return;
 		}
 
-		$settings = WC_Klarna_Order_Management::get_instance()->settings->get_settings( $order_id );
+		$settings = OrderManagement::get_instance()->settings->get_settings( $order_id );
 		if ( isset( $settings['kom_debug_log'] ) && 'yes' === $settings['kom_debug_log'] ) {
 			$message = self::format_data( $data );
 			if ( empty( self::$log ) ) {

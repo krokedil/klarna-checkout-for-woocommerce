@@ -2,7 +2,7 @@
 /**
  * POST request class for order capture
  *
- * @package WC_Klarna_Order_Management/Classes/Requests
+ * @package OrderManagement/Classes/Requests
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -37,7 +37,7 @@ class RequestPostCapture extends RequestPost {
 	 */
 	protected function get_body() {
 		// If force full capture is enabled, set to true.
-		$settings                 = WC_Klarna_Order_Management::get_instance()->settings->get_settings( $this->order_id );
+		$settings                 = OrderManagement::get_instance()->settings->get_settings( $this->order_id );
 		$force_capture_full_order = ( isset( $settings['kom_force_full_capture'] ) && 'yes' === $settings['kom_force_full_capture'] ) ? true : false;
 		$order                    = wc_get_order( $this->order_id );
 
@@ -55,7 +55,7 @@ class RequestPostCapture extends RequestPost {
 		// Don't add order lines if we are forcing a full order capture.
 		if ( ! $force_capture_full_order ) {
 
-			$lines_processor = new WC_Klarna_Order_Management_Order_Lines( $this->order_id, 'capture' );
+			$lines_processor = new OrderManagement_Order_Lines( $this->order_id, 'capture' );
 			$order_lines     = $lines_processor->order_lines();
 
 			if ( isset( $order_lines ) && ! empty( $order_lines ) ) {

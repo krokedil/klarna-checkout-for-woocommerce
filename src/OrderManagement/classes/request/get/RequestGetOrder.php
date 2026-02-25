@@ -2,7 +2,7 @@
 /**
  * Get Order request class for orders
  *
- * @package WC_Klarna_Order_Management/Classes/Requests
+ * @package OrderManagement/Classes/Requests
  */
 
 defined( 'ABSPATH' ) || exit;

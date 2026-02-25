@@ -4,7 +4,7 @@
  *
  * Formats WooCommerce cart items for Klarna API.
  *
- * @package WC_Klarna_Order_Management
+ * @package OrderManagement
  * @since   1.0.0
  */
 
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WC_Klarna_Order_Management_Order_Lines class.
+ * OrderManagement_Order_Lines class.
  *
  * Processes order lines from a WooCommerce order for Klarna order management requests.
  */
@@ -76,7 +76,7 @@ class OrderLines {
 	public $separate_sales_tax = false;
 
 	/**
-	 * WC_Klarna_Order_Management_Order_Lines constructor.
+	 * OrderManagement_Order_Lines constructor.
 	 *
 	 * @param int    $order_id WooCommerce order ID.
 	 * @param string $request_type The request type.

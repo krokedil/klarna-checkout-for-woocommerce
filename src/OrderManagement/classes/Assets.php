@@ -2,7 +2,7 @@
 /**
  * Main assets file.
  *
- * @package WC_Klarna_Order_Management/Classes/Assets
+ * @package OrderManagement/Classes/Assets
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

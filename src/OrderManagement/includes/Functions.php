@@ -2,7 +2,7 @@
 /**
  * Utility functions.
  *
- * @package WC_Klarna_Order_Management/Includes
+ * @package OrderManagement/Includes
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -64,4 +64,3 @@ function kom_maybe_add_product_urls( $item ) {
 	}
 	return $product_data;
 }
-

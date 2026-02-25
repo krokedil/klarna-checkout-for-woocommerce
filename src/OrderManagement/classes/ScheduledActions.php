@@ -4,7 +4,7 @@
  *
  * Provides a way to display scheduled actions related to the order.
  *
- * @package WC_Klarna_Order_Management
+ * @package OrderManagement
  * @since   1.9.4
  */
 
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WC_Klarna_Order_Management_Scheduled_Actions class.
+ * OrderManagement_Scheduled_Actions class.
  *
  * Displays scheduled actions related to the order.
  */
@@ -77,4 +77,4 @@ class ScheduledActions {
 		<?php
 	}
 }
-new WC_Klarna_Order_Management_Scheduled_Actions();
+new OrderManagement_Scheduled_Actions();

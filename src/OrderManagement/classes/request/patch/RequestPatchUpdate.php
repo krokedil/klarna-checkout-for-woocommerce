@@ -2,7 +2,7 @@
 /**
  * PATCH request class
  *
- * @package WC_Klarna_Order_Management/Classes/Requests
+ * @package OrderManagement/Classes/Requests
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -36,7 +36,7 @@ class RequestPatchUpdate extends RequestPatch {
 	 * @return array
 	 */
 	protected function get_body() {
-		$lines_processor = new WC_Klarna_Order_Management_Order_Lines( $this->order_id );
+		$lines_processor = new OrderManagement_Order_Lines( $this->order_id );
 		$data            = $lines_processor->order_lines();
 
 		return apply_filters( 'kom_order_update_args', $data, $this->order_id );

@@ -6,12 +6,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'WC_Klarna_Order_Management' ) ) {
+if ( ! class_exists( 'Krokedil\KustomCheckout\OrderManagement\OrderManagement' ) ) {
 
 	/**
-	 * Class WC_Klarna_Order_Management
+	 * Class OrderManagement
 	 */
-	class WC_Klarna_Order_Management {
+	class OrderManagement {
 
 		/**
 		 * *Singleton* instance of this class
@@ -23,7 +23,7 @@ if ( ! class_exists( 'WC_Klarna_Order_Management' ) ) {
 		/**
 		 * Klarna Order Management settings.
 		 *
-		 * @var WC_Klarna_Order_Management_Settings $settings
+		 * @var OrderManagement_Settings $settings
 		 */
 		public $settings;
 
@@ -75,7 +75,7 @@ if ( ! class_exists( 'WC_Klarna_Order_Management' ) ) {
 		 */
 		public function init() {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-wc-klarna-order-management-settings.php';
-			$this->settings = new WC_Klarna_Order_Management_Settings();
+			$this->settings = new OrderManagement_Settings();
 
 			// If Klarna Order Management is an unavailable feature, do not include the rest of the plugin.
 			$kp_unavailable_feature_ids = get_option( 'kp_unavailable_feature_ids', array() );
@@ -625,6 +625,6 @@ if ( ! class_exists( 'WC_Klarna_Order_Management' ) ) {
 		}
 	}
 
-	WC_Klarna_Order_Management::get_instance();
+	OrderManagement::get_instance();
 
 }

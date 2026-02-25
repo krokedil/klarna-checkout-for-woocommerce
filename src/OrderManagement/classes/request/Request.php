@@ -2,7 +2,7 @@
 /**
  * Main request class
  *
- * @package WC_Klarna_Order_Management/Classes/Requests
+ * @package OrderManagement/Classes/Requests
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -79,7 +79,7 @@ abstract class Request {
 	 * @return array
 	 */
 	private function get_settings() {
-		return WC_Klarna_Order_Management::get_instance()->settings->get_settings( $this->order_id );
+		return OrderManagement::get_instance()->settings->get_settings( $this->order_id );
 	}
 
 	/**

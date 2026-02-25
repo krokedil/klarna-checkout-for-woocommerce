@@ -2,7 +2,7 @@
 /**
  * POST request class for order refund
  *
- * @package WC_Klarna_Order_Management/Classes/Requests
+ * @package OrderManagement/Classes/Requests
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -101,7 +101,7 @@ class RequestPostRefund extends RequestPost {
 
 	/**
 	 * Returns the refund order lines.
-	 * TODO: Move this functionality to WC_Klarna_Order_Management_Order_Lines class.
+	 * TODO: Move this functionality to OrderManagement_Order_Lines class.
 	 *
 	 * @return array
 	 */
@@ -115,7 +115,7 @@ class RequestPostRefund extends RequestPost {
 			$refunded_items          = $refund_order->get_items();
 			$refunded_shipping       = $refund_order->get_shipping_method();
 			$refunded_shipping_items = $refund_order->get_items( 'shipping' );
-			$order_lines_processor   = new WC_Klarna_Order_Management_Order_Lines( $refund_id );
+			$order_lines_processor   = new OrderManagement_Order_Lines( $refund_id );
 			$separate_sales_tax      = $order_lines_processor->separate_sales_tax;
 			$data                    = array();
 

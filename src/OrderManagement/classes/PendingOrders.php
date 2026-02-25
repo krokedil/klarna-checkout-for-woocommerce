@@ -4,7 +4,7 @@
  *
  * Provides Klarna pending orders functionality.
  *
- * @package WC_Klarna_Order_Management
+ * @package OrderManagement
  * @since   1.0.0
  */
 
@@ -49,7 +49,7 @@ class PendingOrders {
 		}
 
 		// Check the order status for the klarna order. Bail if it does not exist in order management.
-		$klarna_order = WC_Klarna_Order_Management::get_instance()->retrieve_klarna_order( $order_id );
+		$klarna_order = OrderManagement::get_instance()->retrieve_klarna_order( $order_id );
 		if ( is_wp_error( $klarna_order ) ) {
 			return;
 		}

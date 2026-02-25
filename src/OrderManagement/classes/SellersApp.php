@@ -4,7 +4,7 @@
  *
  * Provides support for Klarna sellers app.
  *
- * @package WC_Klarna_Order_Management
+ * @package OrderManagement
  * @since   1.0.0
  */
 
@@ -62,7 +62,7 @@ class SellersApp {
 			$order->update_meta_data( '_wc_klarna_environment', self::get_klarna_environment( $order->get_payment_method() ) );
 			$order->save();
 
-			$klarna_order = WC_Klarna_Order_Management::get_instance()->retrieve_klarna_order( $post_id );
+			$klarna_order = OrderManagement::get_instance()->retrieve_klarna_order( $post_id );
 
 			self::populate_klarna_order( $post_id, $klarna_order );
 		}

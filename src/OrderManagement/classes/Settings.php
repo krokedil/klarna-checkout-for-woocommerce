@@ -2,7 +2,7 @@
 /**
  * Class for the KOM settings.
  *
- * @package WC_Klarna_Order_Management
+ * @package OrderManagement
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

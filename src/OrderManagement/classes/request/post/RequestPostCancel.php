@@ -2,7 +2,7 @@
 /**
  * POST request class for order cancellation
  *
- * @package WC_Klarna_Order_Management/Classes/Requests
+ * @package OrderManagement/Classes/Requests
  */
 
 defined( 'ABSPATH' ) || exit;
