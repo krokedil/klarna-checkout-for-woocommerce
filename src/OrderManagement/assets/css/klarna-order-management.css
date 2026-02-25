@@ -1,0 +1,54 @@
+/* METABOX CONNECTION */
+#kom_meta_box .kom_order_sync .kom_order_sync_edit {
+    display: inline-block;
+}
+
+#kom_meta_box .kom_order_sync--box {
+    display: none;
+}
+
+#kom_meta_box .kom_order_sync--toggle {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#kom_meta_box .kom_order_sync--toggle .woocommerce-help-tip {
+    margin: 0;
+}
+
+#kom_meta_box .kom_order_sync--action > .cancel_button {
+    border: none;
+    background: inherit;
+}
+
+#woocommerce-order-items .woocommerce_order_items_wrapper table.woocommerce_order_items tr.klarna-return-fee .thumb div {
+	display: block;
+    text-indent: -9999px;
+    position: relative;
+    height: 1em;
+    width: 1em;
+    font-size: 1.5em;
+    line-height: 1em;
+    vertical-align: middle;
+    margin: 0 auto;
+}
+#woocommerce-order-items .woocommerce_order_items_wrapper table.woocommerce_order_items tr.klarna-return-fee .thumb div::before {
+    font-family: WooCommerce;
+    speak: never;
+    font-weight: 400;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    margin: 0;
+    text-indent: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    content: "\e01a";
+    color: #ccc;
+}
