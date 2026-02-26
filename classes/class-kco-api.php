@@ -35,13 +35,11 @@ class KCO_API {
 	 *
 	 * @param string $session_id The Kustom Checkout session to use for the HPP request.
 	 * @param int    $order_id The WooCommerce order id to use for the HPP request.
-	 * @return mixed
+	 * @return array|WP_Error
 	 */
 	public function create_klarna_hpp_url( $session_id, $order_id ) {
-		$request  = new KCO_Request_Create_HPP();
-		$response = $request->request( $session_id, $order_id );
-
-		return $this->check_for_api_error( $response );
+		$request = new KCO_Request_Create_HPP();
+		return $request->request( $session_id, $order_id );
 	}
 
 	/**
