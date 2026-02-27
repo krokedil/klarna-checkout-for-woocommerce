@@ -831,7 +831,7 @@ function kco_maybe_save_surcharge( $order_id, $klarna_order ) {
 	if ( isset( $klarna_order['order_lines'] ) ) {
 		$order = wc_get_order( $order_id );
 		foreach ( $klarna_order['order_lines'] as $order_line ) {
-			if ( 'added-surcharge' === $order_line['reference'] ) {
+			if ( 'added-surcharge' === ( $order_line['reference'] ?? '' ) ) {
 				$order->update_meta_data( '_kco_added_surcharge', wp_json_encode( $order_line ) );
 			}
 		}
@@ -914,7 +914,7 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 
 	set_transient( 'kss_data_' . $klarna_order_id, $data, HOUR_IN_SECONDS );
 	$chosen_shipping_methods   = array();
-	$chosen_shipping_methods[] = wc_clean( $data['id'] );
+	$chosen_shipping_methods[] = wc_clean( $data['id'] ?? '' );
 
 	KCO_Logger::Log( "Set chosen shipping method for $klarna_order_id " . wp_json_encode( $chosen_shipping_methods ) );
 
