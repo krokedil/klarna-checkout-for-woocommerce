@@ -29,6 +29,8 @@ class KCO_Merchant_URLs {
 			'confirmation' => $this->get_confirmation_url( $order_id ), // Required.
 			'push'         => $this->get_push_url(),                    // Required.
 			'notification' => $this->get_notification_url(),
+			//'upsell'       => home_url( '/wc-api/KCO_WC_Upsell/?kco_wc_order_id={checkout.order.id}' ),
+			'upsell_validation' => home_url( '/wc-api/KCO_WC_Upsell_Validation/?kco_wc_order_id={checkout.order.id}' ),
 		);
 
 		return apply_filters( 'kco_wc_merchant_urls', $merchant_urls );

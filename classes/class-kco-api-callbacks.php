@@ -43,7 +43,58 @@ class KCO_API_Callbacks {
 		add_action( 'woocommerce_api_kco_wc_push', array( $this, 'push_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_notification', array( $this, 'notification_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
+		add_action( 'woocommerce_api_kco_wc_upsell', array( $this, 'upsell_cb' ) );
+		add_action( 'woocommerce_api_kco_wc_upsell_validation', array( $this, 'upsell_validation_cb' ) );
 		add_action( 'kco_wc_punted_notification', array( $this, 'kco_wc_punted_notification_cb' ), 10, 2 );
+	}
+
+	public function upsell_cb() {
+		wp_send_json( array() );
+	}
+
+
+	public function upsell_validation_cb() {
+		$post_body    = file_get_contents( 'php://input' );
+		$data         = json_decode( $post_body, true );
+		$kco_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		// If we could not decode the body or we are missing the KCO order ID, return an error.
+		if ( null === $data || empty( $kco_order_id ) ) {
+			wp_send_json( array( 'error' => 'Invalid JSON or missing KCO order ID' ), 400 );
+		}
+
+		// Get the order from KCO order ID.
+		$order = kco_get_order_by_klarna_id( $kco_order_id );
+		if ( empty( $order ) ) {
+			wp_send_json( array( 'error' => 'Order not found for KCO order ID ' . $kco_order_id ), 404 );
+		}
+
+		// Get the upsell order lines.
+		$upsell_order_line = $data['upsell_order_lines'];
+
+		// For each order line, get the corresponding WooCommerce product and check if it is in stock. If any of the products are out of stock, return an error.
+		foreach ( $upsell_order_line as $line ) {
+			$quantity   = isset( $line['quantity'] ) ? intval( $line['quantity'] ) : 1;
+			$unit_price = isset( $line['unit_price'] ) ? intval( $line['unit_price'] ) : 0;
+
+			// If the line does not have a reference, we can't find the product, so return an error.
+			if ( empty( $line['reference'] ) ) {
+				wp_send_json( array( 'error' => 'Missing product reference in order line' ), 400 );
+			}
+
+			$product    = wc_get_product( $line['reference'] );
+			if ( ! $product || ! $product->is_in_stock() ) {
+				wp_send_json( array( 'error' => 'Product with SKU ' . $line['reference'] . ' is out of stock' ), 400 );
+			}
+
+			// Add the product to the order with the specified quantity and unit price.
+			$order->add_product( $product, $quantity, array( 'subtotal' => wc_price( $unit_price * $quantity / 100 ) ) );
+		}
+
+		$order->calculate_totals();
+		$order->save();
+
+		wp_send_json( array() );
 	}
 
 	/**
