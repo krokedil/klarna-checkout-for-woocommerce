@@ -92,7 +92,9 @@ print_changelog() {
       pad_len=$((12 - header_len))
       pad_len=$((pad_len < 1 ? 1 : pad_len))
       pad=$(printf '%*s' "$pad_len" '')
-      printf "* ${header^} %s %b" "$pad" "${grouped[$t]}"
+      while IFS= read -r entry; do
+        [[ -n "$entry" ]] && printf "* %s %s %s\n" "${header^}" "$pad" "$entry"
+      done < <(printf '%b' "${grouped[$t]}")
     fi
   done
 }
