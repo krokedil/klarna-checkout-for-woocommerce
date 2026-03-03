@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-02-23 09:03+0000\n"
+"POT-Creation-Date: 2026-03-03 09:33+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -452,7 +452,7 @@ msgstr ""
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:50, ../includes/admin/views/status-report.php:17
+#: ../classes/class-kco-gateway.php:50, ../classes/class-kco-gateway.php:854, ../classes/class-kco-gateway.php:856, ../classes/class-kco-gateway.php:858, ../classes/class-kco-gateway.php:860, ../includes/admin/views/status-report.php:17
 msgid "Kustom Checkout"
 msgstr ""
 
@@ -478,27 +478,27 @@ msgstr ""
 msgid "Shipping %s does not match Kustom order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:409
+#: ../classes/class-kco-gateway.php:388
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:412
+#: ../classes/class-kco-gateway.php:391
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:592
+#: ../classes/class-kco-gateway.php:571
 msgid "Order address should not be changed and any changes you make will not be reflected in Kustom system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:651
+#: ../classes/class-kco-gateway.php:630
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:673, ../classes/class-kco-gateway.php:695
+#: ../classes/class-kco-gateway.php:652, ../classes/class-kco-gateway.php:674
 msgid "Reference:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:776
+#: ../classes/class-kco-gateway.php:755
 msgid "Kustom did not accept the new order amount, the order has not been updated"
 msgstr ""
 
