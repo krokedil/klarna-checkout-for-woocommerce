@@ -170,7 +170,7 @@ class OrderLines {
 		 */
 		foreach ( $order->get_items( 'pw_gift_card' ) as $gift_card ) {
 			$code             = $gift_card->get_card_number();
-			$gift_card_sku    = apply_filters( 'klarna_pw_gift_card_sku', __( 'gift_card', 'klarna-order-management' ), $code );
+			$gift_card_sku    = apply_filters( 'klarna_pw_gift_card_sku', __( 'gift_card', 'klarna-checkout-for-woocommerce' ), $code );
 			$gift_card_amount = intval( $gift_card->get_amount() * -100 );
 			$order_item       = array(
 				'type'                  => 'gift_card',
@@ -334,8 +334,8 @@ class OrderLines {
 			// Add sales tax line item.
 			$sales_tax = array(
 				'type'                  => 'sales_tax',
-				'reference'             => __( 'Sales Tax', 'klarna-order-management' ),
-				'name'                  => __( 'Sales Tax', 'klarna-order-management' ),
+				'reference'             => __( 'Sales Tax', 'klarna-checkout-for-woocommerce' ),
+				'name'                  => __( 'Sales Tax', 'klarna-checkout-for-woocommerce' ),
 				'quantity'              => 1,
 				'unit_price'            => $sales_tax_amount,
 				'tax_rate'              => 0,

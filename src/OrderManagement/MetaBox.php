@@ -108,7 +108,7 @@ class MetaBox extends OrderMetabox {
 
 		// Check if the order has been paid.
 		if ( empty( $order->get_date_paid() ) && ! in_array( $order->get_status(), array( 'on-hold' ), true ) ) {
-			$this->print_error_content( __( 'The payment has not been finalized with Klarna.', 'klarna-order-management' ) );
+			$this->print_error_content( __( 'The payment has not been finalized with Klarna.', 'klarna-checkout-for-woocommerce' ) );
 			return;
 		}
 		// False if automatic settings are enabled, true if not. If true then show the option.
@@ -117,7 +117,7 @@ class MetaBox extends OrderMetabox {
 			$klarna_order = $this->order_management->retrieve_klarna_order( $order_id );
 
 			if ( is_wp_error( $klarna_order ) ) {
-				$this->print_error_content( __( 'Failed to retrieve the order from Klarna.', 'klarna-order-management' ) );
+				$this->print_error_content( __( 'Failed to retrieve the order from Klarna.', 'klarna-checkout-for-woocommerce' ) );
 				return;
 			}
 
@@ -144,17 +144,17 @@ class MetaBox extends OrderMetabox {
 		$environment = ! empty( $order->get_meta( '_wc_klarna_environment' ) ) ? $order->get_meta( '_wc_klarna_environment' ) : '';
 
 		self::output_info(
-			__( 'Klarna Environment', 'klarna-order-management' ),
+			__( 'Klarna Environment', 'klarna-checkout-for-woocommerce' ),
 			apply_filters( 'kom_meta_environment', $environment )
 		);
 
 		self::output_info(
-			__( 'Klarna order status', 'klarna-order-management' ),
+			__( 'Klarna order status', 'klarna-checkout-for-woocommerce' ),
 			apply_filters( 'kom_meta_order_status', $klarna_order->status )
 		);
 
 		self::output_info(
-			__( 'Initial Payment method', 'klarna-order-management' ),
+			__( 'Initial Payment method', 'klarna-checkout-for-woocommerce' ),
 			apply_filters( 'kom_meta_payment_method', $klarna_order->initial_payment_method->description )
 		);
 
@@ -164,14 +164,14 @@ class MetaBox extends OrderMetabox {
 			$link_url          = admin_url( 'admin.php?page=wc-status&tab=action-scheduler&s=' . rawurlencode( $session_id ) . '&action=-1&paged=1&action2=-1' );
 
 			self::output_info(
-				__( 'Scheduled actions', 'klarna-order-management' ),
+				__( 'Scheduled actions', 'klarna-checkout-for-woocommerce' ),
 				'<a target="_blank" href="' . $link_url . '">' . $link_text . '</a>'
 			);
 
 		}
 		( new OrderSupport() )->add_export_order_button( $order, true );
 		self::output_actions_dropdown( $order_id, $klarna_order );
-		self::output_collapsable_section( 'kom-advanced', __( 'Advanced', 'klarna-order-management' ), self::get_advanced_section_content( $order ) );
+		self::output_collapsable_section( 'kom-advanced', __( 'Advanced', 'klarna-checkout-for-woocommerce' ), self::get_advanced_section_content( $order ) );
 	}
 
 	/**
@@ -237,8 +237,8 @@ class MetaBox extends OrderMetabox {
 		}
 
 		$om_status = $order->get_meta( $kom_disconnected_key ) ? 'disabled' : 'enabled';
-		$title     = __( 'Order management', 'klarna-order-management' );
-		$tip       = __( 'Disable this to turn off the automatic synchronization with the Klarna Merchant Portal. When disabled, any changes in either system have to be done manually.', 'klarna-order-management' );
+		$title     = __( 'Order management', 'klarna-checkout-for-woocommerce' );
+		$tip       = __( 'Disable this to turn off the automatic synchronization with the Klarna Merchant Portal. When disabled, any changes in either system have to be done manually.', 'klarna-checkout-for-woocommerce' );
 		$enabled   = 'enabled' === $om_status ? true : false;
 
 		ob_start();
@@ -349,7 +349,7 @@ class MetaBox extends OrderMetabox {
 	 */
 	public function output_option_capture( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_capture( $order_id, $klarna_order, $actions ) ) {
-			$this->print_option( 'kom_capture', __( 'Capture order', 'klarna-order-management' ) );
+			$this->print_option( 'kom_capture', __( 'Capture order', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -363,7 +363,7 @@ class MetaBox extends OrderMetabox {
 	 */
 	public function output_tip_capture( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_capture( $order_id, $klarna_order, $actions ) ) {
-			$this->print_tip_fragment( __( 'Capture order', 'klarna-order-management' ), __( 'Activates the order with Klarna.', 'klarna-order-management' ) );
+			$this->print_tip_fragment( __( 'Capture order', 'klarna-checkout-for-woocommerce' ), __( 'Activates the order with Klarna.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -377,7 +377,7 @@ class MetaBox extends OrderMetabox {
 	 */
 	public function output_option_cancel( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_cancel( $order_id, $klarna_order, $actions ) ) {
-			$this->print_option( 'kom_cancel', __( 'Cancel order', 'klarna-order-management' ) );
+			$this->print_option( 'kom_cancel', __( 'Cancel order', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -391,7 +391,7 @@ class MetaBox extends OrderMetabox {
 	 */
 	public function output_tip_cancel( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_cancel( $order_id, $klarna_order, $actions ) ) {
-			$this->print_tip_fragment( __( 'Cancel order', 'klarna-order-management' ), __( 'Cancels the order with Klarna.', 'klarna-order-management' ) );
+			$this->print_tip_fragment( __( 'Cancel order', 'klarna-checkout-for-woocommerce' ), __( 'Cancels the order with Klarna.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -405,7 +405,7 @@ class MetaBox extends OrderMetabox {
 	 */
 	public function output_option_sync( $order_id, $klarna_order, $actions ) {
 		if ( $actions['sync'] ) {
-			$this->print_option( 'kom_sync', __( 'Get customer', 'klarna-order-management' ) );
+			$this->print_option( 'kom_sync', __( 'Get customer', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -419,7 +419,7 @@ class MetaBox extends OrderMetabox {
 	 */
 	public function output_tip_sync( $order_id, $klarna_order, $actions ) {
 		if ( $actions['sync'] ) {
-			$this->print_tip_fragment( __( 'Get customer', 'klarna-order-management' ), __( 'Gets the customer data from Klarna and saves it to the WooCommerce order.', 'klarna-order-management' ) );
+			$this->print_tip_fragment( __( 'Get customer', 'klarna-checkout-for-woocommerce' ), __( 'Gets the customer data from Klarna and saves it to the WooCommerce order.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 

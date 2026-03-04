@@ -71,7 +71,7 @@ class ReturnFee {
 				<td class="thumb"><div></div></td>
 				<td class="name" >
 					<div class="view">
-					<?php esc_html_e( 'Klarna return fee', 'klarna-order-management' ); ?>
+					<?php esc_html_e( 'Klarna return fee', 'klarna-checkout-for-woocommerce' ); ?>
 					</div>
 				</td>
 				<td class="item_cost" width="1%">&nbsp;</td>
@@ -285,7 +285,7 @@ class ReturnFee {
 
 		// Create the fee item.
 		$fee = new \WC_Order_Item_Fee();
-		$fee->set_name( __( 'Return Fee', 'klarna-order-management' ) );
+		$fee->set_name( __( 'Return Fee', 'klarna-checkout-for-woocommerce' ) );
 		$fee->set_tax_class( $tax_class_slug );
 		$fee->set_tax_status( 'taxable' );
 
@@ -360,7 +360,7 @@ class ReturnFee {
 
 		return sprintf(
 		/* translators: %1$s: return fee amount, %2$s: refund reason */
-			__( 'Return fee: %1$s<br>%2$s', 'klarna-order-management' ),
+			__( 'Return fee: %1$s<br>%2$s', 'klarna-checkout-for-woocommerce' ),
 			wc_price( $total, array( 'currency' => $order->get_currency() ) ),
 			$reason
 		);
