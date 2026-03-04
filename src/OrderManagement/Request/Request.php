@@ -1,8 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request;
 
-use Krokedil\ KustomCheckout\OrderManagement;
-use Krokedil\ KustomCheckout\Logger;
+use Krokedil\KustomCheckout\OrderManagement;
+use Krokedil\KustomCheckout\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -93,28 +93,6 @@ abstract class Request {
 	}
 
 	/**
-	 * Get which klarna plugin is relevant for this request. Returns false if no Klarna variant seems relevant.
-	 *
-	 * @return bool|string
-	 */
-	protected function get_klarna_variant() {
-		$order = wc_get_order( $this->order_id );
-
-		if ( ! $order ) {
-			return false;
-		}
-
-		$payment_method = $order->get_payment_method();
-		switch ( $payment_method ) {
-			case 'klarna_payments':
-			case 'kco':
-				return $payment_method;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Gets Klarna order ID from WooCommerce order.
 	 *
 	 * @return mixed
@@ -155,40 +133,6 @@ abstract class Request {
 	}
 
 	/**
-	 * Get the domain to use for the request based on the merchant ID.
-	 *
-	 * @param string $password The shared secret or password to check.
-	 * @param string $username The merchant ID or username to check.
-	 * @param string $klarna_variant The Klarna variant to use (e.g., 'klarna_payments', 'kco').
-	 *
-	 * @return string The domain to use for the request.
-	 */
-	public static function get_api_domain( $password, $username, $klarna_variant = 'klarna_payments' ) {
-		// If the klarna variant is not kco, just return the Klarna domain.
-		if ( 'kco' !== $klarna_variant ) {
-			return 'klarna.com';
-		}
-
-		// If the password starts with 'kco_', or the mid starts with 'M' or 'PM', use kustom.co, otherwise use klarna.com.
-		$password_pattern = '/^kco_/';
-		$mid_pattern      = '/^(M|PM)/';
-
-		$domain = 'klarna.com';
-		if ( preg_match( $password_pattern, $password ) || preg_match( $mid_pattern, $username ) ) {
-			$domain = 'kustom.co';
-		}
-
-		$domain = apply_filters( 'kco_api_domain', $domain, $username );
-
-		// Ensure the return domain is a valid string, and remove any leading or trailing whitespace or slashes.
-		if ( ! is_string( $domain ) || empty( $domain ) ) {
-			$domain = 'klarna.com';
-		}
-
-		return trim( $domain, " \t\n\r\0\x0B/" );
-	}
-
-	/**
 	 * Get the API base URL.
 	 *
 	 * @return string
@@ -196,8 +140,7 @@ abstract class Request {
 	protected function get_api_url_base() {
 		$region     = strtolower( apply_filters( 'klarna_base_region', $this->get_klarna_api_region() ) );
 		$playground = $this->use_playground() ? '.playground' : '';
-		$domain     = self::get_api_domain( $this->get_auth_component( 'shared_secret' ), $this->get_auth_component( 'merchant_id' ), $this->get_klarna_variant() );
-		return "https://api{$region}{$playground}.{$domain}/";
+		return "https://api{$region}{$playground}.kustom.co/";
 	}
 
 	/**
@@ -261,9 +204,8 @@ abstract class Request {
 	 */
 	protected function use_playground() {
 		$playground = false;
-		$variant    = $this->get_klarna_variant();
 		if ( $variant ) {
-			$payment_method_settings = get_option( "woocommerce_{$variant}_settings" );
+			$payment_method_settings = get_option( 'woocommerce_kco_settings' );
 			if ( ! $payment_method_settings || 'yes' == $payment_method_settings['testmode'] ) {
 				$playground = true;
 			}
@@ -277,16 +219,16 @@ abstract class Request {
 	 * @return string|WP_Error
 	 */
 	protected function calculate_auth() {
-		$variant = $this->get_klarna_variant();
-		if ( ! $variant ) {
-			return new \WP_Error( 'wrong_gateway', 'This order was not create via Klarna Payments or Klarna Checkout for WooCommerce.' );
+		$order = wc_get_order( $this->order_id );
+
+		if ( ! $order || 'kco' !== $order->get_payment_method() ) {
+			return new \WP_Error( 'wrong_gateway', 'This order was not create via Kustom Checkout for WooCommerce.' );
 		}
-		$gateway_title = 'kco' === $variant ? 'Klarna Checkout' : 'Klarna Payments';
 
 		$merchant_id   = $this->get_auth_component( 'merchant_id' );
 		$shared_secret = $this->get_auth_component( 'shared_secret' );
 		if ( '' === $merchant_id || '' === $shared_secret ) {
-			return new \WP_Error( 'missing_credentials', "{$gateway_title} credentials are missing" );
+			return new \WP_Error( 'missing_credentials', 'Kustom Checkout credentials are missing' );
 		}
 		return 'Basic ' . base64_encode( $merchant_id . ':' . htmlspecialchars_decode( $shared_secret ) );
 	}
@@ -304,20 +246,14 @@ abstract class Request {
 			return iconv( mb_detect_encoding( $component, mb_detect_order(), true ), 'UTF-8', $component );
 		}
 
-		$variant = $this->get_klarna_variant();
-		if ( empty( $variant ) ) {
-			return '';
-		}
-		$options = get_option( "woocommerce_{$variant}_settings" );
+		$options = get_option( 'woocommerce_kco_settings' );
 		if ( ! $options ) {
 			return '';
 		}
 
 		$prefix  = $this->use_playground() ? 'test_' : '';
 		$country = $this->get_klarna_country();
-		if ( 'klarna_payments' === $variant ) {
-			$country_string = strtolower( $country );
-		} elseif ( 'US' === $country ) {
+		if ( 'US' === $country ) {
 				$country_string = 'us';
 		} else {
 			$country_string = 'eu';

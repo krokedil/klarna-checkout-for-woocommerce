@@ -1,8 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request\Patch;
 
-use Krokedil\ KustomCheckout\OrderLines;
-use Krokedil\ KustomCheckout\Request\RequestPatch;
+use Krokedil\KustomCheckout\OrderLines;
+use Krokedil\KustomCheckout\Request\RequestPatch;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

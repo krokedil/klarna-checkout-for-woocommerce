@@ -1,7 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request\Post;
 
-use Krokedil\ KustomCheckout\Request\RequestPost;
+use Krokedil\KustomCheckout\Request\RequestPost;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

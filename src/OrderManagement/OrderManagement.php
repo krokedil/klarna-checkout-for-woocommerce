@@ -15,17 +15,16 @@ define( 'KLARNA_ORDER_MANAGEMENT_MIN_PHP_VER', '5.3.0' );
 define( 'KLARNA_ORDER_MANAGEMENT_MIN_WC_VER', '3.3.0' );
 define( 'KLARNA_ORDER_MANAGEMENT_CHECKOUT_URL', untrailingslashit( plugins_url( '/', __FILE__ ) ) );
 
-use Krokedil\ KustomCheckout\Settings;
-use Krokedil\ KustomCheckout\Request\Get\RequestGetOrder;
-use Krokedil\ KustomCheckout\Request\Post\RequestPostRefund;
-use Krokedil\ KustomCheckout\Request\Post\RequestPostCapture;
-use Krokedil\ KustomCheckout\Request\Patch\RequestPatchUpdate;
-use Krokedil\ KustomCheckout\Request\Post\RequestPostCancel;
-use Krokedil\ KustomCheckout\MetaBox;
-use Krokedil\ KustomCheckout\Ajax;
-use Krokedil\ KustomCheckout\PendingOrders;
-use Krokedil\Support\Logger;
-use Krokedil\Support\SystemReport;
+use Krokedil\KustomCheckout\OrderManagement\Settings;
+use Krokedil\KustomCheckout\OrderManagement\Request\Get\RequestGetOrder;
+use Krokedil\KustomCheckout\OrderManagement\Request\Post\RequestPostRefund;
+use Krokedil\KustomCheckout\OrderManagement\Request\Post\RequestPostCapture;
+use Krokedil\KustomCheckout\OrderManagement\Request\Patch\RequestPatchUpdate;
+use Krokedil\KustomCheckout\OrderManagement\Request\Post\RequestPostCancel;
+use Krokedil\KustomCheckout\OrderManagement\MetaBox;
+use Krokedil\KustomCheckout\OrderManagement\Ajax;
+use Krokedil\KustomCheckout\OrderManagement\PendingOrders;
+use Krokedil\KustomCheckout\OrderManagement\Logger;
 
 /**
  * Klarna Order Management class.
@@ -63,13 +62,6 @@ class OrderManagement {
 	public $return_fee;
 
 	/**
-	 * Klarna Order Management plugin instance.
-	 *
-	 * @var string $plugin_instance
-	 */
-	public $plugin_instance;
-
-	/**
 	 * Logger instance.
 	 *
 	 * @var Logger
@@ -77,19 +69,9 @@ class OrderManagement {
 	private $logger;
 
 	/**
-	 * SystemReport instance.
-	 *
-	 * @var SystemReport
-	 */
-	private $system_report;
-
-	/**
 	 * Constructor.
-	 *
-	 * @param string $plugin_instance The plugin instance to use, either 'klarna_payments' or 'kco'.
 	 */
-	public function __construct( $plugin_instance = 'klarna_payments' ) {
-		$this->plugin_instance = $plugin_instance;
+	public function __construct() {
 		$this->init();
 	}
 
@@ -101,28 +83,26 @@ class OrderManagement {
 		// If the Klarna Order Management plugin is active, do nothing.
 		if ( class_exists( 'WC_Klarna_Order_Management' ) ) {
 
-			// KCO does not have order management included yet, so we don't want to encourage the disabling of the KOM plugin if KCO is active.
-			if ( ! class_exists( 'KCO' ) ) {
-				add_action(
-					'admin_notices',
-					function () {
-						?>
-						<div class="notice notice-error">
+			add_action(
+				'admin_notices',
+				function () {
+					?>
+					<div class="notice notice-error">
 
-								<p><strong><?php esc_html_e( 'Klarna Order Management is now included in Klarna for WooCommerce.', 'klarna-checkout-for-woocommerce' ); ?></strong></p>
-								<p><?php esc_html_e( 'Starting with version 4.3.0, you no longer need the separate Klarna Order Management plugin – unless you are also using the Kustom Checkout plugin (formerly Klarna Checkout).', 'klarna-checkout-for-woocommerce' ); ?></p>
+							<p><strong><?php esc_html_e( 'Klarna Order Management is now included in Klarna for WooCommerce.', 'klarna-checkout-for-woocommerce' ); ?></strong></p>
+							<p><?php esc_html_e( 'Starting with version 4.3.0, you no longer need the separate Klarna Order Management plugin – unless you are also using the Kustom Checkout plugin (formerly Klarna Checkout).', 'klarna-checkout-for-woocommerce' ); ?></p>
 
-								<p>
-									<a href="https://docs.krokedil.com/klarna-for-woocommerce/get-started/order-management/#important-please-read" target="_blank">
-										<?php esc_html_e( 'Read more about this change here.', 'klarna-checkout-for-woocommerce' ); ?>
-									</a>
-								</p>
+							<p>
+								<a href="https://docs.krokedil.com/klarna-for-woocommerce/get-started/order-management/#important-please-read" target="_blank">
+									<?php esc_html_e( 'Read more about this change here.', 'klarna-checkout-for-woocommerce' ); ?>
+								</a>
+							</p>
 
-						</div>
-						<?php
-					}
-				);
-			}
+					</div>
+					<?php
+				}
+			);
+
 			return;
 		}
 
@@ -137,29 +117,9 @@ class OrderManagement {
 		$this->ajax       = new Ajax();
 		$this->return_fee = new ReturnFee();
 
-		// Add refunds support to Klarna Payments or Klarna Checkout gateways. If not one of these plugins, do nothing.
-		switch ( $this->plugin_instance ) {
-			case 'klarna_payments':
-				add_action( 'wc_klarna_payments_supports', array( $this, 'add_gateway_support' ) );
-				break;
-			case 'kco':
-				add_action( 'kco_wc_supports', array( $this, 'add_gateway_support' ) );
-				break;
-			default:
-				return;
-		}
+		add_action( 'kco_wc_supports', array( $this, 'add_gateway_support' ) );
 
-		$this->logger = new Logger( 'klarna_order_management', wc_string_to_bool( $settings['logging'] ?? false ) );
-		$report_about = array(
-			array( 'id' => 'kom_auto_capture' ),
-			array( 'id' => 'kom_auto_cancel' ),
-			array( 'id' => 'kom_auto_update' ),
-			array( 'id' => 'kom_auto_order_sync' ),
-			array( 'id' => 'kom_force_full_capture' ),
-			array( 'id' => 'kom_debug_log' ),
-
-		);
-		$this->system_report = new SystemReport( $this->plugin_instance, 'Klarna Order Management for WooCommerce', $report_about );
+		$this->logger = new Logger( 'kustom_order_management', wc_string_to_bool( $settings['logging'] ?? false ) );
 
 		// Cancel order.
 		add_action( 'woocommerce_order_status_cancelled', array( $this, 'cancel_klarna_order' ) );
@@ -171,7 +131,6 @@ class OrderManagement {
 		add_action( 'woocommerce_saved_order_items', array( $this, 'update_klarna_order_items' ), 10, 2 );
 
 		// Refund an order.
-		add_filter( 'wc_klarna_payments_process_refund', array( $this, 'refund_klarna_order' ), 10, 4 );
 		add_filter( 'wc_klarna_checkout_process_refund', array( $this, 'refund_klarna_order' ), 10, 4 );
 
 		// Pending orders.
@@ -272,7 +231,7 @@ class OrderManagement {
 			$order = wc_get_order( $order_id );
 
 			// If the order was not paid using the plugin that instanced this class, bail.
-			if ( ! Utility::check_plugin_instance( $this->plugin_instance, $order->get_payment_method() ) ) {
+			if ( 'kco' !== $order->get_payment_method() ) {
 				return;
 			}
 
@@ -352,7 +311,7 @@ class OrderManagement {
 		$order   = wc_get_order( $order_id );
 
 		// If the order was not paid using the plugin that instanced this class, bail.
-		if ( ! Utility::check_plugin_instance( $this->plugin_instance, $order->get_payment_method() ) ) {
+		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
 
@@ -456,7 +415,7 @@ class OrderManagement {
 		$order   = wc_get_order( $order_id );
 
 		// If the order was not paid using the plugin that instanced this class, bail.
-		if ( ! Utility::check_plugin_instance( $this->plugin_instance, $order->get_payment_method() ) ) {
+		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
 
@@ -529,7 +488,7 @@ class OrderManagement {
 						'klarna_order' => $klarna_order,
 					)
 				);
-				$response = $this->report()->request( $request->request() );
+				$response = $request->request();
 
 				if ( ! is_wp_error( $response ) ) {
 					$order->add_order_note( 'Klarna order captured. Capture amount: ' . $order->get_formatted_order_total( '', false ) . '. Capture ID: ' . $response );
@@ -577,7 +536,7 @@ class OrderManagement {
 		$order = wc_get_order( $order_id );
 
 		// If the order was not paid using the plugin that instanced this class, bail.
-		if ( ! Utility::check_plugin_instance( $this->plugin_instance, $order->get_payment_method() ) ) {
+		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
 
@@ -726,14 +685,5 @@ class OrderManagement {
 		}
 
 		return $return_fee;
-	}
-
-	/**
-	 * System report.
-	 *
-	 * @return SystemReport
-	 */
-	public function report() {
-		return $this->system_report;
 	}
 }

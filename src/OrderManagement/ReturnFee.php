@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 /**
- * Handles the return fee functionality for Klarna orders in WooCommerce.
+ * Handles the return fee functionality for Kustom orders in WooCommerce.
  */
 class ReturnFee {
 	/**
@@ -71,7 +71,7 @@ class ReturnFee {
 				<td class="thumb"><div></div></td>
 				<td class="name" >
 					<div class="view">
-					<?php esc_html_e( 'Klarna return fee', 'klarna-checkout-for-woocommerce' ); ?>
+					<?php esc_html_e( 'Kustom return fee', 'klarna-checkout-for-woocommerce' ); ?>
 					</div>
 				</td>
 				<td class="item_cost" width="1%">&nbsp;</td>
@@ -171,7 +171,7 @@ class ReturnFee {
 			return;
 		}
 
-		// If the order is not a Klarna order, just return.
+		// If the order is not a Kustom order, just return.
 		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
@@ -245,7 +245,7 @@ class ReturnFee {
 			return;
 		}
 
-		// If the order is not a Klarna order, just return.
+		// If the order is not a Kustom order, just return.
 		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
@@ -334,7 +334,7 @@ class ReturnFee {
 			return $reason;
 		}
 
-		// If the order is not a Klarna order, just return the reason.
+		// If the order is not a Kustom order, just return the reason.
 		if ( 'kco' !== $order->get_payment_method() ) {
 			return $reason;
 		}
@@ -378,7 +378,7 @@ class ReturnFee {
 	public function woocommerce_order_is_partially_refunded( $is_partially_refunded, $order_id, $refund_id ) {
 		$order = wc_get_order( $order_id );
 
-		// If the order is not a Klarna order, just return the original value.
+		// If the order is not a Kustom order, just return the original value.
 		if ( 'kco' !== $order->get_payment_method() ) {
 			return $is_partially_refunded;
 		}

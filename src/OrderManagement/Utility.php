@@ -64,17 +64,4 @@ class Utility {
 		}
 		return $product_data;
 	}
-
-	/**
-	 * Check the plugin instance.
-	 *
-	 * @param string $plugin_instance The plugin instance to check.
-	 * @param string $order_payment_method The payment method of the order.
-	 */
-	public static function check_plugin_instance( $plugin_instance, $order_payment_method ) {
-		if ( $order_payment_method && $plugin_instance === $order_payment_method ) {
-			return true;
-		}
-		return false;
-	}
 }

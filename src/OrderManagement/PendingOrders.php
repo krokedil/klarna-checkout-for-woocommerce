@@ -26,25 +26,25 @@ class PendingOrders {
 			$klarna_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		}
 
-		// Get order id from klarna order id.
+		// Get order id from the Kustom order id.
 		if ( empty( $order_id ) && ! empty( $klarna_order_id ) ) {
 			$order_id = self::get_order_id_from_klarna_order_id( $klarna_order_id );
 		}
 
-		// Get klarna order id from order id.
+		// Get the Kustom order id from order id.
 		if ( empty( $klarna_order_id ) && ! empty( $order_id ) ) {
 			$klarna_order_id = self::get_klarna_order_id_from_order_id( $order_id );
 		}
 
-		// Bail if we do not have the order id or Klarna order id.
+		// Bail if we do not have the order id or a Kustom order id.
 		if ( empty( $order_id ) || empty( $klarna_order_id ) ) {
 			return;
 		}
 
 		$order = wc_get_order( $order_id );
 
-		$order_management = new OrderManagement( $order->get_payment_method() );
-		// Check the order status for the klarna order. Bail if it does not exist in order management.
+		$order_management = new OrderManagement();
+		// Check the order status for the Kustom order. Bail if it does not exist in order management.
 		$klarna_order = $order_management->retrieve_klarna_order( $order_id );
 		if ( is_wp_error( $klarna_order ) ) {
 			return;
@@ -55,20 +55,20 @@ class PendingOrders {
 			return;
 		}
 
-		// Use the order from Klarna for the fraud status check.
+		// Use the order from Kustom for the fraud status check.
 		if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 			$order->payment_complete( $klarna_order_id );
-			$order->add_order_note( 'Payment with Klarna is accepted.' );
+			$order->add_order_note( 'Payment with Kustom is accepted.' );
 		} elseif ( 'REJECTED' === $klarna_order->fraud_status || 'STOPPED' === $klarna_order->fraud_status ) {
-			// Set meta field so order cancellation doesn't trigger Klarna API requests.
+			// Set meta field so order cancellation doesn't trigger Kustom API requests.
 			$order->update_meta_data( '_wc_klarna_pending_to_cancelled', true );
-			$order->update_status( 'cancelled', 'Klarna order rejected.' );
+			$order->update_status( 'cancelled', 'Kustom order rejected.' );
 			$order->save();
 			wc_mail(
 				get_option( 'admin_email' ),
-				'Klarna order rejected',
+				'Kustom order rejected',
 				sprintf(
-					'Klarna has identified order %1$s, Klarna Reference %2$s as high risk and request that you do not ship this order. Please contact the Klarna Fraud Team to resolve.',
+					'Kustom has identified order %1$s, Kustom Reference %2$s as high risk and request that you do not ship this order. Please contact the Kustom Fraud Team to resolve.',
 					$order->get_order_number(),
 					$klarna_order->order_id
 				)
@@ -77,9 +77,9 @@ class PendingOrders {
 	}
 
 	/**
-	 * Gets WooCommerce order ID from Klarna order ID.
+	 * Gets WooCommerce order ID from Kustom order ID.
 	 *
-	 * @param string $klarna_order_id The klarna order id.
+	 * @param string $klarna_order_id The Kustom order id.
 	 * @return $order_id
 	 */
 	private static function get_order_id_from_klarna_order_id( $klarna_order_id ) {
@@ -103,7 +103,7 @@ class PendingOrders {
 	}
 
 	/**
-	 * Get Klarna order id from WooCommerce order id.
+	 * Get Kustom order id from WooCommerce order id.
 	 *
 	 * @param int $order_id The WooCommerce order id.
 	 * @return string|bool

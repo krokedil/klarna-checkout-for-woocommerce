@@ -80,7 +80,7 @@ class SellersApp {
 		}
 
 		// If the order was not paid using the plugin that instanced this class, bail.
-		if ( ! Utility::check_plugin_instance( self::$order_management->plugin_instance, $order->get_payment_method() ) ) {
+		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
 
