@@ -73,7 +73,7 @@ class SellersApp {
 			return;
 		}
 
-		// Check that this is an update, and that we have a transaction number, and that the payment method is set to KCO or KP.
+		// Check that this is an update, and that we have a transaction number, and that the payment method is set to KCO.
 		$order = wc_get_order( $post_id );
 		if ( empty( $order ) ) {
 			return;
@@ -84,7 +84,7 @@ class SellersApp {
 			return;
 		}
 
-		if ( $update && ! empty( $order->get_transaction_id() ) && in_array( $order->get_payment_method(), array( 'kco', 'klarna_payments' ), true ) ) {
+		if ( $update && ! empty( $order->get_transaction_id() ) && 'kco' === $order->get_payment_method() ) {
 			// Set post metas.
 			$order->update_meta_data( '_wc_klarna_order_id', $order->get_transaction_id() );
 			$order->update_meta_data( '_wc_klarna_country', wc_get_base_location()['country'] );
@@ -101,7 +101,7 @@ class SellersApp {
 	 * Populates the new order with customer data.
 	 *
 	 * @param string $post_id WordPress post id.
-	 * @param object $klarna_order The klarna order.
+	 * @param object $klarna_order The Kustom order.
 	 * @return void
 	 */
 	public static function populate_klarna_order( $post_id, $klarna_order ) {
@@ -140,11 +140,11 @@ class SellersApp {
 
 		$order->save();
 
-		$order->add_order_note( __( 'Order address updated by Klarna Order management.', 'klarna-checkout-for-woocommerce' ) );
+		$order->add_order_note( __( 'Order address updated by Kustom Order management.', 'klarna-checkout-for-woocommerce' ) );
 	}
 
 	/**
-	 * Gets environment (test/live) used for Klarna purchase.
+	 * Gets environment (test/live) used for Kustom purchase.
 	 *
 	 * @param string $payment_method The selected payment method.
 	 * @return mixed
@@ -161,19 +161,19 @@ class SellersApp {
 	}
 
 	/**
-	 * Processes order lines with order data received from Klarna.
+	 * Processes order lines with order data received from Kustom.
 	 *
-	 * @param Klarna_Checkout_Order $klarna_order Klarna order.
+	 * @param Klarna_Checkout_Order $klarna_order Kustom order.
 	 * @param WC_Order              $order WooCommerce order.
 	 *
 	 * @throws Exception WC_Data_Exception.
 	 */
 	private static function process_order_lines( $klarna_order, $order ) {
 		$order_id = $order->get_id();
-		Logger::log( 'Processing order lines (from Klarna order) during sellers app creation for Klarna order ID ' . $klarna_order->order_id, self::$order_management, $order_id );
+		Logger::log( 'Processing order lines (from Kustom order) during sellers app creation for Kustom order ID ' . $klarna_order->order_id, self::$order_management, $order_id );
 		foreach ( $klarna_order->order_lines as $cart_item ) {
 
-			// Only try to add the item to the order if we got a reference in the Klarna order.
+			// Only try to add the item to the order if we got a reference in the Kustom order.
 			if ( empty( $cart_item->reference ) ) {
 				continue;
 			}
@@ -256,7 +256,7 @@ class SellersApp {
 	/**
 	 * Gets the shipping total for the order.
 	 *
-	 * @param object $klarna_order The Klarna order.
+	 * @param object $klarna_order The Kustom order.
 	 * @return int
 	 */
 	private static function get_shipping_total( $klarna_order ) {
@@ -276,7 +276,7 @@ class SellersApp {
 	/**
 	 * Gets the cart contents tax.
 	 *
-	 * @param object $klarna_order The Klarna order.
+	 * @param object $klarna_order The Kustom order.
 	 * @return int
 	 */
 	private static function get_cart_contents_tax( $klarna_order ) {
@@ -296,7 +296,7 @@ class SellersApp {
 	/**
 	 * Gets the shipping tax total for the order.
 	 *
-	 * @param object $klarna_order The Klarna order.
+	 * @param object $klarna_order The Kustom order.
 	 * @return int
 	 */
 	private static function get_shipping_tax_total( $klarna_order ) {

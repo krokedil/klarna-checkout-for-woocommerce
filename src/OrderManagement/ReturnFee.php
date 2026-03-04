@@ -52,7 +52,7 @@ class ReturnFee {
 	public function add_return_fee_order_lines_html( $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		if ( ! in_array( $order->get_payment_method(), array( 'klarna_payments', 'kco' ), true ) ) {
+		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
 
@@ -172,7 +172,7 @@ class ReturnFee {
 		}
 
 		// If the order is not a Klarna order, just return.
-		if ( ! in_array( $order->get_payment_method(), array( 'klarna_payments', 'kco' ), true ) ) {
+		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
 
@@ -246,7 +246,7 @@ class ReturnFee {
 		}
 
 		// If the order is not a Klarna order, just return.
-		if ( ! in_array( $order->get_payment_method(), array( 'klarna_payments', 'kco' ), true ) ) {
+		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
 
@@ -335,7 +335,7 @@ class ReturnFee {
 		}
 
 		// If the order is not a Klarna order, just return the reason.
-		if ( ! in_array( $order->get_payment_method(), array( 'klarna_payments', 'kco' ), true ) ) {
+		if ( 'kco' !== $order->get_payment_method() ) {
 			return $reason;
 		}
 
@@ -379,7 +379,7 @@ class ReturnFee {
 		$order = wc_get_order( $order_id );
 
 		// If the order is not a Klarna order, just return the original value.
-		if ( ! in_array( $order->get_payment_method(), array( 'klarna_payments', 'kco' ), true ) ) {
+		if ( 'kco' !== $order->get_payment_method() ) {
 			return $is_partially_refunded;
 		}
 

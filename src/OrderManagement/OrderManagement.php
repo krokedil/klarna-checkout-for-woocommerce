@@ -200,7 +200,7 @@ class OrderManagement {
 		}
 
 		$order = wc_get_order( $order_id );
-		if ( ! in_array( $order->get_payment_method(), array( 'klarna_payments', 'kco' ), true ) ) {
+		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
 
@@ -287,8 +287,8 @@ class OrderManagement {
 			}
 
 			// Not going to do this for non-KP and non-KCO orders.
-			if ( ! in_array( $order->get_payment_method(), array( 'klarna_payments', 'kco' ), true ) ) {
-				return new \WP_Error( 'not_klarna_order', 'Order does not have klarna_payments or kco payment method.' );
+			if ( 'kco' !== $order->get_payment_method() ) {
+				return new \WP_Error( 'not_klarna_order', 'Order does not have kco payment method.' );
 			}
 
 			// Don't do this if the order is being rejected in pending flow.
@@ -356,8 +356,8 @@ class OrderManagement {
 			return;
 		}
 
-		if ( ! in_array( $order->get_payment_method(), array( 'klarna_payments', 'kco' ), true ) ) {
-			return new \WP_Error( 'not_klarna_order', 'Order does not have klarna_payments or kco payment method.' );
+		if ( 'kco' !== $order->get_payment_method() ) {
+			return new \WP_Error( 'not_klarna_order', 'Order does not have kco payment method.' );
 		}
 
 		// Are we on the subscription page?
@@ -473,8 +473,8 @@ class OrderManagement {
 			}
 
 			// Not going to do this for non-KP and non-KCO orders.
-			if ( ! in_array( $order->get_payment_method(), array( 'klarna_payments', 'kco' ), true ) ) {
-				return new \WP_Error( 'not_klarna_order', 'Order does not have klarna_payments or kco payment method.' );
+			if ( 'kco' !== $order->get_payment_method() ) {
+				return new \WP_Error( 'not_klarna_order', 'Order does not have kco payment method.' );
 			}
 			// Do nothing if Klarna order was already captured.
 			if ( $order->get_meta( '_wc_klarna_capture_id', true ) ) {
@@ -587,8 +587,8 @@ class OrderManagement {
 		}
 
 		// Not going to do this for non-KP and non-KCO orders.
-		if ( ! in_array( $order->get_payment_method(), array( 'klarna_payments', 'kco' ), true ) ) {
-			return new \WP_Error( 'not_klarna_order', 'Order does not have klarna_payments or kco payment method.' );
+		if ( 'kco' !== $order->get_payment_method() ) {
+			return new \WP_Error( 'not_klarna_order', 'Order does not have kco payment method.' );
 		}
 
 		// Do nothing if Klarna order is not captured.

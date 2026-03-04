@@ -77,7 +77,7 @@ class MetaBox extends OrderMetabox {
 				return;
 			}
 
-			if ( in_array( $order->get_payment_method(), array( 'kco', 'klarna_payments' ), true ) ) {
+			if ( 'kco' === $order->get_payment_method() ) {
 				add_meta_box(
 					$this->id,
 					$this->title,

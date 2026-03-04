@@ -117,8 +117,6 @@ class Settings {
 
 		if ( 'kco' === $payment_method ) {
 			return get_option( 'woocommerce_kco_settings', array() );
-		} elseif ( 'klarna_payments' === $payment_method ) {
-			return get_option( 'woocommerce_klarna_payments_settings', array() );
 		} else {
 			return get_option( 'kom_settings', array() );
 		}
