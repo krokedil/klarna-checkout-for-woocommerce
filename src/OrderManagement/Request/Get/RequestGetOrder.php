@@ -19,7 +19,7 @@ class RequestGetOrder extends RequestGet {
 	 */
 	public function __construct( $order_management, $arguments ) {
 		parent::__construct( $order_management, $arguments );
-		$this->log_title = 'Retrieve Klarna order';
+		$this->log_title = 'Retrieve Kustom order';
 	}
 
 	/**

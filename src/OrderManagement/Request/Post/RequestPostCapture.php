@@ -28,7 +28,7 @@ class RequestPostCapture extends RequestPost {
 	 */
 	public function __construct( $order_management, $arguments ) {
 		parent::__construct( $order_management, $arguments );
-		$this->log_title        = 'Capture Klarna order';
+		$this->log_title        = 'Capture Kustom order';
 		$this->order_management = $order_management;
 	}
 

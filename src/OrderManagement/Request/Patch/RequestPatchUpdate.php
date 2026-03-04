@@ -20,7 +20,7 @@ class RequestPatchUpdate extends RequestPatch {
 	 */
 	public function __construct( $order_management, $arguments ) {
 		parent::__construct( $order_management, $arguments );
-		$this->log_title = 'Update Klarna order lines';
+		$this->log_title = 'Update Kustom order lines';
 	}
 
 	/**

@@ -19,7 +19,7 @@ class RequestPostCancel extends RequestPost {
 	 */
 	public function __construct( $order_management, $arguments ) {
 		parent::__construct( $order_management, $arguments );
-		$this->log_title = 'Cancel Klarna order';
+		$this->log_title = 'Cancel Kustom order';
 	}
 
 	/**

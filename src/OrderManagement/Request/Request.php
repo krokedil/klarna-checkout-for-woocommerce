@@ -27,14 +27,14 @@ abstract class Request {
 	protected $log_title;
 
 	/**
-	 * The Klarna order id.
+	 * The Kustom order id.
 	 *
 	 * @var string
 	 */
 	protected $klarna_order_id;
 
 	/**
-	 * The Klarna order object.
+	 * The Kustom order object.
 	 *
 	 * @var object
 	 */
@@ -93,7 +93,7 @@ abstract class Request {
 	}
 
 	/**
-	 * Gets Klarna order ID from WooCommerce order.
+	 * Gets Kustom order ID from WooCommerce order.
 	 *
 	 * @return mixed
 	 */
@@ -103,7 +103,7 @@ abstract class Request {
 	}
 
 	/**
-	 * Gets API region code for Klarna
+	 * Gets API region code for Kustom
 	 *
 	 * @return string
 	 */
@@ -198,7 +198,7 @@ abstract class Request {
 	}
 
 	/**
-	 * Get if this order should use the Klarna Playground or not.
+	 * Get if this order should use the Kustom Playground or not.
 	 *
 	 * @return bool
 	 */

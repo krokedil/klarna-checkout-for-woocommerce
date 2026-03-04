@@ -51,7 +51,7 @@ class RequestPostRefund extends RequestPost {
 	 */
 	public function __construct( $order_management, $arguments ) {
 		parent::__construct( $order_management, $arguments );
-		$this->log_title     = 'Refund Klarna order';
+		$this->log_title     = 'Refund Kustom order';
 		$this->refund_reason = $arguments['refund_reason'];
 		$this->refund_amount = $arguments['refund_amount'];
 		$this->return_fee    = $arguments['return_fee'] ?? array();
@@ -143,7 +143,7 @@ class RequestPostRefund extends RequestPost {
 					/**
 					 *
 					 *  If a product is not available inside of WC anymore wc_get_product() will return false
-					 *  and the default check will fail resulting in an fatal error, creating the Refund with WC but not sending it to Klarna
+					 *  and the default check will fail resulting in an fatal error, creating the Refund with WC but not sending it to Kustom.
 					 *  This fallback allows DEVs to provide the product type which they saved before.
 					 *
 					 *  Alternatively KOM or KCO could save this information on order creation.
