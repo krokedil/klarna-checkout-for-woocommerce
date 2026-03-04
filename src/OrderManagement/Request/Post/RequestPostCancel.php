@@ -1,7 +1,7 @@
 <?php
-namespace Krokedil\KlarnaOrderManagement\Request\Post;
+namespace Krokedil\KustomCheckout\OrderManagement\Request\Post;
 
-use Krokedil\KlarnaOrderManagement\Request\RequestPost;
+use Krokedil\ KustomCheckout\Request\RequestPost;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -14,8 +14,8 @@ class RequestPostCancel extends RequestPost {
 	/**
 	 * Class constructor.
 	 *
-	 * @param KlarnaOrderManagement $order_management The order management instance.
-	 * @param array                 $arguments The request arguments.
+	 * @param OrderManagement $order_management The order management instance.
+	 * @param array           $arguments The request arguments.
 	 */
 	public function __construct( $order_management, $arguments ) {
 		parent::__construct( $order_management, $arguments );

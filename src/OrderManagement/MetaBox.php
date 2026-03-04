@@ -1,5 +1,5 @@
 <?php
-namespace Krokedil\KlarnaOrderManagement;
+namespace Krokedil\KustomCheckout\OrderManagement;
 
 use Krokedil\WooCommerce\OrderMetabox;
 use Krokedil\Support\OrderSupport;
@@ -17,14 +17,14 @@ class MetaBox extends OrderMetabox {
 	/**
 	 * Klarna Order Management instance.
 	 *
-	 * @var KlarnaOrderManagement
+	 * @var OrderManagement
 	 */
 	protected $order_management;
 
 	/**
 	 * Class constructor.
 	 *
-	 * @param KlarnaOrderManagement $order_management Klarna Order Management instance.
+	 * @param OrderManagement $order_management Klarna Order Management instance.
 	 */
 	public function __construct( $order_management ) {
 		$this->order_management = $order_management;

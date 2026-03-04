@@ -1,5 +1,5 @@
 <?php
-namespace Krokedil\KlarnaOrderManagement\Request;
+namespace Krokedil\KustomCheckout\OrderManagement\Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -12,8 +12,8 @@ abstract class RequestGet extends Request {
 	/**
 	 * Class constructor.
 	 *
-	 * @param KlarnaOrderManagement $order_management The order management instance.
-	 * @param array                 $arguments The request arguments.
+	 * @param OrderManagement $order_management The order management instance.
+	 * @param array           $arguments The request arguments.
 	 */
 	public function __construct( $order_management, $arguments ) {
 		parent::__construct( $order_management, $arguments );

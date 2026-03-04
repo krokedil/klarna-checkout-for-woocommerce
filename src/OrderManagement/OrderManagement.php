@@ -1,6 +1,6 @@
 <?php
 
-namespace Krokedil\KlarnaOrderManagement;
+namespace Krokedil\KustomCheckout\OrderManagement;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -15,15 +15,15 @@ define( 'KLARNA_ORDER_MANAGEMENT_MIN_PHP_VER', '5.3.0' );
 define( 'KLARNA_ORDER_MANAGEMENT_MIN_WC_VER', '3.3.0' );
 define( 'KLARNA_ORDER_MANAGEMENT_CHECKOUT_URL', untrailingslashit( plugins_url( '/', __FILE__ ) ) );
 
-use Krokedil\KlarnaOrderManagement\Settings;
-use Krokedil\KlarnaOrderManagement\Request\Get\RequestGetOrder;
-use Krokedil\KlarnaOrderManagement\Request\Post\RequestPostRefund;
-use Krokedil\KlarnaOrderManagement\Request\Post\RequestPostCapture;
-use Krokedil\KlarnaOrderManagement\Request\Patch\RequestPatchUpdate;
-use Krokedil\KlarnaOrderManagement\Request\Post\RequestPostCancel;
-use Krokedil\KlarnaOrderManagement\MetaBox;
-use Krokedil\KlarnaOrderManagement\Ajax;
-use Krokedil\KlarnaOrderManagement\PendingOrders;
+use Krokedil\ KustomCheckout\Settings;
+use Krokedil\ KustomCheckout\Request\Get\RequestGetOrder;
+use Krokedil\ KustomCheckout\Request\Post\RequestPostRefund;
+use Krokedil\ KustomCheckout\Request\Post\RequestPostCapture;
+use Krokedil\ KustomCheckout\Request\Patch\RequestPatchUpdate;
+use Krokedil\ KustomCheckout\Request\Post\RequestPostCancel;
+use Krokedil\ KustomCheckout\MetaBox;
+use Krokedil\ KustomCheckout\Ajax;
+use Krokedil\ KustomCheckout\PendingOrders;
 use Krokedil\Support\Logger;
 use Krokedil\Support\SystemReport;
 
@@ -32,7 +32,7 @@ use Krokedil\Support\SystemReport;
  *
  * The main class responsible for initializing the plugin.
  */
-class KlarnaOrderManagement {
+class OrderManagement {
 
 	/**
 	 * Klarna Order Management settings.

@@ -1,8 +1,8 @@
 <?php
-namespace Krokedil\KlarnaOrderManagement\Request;
+namespace Krokedil\KustomCheckout\OrderManagement\Request;
 
-use Krokedil\KlarnaOrderManagement\KlarnaOrderManagement;
-use Krokedil\KlarnaOrderManagement\Logger;
+use Krokedil\ KustomCheckout\OrderManagement;
+use Krokedil\ KustomCheckout\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -64,15 +64,15 @@ abstract class Request {
 	/**
 	 * The order management instance.
 	 *
-	 * @var KlarnaOrderManagement
+	 * @var OrderManagement
 	 */
 	protected $order_management;
 
 	/**
 	 * Class constructor.
 	 *
-	 * @param KlarnaOrderManagement $order_management The order management instance.
-	 * @param array                 $arguments The request args.
+	 * @param OrderManagement $order_management The order management instance.
+	 * @param array           $arguments The request args.
 	 */
 	public function __construct( $order_management, $arguments = array() ) {
 		$this->order_management = $order_management;

@@ -1,8 +1,8 @@
 <?php
-namespace Krokedil\KlarnaOrderManagement\Request\Patch;
+namespace Krokedil\KustomCheckout\OrderManagement\Request\Patch;
 
-use Krokedil\KlarnaOrderManagement\OrderLines;
-use Krokedil\KlarnaOrderManagement\Request\RequestPatch;
+use Krokedil\ KustomCheckout\OrderLines;
+use Krokedil\ KustomCheckout\Request\RequestPatch;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -15,8 +15,8 @@ class RequestPatchUpdate extends RequestPatch {
 	/**
 	 * Class constructor.
 	 *
-	 * @param KlarnaOrderManagement $order_management The order management instance.
-	 * @param array                 $arguments The request arguments.
+	 * @param OrderManagement $order_management The order management instance.
+	 * @param array           $arguments The request arguments.
 	 */
 	public function __construct( $order_management, $arguments ) {
 		parent::__construct( $order_management, $arguments );
