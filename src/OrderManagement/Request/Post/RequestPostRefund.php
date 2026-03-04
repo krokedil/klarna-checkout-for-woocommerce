@@ -1,9 +1,9 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request\Post;
 
-use Krokedil\KustomCheckout\Request\RequestPost;
-use Krokedil\KustomCheckout\OrderLines;
-use Krokedil\KustomCheckout\Utility;
+use Krokedil\KustomCheckout\OrderManagement\Request\RequestPost;
+use Krokedil\KustomCheckout\OrderManagement\OrderLines;
+use Krokedil\KustomCheckout\OrderManagement\Utility;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -254,7 +254,7 @@ class RequestPostRefund extends RequestPost {
 				$return_fee_tax_rate = 0;
 				$tax_rate_id         = $this->return_fee['tax_rate_id'] ?? 0;
 				if ( $tax_rate_id ) {
-					$tax_rate_data = WC_Tax::_get_tax_rate( $tax_rate_id );
+					$tax_rate_data = \WC_Tax::_get_tax_rate( $tax_rate_id );
 					if ( $tax_rate_data && isset( $tax_rate_data['tax_rate'] ) ) {
 						$return_fee_tax_rate = round( floatval( $tax_rate_data['tax_rate'] ) * 100 );
 					}

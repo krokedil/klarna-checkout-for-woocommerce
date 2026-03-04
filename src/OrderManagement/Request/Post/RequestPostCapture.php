@@ -2,8 +2,8 @@
 namespace Krokedil\KustomCheckout\OrderManagement\Request\Post;
 
 use Krokedil\KustomCheckout\OrderManagement;
-use Krokedil\KustomCheckout\OrderLines;
-use Krokedil\KustomCheckout\Request\RequestPost;
+use Krokedil\KustomCheckout\OrderManagement\OrderLines;
+use Krokedil\KustomCheckout\OrderManagement\Request\RequestPost;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

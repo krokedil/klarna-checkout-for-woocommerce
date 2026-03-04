@@ -2,7 +2,7 @@
 namespace Krokedil\KustomCheckout\OrderManagement\Request;
 
 use Krokedil\KustomCheckout\OrderManagement;
-use Krokedil\KustomCheckout\Logger;
+use Krokedil\KustomCheckout\OrderManagement\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -159,7 +159,7 @@ abstract class Request {
 		$url  = $this->get_request_url();
 		$args = $this->get_request_args();
 		if ( is_wp_error( $args ) || ( isset( $args['body'] ) && is_null( json_decode( $args['body'] ) ) ) ) {
-			return is_wp_error( $args ) ? $args : new WP_Error( 'invalid_json', __( 'Invalid JSON response from the server.', 'woocommerce' ) );
+			return is_wp_error( $args ) ? $args : new \WP_Error( 'invalid_json', __( 'Invalid JSON response from the server.', 'woocommerce' ) );
 		}
 		$response = wp_remote_request( $url, $args );
 		return $this->process_response( $response, $args, $url );
@@ -204,12 +204,12 @@ abstract class Request {
 	 */
 	protected function use_playground() {
 		$playground = false;
-		if ( $variant ) {
-			$payment_method_settings = get_option( 'woocommerce_kco_settings' );
-			if ( ! $payment_method_settings || 'yes' == $payment_method_settings['testmode'] ) {
-				$playground = true;
-			}
+
+		$payment_method_settings = get_option( 'woocommerce_kco_settings' );
+		if ( ! $payment_method_settings || 'yes' === $payment_method_settings['testmode'] ) {
+			$playground = true;
 		}
+
 		return $playground;
 	}
 
