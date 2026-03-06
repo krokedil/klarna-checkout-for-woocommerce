@@ -78,7 +78,7 @@ class KCO_Request_Create extends KCO_Request {
 
 				if ( 'yes' === $this->settings['allow_separate_shipping'] ) {
 					if ( ! empty( $shipping_address ) ) {
-						$request_body['shipping_address '] = $shipping_address;
+						$request_body['shipping_address'] = $shipping_address;
 					}
 				} elseif ( ! empty( $billing_address ) ) {
 						$request_body['shipping_address'] = $billing_address;
@@ -102,7 +102,7 @@ class KCO_Request_Create extends KCO_Request {
 			}
 
 			if ( ! empty( $shipping_address ) ) {
-				$request_body['shipping_address '] = $shipping_address;
+				$request_body['shipping_address'] = $shipping_address;
 			}
 		}
 
