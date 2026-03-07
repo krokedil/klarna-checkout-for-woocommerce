@@ -9,12 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KLARNA_ORDER_MANAGEMENT_VERSION', '1.1.0' );
-
-define( 'KLARNA_ORDER_MANAGEMENT_MIN_PHP_VER', '5.3.0' );
-define( 'KLARNA_ORDER_MANAGEMENT_MIN_WC_VER', '3.3.0' );
-define( 'KLARNA_ORDER_MANAGEMENT_CHECKOUT_URL', untrailingslashit( plugins_url( '/', __FILE__ ) ) );
-
 use Krokedil\KustomCheckout\OrderManagement\Settings;
 use Krokedil\KustomCheckout\OrderManagement\Request\Get\RequestGetOrder;
 use Krokedil\KustomCheckout\OrderManagement\Request\Post\RequestPostRefund;
@@ -204,12 +198,12 @@ class OrderManagement {
 			);
 		}
 
-		wp_enqueue_style( 'kom-admin-style', KLARNA_ORDER_MANAGEMENT_CHECKOUT_URL . '/assets/css/klarna-order-management.css', array(), KLARNA_ORDER_MANAGEMENT_VERSION );
+		wp_enqueue_style( 'kom-admin-style', plugin_dir_url( __FILE__ ) . '/assets/css/klarna-order-management.css', array(), KCO_WC_VERSION );
 		wp_register_script(
 			'kom-admin-js',
-			KLARNA_ORDER_MANAGEMENT_CHECKOUT_URL . '/assets/js/klarna-order-management.js',
+			plugin_dir_url( __FILE__ ) . '/assets/js/klarna-order-management.js',
 			array( 'jquery' ),
-			KLARNA_ORDER_MANAGEMENT_VERSION,
+			KCO_WC_VERSION,
 			true
 		);
 
