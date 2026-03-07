@@ -16,11 +16,10 @@ class PendingOrders {
 	 * Notification listener for Pending orders.
 	 *
 	 * @param string $klarna_order_id Klarna order ID.
-	 * @param array  $data The data for the order.
 	 *
 	 * @link https://developers.klarna.com/en/us/kco-v3/pending-orders
 	 */
-	public static function notification_listener( $klarna_order_id = null, $data = null ) {
+	public static function notification_listener( $klarna_order_id = null ) {
 		$order_id = filter_input( INPUT_GET, 'order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( empty( $klarna_order_id ) ) {
 			$klarna_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
@@ -80,7 +79,7 @@ class PendingOrders {
 	 * Gets WooCommerce order ID from Kustom order ID.
 	 *
 	 * @param string $klarna_order_id The Kustom order id.
-	 * @return $order_id
+	 * @return int|null The WooCommerce order ID or null if not found.
 	 */
 	private static function get_order_id_from_klarna_order_id( $klarna_order_id ) {
 		$orders = wc_get_orders(

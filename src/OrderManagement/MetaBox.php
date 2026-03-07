@@ -1,8 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement;
 
-use Krokedil\WooCommerce\OrderMetabox;
-use Krokedil\Support\OrderSupport;
+use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\OrderMetabox;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -168,7 +167,6 @@ class MetaBox extends OrderMetabox {
 			);
 
 		}
-		( new OrderSupport() )->add_export_order_button( $order, true );
 		self::output_actions_dropdown( $order_id, $klarna_order );
 		self::output_collapsable_section( 'kom-advanced', __( 'Advanced', 'klarna-checkout-for-woocommerce' ), self::get_advanced_section_content( $order ) );
 	}

@@ -271,7 +271,7 @@ class ReturnFee {
 			$location['state']    = $order->get_billing_state();
 			$location['postcode'] = $order->get_billing_postcode();
 			$location['city']     = $order->get_billing_city();
-		} else { // 'shipping' or default.
+		} else {
 			$location['country']  = $order->get_shipping_country();
 			$location['state']    = $order->get_shipping_state();
 			$location['postcode'] = $order->get_shipping_postcode();

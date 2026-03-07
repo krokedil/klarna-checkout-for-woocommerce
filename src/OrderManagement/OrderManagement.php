@@ -25,6 +25,7 @@ use Krokedil\KustomCheckout\OrderManagement\MetaBox;
 use Krokedil\KustomCheckout\OrderManagement\Ajax;
 use Krokedil\KustomCheckout\OrderManagement\PendingOrders;
 use Krokedil\KustomCheckout\OrderManagement\Logger;
+use KrokedilKlarnaCheckoutDeps\Krokedil\Support\SystemReport;
 
 /**
  * Klarna Order Management class.
@@ -67,6 +68,13 @@ class OrderManagement {
 	 * @var Logger
 	 */
 	private $logger;
+
+	/**
+	 * SystemReport instance.
+	 *
+	 * @var SystemReport
+	 */
+	private $system_report;
 
 	/**
 	 * Constructor.
@@ -120,6 +128,17 @@ class OrderManagement {
 		add_action( 'kco_wc_supports', array( $this, 'add_gateway_support' ) );
 
 		$this->logger = new Logger( 'kustom_order_management', wc_string_to_bool( $settings['logging'] ?? false ) );
+
+		$report_about = array(
+			array( 'id' => 'kom_auto_capture' ),
+			array( 'id' => 'kom_auto_cancel' ),
+			array( 'id' => 'kom_auto_update' ),
+			array( 'id' => 'kom_auto_order_sync' ),
+			array( 'id' => 'kom_force_full_capture' ),
+			array( 'id' => 'kom_debug_log' ),
+
+		);
+		$this->system_report = new SystemReport( 'kco', 'Kustom Order Management for WooCommerce', $report_about );
 
 		// Cancel order.
 		add_action( 'woocommerce_order_status_cancelled', array( $this, 'cancel_klarna_order' ) );
@@ -685,5 +704,14 @@ class OrderManagement {
 		}
 
 		return $return_fee;
+	}
+
+	/**
+	 * System report.
+	 *
+	 * @return SystemReport
+	 */
+	public function report() {
+		return $this->system_report;
 	}
 }

@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement;
 
+use Automattic\WooCommerce\Utilities\OrderUtil;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -32,11 +34,9 @@ class Utility {
 	 * @return bool
 	 */
 	public static function is_hpos_enabled() {
-		// CustomOrdersTableController was introduced in WC 6.4.
-		if ( class_exists( CustomOrdersTableController::class ) ) {
-			return wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled();
+		if ( class_exists( OrderUtil::class ) ) {
+			return OrderUtil::custom_orders_table_usage_is_enabled();
 		}
-
 		return false;
 	}
 
