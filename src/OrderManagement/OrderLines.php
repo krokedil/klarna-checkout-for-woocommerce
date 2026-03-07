@@ -175,7 +175,7 @@ class OrderLines {
 			$order_item       = array(
 				'type'                  => 'gift_card',
 				'reference'             => $gift_card_sku,
-				'name'                  => __( 'Gift card', 'pw-woocommerce-gift-cards' ) . ' ' . $code,
+				'name'                  => __( 'Gift card', 'klarna-checkout-for-woocommerce' ) . ' ' . $code,
 				'quantity'              => 1,
 				'tax_rate'              => 0,
 				'total_discount_amount' => 0,

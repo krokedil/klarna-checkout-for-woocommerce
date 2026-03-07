@@ -84,9 +84,9 @@ class PendingOrders {
 	private static function get_order_id_from_klarna_order_id( $klarna_order_id ) {
 		$orders = wc_get_orders(
 			array(
-				'meta_query' => array(
-					'meta_key'   => '_wc_klarna_order_id',
-					'meta_value' => $klarna_order_id,
+				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- We need to query by meta value, and this is only used for pending orders which should be a limited set of orders.
+					'meta_key'   => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+					'meta_value' => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 					'compare'    => '=',
 				),
 			)

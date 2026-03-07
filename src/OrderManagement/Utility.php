@@ -18,6 +18,7 @@ class Utility {
 	 *
 	 * @return int|false The order ID or false.
 	 */
+	//phpcs:ignore
 	public static function get_the_ID() {
 		$hpos_enabled = self::is_hpos_enabled();
 		$order_id     = $hpos_enabled ? filter_input( INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT ) : get_the_ID();

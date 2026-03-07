@@ -230,7 +230,7 @@ abstract class Request {
 		if ( '' === $merchant_id || '' === $shared_secret ) {
 			return new \WP_Error( 'missing_credentials', 'Kustom Checkout credentials are missing' );
 		}
-		return 'Basic ' . base64_encode( $merchant_id . ':' . htmlspecialchars_decode( $shared_secret ) );
+		return 'Basic ' . base64_encode( $merchant_id . ':' . htmlspecialchars_decode( $shared_secret ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Base64 used to calculate auth headers.
 	}
 
 	/**
