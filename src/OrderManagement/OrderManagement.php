@@ -121,7 +121,8 @@ class OrderManagement {
 
 		add_action( 'kco_wc_supports', array( $this, 'add_gateway_support' ) );
 
-		$this->logger = new Logger( 'kustom_order_management', wc_string_to_bool( $this->settings['logging'] ?? false ) );
+		// Initialize the logger.
+		add_action( 'init', array( $this, 'initialize_logger' ) );
 
 		$report_about = array(
 			array( 'id' => 'kom_auto_capture' ),
@@ -701,5 +702,15 @@ class OrderManagement {
 	 */
 	public function report() {
 		return $this->system_report;
+	}
+
+	/**
+	 * Initialize the logger.
+	 *
+	 * @return void
+	 */
+	public function initialize_logger() {
+		$options      = $this->settings->get_settings( null );
+		$this->logger = new Logger( 'kustom_order_management', wc_string_to_bool( $options['logging'] ?? false ) );
 	}
 }
