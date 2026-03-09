@@ -74,4 +74,3 @@ class ScheduledActions {
 		<?php
 	}
 }
-new ScheduledActions();

@@ -88,7 +88,11 @@ class SellersApp {
 			// Set post metas.
 			$order->update_meta_data( '_wc_klarna_order_id', $order->get_transaction_id() );
 			$order->update_meta_data( '_wc_klarna_country', wc_get_base_location()['country'] );
-			$order->update_meta_data( '_wc_klarna_environment', self::get_klarna_environment( $order->get_payment_method() ) );
+
+			$plugin_settings = get_option( 'woocommerce_kco_settings', array() );
+			$env             = 'yes' !== ( $plugin_settings['testmode'] ?? 'yes' ) ? 'live' : 'test';
+
+			$order->update_meta_data( '_wc_klarna_environment', $env );
 			$order->save();
 
 			$klarna_order = self::$order_management->retrieve_klarna_order( $post_id );
@@ -141,23 +145,6 @@ class SellersApp {
 		$order->save();
 
 		$order->add_order_note( __( 'Order address updated by Kustom Order management.', 'klarna-checkout-for-woocommerce' ) );
-	}
-
-	/**
-	 * Gets environment (test/live) used for Kustom purchase.
-	 *
-	 * @param string $payment_method The selected payment method.
-	 * @return mixed
-	 */
-	public static function get_klarna_environment( $payment_method ) {
-		$env                     = 'test';
-		$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
-
-		if ( 'yes' !== $payment_method_settings['testmode'] ) {
-			$env = 'live';
-		}
-
-		return $env;
 	}
 
 	/**
