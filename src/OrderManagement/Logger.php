@@ -12,9 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Logger {
 	/**
-	 * Log message string
+	 * The logger instance.
 	 *
-	 * @var $log
+	 * @var \WC_Logger
 	 */
 	public static $log;
 
@@ -36,9 +36,10 @@ class Logger {
 			if ( empty( self::$log ) ) {
 				self::$log = new \WC_Logger();
 			}
-			self::$log->add( 'klarna-checkout-for-woocommerce', print_r( $message, true ) );
+			self::$log->add( 'kustom-checkout-for-woocommerce', wp_json_encode( $message ) );
 		}
 	}
+
 	/**
 	 * Formats the log data to prevent json error.
 	 *
