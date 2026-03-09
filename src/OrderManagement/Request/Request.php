@@ -222,7 +222,7 @@ abstract class Request {
 		$order = wc_get_order( $this->order_id );
 
 		if ( ! $order || 'kco' !== $order->get_payment_method() ) {
-			return new \WP_Error( 'wrong_gateway', 'This order was not create via Kustom Checkout for WooCommerce.' );
+			return new \WP_Error( 'wrong_gateway', 'This order was not created via Kustom Checkout for WooCommerce.' );
 		}
 
 		$merchant_id   = $this->get_auth_component( 'merchant_id' );

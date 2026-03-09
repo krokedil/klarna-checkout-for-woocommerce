@@ -121,7 +121,7 @@ class OrderManagement {
 
 		add_action( 'kco_wc_supports', array( $this, 'add_gateway_support' ) );
 
-		$this->logger = new Logger( 'kustom_order_management', wc_string_to_bool( $settings['logging'] ?? false ) );
+		$this->logger = new Logger( 'kustom_order_management', wc_string_to_bool( $this->settings['logging'] ?? false ) );
 
 		$report_about = array(
 			array( 'id' => 'kom_auto_capture' ),
@@ -525,12 +525,6 @@ class OrderManagement {
 					$order->update_status( 'on-hold', sprintf( __( 'Could not capture Klarna order. %s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
 					return new \WP_Error( 'capture_failed', 'Capture failed.', $error_message );
 				}
-
-				if ( $order->save() ) {
-					return true;
-				} else {
-					return new \WP_Error( 'save_error', 'Could not save WooCommerce order object.' );
-				}
 			}
 		}
 	}
@@ -616,7 +610,7 @@ class OrderManagement {
 		$response = $request->request();
 		if ( is_wp_error( $response ) ) {
 			// translators: %s Klarna error message.
-			$order->add_order_note( \sprintf( __( 'Could not refund Klarna order. %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() ) );
+			$order->add_order_note( \sprintf( __( 'Could not refund Klarna order. %s.', 'klarna-checkout-for-woocommerce' ), $response->get_error_message() ) );
 			$order->save();
 
 			return new \WP_Error( 'unknown_error', 'Response object is of type WP_Error.', $response );
