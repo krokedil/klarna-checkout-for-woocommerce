@@ -83,11 +83,7 @@ class KCO_Checkout {
 
 		// If we have data, update the shipping.
 		if ( ! empty( $data ) ) {
-			$shipping_data = json_decode( wp_unslash( $data ), true );
-
-			if ( ! is_array( $shipping_data ) ) {
-				return;
-			}
+			$shipping_data = json_decode( wp_unslash( $data ), true ) ?? array();
 
 			$shipping_data = wc_clean( $shipping_data );
 
