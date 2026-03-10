@@ -149,7 +149,7 @@ class KCO_Request {
 		$code = wp_remote_retrieve_response_code( $response );
 		// Check the status code, if its not between 200 and 299 then its an error.
 		if ( $code < 200 || $code > 299 ) {
-			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $request_args );
+			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $this->sanitize_request_args_for_error( $request_args ) );
 			$error_message = '';
 			// Get the error messages.
 			$errors = json_decode( $body, true );
@@ -163,5 +163,58 @@ class KCO_Request {
 			return new WP_Error( $code, "$body $error_message", $data );
 		}
 		return json_decode( $body, true );
+	}
+
+	/**
+	 * Redacts sensitive values from request args before adding them to logs/errors.
+	 *
+	 * @param array $request_args Request args.
+	 * @return array
+	 */
+	protected function sanitize_request_args_for_error( $request_args ) {
+		if ( ! is_array( $request_args ) ) {
+			return array();
+		}
+
+		foreach ( $request_args as $key => $value ) {
+			if ( is_string( $key ) && $this->is_sensitive_request_key( $key ) ) {
+				$request_args[ $key ] = '[REDACTED]';
+				continue;
+			}
+
+			if ( is_array( $value ) ) {
+				$request_args[ $key ] = $this->sanitize_request_args_for_error( $value );
+			}
+		}
+
+		return $request_args;
+	}
+
+	/**
+	 * Checks if a request argument key should be redacted.
+	 *
+	 * @param string $key The argument key.
+	 * @return bool
+	 */
+	protected function is_sensitive_request_key( $key ) {
+		$normalized_key = strtolower( $key );
+
+		if ( false !== strpos( $normalized_key, 'authorization' ) ) {
+			return true;
+		}
+
+		if ( false !== strpos( $normalized_key, 'secret' ) ) {
+			return true;
+		}
+
+		if ( false !== strpos( $normalized_key, 'token' ) ) {
+			return true;
+		}
+
+		if ( false !== strpos( $normalized_key, 'password' ) ) {
+			return true;
+		}
+
+		return false;
 	}
 }
