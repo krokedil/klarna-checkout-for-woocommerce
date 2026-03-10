@@ -370,8 +370,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$checkout_localize_params     = array(
 				'update_cart_url'                 => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
 				'update_cart_nonce'               => wp_create_nonce( 'kco_wc_update_cart' ),
-				'update_shipping_url'             => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
-				'update_shipping_nonce'           => wp_create_nonce( 'kco_wc_update_shipping' ),
 				'change_payment_method_url'       => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
 				'change_payment_method_nonce'     => wp_create_nonce( 'kco_wc_change_payment_method' ),
 				'get_klarna_order_url'            => WC_AJAX::get_endpoint( 'kco_wc_get_klarna_order' ),

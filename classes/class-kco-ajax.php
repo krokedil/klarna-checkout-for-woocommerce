@@ -31,10 +31,8 @@ class KCO_AJAX extends WC_AJAX {
 	public static function add_ajax_events() {
 		$ajax_events = array(
 			'kco_wc_update_cart'                    => true,
-			'kco_wc_update_shipping'                => true,
 			'kco_wc_change_payment_method'          => true,
 			'kco_wc_iframe_shipping_address_change' => true,
-			'kco_wc_set_session_value'              => true,
 			'kco_wc_get_klarna_order'               => true,
 			'kco_wc_log_js'                         => true,
 			'kco_customer_type_changed'             => true,
