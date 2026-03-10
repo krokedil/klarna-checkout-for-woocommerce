@@ -93,7 +93,7 @@ class KCO_Request {
 	 *
 	 * @return string
 	 */
-	public function get_shared_secret() {
+	protected function get_shared_secret() {
 		$credentials = KCO_WC()->credentials->get_credentials_from_session();
 
 		return $credentials['shared_secret'];
