@@ -238,7 +238,7 @@ function kco_wc_prefill_consent() {
 		);
 
 		$credentials           = KCO_WC()->credentials->get_credentials_from_session();
-		$sanitized_merchant_id = rawurlencode( sanitize_text_field( $credentials['merchant_id'] ?? '' ) );
+		$sanitized_merchant_id = sanitize_text_field( $credentials['merchant_id'] ?? '' );
 
 		if ( 'de_DE' === get_locale() || 'de_DE_formal' === get_locale() ) {
 			$button_text = 'Meine Adressdaten vorausfüllen';
