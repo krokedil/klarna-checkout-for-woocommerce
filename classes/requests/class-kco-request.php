@@ -149,7 +149,7 @@ class KCO_Request {
 		$code = wp_remote_retrieve_response_code( $response );
 		// Check the status code, if its not between 200 and 299 then its an error.
 		if ( $code < 200 || $code > 299 ) {
-			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $this->sanitize_request_args_for_error( $request_args ) );
+			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $this->sanitize_request_args( $request_args ) );
 			$error_message = '';
 			// Get the error messages.
 			$errors = json_decode( $body, true );
@@ -166,55 +166,21 @@ class KCO_Request {
 	}
 
 	/**
-	 * Redacts sensitive values from request args before adding them to logs/errors.
+	 * Remove sensitive data from the log.
 	 *
-	 * @param array $request_args Request args.
-	 * @return array
+	 * @param array $request_args The request data to sanitize.
+	 * @return array The request data sanitized.
 	 */
-	protected function sanitize_request_args_for_error( $request_args ) {
-		if ( ! is_array( $request_args ) ) {
-			return array();
-		}
-
-		foreach ( $request_args as $key => $value ) {
-			if ( is_string( $key ) && $this->is_sensitive_request_key( $key ) ) {
-				$request_args[ $key ] = '[REDACTED]';
-				continue;
-			}
-
-			if ( is_array( $value ) ) {
-				$request_args[ $key ] = $this->sanitize_request_args_for_error( $value );
+	protected function sanitize_request_args( $request_args ) {
+		// Do not log the authorization token.
+		foreach ( $request_args['headers'] as $header => $value ) {
+			if ( 'authorization' === strtolower( $header ) ) {
+				// If it is longer than 15 char., it most likely has a token. This is an assumption that is safe even if it is wrong.
+				$request_args['headers'][ $header ] = strlen( $value ) > 15 ? '[REDACTED]' : '[MISSING]';
+				break;
 			}
 		}
 
 		return $request_args;
-	}
-
-	/**
-	 * Checks if a request argument key should be redacted.
-	 *
-	 * @param string $key The argument key.
-	 * @return bool
-	 */
-	protected function is_sensitive_request_key( $key ) {
-		$normalized_key = strtolower( $key );
-
-		if ( false !== strpos( $normalized_key, 'authorization' ) ) {
-			return true;
-		}
-
-		if ( false !== strpos( $normalized_key, 'secret' ) ) {
-			return true;
-		}
-
-		if ( false !== strpos( $normalized_key, 'token' ) ) {
-			return true;
-		}
-
-		if ( false !== strpos( $normalized_key, 'password' ) ) {
-			return true;
-		}
-
-		return false;
 	}
 }
