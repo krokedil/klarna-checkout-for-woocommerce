@@ -249,7 +249,7 @@ function kco_wc_prefill_consent() {
 			$button_text = 'Meine Adressdaten vorausfüllen';
 			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
 			$terms_url   = "https://www.kustom.co/legal{$sanitized_merchant_id}/en_us/checkout";
-			$popup_text  = 'We use Kustom Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Kustom AB, enabling the provision of Kustom Checkout. These User Terms apply for the use of Kustom Checkout is available here:';
+			$popup_text  = 'We use Kustom Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Kustom AB, enabling the provision of Kustom Checkout. The User Terms that apply for the use of Kustom Checkout are available here:';
 		}
 		?>
 		<p><a class="button" href="<?php echo esc_url( $consent_url ); ?>"><?php echo esc_html( $button_text ); ?></a></p>
