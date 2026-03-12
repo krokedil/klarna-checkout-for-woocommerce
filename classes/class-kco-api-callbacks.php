@@ -82,13 +82,18 @@ class KCO_API_Callbacks {
 				wp_send_json( array( 'error' => 'Missing product reference in order line' ), 400 );
 			}
 
-			$product    = wc_get_product( $line['reference'] );
+			$product = wc_get_product( $line['reference'] );
 			if ( ! $product || ! $product->is_in_stock() ) {
 				wp_send_json( array( 'error' => 'Product with SKU ' . $line['reference'] . ' is out of stock' ), 400 );
 			}
 
+			// Unit price is price inc vat, get the price ex vat for the product based on that price.
+			$unit_price        = $unit_price / 100; // Convert from minor to major.
+			$product_vat_rate  = wc_get_price_including_tax( $product, array( 'price' => 1, 'qty' => 1, 'order' => $order ) ) - wc_get_price_excluding_tax( $product, array( 'price' => 1, 'qty' => 1, 'order' => $order ) );
+			$unit_price_ex_vat = round( $unit_price / ( 1 + $product_vat_rate ), wc_get_price_decimals() );
+
 			// Add the product to the order with the specified quantity and unit price.
-			$order->add_product( $product, $quantity, array( 'subtotal' => wc_price( $unit_price * $quantity / 100 ) ) );
+			$order->add_product( $product, $quantity, array( 'subtotal' => $unit_price_ex_vat, 'total' => $unit_price_ex_vat ) );
 		}
 
 		$order->calculate_totals();
