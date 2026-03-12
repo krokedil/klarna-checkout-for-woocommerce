@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Added a missing nonce verification to an AJAX handler.

@@ -1,0 +1,4 @@
+Type: Enhancement
+Needs Documentation: no
+
+Redacted sensitive fields in log entries.

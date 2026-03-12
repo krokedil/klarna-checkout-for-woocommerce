@@ -696,6 +696,7 @@ jQuery( function ( $ ) {
 								url: kco_params.customer_type_changed_url,
 								type: "POST",
 								data: {
+									nonce: kco_params.customer_type_changed_nonce,
 									customer_type,
 								},
 							} )
