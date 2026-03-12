@@ -599,7 +599,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		try {
 			$order = wc_get_order( $order_id );
 			// If the order is already completed, return.
-			if ( ! empty( $order->get_date_paid() ) ) {
+			if ( empty( $order ) || ! empty( $order->get_date_paid() ) ) {
 				return;
 			}
 
