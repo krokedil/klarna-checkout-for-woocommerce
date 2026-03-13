@@ -42,7 +42,10 @@ class PendingOrders {
 
 		$order = wc_get_order( $order_id );
 
-		$order_management = new OrderManagement();
+		$order_management = \KCO_WC()->order_management ?? null;
+		if ( ! $order_management instanceof OrderManagement ) {
+			return;
+		}
 		// Check the order status for the Kustom order. Bail if it does not exist in order management.
 		$klarna_order = $order_management->retrieve_klarna_order( $order_id );
 		if ( is_wp_error( $klarna_order ) ) {
