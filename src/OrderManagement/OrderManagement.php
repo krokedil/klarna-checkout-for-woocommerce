@@ -159,6 +159,11 @@ class OrderManagement {
 		}
 
 		$order = wc_get_order( $order_id );
+
+		if ( empty( $order ) ) {
+			return;
+		}
+
 		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
