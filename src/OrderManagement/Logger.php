@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Logger class.
  *
- * Handles logging for the Klarna Order Management.
+ * Handles logging for the Kustom Order Management (KOM).
  */
 class Logger {
 	/**
@@ -22,7 +22,7 @@ class Logger {
 	 * Logs an event.
 	 *
 	 * @param string $data The data string.
-	 * @param object $order_management The order management instance.
+	 * @param object $order_management Kustom Order Management instance.
 	 * @param int    $order_id WooCommerce order ID.
 	 */
 	public static function log( $data, $order_management, $order_id = null ) {

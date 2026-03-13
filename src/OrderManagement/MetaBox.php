@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * MetaBox class.
  *
- * Handles the meta box for KOM
+ * Handles the meta box for Kustom Order Management (KOM)
  */
 class MetaBox extends OrderMetabox {
 	/**
-	 * Klarna Order Management instance.
+	 * Kustom Order Management instance.
 	 *
 	 * @var OrderManagement
 	 */
@@ -23,11 +23,11 @@ class MetaBox extends OrderMetabox {
 	/**
 	 * Class constructor.
 	 *
-	 * @param OrderManagement $order_management Klarna Order Management instance.
+	 * @param OrderManagement $order_management Kustom Order Management instance.
 	 */
 	public function __construct( $order_management ) {
 		$this->order_management = $order_management;
-		parent::__construct( 'klarna-om', 'Klarna Order Management', 'kco' );
+		parent::__construct( 'kustom-om', 'Kustom Order Management', 'kco' );
 
 		add_action( 'add_meta_boxes', array( $this, 'kom_meta_box' ) );
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'process_kom_actions' ), 45, 2 );

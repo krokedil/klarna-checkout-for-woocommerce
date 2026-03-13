@@ -8,26 +8,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * OrderLines class.
  *
- * Processes order lines from a WooCommerce order for Klarna order management requests.
+ * Processes order lines from a WooCommerce order for Kustom Order Management requests.
  */
 class OrderLines {
 
 	/**
-	 * Klarna order order lines.
+	 * Kustom Order Management order lines.
 	 *
 	 * @var array
 	 */
 	public $order_lines = array();
 
 	/**
-	 * Klarna order amount.
+	 * Kustom order amount.
 	 *
 	 * @var integer
 	 */
 	public $order_amount = 0;
 
 	/**
-	 * Klarna order tax amount.
+	 * Kustom order tax amount.
 	 *
 	 * @var integer
 	 */

@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-03-09 13:58+0000\n"
+"POT-Creation-Date: 2026-03-13 12:59+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -452,7 +452,7 @@ msgstr ""
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:50, ../classes/class-kco-gateway.php:854, ../classes/class-kco-gateway.php:856, ../classes/class-kco-gateway.php:858, ../classes/class-kco-gateway.php:860, ../includes/admin/views/status-report.php:17
+#: ../classes/class-kco-gateway.php:50, ../classes/class-kco-gateway.php:853, ../classes/class-kco-gateway.php:855, ../classes/class-kco-gateway.php:857, ../classes/class-kco-gateway.php:859, ../includes/admin/views/status-report.php:17
 msgid "Kustom Checkout"
 msgstr ""
 
@@ -478,27 +478,27 @@ msgstr ""
 msgid "Shipping %s does not match Kustom order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:388
+#: ../classes/class-kco-gateway.php:387
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:391
+#: ../classes/class-kco-gateway.php:390
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:571
+#: ../classes/class-kco-gateway.php:570
 msgid "Order address should not be changed and any changes you make will not be reflected in Kustom system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:630
+#: ../classes/class-kco-gateway.php:629
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:652, ../classes/class-kco-gateway.php:674
+#: ../classes/class-kco-gateway.php:651, ../classes/class-kco-gateway.php:673
 msgid "Reference:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:755
+#: ../classes/class-kco-gateway.php:754
 msgid "Kustom did not accept the new order amount, the order has not been updated"
 msgstr ""
 
@@ -724,68 +724,64 @@ msgstr ""
 msgid "Sales Tax"
 msgstr ""
 
+#: ../src/OrderManagement/OrderManagement.php:93
+msgid "Order Management is now included in Kustom Checkout for WooCommerce."
+msgstr ""
+
 #: ../src/OrderManagement/OrderManagement.php:94
-msgid "Klarna Order Management is now included in Klarna for WooCommerce."
+msgid "You no longer need the separate Klarna Order Management plugin."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:95
-msgid "Starting with version 4.3.0, you no longer need the separate Klarna Order Management plugin – unless you are also using the Kustom Checkout plugin (formerly Klarna Checkout)."
-msgstr ""
-
-#: ../src/OrderManagement/OrderManagement.php:99
-msgid "Read more about this change here."
-msgstr ""
-
-#: ../src/OrderManagement/OrderManagement.php:181
+#: ../src/OrderManagement/OrderManagement.php:168
 msgid "minus a return fee of"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:182
+#: ../src/OrderManagement/OrderManagement.php:169
 msgid "Refund amount is less than the return fee."
 msgstr ""
 
 #. translators: 1: User name, 2: Existing token, 3: New token.
-#: ../src/OrderManagement/OrderManagement.php:347
+#: ../src/OrderManagement/OrderManagement.php:325
 msgid "%1$s updated the subscription recurring token from \"%2$s\" to \"%3$s\"."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:405
+#: ../src/OrderManagement/OrderManagement.php:383
 msgid "Could not update Klarna order lines. An unknown error occurred."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:403
+#: ../src/OrderManagement/OrderManagement.php:381
 msgid "Could not update Klarna order lines: %s."
 msgstr ""
 
 #. translators: %s: Error message from Klarna.
-#: ../src/OrderManagement/OrderManagement.php:525
+#: ../src/OrderManagement/OrderManagement.php:499
 msgid "Could not capture Klarna order. %s"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:515
+#: ../src/OrderManagement/OrderManagement.php:489
 msgid "Klarna could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:568, ../src/OrderManagement/OrderManagement.php:587
+#: ../src/OrderManagement/OrderManagement.php:531, ../src/OrderManagement/OrderManagement.php:550
 msgid "Klarna order has not been captured and cannot be refunded."
 msgstr ""
 
 #. translators: %s Klarna error message.
-#: ../src/OrderManagement/OrderManagement.php:579, ../src/OrderManagement/OrderManagement.php:619
+#: ../src/OrderManagement/OrderManagement.php:542, ../src/OrderManagement/OrderManagement.php:582
 msgid "Could not refund Klarna order. %s."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:599
+#: ../src/OrderManagement/OrderManagement.php:562
 msgid "Could not retrieve the refund order."
 msgstr ""
 
 #. translators: refund amount, refund id.
-#: ../src/OrderManagement/OrderManagement.php:628
+#: ../src/OrderManagement/OrderManagement.php:591
 msgid "Processing a refund of %1$s with Klarna"
 msgstr ""
 
 #. translators: 1: original amount, 2: return fee amount.
-#: ../src/OrderManagement/OrderManagement.php:638
+#: ../src/OrderManagement/OrderManagement.php:601
 msgid " (original amount of %1$s - return fee of %2$s)"
 msgstr ""
 
@@ -815,7 +811,7 @@ msgstr ""
 msgid "%1$d completed, %2$d failed, %3$d pending"
 msgstr ""
 
-#: ../src/OrderManagement/SellersApp.php:143
+#: ../src/OrderManagement/SellersApp.php:147
 msgid "Order address updated by Kustom Order management."
 msgstr ""
 
