@@ -18,7 +18,7 @@ use Krokedil\KustomCheckout\OrderManagement\Request\Post\RequestPostCancel;
 use Krokedil\KustomCheckout\OrderManagement\MetaBox;
 use Krokedil\KustomCheckout\OrderManagement\Ajax;
 use Krokedil\KustomCheckout\OrderManagement\PendingOrders;
-use Krokedil\KustomCheckout\OrderManagement\Logger;
+use KrokedilKlarnaCheckoutDeps\Krokedil\Support\Logger;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Support\SystemReport;
 
 /**
