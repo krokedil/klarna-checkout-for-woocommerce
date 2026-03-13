@@ -237,29 +237,30 @@ function kco_wc_prefill_consent() {
 			wc_get_checkout_url()
 		);
 
-		$credentials = KCO_WC()->credentials->get_credentials_from_session();
-		$merchant_id = $credentials['merchant_id'];
+		$credentials           = KCO_WC()->credentials->get_credentials_from_session();
+		$sanitized_merchant_id = sanitize_text_field( $credentials['merchant_id'] ?? '' );
 
 		if ( 'de_DE' === get_locale() || 'de_DE_formal' === get_locale() ) {
 			$button_text = 'Meine Adressdaten vorausfüllen';
 			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
-			$popup_text  = 'In unserem Kassenbereich nutzen wir Kustom Checkout. Dazu werden Ihre Daten, wie E-Mail-Adresse, Vor- und
-			Nachname, Geburtsdatum, Adresse und Telefonnummer, soweit erforderlich, automatisch an Kustom AB übertragen,
-			sobald Sie in den Kassenbereich gelangen. Die Nutzungsbedingungen für Kustom Checkout finden Sie hier:
-			<a href="https://www.kustom.co/legal' . $merchant_id . '/de_de/checkout" target="_blank">https://www.kustom.co/legal' . $merchant_id . '/de_de/checkout</a>';
+			$terms_url   = "https://www.kustom.co/legal{$sanitized_merchant_id}/de_de/checkout";
+			$popup_text  = 'In unserem Kassenbereich nutzen wir Kustom Checkout. Dazu werden Ihre Daten, wie E-Mail-Adresse, Vor- und Nachname, Geburtsdatum, Adresse und Telefonnummer, soweit erforderlich, automatisch an Kustom AB übertragen, sobald Sie in den Kassenbereich gelangen. Die Nutzungsbedingungen für Kustom Checkout finden Sie hier:';
 		} else {
 			$button_text = 'Meine Adressdaten vorausfüllen';
 			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
-			$popup_text  = 'We use Kustom Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Kustom AB, enabling the provision of Kustom Checkout. These User Terms apply for the use of Kustom Checkout is available here:
-			<a target="_blank" href="https://www.kustom.co/legal' . $merchant_id . '/en_us/checkout">https://www.kustom.co/legal' . $merchant_id . '/en_us/checkout</a>';
+			$terms_url   = "https://www.kustom.co/legal{$sanitized_merchant_id}/en_us/checkout";
+			$popup_text  = 'We use Kustom Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Kustom AB, enabling the provision of Kustom Checkout. The User Terms that apply for the use of Kustom Checkout are available here:';
 		}
 		?>
-		<p><a class="button" href="<?php echo esc_attr( $consent_url ); ?>"><?php echo esc_html( $button_text ); ?></a></p>
+		<p><a class="button" href="<?php echo esc_url( $consent_url ); ?>"><?php echo esc_html( $button_text ); ?></a></p>
 		<p><a href="#TB_inline?width=600&height=550&inlineId=consent-text"
 			class="thickbox"><?php echo esc_html( $link_text ); ?></a>
 		</p>
 		<div id="consent-text" style="display:none;">
-			<p><?php echo esc_html( $popup_text ); ?></p>
+			<p>
+				<?php echo esc_html( $popup_text ); ?>
+				<a target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( $terms_url ); ?>"><?php echo esc_html( $terms_url ); ?></a>
+			</p>
 		</div>
 		<?php
 	}
