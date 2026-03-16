@@ -1,4 +1,0 @@
-Type: Enhancement
-Needs Documentation: no
-
-Removed dead paths and refactored redundant logic.
