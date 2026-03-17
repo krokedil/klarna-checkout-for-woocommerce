@@ -21,7 +21,8 @@ abstract class CheckoutFlow {
 		$order = wc_get_order( $order_id );
 
 		if ( ! $order ) {
-			throw new Exception( __( 'Invalid order ID.', 'klarna-checkout-for-woocommerce' ) );
+			$message = __( 'Invalid order ID.', 'klarna-checkout-for-woocommerce' );
+			throw new Exception( esc_html( $message ) );
 		}
 		$handler = self::get_handler();
 

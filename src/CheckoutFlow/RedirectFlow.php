@@ -19,7 +19,8 @@ class RedirectFlow extends CheckoutFlow {
 		$klarna_order = KCO_WC()->api->create_klarna_order( $order->get_id(), 'redirect' );
 
 		if ( empty( $klarna_order ) ) {
-			throw new Exception( __( "We couldn't create your payment session right now. Please try again in a moment or contact us if the issue continues.", 'klarna-checkout-for-woocommerce' ) );
+			$message = __( "We couldn't create your payment session right now. Please try again in a moment or contact us if the issue continues.", 'klarna-checkout-for-woocommerce' );
+			throw new Exception( esc_html( $message ) );
 		}
 
 		$this->save_order_metadata( $order, $klarna_order, 'redirect', false );
@@ -28,7 +29,8 @@ class RedirectFlow extends CheckoutFlow {
 
 		if ( is_wp_error( $hpp ) ) {
 			\KCO_Logger::log( \sprintf( '[Process]: Failed to create a HPP session with Kustom Order %s|%s (Kustom ID: %s).', $order->get_id(), $order->get_order_number(), $klarna_order['order_id'] ) );
-			throw new Exception( __( "We couldn't start your payment session right now. Please try again in a moment or contact us if the issue continues.", 'klarna-checkout-for-woocommerce' ) );
+			$message = __( "We couldn't start your payment session right now. Please try again in a moment or contact us if the issue continues.", 'klarna-checkout-for-woocommerce' );
+			throw new Exception( esc_html( $message ) );
 		}
 
 		$hpp_redirect = $hpp['redirect_url'];
