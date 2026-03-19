@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Removed redundant whitespace from the shipping_address key sent to Kustom.

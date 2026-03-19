@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Shipping data is now sanitized before saving.
