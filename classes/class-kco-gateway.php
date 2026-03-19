@@ -245,8 +245,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
-		 * This plugin doesn't handle order management, but it allows Klarna Order Management plugin to process refunds
-		 * and then return true or false.
+		 * Process refunds.
 		 *
 		 * @param int      $order_id WooCommerce order ID.
 		 * @param null|int $amount Refund amount.
