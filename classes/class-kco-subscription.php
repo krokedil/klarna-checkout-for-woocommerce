@@ -5,6 +5,8 @@
  * @package Klarna_Checkout/Classes
  */
 
+use Krokedil\KustomCheckout\Utility\BlocksUtility;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -46,7 +48,7 @@ class KCO_Subscription {
 	 * @return bool
 	 */
 	public static function cart_has_subscription() {
-		if ( ! is_checkout() ) {
+		if ( ! is_checkout() && ! BlocksUtility::is_checkout_block_enabled() ) {
 			return false;
 		}
 
