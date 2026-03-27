@@ -239,29 +239,30 @@ function kco_wc_prefill_consent() {
 			wc_get_checkout_url()
 		);
 
-		$credentials = KCO_WC()->credentials->get_credentials_from_session();
-		$merchant_id = $credentials['merchant_id'];
+		$credentials           = KCO_WC()->credentials->get_credentials_from_session();
+		$sanitized_merchant_id = sanitize_text_field( $credentials['merchant_id'] ?? '' );
 
 		if ( 'de_DE' === get_locale() || 'de_DE_formal' === get_locale() ) {
 			$button_text = 'Meine Adressdaten vorausfüllen';
 			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
-			$popup_text  = 'In unserem Kassenbereich nutzen wir Kustom Checkout. Dazu werden Ihre Daten, wie E-Mail-Adresse, Vor- und
-			Nachname, Geburtsdatum, Adresse und Telefonnummer, soweit erforderlich, automatisch an Kustom AB übertragen,
-			sobald Sie in den Kassenbereich gelangen. Die Nutzungsbedingungen für Kustom Checkout finden Sie hier:
-			<a href="https://www.kustom.co/legal' . $merchant_id . '/de_de/checkout" target="_blank">https://www.kustom.co/legal' . $merchant_id . '/de_de/checkout</a>';
+			$terms_url   = "https://www.kustom.co/legal{$sanitized_merchant_id}/de_de/checkout";
+			$popup_text  = 'In unserem Kassenbereich nutzen wir Kustom Checkout. Dazu werden Ihre Daten, wie E-Mail-Adresse, Vor- und Nachname, Geburtsdatum, Adresse und Telefonnummer, soweit erforderlich, automatisch an Kustom AB übertragen, sobald Sie in den Kassenbereich gelangen. Die Nutzungsbedingungen für Kustom Checkout finden Sie hier:';
 		} else {
 			$button_text = 'Meine Adressdaten vorausfüllen';
 			$link_text   = 'Es gelten die Nutzungsbedingungen zur Datenübertragung';
-			$popup_text  = 'We use Kustom Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Kustom AB, enabling the provision of Kustom Checkout. These User Terms apply for the use of Kustom Checkout is available here:
-			<a target="_blank" href="https://www.kustom.co/legal' . $merchant_id . '/en_us/checkout">https://www.kustom.co/legal' . $merchant_id . '/en_us/checkout</a>';
+			$terms_url   = "https://www.kustom.co/legal{$sanitized_merchant_id}/en_us/checkout";
+			$popup_text  = 'We use Kustom Checkout as our checkout, which offers a simplified purchase experience. When you choose to go to the checkout, your email address, first name, last name, date of birth, address and phone number may be automatically transferred to Kustom AB, enabling the provision of Kustom Checkout. The User Terms that apply for the use of Kustom Checkout are available here:';
 		}
 		?>
-		<p><a class="button" href="<?php echo esc_attr( $consent_url ); ?>"><?php echo esc_html( $button_text ); ?></a></p>
+		<p><a class="button" href="<?php echo esc_url( $consent_url ); ?>"><?php echo esc_html( $button_text ); ?></a></p>
 		<p><a href="#TB_inline?width=600&height=550&inlineId=consent-text"
 			class="thickbox"><?php echo esc_html( $link_text ); ?></a>
 		</p>
 		<div id="consent-text" style="display:none;">
-			<p><?php echo esc_html( $popup_text ); ?></p>
+			<p>
+				<?php echo esc_html( $popup_text ); ?>
+				<a target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( $terms_url ); ?>"><?php echo esc_html( $terms_url ); ?></a>
+			</p>
 		</div>
 		<?php
 	}
@@ -587,59 +588,75 @@ function kco_unset_sessions() {
  */
 function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 	if ( $order_id ) {
-		$order = wc_get_order( $order_id );
-		// If the order is already completed, return.
-		if ( ! empty( $order->get_date_paid() ) ) {
-			return;
+
+		$did_lock = false;
+		if ( apply_filters( 'kco_wc_lock_confirmation', false, $klarna_order_id, $order_id ) ) {
+			$did_lock = KCO_Confirmation::lock_kco_confirmation( $klarna_order_id, $order_id );
+			if ( ! $did_lock ) {
+				KCO_Logger::log( "Simultaneous confirmation attempt for Klarna order ID $klarna_order_id and WooCommerce order ID $order_id. Stopping process." );
+				return;
+			}
 		}
 
-		// Get the Kustom OM order.
-		$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
-
-		if ( ! is_wp_error( $klarna_order ) ) {
-			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
+		try {
+			$order = wc_get_order( $order_id );
+			// If the order is already completed, return.
+			if ( empty( $order ) || ! empty( $order->get_date_paid() ) ) {
 				return;
 			}
 
-			kco_maybe_save_surcharge( $order_id, $klarna_order );
-			kco_maybe_save_org_nr( $order_id, $klarna_order );
-			kco_maybe_save_reference( $order_id, $klarna_order );
+			// Get the Kustom OM order.
+			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
-			// Let other plugins hook into this sequence.
-			do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
+			if ( ! is_wp_error( $klarna_order ) ) {
+				if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
+					return;
+				}
 
-			// Acknowledge order in Kustom.
-			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
-			// Set the merchant references for the order.
-			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
-			// Empty cart to be safe.
-			WC()->cart->empty_cart();
-			// Check fraud status.
-			if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
-				// Payment complete and set transaction id.
-				// translators: Kustom order ID.
-				$note = sprintf( __( 'Payment via Kustom Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
-				$order->add_order_note( $note );
-				$order->payment_complete( $klarna_order_id );
-				KCO_Logger::log( $klarna_order_id . ': Fraud status accepted for order ' . $order->get_order_number() . '. payment_complete triggered.' );
-				do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
-			} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
-				// Set status to on-hold.
-				// translators: Kustom order ID.
-				$note = sprintf( __( 'Kustom order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
-				$order->set_status( 'on-hold', $note );
+				kco_maybe_save_surcharge( $order_id, $klarna_order );
+				kco_maybe_save_org_nr( $order_id, $klarna_order );
+				kco_maybe_save_reference( $order_id, $klarna_order );
+
+				// Let other plugins hook into this sequence.
+				do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
+
+				// Acknowledge order in Kustom.
+				KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+				// Set the merchant references for the order.
+				KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
+				// Empty cart to be safe.
+				WC()->cart->empty_cart();
+				// Check fraud status.
+				if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
+					// Payment complete and set transaction id.
+					// translators: Kustom order ID.
+					$note = sprintf( __( 'Payment via Kustom Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+					$order->add_order_note( $note );
+					$order->payment_complete( $klarna_order_id );
+					KCO_Logger::log( $klarna_order_id . ': Fraud status accepted for order ' . $order->get_order_number() . '. payment_complete triggered.' );
+					do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
+				} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
+					// Set status to on-hold.
+					// translators: Kustom order ID.
+					$note = sprintf( __( 'Kustom order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+					$order->set_status( 'on-hold', $note );
+					$order->save();
+					KCO_Logger::log( $klarna_order_id . ': Fraud status pending for order ' . $order->get_order_number() . '. Order set to on-hold.' );
+				} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
+					// Cancel the order.
+					$order->set_status( 'cancelled', __( 'Kustom Checkout order was rejected', 'klarna-checkout-for-woocommerce' ) );
+					$order->save();
+					KCO_Logger::log( $klarna_order_id . ': Fraud status rejected for order ' . $order->get_order_number() . '. Order cancelled.' );
+				}
+			} else {
+				$order->set_status( 'on-hold', __( 'Waiting for verification from Kustom\'s push notification', 'klarna-checkout-for-woocommerce' ) );
 				$order->save();
-				KCO_Logger::log( $klarna_order_id . ': Fraud status pending for order ' . $order->get_order_number() . '. Order set to on-hold.' );
-			} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
-				// Cancel the order.
-				$order->set_status( 'cancelled', __( 'Kustom Checkout order was rejected', 'klarna-checkout-for-woocommerce' ) );
-				$order->save();
-				KCO_Logger::log( $klarna_order_id . ': Fraud status rejected for order ' . $order->get_order_number() . '. Order cancelled.' );
+				KCO_Logger::log( $klarna_order_id . ': No order found in order management. Waiting for push verification. Order #' . $order->get_order_number() . ' set to on-hold.' );
 			}
-		} else {
-			$order->set_status( 'on-hold', __( 'Waiting for verification from Kustom\'s push notification', 'klarna-checkout-for-woocommerce' ) );
-			$order->save();
-			KCO_Logger::log( $klarna_order_id . ': No order found in order management. Waiting for push verification. Order #' . $order->get_order_number() . ' set to on-hold.' );
+		} finally {
+			if ( $did_lock ) {
+				KCO_Confirmation::unlock_kco_confirmation( $klarna_order_id, $order_id );
+			}
 		}
 	}
 }
@@ -1045,4 +1062,16 @@ function kco_ensure_numeric( $value, $default = 0 ) { //phpcs:ignore Universal.N
 	}
 
 	return $default; // Return the default value if the value is still not numeric.
+}
+
+/**
+ * Checks if the cart needs payment.
+ *
+ * @return bool
+ */
+function kco_cart_needs_payment() {
+	$needs_payment = isset( WC()->cart ) ? method_exists( WC()->cart, 'needs_payment' ) && WC()->cart->needs_payment() : false;
+
+	// A subscription in the cart always needs payment.
+	return $needs_payment || KCO_Subscription::cart_has_subscription();
 }

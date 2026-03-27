@@ -1,0 +1,24 @@
+name: Changelog Check
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [master]
+
+permissions:
+  contents: read
+concurrency:
+  group: pr-master-changelog-check-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  changelogs-exists:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changelog files in PR
+        run: |
+          chmod +x ./.github/scripts/check-changelog-master.sh
+          ./.github/scripts/check-changelog-master.sh

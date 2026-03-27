@@ -93,7 +93,7 @@ class KCO_Request {
 	 *
 	 * @return string
 	 */
-	public function get_shared_secret() {
+	protected function get_shared_secret() {
 		$credentials = KCO_WC()->credentials->get_credentials_from_session();
 
 		return $credentials['shared_secret'];
@@ -149,7 +149,7 @@ class KCO_Request {
 		$code = wp_remote_retrieve_response_code( $response );
 		// Check the status code, if its not between 200 and 299 then its an error.
 		if ( $code < 200 || $code > 299 ) {
-			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $request_args );
+			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $this->sanitize_request_args( $request_args ) );
 			$error_message = '';
 			// Get the error messages.
 			$errors = json_decode( $body, true );
@@ -163,5 +163,24 @@ class KCO_Request {
 			return new WP_Error( $code, "$body $error_message", $data );
 		}
 		return json_decode( $body, true );
+	}
+
+	/**
+	 * Remove sensitive data from the log.
+	 *
+	 * @param array $request_args The request data to sanitize.
+	 * @return array The request data sanitized.
+	 */
+	protected function sanitize_request_args( $request_args ) {
+		// Do not log the authorization token.
+		foreach ( $request_args['headers'] as $header => $value ) {
+			if ( 'authorization' === strtolower( $header ) ) {
+				// If it is longer than 15 char., it most likely has a token. This is an assumption that is safe even if it is wrong.
+				$request_args['headers'][ $header ] = strlen( $value ) > 15 ? '[REDACTED]' : '[MISSING]';
+				break;
+			}
+		}
+
+		return $request_args;
 	}
 }

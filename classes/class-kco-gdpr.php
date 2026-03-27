@@ -66,7 +66,10 @@ class KCO_GDPR {
 	 */
 	public function kco_wc_display_privacy_policy_text() {
 		if ( function_exists( 'wc_checkout_privacy_policy_text' ) ) {
-			echo wp_kses_post( wc_checkout_privacy_policy_text() );
+			ob_start();
+			wc_checkout_privacy_policy_text();
+			$policy_text = ob_get_clean();
+			echo wp_kses_post( $policy_text );
 		}
 	}
 }

@@ -83,8 +83,11 @@ class KCO_Checkout {
 
 		// If we have data, update the shipping.
 		if ( ! empty( $data ) ) {
-			WC()->session->set( 'kco_shipping_data', $data );
-			kco_update_wc_shipping( json_decode( $data, true ) );
+			$shipping_data = json_decode( wp_unslash( $data ), true ) ?? array();
+			$shipping_data = wc_clean( $shipping_data );
+
+			WC()->session->set( 'kco_shipping_data', wp_json_encode( $shipping_data ) );
+			kco_update_wc_shipping( $shipping_data );
 		}
 	}
 
@@ -123,8 +126,8 @@ class KCO_Checkout {
 		// If cart doesn't need payment anymore - reload the checkout page.
 		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
 			$status = $updated_klarna_order ? $updated_klarna_order['status'] : $klarna_order['status'];
-			if ( ! WC()->cart->needs_payment() && 'checkout_incomplete' === $status ) {
-				WC()->session->reload_checkout = true;
+			if ( ! kco_cart_needs_payment() && 'checkout_incomplete' === $status ) {
+				WC()->session->set( 'reload_checkout', true );
 			}
 		}
 	}

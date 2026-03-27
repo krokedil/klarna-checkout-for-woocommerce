@@ -136,5 +136,40 @@ class KCO_Confirmation {
 		wp_redirect( $result['redirect'] ); // phpcs:ignore
 		exit;
 	}
+
+	/**
+	 * Lock a KCO order id and WooCommerce order id combination to prevent multiple simultaneous confirmations.
+	 *
+	 * @param string $kco_id The KCO order id.
+	 * @param string $order_id The WooCommerce order id.
+	 *
+	 * @return bool True if the lock was successful, false if there is already a lock for the given combination.
+	 */
+	public static function lock_kco_confirmation( $kco_id, $order_id ) {
+		$key = "kco_confirm_{$kco_id}_{$order_id}";
+		if ( wp_using_ext_object_cache() ) {
+			return wp_cache_add( $key, true, 'kco_locks', MINUTE_IN_SECONDS );
+		}
+
+		return set_transient( $key, true, MINUTE_IN_SECONDS );
+	}
+
+	/**
+	 * Unlock a KCO order id and WooCommerce order id combination after the confirmation process is done.
+	 *
+	 * @param string $kco_id The KCO order id.
+	 * @param string $order_id The WooCommerce order id.
+	 *
+	 * @return void
+	 */
+	public static function unlock_kco_confirmation( $kco_id, $order_id ) {
+		$key = "kco_confirm_{$kco_id}_{$order_id}";
+		if ( wp_using_ext_object_cache() ) {
+			wp_cache_delete( $key, 'kco_locks' );
+			return;
+		}
+
+		delete_transient( $key );
+	}
 }
 KCO_Confirmation::get_instance();

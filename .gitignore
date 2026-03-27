@@ -24,3 +24,5 @@ nightwatch.conf.js
 .idea/
 
 /tmp*
+.changelogs/backup-*
+*.bak

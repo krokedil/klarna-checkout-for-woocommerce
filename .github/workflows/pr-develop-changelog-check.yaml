@@ -1,0 +1,37 @@
+name: Changelog Check
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [develop]
+    paths:
+      - "**.php"
+      - "**.js"
+      - "**.css"
+      - "**.ts"
+      - "**.jsx"
+      - "**.tsx"
+      - ".distignore"
+      - "phpcs.xml"
+      - "composer.json"
+      - "composer.lock"
+      - "composer-dependencies.json"
+      - "composer-dependencies.lock"
+
+permissions:
+  contents: read
+concurrency:
+  group: pr-develop-changelog-check-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  changelog-exists:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changelog file in PR
+        run: |
+          chmod +x ./.github/scripts/check-changelog-develop.sh
+          ./.github/scripts/check-changelog-develop.sh "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"

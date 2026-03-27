@@ -225,8 +225,14 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return string
 		 */
 		public function get_icon() {
-			$icon_src  = 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100';
-			$icon_html = '<img src="' . $icon_src . '" alt="Kustom Checkout" style="border-radius:0px" width="100"/>';
+			$current_country = WC()->customer ? WC()->customer->get_billing_country() : null;
+
+			// If the billing country is not available, use the store's base country.
+			if ( empty( $current_country ) ) {
+				$current_country = WC()->countries->get_base_country();
+			}
+
+			$icon_html = $this->get_gateway_icon_html( $current_country );
 			return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
 		}
 
@@ -275,33 +281,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			// If we can't retrieve a set of credentials, disable KCO.
 			if ( is_checkout() && ! KCO_WC()->credentials->get_credentials_from_session() ) {
 				return false;
-			}
-
-			// If we have a subscription product in cart and the customer isn't from SE, NO, FI, DE, DK, AT or NL, disable KCO.
-			if ( is_checkout() && KCO_Subscription::cart_has_subscription() ) {
-				$available_recurring_countries = apply_filters(
-				// This filter allows you to add or remove countries from the list of countries eligible for subscription purchases.
-					'kco_wc_available_recurring_countries',
-					array( 'SE', 'NO', 'FI', 'DK', 'DE', 'AT', 'NL' )
-				);
-				$country = WC()->customer->get_billing_country();
-				if ( empty( $country ) ) {
-					// If the billing country is not available, the "No location by default" setting is set.
-					// By default, if there is exactly one country the store sells to, it will be used by default.
-					// However, it still won't be set as the billing country until the customer has filled their billing address.
-					// In practice, the customer doesn't really have any other choice, so we can assume that it is selected country.
-					$countries = WC()->countries->get_allowed_countries();
-					if ( 1 === count( $countries ) ) {
-						$country = array_key_first( $countries );
-					} elseif ( 1 < count( $countries ) ) {
-						// If there is at least more than one allowed country, WC will let the customer pick a country on the checkout page.
-						// We'll wait until the customer has made a choice.
-						return false;
-					}
-				}
-				if ( ! in_array( $country, $available_recurring_countries, true ) ) {
-					return false;
-				}
 			}
 
 			return true;
@@ -394,8 +373,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$checkout_localize_params     = array(
 				'update_cart_url'                 => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
 				'update_cart_nonce'               => wp_create_nonce( 'kco_wc_update_cart' ),
-				'update_shipping_url'             => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
-				'update_shipping_nonce'           => wp_create_nonce( 'kco_wc_update_shipping' ),
 				'change_payment_method_url'       => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
 				'change_payment_method_nonce'     => wp_create_nonce( 'kco_wc_change_payment_method' ),
 				'get_klarna_order_url'            => WC_AJAX::get_endpoint( 'kco_wc_get_klarna_order' ),
@@ -404,6 +381,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'log_to_file_nonce'               => wp_create_nonce( 'kco_wc_log_js' ),
 				'submit_order'                    => WC_AJAX::get_endpoint( 'checkout' ),
 				'customer_type_changed_url'       => WC_AJAX::get_endpoint( 'kco_customer_type_changed' ),
+				'customer_type_changed_nonce'     => wp_create_nonce( 'kco_customer_type_changed' ),
 				'logging'                         => $this->logging,
 				'standard_woo_checkout_fields'    => $standard_woo_checkout_fields,
 				'is_confirmation_page'            => ( is_kco_confirmation() ) ? 'yes' : 'no',
@@ -619,7 +597,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function add_body_class( $classes ) {
 			if ( is_checkout() && 'yes' === $this->shipping_methods_in_iframe ) {
 				// Don't display KCO Shipping Display body classes if we have a cart that doesn't needs payment.
-				if ( null !== WC()->cart && method_exists( WC()->cart, 'needs_payment' ) && ! WC()->cart->needs_payment() ) {
+				if ( ! kco_cart_needs_payment() ) {
 					return $classes;
 				}
 
@@ -863,6 +841,26 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			return $parsed_form_fields;
+		}
+
+		/**
+		 * Get the HTML for the gateway icon.
+		 *
+		 * @param string|null $country The country code to get a specific icon for.
+		 *
+		 * @return string
+		 */
+		private function get_gateway_icon_html( $country ) {
+			switch ( $country ) {
+				case 'SE':
+					return '<img src="' . esc_url( KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_se.png' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px; max-width: 90%;"  width="250"/>';
+				case 'NO':
+					return '<img src="' . esc_url( KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_no.png' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px; max-width: 90%;"  width="250"/>';
+				case 'FI':
+					return '<img src="' . esc_url( KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_fi.png' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px; max-width: 90%;"  width="250"/>';
+				default:
+					return '<img src="' . esc_url( 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px" width="100"/>';
+			}
 		}
 	}
 }

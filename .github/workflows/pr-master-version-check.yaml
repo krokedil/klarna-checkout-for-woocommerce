@@ -1,0 +1,26 @@
+name: Version numbers check
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [master]
+    paths:
+      - "klarna-checkout-for-woocommerce.php"
+      - "readme.txt"
+permissions:
+  contents: read
+concurrency:
+  group: pr-master-version-check-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  version-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check version numbers
+        run: |
+          chmod +x ./.github/scripts/check-version-and-compat.sh
+          ./.github/scripts/check-version-and-compat.sh

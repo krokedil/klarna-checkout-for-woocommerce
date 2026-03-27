@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
 WC requires at least: 5.6.0
-WC tested up to: 10.4.3
-Stable tag: 2.17.0
+WC tested up to: 10.6.1
+Stable tag: 2.18.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,35 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-03-16    - version 2.18.4 =
+* Enhancement   - Redacted sensitive fields in log entries.
+* Enhancement   - Removed dead paths and refactored redundant logic.
+* Enhancement   - Sanitized and escaped needed data at output.
+* Fix           - Removed redundant whitespace from the shipping_address key sent to Kustom.
+* Fix           - Shipping data is now sanitized before saving.
+* Fix           - Added a missing nonce verification to an AJAX handler.
+
+= 2026-03-03    - version 2.18.3 =
+* Enhancement   - Subscription orders are now supported for all countries.
+* Enhancement   - Improved the checkout flow error handling.
+* Enhancement   - The payment method selector now displays country-specific payment option logos during checkout.
+
+= 2026-02-23    - version 2.18.2 =
+* Enhancement   - Clarified the label and description of the "Show prefill consent notice" setting.
+* Fix           - Updated the "Shipping methods in iframe" settings to use the correct documentation links.
+* Fix           - Resolved issue where the "checkout block not supported" notice temporarily appeared when switching from shortcode to block checkout on the admin edit page.
+
+= 2026-02-17    - version 2.18.1 =
+* Fix           - Fixed an issue where subscriptions with a free trial could cause an infinite loop during checkout.
+* Fix           - Fixed a compatibility issue with Kustom Shipping Assistant (KSA) and subscription renewals.
+
+= 2026.02.05    - version 2.18.0 =
+* Feature       - Added a support tab in the settings, featuring a HelpScout beacon.
+* Enhancement   - Enhanced the appearance and usability of the settings page.
+* Fix           - Fixed an issue where Kustom Shipping Assistant (KSA) was incompatible with subscription renewals.
+* Fix           - Fixed a PHP warning that could occur when editing the block checkout page in the admin area.
+* Fix           - Fixed a PHP deprecation warning.
+
 = 2026.01.21    - version 2.17.0 =
 * Feature       - Updated integration to use only Kustom API endpoints.
 * Fix           - Resolved an issue where Express checkout was not functioning correctly.

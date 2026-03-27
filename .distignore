@@ -25,3 +25,4 @@ readme.dev.md
 .prettierignore
 scoper.custom.php
 pnpm-lock.yaml
+/.changelogs

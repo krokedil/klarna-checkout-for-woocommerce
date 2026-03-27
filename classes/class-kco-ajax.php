@@ -31,10 +31,8 @@ class KCO_AJAX extends WC_AJAX {
 	public static function add_ajax_events() {
 		$ajax_events = array(
 			'kco_wc_update_cart'                    => true,
-			'kco_wc_update_shipping'                => true,
 			'kco_wc_change_payment_method'          => true,
 			'kco_wc_iframe_shipping_address_change' => true,
-			'kco_wc_set_session_value'              => true,
 			'kco_wc_get_klarna_order'               => true,
 			'kco_wc_log_js'                         => true,
 			'kco_customer_type_changed'             => true,
@@ -279,6 +277,7 @@ class KCO_AJAX extends WC_AJAX {
 	 * @return void
 	 */
 	public static function kco_customer_type_changed() {
+		check_ajax_referer( 'kco_customer_type_changed', 'nonce' );
 		$customer_type = isset( $_POST['customer_type'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_type'] ) ) : ''; // phpcs:ignore
 		do_action( 'kco_customer_type_changed', $customer_type );
 	}
