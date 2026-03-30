@@ -122,9 +122,9 @@ jQuery( function ( $ ) {
 		 */
 		kcoSuspend: function ( autoResumeBool ) {
 			if ( window._klarnaCheckout && ! kco_wc.validation && ! kco_wc.suspended && kco_wc.shippingAddressKnown ) {
-				kco_wc.suspended = true
 				kco_wc.log( "kcoSuspend", autoResumeBool )
 				window._klarnaCheckout( function ( api ) {
+					kco_wc.suspended = true
 					api.suspend( {
 						autoResume: {
 							enabled: autoResumeBool,
