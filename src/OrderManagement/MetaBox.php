@@ -320,7 +320,7 @@ class MetaBox extends OrderMetabox {
 	 * @param  object $klarna_order The Klarna order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 *
-	 * @return bool Should Capture-related stuff be in the output?
+	 * @return bool Should we add the cancel option to the output?
 	 */
 	public function want_output_cancel( $order_id, $klarna_order, $actions ) {
 		$order = wc_get_order( $order_id );
@@ -330,8 +330,8 @@ class MetaBox extends OrderMetabox {
 		if ( ! empty( $order->get_meta( '_wc_klarna_pending_to_cancelled', true ) ) ) {
 			return false; // A cancellation is already pending, can't cancel again.
 		}
-		if ( ! in_array( $klarna_order->status, array( 'CAPTURED', 'PART_CAPTURED' ), true ) ) {
-			return false; // Can only cancel orders that are captured.
+		if ( in_array( $klarna_order->status, array( 'CAPTURED', 'PART_CAPTURED', 'CANCELLED' ), true ) ) {
+			return false; // We can't cancel if the order is already captured (in whole, or in part) or cancelled.
 		}
 
 		return true;
