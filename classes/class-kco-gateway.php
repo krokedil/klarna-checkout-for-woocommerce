@@ -780,7 +780,11 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				set_transient( 'kustom_checkout_settings_page_config', $args, 60 * 60 * 24 ); // 24 hours lifetime.
 			}
 
-			return json_decode( $args, true );
+			$decoded_args                        = json_decode( $args, true );
+			$decoded_args['styled_output']       = true;
+			$decoded_args['settings_navigation'] = true;
+
+			return $decoded_args;
 		}
 
 		/**
