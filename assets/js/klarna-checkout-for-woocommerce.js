@@ -27,6 +27,12 @@ jQuery( function ( $ ) {
 		shippingEmailExists: false,
 		shippingPhoneExists: false,
 
+		// True when the KCO iframe is currently suspended, to prevent double-suspend calls.
+		suspended: false,
+		// True once a shipping address is known (via shipping_address_change or change event).
+		// Prevents api.suspend from being called before Kustom has an address to fetch shipping for.
+		shippingAddressKnown: false,
+
 		redirectAttemptCount: 0,
 
 		/**
@@ -109,12 +115,16 @@ jQuery( function ( $ ) {
 		},
 
 		/**
-		 * Resumes the Kustom Iframe
+		 * Suspends the Kustom Iframe.
+		 * Will not suspend again if already suspended, and will not suspend before a shipping
+		 * address is known (to avoid triggering premature KSA external TMS shipping fetches).
 		 * @param {boolean} autoResumeBool
 		 */
 		kcoSuspend: function ( autoResumeBool ) {
-			if ( window._klarnaCheckout && ! kco_wc.validation ) {
+			if ( window._klarnaCheckout && ! kco_wc.validation && ! kco_wc.suspended && kco_wc.shippingAddressKnown ) {
+				kco_wc.log( "kcoSuspend", autoResumeBool )
 				window._klarnaCheckout( function ( api ) {
+					kco_wc.suspended = true
 					api.suspend( {
 						autoResume: {
 							enabled: autoResumeBool,
@@ -125,10 +135,12 @@ jQuery( function ( $ ) {
 		},
 
 		/**
-		 * Resumes the KCO Iframe
+		 * Resumes the KCO Iframe. Only resumes if we actually suspended it.
 		 */
 		kcoResume: function () {
-			if ( window._klarnaCheckout && ! kco_wc.validation ) {
+			if ( window._klarnaCheckout && ! kco_wc.validation && kco_wc.suspended ) {
+				kco_wc.suspended = false
+				kco_wc.log( "kcoResume" )
 				window._klarnaCheckout( function ( api ) {
 					api.resume()
 				} )
@@ -620,6 +632,7 @@ jQuery( function ( $ ) {
 						shipping_address_change: function ( data ) {
 							// The shipping_address_change event is triggered when Checkout has detected a complete and valid shipping address for the customer. The shipping address will always be the same as billing address, unless a separate shipping address has been provided by the customer.
 							kco_wc.log( "shipping_address_change", data )
+							kco_wc.shippingAddressKnown = true
 
 							var country = kco_wc.convertCountry( data.country.toUpperCase() )
 
@@ -669,6 +682,9 @@ jQuery( function ( $ ) {
 						change: function ( data ) {
 							// The change event is triggered when the user changes postal code, country or email in their billing address. It is also triggered for given/family name except in the AT & DE markets.
 							kco_wc.log( "change", data )
+							if ( data.country && data.postal_code ) {
+								kco_wc.shippingAddressKnown = true
+							}
 						},
 						order_total_change: function ( data ) {
 							kco_wc.log( "order_total_change", data )
