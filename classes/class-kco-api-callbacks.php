@@ -9,7 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Automattic\WooCommerce\Utilities\ArrayUtil;
+use Krokedil\KustomCheckout\Upsell\UpsellValidator;
+use Krokedil\KustomCheckout\Upsell\UpsellException;
 
 /**
  * KCO_API_Callbacks class.
@@ -45,20 +46,15 @@ class KCO_API_Callbacks {
 		add_action( 'woocommerce_api_kco_wc_push', array( $this, 'push_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_notification', array( $this, 'notification_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
-		add_action( 'woocommerce_api_kco_wc_upsell', array( $this, 'upsell_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_upsell_validation', array( $this, 'upsell_validation_cb' ) );
 		add_action( 'kco_wc_punted_notification', array( $this, 'kco_wc_punted_notification_cb' ), 10, 2 );
 	}
 
-	public function upsell_cb() {
-		wp_send_json( array() );
-	}
-
-
 	/**
-	 * Process the upsell validation request from Kustom and update the WooCommerce order with the new order line.
-	 * If the product cant be added then we will return an error and stop the upsell from going through,
-	 * and reset the WooCommerce order back to the original.
+	 * Process the upsell validation request from Kustom.
+	 *
+	 * Delegates to UpsellValidator for all business logic.
+	 *
 	 * @return void
 	 */
 	public function upsell_validation_cb() {
@@ -66,92 +62,13 @@ class KCO_API_Callbacks {
 		$data         = json_decode( $post_body, true );
 		$kco_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-		// If we could not decode the body or we are missing the KCO order ID, return an error.
-		if ( null === $data || empty( $kco_order_id ) ) {
-			wp_send_json( array( 'error' => 'Invalid JSON or missing KCO order ID' ), 400 );
+		try {
+			$validator = new UpsellValidator( $data ?? [], $kco_order_id ?? '' );
+			$validator->process();
+			wp_send_json( [] );
+		} catch ( UpsellException $e ) {
+			wp_send_json( [ 'error' => $e->getMessage() ], $e->get_status_code() );
 		}
-
-		// Get the order from Kustom to ensure that the order exists, and the status is correct for allowing upsell.
-		$klarna_order = KCO_WC()->api->get_klarna_order( $kco_order_id );
-
-		if ( is_wp_error( $klarna_order ) ) {
-			wp_send_json( array( 'error' => 'Could not retrieve KCO order for order ID ' . $kco_order_id ), 400 );
-		}
-
-		// Ensure the status for the KCO order indicates that the order has been completed, and that the payment type allows increase.
-		if ( 'checkout_complete' !== $klarna_order['status'] || ! $klarna_order['payment_type_allows_increase'] ) {
-			wp_send_json( array( 'error' => 'KCO order status is not checkout_complete or payment type does not allow increase, cannot add upsell items.' ), 400 );
-		}
-
-		// Get the order from KCO order ID.
-		$order = kco_get_order_by_klarna_id( $kco_order_id );
-		if ( empty( $order ) ) {
-			wp_send_json( array( 'error' => 'Order not found for KCO order ID ' . $kco_order_id ), 404 );
-		}
-
-		// If the order was already captured, or cancelled we should not allow upsell.
-		if( ! empty( $order->get_meta( '_wc_klarna_capture_id' ) ) || ! empty( $order->get_meta( '_wc_klarna_cancelled' ) ) ) {
-			wp_send_json( array( 'error' => 'Cannot add upsell items to an order that has already been captured or cancelled.' ), 400 );
-		}
-
-		// If the order is not in processing status, we should not allow upsell.
-		if( 'processing' !== $order->get_status() ) {
-			wp_send_json( array( 'error' => 'Cannot add upsell items to an order that is not in processing status.' ), 400 );
-		}
-
-		// Get the upsell order lines.
-		$upsell_order_line         = $data['upsell_order_lines'];
-		$kco_upsell_order_item_ids = array();
-		$kco_new_order_total       = ArrayUtil::get_value_or_default( $data, 'order_amount', 0 );
-
-		// For each order line, get the corresponding WooCommerce product and check if it is in stock. If any of the products are out of stock, return an error.
-		foreach ( $upsell_order_line as $line ) {
-			$quantity             = ArrayUtil::get_value_or_default( $line, 'quantity', 0 );
-			$unit_price           = ArrayUtil::get_value_or_default( $line, 'unit_price', 0 );
-			$total_price          = ArrayUtil::get_value_or_default( $line, 'total_amount', 0 );
-			$discount_amount      = ArrayUtil::get_value_or_default( $line, 'total_discount_amount', 0 );
-			$unit_discount_amount = $discount_amount / $quantity;
-
-			// If the line does not have a reference, we can't find the product, so return an error.
-			if ( empty( $line['reference'] ) ) {
-				wp_send_json( array( 'error' => 'Missing product reference in order line' ), 400 );
-			}
-
-			$product = wc_get_product( $line['reference'] );
-			if ( ! $product || ! $product->is_in_stock() ) {
-				wp_send_json( array( 'error' => 'Product with SKU ' . $line['reference'] . ' is out of stock' ), 400 );
-			}
-
-			// Unit price is price inc vat, get the price ex vat for the product based on that price.
-			$unit_price        = ( $unit_price - $unit_discount_amount ) / 100; // Convert from minor to major.
-			$product_vat_rate  = wc_get_price_including_tax( $product, array( 'price' => 1, 'qty' => 1, 'order' => $order ) ) - wc_get_price_excluding_tax( $product, array( 'price' => 1, 'qty' => 1, 'order' => $order ) );
-			$unit_price_ex_vat = round( $unit_price / ( 1 + $product_vat_rate ), wc_get_price_decimals() );
-
-			// Add the product to the order with the specified quantity and unit price.
-			$kco_upsell_order_item_ids[] = $order->add_product( $product, $quantity, array( 'subtotal' => $unit_price_ex_vat - $unit_discount_amount, 'total' => $unit_price_ex_vat ) );
-			$kco_new_order_total += $total_price;
-		}
-
-		$order->calculate_totals();
-		$order->save();
-
-		// Ensure the new WooCommerce order total matches the KCO order total after adding the upsell items. If it does not match, return an error.
-		$wc_total = round( $order->get_total(), 2 ) * 100; // Convert to minor units.
-
-		// Allow a diff of 1 unit in minor currency, to account for rounding issues.
-		if ( abs( $wc_total - $kco_new_order_total ) > 1 ) {
-			// Remove all the upsell items that were added to the order, to revert it back to the original state.
-			foreach ( $kco_upsell_order_item_ids as $item_id ) {
-				$order->remove_item( $item_id );
-			}
-
-			$order->calculate_totals();
-			$order->save();
-			wp_send_json( array( 'error' => 'Order total mismatch after adding upsell items. KCO order total: ' . $kco_new_order_total . ', WC order total: ' . $wc_total ), 400 );
-		}
-
-
-		wp_send_json( array() );
 	}
 
 	/**
