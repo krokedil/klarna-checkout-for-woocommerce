@@ -19,7 +19,7 @@ class UpsellException extends \Exception {
 	 * @param int        $status_code The HTTP status code.
 	 * @param \Throwable $previous    The previous exception.
 	 */
-	public function __construct( $message, $status_code = 400, $previous = null ) {
+	public function __construct( string $message, int $status_code = 400, ?\Throwable $previous = null ) {
 		parent::__construct( $message, 0, $previous );
 		$this->status_code = $status_code;
 	}

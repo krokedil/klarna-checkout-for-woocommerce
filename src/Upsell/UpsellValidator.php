@@ -50,7 +50,7 @@ class UpsellValidator {
 		$this->get_validated_klarna_order();
 		$order = $this->get_validated_wc_order();
 
-		$upsell_lines         = $this->request_data['upsell_order_lines'];
+		$upsell_lines          = $this->request_data['upsell_order_lines'];
 		$expected_order_amount = $this->request_data['order_amount'] ?? 0;
 
 		$added_item_ids = $this->process_upsell_lines( $order, $upsell_lines, $expected_order_amount );
@@ -90,7 +90,7 @@ class UpsellValidator {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $this->kco_order_id );
 
 		if ( is_wp_error( $klarna_order ) ) {
-			throw new UpsellException( 'Could not retrieve KCO order for order ID ' . $this->kco_order_id );
+			throw new UpsellException( "Could not retrieve KCO order for order ID {$this->kco_order_id}" );
 		}
 
 		if ( 'checkout_complete' !== $klarna_order['status'] || ! $klarna_order['payment_type_allows_increase'] ) {
@@ -113,7 +113,7 @@ class UpsellValidator {
 		$order = kco_get_order_by_klarna_id( $this->kco_order_id );
 
 		if ( empty( $order ) ) {
-			throw new UpsellException( 'Order not found for KCO order ID ' . $this->kco_order_id, 404 );
+			throw new UpsellException( "Order not found for KCO order ID {$this->kco_order_id}", 404 );
 		}
 
 		if ( ! empty( $order->get_meta( '_wc_klarna_capture_id' ) ) || ! empty( $order->get_meta( '_wc_klarna_cancelled' ) ) ) {
@@ -154,7 +154,7 @@ class UpsellValidator {
 
 			$product = wc_get_product( $line['reference'] );
 			if ( ! $product || ! $product->is_in_stock() ) {
-				throw new UpsellException( 'Product with SKU ' . $line['reference'] . ' is out of stock' );
+				throw new UpsellException( "Product with SKU {$line['reference']} is out of stock" );
 			}
 
 			// Calculate prices in major units. Unit price from Kustom is inc VAT in minor units.
@@ -195,7 +195,7 @@ class UpsellValidator {
 
 		if ( abs( $wc_total - $expected_total ) > 1 ) {
 			$this->revert_added_items( $order, $added_item_ids );
-			throw new UpsellException( 'Order total mismatch after adding upsell items. KCO order total: ' . $expected_total . ', WC order total: ' . $wc_total );
+			throw new UpsellException( "Order total mismatch after adding upsell items. KCO order total: $expected_total, WC order total: $wc_total" );
 		}
 	}
 
