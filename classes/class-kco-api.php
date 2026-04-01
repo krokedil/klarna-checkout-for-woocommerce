@@ -86,7 +86,7 @@ class KCO_API {
 							array(
 								'kco_confirm'  => 'yes',
 								'kco_order_id' => $klarna_order_id,
-								'order_id'     => $order_id,
+								'order_id'     => $order->get_id(),
 								'key'          => $order->get_order_key(),
 							),
 							$order->get_checkout_order_received_url()
