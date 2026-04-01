@@ -1,0 +1,4 @@
+Type: Enhancement
+Needs Documentation: no
+
+If a Klarna order is detected as READ_ONLY while the customer is still on the checkout page, they will be manually redirected to the confirmation flow.
