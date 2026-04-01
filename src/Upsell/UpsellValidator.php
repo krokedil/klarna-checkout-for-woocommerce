@@ -3,6 +3,7 @@ namespace Krokedil\KustomCheckout\Upsell;
 
 use WC_Order;
 use WC_Product;
+use WC_Tax;
 
 /**
  * Validates and processes upsell requests from Kustom.
@@ -34,7 +35,7 @@ class UpsellValidator {
 	 */
 	public function __construct( $request_data, $kco_order_id ) {
 		$this->request_data = $request_data;
-		$this->kco_order_id = esc_html( $kco_order_id );
+		$this->kco_order_id = $kco_order_id;
 	}
 
 	/**
@@ -52,7 +53,7 @@ class UpsellValidator {
 		$order = $this->get_validated_wc_order();
 
 		$upsell_lines          = $this->request_data['upsell_order_lines'];
-		$expected_order_amount = $this->request_data['order_amount'] ?? 0;
+		$expected_order_amount = $this->convert_price_to_major_units( $this->request_data['order_amount'] ?? 0 );
 
 		$added_item_ids = $this->process_upsell_lines( $order, $upsell_lines, $expected_order_amount );
 
@@ -81,8 +82,7 @@ class UpsellValidator {
 	/**
 	 * Fetch and validate the Klarna order.
 	 *
-	 * Ensures the order exists, has status checkout_complete,
-	 * and that the payment type allows amount increase.
+	 * Ensures the order exists and has status checkout_complete with a payment type that allows increase.
 	 *
 	 * @return array The Klarna order data.
 	 * @throws UpsellException If the Klarna order is invalid or in wrong state.
@@ -129,25 +129,45 @@ class UpsellValidator {
 	}
 
 	/**
-	 * Get the vat rate for a product by calculating the percentage using 1 unit of currency.
+	 * Get the price of a product excluding VAT using the price including VAT from Kustom and the order.
+	 * This is necessary because Kustom sends unit prices including VAT, but WC order items require prices excluding VAT.
+	 *
+	 * @param float      $price_incl_vat The price including VAT from Kustom, already converted to major units.
+	 * @param WC_Product $product The WooCommerce product to get the VAT rate for.
+	 * @param WC_Order   $order The WooCommerce order, needed for tax calculations based on order context.
+	 *
+	 * @return float The price excluding VAT in major units.
+	 */
+	private function get_price_excluding_vat( $price_incl_vat, $product, $order ) {
+		$product_vat_rate = $this->get_vat_rate_for_product( $product, $order );
+		return round( $price_incl_vat / ( 1 + $product_vat_rate ), wc_get_price_decimals() );
+	}
+
+	/**
+	 * Get the vat rate for a product based on the order's billing location and the product's tax class.
 	 *
 	 * @param WC_Product $product The WooCommerce product to get the VAT rate for.
 	 * @param WC_Order   $order The WooCommerce order, needed for tax calculations based on order context.
+	 *
 	 * @return float
 	 */
 	private function get_vat_rate_for_product( $product, $order ) {
-		$calc_args = [
-			'price' => 1,
-			'qty'   => 1,
-			'order' => $order,
-		];
+		// Get the rates for the product's tax class based on the order's billing location.
+		$tax_rates = WC_Tax::get_rates_from_location(
+			$product->get_tax_class(),
+			[
+				$order->get_billing_country(),
+				$order->get_billing_state(),
+				$order->get_billing_postcode(),
+				$order->get_billing_city(),
+			]
+		);
 
-		$price_incl_tax = wc_get_price_including_tax( $product, $calc_args );
-		$price_excl_tax = wc_get_price_excluding_tax( $product, $calc_args );
-
-		$product_vat_rate = $price_incl_tax - $price_excl_tax;
-
-		return $product_vat_rate;
+		$rate = 0;
+		foreach ( $tax_rates as $tax_rate ) {
+			$rate += $tax_rate['rate'];
+		}
+		return $rate / 100; // Convert percentage to decimal (e.g. 25 to 0.25).
 	}
 
 	/**
@@ -165,35 +185,27 @@ class UpsellValidator {
 
 		foreach ( $upsell_lines as $line ) {
 			$quantity        = $line['quantity'] ?? 0;
-			$unit_price      = $line['unit_price'] ?? 0;
-			$total_amount    = $line['total_amount'] ?? 0;
-			$discount_amount = $line['total_discount_amount'] ?? 0;
-
-			$unit_discount_amount = $quantity > 0 ? $discount_amount / $quantity : 0;
+			$total_amount    = $this->convert_price_to_major_units( $line['total_amount'] ?? 0 );
+			$discount_amount = $this->convert_price_to_major_units( $line['total_discount_amount'] ?? 0 );
 
 			if ( empty( $line['reference'] ) ) {
 				throw new UpsellException( 'Missing product reference in order line' );
 			}
 
-			$product_reference = esc_html( $line['reference'] );
-			$product           = wc_get_product( $product_reference ) ?? wc_get_product( wc_get_product_id_by_sku( $product_reference ) );
+			$product_reference = $line['reference'];
+			$product           = wc_get_product( $product_reference ) ?: wc_get_product( wc_get_product_id_by_sku( $product_reference ) ); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found -- This is done correctly here, so its safe to use.
 
 			if ( ! $product ) {
-				throw new UpsellException( "Product with SKU or ID {$product_reference} not found" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Reference is escaped on assignment.
+				throw new UpsellException( "Product with SKU or ID {$product_reference} not found" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			}
 
 			if ( ! $product->is_in_stock() ) {
-				throw new UpsellException( "Product with SKU or ID {$product_reference} is out of stock" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Reference is escaped on assignment.
+				throw new UpsellException( "Product with SKU or ID {$product_reference} is out of stock" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			}
 
-			// Calculate prices in major units. Unit price from Kustom is inc VAT in minor units.
-			$unit_price_original_major   = $unit_price / 100;
-			$unit_price_discounted_major = ( $unit_price - $unit_discount_amount ) / 100;
-			$product_vat_rate            = $this->get_vat_rate_for_product( $product, $order );
-
-			// Calculate ex VAT prices: subtotal is before discount, total is after discount.
-			$subtotal_ex_vat = round( $unit_price_original_major / ( 1 + $product_vat_rate ), wc_get_price_decimals() );
-			$total_ex_vat    = round( $unit_price_discounted_major / ( 1 + $product_vat_rate ), wc_get_price_decimals() );
+			// Calculate ex VAT prices: subtotal is before discount, total is after discount, so add the discount to get the original subtotal amount.
+			$subtotal_ex_vat = $this->get_price_excluding_vat( $total_amount + $discount_amount, $product, $order );
+			$total_ex_vat    = $this->get_price_excluding_vat( $total_amount, $product, $order );
 
 			$added_item_ids[] = $order->add_product(
 				$product,
@@ -204,10 +216,24 @@ class UpsellValidator {
 				]
 			);
 
+			// Add the total amount to the expected order amount for final verification, using the numbers from Kustom directly.
 			$expected_order_amount += $total_amount;
 		}
 
 		return $added_item_ids;
+	}
+
+	/**
+	 * Convert a price from minor units to major units by dividing by 100.
+	 * This is used to convert the unit prices from Kustom, which are in minor units
+	 * to major units for display and calculation purposes.
+	 *
+	 * @param int $price_minor The price in minor units (e.g. 9500).
+	 *
+	 * @return float The price in major units (e.g. 95.00).
+	 */
+	private function convert_price_to_major_units( $price_minor ) {
+		return round( $price_minor / 100, wc_get_price_decimals() );
 	}
 
 	/**
@@ -218,15 +244,15 @@ class UpsellValidator {
 	 *
 	 * @param WC_Order $order          The WooCommerce order.
 	 * @param array    $added_item_ids The IDs of the added order items.
-	 * @param int      $expected_total The expected order total in minor currency units.
+	 * @param float    $expected_total The expected order total in major units after adding upsell items.
 	 *
 	 * @return void
 	 * @throws UpsellException If the order total does not match.
 	 */
 	private function verify_order_total( $order, $added_item_ids, $expected_total ) {
-		$wc_total = round( $order->get_total(), 2 ) * 100;
+		$wc_total = $order->get_total();
 
-		if ( abs( $wc_total - $expected_total ) > 1 ) {
+		if ( abs( $wc_total - $expected_total ) > 0.01 ) {
 			$this->revert_added_items( $order, $added_item_ids );
 			throw new UpsellException( "Order total mismatch after adding upsell items. KCO order total: $expected_total, WC order total: $wc_total" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Totals are numeric and not directly from user input.
 		}
