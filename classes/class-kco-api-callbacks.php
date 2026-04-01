@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Automattic\WooCommerce\Utilities\ArrayUtil;
+
 /**
  * KCO_API_Callbacks class.
  *
@@ -69,13 +71,28 @@ class KCO_API_Callbacks {
 			wp_send_json( array( 'error' => 'Order not found for KCO order ID ' . $kco_order_id ), 404 );
 		}
 
+		// If the order was already captured, or cancelled we should not allow upsell.
+		if( ! empty( $order->get_meta( '_wc_klarna_capture_id' ) ) || ! empty( $order->get_meta( '_wc_klarna_cancelled' ) ) ) {
+			wp_send_json( array( 'error' => 'Cannot add upsell items to an order that has already been captured or cancelled.' ), 400 );
+		}
+
+		// If the order is not in processing status, we should not allow upsell.
+		if( 'processing' !== $order->get_status() ) {
+			wp_send_json( array( 'error' => 'Cannot add upsell items to an order that is not in processing status.' ), 400 );
+		}
+
 		// Get the upsell order lines.
-		$upsell_order_line = $data['upsell_order_lines'];
+		$upsell_order_line         = $data['upsell_order_lines'];
+		$kco_upsell_order_item_ids = array();
+		$kco_new_order_total       = ArrayUtil::get_value_or_default( $data, 'order_amount', 0 );
 
 		// For each order line, get the corresponding WooCommerce product and check if it is in stock. If any of the products are out of stock, return an error.
 		foreach ( $upsell_order_line as $line ) {
-			$quantity   = isset( $line['quantity'] ) ? intval( $line['quantity'] ) : 1;
-			$unit_price = isset( $line['unit_price'] ) ? intval( $line['unit_price'] ) : 0;
+			$quantity             = ArrayUtil::get_value_or_default( $line, 'quantity', 0 );
+			$unit_price           = ArrayUtil::get_value_or_default( $line, 'unit_price', 0 );
+			$total_price          = ArrayUtil::get_value_or_default( $line, 'total_amount', 0 );
+			$discount_amount      = ArrayUtil::get_value_or_default( $line, 'total_discount_amount', 0 );
+			$unit_discount_amount = $discount_amount / $quantity;
 
 			// If the line does not have a reference, we can't find the product, so return an error.
 			if ( empty( $line['reference'] ) ) {
@@ -88,16 +105,33 @@ class KCO_API_Callbacks {
 			}
 
 			// Unit price is price inc vat, get the price ex vat for the product based on that price.
-			$unit_price        = $unit_price / 100; // Convert from minor to major.
+			$unit_price        = ( $unit_price - $unit_discount_amount ) / 100; // Convert from minor to major.
 			$product_vat_rate  = wc_get_price_including_tax( $product, array( 'price' => 1, 'qty' => 1, 'order' => $order ) ) - wc_get_price_excluding_tax( $product, array( 'price' => 1, 'qty' => 1, 'order' => $order ) );
 			$unit_price_ex_vat = round( $unit_price / ( 1 + $product_vat_rate ), wc_get_price_decimals() );
 
 			// Add the product to the order with the specified quantity and unit price.
-			$order->add_product( $product, $quantity, array( 'subtotal' => $unit_price_ex_vat, 'total' => $unit_price_ex_vat ) );
+			$kco_upsell_order_item_ids[] = $order->add_product( $product, $quantity, array( 'subtotal' => $unit_price_ex_vat - $unit_discount_amount, 'total' => $unit_price_ex_vat ) );
+			$kco_new_order_total += $total_price;
 		}
 
 		$order->calculate_totals();
 		$order->save();
+
+		// Ensure the new WooCommerce order total matches the KCO order total after adding the upsell items. If it does not match, return an error.
+		$wc_total = round( $order->get_total(), 2 ) * 100; // Convert to minor units.
+
+		// Allow a diff of 1 unit in minor currency, to account for rounding issues.
+		if ( abs( $wc_total - $kco_new_order_total ) > 1 ) {
+			// Remove all the upsell items that were added to the order, to revert it back to the original state.
+			foreach ( $kco_upsell_order_item_ids as $item_id ) {
+				$order->remove_item( $item_id );
+			}
+
+			$order->calculate_totals();
+			$order->save();
+			wp_send_json( array( 'error' => 'Order total mismatch after adding upsell items. KCO order total: ' . $kco_new_order_total . ', WC order total: ' . $wc_total ), 400 );
+		}
+
 
 		wp_send_json( array() );
 	}
