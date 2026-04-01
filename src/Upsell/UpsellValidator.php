@@ -2,6 +2,7 @@
 namespace Krokedil\KustomCheckout\Upsell;
 
 use WC_Order;
+use WC_Product;
 
 /**
  * Validates and processes upsell requests from Kustom.
@@ -33,7 +34,7 @@ class UpsellValidator {
 	 */
 	public function __construct( $request_data, $kco_order_id ) {
 		$this->request_data = $request_data;
-		$this->kco_order_id = $kco_order_id;
+		$this->kco_order_id = esc_html( $kco_order_id );
 	}
 
 	/**
@@ -90,7 +91,7 @@ class UpsellValidator {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $this->kco_order_id );
 
 		if ( is_wp_error( $klarna_order ) ) {
-			throw new UpsellException( "Could not retrieve KCO order for order ID {$this->kco_order_id}" );
+			throw new UpsellException( "Could not retrieve KCO order for order ID {$this->kco_order_id}" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- ID is escaped on assignment.
 		}
 
 		if ( 'checkout_complete' !== $klarna_order['status'] || ! $klarna_order['payment_type_allows_increase'] ) {
@@ -113,7 +114,7 @@ class UpsellValidator {
 		$order = kco_get_order_by_klarna_id( $this->kco_order_id );
 
 		if ( empty( $order ) ) {
-			throw new UpsellException( "Order not found for KCO order ID {$this->kco_order_id}", 404 );
+			throw new UpsellException( "Order not found for KCO order ID {$this->kco_order_id}", 404 ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- ID is escaped on assignment.
 		}
 
 		if ( ! empty( $order->get_meta( '_wc_klarna_capture_id' ) ) || ! empty( $order->get_meta( '_wc_klarna_cancelled' ) ) ) {
@@ -125,6 +126,28 @@ class UpsellValidator {
 		}
 
 		return $order;
+	}
+
+	/**
+	 * Get the vat rate for a product by calculating the percentage using 1 unit of currency.
+	 *
+	 * @param WC_Product $product The WooCommerce product to get the VAT rate for.
+	 * @param WC_Order   $order The WooCommerce order, needed for tax calculations based on order context.
+	 * @return float
+	 */
+	private function get_vat_rate_for_product( $product, $order ) {
+		$calc_args = [
+			'price' => 1,
+			'qty'   => 1,
+			'order' => $order,
+		];
+
+		$price_incl_tax = wc_get_price_including_tax( $product, $calc_args );
+		$price_excl_tax = wc_get_price_excluding_tax( $product, $calc_args );
+
+		$product_vat_rate = $price_incl_tax - $price_excl_tax;
+
+		return $product_vat_rate;
 	}
 
 	/**
@@ -152,24 +175,34 @@ class UpsellValidator {
 				throw new UpsellException( 'Missing product reference in order line' );
 			}
 
-			$product = wc_get_product( $line['reference'] );
-			if ( ! $product || ! $product->is_in_stock() ) {
-				throw new UpsellException( "Product with SKU {$line['reference']} is out of stock" );
+			$product_reference = esc_html( $line['reference'] );
+			$product           = wc_get_product( $product_reference ) ?? wc_get_product( wc_get_product_id_by_sku( $product_reference ) );
+
+			if ( ! $product ) {
+				throw new UpsellException( "Product with SKU or ID {$product_reference} not found" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Reference is escaped on assignment.
+			}
+
+			if ( ! $product->is_in_stock() ) {
+				throw new UpsellException( "Product with SKU or ID {$product_reference} is out of stock" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Reference is escaped on assignment.
 			}
 
 			// Calculate prices in major units. Unit price from Kustom is inc VAT in minor units.
 			$unit_price_original_major   = $unit_price / 100;
 			$unit_price_discounted_major = ( $unit_price - $unit_discount_amount ) / 100;
-
-			// Get the VAT rate by comparing inc/ex tax for 1 unit of currency.
-			$product_vat_rate = wc_get_price_including_tax( $product, [ 'price' => 1, 'qty' => 1, 'order' => $order ] )
-				- wc_get_price_excluding_tax( $product, [ 'price' => 1, 'qty' => 1, 'order' => $order ] );
+			$product_vat_rate            = $this->get_vat_rate_for_product( $product, $order );
 
 			// Calculate ex VAT prices: subtotal is before discount, total is after discount.
 			$subtotal_ex_vat = round( $unit_price_original_major / ( 1 + $product_vat_rate ), wc_get_price_decimals() );
 			$total_ex_vat    = round( $unit_price_discounted_major / ( 1 + $product_vat_rate ), wc_get_price_decimals() );
 
-			$added_item_ids[] = $order->add_product( $product, $quantity, [ 'subtotal' => $subtotal_ex_vat, 'total' => $total_ex_vat ] );
+			$added_item_ids[] = $order->add_product(
+				$product,
+				$quantity,
+				[
+					'subtotal' => $subtotal_ex_vat,
+					'total'    => $total_ex_vat,
+				]
+			);
 
 			$expected_order_amount += $total_amount;
 		}
@@ -195,7 +228,7 @@ class UpsellValidator {
 
 		if ( abs( $wc_total - $expected_total ) > 1 ) {
 			$this->revert_added_items( $order, $added_item_ids );
-			throw new UpsellException( "Order total mismatch after adding upsell items. KCO order total: $expected_total, WC order total: $wc_total" );
+			throw new UpsellException( "Order total mismatch after adding upsell items. KCO order total: $expected_total, WC order total: $wc_total" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Totals are numeric and not directly from user input.
 		}
 	}
 
