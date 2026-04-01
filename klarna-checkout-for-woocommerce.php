@@ -30,6 +30,7 @@
 
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
+use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -113,6 +114,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var KrokedilWooCommerce
 		 */
 		public $krokedil = null;
+
+		/**
+		 * Reference to order management class.
+		 *
+		 * @var OrderManagement $order_management
+		 */
+		public $order_management;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -283,16 +291,17 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
 
 			// Set class variables.
-			$this->credentials   = new KCO_Credentials();
-			$this->merchant_urls = new KCO_Merchant_URLs();
-			$this->logger        = new KCO_Logger();
-			$this->api           = new KCO_API();
-			$this->krokedil      = new KrokedilWooCommerce(
+			$this->credentials      = new KCO_Credentials();
+			$this->merchant_urls    = new KCO_Merchant_URLs();
+			$this->logger           = new KCO_Logger();
+			$this->api              = new KCO_API();
+			$this->krokedil         = new KrokedilWooCommerce(
 				array(
 					'slug'         => 'kco',
 					'price_format' => 'minor',
 				)
 			);
+			$this->order_management = new OrderManagement();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
