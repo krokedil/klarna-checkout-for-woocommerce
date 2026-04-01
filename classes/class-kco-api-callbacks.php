@@ -55,6 +55,12 @@ class KCO_API_Callbacks {
 	}
 
 
+	/**
+	 * Process the upsell validation request from Kustom and update the WooCommerce order with the new order line.
+	 * If the product cant be added then we will return an error and stop the upsell from going through,
+	 * and reset the WooCommerce order back to the original.
+	 * @return void
+	 */
 	public function upsell_validation_cb() {
 		$post_body    = file_get_contents( 'php://input' );
 		$data         = json_decode( $post_body, true );
@@ -63,6 +69,18 @@ class KCO_API_Callbacks {
 		// If we could not decode the body or we are missing the KCO order ID, return an error.
 		if ( null === $data || empty( $kco_order_id ) ) {
 			wp_send_json( array( 'error' => 'Invalid JSON or missing KCO order ID' ), 400 );
+		}
+
+		// Get the order from Kustom to ensure that the order exists, and the status is correct for allowing upsell.
+		$klarna_order = KCO_WC()->api->get_klarna_order( $kco_order_id );
+
+		if ( is_wp_error( $klarna_order ) ) {
+			wp_send_json( array( 'error' => 'Could not retrieve KCO order for order ID ' . $kco_order_id ), 400 );
+		}
+
+		// Ensure the status for the KCO order indicates that the order has been completed, and that the payment type allows increase.
+		if ( 'checkout_complete' !== $klarna_order['status'] || ! $klarna_order['payment_type_allows_increase'] ) {
+			wp_send_json( array( 'error' => 'KCO order status is not checkout_complete or payment type does not allow increase, cannot add upsell items.' ), 400 );
 		}
 
 		// Get the order from KCO order ID.
