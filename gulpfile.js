@@ -8,8 +8,15 @@ var pump = require('pump');
 var cleanCSS = require('gulp-clean-css');
 var wpPot = require('gulp-wp-pot');
 
-var cssFiles = 'assets/css/klarna-checkout-for-woocommerce.css';
-var jsFiles = ['assets/js/klarna-checkout-for-woocommerce.js', 'assets/js/klarna-checkout-for-woocommerce-admin.js'];
+var cssFiles = [
+	'assets/css/klarna-checkout-for-woocommerce.css',
+	'src/OrderManagement/assets/css/klarna-order-management.css'
+];
+var jsFiles = [
+	'assets/js/klarna-checkout-for-woocommerce.js',
+	'assets/js/klarna-checkout-for-woocommerce-admin.js',
+	'src/OrderManagement/assets/js/klarna-order-management.js'
+];
 var translateFiles = '**/*.php';
 
 gulp.task('makePOT', function () {
@@ -42,26 +49,26 @@ function makePot() {
 
 gulp.task('CSS', function() {
     return gulp
-        .src(cssFiles)
+	.src(cssFiles, { base: '.' })
         .pipe(cleanCSS({ debug: true }))
         .pipe(rename({ suffix: '.min' }))
-        .pipe(gulp.dest('assets/css'));
+	.pipe(gulp.dest('.'));
 });
 
 function css() {
 	return gulp
-	.src(cssFiles)
+	.src(cssFiles, { base: '.' })
 	.pipe(cleanCSS({ debug: true }))
 	.pipe(rename({ suffix: '.min' }))
-	.pipe(gulp.dest('assets/css'));
+	.pipe(gulp.dest('.'));
 }
 
 gulp.task('JS', function(cb) {
-    pump([gulp.src(jsFiles), uglify(), rename({ suffix: '.min' }), gulp.dest('assets/js')], cb);
+    pump([gulp.src(jsFiles, { base: '.' }), uglify(), rename({ suffix: '.min' }), gulp.dest('.')], cb);
 });
 
 function js(cb){
-	pump([gulp.src(jsFiles), uglify(), rename({ suffix: '.min' }), gulp.dest('assets/js')], cb);
+	pump([gulp.src(jsFiles, { base: '.' }), uglify(), rename({ suffix: '.min' }), gulp.dest('.')], cb);
 }
 
 gulp.task('watch', function() {

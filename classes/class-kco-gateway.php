@@ -245,8 +245,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
-		 * This plugin doesn't handle order management, but it allows Klarna Order Management plugin to process refunds
-		 * and then return true or false.
+		 * Process refunds.
 		 *
 		 * @param int      $order_id WooCommerce order ID.
 		 * @param null|int $amount Refund amount.
@@ -370,8 +369,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$checkout_localize_params     = array(
 				'update_cart_url'                 => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
 				'update_cart_nonce'               => wp_create_nonce( 'kco_wc_update_cart' ),
-				'update_shipping_url'             => WC_AJAX::get_endpoint( 'kco_wc_update_shipping' ),
-				'update_shipping_nonce'           => wp_create_nonce( 'kco_wc_update_shipping' ),
 				'change_payment_method_url'       => WC_AJAX::get_endpoint( 'kco_wc_change_payment_method' ),
 				'change_payment_method_nonce'     => wp_create_nonce( 'kco_wc_change_payment_method' ),
 				'get_klarna_order_url'            => WC_AJAX::get_endpoint( 'kco_wc_get_klarna_order' ),
@@ -380,6 +377,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'log_to_file_nonce'               => wp_create_nonce( 'kco_wc_log_js' ),
 				'submit_order'                    => WC_AJAX::get_endpoint( 'checkout' ),
 				'customer_type_changed_url'       => WC_AJAX::get_endpoint( 'kco_customer_type_changed' ),
+				'customer_type_changed_nonce'     => wp_create_nonce( 'kco_customer_type_changed' ),
 				'logging'                         => $this->logging,
 				'standard_woo_checkout_fields'    => $standard_woo_checkout_fields,
 				'is_confirmation_page'            => ( is_kco_confirmation() ) ? 'yes' : 'no',

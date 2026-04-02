@@ -101,13 +101,11 @@ class KCO_Merchant_URLs {
 	 * @return string
 	 */
 	private function get_push_url() {
-		$session_id = $this->get_session_id();
 
 		$push_url = add_query_arg(
 			array(
 				'kco-action'      => 'push',
 				'kco_wc_order_id' => '{checkout.order.id}',
-				'kco_session_id'  => $session_id,
 			),
 			home_url( '/wc-api/KCO_WC_Push/' )
 		);
