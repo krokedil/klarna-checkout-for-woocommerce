@@ -49,12 +49,20 @@ class UpsellValidator {
 	 */
 	public function process() {
 		$this->validate_input();
+		\KCO_Logger::log( $this->kco_order_id . ': Upsell request input validated.' );
+
 		$this->get_validated_klarna_order();
+		\KCO_Logger::log( $this->kco_order_id . ': Kustom order validated for upsell (status checkout_complete, payment type allows increase).' );
+
 		$order = $this->get_validated_wc_order();
+		\KCO_Logger::log( $this->kco_order_id . ': WC order #' . $order->get_order_number() . ' validated for upsell.' );
 
 		$upsell_lines = $this->request_data['upsell_order_lines'];
 		$this->validate_upsell_lines( $upsell_lines );
+		\KCO_Logger::log( $this->kco_order_id . ': Upsell order lines validated (' . count( $upsell_lines ) . ' lines).' );
+
 		$this->store_upsell_data( $order, $upsell_lines );
+		\KCO_Logger::log( $this->kco_order_id . ': Upsell data stored on WC order #' . $order->get_order_number() . '.' );
 	}
 
 	/**

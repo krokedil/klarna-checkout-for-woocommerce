@@ -63,11 +63,16 @@ class KCO_API_Callbacks {
 		$data         = json_decode( $post_body, true );
 		$kco_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
+		KCO_WC()->logger->log( "Upsell validation callback hit for order: $kco_order_id" );
+		KCO_WC()->logger->log( 'Upsell validation request data: ' . wp_json_encode( $data ) );
+
 		try {
 			$validator = new UpsellValidator( $data ?? [], $kco_order_id ?? '' );
 			$validator->process();
+			KCO_WC()->logger->log( 'Upsell validation successful for order: ' . $kco_order_id );
 			wp_send_json( [] );
 		} catch ( UpsellException $e ) {
+			KCO_WC()->logger->log( 'ERROR Upsell validation failed for order ' . $kco_order_id . ': ' . $e->getMessage() );
 			wp_send_json( [ 'error' => $e->getMessage() ], $e->get_status_code() );
 		}
 	}

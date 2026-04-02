@@ -21,6 +21,13 @@ class UpsellProcessor {
 	private $order;
 
 	/**
+	 * New product names that where added to the order.
+	 *
+	 * @var string[]
+	 */
+	private $added_product_names = [];
+
+	/**
 	 * UpsellProcessor constructor.
 	 *
 	 * @param WC_Order $order The WooCommerce order to process upsells for.
@@ -39,19 +46,38 @@ class UpsellProcessor {
 	 * @throws UpsellException If a product cannot be added.
 	 */
 	public function process() {
-		$upsell_data = $this->order->get_meta( '_kco_upsell_data' );
+		$order_number = $this->order->get_order_number();
+		$upsell_data  = $this->order->get_meta( '_kco_upsell_data' );
 
 		if ( empty( $upsell_data ) || ! is_array( $upsell_data ) ) {
+			\KCO_Logger::log( 'Upsell processing: No pending upsell data found for WC order #' . $order_number . '. Skipping.' );
 			return;
 		}
+
+		\KCO_Logger::log( 'Upsell processing: Starting for WC order #' . $order_number . ' with ' . count( $upsell_data ) . ' upsell batch(es). Data: ' . wp_json_encode( $upsell_data ) );
 
 		foreach ( $upsell_data as $upsell_lines ) {
 			$this->process_upsell_lines( $upsell_lines );
 		}
 
+		if ( empty( $this->added_product_names ) ) {
+			\KCO_Logger::log( 'Upsell processing: No products were added for WC order #' . $order_number . ' after processing upsell data. This may indicate an issue with the upsell data or processing.' );
+			return;
+		}
+
+		$this->order->add_order_note(
+			sprintf(
+				// translators: %s is a comma separated list of product names that were added to the order as part of the upsell.
+				__( 'The order has been upsold with the products: %s', 'klarna-checkout-for-woocommerce' ),
+				implode( ', ', $this->added_product_names )
+			)
+		);
+
 		$this->order->calculate_totals();
 		$this->order->delete_meta_data( '_kco_upsell_data' ); // Delete the old metadata to prevent re-processing the same upsell data if the push callback is triggered again for the same order.
 		$this->order->save();
+
+		\KCO_Logger::log( 'Upsell processing: Completed for WC order #' . $order_number . '. New order total: ' . $this->order->get_total() );
 
 		return;
 	}
@@ -65,13 +91,13 @@ class UpsellProcessor {
 	 * @throws UpsellException If a product reference is missing or product is not found.
 	 */
 	private function process_upsell_lines( $upsell_lines ) {
-		$product_names = [];
 		foreach ( $upsell_lines as $line ) {
 			$quantity        = $line['quantity'] ?? 0;
 			$total_amount    = $this->convert_price_to_major_units( $line['total_amount'] ?? 0 );
 			$discount_amount = $this->convert_price_to_major_units( $line['total_discount_amount'] ?? 0 );
 
 			if ( empty( $line['reference'] ) ) {
+				\KCO_Logger::log( 'ERROR Upsell processing: Missing product reference in order line for WC order #' . $this->order->get_order_number() . '. Line data: ' . wp_json_encode( $line ) );
 				throw new UpsellException( 'Missing product reference in order line' );
 			}
 
@@ -79,12 +105,15 @@ class UpsellProcessor {
 			$product           = wc_get_product( $product_reference ) ?: wc_get_product( wc_get_product_id_by_sku( $product_reference ) ); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found -- This is done correctly here, so its safe to use.
 
 			if ( ! $product ) {
+				\KCO_Logger::log( 'ERROR Upsell processing: Product with reference ' . $product_reference . ' not found for WC order #' . $this->order->get_order_number() );
 				throw new UpsellException( "Product with SKU or ID {$product_reference} not found" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			}
 
 			// Calculate ex VAT prices: subtotal is before discount, total is after discount, so add the discount to get the original subtotal amount.
 			$subtotal_ex_vat = $this->get_price_excluding_vat( $total_amount + $discount_amount, $product );
 			$total_ex_vat    = $this->get_price_excluding_vat( $total_amount, $product );
+
+			\KCO_Logger::log( 'Upsell processing: Adding product "' . $product->get_name() . '" (ref: ' . $product_reference . ') x' . $quantity . ' to WC order #' . $this->order->get_order_number() . '. Subtotal ex VAT: ' . $subtotal_ex_vat . ', Total ex VAT: ' . $total_ex_vat );
 
 			$item_id = $this->order->add_product(
 				$product,
@@ -100,11 +129,8 @@ class UpsellProcessor {
 			$order_item->add_meta_data( '_kco_is_upsell', 'yes' );
 			$order_item->add_meta_data( '_kco_upsell_reference', $product_reference );
 			$order_item->save_meta_data();
-			$product_names[] = $product->get_name();
+			$this->added_product_names[] = $product->get_name();
 		}
-
-		$order_note = __( 'The order has been upsold with the products: %s', 'klarna-checkout-for-woocommerce' );
-		$this->order->add_order_note( sprintf( $order_note, implode( ', ', $product_names ) ) );
 	}
 
 	/**
