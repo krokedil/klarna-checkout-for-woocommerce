@@ -57,7 +57,7 @@ class KCO_Request_Create_HPP extends KCO_Request {
 	 *
 	 * @param string $session_id The Kustom Checkout session id.
 	 * @param int    $order_id The WooCommerce order id.
-	 * @return string
+	 * @return array
 	 */
 	public function get_body( $session_id, $order_id ) {
 		$order = wc_get_order( $order_id );
