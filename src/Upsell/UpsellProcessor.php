@@ -78,14 +78,12 @@ class UpsellProcessor {
 		$this->order->save();
 
 		\KCO_Logger::log( 'Upsell processing: Completed for WC order #' . $order_number . '. New order total: ' . $this->order->get_total() );
-
-		return;
 	}
 
 	/**
 	 * Process each upsell order line and add the products to the WC order.
 	 *
-	 * @param array    $upsell_lines The upsell order lines from Kustom.
+	 * @param array $upsell_lines The upsell order lines from Kustom.
 	 *
 	 * @return void
 	 * @throws UpsellException If a product reference is missing or product is not found.

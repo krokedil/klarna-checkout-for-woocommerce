@@ -367,12 +367,12 @@ class KCO_Fields {
 				'type' => 'krokedil_section_end',
 			),
 			// Checkout iframe settings.
-			'upsell_settings_title'       => array(
+			'upsell_settings_title'      => array(
 				'title' => __( 'Upsell Settings', 'klarna-checkout-for-woocommerce' ),
 				'type'  => 'krokedil_section_start',
 				'id'    => 'upsell_settings_title',
 			),
-			'enable_upsell'               => array(
+			'enable_upsell'              => array(
 				'title'       => __( 'Enable upsell', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable upsell in Kustom Checkout', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
@@ -380,7 +380,7 @@ class KCO_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
-			'upsell_section_end'       => array(
+			'upsell_section_end'         => array(
 				'type' => 'krokedil_section_end',
 			),
 		);

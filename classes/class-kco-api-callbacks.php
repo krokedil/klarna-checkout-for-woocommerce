@@ -67,13 +67,13 @@ class KCO_API_Callbacks {
 		KCO_WC()->logger->log( 'Upsell validation request data: ' . wp_json_encode( $data ) );
 
 		try {
-			$validator = new UpsellValidator( $data ?? [], $kco_order_id ?? '' );
+			$validator = new UpsellValidator( $data ?? array(), $kco_order_id ?? '' );
 			$validator->process();
 			KCO_WC()->logger->log( 'Upsell validation successful for order: ' . $kco_order_id );
-			wp_send_json( [] );
+			wp_send_json( array() );
 		} catch ( UpsellException $e ) {
 			KCO_WC()->logger->log( 'ERROR Upsell validation failed for order ' . $kco_order_id . ': ' . $e->getMessage() );
-			wp_send_json( [ 'error' => $e->getMessage() ], $e->get_status_code() );
+			wp_send_json( array( 'error' => $e->getMessage() ), $e->get_status_code() );
 		}
 	}
 
@@ -129,7 +129,7 @@ class KCO_API_Callbacks {
 					$processor->process();
 					$order = wc_get_order( $order->get_id() ); // Refresh the order after processing the upsell, to make sure we have the latest data.
 				} catch ( UpsellException $e ) {
-					KCO_WC()->logger->log( 'ERROR Push callback failed to process upsell data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) ) ;
+					KCO_WC()->logger->log( 'ERROR Push callback failed to process upsell data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 					return;
 				}
 				KCO_WC()->logger->log( 'Successfully processed upsell data on push callback for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );

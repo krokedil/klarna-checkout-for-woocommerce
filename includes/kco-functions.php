@@ -607,7 +607,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 			// Get the settings.
-			$settings = get_option( 'woocommerce_kco_settings', array() );
+			$settings       = get_option( 'woocommerce_kco_settings', array() );
 			$upsell_enabled = wc_string_to_bool( $settings['enable_upsell'] ?? 'no' );
 
 			if ( ! is_wp_error( $klarna_order ) ) {
