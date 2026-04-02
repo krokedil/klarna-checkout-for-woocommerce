@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Added the 'kco_checkbox_changed' action hook. This action is triggered whenever the customer toggles the checkbox.
