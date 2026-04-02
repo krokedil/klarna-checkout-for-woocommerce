@@ -701,6 +701,18 @@ jQuery( function ( $ ) {
 								},
 							} )
 						},
+						checkbox_change: (evt) => {
+							const { key, checked } = evt
+							$.ajax( {
+								url: kco_params.checkbox_changed_url,
+								type: "POST",
+								data: {
+									nonce: kco_params.checkbox_changed_nonce,
+									key,
+									checked,
+								},
+							} )
+						},
 						// https://docs.kustom.co/v3/checkout/additional-resources/client-side-events#the-load_confirmation-event
 						redirect_initiated: ( trigger ) => {
 							kco_wc.log( "redirect_initiated", trigger )

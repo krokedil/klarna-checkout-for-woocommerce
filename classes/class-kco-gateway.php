@@ -378,6 +378,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'submit_order'                    => WC_AJAX::get_endpoint( 'checkout' ),
 				'customer_type_changed_url'       => WC_AJAX::get_endpoint( 'kco_customer_type_changed' ),
 				'customer_type_changed_nonce'     => wp_create_nonce( 'kco_customer_type_changed' ),
+				'checkbox_changed_url'            => WC_AJAX::get_endpoint( 'kco_checkbox_changed' ),
+				'checkbox_changed_nonce'          => wp_create_nonce( 'kco_checkbox_changed' ),
 				'logging'                         => $this->logging,
 				'standard_woo_checkout_fields'    => $standard_woo_checkout_fields,
 				'is_confirmation_page'            => ( is_kco_confirmation() ) ? 'yes' : 'no',
