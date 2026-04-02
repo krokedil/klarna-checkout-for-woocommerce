@@ -9,8 +9,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Krokedil\KustomCheckout\Upsell\UpsellValidator;
 use Krokedil\KustomCheckout\Upsell\UpsellException;
+use Krokedil\KustomCheckout\Upsell\UpsellProcessor;
+use Krokedil\KustomCheckout\Upsell\UpsellValidator;
 
 /**
  * KCO_API_Callbacks class.
@@ -103,6 +104,8 @@ class KCO_API_Callbacks {
 
 		$order_id = $order->get_id();
 		if ( $order ) {
+			$settings = get_option( 'woocommerce_kco_settings', array() );
+
 			// Get the Kustom order data.
 			$klarna_order = apply_filters(
 				'kco_wc_api_callbacks_push_klarna_order',
@@ -112,6 +115,19 @@ class KCO_API_Callbacks {
 			if ( is_wp_error( $klarna_order ) ) {
 				KCO_WC()->logger->log( 'ERROR Push callback failed to get Kustom order data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 				return;
+			}
+
+			// If upsell is enabled and we have metadata for the upsell data, then we need to process the upsell before acknowledging the order, to make sure the order total is correct in Kustom before the order is acknowledged.
+			if ( wc_string_to_bool( $settings['enable_upsell'] ?? 'no' ) ) {
+				try {
+					$processor = new UpsellProcessor( $order );
+					$processor->process();
+					$order = wc_get_order( $order->get_id() ); // Refresh the order after processing the upsell, to make sure we have the latest data.
+				} catch ( UpsellException $e ) {
+					KCO_WC()->logger->log( 'ERROR Push callback failed to process upsell data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) ) ;
+					return;
+				}
+				KCO_WC()->logger->log( 'Successfully processed upsell data on push callback for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 			}
 
 			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {

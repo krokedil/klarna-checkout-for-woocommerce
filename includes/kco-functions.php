@@ -606,6 +606,10 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 			// Get the Kustom OM order.
 			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
+			// Get the settings.
+			$settings = get_option( 'woocommerce_kco_settings', array() );
+			$upsell_enabled = wc_string_to_bool( $settings['enable_upsell'] ?? 'no' );
+
 			if ( ! is_wp_error( $klarna_order ) ) {
 				if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
 					return;
@@ -618,12 +622,24 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				// Let other plugins hook into this sequence.
 				do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
 
-				// Acknowledge order in Kustom.
-				KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+				// Acknowledge order in Kustom. Only do that here if upsell is not enabled, since upsell flow requires the order to be acknowledged after the upsell is processed on the push callback.
+				if ( ! $upsell_enabled ) {
+					KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+				}
+
 				// Set the merchant references for the order.
 				KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
 				// Empty cart to be safe.
 				WC()->cart->empty_cart();
+
+				// If upsell is enabled, just set the order to on-hold and wait for the push notification to confirm the order after the upsell is processed. Otherwise, confirm the order immediately.
+				if ( $upsell_enabled ) {
+					$order->set_status( 'on-hold', __( 'Waiting for verification from Kustom\'s push notification', 'klarna-checkout-for-woocommerce' ) );
+					$order->save();
+					KCO_Logger::log( $klarna_order_id . ': Upsell enabled, waiting for push verification. Order #' . $order->get_order_number() . ' set to on-hold.' );
+					return;
+				}
+
 				// Check fraud status.
 				if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
 					// Payment complete and set transaction id.
@@ -752,6 +768,11 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	foreach ( $items as $order_item ) {
 		$order_line = $order_data->get_order_line_items( $order_item );
 		$reference  = $order_line['reference'];
+
+		// If the order row is an upsell row, then set the reference to the stored reference for the upsell.
+		if ( wc_string_to_bool( $order_item->get_meta( '_kco_is_upsell' ) ) ) {
+			$reference = $order_item->get_meta( '_kco_upsell_reference' );
+		}
 
 		if ( isset( $woo_stack[ $reference ] ) ) {
 			$woo_stack[ $reference ] += $order_line['quantity'];
