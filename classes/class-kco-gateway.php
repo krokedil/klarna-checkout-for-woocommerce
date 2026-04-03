@@ -298,10 +298,22 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				$args['icon']            = KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_black.png';
 				$gateway_page            = new Gateway( $this, $args );
 				$args['general_content'] = array( $gateway_page, 'output' );
-				$settings_page           = ( SettingsPage::get_instance() )
-				->set_plugin_name( 'Kustom Checkout for WooCommerce' )
-				->register_page( $this->id, $args, $this )
-				->output( $this->id );
+
+				try {
+					( SettingsPage::get_instance() )
+						->set_plugin_name( 'Kustom Checkout for WooCommerce' )
+						->register_page( $this->id, $args, $this )
+						->output( $this->id );
+				} catch ( Throwable $e ) {
+					KCO_Logger::log( sprintf( 'Failed rendering settings page package output: %s', $e->getMessage() ) );
+					echo '<div class="notice notice-error"><p>' . esc_html__( 'Could not load the enhanced settings page. Showing the standard settings instead.', 'klarna-checkout-for-woocommerce' ) . '</p></div>';
+
+					ob_start();
+					parent::admin_options();
+					$parent_options = ob_get_contents();
+					ob_end_clean();
+					WC_Klarna_Banners::settings_sidebar( $parent_options );
+				}
 			}
 
 			KCO_Settings_Saved::maybe_show_errors();
@@ -779,7 +791,11 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				set_transient( 'kustom_checkout_settings_page_config', $args, 60 * 60 * 24 ); // 24 hours lifetime.
 			}
 
-			return json_decode( $args, true );
+			$decoded_args                        = json_decode( $args, true );
+			$decoded_args['styled_output']       = true;
+			$decoded_args['settings_navigation'] = true;
+
+			return $decoded_args;
 		}
 
 		/**
