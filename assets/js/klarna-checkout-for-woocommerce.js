@@ -540,11 +540,7 @@ jQuery( function ( $ ) {
 										email = response.data.shipping_address.email
 									}
 
-									kco_wc.logToFile(
-										"Successfully placed order [" +
-											email +
-											']. Sending "should_proceed: true" to Kustom',
-									)
+									kco_wc.logToFile( `Successfully placed order [${email}]. Sending "should_proceed: true" to Kustom` )
 									callback( { should_proceed: true } )
 								} else {
 									throw "Result failed"
