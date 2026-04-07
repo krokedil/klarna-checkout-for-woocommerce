@@ -711,6 +711,12 @@ jQuery( function ( $ ) {
 									key,
 									checked,
 								},
+    							success: ( response ) => {
+    							    if ( response.data.reload_checkout) {
+    							        $( document.body ).trigger( 'wc_fragment_refresh' );
+    							        $( document.body ).trigger( 'update_checkout' );
+    							    }
+    							}
 							} )
 						},
 						// https://docs.kustom.co/v3/checkout/additional-resources/client-side-events#the-load_confirmation-event

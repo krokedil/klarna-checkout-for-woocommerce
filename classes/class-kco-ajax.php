@@ -300,6 +300,12 @@ class KCO_AJAX extends WC_AJAX {
 				'checked' => $checked,
 			)
 		);
+
+		wp_send_json_success(
+			array(
+				'reload_checkout' => apply_filters( 'kco_ajax_refresh_checkout', false ),
+			)
+		);
 	}
 }
 KCO_AJAX::init();
