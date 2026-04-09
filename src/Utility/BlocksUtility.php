@@ -35,10 +35,14 @@ class BlocksUtility {
 			return false;
 		}
 
+		if ( wc_get_page_id( 'checkout' ) !== $post_id ) {
+			return false;
+		}
+
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return false;
 		}
 
-		return $is_edit_context && wc_get_page_id( 'checkout' ) === $post_id;
+		return true;
 	}
 }
