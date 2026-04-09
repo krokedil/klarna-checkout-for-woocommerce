@@ -303,7 +303,7 @@ class KCO_AJAX extends WC_AJAX {
 
 		wp_send_json_success(
 			array(
-				'reload_checkout' => apply_filters( 'kco_ajax_refresh_checkout', false ),
+				'refresh_checkout' => apply_filters( 'kco_ajax_refresh_checkout', false ),
 			)
 		);
 	}

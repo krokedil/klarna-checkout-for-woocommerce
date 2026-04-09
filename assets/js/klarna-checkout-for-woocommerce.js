@@ -712,7 +712,7 @@ jQuery( function ( $ ) {
 									checked,
 								},
     							success: ( response ) => {
-    							    if ( response.data.reload_checkout) {
+    							    if ( response.data.refresh_checkout) {
     							        $( document.body ).trigger( 'wc_fragment_refresh' );
     							        $( document.body ).trigger( 'update_checkout' );
     							    }
