@@ -107,6 +107,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			add_filter( 'kco_wc_api_request_args', array( $this, 'maybe_remove_kco_epm' ), 9999 );
 
+			// Log any errors from the settings page rendering, to be able to debug issues with the shared settings page package.
+			add_action( 'krokedil_settings_page_render_error', array( $this, 'log_settings_page_render_error' ), 10, 2 );
+
 			// Prevent the Woo validation from proceeding if there is a discrepancy between Woo and Kustom.
 			add_action( 'woocommerce_after_checkout_validation', array( $this, 'validate_checkout' ), 10, 2 );
 		}
@@ -290,34 +293,49 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$args = $this->get_settings_page_args();
 
 			if ( empty( $args ) ) {
-				ob_start();
-				parent::admin_options();
-				$parent_options = ob_get_contents();
-				ob_end_clean();
-				WC_Klarna_Banners::settings_sidebar( $parent_options );
+				$this->output_legacy_admin_options();
 			} else {
-				$args['icon']            = KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_black.png';
-				$gateway_page            = new Gateway( $this, $args );
-				$args['general_content'] = array( $gateway_page, 'output' );
+				$args['icon']             = KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_black.png';
+				$gateway_page             = new Gateway( $this, $args );
+				$args['general_content']  = array( $gateway_page, 'output' );
+				$args['fallback_content'] = array( $this, 'output_legacy_admin_options' );
+				$args['error_notice']     = __( 'Could not load the enhanced settings page. Showing the standard settings instead.', 'klarna-checkout-for-woocommerce' );
 
-				try {
-					( SettingsPage::get_instance() )
-						->set_plugin_name( 'Kustom Checkout for WooCommerce' )
-						->register_page( $this->id, $args, $this )
-						->output( $this->id );
-				} catch ( Throwable $e ) {
-					KCO_Logger::log( sprintf( 'Failed rendering settings page package output: %s', $e->getMessage() ) );
-					echo '<div class="notice notice-error"><p>' . esc_html__( 'Could not load the enhanced settings page. Showing the standard settings instead.', 'klarna-checkout-for-woocommerce' ) . '</p></div>';
-
-					ob_start();
-					parent::admin_options();
-					$parent_options = ob_get_contents();
-					ob_end_clean();
-					WC_Klarna_Banners::settings_sidebar( $parent_options );
-				}
+				( SettingsPage::get_instance() )
+					->set_plugin_name( 'Kustom Checkout for WooCommerce' )
+					->register_page( $this->id, $args, $this )
+					->output( $this->id );
 			}
 
 			KCO_Settings_Saved::maybe_show_errors();
+		}
+
+		/**
+		 * Output the standard WooCommerce admin options with the Kustom sidebar.
+		 *
+		 * @return void
+		 */
+		public function output_legacy_admin_options() {
+			ob_start();
+			parent::admin_options();
+			$parent_options = ob_get_contents();
+			ob_end_clean();
+			WC_Klarna_Banners::settings_sidebar( $parent_options );
+		}
+
+		/**
+		 * Log settings page rendering errors from the shared settings page package.
+		 *
+		 * @param string    $id Page ID.
+		 * @param Throwable $exception Render exception.
+		 * @return void
+		 */
+		public function log_settings_page_render_error( $id, $exception ) {
+			if ( ! $exception instanceof Throwable ) {
+				return;
+			}
+
+			KCO_Logger::log( sprintf( 'Failed rendering settings page package output: %s', $exception->getMessage() ) );
 		}
 
 		/**
