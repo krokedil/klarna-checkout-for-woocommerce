@@ -37,6 +37,15 @@ class KCO_Request {
 	 */
 	protected $shop_country;
 
+	protected $endpoint;
+
+	/**
+	 * The request URL for the current request.
+	 *
+	 * @var string
+	 */
+	protected $request_url = '';
+
 	/**
 	 * Class constructor.
 	 */
@@ -107,7 +116,8 @@ class KCO_Request {
 	protected function get_user_agent() {
 		return apply_filters(
 			'http_headers_useragent',
-			'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' )
+			'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ),
+			empty( $this->request_url ) ? $this->get_api_url_base() : $this->request_url
 		) . ' - WooCommerce: ' . WC()->version . ' - KCO:' . KCO_WC_VERSION . ' - PHP Version: ' . phpversion() . ' - Krokedil';
 	}
 

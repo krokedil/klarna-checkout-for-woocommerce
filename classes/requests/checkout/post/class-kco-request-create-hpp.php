@@ -21,17 +21,17 @@ class KCO_Request_Create_HPP extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $session_id, $order_id ) {
-		$request_url  = $this->get_api_url_base() . 'hpp/v1/sessions';
-		$request_args = apply_filters( 'wc_klarna_checkout_create_hpp_args', $this->get_request_args( $session_id, $order_id ) );
+		$this->request_url = $this->get_api_url_base() . 'hpp/v1/sessions';
+		$request_args      = apply_filters( 'wc_klarna_checkout_create_hpp_args', $this->get_request_args( $session_id, $order_id ) );
 
-		$response = wp_remote_request( $request_url, $request_args );
+		$response = wp_remote_request( $this->request_url, $request_args );
 		$code     = wp_remote_retrieve_response_code( $response );
 
 		// Log request.
-		$log = KCO_Logger::format_log( $session_id, 'POST', 'KCO create HPP', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $request_url );
+		$log = KCO_Logger::format_log( $session_id, 'POST', 'KCO create HPP', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $this->request_url );
 		KCO_Logger::log( $log );
 
-		$formated_response = $this->process_response( $response, $request_args, $request_url );
+		$formated_response = $this->process_response( $response, $request_args, $this->request_url );
 		return $formated_response;
 	}
 
