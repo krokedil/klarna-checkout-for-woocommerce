@@ -13,12 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Create KCO Order
  */
 class KCO_Request_Create extends KCO_Request {
-	/**
-	 * The API endpoint for creating orders.
-	 *
-	 * @var string
-	 */
-	protected $endpoint = 'checkout/v3/orders';
 
 	/**
 	 * Makes the request.
@@ -28,7 +22,7 @@ class KCO_Request_Create extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $order_id = null, $checkout_flow = 'embedded' ) {
-		$request_url       = $this->get_api_url_base() . $this->endpoint;
+		$request_url       = $this->get_api_url_base() . 'checkout/v3/orders';
 		$request_args      = apply_filters( 'kco_wc_create_order', $this->get_request_args( $order_id, $checkout_flow, $request_url ) );
 		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );

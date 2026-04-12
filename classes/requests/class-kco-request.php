@@ -37,8 +37,6 @@ class KCO_Request {
 	 */
 	protected $shop_country;
 
-	protected $endpoint;
-
 	/**
 	 * Class constructor.
 	 */
