@@ -23,14 +23,14 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $username, $password, $testmode, $endpoint ) {
-		$this->request_url  = $this->get_test_endpoint( $testmode, $endpoint, $username, $password ) . 'checkout/v3/orders';
-		$request_args       = apply_filters( 'kco_wc_test_credentials', $this->get_request_args( $username, $password ) );
-		$response           = wp_remote_request( $this->request_url, $request_args );
+		$request_url        = $this->get_test_endpoint( $testmode, $endpoint, $username, $password ) . 'checkout/v3/orders';
+		$request_args       = apply_filters( 'kco_wc_test_credentials', $this->get_request_args( $username, $password, $request_url ) );
+		$response           = wp_remote_request( $request_url, $request_args );
 		$code               = wp_remote_retrieve_response_code( $response );
-		$formatted_response = $this->process_response( $response, $request_args, $this->request_url );
+		$formatted_response = $this->process_response( $response, $request_args, $request_url );
 
 		// Log the request.
-		$log = KCO_Logger::format_log( null, 'POST', 'KCO test credentials', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $this->request_url );
+		$log = KCO_Logger::format_log( null, 'POST', 'KCO test credentials', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $request_url );
 		KCO_Logger::log( $log );
 		return $formatted_response;
 	}
@@ -68,16 +68,17 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	 *
 	 * @param string $username The username to use.
 	 * @param string $password The password to use.
+	 * @param string $url The request URL.
 	 * @return array
 	 */
-	protected function get_request_args( $username, $password ) {
+	protected function get_request_args( $username, $password, $url = '' ) {
 			return array(
 				'headers'    => array(
 					'Authorization'  => 'Basic ' . base64_encode( $username . ':' . $password ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Base64 used to calculate auth header.
 					'Content-Type'   => 'application/json',
 					'kustom-partner' => 'PG000651',
 				),
-				'user-agent' => $this->get_user_agent(),
+				'user-agent' => $this->get_user_agent( $url ),
 				'method'     => 'POST',
 				'body'       => wp_json_encode( $this->get_body() ),
 				'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),

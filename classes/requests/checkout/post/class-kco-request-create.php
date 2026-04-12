@@ -14,6 +14,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class KCO_Request_Create extends KCO_Request {
 	/**
+	 * The API endpoint for creating orders.
+	 *
+	 * @var string
+	 */
+	protected $endpoint = 'checkout/v3/orders';
+
+	/**
 	 * Makes the request.
 	 *
 	 * @param int    $order_id The WooCommerce order id.
@@ -21,16 +28,16 @@ class KCO_Request_Create extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $order_id = null, $checkout_flow = 'embedded' ) {
-		$this->request_url = $this->get_api_url_base() . $this->endpoint;
-		$request_args      = apply_filters( 'kco_wc_create_order', $this->get_request_args( $order_id, $checkout_flow ) );
-		$response          = wp_remote_request( $this->request_url, $request_args );
+		$request_url       = $this->get_api_url_base() . $this->endpoint;
+		$request_args      = apply_filters( 'kco_wc_create_order', $this->get_request_args( $order_id, $checkout_flow, $request_url ) );
+		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
-		$formated_response = $this->process_response( $response, $request_args, $this->request_url );
+		$formated_response = $this->process_response( $response, $request_args, $request_url );
 
 		$klarna_order_id = is_wp_error( $formated_response ) ? null : $formated_response['order_id'];
 
 		// Log the request.
-		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO create order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $this->request_url );
+		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO create order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $request_url );
 		KCO_Logger::log( $log );
 		return $formated_response;
 	}
@@ -365,12 +372,13 @@ class KCO_Request_Create extends KCO_Request {
 	 *
 	 * @param int    $order_id The WooCommerce order id.
 	 * @param string $checkout_flow Embedded in checkout page or redirect via Kustom HPP.
+	 * @param string $url The request URL.
 	 * @return array
 	 */
-	protected function get_request_args( $order_id, $checkout_flow ) {
+	protected function get_request_args( $order_id, $checkout_flow, $url = '' ) {
 		return array(
 			'headers'    => $this->get_request_headers(),
-			'user-agent' => $this->get_user_agent(),
+			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'POST',
 			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id, $checkout_flow ), $order_id ) ),
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),

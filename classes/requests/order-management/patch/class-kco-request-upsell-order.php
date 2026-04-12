@@ -22,18 +22,18 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $klarna_order_id, $order_id, $upsell_uuid ) {
-		$this->request_url = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id . '/authorization';
-		$request_args      = apply_filters( 'kco_wc_acknowledge_order', $this->get_request_args( $order_id, $upsell_uuid ) );
+		$request_url  = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id . '/authorization';
+		$request_args = apply_filters( 'kco_wc_acknowledge_order', $this->get_request_args( $order_id, $upsell_uuid, $request_url ) );
 
 		$body_array           = apply_filters( 'kco_wc_api_request_args', json_decode( $request_args['body'], true ), $order_id, $upsell_uuid );
 		$request_args['body'] = wp_json_encode( $body_array );
 
-		$response          = wp_remote_request( $this->request_url, $request_args );
+		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
-		$formated_response = $this->process_response( $response, $request_args, $this->request_url );
+		$formated_response = $this->process_response( $response, $request_args, $request_url );
 
 		// Log the request.
-		$log = KCO_Logger::format_log( $klarna_order_id, 'PATCH', 'KCO upsell order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $this->request_url );
+		$log = KCO_Logger::format_log( $klarna_order_id, 'PATCH', 'KCO upsell order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $request_url );
 		KCO_Logger::log( $log );
 		return $formated_response;
 	}
@@ -59,12 +59,13 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 	 *
 	 * @param int    $order_id The WooCommerce order id.
 	 * @param string $upsell_uuid The unique id for the upsell request.
+	 * @param string $url The request URL.
 	 * @return array
 	 */
-	protected function get_request_args( $order_id, $upsell_uuid ) {
+	protected function get_request_args( $order_id, $upsell_uuid, $url = '' ) {
 		return array(
 			'headers'    => $this->get_request_headers(),
-			'user-agent' => $this->get_user_agent(),
+			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'PATCH',
 			'body'       => wp_json_encode( $this->get_body( $order_id, $upsell_uuid ) ),
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),

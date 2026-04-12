@@ -40,13 +40,6 @@ class KCO_Request {
 	protected $endpoint;
 
 	/**
-	 * The request URL for the current request.
-	 *
-	 * @var string
-	 */
-	protected $request_url = '';
-
-	/**
 	 * Class constructor.
 	 */
 	public function __construct() {
@@ -111,13 +104,14 @@ class KCO_Request {
 	/**
 	 * Gets Kustom API request headers.
 	 *
+	 * @param string $url The request URL.
 	 * @return string
 	 */
-	protected function get_user_agent() {
+	protected function get_user_agent( $url = '' ) {
 		return apply_filters(
 			'http_headers_useragent',
 			'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ),
-			empty( $this->request_url ) ? $this->get_api_url_base() : $this->request_url
+			empty( $url ) ? $this->get_api_url_base() : $url
 		) . ' - WooCommerce: ' . WC()->version . ' - KCO:' . KCO_WC_VERSION . ' - PHP Version: ' . phpversion() . ' - Krokedil';
 	}
 

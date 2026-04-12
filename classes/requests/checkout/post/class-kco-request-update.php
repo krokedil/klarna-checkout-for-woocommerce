@@ -22,8 +22,8 @@ class KCO_Request_Update extends KCO_Request {
 	 * @return array|false|WP_Error
 	 */
 	public function request( $klarna_order_id, $order_id = null, $force = false ) {
-		$this->request_url = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
-		$request_args      = apply_filters( 'kco_wc_update_order', $this->get_request_args( $order_id ) );
+		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
+		$request_args = apply_filters( 'kco_wc_update_order', $this->get_request_args( $order_id, $request_url ) );
 
 		// Check if we need to update.
 		if ( WC()->session->get( 'kco_update_md5' ) && WC()->session->get( 'kco_update_md5' ) === md5( wp_json_encode( $request_args ) ) && ! $force ) {
@@ -31,12 +31,12 @@ class KCO_Request_Update extends KCO_Request {
 		}
 		WC()->session->set( 'kco_update_md5', md5( wp_json_encode( $request_args ) ) );
 
-		$response           = wp_remote_request( $this->request_url, $request_args );
+		$response           = wp_remote_request( $request_url, $request_args );
 		$code               = wp_remote_retrieve_response_code( $response );
-		$formatted_response = $this->process_response( $response, $request_args, $this->request_url );
+		$formatted_response = $this->process_response( $response, $request_args, $request_url );
 
 		// Log the request.
-		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO update order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $this->request_url );
+		$log = KCO_Logger::format_log( $klarna_order_id, 'POST', 'KCO update order', $request_args, json_decode( wp_remote_retrieve_body( $response ), true ), $code, $request_url );
 		KCO_Logger::log( $log );
 		return $formatted_response;
 	}
@@ -119,12 +119,13 @@ class KCO_Request_Update extends KCO_Request {
 	 * Gets the request args for the API call.
 	 *
 	 * @param string $order_id The WooCommerce order id.
+	 * @param string $url The request URL.
 	 * @return array
 	 */
-	protected function get_request_args( $order_id ) {
+	protected function get_request_args( $order_id, $url = '' ) {
 		return array(
 			'headers'    => $this->get_request_headers(),
-			'user-agent' => $this->get_user_agent(),
+			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'POST',
 			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id ), $order_id ) ),
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
