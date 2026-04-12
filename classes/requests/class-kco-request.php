@@ -102,7 +102,7 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Kustom API request headers.
+	 * Gets the user agent for the API call.
 	 *
 	 * @param string $url The request URL.
 	 * @return string
