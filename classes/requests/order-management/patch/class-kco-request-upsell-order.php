@@ -50,7 +50,7 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 		return array(
 			'order_lines'  => $helper->get_order_lines( $order_id ),
 			'order_amount' => $helper->get_order_amount( $order_id ),
-			'description'  => __( 'Upsell from thankyou page', 'klarna-upsell-for-woocommerce' ),
+			'description'  => __( 'Upsell from thankyou page', 'klarna-upsell-for-woocommerce' ), // phpcs:ignore
 		);
 	}
 
