@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Added the request URL as the 2nd parameter to the 'http_headers_useragent' filter which is required for other plugins that hook onto this filter that need the URL to modify the user agent string accordingly.

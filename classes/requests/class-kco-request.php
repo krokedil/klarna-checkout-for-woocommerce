@@ -96,14 +96,16 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Kustom API request headers.
+	 * Gets the user agent for the API call.
 	 *
+	 * @param string $url The request URL.
 	 * @return string
 	 */
-	protected function get_user_agent() {
+	protected function get_user_agent( $url = '' ) {
 		return apply_filters(
 			'http_headers_useragent',
-			'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' )
+			'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ),
+			empty( $url ) ? $this->get_api_url_base() : $url
 		) . ' - WooCommerce: ' . WC()->version . ' - KCO:' . KCO_WC_VERSION . ' - PHP Version: ' . phpversion() . ' - Krokedil';
 	}
 

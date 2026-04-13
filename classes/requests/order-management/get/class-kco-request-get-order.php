@@ -21,7 +21,7 @@ class KCO_Request_Get_Order extends KCO_Request {
 	 */
 	public function request( $klarna_order_id ) {
 		$request_url       = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id;
-		$request_args      = apply_filters( 'kco_wc_get_order', $this->get_request_args() );
+		$request_args      = apply_filters( 'kco_wc_get_order', $this->get_request_args( $request_url ) );
 		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
 		$formated_response = $this->process_response( $response, $request_args, $request_url );
@@ -35,12 +35,13 @@ class KCO_Request_Get_Order extends KCO_Request {
 	/**
 	 * Gets the request args for the API call.
 	 *
+	 * @param string $url The request URL.
 	 * @return array
 	 */
-	protected function get_request_args() {
+	protected function get_request_args( $url = '' ) {
 		return array(
 			'headers'    => $this->get_request_headers(),
-			'user-agent' => $this->get_user_agent(),
+			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'GET',
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
 		);
