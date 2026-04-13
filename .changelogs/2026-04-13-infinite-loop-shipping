@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue that could cause checkout to keep refreshing when shipping calculation was set to “most expensive class” and the cart had products from different shipping classes.
