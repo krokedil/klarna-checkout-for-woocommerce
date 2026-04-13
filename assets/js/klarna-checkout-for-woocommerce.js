@@ -499,10 +499,14 @@ jQuery( function ( $ ) {
 		},
 
 		updateShipping: function ( data ) {
-			kco_wc.kcoSuspend( true )
-			$( "#kco_shipping_data" ).val( JSON.stringify( data ) )
-			$( "body" ).trigger( "kco_shipping_option_changed", [ data ] )
-			$( "body" ).trigger( "update_checkout" )
+			const $current = $("#kco_shipping_data").val()
+
+			$("#kco_shipping_data").val(JSON.stringify(data))
+			const $updated = $("#kco_shipping_data").val()
+			if ($updated !== JSON.stringify(data) || $current !== $updated) {
+				$( "body" ).trigger( "kco_shipping_option_changed", [ data ] )
+				$( "body" ).trigger( "update_checkout" )
+			}
 		},
 
 		convertCountry: function ( country ) {
