@@ -56,12 +56,8 @@ class KCO_Request {
 	 * Gets Kustom API URL base.
 	 */
 	public function get_api_url_base() {
-		$base_location  = wc_get_base_location();
-		$country_string = 'US' === $base_location['country'] ? '-na' : '';
-		$test_string    = 'yes' === $this->settings['testmode'] ? '.playground' : '';
-		$domain         = 'kustom.co';
-
-		return "https://api{$country_string}{$test_string}.{$domain}/";
+		$test_string = 'yes' === $this->settings['testmode'] ? '.playground' : '';
+		return "https://api{$test_string}.kustom.co/";
 	}
 
 	/**

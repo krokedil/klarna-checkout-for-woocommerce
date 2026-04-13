@@ -5,12 +5,12 @@
  * Description: Kustom Checkout payment gateway for WooCommerce.
  * Author: Kustom
  * Author URI: https://klarna.com/
- * Version: 2.18.4
+ * Version: 2.19.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 5.6.0
- * WC tested up to: 10.6.1
+ * WC tested up to: 10.6.2
  *
  * Copyright (c) 2017-2026 Krokedil
  *
@@ -30,6 +30,7 @@
 
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
+use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -38,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.18.4' );
+define( 'KCO_WC_VERSION', '2.19.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -113,6 +114,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var KrokedilWooCommerce
 		 */
 		public $krokedil = null;
+
+		/**
+		 * Reference to order management class.
+		 *
+		 * @var OrderManagement $order_management
+		 */
+		public $order_management;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -283,16 +291,17 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
 
 			// Set class variables.
-			$this->credentials   = new KCO_Credentials();
-			$this->merchant_urls = new KCO_Merchant_URLs();
-			$this->logger        = new KCO_Logger();
-			$this->api           = new KCO_API();
-			$this->krokedil      = new KrokedilWooCommerce(
+			$this->credentials      = new KCO_Credentials();
+			$this->merchant_urls    = new KCO_Merchant_URLs();
+			$this->logger           = new KCO_Logger();
+			$this->api              = new KCO_API();
+			$this->krokedil         = new KrokedilWooCommerce(
 				array(
 					'slug'         => 'kco',
 					'price_format' => 'minor',
 				)
 			);
+			$this->order_management = new OrderManagement();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
