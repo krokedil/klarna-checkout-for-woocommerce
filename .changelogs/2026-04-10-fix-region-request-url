@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue with adding -na to the request URL when sending requests to kustom.co for stores based in USA.
