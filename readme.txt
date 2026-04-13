@@ -7,7 +7,7 @@ Tested up to: 6.9
 Requires PHP: 7.4
 WC requires at least: 5.6.0
 WC tested up to: 10.6.2
-Stable tag: 2.18.4
+Stable tag: 2.19.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,13 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-04-13    - version 2.19.0 =
+* Feature       - Order management functionality is now built into the plugin, eliminating the requirement for an external plugin.
+* Enhancement   - If a Kustom order is detected as READ_ONLY while the customer is still on the checkout page, they will be redirected to the confirmation flow.
+* Tweak         - Added a locking mechanism in the confirmation step to prevent a race condition that could lead to an order being processed more than once.
+* Fix           - Moved order validation before meta data updates, to prevent overwriting data on already processed orders.
+* Fix           - Fixed an issue with adding -na to the request URL when sending requests to kustom.co for stores based in USA.
+
 = 2026-03-16    - version 2.18.4 =
 * Enhancement   - Redacted sensitive fields in log entries.
 * Enhancement   - Removed dead paths and refactored redundant logic.
