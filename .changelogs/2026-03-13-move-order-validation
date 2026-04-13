@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Moved order validation before meta data updates, to prevent overwriting data on already processed orders.

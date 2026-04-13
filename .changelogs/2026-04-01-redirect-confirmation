@@ -1,4 +1,0 @@
-Type: Enhancement
-Needs Documentation: no
-
-If a Kustom order is detected as READ_ONLY while the customer is still on the checkout page, they will be redirected to the confirmation flow.
