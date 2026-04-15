@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Changed the Go live banner background color from Klarna pink (#FFB3C7) to Kustom yellow (#eafe53).
