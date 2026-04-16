@@ -133,17 +133,6 @@ class OrderManagement {
 		// Refund an order.
 		add_filter( 'wc_klarna_checkout_process_refund', array( $this, 'refund_klarna_order' ), 10, 4 );
 
-		// Pending orders.
-		add_action(
-			'wc_klarna_notification_listener',
-			array(
-				PendingOrders::class,
-				'notification_listener',
-			),
-			10,
-			2
-		);
-
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ) );
 	}
 
