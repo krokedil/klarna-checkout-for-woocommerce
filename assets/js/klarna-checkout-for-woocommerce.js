@@ -498,9 +498,22 @@ jQuery( function ( $ ) {
 			}
 		},
 
-		updateShipping: function ( data ) {
-			kco_wc.kcoSuspend( true )
-			$( "#kco_shipping_data" ).val( JSON.stringify( data ) )
+		updateShipping: function (data) {
+			const serializedData = JSON.stringify(data)
+
+			// If the update succeeded but the data is the same as before, we won't trigger the update_checkout event to avoid an infinite loop.
+			const current = $("#kco_shipping_data").val()
+			if (current === serializedData) {
+				return
+			}
+
+			$("#kco_shipping_data").val(serializedData)
+
+			// If checkout or update fails, restore the previous value so the guard doesn't block a retry.
+			$( "body" ).one( "checkout_error", function () {
+				$( "#kco_shipping_data" ).val( current )
+			} )
+
 			$( "body" ).trigger( "kco_shipping_option_changed", [ data ] )
 			$( "body" ).trigger( "update_checkout" )
 		},
