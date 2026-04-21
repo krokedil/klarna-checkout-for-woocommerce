@@ -191,10 +191,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 				if ( isset( $klarna_order['billing_address'][ $klarna_name ] ) ) {
 					// Remove all whitespace and convert to lowercase.
-					$billing_address[ $billing_field ]               = strtolower( preg_replace( '/\s+/', '', $billing_address[ $billing_field ] ) );
+					$billing_address[ $billing_field ]               = strtolower( preg_replace( '/\s+/', '', $billing_address[ $billing_field ] ?? '' ) );
 					$klarna_order['billing_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['billing_address'][ $klarna_name ] ) );
 
-					if ( ( $klarna_order['billing_address'][ $klarna_name ] ?? '' ) !== $billing_address[ $billing_field ] ) {
+					if ( $klarna_order['billing_address'][ $klarna_name ] !== $billing_address[ $billing_field ] ) {
 						$field_name = str_replace( '_', ' ', $wc_name );
 						// translators: %s is the field name.
 						$errors->add( $billing_field, sprintf( __( 'Billing %s does not match Kustom order.', 'klarna-checkout-for-woocommerce' ), $field_name ) );
@@ -203,10 +203,10 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 				if ( $ship_to_different_address ) {
 					// Remove all whitespace and convert to lowercase.
-					$shipping_address[ $shipping_field ]              = strtolower( preg_replace( '/\s+/', '', $shipping_address[ $shipping_field ] ) );
+					$shipping_address[ $shipping_field ]              = strtolower( preg_replace( '/\s+/', '', $shipping_address[ $shipping_field ] ?? '' ) );
 					$klarna_order['shipping_address'][ $klarna_name ] = strtolower( preg_replace( '/\s+/', '', $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) );
 
-					if ( ( $klarna_order['shipping_address'][ $klarna_name ] ?? '' ) !== $shipping_address[ $shipping_field ] ) {
+					if ( $klarna_order['shipping_address'][ $klarna_name ] !== $shipping_address[ $shipping_field ] ) {
 						$field_name = str_replace( '_', ' ', $wc_name );
 						// translators: %s is the field name.
 						$errors->add( $shipping_field, sprintf( __( 'Shipping %s does not match Kustom order.', 'klarna-checkout-for-woocommerce' ), $field_name ) );
