@@ -278,10 +278,14 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function set_recurring_token_for_order( $order_id = null, $kco_order = null ) {
+		if ( ! class_exists( 'WC_Subscription' ) || ! function_exists( 'wcs_get_subscriptions_for_order' ) ) {
+			return;
+		}
+
 		$order           = wc_get_order( $order_id );
 		$recurring_order = $order->get_meta( '_kco_recurring_order', true );
 
-		if ( 'yes' === $recurring_order || ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $order ) ) ) ) {
+		if ( 'yes' === $recurring_order || wcs_order_contains_subscription( $order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $order ) ) {
 			$subscriptions = wcs_get_subscriptions_for_order( $order_id, array( 'order_type' => 'any' ) );
 
 			// Use the passed-in Kustom order if it has the recurring token, otherwise fetch it.
@@ -339,6 +343,10 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function save_subscription_meta( $order_id = null ) {
+		if ( ! function_exists( 'wcs_get_subscriptions_for_order' ) ) {
+			return;
+		}
+
 		$order = wc_get_order( $order_id );
 		if ( ! $order ) {
 			return;
