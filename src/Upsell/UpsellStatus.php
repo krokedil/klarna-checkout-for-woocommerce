@@ -21,8 +21,8 @@ class UpsellStatus {
 
 		add_action( 'init', array( $this, 'register_post_status' ) );
 		add_filter( 'wc_order_statuses', array( $this, 'add_order_status' ) );
-		add_filter( 'woocommerce_valid_order_statuses_for_payment', array( $this, 'allow_payment_from_custom_status' ), 10, 2 );
-		add_filter( 'woocommerce_valid_order_statuses_for_payment_complete', array( $this, 'allow_payment_from_custom_status' ), 10, 2 );
+		add_filter( 'woocommerce_valid_order_statuses_for_payment', array( $this, 'allow_payment_from_custom_status' ), 10 );
+		add_filter( 'woocommerce_valid_order_statuses_for_payment_complete', array( $this, 'allow_payment_from_custom_status' ), 10 );
 	}
 
 	/**
@@ -60,10 +60,9 @@ class UpsellStatus {
 	 * Allow orders in the custom waiting status to transition via payment_complete().
 	 *
 	 * @param array     $statuses The statuses that are valid for payment.
-	 * @param \WC_Order $order The order being processed.
 	 * @return array
 	 */
-	public function allow_payment_from_custom_status( $statuses, $order ) {
+	public function allow_payment_from_custom_status( $statuses ) {
 		if ( ! in_array( self::STATUS_SLUG, $statuses, true ) ) {
 			$statuses[] = self::STATUS_SLUG;
 		}
@@ -79,7 +78,7 @@ class UpsellStatus {
 	 * @return string
 	 */
 	public static function get_configured_status() {
-		$settings  = get_option( 'woocommerce_kco_settings', array() );
+		$settings   = get_option( 'woocommerce_kco_settings', array() );
 		$configured = $settings[ self::SETTING_KEY ] ?? self::STATUS_SLUG;
 
 		return ! empty( $configured ) ? $configured : self::STATUS_SLUG;
