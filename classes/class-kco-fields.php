@@ -380,6 +380,19 @@ class KCO_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
+			'upsell_waiting_status'      => array(
+				'title'       => __( 'Upsell waiting status', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'select',
+				'options'     => array(
+					'kco-upsell-wait' => __( 'Kustom Awaiting Upsell', 'klarna-checkout-for-woocommerce' ),
+					'on-hold'         => __( 'On hold', 'klarna-checkout-for-woocommerce' ),
+					'pending'         => __( 'Pending payment', 'klarna-checkout-for-woocommerce' ),
+					'processing'      => __( 'Processing', 'klarna-checkout-for-woocommerce' ),
+				),
+				'description' => __( 'The order status set while waiting for Kustom to confirm the upsell via push callback.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'kco-upsell-wait',
+				'desc_tip'    => true,
+			),
 			'upsell_section_end'         => array(
 				'type' => 'krokedil_section_end',
 			),

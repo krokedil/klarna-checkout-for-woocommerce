@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Krokedil\KustomCheckout\Upsell\UpsellException;
+use Krokedil\KustomCheckout\Upsell\UpsellFallback;
 use Krokedil\KustomCheckout\Upsell\UpsellProcessor;
 use Krokedil\KustomCheckout\Upsell\UpsellValidator;
 
@@ -99,73 +100,82 @@ class KCO_API_Callbacks {
 		// Used by Klarna_Checkout_Subscription::handle_push_cb_for_payment_method_change().
 		do_action( 'wc_klarna_push_cb', $klarna_order_id );
 
+		$this->process_push_for_order( $klarna_order_id );
+	}
+
+	/**
+	 * Run the push processing pipeline for a given Kustom order ID.
+	 *
+	 * Shared by the push webhook and the Action Scheduler fallback so that a
+	 * missed push can still be processed identically later.
+	 *
+	 * @param string $klarna_order_id The Kustom order ID.
+	 * @return void
+	 */
+	public function process_push_for_order( $klarna_order_id ) {
 		$order = kco_get_order_by_klarna_id( $klarna_order_id );
 		if ( empty( $order ) ) {
 			// Backup order creation.
 			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 			return;
-
 		}
 
 		$order_id = $order->get_id();
-		if ( $order ) {
-			$settings = get_option( 'woocommerce_kco_settings', array() );
+		$settings = get_option( 'woocommerce_kco_settings', array() );
 
-			// Get the Kustom order data.
-			$klarna_order = apply_filters(
-				'kco_wc_api_callbacks_push_klarna_order',
-				KCO_WC()->api->get_klarna_om_order( $klarna_order_id )
-			);
+		// Get the Kustom order data.
+		$klarna_order = apply_filters(
+			'kco_wc_api_callbacks_push_klarna_order',
+			KCO_WC()->api->get_klarna_om_order( $klarna_order_id )
+		);
 
-			if ( is_wp_error( $klarna_order ) ) {
-				KCO_WC()->logger->log( 'ERROR Push callback failed to get Kustom order data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
-				return;
-			}
-
-			// If upsell is enabled and we have metadata for the upsell data, then we need to process the upsell before acknowledging the order, to make sure the order total is correct in Kustom before the order is acknowledged.
-			if ( wc_string_to_bool( $settings['enable_upsell'] ?? 'no' ) ) {
-				try {
-					$processor = new UpsellProcessor( $order );
-					$processor->process();
-					$order = wc_get_order( $order->get_id() ); // Refresh the order after processing the upsell, to make sure we have the latest data.
-				} catch ( UpsellException $e ) {
-					KCO_WC()->logger->log( 'ERROR Push callback failed to process upsell data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
-					return;
-				}
-				KCO_WC()->logger->log( 'Successfully processed upsell data on push callback for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
-			}
-
-			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
-				return;
-			}
-
-			// The Woo order was already created. Check if order status was set (in process_payment_handler).
-			if ( empty( $order->get_date_paid() ) ) {
-				if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
-					$order->payment_complete( $klarna_order_id );
-					// translators: Kustom order ID.
-					$note = sprintf( __( 'Payment via Kustom Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
-					$order->add_order_note( $note );
-					do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
-				} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
-					$order->update_status( 'on-hold', __( 'Kustom Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
-				} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
-					// translators: Kustom order ID.
-					$note = sprintf( __( 'Kustom order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
-					$order->update_status( 'on-hold', $note );
-				}
-			}
-
-			// Acknowledge order in Kustom.
-			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
-
-			// Set the merchant references for the order.
-			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
-
-		} else {
-			// Backup order creation.
-			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
+		if ( is_wp_error( $klarna_order ) ) {
+			KCO_WC()->logger->log( 'ERROR Push callback failed to get Kustom order data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
+			return;
 		}
+
+		// If upsell is enabled and we have metadata for the upsell data, then we need to process the upsell before acknowledging the order, to make sure the order total is correct in Kustom before the order is acknowledged.
+		if ( wc_string_to_bool( $settings['enable_upsell'] ?? 'no' ) ) {
+			try {
+				$processor = new UpsellProcessor( $order );
+				$processor->process();
+				$order = wc_get_order( $order->get_id() ); // Refresh the order after processing the upsell, to make sure we have the latest data.
+			} catch ( UpsellException $e ) {
+				KCO_WC()->logger->log( 'ERROR Push callback failed to process upsell data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
+				return;
+			}
+			KCO_WC()->logger->log( 'Successfully processed upsell data on push callback for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
+		}
+
+		if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
+			return;
+		}
+
+		// The Woo order was already created. Check if order status was set (in process_payment_handler).
+		if ( empty( $order->get_date_paid() ) ) {
+			if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
+				$order->payment_complete( $klarna_order_id );
+				// translators: Kustom order ID.
+				$note = sprintf( __( 'Payment via Kustom Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+				$order->add_order_note( $note );
+				do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
+			} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
+				$order->update_status( 'on-hold', __( 'Kustom Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
+			} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
+				// translators: Kustom order ID.
+				$note = sprintf( __( 'Kustom order is under review, order ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
+				$order->update_status( 'on-hold', $note );
+			}
+		}
+
+		// Acknowledge order in Kustom.
+		KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+
+		// Set the merchant references for the order.
+		KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
+
+		// Push processing succeeded; cancel any pending fallback for this order.
+		UpsellFallback::cancel( $klarna_order_id );
 	}
 
 	/**

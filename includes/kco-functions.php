@@ -5,6 +5,9 @@
  * @package  Klarna_Checkout/Includes
  */
 
+use Krokedil\KustomCheckout\Upsell\UpsellFallback;
+use Krokedil\KustomCheckout\Upsell\UpsellStatus;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -632,11 +635,13 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				// Empty cart to be safe.
 				WC()->cart->empty_cart();
 
-				// If upsell is enabled, just set the order to on-hold and wait for the push notification to confirm the order after the upsell is processed. Otherwise, confirm the order immediately.
+				// If upsell is enabled, set the order to the configured waiting status and wait for the push notification to confirm the order after the upsell is processed. Otherwise, confirm the order immediately.
 				if ( $upsell_enabled ) {
-					$order->set_status( 'on-hold', __( 'Waiting for verification from Kustom\'s push notification', 'klarna-checkout-for-woocommerce' ) );
+					$waiting_status = UpsellStatus::get_configured_status();
+					$order->set_status( $waiting_status, __( 'Waiting for verification from Kustom\'s push notification', 'klarna-checkout-for-woocommerce' ) );
 					$order->save();
-					KCO_Logger::log( $klarna_order_id . ': Upsell enabled, waiting for push verification. Order #' . $order->get_order_number() . ' set to on-hold.' );
+					UpsellFallback::schedule( $klarna_order_id );
+					KCO_Logger::log( $klarna_order_id . ': Upsell enabled, waiting for push verification. Order #' . $order->get_order_number() . ' set to ' . $waiting_status . '.' );
 					return;
 				}
 
