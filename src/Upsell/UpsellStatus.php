@@ -59,7 +59,7 @@ class UpsellStatus {
 	/**
 	 * Allow orders in the custom waiting status to transition via payment_complete().
 	 *
-	 * @param array     $statuses The statuses that are valid for payment.
+	 * @param array $statuses The statuses that are valid for payment.
 	 * @return array
 	 */
 	public function allow_payment_from_custom_status( $statuses ) {

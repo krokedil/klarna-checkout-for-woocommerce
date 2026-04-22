@@ -76,8 +76,12 @@ class UpsellValidator {
 			throw new UpsellException( 'Invalid JSON or missing KCO order ID' );
 		}
 
-		if ( ! isset( $this->request_data['upsell_order_lines'] ) ) {
-			throw new UpsellException( 'Missing upsell_order_lines in request data' );
+		if ( ! isset( $this->request_data['upsell_order_lines'] ) || ! is_array( $this->request_data['upsell_order_lines'] ) ) {
+			throw new UpsellException( 'Missing or malformed upsell_order_lines in request data' );
+		}
+
+		if ( empty( $this->request_data['upsell_order_lines'] ) ) {
+			throw new UpsellException( 'upsell_order_lines is empty' );
 		}
 	}
 
@@ -138,16 +142,25 @@ class UpsellValidator {
 	 * @param array $upsell_lines The upsell order lines from Kustom.
 	 *
 	 * @return void
-	 * @throws UpsellException If a product reference is missing, product not found, or out of stock.
+	 * @throws UpsellException If a line is malformed, product is not found, or out of stock.
 	 */
 	private function validate_upsell_lines( $upsell_lines ) {
 		foreach ( $upsell_lines as $line ) {
+			if ( ! is_array( $line ) ) {
+				throw new UpsellException( 'Malformed upsell order line' );
+			}
+
 			if ( empty( $line['reference'] ) ) {
 				throw new UpsellException( 'Missing product reference in order line' );
 			}
 
+			$quantity = (int) ( $line['quantity'] ?? 0 );
+			if ( $quantity < 1 ) {
+				throw new UpsellException( "Invalid quantity for product {$line['reference']}" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			}
+
 			$product_reference = $line['reference'];
-			$product           = wc_get_product( $product_reference ) ?: wc_get_product( wc_get_product_id_by_sku( $product_reference ) ); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found -- This is done correctly here, so its safe to use.
+			$product           = UpsellProcessor::find_product_by_reference( $product_reference );
 
 			if ( ! $product ) {
 				throw new UpsellException( "Product with SKU or ID {$product_reference} not found" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped

@@ -8,7 +8,8 @@ use WC_Tax;
 /**
  * Processes stored upsell data on the push callback.
  *
- * Reads upsell metadata stored by UpsellValidator, adds the upsell products
+ * Reads upsell metadata stored by UpsellValidator, verifies each stored line
+ * against the Kustom order (authoritative source), adds the upsell products
  * to the WooCommerce order, and clears the processed metadata.
  * Throws UpsellException on any failure, reverting changes when necessary.
  */
@@ -21,29 +22,39 @@ class UpsellProcessor {
 	private $order;
 
 	/**
+	 * The Kustom order data, used as the authoritative source for validating
+	 * stored upsell lines before they are added to the WC order.
+	 *
+	 * @var array
+	 */
+	private $klarna_order;
+
+	/**
 	 * New product names that where added to the order.
 	 *
 	 * @var string[]
 	 */
-	private $added_product_names = [];
+	private $added_product_names = array();
 
 	/**
 	 * UpsellProcessor constructor.
 	 *
-	 * @param WC_Order $order The WooCommerce order to process upsells for.
+	 * @param WC_Order $order        The WooCommerce order to process upsells for.
+	 * @param array    $klarna_order The Kustom order fetched on the push, used to verify stored upsell lines.
 	 */
-	public function __construct( $order ) {
-		$this->order = $order;
+	public function __construct( $order, $klarna_order ) {
+		$this->order        = $order;
+		$this->klarna_order = $klarna_order;
 	}
 
 	/**
 	 * Process all pending upsells for the order.
 	 *
-	 * Reads stored upsell metadata, adds products to the WC order,
-	 * and recalculates totals.
+	 * Reads stored upsell metadata, verifies against the Kustom order,
+	 * adds products to the WC order, and recalculates totals.
 	 *
 	 * @return void
-	 * @throws UpsellException If a product cannot be added.
+	 * @throws UpsellException If a product cannot be added or a stored line is not present in the Kustom order.
 	 */
 	public function process() {
 		$order_number = $this->order->get_order_number();
@@ -86,21 +97,34 @@ class UpsellProcessor {
 	 * @param array $upsell_lines The upsell order lines from Kustom.
 	 *
 	 * @return void
-	 * @throws UpsellException If a product reference is missing or product is not found.
+	 * @throws UpsellException If a product reference is missing, product is not found, or the line is not present in the Kustom order.
 	 */
 	private function process_upsell_lines( $upsell_lines ) {
-		foreach ( $upsell_lines as $line ) {
-			$quantity        = $line['quantity'] ?? 0;
-			$total_amount    = $this->convert_price_to_major_units( $line['total_amount'] ?? 0 );
-			$discount_amount = $this->convert_price_to_major_units( $line['total_discount_amount'] ?? 0 );
+		if ( ! is_array( $upsell_lines ) ) {
+			\KCO_Logger::log( 'ERROR Upsell processing: Stored upsell batch is not an array for WC order #' . $this->order->get_order_number() );
+			throw new UpsellException( 'Stored upsell batch is not an array' );
+		}
 
+		foreach ( $upsell_lines as $line ) {
 			if ( empty( $line['reference'] ) ) {
 				\KCO_Logger::log( 'ERROR Upsell processing: Missing product reference in order line for WC order #' . $this->order->get_order_number() . '. Line data: ' . wp_json_encode( $line ) );
 				throw new UpsellException( 'Missing product reference in order line' );
 			}
 
+			$quantity = (int) ( $line['quantity'] ?? 0 );
+			if ( $quantity < 1 ) {
+				\KCO_Logger::log( 'ERROR Upsell processing: Invalid quantity for line with reference ' . $line['reference'] . ' on WC order #' . $this->order->get_order_number() );
+				throw new UpsellException( 'Invalid quantity in upsell line' );
+			}
+
+			// Verify the stored line against the Kustom order before adding it. This is our authentication: the callback was unsigned, but the actual order at Kustom is the source of truth.
+			$this->verify_line_against_klarna_order( $line );
+
+			$total_amount    = $this->convert_price_to_major_units( $line['total_amount'] ?? 0 );
+			$discount_amount = $this->convert_price_to_major_units( $line['total_discount_amount'] ?? 0 );
+
 			$product_reference = $line['reference'];
-			$product           = wc_get_product( $product_reference ) ?: wc_get_product( wc_get_product_id_by_sku( $product_reference ) ); // phpcs:ignore Universal.Operators.DisallowShortTernary.Found -- This is done correctly here, so its safe to use.
+			$product           = self::find_product_by_reference( $product_reference );
 
 			if ( ! $product ) {
 				\KCO_Logger::log( 'ERROR Upsell processing: Product with reference ' . $product_reference . ' not found for WC order #' . $this->order->get_order_number() );
@@ -132,27 +156,93 @@ class UpsellProcessor {
 	}
 
 	/**
+	 * Verify that a stored upsell line actually exists in the Kustom order with matching reference, quantity, and total amount.
+	 *
+	 * Since the upsell validation callback is unsigned, we re-check the stored data against the Kustom order on the push to make sure it was not tampered with by a third party.
+	 *
+	 * @param array $line The stored upsell order line.
+	 *
+	 * @return void
+	 * @throws UpsellException If no matching line is found in the Kustom order.
+	 */
+	private function verify_line_against_klarna_order( $line ) {
+		$klarna_lines = $this->klarna_order['order_lines'] ?? array();
+		if ( ! is_array( $klarna_lines ) || empty( $klarna_lines ) ) {
+			throw new UpsellException( 'Kustom order has no order lines; cannot verify upsell data.' );
+		}
+
+		$reference    = $line['reference'];
+		$quantity     = (int) ( $line['quantity'] ?? 0 );
+		$total_amount = (int) ( $line['total_amount'] ?? 0 );
+
+		foreach ( $klarna_lines as $klarna_line ) {
+			if ( ( $klarna_line['reference'] ?? null ) !== $reference ) {
+				continue;
+			}
+
+			if ( (int) ( $klarna_line['quantity'] ?? 0 ) !== $quantity ) {
+				continue;
+			}
+
+			if ( (int) ( $klarna_line['total_amount'] ?? 0 ) !== $total_amount ) {
+				continue;
+			}
+
+			return;
+		}
+
+		\KCO_Logger::log( 'ERROR Upsell processing: Stored upsell line could not be matched against the Kustom order for WC order #' . $this->order->get_order_number() . '. Line data: ' . wp_json_encode( $line ) );
+		throw new UpsellException( 'Stored upsell line does not match any line in the Kustom order.' );
+	}
+
+	/**
+	 * Resolve a product reference to a WC_Product, preferring SKU lookup over ID lookup to avoid numeric-SKU collisions.
+	 *
+	 * @param string $reference The product reference (SKU or product ID).
+	 *
+	 * @return WC_Product|false The product, or false if not found.
+	 */
+	public static function find_product_by_reference( $reference ) {
+		$product_id_from_sku = wc_get_product_id_by_sku( $reference );
+		if ( $product_id_from_sku ) {
+			return wc_get_product( $product_id_from_sku );
+		}
+
+		return wc_get_product( $reference );
+	}
+
+	/**
 	 * Get the price of a product excluding VAT using the price including VAT from Kustom and the order.
 	 *
+	 * Uses {@see WC_Tax::calc_inclusive_tax()} so compound tax rates are handled correctly.
+	 *
 	 * @param float      $price_incl_vat The price including VAT from Kustom, already converted to major units.
-	 * @param WC_Product $product The WooCommerce product to get the VAT rate for.
+	 * @param WC_Product $product        The WooCommerce product to get the VAT rate for.
 	 *
 	 * @return float The price excluding VAT in major units.
 	 */
 	private function get_price_excluding_vat( $price_incl_vat, $product ) {
-		$product_vat_rate = $this->get_vat_rate_for_product( $product );
-		return round( $price_incl_vat / ( 1 + $product_vat_rate ), wc_get_price_decimals() );
+		$tax_rates = $this->get_tax_rates_for_product( $product );
+
+		if ( empty( $tax_rates ) ) {
+			return round( $price_incl_vat, wc_get_price_decimals() );
+		}
+
+		$taxes     = WC_Tax::calc_inclusive_tax( $price_incl_vat, $tax_rates );
+		$tax_total = array_sum( $taxes );
+
+		return round( $price_incl_vat - $tax_total, wc_get_price_decimals() );
 	}
 
 	/**
-	 * Get the vat rate for a product based on the order's billing location and the product's tax class.
+	 * Get the tax rates applicable to a product based on the order's billing location and the product's tax class.
 	 *
-	 * @param WC_Product $product The WooCommerce product to get the VAT rate for.
+	 * @param WC_Product $product The WooCommerce product to get tax rates for.
 	 *
-	 * @return float
+	 * @return array
 	 */
-	private function get_vat_rate_for_product( $product ) {
-		$tax_rates = WC_Tax::get_rates_from_location(
+	private function get_tax_rates_for_product( $product ) {
+		return WC_Tax::get_rates_from_location(
 			$product->get_tax_class(),
 			array(
 				$this->order->get_billing_country(),
@@ -161,12 +251,6 @@ class UpsellProcessor {
 				$this->order->get_billing_city(),
 			)
 		);
-
-		$rate = 0;
-		foreach ( $tax_rates as $tax_rate ) {
-			$rate += $tax_rate['rate'];
-		}
-		return $rate / 100;
 	}
 
 	/**
