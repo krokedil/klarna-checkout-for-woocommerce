@@ -541,8 +541,6 @@ class KCO_Subscription {
 		}
 
 		$renewal_order->save_meta_data();
-
-		return;
 	}
 
 	/**
