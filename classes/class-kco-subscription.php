@@ -479,9 +479,13 @@ class KCO_Subscription {
 	 *
 	 * @param  WC_Order        $renewal_order Woo renewal order.
 	 * @param  WC_Subscription $subscription Woo subscription.
-	 * @return WC_Order
+	 * @return void
 	 */
 	public function copy_meta_fields_to_renewal_order( $renewal_order, $subscription ) {
+		if ( 'kco' !== $subscription->get_payment_method() ) {
+			return;
+		}
+
 		$parent = $subscription->get_parent();
 
 		// Environment: only set if the Data Copier didn't already copy it from the subscription.
@@ -538,7 +542,7 @@ class KCO_Subscription {
 
 		$renewal_order->save_meta_data();
 
-		return $renewal_order;
+		return;
 	}
 
 	/**
