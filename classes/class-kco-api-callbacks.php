@@ -46,10 +46,8 @@ class KCO_API_Callbacks {
 	 */
 	public function __construct() {
 		add_action( 'woocommerce_api_kco_wc_push', array( $this, 'push_cb' ) );
-		add_action( 'woocommerce_api_kco_wc_notification', array( $this, 'notification_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_upsell_validation', array( $this, 'upsell_validation_cb' ) );
-		add_action( 'kco_wc_punted_notification', array( $this, 'kco_wc_punted_notification_cb' ), 10, 2 );
 	}
 
 	/**
@@ -173,54 +171,6 @@ class KCO_API_Callbacks {
 
 		// Set the merchant references for the order.
 		KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
-
-		// Push processing succeeded; cancel any pending fallback for this order.
-		UpsellFallback::cancel( $klarna_order_id );
-	}
-
-	/**
-	 * Notification callback function, used for pending orders.
-	 */
-	public function notification_cb() {
-		/**
-		 * Notification callback URL has Kustom Order ID (kco_wc_order_id) in it.
-		 *
-		 * 1. Get Kustom Order ID
-		 * 2. Try to find matching WooCommerce order, to see if it was created
-		 * 3. If WooCommerce order does not exist, that means regular creation failed AND confirmation callback
-		 *    either hasn't happened yet or failed. In this case, schedule a single event, 5 minutes from now
-		 *    and try to get WooCommerce order then.
-		 * 4. If WooCommerce order does exist, fire the hook.
-		 */
-
-		$klarna_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-
-		if ( ! empty( $klarna_order_id ) ) {
-
-			$order = kco_get_order_by_klarna_id( $klarna_order_id );
-
-			if ( ! empty( $order ) ) {
-				$order_id = $order->get_id();
-			}
-		}
-
-		if ( isset( $order_id ) ) {
-			do_action( 'wc_klarna_notification_listener' );
-		} else {
-			$post_body = file_get_contents( 'php://input' );
-			$data      = json_decode( $post_body, true );
-			wp_schedule_single_event( time() + 300, 'kco_wc_punted_notification', array( $klarna_order_id, $data ) );
-		}
-	}
-
-	/**
-	 * Punted notification callback.
-	 *
-	 * @param string $klarna_order_id Kustom order ID.
-	 * @param array  $data Kustom order data.
-	 */
-	public function kco_wc_punted_notification_cb( $klarna_order_id, $data ) {
-		do_action( 'wc_klarna_notification_listener', $klarna_order_id, $data );
 	}
 
 	/**

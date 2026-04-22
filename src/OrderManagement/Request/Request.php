@@ -103,25 +103,6 @@ abstract class Request {
 	}
 
 	/**
-	 * Gets API region code for Kustom
-	 *
-	 * @return string
-	 */
-	protected function get_klarna_api_region() {
-		$country = $this->get_klarna_country();
-		switch ( $country ) {
-			case 'CA':
-			case 'US':
-				return '-na';
-			case 'AU':
-			case 'NZ':
-				return '-oc';
-			default:
-				return '';
-		}
-	}
-
-	/**
 	 * Get the country code for the underlaying order.
 	 *
 	 * @return string
@@ -138,9 +119,8 @@ abstract class Request {
 	 * @return string
 	 */
 	protected function get_api_url_base() {
-		$region     = strtolower( apply_filters( 'klarna_base_region', $this->get_klarna_api_region() ) );
 		$playground = $this->use_playground() ? '.playground' : '';
-		return "https://api{$region}{$playground}.kustom.co/";
+		return "https://api{$playground}.kustom.co/";
 	}
 
 	/**

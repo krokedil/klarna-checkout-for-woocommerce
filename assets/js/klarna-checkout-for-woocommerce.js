@@ -498,9 +498,22 @@ jQuery( function ( $ ) {
 			}
 		},
 
-		updateShipping: function ( data ) {
-			kco_wc.kcoSuspend( true )
-			$( "#kco_shipping_data" ).val( JSON.stringify( data ) )
+		updateShipping: function (data) {
+			const serializedData = JSON.stringify(data)
+
+			// If the update succeeded but the data is the same as before, we won't trigger the update_checkout event to avoid an infinite loop.
+			const current = $("#kco_shipping_data").val()
+			if (current === serializedData) {
+				return
+			}
+
+			$("#kco_shipping_data").val(serializedData)
+
+			// If checkout or update fails, restore the previous value so the guard doesn't block a retry.
+			$( "body" ).one( "checkout_error", function () {
+				$( "#kco_shipping_data" ).val( current )
+			} )
+
 			$( "body" ).trigger( "kco_shipping_option_changed", [ data ] )
 			$( "body" ).trigger( "update_checkout" )
 		},
@@ -540,11 +553,7 @@ jQuery( function ( $ ) {
 										email = response.data.shipping_address.email
 									}
 
-									kco_wc.logToFile(
-										"Successfully placed order [" +
-											email +
-											']. Sending "should_proceed: true" to Kustom',
-									)
+									kco_wc.logToFile( `Successfully placed order [${email}]. Sending "should_proceed: true" to Kustom` )
 									callback( { should_proceed: true } )
 								} else {
 									throw "Result failed"
@@ -699,6 +708,24 @@ jQuery( function ( $ ) {
 									nonce: kco_params.customer_type_changed_nonce,
 									customer_type,
 								},
+							} )
+						},
+						checkbox_change: (evt) => {
+							const { key, checked } = evt
+							$.ajax( {
+								url: kco_params.checkbox_changed_url,
+								type: "POST",
+								data: {
+									nonce: kco_params.checkbox_changed_nonce,
+									key,
+									checked,
+								},
+    							success: ( response ) => {
+    							    if ( response.data.refresh_checkout) {
+    							        $( document.body ).trigger( 'wc_fragment_refresh' );
+    							        $( document.body ).trigger( 'update_checkout' );
+    							    }
+    							}
 							} )
 						},
 						// https://docs.kustom.co/v3/checkout/additional-resources/client-side-events#the-load_confirmation-event

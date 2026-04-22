@@ -11,9 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Ajax {
 
 	/**
-	 * Hook in ajax handlers.
+	 * Constructor.
 	 */
-	public static function init() {
+	public function __construct() {
 		self::add_ajax_events();
 	}
 

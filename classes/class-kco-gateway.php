@@ -107,6 +107,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 			add_filter( 'kco_wc_api_request_args', array( $this, 'maybe_remove_kco_epm' ), 9999 );
 
+			// Log any errors from the settings page rendering, to be able to debug issues with the shared settings page package.
+			add_action( 'krokedil_settings_page_render_error', array( $this, 'log_settings_page_render_error' ), 10, 2 );
+
 			// Prevent the Woo validation from proceeding if there is a discrepancy between Woo and Kustom.
 			add_action( 'woocommerce_after_checkout_validation', array( $this, 'validate_checkout' ), 10, 2 );
 		}
@@ -289,22 +292,49 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$args = $this->get_settings_page_args();
 
 			if ( empty( $args ) ) {
-				ob_start();
-				parent::admin_options();
-				$parent_options = ob_get_contents();
-				ob_end_clean();
-				WC_Klarna_Banners::settings_sidebar( $parent_options );
+				$this->output_legacy_admin_options();
 			} else {
-				$args['icon']            = KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_black.png';
-				$gateway_page            = new Gateway( $this, $args );
-				$args['general_content'] = array( $gateway_page, 'output' );
-				$settings_page           = ( SettingsPage::get_instance() )
-				->set_plugin_name( 'Kustom Checkout for WooCommerce' )
-				->register_page( $this->id, $args, $this )
-				->output( $this->id );
+				$args['icon']             = KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_black.png';
+				$gateway_page             = new Gateway( $this, $args );
+				$args['general_content']  = array( $gateway_page, 'output' );
+				$args['fallback_content'] = array( $this, 'output_legacy_admin_options' );
+				$args['error_notice']     = __( 'Could not load the enhanced settings page. Showing the standard settings instead.', 'klarna-checkout-for-woocommerce' );
+
+				( SettingsPage::get_instance() )
+					->set_plugin_name( 'Kustom Checkout for WooCommerce' )
+					->register_page( $this->id, $args, $this )
+					->output( $this->id );
 			}
 
 			KCO_Settings_Saved::maybe_show_errors();
+		}
+
+		/**
+		 * Output the standard WooCommerce admin options with the Kustom sidebar.
+		 *
+		 * @return void
+		 */
+		public function output_legacy_admin_options() {
+			ob_start();
+			parent::admin_options();
+			$parent_options = ob_get_contents();
+			ob_end_clean();
+			WC_Klarna_Banners::settings_sidebar( $parent_options );
+		}
+
+		/**
+		 * Log settings page rendering errors from the shared settings page package.
+		 *
+		 * @param string    $id Page ID.
+		 * @param Throwable $exception Render exception.
+		 * @return void
+		 */
+		public function log_settings_page_render_error( $id, $exception ) {
+			if ( ! $exception instanceof Throwable ) {
+				return;
+			}
+
+			KCO_Logger::log( sprintf( 'Failed rendering settings page package output: %s', $exception->getMessage() ) );
 		}
 
 		/**
@@ -378,6 +408,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'submit_order'                    => WC_AJAX::get_endpoint( 'checkout' ),
 				'customer_type_changed_url'       => WC_AJAX::get_endpoint( 'kco_customer_type_changed' ),
 				'customer_type_changed_nonce'     => wp_create_nonce( 'kco_customer_type_changed' ),
+				'checkbox_changed_url'            => WC_AJAX::get_endpoint( 'kco_checkbox_changed' ),
+				'checkbox_changed_nonce'          => wp_create_nonce( 'kco_checkbox_changed' ),
 				'logging'                         => $this->logging,
 				'standard_woo_checkout_fields'    => $standard_woo_checkout_fields,
 				'is_confirmation_page'            => ( is_kco_confirmation() ) ? 'yes' : 'no',
@@ -778,7 +810,11 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				set_transient( 'kustom_checkout_settings_page_config', $args, 60 * 60 * 24 ); // 24 hours lifetime.
 			}
 
-			return json_decode( $args, true );
+			$decoded_args                        = json_decode( $args, true );
+			$decoded_args['styled_output']       = true;
+			$decoded_args['settings_navigation'] = true;
+
+			return $decoded_args;
 		}
 
 		/**
