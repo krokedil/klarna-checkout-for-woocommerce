@@ -30,7 +30,7 @@ class UpsellProcessor {
 	private $klarna_order;
 
 	/**
-	 * New product names that where added to the order.
+	 * New product names that were added to the order.
 	 *
 	 * @var string[]
 	 */
@@ -146,7 +146,7 @@ class UpsellProcessor {
 				)
 			);
 
-			// Get the order item so we can flag it as a upsell item.
+			// Get the order item so we can flag it as an upsell item.
 			$order_item = $this->order->get_item( $item_id );
 			$order_item->add_meta_data( '_kco_is_upsell', 'yes' );
 			$order_item->add_meta_data( '_kco_upsell_reference', $product_reference );

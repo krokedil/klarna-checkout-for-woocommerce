@@ -111,7 +111,7 @@ class UpsellValidator {
 	 * Find and validate the WooCommerce order.
 	 *
 	 * Ensures the order exists, has not been captured or cancelled,
-	 * and is in processing status.
+	 * and is in the configured upsell waiting status.
 	 *
 	 * @return WC_Order The validated WooCommerce order.
 	 * @throws UpsellException If the WC order is not found or in invalid state.
