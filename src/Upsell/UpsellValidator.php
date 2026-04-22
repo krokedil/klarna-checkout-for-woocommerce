@@ -123,8 +123,8 @@ class UpsellValidator {
 			throw new UpsellException( 'Cannot add upsell items to an order that has already been captured or cancelled.' );
 		}
 
-		if ( 'on-hold' !== $order->get_status() ) {
-			throw new UpsellException( 'Cannot add upsell items to an order that is not on hold.' );
+		if ( UpsellStatus::get_configured_status() !== $order->get_status() ) {
+			throw new UpsellException( 'Cannot add upsell items to an order that is not awaiting upsell.' );
 		}
 
 		return $order;
