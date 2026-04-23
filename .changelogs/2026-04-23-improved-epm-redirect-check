@@ -1,0 +1,4 @@
+Type: Enhancement
+Needs Documentation: yes
+
+Improved the control on external payment method redirects to ensure the correct WooCommerce order is used when placing the order.
