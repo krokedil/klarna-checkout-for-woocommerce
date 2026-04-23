@@ -138,7 +138,7 @@ class KCO_Confirmation {
 		}
 
 		// Ensure the Kustom order has the correct merchant reference 2 that matches the WooCommerce order id.
-		if ( $wc_order_id !== absint( $merchant_ref_2 ) ) {
+		if ( absint( $merchant_ref_2 ) !== $wc_order_id ) {
 			KCO_Logger::log( "Failed EPM validation: merchant_reference2 ({$merchant_ref_2}) does not match the WooCommerce order id. {$log_context}." );
 			return false;
 		}
