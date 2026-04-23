@@ -29,6 +29,9 @@
  */
 
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
+use Krokedil\KustomCheckout\Upsell\UpsellFallback;
+use Krokedil\KustomCheckout\Upsell\UpsellHooks;
+use Krokedil\KustomCheckout\Upsell\UpsellStatus;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 
@@ -121,6 +124,27 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var OrderManagement $order_management
 		 */
 		public $order_management;
+
+		/**
+		 * Reference to upsell hooks class.
+		 *
+		 * @var UpsellHooks $upsell_hooks
+		 */
+		public $upsell_hooks;
+
+		/**
+		 * Reference to upsell status class.
+		 *
+		 * @var UpsellStatus $upsell_status
+		 */
+		public $upsell_status;
+
+		/**
+		 * Reference to upsell fallback class.
+		 *
+		 * @var UpsellFallback $upsell_fallback
+		 */
+		public $upsell_fallback;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -302,6 +326,9 @@ if ( ! class_exists( 'KCO' ) ) {
 				)
 			);
 			$this->order_management = new OrderManagement();
+			$this->upsell_hooks     = new UpsellHooks();
+			$this->upsell_status    = new UpsellStatus();
+			$this->upsell_fallback  = new UpsellFallback();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );

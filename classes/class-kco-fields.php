@@ -366,6 +366,31 @@ class KCO_Fields {
 			'color_settings_end'         => array(
 				'type' => 'krokedil_section_end',
 			),
+			// Checkout iframe settings.
+			'upsell_settings_title'      => array(
+				'title' => __( 'Upsell Settings', 'klarna-checkout-for-woocommerce' ),
+				'type'  => 'krokedil_section_start',
+				'id'    => 'upsell_settings_title',
+			),
+			'enable_upsell'              => array(
+				'title'       => __( 'Enable upsell', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Enable upsell in Kustom Checkout', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If this option is checked, customers will be offered an upsell in Kustom Checkout if there are active upsell campaigns in Kustom.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
+			'upsell_waiting_status'      => array(
+				'title'       => __( 'Upsell waiting status', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'select',
+				'options'     => \Krokedil\KustomCheckout\Upsell\UpsellStatus::get_waiting_status_options(),
+				'description' => __( 'The order status set while waiting for Kustom to confirm the upsell via push callback.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => \Krokedil\KustomCheckout\Upsell\UpsellStatus::STATUS_SLUG,
+				'desc_tip'    => true,
+			),
+			'upsell_section_end'         => array(
+				'type' => 'krokedil_section_end',
+			),
 		);
 
 		// Insert the "Checkout flow" setting after the "Checkout layout" setting.
