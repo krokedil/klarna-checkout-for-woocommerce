@@ -83,4 +83,41 @@ class UpsellStatus {
 
 		return ! empty( $configured ) ? $configured : self::STATUS_SLUG;
 	}
+
+	/**
+	 * Build the list of selectable waiting statuses for the settings UI.
+	 *
+	 * Starts from all registered WooCommerce order statuses (so custom statuses
+	 * from other plugins are available), removes statuses that would break the
+	 * upsell waiting flow, and ensures the custom Kustom status is always first.
+	 *
+	 * @return array<string, string> Map of unprefixed status slug => label.
+	 */
+	public static function get_waiting_status_options() {
+		// Statuses that cannot be used as a "waiting for upsell push" state — either
+		// terminal, or collide with the post-push status and would cause the
+		// fallback to misfire.
+		$disallowed = apply_filters(
+			'kco_upsell_waiting_status_disallowed',
+			array( 'processing', 'completed', 'cancelled', 'refunded', 'failed', 'checkout-draft' )
+		);
+
+		$options = array();
+		if ( function_exists( 'wc_get_order_statuses' ) ) {
+			foreach ( wc_get_order_statuses() as $slug => $label ) {
+				$unprefixed = 0 === strpos( $slug, 'wc-' ) ? substr( $slug, 3 ) : $slug;
+				if ( \in_array( $unprefixed, $disallowed, true ) ) {
+					continue;
+				}
+				$options[ $unprefixed ] = $label;
+			}
+		}
+
+		// Guarantee the default Kustom status is present and first in the list.
+		$default_label = _x( 'Kustom Awaiting Upsell', 'Order status', 'klarna-checkout-for-woocommerce' );
+		unset( $options[ self::STATUS_SLUG ] );
+		$options = array( self::STATUS_SLUG => $default_label ) + $options;
+
+		return $options;
+	}
 }
