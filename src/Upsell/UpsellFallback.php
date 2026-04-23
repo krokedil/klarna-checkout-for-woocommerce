@@ -76,6 +76,11 @@ class UpsellFallback {
 			return;
 		}
 
+		if ( empty( $order->get_meta( '_kco_upsell_data' ) ) ) {
+			\KCO_Logger::log( $klarna_order_id . ': Upsell push fallback skipped; order #' . $order->get_order_number() . ' has no pending upsell data.' );
+			return;
+		}
+
 		if ( UpsellStatus::get_configured_status() !== $order->get_status() ) {
 			\KCO_Logger::log( $klarna_order_id . ': Upsell push fallback skipped; order #' . $order->get_order_number() . ' is no longer in the waiting status.' );
 			return;
