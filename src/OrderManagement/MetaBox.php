@@ -209,8 +209,38 @@ class MetaBox extends OrderMetabox {
 			<?php endif; ?>
 		</ul>
 		<?php
-		$output = ob_get_clean();
-		echo wp_kses_post( $output );
+		$output       = ob_get_clean();
+		$allowed_tags = array(
+			'ul'     => array(
+				'class' => true,
+			),
+			'li'     => array(
+				'class' => true,
+				'id'    => true,
+			),
+			'select' => array(
+				'class' => true,
+				'name'  => true,
+				'id'    => true,
+			),
+			'option' => array(
+				'value'    => true,
+				'selected' => true,
+				'disabled' => true,
+			),
+			'button' => array(
+				'class' => true,
+				'type'  => true,
+				'name'  => true,
+				'value' => true,
+			),
+			'span'   => array(
+				'class'    => true,
+				'data-tip' => true,
+			),
+		);
+
+		echo wp_kses( $output, $allowed_tags );
 	}
 
 	/**
