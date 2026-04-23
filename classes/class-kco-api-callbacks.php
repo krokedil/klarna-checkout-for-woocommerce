@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Krokedil\KustomCheckout\Upsell\UpsellException;
+use Krokedil\KustomCheckout\Upsell\UpsellFallback;
 use Krokedil\KustomCheckout\Upsell\UpsellProcessor;
 use Krokedil\KustomCheckout\Upsell\UpsellValidator;
 
@@ -180,6 +181,9 @@ class KCO_API_Callbacks {
 
 			// Set the merchant references for the order.
 			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
+
+			// Push processing succeeded; drop any pending fallback action for this order.
+			UpsellFallback::cancel( $klarna_order_id );
 		} finally {
 			delete_transient( $lock_key );
 		}
