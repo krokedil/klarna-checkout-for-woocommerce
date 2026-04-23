@@ -35,13 +35,10 @@ class SigningKeyUtility {
 	 * @return string|null The generated signing key, or null if the Kustom order ID is not available in the order.
 	 */
 	public static function from_wc_order_kco_id( $order ) {
-		// If the order is an ID, we need to get the order object.
-		if ( is_numeric( $order ) ) {
-			$order = wc_get_order( $order );
-		}
+		$order = wc_get_order( $order );
 
-		// If we still don't have an order object, we can return null.
-		if ( ! $order instanceof \WC_Order ) {
+		// Ensure we have a valid order object.
+		if ( ! $order ) {
 			return null;
 		}
 
