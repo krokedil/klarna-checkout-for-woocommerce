@@ -146,8 +146,18 @@ class UpsellProcessor {
 				)
 			);
 
+			if ( empty( $item_id ) ) {
+				\KCO_Logger::log( 'ERROR Upsell processing: add_product returned no item ID for reference ' . $product_reference . ' on WC order #' . $this->order->get_order_number() );
+				throw new UpsellException( "Failed to add product {$product_reference} to order" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			}
+
 			// Get the order item so we can flag it as an upsell item.
 			$order_item = $this->order->get_item( $item_id );
+			if ( ! $order_item ) {
+				\KCO_Logger::log( 'ERROR Upsell processing: get_item returned false for item ID ' . $item_id . ' (reference ' . $product_reference . ') on WC order #' . $this->order->get_order_number() );
+				throw new UpsellException( "Failed to retrieve added order item for reference {$product_reference}" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			}
+
 			$order_item->add_meta_data( '_kco_is_upsell', 'yes' );
 			$order_item->add_meta_data( '_kco_upsell_reference', $product_reference );
 			$order_item->save_meta_data();
