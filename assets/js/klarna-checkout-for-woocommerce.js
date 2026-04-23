@@ -516,7 +516,8 @@ jQuery( function ( $ ) {
 			// If the update succeeded but the data is the same as before, we won't trigger the update_checkout event to avoid an infinite loop.
 			const current = $("#kco_shipping_data").val()
 			if (current === serializedData) {
-				return
+				// We temporarily comment out this since it is causing issues with pickup point changes in KSA not being detected (since the shipping option change event is triggered with the same data when the pickup point is changed). We will need to find a better way to detect changes in shipping options in KSA.
+				//return
 			}
 
 			$("#kco_shipping_data").val(serializedData)
