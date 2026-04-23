@@ -606,12 +606,18 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				return;
 			}
 
-			// Get the Kustom OM order.
-			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
-
 			// Get the settings.
 			$settings       = get_option( 'woocommerce_kco_settings', array() );
 			$upsell_enabled = wc_string_to_bool( $settings['enable_upsell'] ?? 'no' );
+
+			// Skip re-confirming an order that is already sitting in the upsell waiting status.
+			if ( $upsell_enabled && $order->get_status() === UpsellStatus::get_configured_status() ) {
+				KCO_Logger::log( $klarna_order_id . ': kco_confirm_klarna_order skipped; order #' . $order->get_order_number() . ' is already in the upsell waiting status.' );
+				return;
+			}
+
+			// Get the Kustom OM order.
+			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 			if ( ! is_wp_error( $klarna_order ) ) {
 				if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
