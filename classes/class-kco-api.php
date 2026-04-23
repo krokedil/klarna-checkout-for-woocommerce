@@ -35,13 +35,11 @@ class KCO_API {
 	 *
 	 * @param string $session_id The Kustom Checkout session to use for the HPP request.
 	 * @param int    $order_id The WooCommerce order id to use for the HPP request.
-	 * @return mixed
+	 * @return array|WP_Error
 	 */
 	public function create_klarna_hpp_url( $session_id, $order_id ) {
-		$request  = new KCO_Request_Create_HPP();
-		$response = $request->request( $session_id, $order_id );
-
-		return $this->check_for_api_error( $response );
+		$request = new KCO_Request_Create_HPP();
+		return $request->request( $session_id, $order_id );
 	}
 
 	/**
@@ -73,13 +71,27 @@ class KCO_API {
 		if ( is_wp_error( $response ) ) {
 
 			// Data is returned as both json and string. Let's try to grab only the json data.
-			$extracted_response = strstr( $response->get_error_message(), '}', true ) . '}';
-			$extracted_response = json_decode( $extracted_response );
-			if ( is_object( $extracted_response ) && 'READ_ONLY_ORDER' === $extracted_response->error_code ?? false ) {
+			$error = strstr( $response->get_error_message(), '}', true ) . '}';
+			$error = json_decode( $error, true );
+			if ( is_array( $error ) && 'READ_ONLY_ORDER' === ( $error['error_code'] ?? false ) ) {
 				$order = kco_get_order_by_klarna_id( $klarna_order_id, '2 day ago' );
-
 				if ( ! empty( $order ) ) {
-					wp_safe_redirect( $order->get_checkout_order_received_url() );
+
+					$redirect_url = $order->get_checkout_order_received_url();
+					if ( empty( $order->get_date_paid() ) ) {
+						// If this was not paid directly, we're not dealing with a zero-order purchase (e.g., free trial subscription), and we should redirect to the confirmation page instead.
+						$redirect_url = add_query_arg(
+							array(
+								'kco_confirm'  => 'yes',
+								'kco_order_id' => $klarna_order_id,
+								'order_id'     => $order->get_id(),
+								'key'          => $order->get_order_key(),
+							),
+							$order->get_checkout_order_received_url()
+						);
+					}
+
+					wp_safe_redirect( $redirect_url );
 					exit;
 				}
 			}

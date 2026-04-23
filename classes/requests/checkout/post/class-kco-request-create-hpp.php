@@ -22,7 +22,7 @@ class KCO_Request_Create_HPP extends KCO_Request {
 	 */
 	public function request( $session_id, $order_id ) {
 		$request_url  = $this->get_api_url_base() . 'hpp/v1/sessions';
-		$request_args = apply_filters( 'wc_klarna_checkout_create_hpp_args', $this->get_request_args( $session_id, $order_id ) );
+		$request_args = apply_filters( 'wc_klarna_checkout_create_hpp_args', $this->get_request_args( $session_id, $order_id, $request_url ) );
 
 		$response = wp_remote_request( $request_url, $request_args );
 		$code     = wp_remote_retrieve_response_code( $response );
@@ -40,12 +40,13 @@ class KCO_Request_Create_HPP extends KCO_Request {
 	 *
 	 * @param string $session_id The Kustom Payment session id.
 	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $url The request URL.
 	 * @return array
 	 */
-	public function get_request_args( $session_id, $order_id ) {
+	public function get_request_args( $session_id, $order_id, $url = '' ) {
 		return array(
 			'headers'    => $this->get_request_headers(),
-			'user-agent' => $this->get_user_agent(),
+			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'POST',
 			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_hpp_request_args', $this->get_body( $session_id, $order_id ), $order_id, $session_id ) ),
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
@@ -57,7 +58,7 @@ class KCO_Request_Create_HPP extends KCO_Request {
 	 *
 	 * @param string $session_id The Kustom Checkout session id.
 	 * @param int    $order_id The WooCommerce order id.
-	 * @return string
+	 * @return array
 	 */
 	public function get_body( $session_id, $order_id ) {
 		$order = wc_get_order( $order_id );

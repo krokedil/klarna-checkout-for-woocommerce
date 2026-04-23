@@ -38,6 +38,44 @@ class KCO_Subscription {
 
 		// Since not all metadata is copied to the renewal subscription, we have to manually copy them over.
 		add_action( 'wcs_renewal_order_created', array( $this, 'copy_meta_fields_to_renewal_order' ), 10, 2 );
+
+		// This is required for non-trial, free subscriptions products to be processed in KCO, since WC Subscriptions does not consider them as needing payment.
+		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'allow_processing_free_subscription' ) );
+	}
+
+
+	/**
+	 * Allow processing free subscription products in KCO.
+	 *
+	 * @param bool $needs_payment Whether the cart needs payment or not.
+	 * @return bool
+	 */
+	public function allow_processing_free_subscription( $needs_payment ) {
+		// Avoid additional checks if we already know that payment is needed.
+		if ( $needs_payment ) {
+			return $needs_payment;
+		}
+
+		if ( ! self::cart_has_subscription() ) {
+			return $needs_payment;
+		}
+
+		// Ensure we only change needs_payment for WC is determining whether it should be processed with or without gateway payment.
+		$is_processing = did_action( 'woocommerce_checkout_order_processed' ) !== 0;
+		if ( ! $is_processing ) {
+			return $needs_payment;
+		}
+
+		// Only modify needs_payment when KCO is the chosen payment method.
+		$chosen_payment_method = WC()->session
+		? WC()->session->get( 'chosen_payment_method' )
+		: null;
+
+		if ( 'kco' !== $chosen_payment_method ) {
+			return $needs_payment;
+		}
+
+		return true;
 	}
 
 	/**
@@ -46,10 +84,6 @@ class KCO_Subscription {
 	 * @return bool
 	 */
 	public static function cart_has_subscription() {
-		if ( ! is_checkout() ) {
-			return false;
-		}
-
 		return ( class_exists( 'WC_Subscriptions_Cart' ) && WC_Subscriptions_Cart::cart_contains_subscription() ) ||
 			( function_exists( 'wcs_cart_contains_renewal' ) && wcs_cart_contains_renewal() ) ||
 			( function_exists( 'wcs_cart_contains_failed_renewal_order_payment' ) && wcs_cart_contains_failed_renewal_order_payment() ) ||

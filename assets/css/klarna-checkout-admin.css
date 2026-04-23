@@ -16,7 +16,7 @@
 }
 
 .kb-new-container{
-	background-color: #FFB3C7;
+	background-color: #eafe53;
 	display: flex;
 	margin: 0px !important;
 	padding: 20px 2% 30px 2% !important;
@@ -141,7 +141,7 @@ justify-content: flex-end;
 	box-sizing: border-box;
 	text-align: center;
 	font-family: Klarna, sans-serif;
-	background-color: #FFB3C7;
+	background-color: #eafe53;
 	display: flex;
 	justify-content: center;
 	padding: 20px 0px;
@@ -432,7 +432,7 @@ margin-right:20px;
 		box-sizing: border-box;
 		text-align: unset;
 		font-family: Klarna, sans-serif;
-		background-color: #FFB3C7;
+		background-color: #eafe53;
 		display: flex;
 		justify-content: unset;
 		padding: 20px 0px;

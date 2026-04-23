@@ -1,4 +1,0 @@
-Type: Tweak
-Needs Documentation: no
-
-Added a locking mechanism in the confirmation step to prevent a race condition that could lead to an order being processed more than once.

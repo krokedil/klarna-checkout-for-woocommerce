@@ -38,6 +38,8 @@ class OrderValidation {
 		// Get the order from the merchant reference.
 		$order = self::get_wc_order( $merchant_reference );
 
+		self::validate_wc_order( $order );
+
 		// Set the klarna order id in the order meta data.
 		$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
 
@@ -45,8 +47,6 @@ class OrderValidation {
 		$order->set_billing_email( $klarna_order['billing_address']['email'] ?? '' );
 
 		$order->save();
-
-		self::validate_wc_order( $order );
 
 		// Attempt to submit the order to WooCommerce using the store api.
 		$updated_order = self::submit_wc_order( $klarna_order, $order );

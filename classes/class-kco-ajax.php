@@ -36,6 +36,7 @@ class KCO_AJAX extends WC_AJAX {
 			'kco_wc_get_klarna_order'               => true,
 			'kco_wc_log_js'                         => true,
 			'kco_customer_type_changed'             => true,
+			'kco_checkbox_changed'                  => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -280,6 +281,34 @@ class KCO_AJAX extends WC_AJAX {
 		check_ajax_referer( 'kco_customer_type_changed', 'nonce' );
 		$customer_type = isset( $_POST['customer_type'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_type'] ) ) : ''; // phpcs:ignore
 		do_action( 'kco_customer_type_changed', $customer_type );
+	}
+
+	/**
+	 * Trigger 'kco_checkbox_changed' action. This function should be called from the client.
+	 *
+	 * @hook kco_checkbox_changed
+	 * @link https://docs.kustom.co/contents/checkout/additional-resources/client-side-events#the-checkbox_change-event
+	 *
+	 * @return void
+	 */
+	public static function kco_checkbox_changed() {
+		check_ajax_referer( 'kco_checkbox_changed', 'nonce' );
+
+		$key     = filter_input( INPUT_POST, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$checked = filter_input( INPUT_POST, 'checked', FILTER_VALIDATE_BOOLEAN );
+		do_action(
+			'kco_checkbox_changed',
+			array(
+				'key'     => $key,
+				'checked' => $checked,
+			)
+		);
+
+		wp_send_json_success(
+			array(
+				'refresh_checkout' => apply_filters( 'kco_ajax_refresh_checkout', false ),
+			)
+		);
 	}
 }
 KCO_AJAX::init();

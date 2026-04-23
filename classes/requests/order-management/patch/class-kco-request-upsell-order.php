@@ -23,7 +23,7 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 	 */
 	public function request( $klarna_order_id, $order_id, $upsell_uuid ) {
 		$request_url  = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id . '/authorization';
-		$request_args = apply_filters( 'kco_wc_acknowledge_order', $this->get_request_args( $order_id, $upsell_uuid ) );
+		$request_args = apply_filters( 'kco_wc_acknowledge_order', $this->get_request_args( $order_id, $upsell_uuid, $request_url ) );
 
 		$body_array           = apply_filters( 'kco_wc_api_request_args', json_decode( $request_args['body'], true ), $order_id, $upsell_uuid );
 		$request_args['body'] = wp_json_encode( $body_array );
@@ -50,7 +50,7 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 		return array(
 			'order_lines'  => $helper->get_order_lines( $order_id ),
 			'order_amount' => $helper->get_order_amount( $order_id ),
-			'description'  => __( 'Upsell from thankyou page', 'klarna-upsell-for-woocommerce' ),
+			'description'  => __( 'Upsell from thankyou page', 'klarna-upsell-for-woocommerce' ), // phpcs:ignore
 		);
 	}
 
@@ -59,12 +59,13 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 	 *
 	 * @param int    $order_id The WooCommerce order id.
 	 * @param string $upsell_uuid The unique id for the upsell request.
+	 * @param string $url The request URL.
 	 * @return array
 	 */
-	protected function get_request_args( $order_id, $upsell_uuid ) {
+	protected function get_request_args( $order_id, $upsell_uuid, $url = '' ) {
 		return array(
 			'headers'    => $this->get_request_headers(),
-			'user-agent' => $this->get_user_agent(),
+			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'PATCH',
 			'body'       => wp_json_encode( $this->get_body( $order_id, $upsell_uuid ) ),
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),

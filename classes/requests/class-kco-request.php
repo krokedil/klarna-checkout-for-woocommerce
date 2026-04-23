@@ -56,12 +56,8 @@ class KCO_Request {
 	 * Gets Kustom API URL base.
 	 */
 	public function get_api_url_base() {
-		$base_location  = wc_get_base_location();
-		$country_string = 'US' === $base_location['country'] ? '-na' : '';
-		$test_string    = 'yes' === $this->settings['testmode'] ? '.playground' : '';
-		$domain         = 'kustom.co';
-
-		return "https://api{$country_string}{$test_string}.{$domain}/";
+		$test_string = 'yes' === $this->settings['testmode'] ? '.playground' : '';
+		return "https://api{$test_string}.kustom.co/";
 	}
 
 	/**
@@ -100,14 +96,16 @@ class KCO_Request {
 	}
 
 	/**
-	 * Gets Kustom API request headers.
+	 * Gets the user agent for the API call.
 	 *
+	 * @param string $url The request URL.
 	 * @return string
 	 */
-	protected function get_user_agent() {
+	protected function get_user_agent( $url = '' ) {
 		return apply_filters(
 			'http_headers_useragent',
-			'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' )
+			'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ),
+			empty( $url ) ? $this->get_api_url_base() : $url
 		) . ' - WooCommerce: ' . WC()->version . ' - KCO:' . KCO_WC_VERSION . ' - PHP Version: ' . phpversion() . ' - Krokedil';
 	}
 

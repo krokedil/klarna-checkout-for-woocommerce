@@ -28,7 +28,6 @@ class KCO_Merchant_URLs {
 			'checkout'     => $this->get_checkout_url(),                // Required.
 			'confirmation' => $this->get_confirmation_url( $order_id ), // Required.
 			'push'         => $this->get_push_url(),                    // Required.
-			'notification' => $this->get_notification_url(),
 		);
 
 		return apply_filters( 'kco_wc_merchant_urls', $merchant_urls );
@@ -140,18 +139,6 @@ class KCO_Merchant_URLs {
 		$address_update_url = str_replace( 'http:', 'https:', $address_update_url );
 
 		return apply_filters( 'kco_wc_address_update_url', $address_update_url );
-	}
-
-	/**
-	 * Notification URL.
-	 *
-	 * URL for notifications on pending orders.
-	 *
-	 * @return string
-	 */
-	private function get_notification_url() {
-		$notification_url = home_url( '/wc-api/KCO_WC_Notification/?kco_wc_order_id={checkout.order.id}' );
-		return apply_filters( 'kco_wc_notification_url', $notification_url );
 	}
 
 	/**
