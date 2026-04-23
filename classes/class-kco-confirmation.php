@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Krokedil\KustomCheckout\Utility\SigningKeyUtility;
+
 /**
  * KCO_Confirmation class.
  *
@@ -92,6 +94,65 @@ class KCO_Confirmation {
 	}
 
 	/**
+	 * Validate the EPM order to ensure we should continue with the EPM purchase or not.
+	 *
+	 * @param string   $kustom_order_id The Kustom order id.
+	 * @param string   $epm The name of the external payment method.
+	 * @param WC_Order $order The WooCommerce order object.
+	 * @return bool True if the order is valid for processing the external payment, false if not.
+	 */
+	private function validate_epm_order( $kustom_order_id, $epm, $order ) {
+		$wc_order_id     = $order->get_id();
+		$wc_order_number = $order->get_order_number();
+		$log_context     = "Kustom order id {$kustom_order_id}, WC order id {$wc_order_id} (number {$wc_order_number}), external payment {$epm}";
+
+		// Get the Kustom order details from the API to be able to validate the order.
+		$kustom_order = KCO_WC()->api->get_klarna_order( $kustom_order_id );
+
+		// Ensure we got a valid Kustom order response.
+		if ( is_wp_error( $kustom_order ) || empty( $kustom_order ) ) {
+			KCO_Logger::log( "Failed to retrieve Kustom order for EPM validation. {$log_context}." );
+			return false;
+		}
+
+		$kustom_status  = $kustom_order['status'] ?? '';
+		$merchant_ref_1 = $kustom_order['merchant_reference1'] ?? '';
+		$merchant_ref_2 = $kustom_order['merchant_reference2'] ?? '';
+
+		// Validate the signing key to ensure the order is valid and was not tampered with.
+		if ( ! SigningKeyUtility::validate_from_kustom_order( $kustom_order, $kustom_order_id ) ) {
+			KCO_Logger::log( "Failed to validate the signing key from the Kustom order. {$log_context}." );
+			return false;
+		}
+
+		// Ensure the Kustom order is in the correct status.
+		if ( 'checkout_incomplete' !== $kustom_status ) {
+			KCO_Logger::log( "The Kustom order is in status {$kustom_status} which is not valid for EPM. {$log_context}." );
+			return false;
+		}
+
+		// Ensure the Kustom order has the correct merchant reference 1 that matches the WooCommerce order number.
+		if ( $wc_order_number !== $merchant_ref_1 ) {
+			KCO_Logger::log( "Failed EPM validation: merchant_reference1 ({$merchant_ref_1}) does not match the WooCommerce order number. {$log_context}." );
+			return false;
+		}
+
+		// Ensure the Kustom order has the correct merchant reference 2 that matches the WooCommerce order id.
+		if ( $wc_order_id !== absint( $merchant_ref_2 ) ) {
+			KCO_Logger::log( "Failed EPM validation: merchant_reference2 ({$merchant_ref_2}) does not match the WooCommerce order id. {$log_context}." );
+			return false;
+		}
+
+		// Ensure the WooCommerce order has the correct Kustom order id stored in the meta.
+		if ( $order->get_meta( '_wc_klarna_order_id' ) !== $kustom_order_id ) {
+			KCO_Logger::log( "Failed EPM validation: the WooCommerce order does not have the correct Kustom order id stored in the meta. {$log_context}." );
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Initiates a Kustom External Payment Method payment.
 	 *
 	 * @param string $epm The name of the external payment method.
@@ -113,26 +174,49 @@ class KCO_Confirmation {
 
 		// Check if we have a order.
 		if ( empty( $order ) ) {
-			wc_print_notice( __( 'Failed getting the order for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
+			wc_add_notice( __( 'Failed getting the order for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
+			return;
+		}
+
+		if ( empty( $klarna_order_id ) ) {
+			/**
+			 * Deprecated notice for missing Kustom order id in EPM URL.
+			 *
+			 * This is done to make sure that existing integrations that use external payment methods without including the Kustom order id in the URL do not break immediately.
+			 * But in the future this will be required to be able to properly verify the order,
+			 * and prevent the wrong order being processed in cases where multiple orders have been created in WooCommerce with the same KCO order id.
+			 *
+			 * To add this to your integration, make sure to include the Kustom order id in the URL as a kco_order_id parameter by adding &kco_order_id={checkout.order.id} to the redirect URL when registering the EPM.
+			 *
+			 * @see https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/external-payment-method-epm/#example-code-bacs
+			 */
+			KCO_Logger::log( "Running external payment method {$epm} without Kustom order id in the URL. This will be required in the future to ensure proper verification of the order." );
+			wc_deprecated_argument( 'run_kepm', '2.20.0', 'Please include the Kustom order id in the redirect URL by adding &kco_order_id={checkout.order.id} when registering the EPM. If this is not done, the external payment method may not function correctly in the future.' );
+		} elseif ( ! $this->validate_epm_order( $klarna_order_id, $epm, $order ) ) { // If we fail to validate the purchase, we should not continue with processing the external payment.
+			wc_add_notice( __( 'We couldn\'t verify your payment. Please try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
 			return;
 		}
 
 		$payment_methods = WC()->payment_gateways->get_available_payment_gateways();
+
 		// Check if the payment method is available.
 		if ( ! isset( $payment_methods[ $epm ] ) ) {
-			wc_print_notice( __( 'Failed to find the payment method for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
+			wc_add_notice( __( 'Failed to find the payment method for the external payment.', 'klarna-checkout-for-woocommerce' ), 'error' );
 			return;
 		}
+
 		// Everything is fine, redirect to the URL specified by the gateway.
 		WC()->session->set( 'chosen_payment_method', $epm );
 		$order->set_payment_method( $payment_methods[ $epm ] );
 		$order->save();
 		$result = $payment_methods[ $epm ]->process_payment( $order_id );
+
 		// Check if the result is good.
 		if ( ! isset( $result['result'] ) || 'success' !== $result['result'] ) {
-			wc_print_notice( __( 'Something went wrong with the external payment. Please try again', 'klarna-checkout-for-woocommerce' ), 'error' );
+			wc_add_notice( __( 'Something went wrong with the external payment. Please try again', 'klarna-checkout-for-woocommerce' ), 'error' );
 			return;
 		}
+
 		wp_redirect( $result['redirect'] ); // phpcs:ignore
 		exit;
 	}
