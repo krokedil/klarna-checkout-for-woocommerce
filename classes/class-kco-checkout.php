@@ -66,7 +66,7 @@ class KCO_Checkout {
 			return;
 		}
 
-		$data = '';
+		$data = false;
 
 		/*
 		 * If - During the normal checkout flow.
