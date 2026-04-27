@@ -7,7 +7,7 @@ Tested up to: 6.9
 Requires PHP: 7.4
 WC requires at least: 5.6.0
 WC tested up to: 10.7.0
-Stable tag: 2.19.1
+Stable tag: 2.20.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,15 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-04-27    - version 2.20.0 =
+* Feature       - Added the 'kco_checkbox_changed' action hook. This action is triggered whenever the customer toggles the checkbox.
+* Enhancement   - Enhanced error handling for the settings page package, to prevent fatal errors and provide clearer feedback when errors occur.
+* Enhancement   - Improved the control on external payment method redirects to ensure the correct WooCommerce order is used when placing the order.
+* Tweak         - Settings page design arguments are now defined directly within the plugin, rather than in the external configuration file.
+* Tweak         - Removed deprecated code related to Kustom notifications that is no longer in use.
+* Tweak         - Changed the Go live banner background color from Klarna pink (#FFB3C7) to Kustom yellow (#eafe53).
+* Fix           - Added the request URL as the 2nd parameter to the 'http_headers_useragent' filter which is required for other plugins that hook onto this filter that need the URL to modify the user agent string accordingly.
+
 = 2026-04-16    - version 2.19.1 =
 * Fix           - Fixed improper registration of AJAX events for order management.
 
