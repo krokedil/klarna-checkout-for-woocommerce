@@ -510,23 +510,9 @@ jQuery( function ( $ ) {
 			}
 		},
 
-		updateShipping: function (data) {
-			const serializedData = JSON.stringify(data)
-
-			// If the update succeeded but the data is the same as before, we won't trigger the update_checkout event to avoid an infinite loop.
-			const current = $("#kco_shipping_data").val()
-			if (current === serializedData) {
-				// We temporarily comment out this since it is causing issues with pickup point changes in KSA not being detected (since the shipping option change event is triggered with the same data when the pickup point is changed). We will need to find a better way to detect changes in shipping options in KSA.
-				//return
-			}
-
-			$("#kco_shipping_data").val(serializedData)
-
-			// If checkout or update fails, restore the previous value so the guard doesn't block a retry.
-			$( "body" ).one( "checkout_error", function () {
-				$( "#kco_shipping_data" ).val( current )
-			} )
-
+		updateShipping: function ( data ) {
+			kco_wc.kcoSuspend( true )
+			$( "#kco_shipping_data" ).val( JSON.stringify( data ) )
 			$( "body" ).trigger( "kco_shipping_option_changed", [ data ] )
 			$( "body" ).trigger( "update_checkout" )
 		},
