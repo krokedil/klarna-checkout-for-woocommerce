@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-04-16 11:41+0000\n"
+"POT-Creation-Date: 2026-04-27 13:10+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -34,15 +34,15 @@ msgid "Your installation of Kustom Checkout for WooCommerce is not complete. If 
 msgstr ""
 
 #. translators: Kustom order ID.
-#: ../classes/class-kco-api-callbacks.php:108, ../includes/kco-functions.php:639
+#: ../classes/class-kco-api-callbacks.php:106, ../includes/kco-functions.php:639
 msgid "Kustom order is under review, order ID: %s."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:105
+#: ../classes/class-kco-api-callbacks.php:103
 msgid "Kustom Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:101, ../includes/kco-functions.php:631
+#: ../classes/class-kco-api-callbacks.php:99, ../includes/kco-functions.php:631
 msgid "Payment via Kustom Checkout, order ID: %s"
 msgstr ""
 
@@ -50,15 +50,19 @@ msgstr ""
 msgid "The shipping methods have been changed during the checkout process. Please verify your selected shipping method and try again."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:116
+#: ../classes/class-kco-confirmation.php:177
 msgid "Failed getting the order for the external payment."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:123
+#: ../classes/class-kco-confirmation.php:196
+msgid "We couldn't verify your payment. Please try again."
+msgstr ""
+
+#: ../classes/class-kco-confirmation.php:204
 msgid "Failed to find the payment method for the external payment."
 msgstr ""
 
-#: ../classes/class-kco-confirmation.php:133
+#: ../classes/class-kco-confirmation.php:216
 msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
 
@@ -452,7 +456,7 @@ msgstr ""
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:50, ../classes/class-kco-gateway.php:852, ../classes/class-kco-gateway.php:854, ../classes/class-kco-gateway.php:856, ../classes/class-kco-gateway.php:858, ../includes/admin/views/status-report.php:17
+#: ../classes/class-kco-gateway.php:50, ../classes/class-kco-gateway.php:888, ../classes/class-kco-gateway.php:890, ../classes/class-kco-gateway.php:892, ../classes/class-kco-gateway.php:894, ../includes/admin/views/status-report.php:17
 msgid "Kustom Checkout"
 msgstr ""
 
@@ -460,45 +464,49 @@ msgstr ""
 msgid "The current Kustom Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:135
+#: ../classes/class-kco-gateway.php:138
 msgid "The Kustom order id could not be retrieved from the session. Please try again."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:142
+#: ../classes/class-kco-gateway.php:145
 msgid "The Kustom order could not be retrieved from the session. Please try again."
 msgstr ""
 
 #. translators: %s is the field name.
-#: ../classes/class-kco-gateway.php:200
+#: ../classes/class-kco-gateway.php:203
 msgid "Billing %s does not match Kustom order."
 msgstr ""
 
 #. translators: %s is the field name.
-#: ../classes/class-kco-gateway.php:212
+#: ../classes/class-kco-gateway.php:215
 msgid "Shipping %s does not match Kustom order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:386
+#: ../classes/class-kco-gateway.php:301
+msgid "Could not load the enhanced settings page. Showing the standard settings instead."
+msgstr ""
+
+#: ../classes/class-kco-gateway.php:418
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:389
+#: ../classes/class-kco-gateway.php:421
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:569
+#: ../classes/class-kco-gateway.php:601
 msgid "Order address should not be changed and any changes you make will not be reflected in Kustom system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:628
+#: ../classes/class-kco-gateway.php:660
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:650, ../classes/class-kco-gateway.php:672
+#: ../classes/class-kco-gateway.php:682, ../classes/class-kco-gateway.php:704
 msgid "Reference:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:753
+#: ../classes/class-kco-gateway.php:785
 msgid "Kustom did not accept the new order amount, the order has not been updated"
 msgstr ""
 
@@ -740,56 +748,56 @@ msgstr ""
 msgid "You no longer need the separate Klarna Order Management plugin."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:173
+#: ../src/OrderManagement/OrderManagement.php:162
 msgid "minus a return fee of"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:174
+#: ../src/OrderManagement/OrderManagement.php:163
 msgid "Refund amount is less than the return fee."
 msgstr ""
 
 #. translators: 1: User name, 2: Existing token, 3: New token.
-#: ../src/OrderManagement/OrderManagement.php:330
+#: ../src/OrderManagement/OrderManagement.php:319
 msgid "%1$s updated the subscription recurring token from \"%2$s\" to \"%3$s\"."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:388
+#: ../src/OrderManagement/OrderManagement.php:377
 msgid "Could not update Klarna order lines. An unknown error occurred."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:386
+#: ../src/OrderManagement/OrderManagement.php:375
 msgid "Could not update Klarna order lines: %s."
 msgstr ""
 
 #. translators: %s: Error message from Klarna.
-#: ../src/OrderManagement/OrderManagement.php:504
+#: ../src/OrderManagement/OrderManagement.php:493
 msgid "Could not capture Klarna order. %s"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:494
+#: ../src/OrderManagement/OrderManagement.php:483
 msgid "Klarna could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:536, ../src/OrderManagement/OrderManagement.php:555
+#: ../src/OrderManagement/OrderManagement.php:525, ../src/OrderManagement/OrderManagement.php:544
 msgid "Klarna order has not been captured and cannot be refunded."
 msgstr ""
 
 #. translators: %s Klarna error message.
-#: ../src/OrderManagement/OrderManagement.php:547, ../src/OrderManagement/OrderManagement.php:587
+#: ../src/OrderManagement/OrderManagement.php:536, ../src/OrderManagement/OrderManagement.php:576
 msgid "Could not refund Klarna order. %s."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:567
+#: ../src/OrderManagement/OrderManagement.php:556
 msgid "Could not retrieve the refund order."
 msgstr ""
 
 #. translators: refund amount, refund id.
-#: ../src/OrderManagement/OrderManagement.php:596
+#: ../src/OrderManagement/OrderManagement.php:585
 msgid "Processing a refund of %1$s with Klarna"
 msgstr ""
 
 #. translators: 1: original amount, 2: return fee amount.
-#: ../src/OrderManagement/OrderManagement.php:606
+#: ../src/OrderManagement/OrderManagement.php:595
 msgid " (original amount of %1$s - return fee of %2$s)"
 msgstr ""
 

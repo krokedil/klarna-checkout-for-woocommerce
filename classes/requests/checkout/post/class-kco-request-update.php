@@ -23,7 +23,7 @@ class KCO_Request_Update extends KCO_Request {
 	 */
 	public function request( $klarna_order_id, $order_id = null, $force = false ) {
 		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
-		$request_args = apply_filters( 'kco_wc_update_order', $this->get_request_args( $order_id ) );
+		$request_args = apply_filters( 'kco_wc_update_order', $this->get_request_args( $order_id, $request_url ) );
 
 		// Check if we need to update.
 		if ( WC()->session->get( 'kco_update_md5' ) && WC()->session->get( 'kco_update_md5' ) === md5( wp_json_encode( $request_args ) ) && ! $force ) {
@@ -63,7 +63,7 @@ class KCO_Request_Update extends KCO_Request {
 			'order_tax_amount'   => $cart_data->get_order_tax_amount( $cart_data->get_order_lines() ),
 			'billing_countries'  => KCO_Request_Countries::get_billing_countries(),
 			'shipping_countries' => KCO_Request_Countries::get_shipping_countries(),
-			'merchant_data'      => KCO_Request_Merchant_Data::get_merchant_data(),
+			'merchant_data'      => KCO_Request_Merchant_Data::get_merchant_data( $order_id ),
 			'options'            => $request_options->get_options(),
 		);
 
@@ -119,12 +119,13 @@ class KCO_Request_Update extends KCO_Request {
 	 * Gets the request args for the API call.
 	 *
 	 * @param string $order_id The WooCommerce order id.
+	 * @param string $url The request URL.
 	 * @return array
 	 */
-	protected function get_request_args( $order_id ) {
+	protected function get_request_args( $order_id, $url = '' ) {
 		return array(
 			'headers'    => $this->get_request_headers(),
-			'user-agent' => $this->get_user_agent(),
+			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'POST',
 			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id ), $order_id ) ),
 			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),

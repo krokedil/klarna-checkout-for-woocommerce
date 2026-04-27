@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "01677504b11b22a4dc3e25fa5633d560",
+    "content-hash": "a268637b4eb3a48d9e12690a6824d424",
     "packages": [
         {
             "name": "krokedil/settings-page",
-            "version": "1.3.2",
+            "version": "1.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/krokedil/settings-page.git",
-                "reference": "2d50b3b3d539d9418a3e2d699d3829e9a5c0566c"
+                "reference": "2ebd903fc608206cf6fdd414a74c760a282e8159"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/krokedil/settings-page/zipball/2d50b3b3d539d9418a3e2d699d3829e9a5c0566c",
-                "reference": "2d50b3b3d539d9418a3e2d699d3829e9a5c0566c",
+                "url": "https://api.github.com/repos/krokedil/settings-page/zipball/2ebd903fc608206cf6fdd414a74c760a282e8159",
+                "reference": "2ebd903fc608206cf6fdd414a74c760a282e8159",
                 "shasum": ""
             },
             "require-dev": {
@@ -46,10 +46,10 @@
             ],
             "description": "A package to help setup settings pages in WordPress and WooCommerce for Krokedil plugins to add the Addons and Support tabs",
             "support": {
-                "source": "https://github.com/krokedil/settings-page/tree/1.3.2",
+                "source": "https://github.com/krokedil/settings-page/tree/1.3.4",
                 "issues": "https://github.com/krokedil/settings-page/issues"
             },
-            "time": "2026-01-23T10:41:25+00:00"
+            "time": "2026-04-23T19:14:17+00:00"
         },
         {
             "name": "krokedil/support",
