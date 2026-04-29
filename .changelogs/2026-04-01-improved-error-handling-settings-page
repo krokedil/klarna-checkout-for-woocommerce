@@ -1,4 +1,0 @@
-Type: Enhancement
-Needs Documentation: no
-
-Enhanced error handling for the settings page package, to prevent fatal errors and provide clearer feedback when errors occur.

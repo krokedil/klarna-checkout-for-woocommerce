@@ -1,4 +1,0 @@
-Type: Tweak
-Needs Documentation: no
-
-Settings page design arguments are now defined directly within the plugin, rather than in the external configuration file.

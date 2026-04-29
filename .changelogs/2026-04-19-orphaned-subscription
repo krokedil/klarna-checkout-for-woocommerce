@@ -1,0 +1,5 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed a critical error when attempting to renew an orphaned subscription.
+

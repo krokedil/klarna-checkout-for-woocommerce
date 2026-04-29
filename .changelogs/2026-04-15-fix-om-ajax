@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Fixed improper registration of AJAX events for order management.
