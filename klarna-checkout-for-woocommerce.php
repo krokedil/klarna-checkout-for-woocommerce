@@ -310,7 +310,17 @@ if ( ! class_exists( 'KCO' ) ) {
 			// Load the autoloader.
 			$autoloader_result = self::init_composer();
 			if ( $autoloader_result ) {
-				$this->block_extension = new BlockExtension();
+				// Defer instantiation to `init` (priority 5) so wc_get_page_id() is not called
+				// before WordPress has initialized — prevents _doing_it_wrong notices in WP 6.7+
+				// when third-party filters call is_page() or load text domains early.
+				// Priority 5 ensures we register before woocommerce_blocks_loaded fires (~priority 10).
+				add_action(
+					'init',
+					function () {
+						$this->block_extension = new BlockExtension();
+					},
+					5
+				);
 			}
 		}
 
