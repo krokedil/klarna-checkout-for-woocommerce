@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where paying for an order containing a subscription product would fail with an error. Subscription products now work correctly with the Pay for Order flow.
