@@ -38,6 +38,11 @@ function kco_create_or_update_order() {
 			set_transient( "kustom_customer_id_{$klarna_order['order_id']}", WC()->session->get_customer_id(), WEEK_IN_SECONDS * 2 );
 			return $klarna_order;
 		}
+
+		// Ensure the transient is set correctly and updated with the customer id in case the order was updated or the customer was logged in after the order was created.
+		if ( ! empty( $klarna_order['order_id'] ) ) {
+			set_transient( "kustom_customer_id_{$klarna_order['order_id']}", WC()->session->get_customer_id(), WEEK_IN_SECONDS * 2 );
+		}
 		return $klarna_order;
 	} else {
 		// Create new order, since we dont have one.
