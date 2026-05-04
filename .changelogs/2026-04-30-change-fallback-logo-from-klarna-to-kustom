@@ -1,4 +1,4 @@
 Type: Enhancement
 Needs Documentation: no
 
-change fallback logo from klarna to Kustom
+When multiple payment methods are used, the fallback logo has been changed from Klarna to Kustom.
