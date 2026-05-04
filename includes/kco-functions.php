@@ -955,6 +955,10 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
  * @return void
  */
 function kco_maybe_set_selected_pickup_point( $klarna_order ) {
+	if ( ! is_array( $klarna_order ) ) {
+		return;
+	}
+
 	// If we have delivery_details and pickup_location set.
 	if ( isset( $klarna_order['selected_shipping_option']['delivery_details']['pickup_location'] ) ) {
 		$shipping_method_id = $klarna_order['selected_shipping_option']['id'];
