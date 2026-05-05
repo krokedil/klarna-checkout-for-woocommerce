@@ -607,6 +607,12 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 			if ( ! is_wp_error( $klarna_order ) ) {
+				// Sync KSS-selected shipping back to the WC order before validation.
+				// In the redirect/HPP flow the WC order is created with the cart's shipping selection,
+				// but Kustom Shipping Assistant may change the selection on the HPP page. Without this
+				// sync the WC order keeps the original shipping and totals will mismatch.
+				kco_maybe_sync_shipping_from_klarna_order( $order, $klarna_order );
+
 				if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
 					return;
 				}
@@ -936,6 +942,110 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 	KCO_Logger::Log( "Set chosen shipping method for $klarna_order_id " . wp_json_encode( $chosen_shipping_methods ) );
 
 	WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
+}
+
+/**
+ * Sync the shipping line on a WooCommerce order from the selected_shipping_option on the Kustom order.
+ *
+ * Used by the redirect/HPP confirmation flow: the WC order is created before the customer is sent
+ * to Kustom's hosted payment page, so if Kustom Shipping Assistant changes the shipping selection on
+ * the HPP page the WC order would otherwise keep the original shipping and totals would mismatch.
+ *
+ * Idempotent — if the shipping already matches, only the KSS meta is refreshed.
+ *
+ * @param WC_Order $order The WooCommerce order.
+ * @param array    $klarna_order The Kustom order.
+ * @return void
+ */
+function kco_maybe_sync_shipping_from_klarna_order( $order, $klarna_order ) {
+	if ( empty( $order ) || empty( $klarna_order ) ) {
+		return;
+	}
+
+	$selected = $klarna_order['selected_shipping_option'] ?? null;
+	if ( empty( $selected ) || empty( $selected['id'] ) ) {
+		return;
+	}
+
+	$kustom_id = wc_clean( $selected['id'] );
+
+	$existing_id = '';
+	$existing_items = $order->get_items( 'shipping' );
+	foreach ( $existing_items as $existing_item ) {
+		$existing_id = $existing_item->get_method_id();
+		$instance    = $existing_item->get_instance_id();
+		if ( ! empty( $instance ) ) {
+			$existing_id .= ':' . $instance;
+		}
+		break;
+	}
+
+	// Persist KSS reference even when shipping already matches, so capture/order-lines can use it.
+	$order->update_meta_data( '_kco_kss_data', wp_json_encode( $selected ) );
+
+	if ( $existing_id === $kustom_id ) {
+		$order->save();
+		return;
+	}
+
+	try {
+		// Remove existing shipping items.
+		foreach ( $existing_items as $existing_item_id => $existing_item ) {
+			$order->remove_item( $existing_item_id );
+		}
+
+		list( $method_id, $instance_id ) = array_pad( explode( ':', $kustom_id, 2 ), 2, '' );
+
+		$kustom_total = absint( $selected['price'] ?? 0 );
+		$kustom_tax   = absint( $selected['tax_amount'] ?? 0 );
+
+		$shipping_total_excl_tax = ( $kustom_total - $kustom_tax ) / 100;
+		$shipping_tax_amount     = $kustom_tax / 100;
+
+		$item = new WC_Order_Item_Shipping();
+		$item->set_method_title( $selected['name'] ?? __( 'Shipping', 'klarna-checkout-for-woocommerce' ) );
+		$item->set_method_id( $method_id );
+		if ( '' !== $instance_id ) {
+			$item->set_instance_id( $instance_id );
+		}
+		$item->set_total( wc_format_decimal( $shipping_total_excl_tax ) );
+
+		if ( $shipping_tax_amount > 0 ) {
+			$tax_rate_id = 0;
+			foreach ( $order->get_items( 'tax' ) as $tax_item ) {
+				if ( '' !== $tax_item->get_shipping_tax_total() && $tax_item->get_rate_id() ) {
+					$tax_rate_id = $tax_item->get_rate_id();
+					break;
+				}
+			}
+			if ( ! $tax_rate_id ) {
+				$shipping_tax_rates = WC_Tax::get_shipping_tax_rates();
+				if ( ! empty( $shipping_tax_rates ) ) {
+					$tax_rate_id = array_key_first( $shipping_tax_rates );
+				}
+			}
+			if ( $tax_rate_id ) {
+				$item->set_taxes( array( 'total' => array( $tax_rate_id => $shipping_tax_amount ) ) );
+			}
+		}
+
+		$order->add_item( $item );
+		$order->calculate_totals( true );
+
+		KCO_Logger::log( sprintf(
+			'[KSS sync] Replaced shipping on WC order %s|%s — was "%s", now "%s" from Kustom selected_shipping_option.',
+			$order->get_id(),
+			$order->get_order_number(),
+			$existing_id,
+			$kustom_id
+		) );
+	} catch ( Exception $e ) {
+		KCO_Logger::log( sprintf(
+			'[KSS sync] Failed to sync shipping on WC order %s: %s',
+			$order->get_id(),
+			$e->getMessage()
+		) );
+	}
 }
 
 /**
