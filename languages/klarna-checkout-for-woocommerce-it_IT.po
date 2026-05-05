@@ -71,17 +71,16 @@ msgstr ""
 msgid "Kustom order id:"
 msgstr ""
 
-#. translators: 1. Kustom customer service URL. 2. Kustom's app url.
+#. translators: Kustom customer service URL.
 #: ../classes/class-kco-email.php:45
 msgid ""
 "Your payment is processed by our partner %1$s. You will shortly receive "
 "instructions on how to complete your payment. You can manage all your "
-"payments via kustom.co or in the %2$s"
+"payments via kustom.co."
 msgstr ""
 "Il pagamento viene elaborato dal nostro partner %1$s. Riceverai a breve le "
 "istruzioni su come completare il pagamento. Puoi gestire tutti i tuoi "
-"pagamenti tramite kustom.co o nell'app %2$s e persino pagare con un solo "
-"clic."
+"pagamenti tramite kustom.co."
 
 #: ../classes/class-kco-fields.php:25
 msgid "Enable/Disable"
