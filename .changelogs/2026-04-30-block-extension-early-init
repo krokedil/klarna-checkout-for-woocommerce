@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Fixed PHP notices appearing on every page load in WordPress 6.7+ caused by the checkout block being initialized too early (thanks @Dekadinious).

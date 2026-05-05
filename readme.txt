@@ -7,7 +7,7 @@ Tested up to: 6.9
 Requires PHP: 7.4
 WC requires at least: 5.6.0
 WC tested up to: 10.7.0
-Stable tag: 2.20.0
+Stable tag: 2.20.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,11 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-05-05    - version 2.20.1 =
+* Fix           - Fixed a critical error when attempting to renew an orphaned subscription.
+* Fix           - Addressed an undefined shipping_company array warning.
+* Fix           - Fixed PHP notices appearing on every page load in WordPress 6.7+ caused by the checkout block being initialized too early (thanks @Dekadinious).
+
 = 2026-04-27    - version 2.20.0 =
 * Feature       - Added the 'kco_checkbox_changed' action hook. This action is triggered whenever the customer toggles the checkbox.
 * Enhancement   - Enhanced error handling for the settings page package, to prevent fatal errors and provide clearer feedback when errors occur.
