@@ -52,7 +52,7 @@ class KCO_Request_Create extends KCO_Request {
 			'merchant_urls'      => KCO_WC()->merchant_urls->get_urls( $order_id ),
 			'billing_countries'  => KCO_Request_Countries::get_billing_countries(),
 			'shipping_countries' => KCO_Request_Countries::get_shipping_countries(),
-			'merchant_data'      => KCO_Request_Merchant_Data::get_merchant_data(),
+			'merchant_data'      => KCO_Request_Merchant_Data::get_merchant_data( $order_id ),
 			'options'            => $request_options->get_options( $checkout_flow ),
 			'customer'           => array(
 				'type' => ( in_array( $this->settings['allowed_customer_types'], array( 'B2B', 'B2BC' ), true ) ) ? 'organization' : 'person',

@@ -27,6 +27,7 @@ class KCO_Subscription {
 		add_filter( 'kco_wc_api_request_args', array( $this, 'set_recurring' ) );
 		add_filter( 'kco_wc_api_hpp_request_args', array( $this, 'change_return_url_for_recurring_change_payment_method' ), 10, 3 );
 		add_action( 'kco_wc_payment_complete', array( $this, 'set_recurring_token_for_order' ), 10, 2 );
+		add_action( 'kco_wc_payment_complete', array( $this, 'save_subscription_meta' ) );
 		add_action( 'woocommerce_scheduled_subscription_payment_kco', array( $this, 'trigger_scheduled_payment' ), 10, 2 );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'show_recurring_token' ) );
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'save_kco_recurring_token_update' ), 45, 1 );
@@ -273,22 +274,31 @@ class KCO_Subscription {
 	 * Sets the recurring token for the subscription order
 	 *
 	 * @param int   $order_id The WooCommerce order id.
-	 * @param array $klarna_order The Kustom order.
+	 * @param array $kco_order The Kustom order.
 	 * @return void
 	 */
-	public function set_recurring_token_for_order( $order_id = null, $klarna_order = null ) {
-		$wc_order        = wc_get_order( $order_id );
-		$recurring_order = $wc_order->get_meta( '_kco_recurring_order', true );
+	public function set_recurring_token_for_order( $order_id = null, $kco_order = null ) {
+		if ( ! class_exists( 'WC_Subscription' ) || ! function_exists( 'wcs_get_subscriptions_for_order' ) ) {
+			return;
+		}
 
-		if ( 'yes' === $recurring_order || ( class_exists( 'WC_Subscription' ) && ( wcs_order_contains_subscription( $wc_order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $wc_order ) ) ) ) {
-			$subscriptions   = wcs_get_subscriptions_for_order( $order_id, array( 'order_type' => 'any' ) );
-			$klarna_order_id = $wc_order->get_transaction_id();
-			$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
-			if ( isset( $klarna_order['recurring_token'] ) ) {
-				$recurring_token = $klarna_order['recurring_token'];
+		$order           = wc_get_order( $order_id );
+		$recurring_order = $order->get_meta( '_kco_recurring_order', true );
+
+		if ( 'yes' === $recurring_order || wcs_order_contains_subscription( $order, array( 'parent', 'renewal', 'resubscribe', 'switch' ) ) || wcs_is_subscription( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_order( $order_id, array( 'order_type' => 'any' ) );
+
+			// Use the passed-in Kustom order if it has the recurring token, otherwise fetch it.
+			if ( ! isset( $kco_order['recurring_token'] ) ) {
+				$klarna_order_id = $order->get_transaction_id();
+				$kco_order       = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+			}
+
+			if ( isset( $kco_order['recurring_token'] ) ) {
+				$recurring_token = $kco_order['recurring_token'];
 				// translators: %s Kustom recurring token.
 				$note = sprintf( __( 'Recurring token for subscription: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $recurring_token ) );
-				$wc_order->add_order_note( $note );
+				$order->add_order_note( $note );
 
 				foreach ( $subscriptions as $subscription ) {
 					$subscription->update_meta_data( '_kco_recurring_token', $recurring_token );
@@ -299,26 +309,75 @@ class KCO_Subscription {
 
 						// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
 						if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
-							$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
+							$subscription->set_shipping_phone( $kco_order['shipping_address']['phone'] );
 						} else {
-							$subscription->update_meta_data( '_shipping_phone', $klarna_order['shipping_address']['phone'] );
+							$subscription->update_meta_data( '_shipping_phone', $kco_order['shipping_address']['phone'] );
 						}
 					}
 					$subscription->save();
 				}
 
 				// Also update the renewal order with the new recurring token.
-				$wc_order->update_meta_data( '_kco_recurring_token', sanitize_key( $recurring_token ) );
+				$order->update_meta_data( '_kco_recurring_token', sanitize_key( $recurring_token ) );
 
 			} else {
-				$wc_order->add_order_note( __( 'Recurring token was missing from the Kustom order during the checkout process. Please contact Kustom for help.', 'klarna-checkout-for-woocommerce' ) );
-				$wc_order->set_status( 'on-hold' );
+				$order->add_order_note( __( 'Recurring token was missing from the Kustom order during the checkout process. Please contact Kustom for help.', 'klarna-checkout-for-woocommerce' ) );
+				$order->set_status( 'on-hold' );
 				foreach ( $subscriptions as $subscription ) {
 					$subscription->set_status( 'on-hold' );
 				}
 			}
 
-			$wc_order->save();
+			$order->save();
+		}
+	}
+
+	/**
+	 * Propagate subscription-specific meta from the parent order to its subscriptions.
+	 *
+	 * These values (Klarna environment, KSS shipping data) are written to the parent order during
+	 * checkout, after the subscription has already been created. Saving them to the subscription
+	 * here ensures the Data Copier can copy them to renewal orders automatically.
+	 *
+	 * @param int $order_id The WooCommerce order id.
+	 * @return void
+	 */
+	public function save_subscription_meta( $order_id = null ) {
+		if ( ! function_exists( 'wcs_get_subscriptions_for_order' ) ) {
+			return;
+		}
+
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
+			return;
+		}
+
+		$subscriptions = wcs_get_subscriptions_for_order( $order_id, array( 'order_type' => 'any' ) );
+		if ( empty( $subscriptions ) ) {
+			return;
+		}
+
+		$env = $order->get_meta( '_wc_klarna_environment' );
+		if ( empty( $env ) ) {
+			$settings = get_option( 'woocommerce_kco_settings' );
+			$env      = wc_string_to_bool( $settings['testmode'] ?? 'yes' ) ? 'test' : 'live';
+		}
+
+		$kss_data      = $order->get_meta( '_kco_kss_data' );
+		$kss_reference = $order->get_meta( '_kco_kss_reference' );
+
+		foreach ( $subscriptions as $subscription ) {
+			$subscription->update_meta_data( '_wc_klarna_environment', $env );
+
+			if ( ! empty( $kss_data ) ) {
+				$subscription->update_meta_data( '_kco_kss_data', $kss_data );
+			}
+
+			if ( ! empty( $kss_reference ) ) {
+				$subscription->update_meta_data( '_kco_kss_reference', $kss_reference );
+			}
+
+			$subscription->save_meta_data();
 		}
 	}
 
@@ -349,25 +408,35 @@ class KCO_Subscription {
 
 		$subscriptions = wcs_get_subscriptions_for_renewal_order( $order_id );
 
-		// The new subscription that is created from the renewal order.
+		// The subscription that is associated with the renewal order.
 		$subscription = reset( $subscriptions );
-		$parent       = $subscription->get_parent();
 
 		$recurring_token = $renewal_order->get_meta( '_kco_recurring_token', true );
 		if ( empty( $recurring_token ) ) {
-			// Try getting it from parent order.
-			$recurring_token = $parent->get_meta( '_kco_recurring_token', true );
-			$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
+			// Try the subscription (source of truth).
+			$recurring_token = $subscription->get_meta( '_kco_recurring_token', true );
 
 			if ( empty( $recurring_token ) ) {
-				// Try getting it from _klarna_recurring_token (the old Klarna plugin).
+				// Try the old Klarna plugin meta key on renewal order, then subscription.
 				$recurring_token = $renewal_order->get_meta( '_klarna_recurring_token', true );
 
 				if ( empty( $recurring_token ) ) {
-					$recurring_token = $parent->get_meta( '_klarna_recurring_token', true );
-					$renewal_order->update_meta_data( '_klarna_recurring_token', $recurring_token );
+					$recurring_token = $subscription->get_meta( '_klarna_recurring_token', true );
 				}
 
+				if ( empty( $recurring_token ) ) {
+					// Last resort: try the parent order for legacy/migrated subscriptions.
+					$parent = $subscription->get_parent();
+					if ( $parent ) {
+						$recurring_token = $parent->get_meta( '_kco_recurring_token', true );
+
+						if ( empty( $recurring_token ) ) {
+							$recurring_token = $parent->get_meta( '_klarna_recurring_token', true );
+						}
+					}
+				}
+
+				// Persist the token back to the subscription and renewal so future renewals don't need the fallback.
 				if ( ! empty( $recurring_token ) ) {
 					$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
 					foreach ( $subscriptions as $related_subscription ) {
@@ -375,6 +444,8 @@ class KCO_Subscription {
 						$related_subscription->save_meta_data();
 					}
 				}
+			} else {
+				$renewal_order->update_meta_data( '_kco_recurring_token', $recurring_token );
 			}
 
 			$renewal_order->save_meta_data();
@@ -402,36 +473,74 @@ class KCO_Subscription {
 	/**
 	 * Copy meta fields to renewal order.
 	 *
-	 * This is triggered before 'woocommerce_scheduled_subscription_payment_*', thus before the renewal order is processed and can be used for preparing the renewal for further processing (e.g., setting the recurring token).
+	 * For new subscriptions, the Data Copier handles this automatically since meta is saved
+	 * directly to the subscription. This method serves as a fallback for old or migrated
+	 * subscriptions that may not have the meta on the subscription yet.
 	 *
 	 * @param  WC_Order        $renewal_order Woo renewal order.
 	 * @param  WC_Subscription $subscription Woo subscription.
-	 * @return WC_Order
+	 * @return void
 	 */
 	public function copy_meta_fields_to_renewal_order( $renewal_order, $subscription ) {
-		$parent_order = $subscription->get_parent();
-
-		// The environment used for the parent order.
-		$env = $parent_order->get_meta( '_wc_klarna_environment' );
-		if ( empty( $env ) ) {
-			$settings = get_option( 'woocommerce_kco_settings' );
-			$env      = wc_string_to_bool( $settings['testmode'] ?? 'yes' ) ? 'test' : 'live';
-		}
-		$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
-
-		$kss_data = $parent_order->get_meta( '_kco_kss_data' );
-		if ( ! empty( $kss_data ) ) {
-			$renewal_order->update_meta_data( '_kco_kss_data', $kss_data );
+		if ( 'kco' !== $subscription->get_payment_method() ) {
+			return;
 		}
 
-		$kss_reference = $parent_order->get_meta( '_kco_kss_reference' );
-		if ( ! empty( $kss_reference ) ) {
-			$renewal_order->update_meta_data( '_kco_kss_reference', $kss_reference );
+		$parent = $subscription->get_parent();
+
+		// Environment: only set if the Data Copier didn't already copy it from the subscription.
+		if ( empty( $renewal_order->get_meta( '_wc_klarna_environment' ) ) ) {
+			$env = $subscription->get_meta( '_wc_klarna_environment' );
+
+			// Fall back to the parent order for legacy subscriptions.
+			if ( empty( $env ) && $parent ) {
+				$env = $parent->get_meta( '_wc_klarna_environment' );
+			}
+
+			if ( empty( $env ) ) {
+				$settings = get_option( 'woocommerce_kco_settings' );
+				$env      = wc_string_to_bool( $settings['testmode'] ?? 'yes' ) ? 'test' : 'live';
+			}
+
+			// Persist to the subscription so future renewals don't need the fallback.
+			$subscription->update_meta_data( '_wc_klarna_environment', $env );
+			$subscription->save_meta_data();
+
+			$renewal_order->update_meta_data( '_wc_klarna_environment', $env );
+		}
+
+		// KSS data: only set if the Data Copier didn't already copy it.
+		if ( empty( $renewal_order->get_meta( '_kco_kss_data' ) ) ) {
+			$kss_data = $subscription->get_meta( '_kco_kss_data' );
+
+			if ( empty( $kss_data ) && $parent ) {
+				$kss_data = $parent->get_meta( '_kco_kss_data' );
+			}
+
+			if ( ! empty( $kss_data ) ) {
+				$subscription->update_meta_data( '_kco_kss_data', $kss_data );
+				$subscription->save_meta_data();
+
+				$renewal_order->update_meta_data( '_kco_kss_data', $kss_data );
+			}
+		}
+
+		if ( empty( $renewal_order->get_meta( '_kco_kss_reference' ) ) ) {
+			$kss_reference = $subscription->get_meta( '_kco_kss_reference' );
+
+			if ( empty( $kss_reference ) && $parent ) {
+				$kss_reference = $parent->get_meta( '_kco_kss_reference' );
+			}
+
+			if ( ! empty( $kss_reference ) ) {
+				$subscription->update_meta_data( '_kco_kss_reference', $kss_reference );
+				$subscription->save_meta_data();
+
+				$renewal_order->update_meta_data( '_kco_kss_reference', $kss_reference );
+			}
 		}
 
 		$renewal_order->save_meta_data();
-
-		return $renewal_order;
 	}
 
 	/**

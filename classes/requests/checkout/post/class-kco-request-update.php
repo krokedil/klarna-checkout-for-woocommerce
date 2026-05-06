@@ -63,7 +63,7 @@ class KCO_Request_Update extends KCO_Request {
 			'order_tax_amount'   => $cart_data->get_order_tax_amount( $cart_data->get_order_lines() ),
 			'billing_countries'  => KCO_Request_Countries::get_billing_countries(),
 			'shipping_countries' => KCO_Request_Countries::get_shipping_countries(),
-			'merchant_data'      => KCO_Request_Merchant_Data::get_merchant_data(),
+			'merchant_data'      => KCO_Request_Merchant_Data::get_merchant_data( $order_id ),
 			'options'            => $request_options->get_options(),
 		);
 
