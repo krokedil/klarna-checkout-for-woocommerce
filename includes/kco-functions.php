@@ -645,6 +645,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				if ( $upsell_enabled ) {
 					$waiting_status = UpsellStatus::get_configured_status();
 					$order->set_status( $waiting_status, __( 'Waiting for verification from Kustom\'s push notification', 'klarna-checkout-for-woocommerce' ) );
+					$order->add_meta_data( '_kco_upsell_flow', 'yes' );
 					$order->save();
 					UpsellFallback::schedule( $klarna_order_id );
 					KCO_Logger::log( $klarna_order_id . ': Upsell enabled, waiting for push verification. Order #' . $order->get_order_number() . ' set to ' . $waiting_status . '.' );
