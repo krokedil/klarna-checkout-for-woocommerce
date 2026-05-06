@@ -30,6 +30,7 @@ class UpsellFallback {
 	 */
 	public static function schedule( $klarna_order_id ) {
 		if ( empty( $klarna_order_id ) || ! function_exists( 'as_schedule_single_action' ) ) {
+			\KCO_Logger::log( $klarna_order_id . ': Cannot schedule upsell push fallback; missing Klarna order ID or Action Scheduler.' );
 			return;
 		}
 
