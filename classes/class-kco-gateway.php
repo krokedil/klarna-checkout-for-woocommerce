@@ -551,12 +551,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
-			if ( $order_id ) {
-				$order = wc_get_order( $order_id );
-				if ( is_object( $order ) && ! empty( $klarna_order_id ) ) {
-					$upsell_uuids    = $order->get_meta( '_ppu_upsell_ids', true );
-					$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
-					$has_been_upsold = ! empty( $upsell_uuids );
+			$order = wc_get_order( $order_id );
+			if ( is_object( $order ) ) {
+				$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
+				$upsell_uuids    = $order->get_meta( '_ppu_upsell_ids', true );
+				$has_been_upsold = ! empty( $upsell_uuids );
+
+				if ( ! empty( $klarna_order_id ) ) {
 					$klarna_order    = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
 					if ( $klarna_order && ! $has_been_upsold ) { // Don't show the snippet for upsold orders, since the iFrame wont be updated with the new orders lines.
