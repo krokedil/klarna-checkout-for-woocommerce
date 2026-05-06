@@ -1,0 +1,4 @@
+Type: Add
+Needs Documentation: yes
+
+Added a new "Auto capture" checkbox setting under Checkout settings that, when enabled, sends auto_capture=true to the Kustom API so that orders are captured automatically on activation. Applies to standard and recurring orders (HPP inherits from the underlying checkout order). Default is off.

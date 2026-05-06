@@ -293,6 +293,14 @@ class KCO_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
+			'kco_auto_capture'           => array(
+				'title'       => __( 'Auto capture', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Automatically capture the Kustom order when it is activated', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If checked, the Kustom order will be captured automatically by Kustom on activation.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
 			'show_subtotal_detail'       => array(
 				'title'       => __( 'Display subtotal details', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'select',

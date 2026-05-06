@@ -45,6 +45,8 @@ class KCO_Request_Create_Recurring extends KCO_Request {
 		$order_data = new KCO_Request_Order();
 		$order      = wc_get_order( $order_id );
 
+		$settings = get_option( 'woocommerce_kco_settings', array() );
+
 		$request_body = array(
 			'purchase_currency'   => $order->get_currency(),
 			'order_amount'        => $order_data->get_order_amount( $order_id ),
@@ -52,6 +54,7 @@ class KCO_Request_Create_Recurring extends KCO_Request {
 			'order_tax_amount'    => $order_data->get_total_tax(),
 			'merchant_reference1' => $order->get_order_number(),
 			'merchant_reference2' => $order->get_id(),
+			'auto_capture'        => isset( $settings['kco_auto_capture'] ) && 'yes' === $settings['kco_auto_capture'],
 		);
 
 		return $request_body;

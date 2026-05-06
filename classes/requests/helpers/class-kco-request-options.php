@@ -49,6 +49,7 @@ class KCO_Request_Options {
 			'require_client_validation_callback_response' => 'redirect' === $checkout_flow ? false : true,
 			'phone_mandatory'                             => 'required' === get_option( 'woocommerce_checkout_phone_field', 'required' ),
 			'show_subtotal_detail'                        => $this->show_subtotal_detail( $checkout_flow ),
+			'auto_capture'                                => $this->get_auto_capture(),
 		);
 
 		if ( $this->get_iframe_colors() ) {
@@ -76,6 +77,15 @@ class KCO_Request_Options {
 		$title_mandatory = isset( $this->settings ) && 'yes' === $this->settings['title_mandatory'];
 
 		return $title_mandatory;
+	}
+
+	/**
+	 * Gets the auto capture option.
+	 *
+	 * @return bool
+	 */
+	private function get_auto_capture() {
+		return isset( $this->settings['kco_auto_capture'] ) && 'yes' === $this->settings['kco_auto_capture'];
 	}
 
 	/**
