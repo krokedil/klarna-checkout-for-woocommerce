@@ -891,7 +891,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				case 'FI':
 					return '<img src="' . esc_url( KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_fi.png' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px; max-width: 90%;"  width="250"/>';
 				default:
-					return '<img src="' . esc_url( KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_primary.png' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px" width="100"/>';
+					return '<img src="' . esc_url( KCO_WC_PLUGIN_URL . '/assets/img/kustom_badge.svg' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px" width="75"/>';
 			}
 		}
 	}
