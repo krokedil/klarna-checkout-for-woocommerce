@@ -90,6 +90,9 @@ class KCO_Request_Update extends KCO_Request {
 				'region'            => WC()->checkout()->get_value( 'billing_state' ),
 			);
 
+			/* Sanitize all values. Remove all empty elements. */
+			$request_body['billing_address'] = self::remove_empty_values( $request_body['billing_address'] );
+
 			$request_body['shipping_address'] = array(
 				'postal_code'       => WC()->checkout()->get_value( 'shipping_postcode' ),
 				'country'           => WC()->checkout()->get_value( 'shipping_country' ),
@@ -103,9 +106,13 @@ class KCO_Request_Update extends KCO_Request {
 			);
 
 			$request_body['shipping_address'] = wp_parse_args( $request_body['billing_address'], $request_body['shipping_address'] ?? array() );
+
+
+			/* Sanitize all values. Remove all empty elements. */
+			$request_body['shipping_address'] = self::remove_empty_values( $request_body['shipping_address'] );
 		}
 
-		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {
+		if ( wc_string_to_bool($this->settings['shipping_methods_in_iframe'] ?? 'no' ) && WC()->cart->needs_shipping() ) {
 			$request_body['shipping_options'] = KCO_Request_Shipping_Options::get_shipping_options( $this->separate_sales_tax );
 		} elseif ( ! WC()->cart->needs_shipping() ) {
 			// If the order had a shipping option before but is removed now, same needs to be sent to Kustom else it will retain the old shipping option.

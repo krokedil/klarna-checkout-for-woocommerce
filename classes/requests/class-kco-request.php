@@ -164,6 +164,16 @@ class KCO_Request {
 	}
 
 	/**
+	 * Strips empty values from a field array after sanitization.
+	 *
+	 * @param array $fields Field values to filter.
+	 * @return array
+	 */
+	protected static function remove_empty_values( array $fields ): array {
+		return array_filter( $fields, fn( $value ) => ! empty( wc_clean( $value ) ) );
+	}
+
+	/**
 	 * Remove sensitive data from the log.
 	 *
 	 * @param array $request_args The request data to sanitize.
