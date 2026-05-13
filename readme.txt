@@ -36,7 +36,7 @@ Installment, revolving and other flexible financing plans let customers pay when
 * Get your store approved by Kustom, and start selling.
 
 == Installation ==
-1. Upload plugin folder to to the "/wp-content/plugins/" directory.
+1. Upload plugin folder to the "/wp-content/plugins/" directory.
 2. Activate the plugin through the "Plugins" menu in WordPress.
 3. Go WooCommerce Settings –> Payment Gateways and configure your Kustom Checkout settings.
 4. Read more about the configuration process in the [plugin documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
