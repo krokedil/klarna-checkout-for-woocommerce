@@ -13,8 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * <kustom-payment-method-display> web component anywhere on the site.
  *
  * Usage:
- *   [kustom_element data-key="my-key"]
- *   [kustom_element data-key="my-key" data-purchase-amount="9900"]
+ *   [kustom_element]
+ *   [kustom_element locale="sv-SE"]
+ *   [kustom_element locale="sv-SE" include="klarna_pay_later" exclude="klarna_pay_now"]
  */
 class Shortcode {
 
@@ -28,27 +29,31 @@ class Shortcode {
 	/**
 	 * Renders the shortcode output.
 	 *
+	 * Locale falls back to the global KE setting when not provided.
+	 *
 	 * @param array $atts Shortcode attributes.
 	 * @return string
 	 */
 	public function render( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'data-key'             => '',
-				'data-purchase-amount' => '',
+				'locale'  => Settings::get( 'ke_locale', Settings::default_locale() ),
+				'include' => Settings::get( 'ke_include', '' ),
+				'exclude' => Settings::get( 'ke_exclude', '' ),
 			),
 			$atts,
 			'kustom_element'
 		);
 
-		$data_key = sanitize_text_field( $atts['data-key'] );
-		if ( empty( $data_key ) ) {
+		$locale = sanitize_text_field( $atts['locale'] );
+		if ( empty( $locale ) ) {
 			return '';
 		}
 
 		Scripts::enqueue();
 
-		$purchase_amount = sanitize_text_field( $atts['data-purchase-amount'] );
+		$include = sanitize_text_field( $atts['include'] );
+		$exclude = sanitize_text_field( $atts['exclude'] );
 
 		ob_start();
 
@@ -57,15 +62,19 @@ class Shortcode {
 		 *
 		 * @since 2.21.0
 		 *
-		 * @param string $data_key        The element data-key.
-		 * @param string $purchase_amount Purchase amount in minor units (empty string if not set).
+		 * @param string $locale  The element locale.
+		 * @param string $include Comma-separated payment method IDs to include.
+		 * @param string $exclude Comma-separated payment method IDs to exclude.
 		 */
-		do_action( 'kco_before_kustom_element_shortcode', $data_key, $purchase_amount );
+		do_action( 'kco_before_kustom_element_shortcode', $locale, $include, $exclude );
 
 		echo '<kustom-payment-method-display';
-		echo ' data-key="' . esc_attr( $data_key ) . '"';
-		if ( '' !== $purchase_amount ) {
-			echo ' data-purchase-amount="' . esc_attr( $purchase_amount ) . '"';
+		echo ' locale="' . esc_attr( $locale ) . '"';
+		if ( ! empty( $include ) ) {
+			echo ' include="' . esc_attr( $include ) . '"';
+		}
+		if ( ! empty( $exclude ) ) {
+			echo ' exclude="' . esc_attr( $exclude ) . '"';
 		}
 		echo '></kustom-payment-method-display>' . "\n";
 
@@ -74,10 +83,11 @@ class Shortcode {
 		 *
 		 * @since 2.21.0
 		 *
-		 * @param string $data_key        The element data-key.
-		 * @param string $purchase_amount Purchase amount in minor units (empty string if not set).
+		 * @param string $locale  The element locale.
+		 * @param string $include Comma-separated payment method IDs to include.
+		 * @param string $exclude Comma-separated payment method IDs to exclude.
 		 */
-		do_action( 'kco_after_kustom_element_shortcode', $data_key, $purchase_amount );
+		do_action( 'kco_after_kustom_element_shortcode', $locale, $include, $exclude );
 
 		return ob_get_clean();
 	}

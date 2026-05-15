@@ -34,34 +34,34 @@ class ProductPlacement {
 	 * @return void
 	 */
 	public function render() {
-		$data_key = Settings::get( 'ke_product_data_key', '' );
-		if ( empty( $data_key ) ) {
+		$locale = Settings::get( 'ke_locale', Settings::default_locale() );
+		if ( empty( $locale ) ) {
 			return;
 		}
 
 		Scripts::enqueue();
 
-		$purchase_amount = '';
-		$product         = wc_get_product( get_the_ID() );
-		if ( $product ) {
-			// Kustom expects the amount in minor units (e.g. öre/cents).
-			$purchase_amount = (string) (int) ( (float) $product->get_price() * 100 );
-		}
+		$include = Settings::get( 'ke_include', '' );
+		$exclude = Settings::get( 'ke_exclude', '' );
 
 		/**
 		 * Fires before the Kustom Element is rendered on the product page.
 		 *
 		 * @since 2.21.0
 		 *
-		 * @param string $data_key        The element data-key.
-		 * @param string $purchase_amount Purchase amount in minor units.
+		 * @param string $locale  The element locale.
+		 * @param string $include Comma-separated payment method IDs to include.
+		 * @param string $exclude Comma-separated payment method IDs to exclude.
 		 */
-		do_action( 'kco_before_kustom_element_product', $data_key, $purchase_amount );
+		do_action( 'kco_before_kustom_element_product', $locale, $include, $exclude );
 
 		echo '<kustom-payment-method-display';
-		echo ' data-key="' . esc_attr( $data_key ) . '"';
-		if ( '' !== $purchase_amount ) {
-			echo ' data-purchase-amount="' . esc_attr( $purchase_amount ) . '"';
+		echo ' locale="' . esc_attr( $locale ) . '"';
+		if ( ! empty( $include ) ) {
+			echo ' include="' . esc_attr( $include ) . '"';
+		}
+		if ( ! empty( $exclude ) ) {
+			echo ' exclude="' . esc_attr( $exclude ) . '"';
 		}
 		echo '></kustom-payment-method-display>' . "\n";
 
@@ -70,9 +70,10 @@ class ProductPlacement {
 		 *
 		 * @since 2.21.0
 		 *
-		 * @param string $data_key        The element data-key.
-		 * @param string $purchase_amount Purchase amount in minor units.
+		 * @param string $locale  The element locale.
+		 * @param string $include Comma-separated payment method IDs to include.
+		 * @param string $exclude Comma-separated payment method IDs to exclude.
 		 */
-		do_action( 'kco_after_kustom_element_product', $data_key, $purchase_amount );
+		do_action( 'kco_after_kustom_element_product', $locale, $include, $exclude );
 	}
 }

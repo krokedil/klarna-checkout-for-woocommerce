@@ -10,11 +10,15 @@
 		icon: 'store',
 		category: 'woocommerce',
 		attributes: {
-			dataKey: {
+			locale: {
 				type: 'string',
 				default: '',
 			},
-			purchaseAmount: {
+			include: {
+				type: 'string',
+				default: '',
+			},
+			exclude: {
 				type: 'string',
 				default: '',
 			},
@@ -32,19 +36,27 @@
 						PanelBody,
 						{ title: __( 'Kustom Element settings', 'klarna-checkout-for-woocommerce' ) },
 						el( TextControl, {
-							label: __( 'Data key', 'klarna-checkout-for-woocommerce' ),
-							help: __( 'The data-key provided by Kustom (required).', 'klarna-checkout-for-woocommerce' ),
-							value: attributes.dataKey,
+							label: __( 'Locale', 'klarna-checkout-for-woocommerce' ),
+							help: __( 'Market/language code, e.g. sv-SE, en-GB. Leave empty to use the global setting.', 'klarna-checkout-for-woocommerce' ),
+							value: attributes.locale,
 							onChange: function ( val ) {
-								setAttributes( { dataKey: val } );
+								setAttributes( { locale: val } );
 							},
 						} ),
 						el( TextControl, {
-							label: __( 'Purchase amount (minor units)', 'klarna-checkout-for-woocommerce' ),
-							help: __( 'Optional. Amount in minor units, e.g. 9900 for 99.00.', 'klarna-checkout-for-woocommerce' ),
-							value: attributes.purchaseAmount,
+							label: __( 'Include payment methods', 'klarna-checkout-for-woocommerce' ),
+							help: __( 'Optional. Comma-separated IDs to always show. Leave empty to use global setting.', 'klarna-checkout-for-woocommerce' ),
+							value: attributes.include,
 							onChange: function ( val ) {
-								setAttributes( { purchaseAmount: val } );
+								setAttributes( { include: val } );
+							},
+						} ),
+						el( TextControl, {
+							label: __( 'Exclude payment methods', 'klarna-checkout-for-woocommerce' ),
+							help: __( 'Optional. Comma-separated IDs to hide. Leave empty to use global setting.', 'klarna-checkout-for-woocommerce' ),
+							value: attributes.exclude,
+							onChange: function ( val ) {
+								setAttributes( { exclude: val } );
 							},
 						} )
 					)
@@ -52,9 +64,12 @@
 				el(
 					'div',
 					{ key: 'preview', className: 'kco-kustom-element-block-preview' },
-					attributes.dataKey
-						? el( 'p', null, __( 'Kustom Element: ', 'klarna-checkout-for-woocommerce' ) + attributes.dataKey )
-						: el( 'p', { style: { color: '#999' } }, __( 'Set a data-key in the block settings.', 'klarna-checkout-for-woocommerce' ) )
+					el(
+						'p',
+						{ style: { padding: '8px', background: '#f0f0f0', borderRadius: '4px' } },
+						__( 'Kustom Element', 'klarna-checkout-for-woocommerce' ),
+						attributes.locale ? ' — ' + attributes.locale : ''
+					)
 				),
 			];
 		},

@@ -45,11 +45,15 @@ class Block {
 			array(
 				'editor_script'   => 'kco-kustom-element-block',
 				'attributes'      => array(
-					'dataKey'        => array(
+					'locale'  => array(
 						'type'    => 'string',
 						'default' => '',
 					),
-					'purchaseAmount' => array(
+					'include' => array(
+						'type'    => 'string',
+						'default' => '',
+					),
+					'exclude' => array(
 						'type'    => 'string',
 						'default' => '',
 					),
@@ -62,23 +66,33 @@ class Block {
 	/**
 	 * Server-side render callback for the block.
 	 *
+	 * Falls back to global KE settings when block attributes are not set.
+	 *
 	 * @param array $attributes Block attributes.
 	 * @return string
 	 */
 	public function render( $attributes ) {
-		$data_key = sanitize_text_field( $attributes['dataKey'] ?? '' );
-		if ( empty( $data_key ) ) {
+		$locale = sanitize_text_field( $attributes['locale'] ?? '' );
+		if ( empty( $locale ) ) {
+			$locale = Settings::get( 'ke_locale', Settings::default_locale() );
+		}
+
+		if ( empty( $locale ) ) {
 			return '';
 		}
 
 		Scripts::enqueue();
 
-		$purchase_amount = sanitize_text_field( $attributes['purchaseAmount'] ?? '' );
+		$include = sanitize_text_field( $attributes['include'] ?? Settings::get( 'ke_include', '' ) );
+		$exclude = sanitize_text_field( $attributes['exclude'] ?? Settings::get( 'ke_exclude', '' ) );
 
 		$html  = '<kustom-payment-method-display';
-		$html .= ' data-key="' . esc_attr( $data_key ) . '"';
-		if ( '' !== $purchase_amount ) {
-			$html .= ' data-purchase-amount="' . esc_attr( $purchase_amount ) . '"';
+		$html .= ' locale="' . esc_attr( $locale ) . '"';
+		if ( ! empty( $include ) ) {
+			$html .= ' include="' . esc_attr( $include ) . '"';
+		}
+		if ( ! empty( $exclude ) ) {
+			$html .= ' exclude="' . esc_attr( $exclude ) . '"';
 		}
 		$html .= '></kustom-payment-method-display>';
 
