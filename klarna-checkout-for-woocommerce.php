@@ -31,6 +31,7 @@
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
+use Krokedil\KustomCheckout\KustomElements\KustomElements;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -121,6 +122,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var OrderManagement $order_management
 		 */
 		public $order_management;
+
+		/**
+		 * Reference to Kustom Elements module.
+		 *
+		 * @var KustomElements $kustom_elements
+		 */
+		public $kustom_elements;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -301,7 +309,8 @@ if ( ! class_exists( 'KCO' ) ) {
 					'price_format' => 'minor',
 				)
 			);
-			$this->order_management = new OrderManagement();
+			$this->order_management  = new OrderManagement();
+			$this->kustom_elements   = new KustomElements();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
