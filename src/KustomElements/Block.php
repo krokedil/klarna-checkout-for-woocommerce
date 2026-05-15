@@ -74,7 +74,7 @@ class Block {
 	public function render( $attributes ) {
 		$locale = sanitize_text_field( $attributes['locale'] ?? '' );
 		if ( empty( $locale ) ) {
-			$locale = Settings::get( 'ke_locale', Settings::default_locale() );
+			$locale = Settings::get_locale();
 		}
 
 		if ( empty( $locale ) ) {
@@ -83,8 +83,8 @@ class Block {
 
 		Scripts::enqueue();
 
-		$include = sanitize_text_field( $attributes['include'] ?? Settings::get( 'ke_include', '' ) );
-		$exclude = sanitize_text_field( $attributes['exclude'] ?? Settings::get( 'ke_exclude', '' ) );
+		$include = sanitize_text_field( ! empty( $attributes['include'] ) ? $attributes['include'] : Settings::get_include() );
+		$exclude = sanitize_text_field( ! empty( $attributes['exclude'] ) ? $attributes['exclude'] : Settings::get_exclude() );
 
 		$html  = '<kustom-payment-method-display';
 		$html .= ' locale="' . esc_attr( $locale ) . '"';

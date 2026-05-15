@@ -37,9 +37,9 @@ class Shortcode {
 	public function render( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'locale'  => Settings::get( 'ke_locale', Settings::default_locale() ),
-				'include' => Settings::get( 'ke_include', '' ),
-				'exclude' => Settings::get( 'ke_exclude', '' ),
+				'locale'  => Settings::get_locale(),
+				'include' => Settings::get_include(),
+				'exclude' => Settings::get_exclude(),
 			),
 			$atts,
 			'kustom_element'

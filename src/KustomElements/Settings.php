@@ -14,6 +14,111 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Settings {
 
 	/**
+	 * All locales supported by kustom-payment-method-display.
+	 *
+	 * @var array<string,string>
+	 */
+	private static $supported_locales = array(
+		'cs-CZ' => 'Czech (Czechia)',
+		'da-DK' => 'Danish (Denmark)',
+		'de-CH' => 'German (Switzerland)',
+		'de-DE' => 'German (Germany)',
+		'en-AT' => 'English (Austria)',
+		'en-AU' => 'English (Australia)',
+		'en-BE' => 'English (Belgium)',
+		'en-CA' => 'English (Canada)',
+		'en-DE' => 'English (Germany)',
+		'en-DK' => 'English (Denmark)',
+		'en-FI' => 'English (Finland)',
+		'en-FR' => 'English (France)',
+		'en-GB' => 'English (United Kingdom)',
+		'en-NL' => 'English (Netherlands)',
+		'en-NO' => 'English (Norway)',
+		'en-SE' => 'English (Sweden)',
+		'en-US' => 'English (United States)',
+		'es-ES' => 'Spanish (Spain)',
+		'es-US' => 'Spanish (United States)',
+		'fi-FI' => 'Finnish (Finland)',
+		'fr-BE' => 'French (Belgium)',
+		'fr-CA' => 'French (Canada)',
+		'fr-CH' => 'French (Switzerland)',
+		'fr-FR' => 'French (France)',
+		'it-IT' => 'Italian (Italy)',
+		'nb-NO' => 'Norwegian (Norway)',
+		'nl-BE' => 'Dutch (Belgium)',
+		'nl-NL' => 'Dutch (Netherlands)',
+		'pl-PL' => 'Polish (Poland)',
+		'pt-PT' => 'Portuguese (Portugal)',
+		'sv-FI' => 'Swedish (Finland)',
+		'sv-SE' => 'Swedish (Sweden)',
+	);
+
+	/**
+	 * All payment method identifiers supported by kustom-payment-method-display.
+	 *
+	 * @var array<string,string>
+	 */
+	private static $supported_methods = array(
+		'affirm'          => 'Affirm',
+		'aktia'           => 'Aktia',
+		'alandsbanken'    => 'Ålandsbanken',
+		'alipay'          => 'Alipay',
+		'amazonpay'       => 'Amazon Pay',
+		'amex'            => 'American Express',
+		'applepay'        => 'Apple Pay',
+		'bancontact'      => 'Bancontact',
+		'bank'            => 'Bank',
+		'billie'          => 'Billie',
+		'bitcoin'         => 'Bitcoin',
+		'bitcoincash'     => 'Bitcoin Cash',
+		'bitpay'          => 'BitPay',
+		'blik'            => 'BLIK',
+		'card'            => 'Card',
+		'cartes-bancaires' => 'Cartes Bancaires',
+		'citadele'        => 'Citadele',
+		'danskebank'      => 'Danske Bank',
+		'dinersclub'      => 'Diners Club',
+		'directdebit'     => 'Direct Debit',
+		'discover'        => 'Discover',
+		'dnb'             => 'DNB',
+		'elo'             => 'Elo',
+		'eps'             => 'EPS',
+		'forbrugsforeningen' => 'Forbrugsforeningen',
+		'giropay'         => 'Giropay',
+		'googlepay'       => 'Google Pay',
+		'ideal'           => 'iDEAL',
+		'interac'         => 'Interac',
+		'jcb'             => 'JCB',
+		'klarna'          => 'Klarna',
+		'maestro'         => 'Maestro',
+		'mastercard'      => 'Mastercard',
+		'mbway'           => 'MB Way',
+		'mobilepay'       => 'MobilePay',
+		'nordea'          => 'Nordea',
+		'omasp'           => 'Oma Säästöpankki',
+		'op'              => 'OP',
+		'p24'             => 'Przelewy24',
+		'payoneer'        => 'Payoneer',
+		'paypal'          => 'PayPal',
+		'paysafe'         => 'Paysafe',
+		'poppankki'       => 'POP Pankki',
+		'saastopankki'    => 'Säästöpankki',
+		'satispay'        => 'Satispay',
+		'seb'             => 'SEB',
+		'sepa'            => 'SEPA',
+		'skrill'          => 'Skrill',
+		'sofort'          => 'Sofort',
+		'swish'           => 'Swish',
+		'twint'           => 'TWINT',
+		'unionpay'        => 'UnionPay',
+		'venmo'           => 'Venmo',
+		'vipps'           => 'Vipps',
+		'visa'            => 'Visa',
+		'visaelectron'    => 'Visa Electron',
+		'wechat'          => 'WeChat Pay',
+	);
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -50,23 +155,26 @@ class Settings {
 
 		$settings['ke_locale'] = array(
 			'title'       => __( 'Locale', 'klarna-checkout-for-woocommerce' ),
-			'type'        => 'text',
-			'description' => __( 'Market and language code for the element, e.g. <code>sv-SE</code>, <code>en-GB</code>, <code>nb-NO</code>. Must match the market configured in the Kustom Portal.', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'select',
+			'description' => __( 'Market and language for the element. Must match the market configured in the Kustom Portal.', 'klarna-checkout-for-woocommerce' ),
+			'options'     => self::$supported_locales,
 			'default'     => $kco_settings['ke_locale'] ?? self::default_locale(),
 		);
 
 		$settings['ke_include'] = array(
 			'title'       => __( 'Include payment methods', 'klarna-checkout-for-woocommerce' ),
-			'type'        => 'text',
-			'description' => __( 'Optional. Comma-separated payment method identifiers to always show, even if not returned by the API.', 'klarna-checkout-for-woocommerce' ),
-			'default'     => $kco_settings['ke_include'] ?? '',
+			'type'        => 'multiselect',
+			'description' => __( 'Optional. Payment methods to always show, even if not returned by the API. Hold Ctrl/Cmd to select multiple.', 'klarna-checkout-for-woocommerce' ),
+			'options'     => self::$supported_methods,
+			'default'     => $kco_settings['ke_include'] ?? array(),
 		);
 
 		$settings['ke_exclude'] = array(
 			'title'       => __( 'Exclude payment methods', 'klarna-checkout-for-woocommerce' ),
-			'type'        => 'text',
-			'description' => __( 'Optional. Comma-separated payment method identifiers to hide from the list.', 'klarna-checkout-for-woocommerce' ),
-			'default'     => $kco_settings['ke_exclude'] ?? '',
+			'type'        => 'multiselect',
+			'description' => __( 'Optional. Payment methods to hide from the list. Hold Ctrl/Cmd to select multiple.', 'klarna-checkout-for-woocommerce' ),
+			'options'     => self::$supported_methods,
+			'default'     => $kco_settings['ke_exclude'] ?? array(),
 		);
 
 		// Product page placement.
@@ -158,14 +266,46 @@ class Settings {
 	}
 
 	/**
-	 * Returns a best-guess locale derived from the WC base country and WP locale.
+	 * Returns the selected locale as a string.
 	 *
-	 * Converts WP locale format (sv_SE) to Kustom format (sv-SE).
+	 * @return string
+	 */
+	public static function get_locale() {
+		return (string) self::get( 'ke_locale', self::default_locale() );
+	}
+
+	/**
+	 * Returns the include list as a comma-separated string for the element attribute.
+	 *
+	 * Multiselect values are stored as arrays by WooCommerce.
+	 *
+	 * @return string
+	 */
+	public static function get_include() {
+		$value = self::get( 'ke_include', array() );
+		return is_array( $value ) ? implode( ',', $value ) : (string) $value;
+	}
+
+	/**
+	 * Returns the exclude list as a comma-separated string for the element attribute.
+	 *
+	 * @return string
+	 */
+	public static function get_exclude() {
+		$value = self::get( 'ke_exclude', array() );
+		return is_array( $value ) ? implode( ',', $value ) : (string) $value;
+	}
+
+	/**
+	 * Returns a best-guess locale derived from the WP site locale.
+	 *
+	 * Converts WP locale format (sv_SE) to Kustom format (sv-SE) and
+	 * returns it if it exists in the supported list, otherwise falls back to en-GB.
 	 *
 	 * @return string
 	 */
 	public static function default_locale() {
-		$wp_locale = get_locale(); // e.g. sv_SE
-		return str_replace( '_', '-', $wp_locale );
+		$candidate = str_replace( '_', '-', get_locale() );
+		return isset( self::$supported_locales[ $candidate ] ) ? $candidate : 'en-GB';
 	}
 }

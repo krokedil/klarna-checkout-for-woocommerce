@@ -34,15 +34,15 @@ class CartPlacement {
 	 * @return void
 	 */
 	public function render() {
-		$locale = Settings::get( 'ke_locale', Settings::default_locale() );
+		$locale = Settings::get_locale();
 		if ( empty( $locale ) ) {
 			return;
 		}
 
 		Scripts::enqueue();
 
-		$include = Settings::get( 'ke_include', '' );
-		$exclude = Settings::get( 'ke_exclude', '' );
+		$include = Settings::get_include();
+		$exclude = Settings::get_exclude();
 
 		/**
 		 * Fires before the Kustom Element is rendered on the cart page.
