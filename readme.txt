@@ -52,7 +52,7 @@ For help setting up and configuring Kustom Checkout for WooCommerce please refer
 == Changelog ==
 = 2026-05-18    - version 2.20.2 =
 * Enhancement   - When multiple payment methods are used, the fallback logo has been changed from Klarna to Kustom.
-* Enhancement   - Add WPML configuration file for improved multilingual compatibility
+* Enhancement   - Added WPML configuration file for improved multilingual compatibility.
 * Fix           - Fixed an issue where the manual order management action dropdown would render incorrectly in the order metabox.
 
 = 2026-05-05    - version 2.20.1 =

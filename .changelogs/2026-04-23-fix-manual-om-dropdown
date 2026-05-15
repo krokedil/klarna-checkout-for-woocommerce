@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Fixed an issue where the manual order management action dropdown would render incorrectly in the order metabox.
