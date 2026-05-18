@@ -101,9 +101,8 @@ class KCO_API {
 				}
 			}
 
-			// Handle BAD_VALUE purchase_currency mismatch (e.g. customer changes country to one incompatible
-			// with the store currency). Reload the checkout once so WC can display the "not available" message
-			// instead of surfacing the raw Klarna error. The one-shot flag prevents an infinite reload loop.
+			// Handle BAD_VALUE purchase_currency mismatch (e.g. customer changes country to one incompatible with the store currency).
+			// In this case we want to reload the checkout and try again, but only once to avoid infinite reload loops.
 			if ( is_array( $error ) && 'BAD_VALUE' === ( $error['error_code'] ?? false ) ) {
 				$has_currency_error = false;
 				foreach ( $error['error_messages'] ?? array() as $message ) {
@@ -114,7 +113,6 @@ class KCO_API {
 				}
 				if ( $has_currency_error && ! WC()->session->get( 'kco_bad_value_reload_attempted' ) ) {
 					WC()->session->set( 'kco_bad_value_reload_attempted', true );
-					WC()->session->set( 'kco_wc_order_id', null );
 					WC()->session->set( 'reload_checkout', true );
 					KCO_Logger::log( 'Klarna BAD_VALUE purchase_currency mismatch for order ' . $klarna_order_id . '. Reloading checkout.' );
 					return false;
