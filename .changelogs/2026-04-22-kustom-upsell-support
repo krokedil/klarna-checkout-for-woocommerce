@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Adds support for Kustom's upsell feature, and allows showing upsell products in the thankyou page iframe that can be added to the order after the initial purchase.
