@@ -42,13 +42,33 @@ class KCO_Request_Create_Recurring extends KCO_Request {
 	 * @return array
 	 */
 	public function get_body( $order_id ) {
-		$order_data = new KCO_Request_Order();
-		$order      = wc_get_order( $order_id );
+		$order_data  = new KCO_Request_Order();
+		$order       = wc_get_order( $order_id );
+		$order_lines = $order_data->get_order_lines( $order_id );
+
+		if ( class_exists( 'WC_Subscriptions_Product' ) ) {
+			$subscription_map = array();
+			foreach ( $order->get_items() as $item ) {
+				$product = wc_get_product( $item->get_product_id() );
+				if ( $product && WC_Subscriptions_Product::is_subscription( $product ) ) {
+					$subscription_map[ $order_data->get_item_reference( $item ) ] = array(
+						'name'           => $item->get_name(),
+						'interval'       => strtoupper( WC_Subscriptions_Product::get_period( $product ) ),
+						'interval_count' => absint( WC_Subscriptions_Product::get_interval( $product ) ),
+					);
+				}
+			}
+			foreach ( $order_lines as $index => $line ) {
+				if ( isset( $subscription_map[ $line['reference'] ] ) ) {
+					$order_lines[ $index ]['subscription'] = $subscription_map[ $line['reference'] ];
+				}
+			}
+		}
 
 		$request_body = array(
 			'purchase_currency'   => $order->get_currency(),
 			'order_amount'        => $order_data->get_order_amount( $order_id ),
-			'order_lines'         => $order_data->get_order_lines( $order_id ),
+			'order_lines'         => $order_lines,
 			'order_tax_amount'    => $order_data->get_total_tax(),
 			'merchant_reference1' => $order->get_order_number(),
 			'merchant_reference2' => $order->get_id(),

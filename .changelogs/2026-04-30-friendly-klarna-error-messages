@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: no
+
+Improved the error message shown to customers when a Klarna error occurs. Customers will now see a clear, readable message instead of a raw technical response.
