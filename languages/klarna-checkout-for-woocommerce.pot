@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-05-05 09:16+0000\n"
+"POT-Creation-Date: 2026-05-15 07:54+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -696,35 +696,35 @@ msgstr ""
 msgid "Advanced"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:238
+#: ../src/OrderManagement/MetaBox.php:272
 msgid "Order management"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:239
+#: ../src/OrderManagement/MetaBox.php:273
 msgid "Disable this to turn off the automatic synchronization with the Klarna Merchant Portal. When disabled, any changes in either system have to be done manually."
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:350, ../src/OrderManagement/MetaBox.php:364
+#: ../src/OrderManagement/MetaBox.php:384, ../src/OrderManagement/MetaBox.php:398
 msgid "Capture order"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:364
+#: ../src/OrderManagement/MetaBox.php:398
 msgid "Activates the order with Klarna."
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:378, ../src/OrderManagement/MetaBox.php:392
+#: ../src/OrderManagement/MetaBox.php:412, ../src/OrderManagement/MetaBox.php:426
 msgid "Cancel order"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:392
+#: ../src/OrderManagement/MetaBox.php:426
 msgid "Cancels the order with Klarna."
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:406, ../src/OrderManagement/MetaBox.php:420
+#: ../src/OrderManagement/MetaBox.php:440, ../src/OrderManagement/MetaBox.php:454
 msgid "Get customer"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:420
+#: ../src/OrderManagement/MetaBox.php:454
 msgid "Gets the customer data from Klarna and saves it to the WooCommerce order."
 msgstr ""
 
