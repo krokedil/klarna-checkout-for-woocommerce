@@ -26,8 +26,13 @@ class KCO_API {
 	public function create_klarna_order( $order_id = false, $checkout_flow = 'embedded' ) {
 		$request  = new KCO_Request_Create();
 		$response = $request->request( $order_id, $checkout_flow );
+		$result   = $this->check_for_api_error( $response );
 
-		return $this->check_for_api_error( $response );
+		if ( $result ) {
+			WC()->session->set( 'kco_bad_value_reload_attempted', false );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -93,6 +98,26 @@ class KCO_API {
 
 					wp_safe_redirect( $redirect_url );
 					exit;
+				}
+			}
+
+			// Handle BAD_VALUE purchase_currency mismatch (e.g. customer changes country to one incompatible
+			// with the store currency). Reload the checkout once so WC can display the "not available" message
+			// instead of surfacing the raw Klarna error. The one-shot flag prevents an infinite reload loop.
+			if ( is_array( $error ) && 'BAD_VALUE' === ( $error['error_code'] ?? false ) ) {
+				$has_currency_error = false;
+				foreach ( $error['error_messages'] ?? array() as $message ) {
+					if ( false !== strpos( $message, 'purchase_currency' ) ) {
+						$has_currency_error = true;
+						break;
+					}
+				}
+				if ( $has_currency_error && ! WC()->session->get( 'kco_bad_value_reload_attempted' ) ) {
+					WC()->session->set( 'kco_bad_value_reload_attempted', true );
+					WC()->session->set( 'kco_wc_order_id', null );
+					WC()->session->set( 'reload_checkout', true );
+					KCO_Logger::log( 'Klarna BAD_VALUE purchase_currency mismatch for order ' . $klarna_order_id . '. Reloading checkout.' );
+					return false;
 				}
 			}
 		}
