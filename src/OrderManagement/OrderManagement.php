@@ -100,12 +100,27 @@ class OrderManagement {
 			return;
 		}
 
-		$this->settings   = new Settings();
-		$this->metabox    = new MetaBox( $this );
-		$this->ajax       = new Ajax();
-		$this->return_fee = new ReturnFee();
+		$this->settings = new Settings();
+		$this->ajax     = new Ajax();
 
-		add_action( 'kco_wc_supports', array( $this, 'add_gateway_support' ) );
+		// Toggles for features that previously had no off-switch. Default to enabled when the key is missing
+		// so existing installs behave exactly as before the toggles were introduced.
+		$kco_settings      = get_option( 'woocommerce_kco_settings', array() );
+		$enable_metabox    = ! isset( $kco_settings['kom_enable_metabox'] ) || 'yes' === $kco_settings['kom_enable_metabox'];
+		$enable_refunds    = ! isset( $kco_settings['kom_enable_refunds'] ) || 'yes' === $kco_settings['kom_enable_refunds'];
+		$enable_return_fee = ! isset( $kco_settings['kom_enable_return_fee'] ) || 'yes' === $kco_settings['kom_enable_return_fee'];
+
+		if ( $enable_metabox ) {
+			$this->metabox = new MetaBox( $this );
+		}
+
+		if ( $enable_return_fee ) {
+			$this->return_fee = new ReturnFee();
+		}
+
+		if ( $enable_refunds ) {
+			add_action( 'kco_wc_supports', array( $this, 'add_gateway_support' ) );
+		}
 
 		// Initialize the logger.
 		add_action( 'init', array( $this, 'initialize_logger' ) );
@@ -116,6 +131,9 @@ class OrderManagement {
 			array( 'id' => 'kom_auto_update' ),
 			array( 'id' => 'kom_auto_order_sync' ),
 			array( 'id' => 'kom_force_full_capture' ),
+			array( 'id' => 'kom_enable_metabox' ),
+			array( 'id' => 'kom_enable_refunds' ),
+			array( 'id' => 'kom_enable_return_fee' ),
 			array( 'id' => 'kom_debug_log' ),
 
 		);
@@ -130,10 +148,14 @@ class OrderManagement {
 		// Update an order.
 		add_action( 'woocommerce_saved_order_items', array( $this, 'update_klarna_order_items' ), 10, 2 );
 
-		// Refund an order.
-		add_filter( 'wc_klarna_checkout_process_refund', array( $this, 'refund_klarna_order' ), 10, 4 );
+		if ( $enable_refunds ) {
+			// Refund an order.
+			add_filter( 'wc_klarna_checkout_process_refund', array( $this, 'refund_klarna_order' ), 10, 4 );
+		}
 
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ) );
+		if ( $enable_metabox ) {
+			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ) );
+		}
 	}
 
 	/**

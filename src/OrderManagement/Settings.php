@@ -32,6 +32,9 @@ class Settings {
 				'kom_auto_update'        => 'yes',
 				'kom_auto_order_sync'    => 'yes',
 				'kom_force_full_capture' => 'no',
+				'kom_enable_metabox'     => 'yes',
+				'kom_enable_refunds'     => 'yes',
+				'kom_enable_return_fee'  => 'yes',
 				'kom_debug_log'          => 'yes',
 			)
 		);
@@ -74,6 +77,27 @@ class Settings {
 			'type'    => 'checkbox',
 			'default' => $default_values['kom_force_full_capture'],
 			'label'   => __( 'Force capture full order. Useful if the Kustom order has been updated by an ERP system.', 'klarna-checkout-for-woocommerce' ),
+		);
+
+		$settings['kom_enable_metabox'] = array(
+			'title'   => 'Order management metabox',
+			'type'    => 'checkbox',
+			'default' => $default_values['kom_enable_metabox'],
+			'label'   => __( 'Show the Kustom order management metabox on the order edit screen.', 'klarna-checkout-for-woocommerce' ),
+		);
+
+		$settings['kom_enable_refunds'] = array(
+			'title'   => 'Refunds',
+			'type'    => 'checkbox',
+			'default' => $default_values['kom_enable_refunds'],
+			'label'   => __( 'Allow refunds to be processed against Kustom from the WooCommerce refund UI.', 'klarna-checkout-for-woocommerce' ),
+		);
+
+		$settings['kom_enable_return_fee'] = array(
+			'title'   => 'Return fee',
+			'type'    => 'checkbox',
+			'default' => $default_values['kom_enable_return_fee'],
+			'label'   => __( 'Enable the return fee field in the WooCommerce refund UI for Kustom orders.', 'klarna-checkout-for-woocommerce' ),
 		);
 
 		$settings['kom_debug_log'] = array(
