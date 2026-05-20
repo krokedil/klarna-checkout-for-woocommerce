@@ -9,20 +9,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Scripts class for Kustom Elements.
  *
- * Outputs the merchant-provided Elements script tag in <head> on pages
- * where at least one Kustom Element is rendered.
+ * Outputs the Kustom Elements loader snippet in <head> on pages where at
+ * least one element is rendered. The snippet is built from the merchant's
+ * API key and the script URL; no raw HTML needs to be pasted by the merchant.
+ *
+ * The snippet mirrors the one from the Kustom Portal:
+ *   1. An async external <script> that loads the pre-load.js file.
+ *   2. An inline <script> that initialises the kustomElements queue object.
  */
 class Scripts {
 
 	/**
-	 * Whether the script has been output this request.
+	 * Whether the snippet has already been printed this request.
 	 *
 	 * @var bool
 	 */
 	private static $printed = false;
 
 	/**
-	 * Whether any element has been enqueued on this page load.
+	 * Whether any element has signalled it will render on this page.
 	 *
 	 * @var bool
 	 */
@@ -32,12 +37,11 @@ class Scripts {
 	 * Constructor.
 	 */
 	public function __construct() {
-		// Priority 1 so the script lands before any element tag rendered in the body.
 		add_action( 'wp_head', array( $this, 'maybe_print_script' ), 1 );
 	}
 
 	/**
-	 * Signal that a Kustom Element will be rendered on this page.
+	 * Signals that a Kustom Element will be rendered on this page.
 	 *
 	 * Called by placement classes and the shortcode before rendering an element.
 	 *
@@ -48,12 +52,11 @@ class Scripts {
 	}
 
 	/**
-	 * Outputs the sanitized Elements script tag if an element has been flagged.
+	 * Outputs the snippet if a product/cart placement is active.
 	 *
-	 * Because wp_head fires before most body content, placements hook at
-	 * priority ≥ 10 on their respective action, while this fires at priority 1.
-	 * To ensure the script is present even when the shortcode is the first signal,
-	 * we also late-print via wp_footer as fallback (see constructor).
+	 * For shortcode/block pages we cannot know at wp_head time whether the
+	 * page contains an element, so we register a wp_footer fallback and let
+	 * the shortcode/block call enqueue() before that fires.
 	 *
 	 * @return void
 	 */
@@ -62,24 +65,19 @@ class Scripts {
 			return;
 		}
 
-		// For shortcode and block usage we can't know at wp_head time whether
-		// the page contains an element, so we always print when product/cart
-		// placements are active, and rely on the shortcode/block to call enqueue()
-		// before wp_footer fires.
 		$product_active = 'yes' === Settings::get( 'ke_product_enabled', 'no' ) && is_product();
 		$cart_active    = 'yes' === Settings::get( 'ke_cart_enabled', 'no' ) && is_cart();
 
 		if ( ! $product_active && ! $cart_active ) {
-			// Defer to footer so shortcode/block pages still get the script.
 			add_action( 'wp_footer', array( $this, 'maybe_print_script_footer' ), 1 );
 			return;
 		}
 
-		$this->print_script();
+		$this->print_snippet();
 	}
 
 	/**
-	 * Fallback print in wp_footer for pages using the shortcode or block.
+	 * Fallback print in wp_footer for pages that use the shortcode or block.
 	 *
 	 * @return void
 	 */
@@ -87,39 +85,44 @@ class Scripts {
 		if ( self::$printed || ! self::$enqueued ) {
 			return;
 		}
-		$this->print_script();
+		$this->print_snippet();
 	}
 
 	/**
-	 * Sanitizes and outputs the script tag.
-	 *
-	 * Only a <script> element with safe attributes is allowed through.
+	 * Builds and outputs the Kustom Elements loader snippet.
 	 *
 	 * @return void
 	 */
-	private function print_script() {
-		$raw = Settings::get( 'ke_script', '' );
-		if ( empty( trim( $raw ) ) ) {
+	private function print_snippet() {
+		$api_key = Settings::get_api_key();
+		if ( empty( $api_key ) ) {
 			return;
 		}
 
-		$allowed = array(
-			'script' => array(
-				'src'   => true,
-				'type'  => true,
-				'async' => true,
-				'defer' => true,
-				'id'    => true,
-			),
-		);
+		$script_url = Settings::get_script_url();
 
-		$safe = wp_kses( $raw, $allowed );
-		if ( empty( trim( $safe ) ) ) {
-			return;
-		}
+		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- all values are escaped inline below.
+		echo "\n<!-- Kustom Elements -->\n";
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized above via wp_kses.
-		echo $safe . "\n";
+		// 1. External pre-load script.
+		echo '<script';
+		echo ' async';
+		echo ' id="kustom-elements-script"';
+		echo ' type="text/javascript"';
+		echo ' src="' . esc_url( $script_url ) . '"';
+		echo ' data-public-api-key="' . esc_attr( $api_key ) . '"';
+		echo '></script>' . "\n";
+
+		// 2. Inline queue initialiser — static snippet, no user data interpolated.
+		echo '<script>(function(w){';
+		echo 'window.kustomElements=window.kustomElements||function(w,...n){return new Promise(((o,i)=>{window.kustomElements._internal.q.push({method:w,args:n,resolve:o,reject:i})}))},';
+		echo 'window.kustomElements._internal=window.kustomElements._internal||{q:[],snippetVersion:"1.0.0"},';
+		echo 'window.kustomElements.load||(window.kustomElements.load=new Promise(((w,n)=>{window.kustomElements._internal.loadResolve=w,window.kustomElements._internal.loadReject=n})));';
+		echo '})(window);</script>' . "\n";
+
+		echo "<!-- /Kustom Elements -->\n";
+		// phpcs:enable
+
 		self::$printed = true;
 	}
 }

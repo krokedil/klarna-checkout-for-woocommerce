@@ -146,11 +146,11 @@ class Settings {
 			'default' => $kco_settings['ke_enabled'] ?? 'no',
 		);
 
-		$settings['ke_script'] = array(
-			'title'       => __( 'Elements script', 'klarna-checkout-for-woocommerce' ),
-			'type'        => 'textarea',
-			'description' => __( 'Paste the &lt;script&gt; tag provided in the Kustom Portal. It will be output in &lt;head&gt; on pages where Elements are active.', 'klarna-checkout-for-woocommerce' ),
-			'default'     => $kco_settings['ke_script'] ?? '',
+		$settings['ke_api_key'] = array(
+			'title'       => __( 'Public API key', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'text',
+			'description' => __( 'The <code>data-public-api-key</code> value from the Kustom Elements installation snippet in the Kustom Portal. The script is loaded automatically — no need to paste HTML. Uses playground or production environment based on the Test mode setting above.', 'klarna-checkout-for-woocommerce' ),
+			'default'     => $kco_settings['ke_api_key'] ?? '',
 		);
 
 		$settings['ke_locale'] = array(
@@ -263,6 +263,36 @@ class Settings {
 	 */
 	public static function is_enabled() {
 		return 'yes' === self::get( 'ke_enabled', 'no' );
+	}
+
+	/**
+	 * Returns the public API key.
+	 *
+	 * @return string
+	 */
+	public static function get_api_key() {
+		return (string) self::get( 'ke_api_key', '' );
+	}
+
+	/**
+	 * Whether KCO is running in test/playground mode.
+	 *
+	 * @return bool
+	 */
+	public static function is_test_mode() {
+		return 'yes' === self::get( 'testmode', 'no' );
+	}
+
+	/**
+	 * Returns the Kustom Elements JS URL for the current environment.
+	 *
+	 * @return string
+	 */
+	public static function get_script_url() {
+		if ( self::is_test_mode() ) {
+			return 'https://js.playground.kustom.co/kustom-elements/v1/pre-load.js';
+		}
+		return 'https://js.kustom.co/kustom-elements/v1/pre-load.js';
 	}
 
 	/**
