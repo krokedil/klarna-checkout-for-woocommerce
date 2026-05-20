@@ -26,6 +26,7 @@ class KCO_API {
 	public function create_klarna_order( $order_id = false, $checkout_flow = 'embedded' ) {
 		$request  = new KCO_Request_Create();
 		$response = $request->request( $order_id, $checkout_flow );
+
 		return $this->check_for_api_error( $response );
 	}
 
