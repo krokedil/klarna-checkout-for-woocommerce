@@ -34,9 +34,25 @@ if ( ! class_exists( 'KCO_Email' ) ) {
 			$settings     = get_option( 'woocommerce_kco_settings' );
 			$add_to_email = isset( $settings['add_to_email'] ) && 'yes' === $settings['add_to_email'] ? true : false;
 			if ( 'kco' === $gateway_used && $add_to_email ) {
-				$klarna_cs_url = '<a href="https://help.kustom.co/en/">' . esc_html__( 'Kustom', 'klarna-checkout-for-woocommerce' ) . '</a>';
+				$klarna_order = KCO_WC()->order_management->retrieve_klarna_order( $order->get_id() );
+				if ( is_wp_error( $klarna_order ) || empty( $klarna_order->initial_payment_method->description ) ) {
+					return;
+				}
+
+				$payment_method_description = $klarna_order->initial_payment_method->description;
+				$klarna_cs_url              = '<a href="https://help.kustom.co/en/">' . esc_html( $payment_method_description ) . '</a>';
 				?>
-				<p><?php echo esc_html__( 'Kustom order id:', 'klarna-checkout-for-woocommerce' ) . ' ' . esc_html( $order->get_transaction_id() ); ?></p>
+				<p>
+					<?php
+					echo esc_html(
+						sprintf(
+							// translators: 1: payment method description.
+							__( '%1$s order id:', 'klarna-checkout-for-woocommerce' ),
+							$payment_method_description
+						)
+					) . ' ' . esc_html( $order->get_transaction_id() );
+					?>
+				</p>
 				<?php if ( ! $sent_to_admin ) { ?>
 					<p>
 						<?php
