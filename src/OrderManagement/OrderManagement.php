@@ -110,14 +110,12 @@ class OrderManagement {
 		// Initialize the logger.
 		add_action( 'init', array( $this, 'initialize_logger' ) );
 
-		$report_about = array(
+		$report_about        = array(
 			array( 'id' => 'kom_auto_capture' ),
 			array( 'id' => 'kom_auto_cancel' ),
 			array( 'id' => 'kom_auto_update' ),
 			array( 'id' => 'kom_auto_order_sync' ),
 			array( 'id' => 'kom_force_full_capture' ),
-			array( 'id' => 'kom_debug_log' ),
-
 		);
 		$this->system_report = new SystemReport( 'kco', 'Kustom Order Management for WooCommerce', $report_about );
 

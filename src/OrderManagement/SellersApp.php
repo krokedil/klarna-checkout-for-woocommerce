@@ -157,7 +157,7 @@ class SellersApp {
 	 */
 	private static function process_order_lines( $klarna_order, $order ) {
 		$order_id = $order->get_id();
-		Logger::log( 'Processing order lines (from Kustom order) during sellers app creation for Kustom order ID ' . $klarna_order->order_id, self::$order_management, $order_id );
+		\KCO_Logger::log( 'Processing order lines (from Kustom order) during sellers app creation for Kustom order ID ' . $klarna_order->order_id );
 		foreach ( $klarna_order->order_lines as $cart_item ) {
 
 			// Only try to add the item to the order if we got a reference in the Kustom order.
@@ -191,7 +191,7 @@ class SellersApp {
 					$order->add_item( $item );
 
 				} catch ( \Exception $e ) {
-					Logger::log( 'Error during process order lines. Add to cart error:   ' . $e->getCode() . ' - ' . $e->getMessage(), self::$order_management, $order_id );
+					\KCO_Logger::log( 'Error during process order lines. Add to cart error:   ' . $e->getCode() . ' - ' . $e->getMessage() );
 				}
 			}
 
@@ -212,7 +212,7 @@ class SellersApp {
 					);
 					$order->add_item( $item );
 				} catch ( \Exception $e ) {
-					Logger::log( 'Error during process order lines. Add shipping error:   ' . $e->getCode() . ' - ' . $e->getMessage(), self::$order_management, $order_id );
+					\KCO_Logger::log( 'Error during process order lines. Add shipping error:   ' . $e->getCode() . ' - ' . $e->getMessage() );
 				}
 			}
 
@@ -234,7 +234,7 @@ class SellersApp {
 					$fee->set_props( $args );
 					$order->add_item( $fee );
 				} catch ( \Exception $e ) {
-					Logger::log( 'Error during process order lines. Add fee error:   ' . $e->getCode() . ' - ' . $e->getMessage(), self::$order_management, $order_id );
+					\KCO_Logger::log( 'Error during process order lines. Add fee error:   ' . $e->getCode() . ' - ' . $e->getMessage() );
 				}
 			}
 		}

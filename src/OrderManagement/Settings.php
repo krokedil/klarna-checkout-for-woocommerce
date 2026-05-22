@@ -32,7 +32,6 @@ class Settings {
 				'kom_auto_update'        => 'yes',
 				'kom_auto_order_sync'    => 'yes',
 				'kom_force_full_capture' => 'no',
-				'kom_debug_log'          => 'yes',
 			)
 		);
 
@@ -74,13 +73,6 @@ class Settings {
 			'type'    => 'checkbox',
 			'default' => $default_values['kom_force_full_capture'],
 			'label'   => __( 'Force capture full order. Useful if the Kustom order has been updated by an ERP system.', 'klarna-checkout-for-woocommerce' ),
-		);
-
-		$settings['kom_debug_log'] = array(
-			'title'   => 'Debug log',
-			'type'    => 'checkbox',
-			'default' => $default_values['kom_debug_log'],
-			'label'   => __( 'Enable the debug log.', 'klarna-checkout-for-woocommerce' ),
 		);
 
 		return $settings;
