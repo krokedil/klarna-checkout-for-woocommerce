@@ -156,7 +156,6 @@ class SellersApp {
 	 * @throws Exception WC_Data_Exception.
 	 */
 	private static function process_order_lines( $klarna_order, $order ) {
-		$order_id = $order->get_id();
 		\KCO_Logger::log( 'Processing order lines (from Kustom order) during sellers app creation for Kustom order ID ' . $klarna_order->order_id );
 		foreach ( $klarna_order->order_lines as $cart_item ) {
 
