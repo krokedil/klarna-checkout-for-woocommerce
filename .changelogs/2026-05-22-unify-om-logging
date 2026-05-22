@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: yes
+
+The integrated order management now uses the same logging file and logging setting as the rest of Klarna for WooCommerce.
