@@ -199,8 +199,66 @@ abstract class CheckoutFlow {
 
 		$order->update_meta_data( '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
 
+		$this->maybe_set_selected_pickup_point_on_order( $order, $klarna_order );
+
 		if ( $save ) {
 			$order->save();
+		}
+	}
+
+	/**
+	 * Reconcile the selected pickup point on the order's shipping line with the Kustom order data.
+	 *
+	 * When Kustom Shipping Assistant is backed by WooCommerce (via Kroconnect's KSA integration), the customer
+	 * may pick a pickup point in the iframe after the WC shipping rate was built. In that window the order's
+	 * shipping line meta can disagree with what the customer actually selected. The Kustom order is the source
+	 * of truth, so we copy `selected_shipping_option.delivery_details.pickup_location` onto the matching
+	 * shipping line. Lines without `krokedil_pickup_points` meta belong to other TMS integrations and are left
+	 * untouched.
+	 *
+	 * @param \WC_Order $order The WooCommerce order.
+	 * @param array     $klarna_order The Kustom order data.
+	 *
+	 * @return void
+	 */
+	protected function maybe_set_selected_pickup_point_on_order( $order, $klarna_order ) {
+		$pickup_location    = $klarna_order['selected_shipping_option']['delivery_details']['pickup_location'] ?? null;
+		$shipping_method_id = $klarna_order['selected_shipping_option']['id'] ?? null;
+
+		if ( empty( $pickup_location['id'] ) || empty( $shipping_method_id ) ) {
+			return;
+		}
+
+		foreach ( $order->get_items( 'shipping' ) as $shipping_line ) {
+			$instance_id = $shipping_line->get_instance_id();
+			$rate_id     = $instance_id ? $shipping_line->get_method_id() . ':' . $instance_id : $shipping_line->get_method_id();
+
+			if ( $rate_id !== $shipping_method_id ) {
+				continue;
+			}
+
+			$pickup_points_json = $shipping_line->get_meta( 'krokedil_pickup_points' );
+			if ( empty( $pickup_points_json ) ) {
+				return;
+			}
+
+			$pickup_points = json_decode( $pickup_points_json, true );
+			if ( ! is_array( $pickup_points ) ) {
+				return;
+			}
+
+			foreach ( $pickup_points as $pickup_point ) {
+				if ( ! isset( $pickup_point['id'] ) || (string) $pickup_point['id'] !== (string) $pickup_location['id'] ) {
+					continue;
+				}
+
+				$shipping_line->update_meta_data( 'krokedil_selected_pickup_point_id', $pickup_point['id'] );
+				$shipping_line->update_meta_data( 'krokedil_selected_pickup_point', wp_json_encode( $pickup_point ) );
+				$shipping_line->save();
+				return;
+			}
+
+			return;
 		}
 	}
 
