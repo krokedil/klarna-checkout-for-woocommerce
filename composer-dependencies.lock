@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a268637b4eb3a48d9e12690a6824d424",
+    "content-hash": "dc3bb960232843bf802f99d1ee605c38",
     "packages": [
         {
             "name": "krokedil/settings-page",
@@ -53,16 +53,16 @@
         },
         {
             "name": "krokedil/support",
-            "version": "1.0.2",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/krokedil/support.git",
-                "reference": "99059b1b27cc4ed7667c1d04968aec45413fe533"
+                "reference": "96da75792434a2553c6af9e891e646705fd33e7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/krokedil/support/zipball/99059b1b27cc4ed7667c1d04968aec45413fe533",
-                "reference": "99059b1b27cc4ed7667c1d04968aec45413fe533",
+                "url": "https://api.github.com/repos/krokedil/support/zipball/96da75792434a2553c6af9e891e646705fd33e7c",
+                "reference": "96da75792434a2553c6af9e891e646705fd33e7c",
                 "shasum": ""
             },
             "require": {
@@ -102,10 +102,10 @@
             ],
             "description": "The support library allows you to extend your plugin with logging that can be optionally toggled through your plugin settings, generate an entry in the system report from your plugin settings, and report issues to the system report.",
             "support": {
-                "source": "https://github.com/krokedil/support/tree/1.0.2",
+                "source": "https://github.com/krokedil/support/tree/1.0.4",
                 "issues": "https://github.com/krokedil/support/issues"
             },
-            "time": "2025-10-08T12:47:46+00:00"
+            "time": "2026-04-20T16:27:59+00:00"
         },
         {
             "name": "krokedil/woocommerce",
