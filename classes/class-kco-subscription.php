@@ -306,17 +306,22 @@ class KCO_Subscription {
 
 					// Do not overwrite any existing phone number in case the customer has changed payment method (and thus shipping details).
 					if ( empty( $subscription->get_shipping_phone() ) ) {
-
-						// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
-						if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
-							$subscription->set_shipping_phone( $kco_order['shipping_address']['phone'] );
-						} else {
-							$subscription->update_meta_data( '_shipping_phone', $kco_order['shipping_address']['phone'] );
+						$shipping_phone = $kco_order['shipping_address']['phone'] ?? $kco_order['billing_address']['phone'] ?? '';
+						if ( ! empty( $shipping_phone ) ) {
+							// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
+							if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
+								$subscription->set_shipping_phone( sanitize_text_field( $shipping_phone ) );
+							} else {
+								$subscription->update_meta_data( '_shipping_phone', sanitize_text_field( $shipping_phone ) );
+							}
 						}
 					}
 
-					if ( isset( $kco_order['shipping_address']['email'] ) && empty( $subscription->get_meta( '_shipping_email' ) ) ) {
-						$subscription->update_meta_data( '_shipping_email', sanitize_text_field( $kco_order['shipping_address']['email'] ) );
+					if ( empty( $subscription->get_meta( '_shipping_email' ) ) ) {
+						$shipping_email = $kco_order['shipping_address']['email'] ?? $kco_order['billing_address']['email'] ?? '';
+						if ( ! empty( $shipping_email ) ) {
+							$subscription->update_meta_data( '_shipping_email', sanitize_text_field( $shipping_email ) );
+						}
 					}
 
 					$subscription->save();
@@ -703,15 +708,15 @@ class KCO_Subscription {
 		$subscription->set_shipping_city( $klarna_order['shipping_address']['city'] );
 
 		// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
+		$shipping_phone = $klarna_order['shipping_address']['phone'] ?? $klarna_order['billing_address']['phone'] ?? '';
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
-			$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
+			$subscription->set_shipping_phone( sanitize_text_field( $shipping_phone ) );
 		} else {
-			$subscription->update_meta_data( '_shipping_phone', $klarna_order['shipping_address']['phone'] );
+			$subscription->update_meta_data( '_shipping_phone', sanitize_text_field( $shipping_phone ) );
 		}
 
-		if ( isset( $klarna_order['shipping_address']['email'] ) ) {
-			$subscription->update_meta_data( '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
-		}
+		$shipping_email = $klarna_order['shipping_address']['email'] ?? $klarna_order['billing_address']['email'] ?? '';
+		$subscription->update_meta_data( '_shipping_email', sanitize_text_field( $shipping_email ) );
 
 		$subscription->save();
 	}
