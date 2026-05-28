@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-05-15 07:54+0000\n"
+"POT-Creation-Date: 2026-05-28 12:17+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -514,7 +514,7 @@ msgstr ""
 msgid "Kustom Checkout for WooCommerce"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:324
+#: ../classes/class-kco-subscription.php:334
 msgid "Recurring token was missing from the Kustom order during the checkout process. Please contact Kustom for help."
 msgstr ""
 
@@ -523,27 +523,27 @@ msgid "Recurring token for subscription: %s"
 msgstr ""
 
 #. translators: Error message.
-#: ../classes/class-kco-subscription.php:466
+#: ../classes/class-kco-subscription.php:476
 msgid "Subscription payment failed with Klarna. Message: %1$s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:459
+#: ../classes/class-kco-subscription.php:469
 msgid "Subscription payment made with Kustom. Kustom order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:572
+#: ../classes/class-kco-subscription.php:582
 msgid "Kustom recurring token"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:627
+#: ../classes/class-kco-subscription.php:637
 msgid "Could not retrieve new Kustom recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:621
+#: ../classes/class-kco-subscription.php:631
 msgid "Payment method changed via Kustom Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:648
+#: ../classes/class-kco-subscription.php:658
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -648,7 +648,7 @@ msgstr ""
 msgid "Klarna order not found or an error occurred."
 msgstr ""
 
-#: ../src/CheckoutFlow/CheckoutFlow.php:217
+#: ../src/CheckoutFlow/CheckoutFlow.php:218
 msgid "There was an error processing your payment. Please try again."
 msgstr ""
 
