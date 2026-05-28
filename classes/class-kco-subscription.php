@@ -314,6 +314,11 @@ class KCO_Subscription {
 							$subscription->update_meta_data( '_shipping_phone', $kco_order['shipping_address']['phone'] );
 						}
 					}
+
+					if ( isset( $kco_order['shipping_address']['email'] ) && empty( $subscription->get_meta( '_shipping_email' ) ) ) {
+						$subscription->update_meta_data( '_shipping_email', sanitize_text_field( $kco_order['shipping_address']['email'] ) );
+					}
+
 					$subscription->save();
 				}
 
@@ -702,6 +707,10 @@ class KCO_Subscription {
 			$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
 		} else {
 			$subscription->update_meta_data( '_shipping_phone', $klarna_order['shipping_address']['phone'] );
+		}
+
+		if ( isset( $klarna_order['shipping_address']['email'] ) ) {
+			$subscription->update_meta_data( '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
 		}
 
 		$subscription->save();

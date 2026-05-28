@@ -197,7 +197,9 @@ abstract class CheckoutFlow {
 			}
 		}
 
-		$order->update_meta_data( '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
+		if ( isset( $klarna_order['shipping_address']['email'] ) ) {
+			$order->update_meta_data( '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
+		}
 
 		if ( $save ) {
 			$order->save();
