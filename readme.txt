@@ -3,11 +3,11 @@ Contributors: kustom, krokedil, automattic
 Tags: woocommerce, ecommerce, e-commerce, checkout, klarna
 Donate link: https://kustom.co
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
 WC requires at least: 5.6.0
-WC tested up to: 10.7.0
-Stable tag: 2.20.2
+WC tested up to: 10.8.1
+Stable tag: 2.20.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,9 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-05-28    - version 2.20.3 =
+* Fix           - Resolved a potential checkout error introduced by WooCommerce 10.8.0, where shipping phone became a required field. The shipping phone value is now populated as needed.
+
 = 2026-05-18    - version 2.20.2 =
 * Enhancement   - When multiple payment methods are used, the fallback logo has been changed from Klarna to Kustom.
 * Enhancement   - Added WPML configuration file for improved multilingual compatibility.

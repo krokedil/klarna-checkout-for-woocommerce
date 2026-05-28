@@ -268,11 +268,11 @@ class OrderValidation {
 				),
 				array(
 					'key'   => '_shipping_email',
-					'value' => $klarna_shipping_address['email'] ?? '',
+					'value' => $klarna_shipping_address['email'] ?? $klarna_billing_address['email'] ?? '',
 				),
 				array(
 					'key'   => '_shipping_phone',
-					'value' => $klarna_shipping_address['phone'] ?? '',
+					'value' => $klarna_shipping_address['phone'] ?? $klarna_billing_address['phone'] ?? '',
 				),
 			),
 			'billing_address'  => array(
