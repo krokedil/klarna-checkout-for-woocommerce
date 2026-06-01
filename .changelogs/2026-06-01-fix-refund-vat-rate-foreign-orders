@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where refunds on orders from non-base countries were sent to Kustom with the wrong VAT rate, resulting in an incorrect tax breakdown on the customer's refund receipt.
