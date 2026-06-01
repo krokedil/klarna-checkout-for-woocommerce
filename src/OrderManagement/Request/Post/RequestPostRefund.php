@@ -130,11 +130,15 @@ class RequestPostRefund extends RequestPost {
 					 *
 					 * @var \WC_Order_Item_Product $order_item WooCommerce order item product.
 					 */
+					$order_line_total    = 0;
+					$order_line_tax      = 0;
+					$order_line_tax_rate = 0;
 					foreach ( $order_items as $order_item ) {
 						if ( $item->get_product_id() === $order_item->get_product_id() ) {
 							$order_line_total    = round( $order->get_line_subtotal( $order_item, false ) * 100 );
 							$order_line_tax      = round( $order->get_line_tax( $order_item ) * 100 );
 							$order_line_tax_rate = ( 0 !== $order_line_tax && 0 !== $order_line_total ) ? round( ( $order_line_tax / $order_line_total ) * 10000 ) : 0;
+							break;
 						}
 					}
 
