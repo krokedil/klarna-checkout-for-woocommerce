@@ -133,9 +133,10 @@ class RequestPostRefund extends RequestPost {
 					$order_line_total    = 0;
 					$order_line_tax      = 0;
 					$order_line_tax_rate = 0;
+					$refunded_item_id    = absint( $item->get_meta( '_refunded_item_id' ) );
 					foreach ( $order_items as $order_item ) {
 						/** @var \WC_Order_Item_Product $order_item */
-						if ( $item->get_product_id() === $order_item->get_product_id() ) {
+						if ( $order_item->get_id() === $refunded_item_id ) {
 							$order_line_total    = round( $order->get_line_total( $order_item, false, false ) * 100 );
 							$order_line_tax      = round( $order_item->get_total_tax() * 100 );
 							$order_line_tax_rate = ( 0 !== $order_line_tax && 0 !== $order_line_total ) ? round( ( $order_line_tax / $order_line_total ) * 10000 ) : 0;
