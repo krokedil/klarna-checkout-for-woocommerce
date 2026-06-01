@@ -120,7 +120,7 @@ class RequestPostRefund extends RequestPost {
 				/**
 				 * Process order item products.
 				 *
-				 * @var WC_Order_Item_Product $item WooCommerce order item product.
+				 * @var \WC_Order_Item_Product $item WooCommerce order item product.
 				 */
 				foreach ( $refunded_items as $item ) {
 					$product = wc_get_product( $item->get_product_id() );
@@ -128,15 +128,13 @@ class RequestPostRefund extends RequestPost {
 					/**
 					 * Get the order line total from order for calculation.
 					 *
-					 * @var WC_Order_Item_Product $order_item WooCommerce order item product.
+					 * @var \WC_Order_Item_Product $order_item WooCommerce order item product.
 					 */
 					foreach ( $order_items as $order_item ) {
 						if ( $item->get_product_id() === $order_item->get_product_id() ) {
-							$order_line_total    = round( ( $order->get_line_subtotal( $order_item, false ) * 100 ) );
-							$order_line_tax      = round( ( $order->get_line_tax( $order_item ) * 100 ) );
-							$tax_rates           = \WC_Tax::get_base_tax_rates( $order_item->get_tax_class() );
-							$first_tax_rate      = reset( $tax_rates );
-							$order_line_tax_rate = ( 0 !== $order_line_tax && 0 !== $order_line_total ) ? ( $first_tax_rate['rate'] * 100 ?? round( ( $order_line_tax / $order_line_total ) * 100 * 100 ) ) : 0;
+							$order_line_total    = round( $order->get_line_subtotal( $order_item, false ) * 100 );
+							$order_line_tax      = round( $order->get_line_tax( $order_item ) * 100 );
+							$order_line_tax_rate = ( 0 !== $order_line_tax && 0 !== $order_line_total ) ? round( ( $order_line_tax / $order_line_total ) * 10000 ) : 0;
 						}
 					}
 
