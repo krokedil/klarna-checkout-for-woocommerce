@@ -7,7 +7,7 @@ Tested up to: 7.0
 Requires PHP: 7.4
 WC requires at least: 5.6.0
 WC tested up to: 10.8.1
-Stable tag: 2.20.3
+Stable tag: 2.20.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,10 +36,10 @@ Installment, revolving and other flexible financing plans let customers pay when
 * Get your store approved by Kustom, and start selling.
 
 == Installation ==
-1. Upload plugin folder to to the "/wp-content/plugins/" directory.
+1. Upload plugin folder to the "/wp-content/plugins/" directory.
 2. Activate the plugin through the "Plugins" menu in WordPress.
 3. Go WooCommerce Settings –> Payment Gateways and configure your Kustom Checkout settings.
-4. Read more about the configuration process in the [plugin documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
+4. Read more about the configuration process in the [plugin documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 
 == Frequently Asked Questions ==
@@ -47,9 +47,16 @@ Installment, revolving and other flexible financing plans let customers pay when
 Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria, the Netherlands, UK and United States.
 
 = Where can I find Kustom Checkout for WooCommerce documentation? =
-For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
+For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-06-02    - version 2.20.4 =
+* Enhancement   - [Support] Explicitly disabled autoloading the system report option to prevent it from being loaded on every request, as it is only needed when issuing a request, and viewing the system report.
+* Fix           - [Support] The $form_field variable can sometimes be missing keys that are available in the $setting array when "MU"-plugins are used. Added a check to ensure that the keys exist in both arrays before attempting to access them, preventing potential undefined key errors.
+* Fix           - Update links in README
+* Fix           - Fixed an issue that could allow customers from unsupported countries to complete checkout and place an order.
+* Tweak         - The integrated order management now uses the same logging file and logging setting as the rest of Kustom Checkout for WooCommerce.
+
 = 2026-05-28    - version 2.20.3 =
 * Fix           - Resolved a potential checkout error introduced by WooCommerce 10.8.0, where shipping phone became a required field. The shipping phone value is now populated as needed.
 
