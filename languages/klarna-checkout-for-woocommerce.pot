@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-05-28 12:17+0000\n"
+"POT-Creation-Date: 2026-06-02 11:54+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -740,64 +740,64 @@ msgstr ""
 msgid "Sales Tax"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:93
+#: ../src/OrderManagement/OrderManagement.php:85
 msgid "Order Management is now included in Kustom Checkout for WooCommerce."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:94
+#: ../src/OrderManagement/OrderManagement.php:86
 msgid "You no longer need the separate Klarna Order Management plugin."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:162
+#: ../src/OrderManagement/OrderManagement.php:149
 msgid "minus a return fee of"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:163
+#: ../src/OrderManagement/OrderManagement.php:150
 msgid "Refund amount is less than the return fee."
 msgstr ""
 
 #. translators: 1: User name, 2: Existing token, 3: New token.
-#: ../src/OrderManagement/OrderManagement.php:319
+#: ../src/OrderManagement/OrderManagement.php:306
 msgid "%1$s updated the subscription recurring token from \"%2$s\" to \"%3$s\"."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:377
+#: ../src/OrderManagement/OrderManagement.php:364
 msgid "Could not update Klarna order lines. An unknown error occurred."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:375
+#: ../src/OrderManagement/OrderManagement.php:362
 msgid "Could not update Klarna order lines: %s."
 msgstr ""
 
 #. translators: %s: Error message from Klarna.
-#: ../src/OrderManagement/OrderManagement.php:493
+#: ../src/OrderManagement/OrderManagement.php:480
 msgid "Could not capture Klarna order. %s"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:483
+#: ../src/OrderManagement/OrderManagement.php:470
 msgid "Klarna could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:525, ../src/OrderManagement/OrderManagement.php:544
+#: ../src/OrderManagement/OrderManagement.php:512, ../src/OrderManagement/OrderManagement.php:531
 msgid "Klarna order has not been captured and cannot be refunded."
 msgstr ""
 
 #. translators: %s Klarna error message.
-#: ../src/OrderManagement/OrderManagement.php:536, ../src/OrderManagement/OrderManagement.php:576
+#: ../src/OrderManagement/OrderManagement.php:523, ../src/OrderManagement/OrderManagement.php:563
 msgid "Could not refund Klarna order. %s."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:556
+#: ../src/OrderManagement/OrderManagement.php:543
 msgid "Could not retrieve the refund order."
 msgstr ""
 
 #. translators: refund amount, refund id.
-#: ../src/OrderManagement/OrderManagement.php:585
+#: ../src/OrderManagement/OrderManagement.php:572
 msgid "Processing a refund of %1$s with Klarna"
 msgstr ""
 
 #. translators: 1: original amount, 2: return fee amount.
-#: ../src/OrderManagement/OrderManagement.php:595
+#: ../src/OrderManagement/OrderManagement.php:582
 msgid " (original amount of %1$s - return fee of %2$s)"
 msgstr ""
 
@@ -831,28 +831,24 @@ msgstr ""
 msgid "Order address updated by Kustom Order management."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:48
+#: ../src/OrderManagement/Settings.php:47
 msgid "Activate Kustom order automatically when WooCommerce order is marked complete."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:55
+#: ../src/OrderManagement/Settings.php:54
 msgid "Cancel Kustom order automatically when WooCommerce order is marked canceled."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:62
+#: ../src/OrderManagement/Settings.php:61
 msgid "Update Kustom order automatically when WooCommerce order is updated."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:69
+#: ../src/OrderManagement/Settings.php:68
 msgid "Gets the customer information from Kustom when creating a manual admin order and adding a Kustom order id as a transaction id."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:76
+#: ../src/OrderManagement/Settings.php:75
 msgid "Force capture full order. Useful if the Kustom order has been updated by an ERP system."
-msgstr ""
-
-#: ../src/OrderManagement/Settings.php:83
-msgid "Enable the debug log."
 msgstr ""
 
 #: ../blocks/src/Checkout/CheckoutBlock.php:136

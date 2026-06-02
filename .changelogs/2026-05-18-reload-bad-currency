@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Fixed an issue that could allow customers from unsupported countries to complete checkout and place an order.

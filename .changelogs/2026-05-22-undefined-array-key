@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-[Support] The $form_field variable can sometimes be missing keys that are available in the $setting array when "MU"-plugins are used. Added a check to ensure that the keys exist in both arrays before attempting to access them, preventing potential undefined key errors.

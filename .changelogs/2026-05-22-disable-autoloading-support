@@ -1,4 +1,0 @@
-Type: Enhancement
-Needs Documentation: no
-
-[Support] Explicitly disabled autoloading the system report option to prevent it from being loaded on every request, as it is only needed when issuing a request, and viewing the system report.
