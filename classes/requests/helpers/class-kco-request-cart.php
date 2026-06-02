@@ -163,6 +163,29 @@ class KCO_Request_Cart {
 			return $this->order_lines;
 		}
 
+		// When shipping is handled in the iframe it is excluded from order_lines. A gift card
+		// that covers shipping costs will make the order_lines total negative, which the gift
+		// card plugin rejects. Reduce gift card amounts so they only offset what is in order_lines.
+		$settings = get_option( 'woocommerce_kco_settings' );
+		if ( $amount_to_adjust > 0 && wc_string_to_bool( $settings['shipping_methods_in_iframe'] ?? 'no' ) ) {
+			foreach ( $this->order_lines as &$order_line ) {
+				if ( 0 >= $amount_to_adjust ) {
+					break;
+				}
+				if ( 'gift_card' === $order_line['type'] ) {
+					$reduction = min( $amount_to_adjust, abs( $order_line['total_amount'] ) );
+					$order_line['unit_price']   += $reduction;
+					$order_line['total_amount'] += $reduction;
+					$amount_to_adjust           -= $reduction;
+				}
+			}
+			unset( $order_line );
+		}
+
+		if ( 0 === intval( round( $amount_to_adjust * 100 ) ) ) {
+			return $this->order_lines;
+		}
+
 		$adjust_item = array(
 			'type'                  => 'surcharge',
 			'reference'             => 'added-surcharge',
