@@ -67,13 +67,31 @@ class Scripts {
 
 		$product_active = 'yes' === Settings::get( 'ke_product_enabled', 'no' ) && is_product();
 		$cart_active    = 'yes' === Settings::get( 'ke_cart_enabled', 'no' ) && is_cart();
+		$block_active   = self::page_has_block();
 
-		if ( ! $product_active && ! $cart_active ) {
+		if ( ! $product_active && ! $cart_active && ! $block_active ) {
 			add_action( 'wp_footer', array( $this, 'maybe_print_script_footer' ), 1 );
 			return;
 		}
 
 		$this->print_snippet();
+	}
+
+	/**
+	 * Whether the current singular page contains a Kustom Elements display block.
+	 *
+	 * Static blocks have no render callback to signal enqueue(), so we detect
+	 * their presence directly in post content to decide whether to print the
+	 * loader snippet in <head>.
+	 *
+	 * @return bool
+	 */
+	private static function page_has_block() {
+		if ( ! function_exists( 'has_block' ) || ! is_singular() ) {
+			return false;
+		}
+
+		return has_block( 'kco/payment-method-display' ) || has_block( 'kco/delivery-method-display' );
 	}
 
 	/**

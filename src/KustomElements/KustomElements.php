@@ -57,6 +57,13 @@ class KustomElements {
 	public $block;
 
 	/**
+	 * Static blocks instance.
+	 *
+	 * @var Blocks
+	 */
+	public $blocks;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -73,9 +80,10 @@ class KustomElements {
 	 * @return void
 	 */
 	public function init() {
-		// Always register settings (admin) and the block type.
+		// Always register settings (admin) and the block types.
 		$this->settings = new Settings();
 		$this->block    = new Block();
+		$this->blocks   = new Blocks();
 
 		if ( ! Settings::is_enabled() ) {
 			return;
