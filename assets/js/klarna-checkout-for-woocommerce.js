@@ -327,6 +327,11 @@ jQuery( function ( $ ) {
 				},
 				dataType: "json",
 				success: function ( data ) {
+					// Checkout session expired (404): reload to create a fresh session.
+					if ( data.data && data.data.reload ) {
+						window.location.reload()
+						return
+					}
 					kco_wc.setCustomerData( data.data )
 
 					// Check Terms checkbox, if it exists.
@@ -505,6 +510,11 @@ jQuery( function ( $ ) {
 
 		placeKlarnaOrder: function ( callback ) {
 			kco_wc.getKlarnaOrder().done( function ( response ) {
+				// Checkout session expired (404): reload to create a fresh session.
+				if ( response.data && response.data.reload ) {
+					window.location.reload()
+					return
+				}
 				if ( response.success ) {
 					$( ".woocommerce-checkout-review-order-table" ).block( {
 						message: null,

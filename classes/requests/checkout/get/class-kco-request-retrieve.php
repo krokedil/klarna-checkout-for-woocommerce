@@ -33,6 +33,25 @@ class KCO_Request_Retrieve extends KCO_Request {
 	}
 
 	/**
+	 * Checks response for any error.
+	 *
+	 * @param object $response The response.
+	 * @param array  $request_args The request args.
+	 * @param string $request_url The request URL.
+	 * @return array|false|WP_Error
+	 */
+	public function process_response( $response, $request_args = array(), $request_url = '' ) {
+		if ( ! is_wp_error( $response ) && 404 === (int) wp_remote_retrieve_response_code( $response ) ) {
+			if ( WC()->session ) {
+				WC()->session->__unset( 'kco_wc_order_id' );
+			}
+			KCO_Logger::log( 'KCO retrieve: 404 response received. Checkout session has expired. Clearing stored order ID.' );
+			return false;
+		}
+		return parent::process_response( $response, $request_args, $request_url );
+	}
+
+	/**
 	 * Gets the request args for the API call.
 	 *
 	 * @param string $url The request URL.

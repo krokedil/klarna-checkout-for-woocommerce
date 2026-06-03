@@ -218,8 +218,14 @@ class KCO_AJAX extends WC_AJAX {
 			exit;
 		}
 
-		$klarna_order = KCO_WC()->api->get_klarna_order( WC()->session->get( 'kco_wc_order_id' ) );
+		$order_id_before  = WC()->session->get( 'kco_wc_order_id' );
+		$klarna_order     = KCO_WC()->api->get_klarna_order( $order_id_before );
 		if ( ! $klarna_order ) {
+			// If the order ID was cleared from the session it means a 404 was received (expired session).
+			// Tell the browser to reload so a fresh checkout session can be created on page load.
+			if ( $order_id_before && empty( WC()->session->get( 'kco_wc_order_id' ) ) ) {
+				wp_send_json_success( array( 'reload' => true ) );
+			}
 			wp_send_json_error( $klarna_order );
 		}
 
