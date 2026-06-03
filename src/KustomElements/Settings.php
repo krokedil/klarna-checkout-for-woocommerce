@@ -146,11 +146,11 @@ class Settings {
 			'default' => $kco_settings['ke_enabled'] ?? 'no',
 		);
 
-		$settings['ke_api_key'] = array(
-			'title'       => __( 'Public API key', 'klarna-checkout-for-woocommerce' ),
-			'type'        => 'text',
-			'description' => __( 'The <code>data-public-api-key</code> value from the Kustom Elements installation snippet in the Kustom Portal. The script is loaded automatically — no need to paste HTML. Uses playground or production environment based on the Test mode setting above.', 'klarna-checkout-for-woocommerce' ),
-			'default'     => $kco_settings['ke_api_key'] ?? '',
+		$settings['ke_snippet'] = array(
+			'title'       => __( 'Installation snippet', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'textarea',
+			'description' => __( 'Paste the full installation snippet from the Kustom Portal. The API key is extracted automatically and the script is generated correctly for playground or production based on the Test mode setting above.', 'klarna-checkout-for-woocommerce' ),
+			'default'     => $kco_settings['ke_snippet'] ?? '',
 		);
 
 		$settings['ke_locale'] = array(
@@ -266,12 +266,21 @@ class Settings {
 	}
 
 	/**
-	 * Returns the public API key.
+	 * Extracts the public API key from the stored installation snippet.
 	 *
-	 * @return string
+	 * Looks for data-public-api-key="..." in whatever the merchant pasted.
+	 *
+	 * @return string The extracted API key, or empty string if not found.
 	 */
 	public static function get_api_key() {
-		return (string) self::get( 'ke_api_key', '' );
+		$snippet = (string) self::get( 'ke_snippet', '' );
+		if ( empty( $snippet ) ) {
+			return '';
+		}
+		if ( preg_match( '/data-public-api-key=["\']([^"\']+)["\']/', $snippet, $matches ) ) {
+			return sanitize_text_field( $matches[1] );
+		}
+		return '';
 	}
 
 	/**
