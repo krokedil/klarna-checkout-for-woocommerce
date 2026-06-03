@@ -84,6 +84,12 @@ export function registerKustomElementBlock( config: ElementBlockConfig ): void {
 
 	// Capitalised so ESLint's rules-of-hooks recognises these as components
 	// (useBlockProps is a hook). config is captured from the closure.
+
+	/**
+	 * Editor view — a static placeholder; the real element renders on the frontend.
+	 *
+	 * @return {JSX.Element} The block's editor placeholder.
+	 */
 	const Edit = (): JSX.Element => {
 		const blockProps = useBlockProps( {
 			className: 'kco-kustom-element-placeholder',
@@ -108,6 +114,14 @@ export function registerKustomElementBlock( config: ElementBlockConfig ): void {
 		);
 	};
 
+	/**
+	 * Saved markup written to post content.
+	 *
+	 * @param {Object} root0                   Block props supplied by the editor.
+	 * @param {Object} root0.attributes        The block's stored attributes.
+	 * @param {string} root0.attributes.locale The frozen locale for the web component.
+	 * @return {JSX.Element} The serialized web component wrapper.
+	 */
 	const Save = ( { attributes }: { attributes: { locale: string } } ): JSX.Element => {
 		const blockProps = useBlockProps.save();
 
