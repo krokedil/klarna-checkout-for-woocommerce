@@ -277,10 +277,7 @@ class KCO_AJAX extends WC_AJAX {
 			$log_context = array_merge( array( 'message' => sanitize_text_field( $raw_message ) ), $base_context );
 		}
 
-		$settings = get_option( 'woocommerce_kco_settings' );
-		if ( 'yes' === ( $settings['logging'] ?? '' ) ) {
-			wc_get_logger()->log( 'notice', 'Frontend JS', $log_context );
-		}
+		KCO_Logger::log( array_merge( array( 'title' => 'Frontend JS' ), $log_context ) );
 
 		wp_send_json_success();
 	}
