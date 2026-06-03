@@ -25,7 +25,8 @@ abstract class CheckoutFlow {
 			throw new Exception( esc_html( $message ) );
 		}
 		$handler         = self::get_handler();
-		$kustom_order_id = $order->get_meta( '_wc_klarna_order_id', true ) ?: ( WC()->session ? WC()->session->get( 'kco_wc_order_id' ) : null ) ?? 'N/A';
+		$meta_id         = $order->get_meta( '_wc_klarna_order_id', true );
+		$kustom_order_id = $meta_id ? $meta_id : ( WC()->session?->get( 'kco_wc_order_id' ) ?? 'N/A' );
 
 		\KCO_Logger::log( sprintf( 'Processing order %s|%s (Kustom ID: %s) with flow %s.', $order->get_id(), $order->get_order_number(), $kustom_order_id, get_class( $handler ) ) );
 
