@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed a bug where checkout error details could be silently dropped from the debug log.
