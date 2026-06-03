@@ -254,6 +254,14 @@ class KCO_AJAX extends WC_AJAX {
 		check_ajax_referer( 'kco_wc_log_js', 'nonce' );
 		$kustom_order_id = WC()->session->get( 'kco_wc_order_id' );
 
+		$raw_message = filter_input( INPUT_POST, 'message' ) ?? '';
+
+		// If the message is too long, log an error message and return.
+		if ( strlen( $raw_message ) > 1024 ) {
+			KCO_Logger::log( "Frontend JS Kustom:{$kustom_order_id}: message too long and can't be logged." ); // Return success to not stop anything in the frontend if this happens.
+			wp_send_json_success();
+			return;
+		}
 		$base_context = array(
 			'id'     => $kustom_order_id,
 			'source' => 'kustom-checkout-for-woocommerce',
@@ -262,8 +270,6 @@ class KCO_AJAX extends WC_AJAX {
 		$decoded      = json_decode( $raw_message, true );
 		$allowed_keys = array( 'type', 'message', 'status', 'response' );
 
-		// Get the content size of the request.
-		$post_size = (int) $_SERVER['CONTENT_LENGTH'] ?? 0;
 		if ( is_array( $decoded ) ) {
 			$filtered    = array_intersect_key( $decoded, array_flip( $allowed_keys ) );
 			$log_context = array_merge( array_map( 'sanitize_text_field', $filtered ), $base_context );
