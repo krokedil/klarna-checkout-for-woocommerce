@@ -252,20 +252,30 @@ class KCO_AJAX extends WC_AJAX {
 	 */
 	public static function kco_wc_log_js() {
 		check_ajax_referer( 'kco_wc_log_js', 'nonce' );
-		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
+		$kustom_order_id = WC()->session->get( 'kco_wc_order_id' );
+
+		$base_context = array(
+			'id'     => $kustom_order_id,
+			'source' => 'kustom-checkout-for-woocommerce',
+		);
+
+		$decoded      = json_decode( $raw_message, true );
+		$allowed_keys = array( 'type', 'message', 'status', 'response' );
 
 		// Get the content size of the request.
 		$post_size = (int) $_SERVER['CONTENT_LENGTH'] ?? 0;
-
-		// If the post data is to long, log a error message and return.
-		if ( $post_size > 1024 ) {
-			KCO_Logger::log( "Frontend JS $klarna_order_id: message to long and can't be logged." );
-			wp_send_json_success(); // Return success to not stop anything in the frontend if this happens.
+		if ( is_array( $decoded ) ) {
+			$filtered    = array_intersect_key( $decoded, array_flip( $allowed_keys ) );
+			$log_context = array_merge( array_map( 'sanitize_text_field', $filtered ), $base_context );
+		} else {
+			$log_context = array_merge( array( 'message' => sanitize_text_field( $raw_message ) ), $base_context );
 		}
 
-		$posted_message = filter_input( INPUT_POST, 'message', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$message        = "Frontend JS $klarna_order_id: $posted_message";
-		KCO_Logger::log( $message );
+		$settings = get_option( 'woocommerce_kco_settings' );
+		if ( 'yes' === ( $settings['logging'] ?? '' ) ) {
+			wc_get_logger()->log( 'notice', 'Frontend JS', $log_context );
+		}
+
 		wp_send_json_success();
 	}
 
