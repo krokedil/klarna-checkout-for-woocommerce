@@ -82,6 +82,44 @@ export function registerKustomElementBlock( config: ElementBlockConfig ): void {
 	// stricter BlockConfiguration than we need for this static block.
 	const register = registerBlockType as ( name: string, settings: object ) => void;
 
+	// Capitalised so ESLint's rules-of-hooks recognises these as components
+	// (useBlockProps is a hook). config is captured from the closure.
+	const Edit = (): JSX.Element => {
+		const blockProps = useBlockProps( {
+			className: 'kco-kustom-element-placeholder',
+		} );
+		const logoUrl = window.kcoKustomElements?.logoUrl;
+
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					label={ config.title }
+					instructions={ config.placeholderText }
+				>
+					{ logoUrl ? (
+						<img
+							src={ logoUrl }
+							alt="Kustom"
+							style={ { maxHeight: 24, width: 'auto' } }
+						/>
+					) : null }
+				</Placeholder>
+			</div>
+		);
+	};
+
+	const Save = ( { attributes }: { attributes: { locale: string } } ): JSX.Element => {
+		const blockProps = useBlockProps.save();
+
+		// `locale` comes purely from the stored attribute so save() stays
+		// deterministic and the block validates across environments.
+		return (
+			<div { ...blockProps }>
+				{ React.createElement( config.tag, { locale: attributes.locale } ) }
+			</div>
+		);
+	};
+
 	register( config.name, {
 		apiVersion: 2,
 		title: config.title,
@@ -95,43 +133,9 @@ export function registerKustomElementBlock( config: ElementBlockConfig ): void {
 				default: getConfiguredLocale(),
 			},
 		},
-		// Renders edit() as the inserter preview.
+		// Renders Edit as the inserter preview.
 		example: {},
-
-		edit: (): JSX.Element => {
-			const blockProps = useBlockProps( {
-				className: 'kco-kustom-element-placeholder',
-			} );
-			const logoUrl = window.kcoKustomElements?.logoUrl;
-
-			return (
-				<div { ...blockProps }>
-					<Placeholder
-						label={ config.title }
-						instructions={ config.placeholderText }
-					>
-						{ logoUrl ? (
-							<img
-								src={ logoUrl }
-								alt="Kustom"
-								style={ { maxHeight: 24, width: 'auto' } }
-							/>
-						) : null }
-					</Placeholder>
-				</div>
-			);
-		},
-
-		save: ( { attributes }: { attributes: { locale: string } } ): JSX.Element => {
-			const blockProps = useBlockProps.save();
-
-			// `locale` comes purely from the stored attribute so save() stays
-			// deterministic and the block validates across environments.
-			return (
-				<div { ...blockProps }>
-					{ React.createElement( config.tag, { locale: attributes.locale } ) }
-				</div>
-			);
-		},
+		edit: Edit,
+		save: Save,
 	} );
 }
