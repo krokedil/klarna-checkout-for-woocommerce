@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Corrected handling of the shipping phone field in Checkout Blocks to align with changes introduced in WooCommerce 10.8.0.
