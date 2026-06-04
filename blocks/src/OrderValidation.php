@@ -294,6 +294,7 @@ class OrderValidation {
 				'state'      => $klarna_shipping_address['region'] ?? '',
 				'postcode'   => $klarna_shipping_address['postal_code'] ?? '',
 				'country'    => strtoupper( $klarna_shipping_address['country'] ?? '' ),
+				'phone'      => $klarna_shipping_address['phone'] ?? $klarna_billing_address['phone'] ?? '',
 			),
 		);
 
