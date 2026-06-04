@@ -171,7 +171,7 @@ class KCO_Request_Cart {
 					break;
 				}
 				if ( 'gift_card' === $order_line['type'] ) {
-					$reduction = min( $amount_to_adjust, abs( $order_line['total_amount'] ) );
+					$reduction                   = min( $amount_to_adjust, abs( $order_line['total_amount'] ) );
 					$order_line['unit_price']   += $reduction;
 					$order_line['total_amount'] += $reduction;
 					$amount_to_adjust           -= $reduction;
