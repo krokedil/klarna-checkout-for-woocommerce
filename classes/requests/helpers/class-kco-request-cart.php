@@ -159,7 +159,7 @@ class KCO_Request_Cart {
 		$amount_to_adjust = intval( round( $this->get_order_amount() - $this->get_order_lines_total_amount() ) );
 
 		// If the amount to adjust is zero, return.
-		if ( 0 === intval( round( $amount_to_adjust * 100 ) ) ) {
+		if ( 0 === $amount_to_adjust ) {
 			return $this->order_lines;
 		}
 
@@ -180,7 +180,7 @@ class KCO_Request_Cart {
 			unset( $order_line );
 		}
 
-		if ( 0 === intval( round( $amount_to_adjust * 100 ) ) ) {
+		if ( 0 === $amount_to_adjust ) {
 			return $this->order_lines;
 		}
 
