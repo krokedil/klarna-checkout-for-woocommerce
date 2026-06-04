@@ -86,10 +86,10 @@ class KCO_Request_Shipping_Options {
 
 				// Reduce the chosen method's price by the shipping cost already covered by a gift card.
 				if ( $method_selected && $remaining_overflow > 0 && $method_price > 0 ) {
-					$reduction          = min( $remaining_overflow, $method_price );
-					$adjusted_price     = $method_price - $reduction;
-					$method_tax_amount  = intval( round( $method_tax_amount * $adjusted_price / $method_price ) );
-					$method_price       = $adjusted_price;
+					$reduction           = min( $remaining_overflow, $method_price );
+					$adjusted_price      = $method_price - $reduction;
+					$method_tax_amount   = intval( round( $method_tax_amount * $adjusted_price / $method_price ) );
+					$method_price        = $adjusted_price;
 					$remaining_overflow -= $reduction;
 				}
 
