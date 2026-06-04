@@ -53,7 +53,7 @@ class KCO_Request_Shipping_Options {
 			$selected_shipping_amount = intval( round( ( WC()->cart->shipping_total + WC()->cart->shipping_tax_total ) * 100 ) );
 		}
 		$cart_total_amount  = max( 0, intval( round( WC()->cart->total * 100 ) ) );
-		$gift_card_overflow = max( 0, $selected_shipping_amount - $cart_total_amount );
+		$remaining_overflow = max( 0, $selected_shipping_amount - $cart_total_amount );
 
 		$shipping_options = array();
 		foreach ( $packages as $i => $package ) {
@@ -82,13 +82,17 @@ class KCO_Request_Shipping_Options {
 					$method_tax_rate   = 0;
 				}
 
-				if ( $gift_card_overflow > 0 ) {
-					$adjusted_price    = max( 0, $method_price - $gift_card_overflow );
-					$method_tax_amount = $method_price > 0 ? intval( round( $method_tax_amount * $adjusted_price / $method_price ) ) : 0;
-					$method_price      = $adjusted_price;
+				$method_selected = $method->id === $chosen_method ? true : false;
+
+				// Reduce the chosen method's price by the shipping cost already covered by a gift card.
+				if ( $method_selected && $remaining_overflow > 0 && $method_price > 0 ) {
+					$reduction          = min( $remaining_overflow, $method_price );
+					$adjusted_price     = $method_price - $reduction;
+					$method_tax_amount  = intval( round( $method_tax_amount * $adjusted_price / $method_price ) );
+					$method_price       = $adjusted_price;
+					$remaining_overflow -= $reduction;
 				}
 
-				$method_selected    = $method->id === $chosen_method ? true : false;
 				$shipping_options[] = array(
 					'id'          => $method_id,
 					'name'        => $method_name,
