@@ -164,7 +164,7 @@ class KCO_Request_Cart {
 		}
 
 		// Reduce gift card amounts instead of adding a surcharge when shipping is in the iframe and a gift card covers shipping costs.
-		$settings = get_option( 'woocommerce_kco_settings' );
+		$settings = get_option( 'woocommerce_kco_settings', array() );
 		if ( $amount_to_adjust > 0 && wc_string_to_bool( $settings['shipping_methods_in_iframe'] ?? 'no' ) ) {
 			foreach ( $this->order_lines as &$order_line ) {
 				if ( 0 >= $amount_to_adjust ) {
