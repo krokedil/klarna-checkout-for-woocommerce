@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where renewal orders for subscriptions could fail to be created or processed when another plugin hooked into WooCommerce Subscriptions' renewal order creation after Kustom Checkout. 
