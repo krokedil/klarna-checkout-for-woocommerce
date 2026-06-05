@@ -113,9 +113,19 @@ class KCO_Checkout {
 
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 		if ( ! $klarna_order ) {
+			// If the order was not found and we haven't already attempted a reload, clear the
+			// stale session ID and reload to let a fresh Klarna order be created. The flag
+			// prevents an infinite reload loop if the session cannot be recovered.
+			if ( ! WC()->session->get( 'kco_order_missing_reload' ) ) {
+				WC()->session->set( 'kco_order_missing_reload', true );
+				WC()->session->set( 'kco_wc_order_id', '' );
+				WC()->session->set( 'reload_checkout', true );
+				return;
+			}
 			KCO_Logger::log( "Klarna order could not be retrieved during update for ID: $klarna_order_id " );
 			return;
 		}
+		WC()->session->set( 'kco_order_missing_reload', false );
 
 		$updated_klarna_order = false;
 		if ( 'checkout_incomplete' === $klarna_order['status'] ) {
