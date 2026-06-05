@@ -38,17 +38,17 @@ class KCO_Request_Retrieve extends KCO_Request {
 	 * @param object $response The response.
 	 * @param array  $request_args The request args.
 	 * @param string $request_url The request URL.
-	 * @return object|array
+	 * @return array|WP_Error|false
 	 */
 	public function process_response( $response, $request_args = array(), $request_url = '' ) {
 		if ( ! is_wp_error( $response ) ) {
 			$code = wp_remote_retrieve_response_code( $response );
-			if ( 404 === $code && empty( json_decode( wp_remote_retrieve_body( $response ), true ) ) ) {
+			if ( 404 === $code && '' === trim( wp_remote_retrieve_body( $response ) ) ) {
 				if ( ! WC()->session->get( 'kco_order_missing_reload' ) ) {
 					WC()->session->set( 'kco_order_missing_reload', true );
-					WC()->session->set( 'kco_wc_order_id', '' );
+					WC()->session->__unset( 'kco_wc_order_id' );
 					WC()->session->set( 'reload_checkout', true );
-					return;
+					return false;
 				}
 			}
 		}
