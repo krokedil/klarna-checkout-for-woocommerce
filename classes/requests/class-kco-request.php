@@ -152,17 +152,6 @@ class KCO_Request {
 			// Get the error messages.
 			$errors = json_decode( $body, true );
 			if ( empty( $errors ) ) {
-				// If we get a 404, it might be because the Klarna order was not found. This can happen if the session was lost or if the order was never created.
-				// In this case, we want to clear the session and reload the checkout page, so the customer can try again and hopefully create a new order.
-				// We also add a session variable to make sure we only do this once, to avoid an infinite reload loop if something else is wrong.
-				if ( ! WC()->session->get( 'kco_order_missing_reload' ) && 404 === $code ) {
-					WC()->session->set( 'kco_order_missing_reload', true );
-					WC()->session->set( 'kco_wc_order_id', '' );
-					WC()->session->set( 'reload_checkout', true );
-					return;
-				}
-
-				WC()->session->set( 'kco_order_missing_reload', false );
 				return new WP_Error( $code, 'received empty body', $data );
 			} elseif ( isset( $errors['error_messages'] ) && is_array( $errors['error_messages'] ) ) {
 				foreach ( $errors['error_messages'] as $error ) {
