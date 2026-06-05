@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Improved checkout error handling when a requested Kustom order cannot be found.
