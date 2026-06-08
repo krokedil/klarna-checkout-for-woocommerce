@@ -152,6 +152,21 @@ class KCO_Request {
 			// Get the error messages.
 			$errors = json_decode( $body, true );
 			if ( empty( $errors ) ) {
+				// The reload based recovery only works in the classic checkout, skip it for Store API requests.
+				if ( ! WC()->is_rest_api_request() ) {
+					$reload_attempts = (int) WC()->session->get( 'kco_empty_body_reloads', 0 );
+
+					if ( $reload_attempts < 2 ) {
+						// Likely a transient empty body, reload the checkout and retry instead of failing.
+						WC()->session->set( 'kco_empty_body_reloads', $reload_attempts + 1 );
+						WC()->session->set( 'reload_checkout', true );
+					} else {
+						// The empty body persisted across reloads, stop reloading and show an error instead.
+						KCO_Logger::log( "Received empty body from Kustom after {$reload_attempts} checkout reloads. URL: {$request_url}" );
+						wc_add_notice( __( 'The payment provider is temporarily unavailable. Please wait a moment and try again.', 'klarna-checkout-for-woocommerce' ), 'error' );
+					}
+				}
+
 				return new WP_Error( $code, 'received empty body', $data );
 			} elseif ( isset( $errors['error_messages'] ) && is_array( $errors['error_messages'] ) ) {
 				foreach ( $errors['error_messages'] as $error ) {
@@ -160,6 +175,9 @@ class KCO_Request {
 			}
 			return new WP_Error( $code, "$body $error_message", $data );
 		}
+
+		// Successful response, reset the empty body reload counter.
+		WC()->session->set( 'kco_empty_body_reloads', 0 );
 		return json_decode( $body, true );
 	}
 
