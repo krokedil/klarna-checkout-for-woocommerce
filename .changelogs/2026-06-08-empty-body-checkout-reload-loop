@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where returning customers could get stuck at the checkout when their previous Kustom session had expired.
