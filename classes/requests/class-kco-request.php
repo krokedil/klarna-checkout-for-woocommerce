@@ -194,7 +194,7 @@ class KCO_Request {
 		if ( wc_has_notice( $message, 'error' ) ) {
 			$error_notices = wc_get_notices( 'error' );
 			foreach ( $error_notices as $key => $notice ) {
-				if ( $message === ( $notice['notice'] ?? '' ) ) {
+				if ( ( $notice['notice'] ?? '' ) === $message ) {
 					unset( $error_notices[ $key ] );
 				}
 			}
