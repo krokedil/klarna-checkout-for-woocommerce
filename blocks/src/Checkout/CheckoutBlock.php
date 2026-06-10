@@ -42,7 +42,8 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 	 * @return boolean
 	 */
 	public function is_active() {
-		return 'yes' === $this->get_setting( 'enabled', 'no' );
+		// Includes the advanced demo mode check, requiring the demo mode coupon to be applied to the cart when enabled.
+		return SettingsUtility::is_enabled_with_demo_check();
 	}
 
 	/**

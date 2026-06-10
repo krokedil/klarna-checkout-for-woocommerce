@@ -74,6 +74,28 @@ class KCO_Fields {
 				'default'     => 'yes',
 				'desc_tip'    => true,
 			),
+			'demomode'                   => array(
+				'title'       => __( 'Advanced demo mode', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Enable advanced demo mode', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => sprintf(
+					/* translators: 1: WooCommerce coupon settings link, 2: documentation link */
+					__( 'Only display Kustom Checkout in the checkout when the demo mode coupon has been applied to the cart. Configure coupons in %1$s. For detailed instructions, see the %2$s.', 'klarna-checkout-for-woocommerce' ),
+					'<a target="_blank" href="' . admin_url( 'edit.php?post_type=shop_coupon' ) . '">' . __( 'WooCommerce coupon settings', 'klarna-checkout-for-woocommerce' ) . '</a>',
+					'<a target="_blank" href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/advanced-demo-mode/">' . __( 'documentation', 'klarna-checkout-for-woocommerce' ) . '</a>'
+				),
+				'default'     => 'no',
+				'desc_tip'    => false,
+				'class'       => 'krokedil_conditional_toggler krokedil_toggler_demomode',
+			),
+			'demomode_coupon'            => array(
+				'title'       => __( 'Demo mode coupon', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'text',
+				'description' => __( 'Enter the coupon code that can be used at checkout to activate the advanced demo mode.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'demo-mode',
+				'desc_tip'    => false,
+				'class'       => 'krokedil_conditional_setting krokedil_conditional_demomode',
+			),
 			'logging'                    => array(
 				'title'       => __( 'Logging', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Log debug messages', 'klarna-checkout-for-woocommerce' ),

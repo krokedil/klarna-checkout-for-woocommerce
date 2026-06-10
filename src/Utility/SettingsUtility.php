@@ -57,6 +57,37 @@ class SettingsUtility {
 	}
 
 	/**
+	 * Check if Kustom Checkout is enabled, including the advanced demo mode check.
+	 *
+	 * If the advanced demo mode is enabled, Kustom Checkout is only considered enabled on the
+	 * checkout page when the configured demo mode coupon has been applied to the cart.
+	 *
+	 * @return bool
+	 */
+	public static function is_enabled_with_demo_check() {
+		$is_enabled = wc_string_to_bool( self::get_setting( 'enabled', 'no' ) );
+
+		// Only check for demo mode if we are on the checkout page, and not on the order received page or the pay for order page.
+		if ( ! is_checkout() || is_order_received_page() || is_wc_endpoint_url( 'order-pay' ) ) {
+			return $is_enabled;
+		}
+
+		if ( ! $is_enabled || ! wc_string_to_bool( self::get_setting( 'demomode', 'no' ) ) ) {
+			return $is_enabled;
+		}
+
+		// If the demo mode coupon is not set, the gateway should not be available.
+		$demomode_coupon = self::get_setting( 'demomode_coupon', '' );
+		if ( empty( $demomode_coupon ) ) {
+			return false;
+		}
+
+		// The coupon code is case-sensitive and must match an applied coupon exactly.
+		$applied_coupons = isset( WC()->cart ) ? WC()->cart->get_applied_coupons() : array();
+		return in_array( $demomode_coupon, $applied_coupons, true );
+	}
+
+	/**
 	 * Get the default values for the settings.
 	 *
 	 * @return array

@@ -277,6 +277,11 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return false;
 			}
 
+			// If the advanced demo mode is enabled, the demo mode coupon must be applied to the cart for KCO to be available in the checkout.
+			if ( ! SettingsUtility::is_enabled_with_demo_check() ) {
+				return false;
+			}
+
 			// If we can't retrieve a set of credentials, disable KCO.
 			if ( is_checkout() && ! KCO_WC()->credentials->get_credentials_from_session() ) {
 				return false;

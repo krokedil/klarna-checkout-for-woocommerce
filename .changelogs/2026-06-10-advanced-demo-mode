@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Added Advanced demo mode. When enabled, Kustom Checkout is only displayed in the checkout when the configured demo mode coupon has been applied to the cart. This makes it possible to evaluate Kustom Checkout in a live store without making it available to all customers.
