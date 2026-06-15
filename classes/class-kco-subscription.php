@@ -38,7 +38,7 @@ class KCO_Subscription {
 		add_filter( 'allowed_redirect_hosts', array( $this, 'extend_allowed_domains_list' ) );
 
 		// Since not all metadata is copied to the renewal subscription, we have to manually copy them over.
-		add_action( 'wcs_renewal_order_created', array( $this, 'copy_meta_fields_to_renewal_order' ), 10, 2 );
+		add_filter( 'wcs_renewal_order_created', array( $this, 'copy_meta_fields_to_renewal_order' ), 10, 2 );
 
 		// This is required for non-trial, free subscriptions products to be processed in KCO, since WC Subscriptions does not consider them as needing payment.
 		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'allow_processing_free_subscription' ) );
@@ -489,11 +489,11 @@ class KCO_Subscription {
 	 *
 	 * @param  WC_Order        $renewal_order Woo renewal order.
 	 * @param  WC_Subscription $subscription Woo subscription.
-	 * @return void
+	 * @return WC_Order
 	 */
 	public function copy_meta_fields_to_renewal_order( $renewal_order, $subscription ) {
 		if ( 'kco' !== $subscription->get_payment_method() ) {
-			return;
+			return $renewal_order;
 		}
 
 		$parent = $subscription->get_parent();
@@ -551,6 +551,7 @@ class KCO_Subscription {
 		}
 
 		$renewal_order->save_meta_data();
+		return $renewal_order;
 	}
 
 	/**
