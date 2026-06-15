@@ -42,6 +42,33 @@ class KCO_Request_Update extends KCO_Request {
 	}
 
 	/**
+	 * Checks response for any error, with 404 session-reload handling for missing checkout orders.
+	 *
+	 * @param object $response The response.
+	 * @param array  $request_args The request args.
+	 * @param string $request_url The request URL.
+	 * @return array|WP_Error|false
+	 */
+	public function process_response( $response, $request_args = array(), $request_url = '' ) {
+		if ( ! is_wp_error( $response ) ) {
+			$code = wp_remote_retrieve_response_code( $response );
+			if ( 404 === $code && '' === trim( wp_remote_retrieve_body( $response ) ) ) {
+				if ( ! WC()->session->get( 'kco_order_missing_reload' ) ) {
+					WC()->session->set( 'kco_order_missing_reload', true );
+					WC()->session->__unset( 'kco_wc_order_id' );
+					WC()->session->set( 'reload_checkout', true );
+					return false;
+				}
+			}
+		}
+		$result = parent::process_response( $response, $request_args, $request_url );
+		if ( is_array( $result ) ) {
+			WC()->session->set( 'kco_order_missing_reload', false );
+		}
+		return $result;
+	}
+
+	/**
 	 * Gets the request body.
 	 *
 	 * @param string $order_id The WooCommerce order id.
