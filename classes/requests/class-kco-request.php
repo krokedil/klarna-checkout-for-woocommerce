@@ -145,14 +145,39 @@ class KCO_Request {
 
 		$body = wp_remote_retrieve_body( $response );
 		$code = wp_remote_retrieve_response_code( $response );
+
 		// Check the status code, if its not between 200 and 299 then its an error.
 		if ( $code < 200 || $code > 299 ) {
-			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $this->sanitize_request_args( $request_args ) );
+			$data          = "URL: {$request_url} - " . wp_json_encode( $this->sanitize_request_args( $request_args ) );
 			$error_message = '';
 			// Get the error messages.
 			$errors = json_decode( $body, true );
 			if ( empty( $errors ) ) {
-				return new WP_Error( $code, 'received empty body', $data );
+				// No customer facing message while we silently retry. Blocks print the WP_Error message, so keep it empty until we give up.
+				$message = '';
+
+				// Both the classic and block checkout reload on this flag, limit the reloads so a persistent empty body can't loop forever.
+				$reload_attempts = (int) WC()->session->get( 'kco_empty_body_reloads', 0 );
+
+				// It typically requires three reloads for a session to be properly set up. Hence why we picked three attempts before giving up and showing the error message to the customer.
+				if ( $reload_attempts < 3 ) {
+					// Likely a transient empty body, reload the checkout and retry instead of failing.
+					WC()->session->set( 'kco_empty_body_reloads', $reload_attempts + 1 );
+					WC()->session->set( 'reload_checkout', true );
+				} else {
+					// The empty body persisted across reloads, stop reloading and show a customer facing message.
+					KCO_Logger::log( "Received empty body from Kustom after {$reload_attempts} checkout reloads. URL: {$request_url}" );
+					// Blocks print the WP_Error message themselves, so only set it for the classic checkout to keep it hidden in blocks.
+					if ( ! WC()->is_rest_api_request() ) {
+						$message = __( 'The payment provider is temporarily unavailable. Please wait a moment and try again.', 'klarna-checkout-for-woocommerce' );
+						if ( ! wc_has_notice( $message, 'error' ) ) {
+							wc_add_notice( $message, 'error' );
+						}
+					}
+				}
+
+				// The error code identifies the empty body case, the message is the customer facing text.
+				return new WP_Error( 'received_empty_body', $message, $data );
 			} elseif ( isset( $errors['error_messages'] ) && is_array( $errors['error_messages'] ) ) {
 				foreach ( $errors['error_messages'] as $error ) {
 					$error_message = "$error_message  $error";
@@ -160,6 +185,24 @@ class KCO_Request {
 			}
 			return new WP_Error( $code, "$body $error_message", $data );
 		}
+
+		// Successful response, reset the empty body reload counter.
+		WC()->session->set( 'kco_empty_body_reloads', 0 );
+
+		// Kustom responded, clear any empty body notice that was shown before the checkout recovered.
+		$message = __( 'The payment provider is temporarily unavailable. Please wait a moment and try again.', 'klarna-checkout-for-woocommerce' );
+		if ( wc_has_notice( $message, 'error' ) ) {
+			$error_notices = wc_get_notices( 'error' );
+			foreach ( $error_notices as $key => $notice ) {
+				if ( ( $notice['notice'] ?? '' ) === $message ) {
+					unset( $error_notices[ $key ] );
+				}
+			}
+			$all_notices          = wc_get_notices();
+			$all_notices['error'] = array_values( $error_notices );
+			wc_set_notices( $all_notices );
+		}
+
 		return json_decode( $body, true );
 	}
 

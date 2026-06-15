@@ -559,6 +559,11 @@ function is_kco_confirmation() {
  * @return void
  */
 function kco_print_error_message( $wp_error ) {
+	// The empty body case adds its own customer facing message on give-up, don't also print it here.
+	if ( 'received_empty_body' === $wp_error->get_error_code() ) {
+		return;
+	}
+
 	if ( is_ajax() ) {
 		wc_add_notice( $wp_error->get_error_message(), 'error' );
 	} else {
