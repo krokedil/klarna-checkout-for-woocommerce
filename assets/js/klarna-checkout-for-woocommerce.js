@@ -521,15 +521,6 @@ jQuery( function ( $ ) {
 
 			$("#kco_shipping_data").val(serializedData)
 
-			// If checkout or update fails, restore the previous value so the guard doesn't block a retry.
-			// Namespace + off() prevents stale handlers from a previous successful updateShipping call surviving
-			// to restore an outdated value on an unrelated later checkout_error.
-			$( "body" )
-				.off( "checkout_error.kcoUpdateShipping" )
-				.one( "checkout_error.kcoUpdateShipping", function () {
-					$( "#kco_shipping_data" ).val( current )
-				} )
-
 			$( "body" ).trigger( "kco_shipping_option_changed", [ data ] )
 			$( "body" ).trigger( "update_checkout" )
 		},
