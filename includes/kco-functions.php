@@ -675,7 +675,7 @@ function kco_validate_order_total( $klarna_order, $order ) {
 	$order_total = $order->get_total();
 
 	// Convert the WC Order total to be in minor units with zero decimal places.
-	$order_total = wc_format_decimal( $order_total * 100, array( 'decimals' => 0 ) );
+	$order_total = wc_format_decimal( $order_total * 100, 0 );
 
 	// Get the difference between the two.
 	$diff = abs( $klarna_order_total - $order_total );
@@ -684,8 +684,8 @@ function kco_validate_order_total( $klarna_order, $order ) {
 	if ( $diff > 1 ) {
 		KCO_Logger::log( 'Order total mismatch. Kustom Order total: ' . $klarna_order_total . ' WC Order total: ' . $order_total . ' Kustom order ID: ' . $klarna_order['order_id'] . ' WC Order ID: ' . $order->get_id() );
 
-		$klarna_order_total = wc_format_decimal( $klarna_order_total / 100, array( 'decimals' => 2 ) );
-		$order_total        = wc_format_decimal( $order_total / 100, array( 'decimals' => 2 ) );
+		$klarna_order_total = wc_format_decimal( $klarna_order_total / 100, 2 );
+		$order_total        = wc_format_decimal( $order_total / 100, 2 );
 
 		// translators: 1: Kustom order total, 2: WooCommerce order total.
 		$order->set_status(
