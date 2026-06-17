@@ -230,6 +230,11 @@ abstract class CheckoutFlow {
 		}
 
 		foreach ( $order->get_items( 'shipping' ) as $shipping_line ) {
+			/**
+			 * Shipping line item.
+			 *
+			 * @var \WC_Order_Item_Shipping $shipping_line
+			 */
 			$instance_id = $shipping_line->get_instance_id();
 			$rate_id     = $instance_id ? $shipping_line->get_method_id() . ':' . $instance_id : $shipping_line->get_method_id();
 
@@ -239,12 +244,12 @@ abstract class CheckoutFlow {
 
 			$pickup_points_json = $shipping_line->get_meta( 'krokedil_pickup_points' );
 			if ( empty( $pickup_points_json ) ) {
-				return;
+				continue;
 			}
 
 			$pickup_points = json_decode( $pickup_points_json, true );
 			if ( ! is_array( $pickup_points ) ) {
-				return;
+				continue;
 			}
 
 			foreach ( $pickup_points as $pickup_point ) {
@@ -254,11 +259,8 @@ abstract class CheckoutFlow {
 
 				$shipping_line->update_meta_data( 'krokedil_selected_pickup_point_id', $pickup_point['id'] );
 				$shipping_line->update_meta_data( 'krokedil_selected_pickup_point', wp_json_encode( $pickup_point ) );
-				$shipping_line->save();
-				return;
+				break;
 			}
-
-			return;
 		}
 	}
 
