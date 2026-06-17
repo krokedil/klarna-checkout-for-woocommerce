@@ -25,3 +25,4 @@ nightwatch.conf.js
 
 .changelogs/backup-*
 *.bak
+tmp*
