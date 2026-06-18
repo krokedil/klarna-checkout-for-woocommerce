@@ -732,6 +732,8 @@ class KCO_Subscription {
 	public function extend_allowed_domains_list( $hosts ) {
 		$hosts[] = 'pay.playground.klarna.com';
 		$hosts[] = 'pay.klarna.com';
+		$hosts[] = 'pay.playground.kustom.co';
+		$hosts[] = 'pay.kustom.co';
 		return $hosts;
 	}
 }
