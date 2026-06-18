@@ -35,7 +35,13 @@ function kco_create_or_update_order() {
 				return;
 			}
 			WC()->session->set( 'kco_wc_order_id', $klarna_order['order_id'] );
+			set_transient( "kustom_customer_id_{$klarna_order['order_id']}", WC()->session->get_customer_id(), WEEK_IN_SECONDS * 2 );
 			return $klarna_order;
+		}
+
+		// Ensure the transient is set correctly and updated with the customer id in case the order was updated or the customer was logged in after the order was created.
+		if ( ! empty( $klarna_order['order_id'] ) ) {
+			set_transient( "kustom_customer_id_{$klarna_order['order_id']}", WC()->session->get_customer_id(), WEEK_IN_SECONDS * 2 );
 		}
 		return $klarna_order;
 	} else {
@@ -45,6 +51,7 @@ function kco_create_or_update_order() {
 			return;
 		}
 		WC()->session->set( 'kco_wc_order_id', $klarna_order['order_id'] );
+		set_transient( "kustom_customer_id_{$klarna_order['order_id']}", WC()->session->get_customer_id(), WEEK_IN_SECONDS * 2 );
 		return $klarna_order;
 	}
 }
@@ -936,6 +943,49 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 	KCO_Logger::Log( "Set chosen shipping method for $klarna_order_id " . wp_json_encode( $chosen_shipping_methods ) );
 
 	WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
+
+	// Maybe set the selected pickup point as well from the chosen shipping method if it exists.
+	kco_maybe_set_selected_pickup_point( $klarna_order );
+}
+
+/**
+ * Maybe set the pickup point for the Klarna order if it exists.
+ *
+ * @param array $klarna_order The Klarna order data.
+ * @return void
+ */
+function kco_maybe_set_selected_pickup_point( $klarna_order ) {
+	if ( ! is_array( $klarna_order ) ) {
+		return;
+	}
+
+	// If we have delivery_details and pickup_location set.
+	if ( isset( $klarna_order['selected_shipping_option']['delivery_details']['pickup_location'] ) ) {
+		$shipping_method_id = $klarna_order['selected_shipping_option']['id'];
+		$pickup_location    = $klarna_order['selected_shipping_option']['delivery_details']['pickup_location'];
+
+		// Get the selected shipping rate from the session.
+		$shipping_methods = WC()->cart->get_shipping_methods() ?? array();
+		foreach ( $shipping_methods as $method ) {
+			if ( $method->get_id() !== $shipping_method_id ) {
+				continue;
+			}
+
+			// If the method has pickup points set and the selected pickup location exists, set the selected pickup point.
+			$selected_pickup_point = KCO_WC()->pickup_points->get_pickup_point_from_rate_by_id( $method, $pickup_location['id'] );
+			if ( ! empty( $selected_pickup_point ) ) {
+
+				// If the selected pickup point is already the same as we have saved, return.
+				$saved_pickup_point = KCO_WC()->pickup_points->get_selected_pickup_point_from_rate( $method );
+				if ( ! empty( $saved_pickup_point ) && $saved_pickup_point->get_id() === $selected_pickup_point->get_id() ) {
+					return;
+				}
+
+				KCO_WC()->pickup_points->save_selected_pickup_point_to_rate( $method, $selected_pickup_point );
+				return;
+			}
+		}
+	}
 }
 
 /**

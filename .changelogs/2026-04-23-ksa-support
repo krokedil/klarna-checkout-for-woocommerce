@@ -1,0 +1,4 @@
+Type: Enhancement
+Needs Documentation: yes
+
+Added support for Kustom Shipping Assistant (KSA). The plugin now registers a pickup points service and sets the selected pickup point from the Klarna order's shipping data when available. The WooCommerce customer ID is also stored as a transient tied to the Klarna order ID to support KSA order flows.

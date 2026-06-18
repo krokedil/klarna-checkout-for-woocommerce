@@ -8,7 +8,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-06-04 09:19+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -17,24 +16,24 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:145, ../klarna-checkout-for-woocommerce.php:155
+#: ../klarna-checkout-for-woocommerce.php:153, ../klarna-checkout-for-woocommerce.php:163
 msgid "Nope"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:201
+#: ../klarna-checkout-for-woocommerce.php:209
 msgid "Settings"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:202
+#: ../klarna-checkout-for-woocommerce.php:210
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:419, ../klarna-checkout-for-woocommerce.php:429
+#: ../klarna-checkout-for-woocommerce.php:428, ../klarna-checkout-for-woocommerce.php:438
 msgid "Your installation of Kustom Checkout for WooCommerce is not complete. If you installed this plugin directly from Github please refer to the README.DEV.md file in the plugin."
 msgstr ""
 
 #. translators: Kustom order ID.
-#: ../classes/class-kco-api-callbacks.php:106, ../includes/kco-functions.php:639
+#: ../classes/class-kco-api-callbacks.php:106, ../includes/kco-functions.php:646
 msgid "Kustom order is under review, order ID: %s."
 msgstr ""
 
@@ -42,7 +41,7 @@ msgstr ""
 msgid "Kustom Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:99, ../includes/kco-functions.php:631
+#: ../classes/class-kco-api-callbacks.php:99, ../includes/kco-functions.php:638
 msgid "Payment via Kustom Checkout, order ID: %s"
 msgstr ""
 
@@ -456,7 +455,7 @@ msgstr ""
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:50, ../classes/class-kco-gateway.php:888, ../classes/class-kco-gateway.php:890, ../classes/class-kco-gateway.php:892, ../classes/class-kco-gateway.php:894, ../includes/admin/views/status-report.php:17
+#: ../classes/class-kco-gateway.php:50, ../classes/class-kco-gateway.php:891, ../classes/class-kco-gateway.php:893, ../classes/class-kco-gateway.php:895, ../classes/class-kco-gateway.php:897, ../includes/admin/views/status-report.php:17
 msgid "Kustom Checkout"
 msgstr ""
 
@@ -473,40 +472,40 @@ msgid "The Kustom order could not be retrieved from the session. Please try agai
 msgstr ""
 
 #. translators: %s is the field name.
-#: ../classes/class-kco-gateway.php:203
+#: ../classes/class-kco-gateway.php:206
 msgid "Billing %s does not match Kustom order."
 msgstr ""
 
 #. translators: %s is the field name.
-#: ../classes/class-kco-gateway.php:215
+#: ../classes/class-kco-gateway.php:218
 msgid "Shipping %s does not match Kustom order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:301
+#: ../classes/class-kco-gateway.php:304
 msgid "Could not load the enhanced settings page. Showing the standard settings instead."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:418
+#: ../classes/class-kco-gateway.php:421
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:421
+#: ../classes/class-kco-gateway.php:424
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:601
+#: ../classes/class-kco-gateway.php:604
 msgid "Order address should not be changed and any changes you make will not be reflected in Kustom system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:660
+#: ../classes/class-kco-gateway.php:663
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:682, ../classes/class-kco-gateway.php:704
+#: ../classes/class-kco-gateway.php:685, ../classes/class-kco-gateway.php:707
 msgid "Reference:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:785
+#: ../classes/class-kco-gateway.php:788
 msgid "Kustom did not accept the new order amount, the order has not been updated"
 msgstr ""
 
@@ -531,19 +530,19 @@ msgstr ""
 msgid "Subscription payment made with Kustom. Kustom order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:582
+#: ../classes/class-kco-subscription.php:583
 msgid "Kustom recurring token"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:637
+#: ../classes/class-kco-subscription.php:638
 msgid "Could not retrieve new Kustom recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:631
+#: ../classes/class-kco-subscription.php:632
 msgid "Payment method changed via Kustom Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:658
+#: ../classes/class-kco-subscription.php:659
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -551,34 +550,34 @@ msgstr ""
 msgid "Kustom Checkout is not available. Please choose a different payment option or contact the store for assistance."
 msgstr ""
 
-#: ../includes/kco-functions.php:168
+#: ../includes/kco-functions.php:175
 msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:650
+#: ../includes/kco-functions.php:657
 msgid "Waiting for verification from Kustom's push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:645
+#: ../includes/kco-functions.php:652
 msgid "Kustom Checkout order was rejected"
 msgstr ""
 
 #. translators: 1: Kustom order total, 2: WooCommerce order total.
-#: ../includes/kco-functions.php:695
+#: ../includes/kco-functions.php:702
 msgid "Kustom order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Kustom before processing."
 msgstr ""
 
-#: ../includes/kco-functions.php:725
+#: ../includes/kco-functions.php:732
 msgid "A mismatch between the WooCommerce and Kustom orders was identified. Please verify the order in the Kustom merchant portal before processing."
 msgstr ""
 
 #. translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
-#: ../includes/kco-functions.php:776
+#: ../includes/kco-functions.php:783
 msgid "The product \"%1$s\" has a quantity mismatch. Expected %2$d found %3$d."
 msgstr ""
 
 #. translators: %s: Product name.
-#: ../includes/kco-functions.php:786
+#: ../includes/kco-functions.php:793
 msgid "The product \"%s\" was not found in the Kustom order."
 msgstr ""
 
@@ -648,7 +647,7 @@ msgstr ""
 msgid "Klarna order not found or an error occurred."
 msgstr ""
 
-#: ../src/CheckoutFlow/CheckoutFlow.php:218
+#: ../src/CheckoutFlow/CheckoutFlow.php:278
 msgid "There was an error processing your payment. Please try again."
 msgstr ""
 
@@ -782,6 +781,7 @@ msgstr ""
 msgid "Klarna order has not been captured and cannot be refunded."
 msgstr ""
 
+#. translators: %s Klarna error message.
 #. translators: %s Klarna error message.
 #: ../src/OrderManagement/OrderManagement.php:523, ../src/OrderManagement/OrderManagement.php:563
 msgid "Could not refund Klarna order. %s."

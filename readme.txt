@@ -5,7 +5,7 @@ Donate link: https://kustom.co
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.4
-WC requires at least: 5.6.0
+WC requires at least: 9.7.0
 WC tested up to: 10.8.1
 Stable tag: 2.20.5
 License: GPLv3 or later
