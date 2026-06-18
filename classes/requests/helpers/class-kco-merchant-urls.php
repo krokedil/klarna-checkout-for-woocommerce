@@ -104,10 +104,29 @@ class KCO_Merchant_URLs {
 				'kco-action'      => 'push',
 				'kco_wc_order_id' => '{checkout.order.id}',
 			),
-			home_url( '/wc-api/KCO_WC_Push/' )
+			$this->align_host_to_checkout( home_url( '/wc-api/KCO_WC_Push/' ) )
 		);
 
 		return apply_filters( 'kco_wc_push_url', $push_url );
+	}
+
+	/**
+	 * Callback host alignment.
+	 *
+	 * Aligns a home_url based callback host to the checkout host. Required for Polylang Pro multidomain, where home_url is not language-resolved and falls back to the primary domain. Returns the URL unchanged when the hosts already match.
+	 *
+	 * @param string $url The callback URL.
+	 * @return string
+	 */
+	private function align_host_to_checkout( $url ) {
+		$checkout_host = wp_parse_url( wc_get_checkout_url(), PHP_URL_HOST );
+		$url_host      = wp_parse_url( $url, PHP_URL_HOST );
+
+		if ( empty( $checkout_host ) || empty( $url_host ) || $checkout_host === $url_host ) {
+			return $url;
+		}
+
+		return str_replace( '://' . $url_host, '://' . $checkout_host, $url );
 	}
 
 	/**
