@@ -158,7 +158,8 @@ class KCO_Request {
 					$error_message = "$error_message  $error";
 				}
 			}
-			return new WP_Error( $code, "$body $error_message", $data );
+			$message = ! empty( $error_message ) ? trim( $error_message ) : $body;
+			return new WP_Error( $code, $message, $data );
 		}
 		return json_decode( $body, true );
 	}
