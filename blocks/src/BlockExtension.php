@@ -47,25 +47,27 @@ class BlockExtension {
 	 * @return void
 	 */
 	public function init_checkout_block() {
-		// Register woocommerce_blocks_loaded callbacks immediately — this action fires
-		// during plugins_loaded so hooks must be registered before it fires.
-		add_action( 'woocommerce_blocks_loaded', array( $this, 'register_callbacks' ) );
-		add_action( 'woocommerce_blocks_loaded', array( $this, 'register_method' ) );
+		if ( function_exists( 'woocommerce_store_api_register_update_callback' ) ) {
+			// Register woocommerce_blocks_loaded callbacks immediately — this action fires
+			// during plugins_loaded so hooks must be registered before it fires.
+			add_action( 'woocommerce_blocks_loaded', array( $this, 'register_callbacks' ) );
+			add_action( 'woocommerce_blocks_loaded', array( $this, 'register_method' ) );
 
-		// Defer the is_checkout_block_enabled() check to init so wc_get_page_id() is not
-		// called before WordPress has initialized — prevents _doing_it_wrong notices in
-		// WP 6.7+ from third-party plugins that call is_page() or load text domains early.
-		add_action(
-			'init',
-			function () {
-				if ( ! BlocksUtility::is_checkout_block_enabled() ) {
-					return;
-				}
-				$this->overrides    = new Overrides();
-				$this->api_registry = new Registry();
-			},
-			5
-		);
+			// Defer the is_checkout_block_enabled() check to init so wc_get_page_id() is not
+			// called before WordPress has initialized — prevents _doing_it_wrong notices in
+			// WP 6.7+ from third-party plugins that call is_page() or load text domains early.
+			add_action(
+				'init',
+				function () {
+					if ( ! BlocksUtility::is_checkout_block_enabled() ) {
+						return;
+					}
+					$this->overrides    = new Overrides();
+					$this->api_registry = new Registry();
+				},
+				5
+			);
+		}
 	}
 
 	/**
