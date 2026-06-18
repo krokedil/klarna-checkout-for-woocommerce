@@ -25,7 +25,6 @@ jQuery( function ( $ ) {
 		// True or false if we need to update the Kustom order. Set to false on initial page load.
 		klarnaUpdateNeeded: false,
 		shippingEmailExists: false,
-		shippingPhoneExists: false,
 
 		// True when the KCO iframe is currently suspended, to prevent double-suspend calls.
 		suspended: false,
@@ -246,9 +245,6 @@ jQuery( function ( $ ) {
 							$( "div#wc_checkout_add_ons" ).appendTo( "#kco-extra-checkout-fields" )
 						}
 					} else if ( 0 < $( "p#" + name + "_field" ).length ) {
-						if ( name === "shipping_phone" ) {
-							kco_wc.shippingPhoneExists = true
-						}
 						if ( name === "shipping_email" ) {
 							kco_wc.shippingEmailExists = true
 						}
@@ -431,13 +427,11 @@ jQuery( function ( $ ) {
 					"country" in data.shipping_address ? data.shipping_address.country.toUpperCase() : "",
 				)
 				$( "#shipping_state" ).val( "region" in data.shipping_address ? data.shipping_address.region : "" )
+				$( "#shipping_phone" ).val( "phone" in data.shipping_address ? data.shipping_address.phone : "" )
 
-				// extra shipping fields (email, phone).
+				// extra shipping fields (email).
 				if ( kco_wc.shippingEmailExists === true && $( "#shipping_email" ) ) {
 					$( "#shipping_email" ).val( "email" in data.shipping_address ? data.shipping_address.email : "" )
-				}
-				if ( kco_wc.shippingPhoneExists === true && $( "#shipping_phone" ) ) {
-					$( "#shipping_phone" ).val( "phone" in data.shipping_address ? data.shipping_address.phone : "" )
 				}
 			}
 		},

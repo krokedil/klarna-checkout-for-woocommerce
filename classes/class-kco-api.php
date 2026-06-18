@@ -95,6 +95,22 @@ class KCO_API {
 					exit;
 				}
 			}
+
+			// Handle BAD_VALUE purchase_currency mismatch (e.g. customer changes country to one incompatible with the store currency).
+			if ( is_array( $error ) && 'BAD_VALUE' === ( $error['error_code'] ?? false ) ) {
+				$has_currency_error = false;
+				foreach ( $error['error_messages'] ?? array() as $message ) {
+					if ( false !== strpos( $message, 'purchase_currency' ) ) {
+						$has_currency_error = true;
+						break;
+					}
+				}
+				if ( $has_currency_error ) {
+					WC()->session->set( 'reload_checkout', true );
+					KCO_Logger::log( 'Klarna BAD_VALUE purchase_currency mismatch for order ' . $klarna_order_id . '. Reloading checkout.' );
+					return false;
+				}
+			}
 		}
 
 		return $this->check_for_api_error( $response );

@@ -3,11 +3,11 @@ Contributors: kustom, krokedil, automattic
 Tags: woocommerce, ecommerce, e-commerce, checkout, klarna
 Donate link: https://kustom.co
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
 WC requires at least: 9.7.0
-WC tested up to: 10.7.0
-Stable tag: 2.20.0
+WC tested up to: 10.8.1
+Stable tag: 2.20.5
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,10 +36,10 @@ Installment, revolving and other flexible financing plans let customers pay when
 * Get your store approved by Kustom, and start selling.
 
 == Installation ==
-1. Upload plugin folder to to the "/wp-content/plugins/" directory.
+1. Upload plugin folder to the "/wp-content/plugins/" directory.
 2. Activate the plugin through the "Plugins" menu in WordPress.
 3. Go WooCommerce Settings –> Payment Gateways and configure your Kustom Checkout settings.
-4. Read more about the configuration process in the [plugin documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
+4. Read more about the configuration process in the [plugin documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 
 == Frequently Asked Questions ==
@@ -47,9 +47,32 @@ Installment, revolving and other flexible financing plans let customers pay when
 Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria, the Netherlands, UK and United States.
 
 = Where can I find Kustom Checkout for WooCommerce documentation? =
-For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
+For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-06-04    - version 2.20.5 =
+* Fix           - Corrected handling of the shipping phone field in Checkout Blocks to align with changes introduced in WooCommerce 10.8.0.
+
+= 2026-06-02    - version 2.20.4 =
+* Enhancement   - [Support] Explicitly disabled autoloading the system report option to prevent it from being loaded on every request, as it is only needed when issuing a request, and viewing the system report.
+* Fix           - [Support] The $form_field variable can sometimes be missing keys that are available in the $setting array when "MU"-plugins are used. Added a check to ensure that the keys exist in both arrays before attempting to access them, preventing potential undefined key errors.
+* Fix           - Update links in README
+* Fix           - Fixed an issue that could allow customers from unsupported countries to complete checkout and place an order.
+* Tweak         - The integrated order management now uses the same logging file and logging setting as the rest of Kustom Checkout for WooCommerce.
+
+= 2026-05-28    - version 2.20.3 =
+* Fix           - Resolved a potential checkout error introduced by WooCommerce 10.8.0, where shipping phone became a required field. The shipping phone value is now populated as needed.
+
+= 2026-05-18    - version 2.20.2 =
+* Enhancement   - When multiple payment methods are used, the fallback logo has been changed from Klarna to Kustom.
+* Enhancement   - Added WPML configuration file for improved multilingual compatibility.
+* Fix           - Fixed an issue where the manual order management action dropdown would render incorrectly in the order metabox.
+
+= 2026-05-05    - version 2.20.1 =
+* Fix           - Fixed a critical error when attempting to renew an orphaned subscription.
+* Fix           - Addressed an undefined shipping_company array warning.
+* Fix           - Fixed PHP notices appearing on every page load in WordPress 6.7+ caused by the checkout block being initialized too early (thanks @Dekadinious).
+
 = 2026-04-27    - version 2.20.0 =
 * Feature       - Added the 'kco_checkbox_changed' action hook. This action is triggered whenever the customer toggles the checkbox.
 * Enhancement   - Enhanced error handling for the settings page package, to prevent fatal errors and provide clearer feedback when errors occur.

@@ -2,7 +2,6 @@
 namespace Krokedil\KustomCheckout\OrderManagement\Request;
 
 use Krokedil\KustomCheckout\OrderManagement;
-use Krokedil\KustomCheckout\OrderManagement\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -331,7 +330,7 @@ abstract class Request {
 				break;
 			}
 		}
-		$log = Logger::format_log( $this->klarna_order_id, $this->method, $this->log_title, $request_args, $response, $code );
-		Logger::log( $log, $this->order_management, $this->order_id );
+		$log = \KCO_Logger::format_log( $this->klarna_order_id, $this->method, $this->log_title, $request_args, $response, $code );
+		\KCO_Logger::log( $log );
 	}
 }

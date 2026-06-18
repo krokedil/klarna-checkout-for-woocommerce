@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Addressed an undefined shipping_company array warning.

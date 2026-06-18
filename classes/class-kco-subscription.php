@@ -38,7 +38,7 @@ class KCO_Subscription {
 		add_filter( 'allowed_redirect_hosts', array( $this, 'extend_allowed_domains_list' ) );
 
 		// Since not all metadata is copied to the renewal subscription, we have to manually copy them over.
-		add_action( 'wcs_renewal_order_created', array( $this, 'copy_meta_fields_to_renewal_order' ), 10, 2 );
+		add_filter( 'wcs_renewal_order_created', array( $this, 'copy_meta_fields_to_renewal_order' ), 10, 2 );
 
 		// This is required for non-trial, free subscriptions products to be processed in KCO, since WC Subscriptions does not consider them as needing payment.
 		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'allow_processing_free_subscription' ) );
@@ -306,14 +306,24 @@ class KCO_Subscription {
 
 					// Do not overwrite any existing phone number in case the customer has changed payment method (and thus shipping details).
 					if ( empty( $subscription->get_shipping_phone() ) ) {
-
-						// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
-						if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
-							$subscription->set_shipping_phone( $kco_order['shipping_address']['phone'] );
-						} else {
-							$subscription->update_meta_data( '_shipping_phone', $kco_order['shipping_address']['phone'] );
+						$shipping_phone = $kco_order['shipping_address']['phone'] ?? $kco_order['billing_address']['phone'] ?? '';
+						if ( ! empty( $shipping_phone ) ) {
+							// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
+							if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
+								$subscription->set_shipping_phone( sanitize_text_field( $shipping_phone ) );
+							} else {
+								$subscription->update_meta_data( '_shipping_phone', sanitize_text_field( $shipping_phone ) );
+							}
 						}
 					}
+
+					if ( empty( $subscription->get_meta( '_shipping_email' ) ) ) {
+						$shipping_email = $kco_order['shipping_address']['email'] ?? $kco_order['billing_address']['email'] ?? '';
+						if ( ! empty( $shipping_email ) ) {
+							$subscription->update_meta_data( '_shipping_email', sanitize_text_field( $shipping_email ) );
+						}
+					}
+
 					$subscription->save();
 				}
 
@@ -479,11 +489,11 @@ class KCO_Subscription {
 	 *
 	 * @param  WC_Order        $renewal_order Woo renewal order.
 	 * @param  WC_Subscription $subscription Woo subscription.
-	 * @return void
+	 * @return WC_Order
 	 */
 	public function copy_meta_fields_to_renewal_order( $renewal_order, $subscription ) {
 		if ( 'kco' !== $subscription->get_payment_method() ) {
-			return;
+			return $renewal_order;
 		}
 
 		$parent = $subscription->get_parent();
@@ -541,6 +551,7 @@ class KCO_Subscription {
 		}
 
 		$renewal_order->save_meta_data();
+		return $renewal_order;
 	}
 
 	/**
@@ -698,11 +709,15 @@ class KCO_Subscription {
 		$subscription->set_shipping_city( $klarna_order['shipping_address']['city'] );
 
 		// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
+		$shipping_phone = $klarna_order['shipping_address']['phone'] ?? $klarna_order['billing_address']['phone'] ?? '';
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
-			$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
+			$subscription->set_shipping_phone( sanitize_text_field( $shipping_phone ) );
 		} else {
-			$subscription->update_meta_data( '_shipping_phone', $klarna_order['shipping_address']['phone'] );
+			$subscription->update_meta_data( '_shipping_phone', sanitize_text_field( $shipping_phone ) );
 		}
+
+		$shipping_email = $klarna_order['shipping_address']['email'] ?? $klarna_order['billing_address']['email'] ?? '';
+		$subscription->update_meta_data( '_shipping_email', sanitize_text_field( $shipping_email ) );
 
 		$subscription->save();
 	}
@@ -717,6 +732,8 @@ class KCO_Subscription {
 	public function extend_allowed_domains_list( $hosts ) {
 		$hosts[] = 'pay.playground.klarna.com';
 		$hosts[] = 'pay.klarna.com';
+		$hosts[] = 'pay.playground.kustom.co';
+		$hosts[] = 'pay.kustom.co';
 		return $hosts;
 	}
 }
