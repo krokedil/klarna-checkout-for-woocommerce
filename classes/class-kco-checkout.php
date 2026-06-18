@@ -222,6 +222,11 @@ class KCO_Checkout {
 			return $wc_result;
 		}
 
+		// If the order is pending an upsell, we should return false here, since it should be treated as paid.
+		if ( 'yes' === $order->get_meta( '_kco_upsell_flow' ) ) {
+			return false;
+		}
+
 		// If we are on the order-received page, we don't need to change anything.
 		if ( is_wc_endpoint_url( 'order-received' ) ) {
 			return $wc_result;
