@@ -1,5 +1,5 @@
 /**
- * Wordpress/WooCommerce dependencies
+ * WordPress/WooCommerce dependencies
  */
 import { select } from '@wordpress/data';
 
@@ -22,9 +22,9 @@ export const getElementsToHide = (shippingInIframe: boolean): string[] => {
 };
 
 /**
- * Test if Kustom Checkout is the only available payment method in the checkout.
+ * Test if Kustom Checkout is the only available Gateway in the checkout.
  *
- * @return {boolean} - True if Kustom Checkout is the only available payment method, false otherwise.
+ * @return {boolean} - True if Kustom Checkout is the only available Gateway, false otherwise.
  */
 export const isKcoOnlyAvailableGateway = (): boolean => {
 	const paymentStore = select('wc/store/payment');
