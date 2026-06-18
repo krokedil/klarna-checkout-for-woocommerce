@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: no
+
+Checkout error log entries now include the error type and HTTP status code, making it faster to diagnose failed orders.

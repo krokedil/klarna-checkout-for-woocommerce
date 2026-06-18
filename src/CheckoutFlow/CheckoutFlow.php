@@ -24,9 +24,16 @@ abstract class CheckoutFlow {
 			$message = __( 'Invalid order ID.', 'klarna-checkout-for-woocommerce' );
 			throw new Exception( esc_html( $message ) );
 		}
-		$handler = self::get_handler();
+		$handler         = self::get_handler();
+		$kustom_order_id = $order->get_meta( '_wc_klarna_order_id', true );
+		if ( empty( $kustom_order_id ) && WC()->session ) {
+			$kustom_order_id = WC()->session->get( 'kco_wc_order_id' );
+		}
+		if ( empty( $kustom_order_id ) ) {
+			$kustom_order_id = 'N/A';
+		}
 
-		\KCO_Logger::log( sprintf( 'Processing order %s|%s with flow %s.', $order->get_id(), $order->get_order_number(), get_class( $handler ) ) );
+		\KCO_Logger::log( \sprintf( 'Processing order %s|%s (Kustom ID: %s) with flow %s.', $order->get_id(), $order->get_order_number(), $kustom_order_id, \get_class( $handler ) ) );
 
 		return $handler->process( $order );
 	}
