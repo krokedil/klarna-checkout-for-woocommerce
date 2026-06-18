@@ -1,0 +1,28 @@
+<wpml-config>
+    <!--
+        Klarna/Kustom Checkout for WooCommerce — WPML configuration.
+
+        Only the four admin-editable strings that are shown to the customer
+        are registered. Everything else in woocommerce_kco_settings (API
+        credentials, environment flags, colors, layout selects, checkboxes)
+        is intentionally excluded: those values are technical configuration
+        and must remain identical across languages.
+
+        Order meta (Klarna order IDs, recurring tokens, capture IDs, hashes,
+        URLs, etc.) is not registered: WooCommerce orders are not translated
+        under WCML, and these values are per-order opaque identifiers that
+        must never be modified by the translation layer.
+    -->
+    <admin-texts>
+        <key name="woocommerce_kco_settings">
+            <!-- Payment method title shown at checkout. -->
+            <key name="title" />
+            <!-- Payment method description shown at checkout. -->
+            <key name="description" />
+            <!-- "Select another payment method" button text on the KCO checkout page. -->
+            <key name="select_another_method_text" />
+            <!-- Shipping note shown to the customer on the thank-you page. -->
+            <key name="shipping_details" />
+        </key>
+    </admin-texts>
+</wpml-config>

@@ -7,7 +7,7 @@ Tested up to: 6.9
 Requires PHP: 7.4
 WC requires at least: 5.6.0
 WC tested up to: 10.7.0
-Stable tag: 2.20.1
+Stable tag: 2.20.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,10 +36,10 @@ Installment, revolving and other flexible financing plans let customers pay when
 * Get your store approved by Kustom, and start selling.
 
 == Installation ==
-1. Upload plugin folder to to the "/wp-content/plugins/" directory.
+1. Upload plugin folder to the "/wp-content/plugins/" directory.
 2. Activate the plugin through the "Plugins" menu in WordPress.
 3. Go WooCommerce Settings –> Payment Gateways and configure your Kustom Checkout settings.
-4. Read more about the configuration process in the [plugin documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
+4. Read more about the configuration process in the [plugin documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 
 == Frequently Asked Questions ==
@@ -47,9 +47,14 @@ Installment, revolving and other flexible financing plans let customers pay when
 Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria, the Netherlands, UK and United States.
 
 = Where can I find Kustom Checkout for WooCommerce documentation? =
-For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
+For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-05-18    - version 2.20.2 =
+* Enhancement   - When multiple payment methods are used, the fallback logo has been changed from Klarna to Kustom.
+* Enhancement   - Added WPML configuration file for improved multilingual compatibility.
+* Fix           - Fixed an issue where the manual order management action dropdown would render incorrectly in the order metabox.
+
 = 2026-05-05    - version 2.20.1 =
 * Fix           - Fixed a critical error when attempting to renew an orphaned subscription.
 * Fix           - Addressed an undefined shipping_company array warning.
