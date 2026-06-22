@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: no
+
+Order total comparison now displays prices with two decimals in order note.
