@@ -7,7 +7,7 @@ Tested up to: 7.0
 Requires PHP: 7.4
 WC requires at least: 9.7.0
 WC tested up to: 10.8.1
-Stable tag: 2.20.5
+Stable tag: 2.20.6
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,15 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-06-23    - version 2.20.6 =
+* Enhancement   - Added support for Kustom Shipping Assistant (KSA). The plugin now registers a pickup points service and sets the selected pickup point from the Klarna order's shipping data when available. The WooCommerce customer ID is also stored as a transient tied to the Klarna order ID to support KSA order flows.
+* Enhancement   - Hide the payment options section in the checkout block when Kustom Checkout is the only available payment method.
+* Change        - Bumped the minimum supported version of WooCommerce to 9.7
+* Tweak         - Order total comparison now displays prices with two decimals in order note.
+* Fix           - Fixed an issue where renewal orders for subscriptions could fail to be created or processed when another plugin hooked into WooCommerce Subscriptions' renewal order creation after Kustom Checkout. 
+* Fix           - Fixed a critical error that could occur when refunding an order with free (zero-cost) shipping.
+* Fix           - Fixed an issue where customers changing the payment method on a subscription could fail to reach Kustom's payment page, caused by the Kustom payment domains (pay.kustom.co) missing from the allowed redirect hosts.
+
 = 2026-06-04    - version 2.20.5 =
 * Fix           - Corrected handling of the shipping phone field in Checkout Blocks to align with changes introduced in WooCommerce 10.8.0.
 

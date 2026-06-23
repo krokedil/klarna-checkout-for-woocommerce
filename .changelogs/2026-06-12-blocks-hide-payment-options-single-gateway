@@ -1,4 +1,0 @@
-Type: Enhancement
-Needs Documentation: no
-
-Hide the payment options section in the checkout block when Kustom Checkout is the only available payment method.

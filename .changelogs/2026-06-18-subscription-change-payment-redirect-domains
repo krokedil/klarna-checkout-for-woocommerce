@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Fixed an issue where customers changing the payment method on a subscription could fail to reach Kustom's payment page, caused by the Kustom payment domains (pay.kustom.co) missing from the allowed redirect hosts.
