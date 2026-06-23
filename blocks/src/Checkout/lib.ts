@@ -1,4 +1,9 @@
 /**
+ * WordPress/WooCommerce dependencies
+ */
+import { select } from '@wordpress/data';
+
+/**
  * Returns a list of elements to hide in the WooCommerce checkout page that are not relevant for the Kustom Checkout iframe.
  *
  * @param {boolean} shippingInIframe - Whether the shipping fields are displayed in the iframe.
@@ -12,7 +17,26 @@ export const getElementsToHide = (shippingInIframe: boolean): string[] => {
 		'.wc-block-components-checkout-place-order-button', // Hide the place order button since it is handled in the iframe.
 		'.wp-block-woocommerce-checkout-terms-block', // Hide the terms and conditions block since it is handled in the iframe.
 		shippingInIframe ? '#shipping-option' : '', // Hide shipping option if shipping is in the iframe.
+		isKcoOnlyAvailableGateway() ? '.wc-block-checkout__payment-method' : '', // Hide the payment options step if Kustom Checkout is the only available payment method, since there is no choice to make.
 	];
+};
+
+/**
+ * Test if Kustom Checkout is the only available Gateway in the checkout.
+ *
+ * @return {boolean} - True if Kustom Checkout is the only available Gateway, false otherwise.
+ */
+export const isKcoOnlyAvailableGateway = (): boolean => {
+	const paymentStore = select('wc/store/payment');
+	if (!paymentStore) {
+		return false;
+	}
+
+	const availableGateways = Object.keys(
+		paymentStore.getAvailablePaymentMethods() || {}
+	);
+
+	return availableGateways.length === 1 && availableGateways[0] === 'kco';
 };
 
 /**

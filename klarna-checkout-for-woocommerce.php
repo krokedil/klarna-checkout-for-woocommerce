@@ -5,11 +5,11 @@
  * Description: Kustom Checkout payment gateway for WooCommerce.
  * Author: Kustom
  * Author URI: https://klarna.com/
- * Version: 2.20.5
+ * Version: 2.20.6
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
- * WC requires at least: 5.6.0
+ * WC requires at least: 9.7.0
  * WC tested up to: 10.8.1
  *
  * Copyright (c) 2017-2026 Krokedil
@@ -29,6 +29,7 @@
  */
 
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
+use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 
@@ -39,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.20.5' );
+define( 'KCO_WC_VERSION', '2.20.6' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -121,6 +122,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var OrderManagement $order_management
 		 */
 		public $order_management;
+
+		/**
+		 * Reference to pickup points class.
+		 *
+		 * @var PickupPoints $pickup_points
+		 */
+		public $pickup_points;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -302,6 +310,7 @@ if ( ! class_exists( 'KCO' ) ) {
 				)
 			);
 			$this->order_management = new OrderManagement();
+			$this->pickup_points    = new PickupPoints();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );

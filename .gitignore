@@ -23,5 +23,7 @@ nightwatch.conf.js
 .vscode/settings.json
 .idea/
 
+/tmp*
 .changelogs/backup-*
 *.bak
+tmp*
