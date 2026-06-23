@@ -321,6 +321,39 @@ if ( ! class_exists( 'KCO' ) ) {
 			if ( $autoloader_result ) {
 				$this->block_extension = new BlockExtension();
 			}
+
+			// Load the bundled Kustom Shipping Assistant.
+			$this->init_shipping_assistant();
+		}
+
+		/**
+		 * Initialize the bundled Kustom Shipping Assistant (formerly the standalone
+		 * "Kustom Shipping Assistant for WooCommerce" plugin).
+		 *
+		 * The feature is only loaded when it is enabled in the gateway settings and
+		 * the standalone plugin is not active. When the standalone plugin is active
+		 * it has already defined the class (it self-instantiates on plugin include,
+		 * before plugins_loaded fires), so we defer to it to avoid a fatal redeclare
+		 * and an admin notice points the merchant to deactivate it.
+		 *
+		 * @return void
+		 */
+		public function init_shipping_assistant() {
+			// Defer to the standalone plugin if it is active.
+			if ( class_exists( 'Klarna_Shipping_Service_For_WooCommerce' ) ) {
+				return;
+			}
+
+			// Enabled by default: treat a missing setting (fresh installs and existing
+			// stores that saved their settings before this option existed) as enabled.
+			$settings    = get_option( 'woocommerce_kco_settings', array() );
+			$kss_enabled = isset( $settings['kss_enabled'] ) ? $settings['kss_enabled'] : 'yes';
+			if ( ! wc_string_to_bool( $kss_enabled ) ) {
+				return;
+			}
+
+			include_once KCO_WC_PLUGIN_PATH . '/kss/class-klarna-shipping-service.php';
+			new Klarna_Shipping_Service_For_WooCommerce();
 		}
 
 		/**

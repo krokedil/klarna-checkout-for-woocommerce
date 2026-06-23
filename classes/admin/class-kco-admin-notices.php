@@ -57,6 +57,7 @@ class KCO_Admin_Notices {
 		add_action( 'admin_init', array( $this, 'check_settings' ) );
 		add_action( 'admin_init', array( $this, 'check_hide_action' ) );
 		add_action( 'admin_notices', array( $this, 'check_klarna_upstream' ) );
+		add_action( 'admin_notices', array( $this, 'check_standalone_kss' ) );
 	}
 	/**
 	 * Checks the settings.
@@ -167,6 +168,40 @@ class KCO_Admin_Notices {
 				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_upstream' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
 				<?php // translators: %s: URL. ?>
 				<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href="%s">Kustom Add-ons page</a>. ', 'klarna-checkout-for-woocommerce' ), admin_url( '/admin.php?page=checkout-addons' ) ) . '<a href="https://docs.krokedil.com/article/259-klarna-on-site-messaging"> ' . __( 'Read more here. ', 'klarna-checkout-for-woocommerce' ) . '</a></p>' ) ); ?>
+				</div>
+				<?php
+			}
+		}
+	}
+
+	/**
+	 * Show admin notice if the standalone Kustom Shipping Assistant plugin is active.
+	 *
+	 * The Kustom Shipping Assistant is now bundled with Kustom Checkout, so the
+	 * standalone plugin is redundant and should be deactivated. While it is active,
+	 * the bundled version stays dormant and the feature is controlled by it instead.
+	 *
+	 * @return void
+	 */
+	public function check_standalone_kss() {
+		$plugin_slug = 'klarna-shipping-service-for-woocommerce';
+
+		// If the standalone plugin file exists.
+		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
+			if ( ! function_exists( 'is_plugin_active' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+
+			if ( ! is_plugin_active( $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
+				return;
+			}
+
+			// If can activate plugins.
+			if ( current_user_can( 'activate_plugins' ) && ! get_user_meta( get_current_user_id(), 'dismissed_kco_check_standalone_kss_notice', true ) ) {
+				?>
+				<div class="kco-message notice woocommerce-message notice-warning">
+				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_standalone_kss' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
+				<?php echo wp_kses_post( wpautop( '<p>' . __( 'The <i>Kustom Shipping Assistant for WooCommerce</i> plugin is now bundled with <i>Kustom Checkout for WooCommerce</i>. Please deactivate and delete the standalone plugin, and enable the <i>Kustom Shipping Assistant</i> option in the Kustom Checkout shipping settings instead.', 'klarna-checkout-for-woocommerce' ) . '</p>' ) ); ?>
 				</div>
 				<?php
 			}
