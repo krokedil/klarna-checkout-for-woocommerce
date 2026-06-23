@@ -120,7 +120,7 @@ class KCO_Request_Cart {
 	 * @return int
 	 */
 	public function get_order_amount() {
-		$settings     = get_option( 'woocommerce_kco_settings' );
+		$settings     = get_option( 'woocommerce_kco_settings', array() );
 		$order_amount = round( WC()->cart->total * 100 );
 
 		if ( isset( $settings['shipping_methods_in_iframe'] ) && 'yes' === $settings['shipping_methods_in_iframe'] ) {
@@ -156,10 +156,31 @@ class KCO_Request_Cart {
 	 * @return array
 	 */
 	public function adjust_order_lines() {
-		$amount_to_adjust = $this->get_order_amount() - $this->get_order_lines_total_amount();
+		$amount_to_adjust = intval( round( $this->get_order_amount() - $this->get_order_lines_total_amount() ) );
 
 		// If the amount to adjust is zero, return.
-		if ( 0 === intval( round( $amount_to_adjust * 100 ) ) ) {
+		if ( 0 === $amount_to_adjust ) {
+			return $this->order_lines;
+		}
+
+		// Reduce gift card amounts instead of adding a surcharge when shipping is in the iframe and a gift card covers shipping costs.
+		$settings = get_option( 'woocommerce_kco_settings', array() );
+		if ( $amount_to_adjust > 0 && wc_string_to_bool( $settings['shipping_methods_in_iframe'] ?? 'no' ) ) {
+			foreach ( $this->order_lines as &$order_line ) {
+				if ( 0 >= $amount_to_adjust ) {
+					break;
+				}
+				if ( 'gift_card' === $order_line['type'] ) {
+					$reduction                   = min( $amount_to_adjust, absint( $order_line['total_amount'] ) );
+					$order_line['unit_price']   += $reduction;
+					$order_line['total_amount'] += $reduction;
+					$amount_to_adjust           -= $reduction;
+				}
+			}
+			unset( $order_line );
+		}
+
+		if ( 0 === $amount_to_adjust ) {
 			return $this->order_lines;
 		}
 
@@ -264,7 +285,7 @@ class KCO_Request_Cart {
 	 * Process WooCommerce shipping to Kustom Payments order lines.
 	 */
 	public function process_shipping() {
-		$settings = get_option( 'woocommerce_kco_settings' );
+		$settings = get_option( 'woocommerce_kco_settings', array() );
 		if ( ! wc_string_to_bool( $settings['shipping_methods_in_iframe'] ?? 'no' ) ) {
 			if ( WC()->shipping->get_packages() && ! empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
 				$shipping            = array(
