@@ -56,7 +56,6 @@ class KCO_Admin_Notices {
 
 		add_action( 'admin_init', array( $this, 'check_settings' ) );
 		add_action( 'admin_init', array( $this, 'check_hide_action' ) );
-		add_action( 'admin_notices', array( $this, 'check_klarna_upstream' ) );
 	}
 	/**
 	 * Checks the settings.
@@ -145,28 +144,6 @@ class KCO_Admin_Notices {
 				<div class="kco-message notice woocommerce-message notice-error">
 				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_optimize' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
 				<?php echo wp_kses_post( wpautop( '<p>' . __( 'It looks as if you have a Optimizing or Caching plugin installed. Please make sure to not enable these features on the checkout page, as this can cause issues with Kustom Checkout. The checkout page should never be minified, concatenated, or cached. ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.krokedil.com/krokedil-general-support-info/optimizing-your-checkout-when-using-an-iframe-based-checkout">' . __( 'Read more here. ', 'klarna-checkout-for-woocommerce' ) . '</a></p>' ) ); ?>
-				</div>
-				<?php
-			}
-		}
-	}
-
-	/**
-	 * Show admin notice if old Klarna Upstream plugin is installed.
-	 */
-	public function check_klarna_upstream() {
-
-		$plugin_slug = 'klarna-upstream-for-woocommerce';
-
-		// If plugin file exists.
-		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
-			// If can activate plugins.
-			if ( current_user_can( 'activate_plugins' ) && ! get_user_meta( get_current_user_id(), 'dismissed_kco_check_upstream_notice', true ) ) {
-				?>
-				<div class="kco-message notice woocommerce-message notice-error">
-				<a class="woocommerce-message-close notice-dismiss" href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_check_upstream' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' ) ); ?>"><?php esc_html_e( 'Dismiss', 'woocommerce' ); ?></a>
-				<?php // translators: %s: URL. ?>
-				<?php echo wp_kses_post( wpautop( '<p>' . sprintf( __( 'The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href="%s">Kustom Add-ons page</a>. ', 'klarna-checkout-for-woocommerce' ), admin_url( '/admin.php?page=checkout-addons' ) ) . '<a href="https://docs.krokedil.com/article/259-klarna-on-site-messaging"> ' . __( 'Read more here. ', 'klarna-checkout-for-woocommerce' ) . '</a></p>' ) ); ?>
 				</div>
 				<?php
 			}
