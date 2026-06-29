@@ -34,7 +34,7 @@ class OrderValidation {
 			throw new Exception( 'Could not validate the order, please try again.', 400 );
 		}
 
-		// On WooCommerce 9.x there is no early draft order, so the reference may be empty and the order is created from
+		// On WooCommerce 10.9.x there is no early draft order, so the reference may be empty and the order is created from
 		// the cart token below. When a reference exists, we validate and reuse that existing order instead.
 		$merchant_reference = $klarna_order['merchant_reference2'] ?? '';
 		$order              = ! empty( $merchant_reference ) ? self::get_wc_order( $merchant_reference ) : null;
