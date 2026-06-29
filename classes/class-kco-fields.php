@@ -197,6 +197,15 @@ class KCO_Fields {
 				'type'  => 'krokedil_section_start',
 				'id'    => 'shipping_section',
 			),
+			'kss_enabled'                => array(
+				'title'       => __( 'Kustom Shipping Assistant', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Enable Kustom Shipping Assistant', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				// translators: 1: Configuration link, 2: Tax settings link.
+				'description' => sprintf( __( 'Let customers select shipping in the Kustom iframe (TMS). Requires configuration on the Kustom side. See the steps explained in the documentation under the sections titled %1$s and %2$s.', 'klarna-checkout-for-woocommerce' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#configuration" target="_blank">configuration</a>' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#tax-settings" target="_blank">tax settings</a>' ) ),
+				'default'     => 'yes',
+				'desc_tip'    => false,
+			),
 			'allow_separate_shipping'    => array(
 				'title'       => __( 'Separate shipping address', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Allow separate shipping address', 'klarna-checkout-for-woocommerce' ),
