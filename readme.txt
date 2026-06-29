@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.4
 WC requires at least: 9.7.0
-WC tested up to: 10.8.1
-Stable tag: 2.20.6
+WC tested up to: 10.9.1
+Stable tag: 2.20.7
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,10 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-06-29    - version 2.20.7 =
+* Fix           - Fixed an issue where refunds on orders from non-base countries were sent to Kustom with the wrong VAT rate, resulting in an incorrect tax breakdown on the customer's refund receipt.
+* Fix           - Fixed an issue with WooCommerce version 10.9.x impacting the checkout block support. WooCommerce now only creates the order for the block checkout when the customer places the order, which caused an issue when placing the order.
+
 = 2026-06-23    - version 2.20.6 =
 * Enhancement   - Added support for Kustom Shipping Assistant (KSA). The plugin now registers a pickup points service and sets the selected pickup point from the Klarna order's shipping data when available. The WooCommerce customer ID is also stored as a transient tied to the Klarna order ID to support KSA order flows.
 * Enhancement   - Hide the payment options section in the checkout block when Kustom Checkout is the only available payment method.

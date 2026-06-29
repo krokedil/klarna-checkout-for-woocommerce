@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Fixed an issue with WooCommerce version 10.9.x impacting the checkout block support. WooCommerce now only creates the order for the block checkout when the customer places the order, which caused an issue when placing the order.
