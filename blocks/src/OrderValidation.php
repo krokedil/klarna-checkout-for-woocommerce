@@ -28,27 +28,30 @@ class OrderValidation {
 		}
 
 		$klarna_order         = self::get_klarna_order( $klarna_order_id );
-		$merchant_reference   = $klarna_order['merchant_reference2']; // Get the merchant reference from the klarna order.
 		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-		// If the merchant reference or klarna merchant data is empty, throw an exception.
-		if ( empty( $merchant_reference ) || empty( $klarna_merchant_data ) ) {
+		// The merchant data (which carries the cart token used to place the order) is always required.
+		if ( empty( $klarna_merchant_data ) ) {
 			throw new Exception( 'Could not validate the order, please try again.', 400 );
 		}
 
-		// Get the order from the merchant reference.
-		$order = self::get_wc_order( $merchant_reference );
+		// On WooCommerce 9.x there is no early draft order, so the reference may be empty and the order is created from
+		// the cart token below. When a reference exists, we validate and reuse that existing order instead.
+		$merchant_reference = $klarna_order['merchant_reference2'] ?? '';
+		$order              = ! empty( $merchant_reference ) ? self::get_wc_order( $merchant_reference ) : null;
 
-		self::validate_wc_order( $order );
+		if ( $order ) {
+			self::validate_wc_order( $order );
 
-		// Set the klarna order id in the order meta data.
-		$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
+			// Set the klarna order id in the order meta data.
+			$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
 
-		// Set the customers billing email from the klarna order.
-		$order->set_billing_email( $klarna_order['billing_address']['email'] ?? '' );
+			// Set the customers billing email from the klarna order.
+			$order->set_billing_email( $klarna_order['billing_address']['email'] ?? '' );
 
-		$order->save();
+			$order->save();
+		}
 
-		// Attempt to submit the order to WooCommerce using the store api.
+		// Submit the order via the store api. When no order exists yet it is created from the cart token.
 		$updated_order = self::submit_wc_order( $klarna_order, $order );
 
 		// Compare the order hashes to the once stored in the merchant data to ensure the order is valid.
@@ -227,13 +230,13 @@ class OrderValidation {
 	/**
 	 * Submit the WooCommerce order.
 	 *
-	 * @param array     $klarna_order The Klarna order.
-	 * @param \WC_Order $order The WooCommerce order.
+	 * @param array          $klarna_order The Klarna order.
+	 * @param \WC_Order|null $order The WooCommerce order, or null when it should be created from the cart token.
 	 *
 	 * @return \WC_Order The updated WooCommerce order after submission.
 	 * @throws Exception If the order could not be submitted.
 	 */
-	private static function submit_wc_order( $klarna_order, $order ) {
+	private static function submit_wc_order( $klarna_order, $order = null ) {
 		$settings                = get_option( 'woocommerce_kco_settings', array() );
 		$klarna_billing_address  = $klarna_order['billing_address'] ?? array();
 		$klarna_shipping_address = $klarna_order['shipping_address'] ?? array();
@@ -243,10 +246,10 @@ class OrderValidation {
 		$wc_nonce                = $klarna_merchant_data['wc_nonce'] ?? '';
 		$wp_logged_in_cookie     = $klarna_merchant_data['wp_logged_in_cookie'] ?? null;
 
-		$request_url = rest_url( 'wc/store/v1/checkout/' . $order->get_id() );
+		// Pay for the existing order, or post to the base endpoint so the Store API creates it from the cart token.
+		$request_url = $order ? rest_url( 'wc/store/v1/checkout/' . $order->get_id() ) : rest_url( 'wc/store/v1/checkout' );
 
 		$body = array(
-			'key'              => $order->get_order_key(),
 			'payment_method'   => 'kco',
 			'billing_email'    => $klarna_billing_address['email'] ?? '',
 			'payment_data'     => array(
@@ -297,6 +300,11 @@ class OrderValidation {
 				'phone'      => ! empty( $klarna_shipping_address['phone'] ) ? $klarna_shipping_address['phone'] : ( $klarna_billing_address['phone'] ?? '' ),
 			),
 		);
+
+		// The order key is required by the Store API to pay for an existing order, and omitted for the create flow.
+		if ( $order ) {
+			$body['key'] = $order->get_order_key();
+		}
 
 		// Set the billing company name if it exists.
 		if ( isset( $klarna_billing_address['organization_name'] ) ) {
