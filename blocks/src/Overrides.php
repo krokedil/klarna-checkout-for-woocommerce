@@ -65,21 +65,35 @@ class Overrides {
 		$this->override_options( $args );
 		$this->set_merchant_data( $args );
 
+		// WooCommerce 10.9.x (PR #64155) defers draft order creation to the POST request, so this is null on a fresh
+		// session and the order is instead created from the cart token during validation.
+		$draft_order = $this->get_draft_order();
+
+		// Always set the merchant URLs so the validation callback is registered. get_urls() tolerates a null order id.
+		$this->override_merchant_urls( $args, $draft_order );
+
+		// When there is no draft order yet, the references are set later during process_payment.
+		if ( $draft_order ) {
+			$this->set_merchant_reference( $args, $draft_order );
+		}
+
+		return $args;
+	}
+
+	/**
+	 * Get the Store API draft order from the session if it exists.
+	 *
+	 * @return \WC_Order|null The draft order, or null if none exists in the session.
+	 */
+	private function get_draft_order() {
 		$draft_order_id = WC()->session->get( 'store_api_draft_order', null );
 		if ( ! $draft_order_id ) {
-			return $args;
+			return null;
 		}
 
 		$draft_order = wc_get_order( $draft_order_id );
 
-		if ( ! $draft_order ) {
-			return $args;
-		}
-
-		$this->override_merchant_urls( $args, $draft_order );
-		$this->set_merchant_reference( $args, $draft_order );
-
-		return $args;
+		return $draft_order ?: null; // phpcs:ignore Universal.Operators.DisallowShortTernary.Found -- Safe to use here.
 	}
 
 	/**
@@ -99,13 +113,13 @@ class Overrides {
 	/**
 	 * Override the merchant URLs for the Klarna Checkout API.
 	 *
-	 * @param array     $args The request arguments.
-	 * @param \WC_Order $draft_order The WooCommerce order.
+	 * @param array          $args The request arguments.
+	 * @param \WC_Order|null $draft_order The WooCommerce order, or null if it does not exist yet.
 	 *
 	 * @return void
 	 */
-	private function override_merchant_urls( &$args, $draft_order ) {
-		$args['merchant_urls'] = KCO_WC()->merchant_urls->get_urls( $draft_order->get_id() );
+	private function override_merchant_urls( &$args, $draft_order = null ) {
+		$args['merchant_urls'] = KCO_WC()->merchant_urls->get_urls( $draft_order ? $draft_order->get_id() : null );
 		// Set the validation callback URL for the block checkout.
 		$args['merchant_urls']['validation'] = OrderController::get_validate_endpoint();
 	}
