@@ -120,23 +120,22 @@ class RequestPostRefund extends RequestPost {
 				/**
 				 * Process order item products.
 				 *
-				 * @var WC_Order_Item_Product $item WooCommerce order item product.
+				 * @var \WC_Order_Item_Product $item WooCommerce order item product.
 				 */
 				foreach ( $refunded_items as $item ) {
 					$product = wc_get_product( $item->get_product_id() );
 
+					$order_line_tax_rate = 0;
+					$refunded_item_id    = absint( $item->get_meta( '_refunded_item_id' ) );
 					/**
-					 * Get the order line total from order for calculation.
+					 * Get the tax rate WooCommerce applied to the matching order item.
 					 *
-					 * @var WC_Order_Item_Product $order_item WooCommerce order item product.
+					 * @var \WC_Order_Item_Product $order_item WooCommerce order item product.
 					 */
 					foreach ( $order_items as $order_item ) {
-						if ( $item->get_product_id() === $order_item->get_product_id() ) {
-							$order_line_total    = round( ( $order->get_line_subtotal( $order_item, false ) * 100 ) );
-							$order_line_tax      = round( ( $order->get_line_tax( $order_item ) * 100 ) );
-							$tax_rates           = \WC_Tax::get_base_tax_rates( $order_item->get_tax_class() );
-							$first_tax_rate      = reset( $tax_rates );
-							$order_line_tax_rate = ( 0 !== $order_line_tax && 0 !== $order_line_total ) ? ( $first_tax_rate['rate'] * 100 ?? round( ( $order_line_tax / $order_line_total ) * 100 * 100 ) ) : 0;
+						if ( $order_item->get_id() === $refunded_item_id ) {
+							$order_line_tax_rate = $this->get_order_item_tax_rate( $order, $order_item );
+							break;
 						}
 					}
 
@@ -275,6 +274,39 @@ class RequestPostRefund extends RequestPost {
 		}
 
 		return apply_filters( 'kom_refund_order_args', $data, $this->order_id );
+	}
+
+	/**
+	 * Get the tax rate WooCommerce applied to an order item.
+	 *
+	 * Reads the rate from the order's tax data instead of recalculating it from the
+	 * line totals, since WooCommerce is not always consistent with computed tax rates.
+	 * The rate is returned in basis points (e.g. 25% becomes 2500).
+	 *
+	 * @param \WC_Order      $order      The WooCommerce order.
+	 * @param \WC_Order_Item $order_item The WooCommerce order item.
+	 * @return int
+	 */
+	private function get_order_item_tax_rate( $order, $order_item ) {
+		// If the item has no tax, the rate is 0.
+		if ( '0' === (string) $order_item->get_total_tax() ) {
+			return 0;
+		}
+
+		$item_taxes = $order_item->get_taxes()['total'] ?? array();
+		if ( empty( $item_taxes ) ) {
+			return 0;
+		}
+
+		$rate_id = key( $item_taxes );
+
+		foreach ( $order->get_items( 'tax' ) as $tax_item ) {
+			if ( $tax_item->get_rate_id() === $rate_id ) {
+				return round( floatval( \WC_Tax::get_rate_percent_value( $rate_id ) ) * 100 );
+			}
+		}
+
+		return 0;
 	}
 
 	/**
