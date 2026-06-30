@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: no
+
+Removed the "Add Kustom Post Purchase info to order email" setting and its associated functionality.
