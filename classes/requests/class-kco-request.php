@@ -160,7 +160,8 @@ class KCO_Request {
 				// Order management, callback and cron requests share this handler but run without a session, so guard against a fatal.
 				$session = WC()->session;
 				if ( $session instanceof WC_Session ) {
-					// Both the classic and block checkout reload on this flag, limit the reloads so a persistent empty body can't loop forever.
+					// Classic checkout reloads on this flag via WooCommerce core (update_order_review). Block checkout recovers on the
+					// next render through the create-fallback in kco_create_or_update_order(). Limit the reloads so a persistent empty body can't loop forever.
 					$reload_attempts = (int) $session->get( 'kco_empty_body_reloads', 0 );
 
 					// It typically requires three reloads for a session to be properly set up. Hence why we picked three attempts before giving up and showing the error message to the customer.
