@@ -35,6 +35,8 @@ function kco_create_or_update_order() {
 				return;
 			}
 			WC()->session->set( 'kco_wc_order_id', $klarna_order['order_id'] );
+			// The failed update above may have flagged a reload. We recovered with a fresh order, so clear it to avoid an unnecessary reload.
+			WC()->session->__unset( 'reload_checkout' );
 			return $klarna_order;
 		}
 		return $klarna_order;
