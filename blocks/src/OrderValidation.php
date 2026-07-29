@@ -60,6 +60,19 @@ class OrderValidation {
 		self::validate_hash( $klarna_merchant_data['wc_fees_hash'], $updated_order->get_meta( '_fees_hash' ) );
 		self::validate_hash( $klarna_merchant_data['wc_coupons_hash'], $updated_order->get_meta( '_coupons_hash' ) );
 		self::validate_hash( $klarna_merchant_data['wc_taxes_hash'], $updated_order->get_meta( '_taxes_hash' ) );
+
+		/*
+		 * When the order was created from the cart token, there was no draft order to store the Kustom order ID on
+		 * above. Store it now, so the order can be found again from the Kustom order ID on the confirmation page and
+		 * by the push callback.
+		 *
+		 * The gateway cannot do this for an order that does not need payment, such as an order where a coupon reduced
+		 * the total to zero, since WooCommerce skips the gateway entirely for those.
+		 */
+		if ( empty( $order ) ) {
+			$updated_order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
+			$updated_order->save();
+		}
 	}
 
 	/**
