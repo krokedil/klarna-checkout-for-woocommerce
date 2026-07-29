@@ -1,4 +1,4 @@
 Type: Fix
 Needs Documentation: no
 
-Fixed an issue where a customer was not redirected to the order confirmation page after completing a purchase in the block checkout when the order did not require payment, for example when a coupon reduced the total to zero. The customer was instead shown a raw "read-only order" error on the checkout page and a redundant Kustom order was created.
+Fixed an issue where a customer was not redirected to the order confirmation page after completing a purchase in the block checkout when the order did not require payment, for example when a coupon reduced the total to zero. The customer was instead shown a raw "read-only order" error on the checkout page and a redundant Kustom order was created. The Kustom confirmation snippet was also missing from the order confirmation page for these orders, and the order was missing the Kustom environment and country, which order management needs.

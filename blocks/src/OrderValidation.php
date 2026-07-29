@@ -4,6 +4,7 @@ namespace Krokedil\KustomCheckout\Blocks;
 use Automattic\WooCommerce\StoreApi\SessionHandler;
 use Automattic\WooCommerce\StoreApi\Utilities\JsonWebToken;
 use Exception;
+use Krokedil\KustomCheckout\CheckoutFlow\EmbeddedBlockFlow;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -54,25 +55,59 @@ class OrderValidation {
 		// Submit the order via the store api. When no order exists yet it is created from the cart token.
 		$updated_order = self::submit_wc_order( $klarna_order, $order );
 
+		/*
+		 * When the order was created from the cart token, there was no draft order to store the Kustom order data on
+		 * above. Store it before validating the hashes below, so the order can always be found again from the Kustom
+		 * order ID, even if the validation fails.
+		 */
+		if ( empty( $order ) ) {
+			self::save_kustom_order_data( $updated_order, $klarna_order );
+		}
+
 		// Compare the order hashes to the once stored in the merchant data to ensure the order is valid.
 		self::validate_hash( $klarna_merchant_data['wc_cart_hash'], $updated_order->get_cart_hash() );
 		self::validate_hash( $klarna_merchant_data['wc_shipping_hash'], $updated_order->get_meta( '_shipping_hash' ) );
 		self::validate_hash( $klarna_merchant_data['wc_fees_hash'], $updated_order->get_meta( '_fees_hash' ) );
 		self::validate_hash( $klarna_merchant_data['wc_coupons_hash'], $updated_order->get_meta( '_coupons_hash' ) );
 		self::validate_hash( $klarna_merchant_data['wc_taxes_hash'], $updated_order->get_meta( '_taxes_hash' ) );
+	}
 
-		/*
-		 * When the order was created from the cart token, there was no draft order to store the Kustom order ID on
-		 * above. Store it now, so the order can be found again from the Kustom order ID on the confirmation page and
-		 * by the push callback.
-		 *
-		 * The gateway cannot do this for an order that does not need payment, such as an order where a coupon reduced
-		 * the total to zero, since WooCommerce skips the gateway entirely for those.
-		 */
-		if ( empty( $order ) ) {
-			$updated_order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
-			$updated_order->save();
+	/**
+	 * Store the Kustom order data on an order that was created from the cart token.
+	 *
+	 * The Kustom order ID is required to be able to find the order again from the confirmation page and the push
+	 * callback, since neither of them can rely on the WooCommerce order key for these orders.
+	 *
+	 * WooCommerce skips the gateway for an order that does not need payment, such as an order where a coupon reduced the
+	 * total to zero, so none of the metadata the gateway normally stores exists for those. Store all of it here instead,
+	 * including the transaction ID, which the order received page needs to be able to print the Kustom confirmation
+	 * snippet.
+	 *
+	 * @param \WC_Order $order The WooCommerce order that was created from the cart token.
+	 * @param array     $klarna_order The Kustom order.
+	 *
+	 * @return void
+	 */
+	private static function save_kustom_order_data( $order, $klarna_order ) {
+		$klarna_order_id = sanitize_key( $klarna_order['order_id'] );
+
+		// The gateway always stores the checkout flow, so it did not run for this order when that is missing.
+		if ( empty( $order->get_meta( '_wc_klarna_checkout_flow' ) ) ) {
+			( new EmbeddedBlockFlow() )->save_order_metadata( $order, $klarna_order, 'embedded', false );
+
+			// WooCommerce completed the payment without a transaction ID, since the gateway never got to set one.
+			$order->set_transaction_id( $klarna_order_id );
+			$order->save();
+			return;
 		}
+
+		// The gateway already stored the Kustom order ID, so there is nothing left to do.
+		if ( $order->get_meta( '_wc_klarna_order_id' ) === $klarna_order_id ) {
+			return;
+		}
+
+		$order->update_meta_data( '_wc_klarna_order_id', $klarna_order_id );
+		$order->save();
 	}
 
 	/**
