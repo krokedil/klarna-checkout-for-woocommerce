@@ -298,6 +298,14 @@ class KCO_Fields {
 				'default'     => 'woo',
 				'desc_tip'    => false,
 			),
+			'allow_free_orders'          => array(
+				'title'       => __( 'Free orders', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Display Kustom Checkout on free orders', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If checked, Kustom Checkout is displayed even when the order total is 0, for example when a coupon reduces the total to zero. Carts containing subscriptions are not affected by this setting, since they are always handled by Kustom Checkout.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
 			'checkout_section_end'       => array(
 				'type' => 'krokedil_section_end',
 			),

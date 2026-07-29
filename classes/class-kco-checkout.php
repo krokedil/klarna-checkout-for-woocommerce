@@ -5,6 +5,8 @@
  * @package Klarna_Checkout/Classes
  */
 
+use Krokedil\KustomCheckout\Utility\SettingsUtility;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -26,6 +28,9 @@ class KCO_Checkout {
 		add_action( 'woocommerce_shipping_method_chosen', array( __CLASS__, 'maybe_throw_shipping_error' ), 9999 );
 		add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 2 );
 		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'maybe_change_needs_payment_cart' ), 999, 1 );
+
+		// Registered on a low priority, so a third party filter on the default priority can still override the setting.
+		add_filter( 'kco_check_if_needs_payment', array( $this, 'maybe_allow_free_orders' ), 5 );
 	}
 
 	/**
@@ -254,6 +259,20 @@ class KCO_Checkout {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Skip the free order check if the merchant has enabled Kustom Checkout for free orders.
+	 *
+	 * @param bool $check Whether the free order check should be performed.
+	 * @return bool
+	 */
+	public function maybe_allow_free_orders( $check ) {
+		if ( wc_string_to_bool( SettingsUtility::get_setting( 'allow_free_orders', 'no' ) ) ) {
+			return false;
+		}
+
+		return $check;
 	}
 }
 new KCO_Checkout();

@@ -1,0 +1,4 @@
+Type: Enhancement
+Needs Documentation: yes
+
+Added a setting for displaying Kustom Checkout on free orders. This was previously only possible through the "kco_check_if_needs_payment" filter, which can still be used to override the setting.
