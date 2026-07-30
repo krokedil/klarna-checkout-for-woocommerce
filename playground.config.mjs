@@ -31,6 +31,16 @@ export default {
 	// source, so it is deliberately not wired into provisioning.
 
 	options: {
+		development: {
+			// The tool seeds a BACS gateway in development mode so that any
+			// plugin can place test orders. For a checkout gateway that works
+			// against us: BACS sorts ahead of Kustom, so a fresh site opens the
+			// *classic* checkout with "Direct bank transfer" preselected and the
+			// Kustom iframe only appears once you pick it by hand. This plugin
+			// is the payment method — turn the placeholder off.
+			woocommerce_bacs_settings: { enabled: 'no' },
+		},
+
 		all: {
 			woocommerce_kco_settings: {
 				enabled: 'yes',
