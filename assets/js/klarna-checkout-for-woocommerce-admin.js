@@ -24,7 +24,7 @@ jQuery( function ( $ ) {
 		var title = titles
 	}
 
-	titles.find( "a" ).click( function ( e ) {
+	titles.find( "a" ).on( "click", function ( e ) {
 		console.log( "click" )
 		e.preventDefault()
 
@@ -82,13 +82,13 @@ jQuery( function ( $ ) {
 				saveChangesButton.prop( "disabled", true )
 				if ( ! EUmerchantIdField.val() && ! EUmerchantPasswordField.val() ) {
 					alert( "Please enter valid Test Merchant information" )
-					EUmerchantIdField.focus()
+					EUmerchantIdField.trigger( "focus" )
 				} else if ( ! EUmerchantPasswordField.val() ) {
 					alert( "Please enter a valid Test Merchant Password" )
-					EUmerchantPasswordField.focus()
+					EUmerchantPasswordField.trigger( "focus" )
 				} else if ( ! EUmerchantIdField.val() ) {
 					alert( "Please enter a valid Test Merchant ID" )
-					EUmerchantIdField.focus()
+					EUmerchantIdField.trigger( "focus" )
 				} else {
 					saveChangesButton.prop( "disabled", false )
 				}
@@ -96,13 +96,13 @@ jQuery( function ( $ ) {
 				saveChangesButton.prop( "disabled", true )
 				if ( ! USmerchantIdField.val() && ! USmerchantPasswordField.val() ) {
 					alert( "Please enter valid Test Merchant information" )
-					USmerchantIdField.focus()
+					USmerchantIdField.trigger( "focus" )
 				} else if ( ! USmerchantPasswordField.val() ) {
 					alert( "Please enter a valid Test Merchant Password" )
-					USmerchantPasswordField.focus()
+					USmerchantPasswordField.trigger( "focus" )
 				} else if ( ! USmerchantIdField.val() ) {
 					alert( "Please enter a valid Test Merchant ID" )
-					USmerchantIdField.focus()
+					USmerchantIdField.trigger( "focus" )
 				} else {
 					saveChangesButton.prop( "disabled", false )
 				}
@@ -112,7 +112,7 @@ jQuery( function ( $ ) {
 		}
 	}
 
-	testCheckBox.click( function () {
+	testCheckBox.on( "click", function () {
 		checkEmptyFields()
 	} )
 

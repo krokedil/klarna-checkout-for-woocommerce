@@ -396,8 +396,8 @@ jQuery( function ( $ ) {
 				)
 				$( "#billing_state" ).val( "region" in data.billing_address ? data.billing_address.region : "" )
 				// Trigger changes
-				$( "#billing_email" ).change()
-				$( "#billing_email" ).blur()
+				$( "#billing_email" ).trigger( "change" )
+				$( "#billing_email" ).trigger( "blur" )
 			}
 
 			if ( "shipping_address" in data && data.shipping_address !== null ) {
@@ -474,7 +474,10 @@ jQuery( function ( $ ) {
 				'<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' + error_message + "</div>",
 			) // eslint-disable-line max-len
 			$( className ).removeClass( "processing" ).unblock()
-			$( className ).find( ".input-text, select, input:checkbox" ).trigger( "validate" ).blur()
+			$( className )
+				.find( ".input-text, select, input:checkbox" )
+				.trigger( "validate" )
+				.trigger( "blur" )
 			$( document.body ).trigger( "checkout_error", [ error_message ] )
 		},
 
@@ -643,20 +646,20 @@ jQuery( function ( $ ) {
 								"postal_code" in data && $( "#billing_postcode" ).val( data.postal_code )
 								"country" in data && $( "#billing_country" ).val( country )
 								"email" in data && $( "#billing_email" ).val( data.email )
-								$( "#billing_country" ).change()
-								$( "#billing_email" ).change()
-								$( "#billing_email" ).blur()
+								$( "#billing_country" ).trigger( "change" )
+								$( "#billing_email" ).trigger( "change" )
+								$( "#billing_email" ).trigger( "blur" )
 
 								kco_wc.update_checkout.fire()
 							} else {
 								$( "#ship-to-different-address-checkbox" ).prop( "checked", true )
-								$( "#ship-to-different-address-checkbox" ).change()
-								$( "#ship-to-different-address-checkbox" ).blur()
+								$( "#ship-to-different-address-checkbox" ).trigger( "change" )
+								$( "#ship-to-different-address-checkbox" ).trigger( "blur" )
 								"given_name" in data && $( "#shipping_first_name" ).val( data.given_name )
 								"family_name" in data && $( "#shipping_last_name" ).val( data.family_name )
 								"postal_code" in data && $( "#shipping_postcode" ).val( data.postal_code )
 								"country" in data && $( "#shipping_country" ).val( country )
-								$( "#shipping_country" ).change()
+								$( "#shipping_country" ).trigger( "change" )
 
 								$( "form.checkout" ).trigger( "update_checkout" )
 							}
@@ -671,9 +674,9 @@ jQuery( function ( $ ) {
 							"postal_code" in data && $( "#billing_postcode" ).val( data.postal_code )
 							"country" in data && $( "#billing_country" ).val( country )
 							"email" in data && $( "#billing_email" ).val( data.email )
-							$( "#billing_country" ).change()
-							$( "#billing_email" ).change()
-							$( "#billing_email" ).blur()
+							$( "#billing_country" ).trigger( "change" )
+							$( "#billing_email" ).trigger( "change" )
+							$( "#billing_email" ).trigger( "blur" )
 
 							kco_wc.update_checkout.fire()
 						},

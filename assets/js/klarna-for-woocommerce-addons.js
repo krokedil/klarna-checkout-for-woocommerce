@@ -1,6 +1,6 @@
 jQuery( function ( $ ) {
 	"use strict"
-	$( ".checkout-addon-action .button" ).click( function () {
+	$( ".checkout-addon-action .button" ).on( "click", function () {
 		var pluginStatus = $( this ).attr( "data-status" )
 		var pluginAction = $( this ).attr( "data-action" )
 		var pluginId = $( this ).attr( "data-plugin-id" )
