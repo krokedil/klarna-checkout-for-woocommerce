@@ -73,7 +73,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_title_mandatory() {
-		$title_mandatory = isset( $this->settings ) && 'yes' === $this->settings['title_mandatory'];
+		$title_mandatory = isset( $this->settings['title_mandatory'] ) && 'yes' === $this->settings['title_mandatory'];
 
 		return $title_mandatory;
 	}
@@ -84,7 +84,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_allow_separate_shipping_address() {
-		$allow_separate_shipping = isset( $this->settings ) && 'yes' === $this->settings['allow_separate_shipping'];
+		$allow_separate_shipping = isset( $this->settings['allow_separate_shipping'] ) && 'yes' === $this->settings['allow_separate_shipping'];
 
 		return $allow_separate_shipping;
 	}
@@ -95,7 +95,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_dob_mandatory() {
-		$dob_mandatory = isset( $this->settings ) && 'yes' === $this->settings['dob_mandatory'];
+		$dob_mandatory = isset( $this->settings['dob_mandatory'] ) && 'yes' === $this->settings['dob_mandatory'];
 
 		return $dob_mandatory;
 	}
@@ -106,7 +106,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_nin_validation_mandatory() {
-		$nin_validation_mandatory = isset( $this->settings ) && isset( $this->settings['nin_validation_mandatory'] ) && 'yes' === $this->settings['nin_validation_mandatory'];
+		$nin_validation_mandatory = isset( $this->settings['nin_validation_mandatory'] ) && 'yes' === $this->settings['nin_validation_mandatory'];
 
 		return $nin_validation_mandatory;
 	}
@@ -186,14 +186,10 @@ class KCO_Request_Options {
 	/**
 	 * Gets shipping details note.
 	 *
-	 * @return bool
+	 * @return string|bool The shipping details note, or false if the setting has no stored value.
 	 */
 	private function get_shipping_details() {
-		if ( isset( $this->settings ) ) {
-			return $this->settings['shipping_details'];
-		}
-
-		return false;
+		return $this->settings['shipping_details'] ?? false;
 	}
 
 	/**
@@ -203,7 +199,7 @@ class KCO_Request_Options {
 	 * @return array|bool
 	 */
 	private function check_option_field( $field ) {
-		if ( isset( $this->settings ) && '' !== $this->settings[ $field ] ) {
+		if ( isset( $this->settings[ $field ] ) && '' !== $this->settings[ $field ] ) {
 			return $this->settings[ $field ];
 		}
 

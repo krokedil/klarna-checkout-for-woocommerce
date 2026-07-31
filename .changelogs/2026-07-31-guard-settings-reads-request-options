@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed "Undefined array key" PHP warnings emitted on every checkout when a gateway setting has no stored value, e.g. on sites whose settings were seeded programmatically or that predate a setting being added.
