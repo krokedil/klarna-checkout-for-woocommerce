@@ -70,7 +70,7 @@ class KCO_Confirmation {
 		if ( empty( $order_key ) ) {
 			/*
 			 * Without an order key we cannot verify the request against the order itself, so only trust the Kustom order
-			 * ID from the query string if it matches the one in the customers own session. Otherwise anyone who knows
+			 * ID from the query string if it matches the one in the customer's own session. Otherwise anyone who knows
 			 * the Kustom order ID could be handed the order received URL, which contains the order key.
 			 */
 			if ( ! isset( WC()->session ) || WC()->session->get( 'kco_wc_order_id' ) !== $klarna_order_id ) {
