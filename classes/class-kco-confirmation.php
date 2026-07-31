@@ -93,9 +93,21 @@ class KCO_Confirmation {
 				 * handles orders that are not paid yet. Acknowledge the Kustom order here instead, so it does not depend
 				 * on the push callback arriving.
 				 */
-				KCO_Logger::log( $klarna_order_id . ': The order ' . $order->get_order_number() . ' was already marked as paid by WooCommerce. Acknowledge the Kustom order from the confirmation page.' );
-				KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
-				KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order->get_id() );
+				KCO_Logger::log( $klarna_order_id . ': The order ' . $order->get_order_number() . ' was already marked as paid by WooCommerce. Validate the Kustom order from the confirmation page before acknowledging it.' );
+
+				/*
+				 * Validate the order against the Kustom order before acknowledging it, the same way the confirmation and
+				 * push callback paths do. Acknowledging cannot be undone, so it must not happen for an order that does
+				 * not match. Leave it to the push callback whenever we cannot validate, and never let a failure here stop
+				 * the redirect below, since the customer would otherwise be left on the checkout page.
+				 */
+				$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
+				if ( is_wp_error( $klarna_order ) ) {
+					KCO_Logger::log( $klarna_order_id . ': Could not get the Kustom order from order management. Leaving the acknowledgement to the push callback.' );
+				} elseif ( kco_validate_order_total( $klarna_order, $order ) && kco_validate_order_content( $klarna_order, $order ) ) {
+					KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+					KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order->get_id() );
+				}
 			}
 
 			kco_unset_sessions();
