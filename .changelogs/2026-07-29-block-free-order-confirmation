@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Restored compatibility for the kco_check_if_needs_payment filter

@@ -57,8 +57,51 @@ class KCO_Confirmation {
 		$order_key       = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		// Return if we don't have our parameters set.
-		if ( empty( $kco_confirm ) || empty( $klarna_order_id ) || empty( $order_key ) ) {
+		if ( empty( $kco_confirm ) || empty( $klarna_order_id ) ) {
 			return;
+		}
+
+		/*
+		 * The confirmation URL is set before the WooCommerce order exists when the block checkout defers the order
+		 * creation to the point where the customer places the order. It therefore points at the checkout page, without
+		 * an order key, and we have to look the order up by the Kustom order ID instead. Redirect to the order received
+		 * page, since the confirmation URL cannot do it for us.
+		 */
+		if ( empty( $order_key ) ) {
+			/*
+			 * Without an order key we cannot verify the request against the order itself, so only trust the Kustom order
+			 * ID from the query string if it matches the one in the customer's own session. Otherwise anyone who knows
+			 * the Kustom order ID could be handed the order received URL, which contains the order key.
+			 */
+			if ( ! isset( WC()->session ) || WC()->session->get( 'kco_wc_order_id' ) !== $klarna_order_id ) {
+				KCO_Logger::log( $klarna_order_id . ': The Kustom order ID on the confirmation page does not match the one in the session. Cannot confirm the order without an order key.' );
+				return;
+			}
+
+			$order = kco_get_order_by_klarna_id( $klarna_order_id, '-2 days' );
+			if ( empty( $order ) ) {
+				KCO_Logger::log( $klarna_order_id . ': Could not find a WooCommerce order for the Kustom order ID on the confirmation page.' );
+				return;
+			}
+
+			if ( empty( $order->get_date_paid() ) ) {
+				KCO_Logger::log( $klarna_order_id . ': Confirm the Kustom order from the confirmation page, without an order key.' );
+				kco_confirm_klarna_order( $order->get_id(), $klarna_order_id );
+			} else {
+				/*
+				 * WooCommerce marks an order that does not need payment as paid itself, and kco_confirm_klarna_order only
+				 * handles orders that are not paid yet. Acknowledge the Kustom order here instead, so it does not depend
+				 * on the push callback arriving.
+				 */
+				KCO_Logger::log( $klarna_order_id . ': The order ' . $order->get_order_number() . ' was already marked as paid by WooCommerce. Acknowledge the Kustom order from the confirmation page.' );
+				KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+				KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order->get_id() );
+			}
+
+			kco_unset_sessions();
+
+			wp_safe_redirect( $order->get_checkout_order_received_url() );
+			exit;
 		}
 
 		if ( ! empty( $order_id ) ) {
