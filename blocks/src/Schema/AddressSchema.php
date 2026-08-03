@@ -6,7 +6,7 @@ namespace Krokedil\KustomCheckout\Blocks\Schema;
  */
 class AddressSchema {
 	/**
-	 * Returns the schema for the Klarna Checkout address data.
+	 * Returns the schema for the Kustom Checkout address data.
 	 *
 	 * @return array
 	 */

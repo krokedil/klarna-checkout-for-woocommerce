@@ -167,7 +167,7 @@ class BlockExtension {
 	}
 
 	/**
-	 * Get the address data for the Klarna Checkout block. Also updates the Klarna order if needed.
+	 * Get the address data for the Kustom Checkout block. Also updates the Klarna order if needed.
 	 *
 	 * @return array
 	 * @throws Exception If we can't get the Klarna order.

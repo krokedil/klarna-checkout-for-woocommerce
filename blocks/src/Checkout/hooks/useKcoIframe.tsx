@@ -215,7 +215,7 @@ export const useKcoIframe = (
 	 * @return {void}
 	 */
 	const registerKCOEvents = useCallback(() => {
-		// Register listeners for the Klarna Checkout events.
+		// Register listeners for the Kustom Checkout events.
 		if ('function' !== typeof window._klarnaCheckout) {
 			return;
 		}

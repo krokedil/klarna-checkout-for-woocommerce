@@ -49,7 +49,7 @@ class Overrides {
 	}
 
 	/**
-	 * Override the request body for the Klarna Checkout API.
+	 * Override the request body for the Kustom Checkout API.
 	 *
 	 * @param array    $args The request arguments.
 	 * @param int|null $order_id The WooCommerce order ID.
@@ -97,7 +97,7 @@ class Overrides {
 	}
 
 	/**
-	 * Override the options for the Klarna Checkout API.
+	 * Override the options for the Kustom Checkout API.
 	 *
 	 * @param array $args The request arguments.
 	 *
@@ -111,7 +111,7 @@ class Overrides {
 	}
 
 	/**
-	 * Override the merchant URLs for the Klarna Checkout API.
+	 * Override the merchant URLs for the Kustom Checkout API.
 	 *
 	 * @param array          $args The request arguments.
 	 * @param \WC_Order|null $draft_order The WooCommerce order, or null if it does not exist yet.
@@ -125,7 +125,7 @@ class Overrides {
 	}
 
 	/**
-	 * Set the merchant reference for the Klarna Checkout API.
+	 * Set the merchant reference for the Kustom Checkout API.
 	 *
 	 * @param array     $args The request arguments.
 	 * @param \WC_Order $draft_order The WooCommerce order.
@@ -157,7 +157,7 @@ class Overrides {
 	}
 
 	/**
-	 * Set the merchant data for the Klarna Checkout API.
+	 * Set the merchant data for the Kustom Checkout API.
 	 *
 	 * @param array $args The request arguments.
 	 *
