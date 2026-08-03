@@ -488,7 +488,7 @@ jQuery( function ( $ ) {
 				type: "POST",
 				dataType: "json",
 				data: {
-					message: message,
+					message: typeof message === "object" ? JSON.stringify( message ) : message,
 					nonce: kco_params.log_to_file_nonce,
 				},
 			} )
@@ -561,10 +561,10 @@ jQuery( function ( $ ) {
 								}
 							} catch ( err ) {
 								if ( data.messages ) {
-									kco_wc.logToFile( "Checkout error | " + data.messages )
+									kco_wc.logToFile( { type: "checkout_error", message: data.messages } )
 									kco_wc.failOrder( "submission", data.messages, callback )
 								} else {
-									kco_wc.logToFile( "Checkout error | No message" )
+									kco_wc.logToFile( { type: "checkout_error", message: "No message" } )
 									kco_wc.failOrder(
 										"submission",
 										'<div class="woocommerce-error">Checkout error</div>',
@@ -574,11 +574,12 @@ jQuery( function ( $ ) {
 							}
 						},
 						error: function ( data ) {
-							try {
-								kco_wc.logToFile( "AJAX error | " + JSON.stringify( data ) )
-							} catch ( e ) {
-								kco_wc.logToFile( "AJAX error | Failed to parse error message." )
-							}
+							const isHtmlResponse = ( data.responseText || "" ).trimStart().startsWith( "<" )
+							kco_wc.logToFile( {
+								type:     "ajax_error",
+								status:   data.status,
+								response: isHtmlResponse ? "[HTML body stripped]" : ( data.responseText || "" ),
+							} )
 							kco_wc.failOrder(
 								"ajax-error",
 								'<div class="woocommerce-error">Internal Server Error</div>',
