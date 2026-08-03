@@ -34,7 +34,7 @@ class OrderController extends Controller {
 	}
 
 	/**
-	 * Validate the order Kustom order.
+	 * Validate the Kustom order.
 	 *
 	 * @param \WP_REST_Request $request The request object.
 	 *

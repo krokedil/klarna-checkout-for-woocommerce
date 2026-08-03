@@ -121,7 +121,7 @@ class OrderValidation {
 	}
 
 	/**
-	 * Get the Kustom order and ensure that its valid.
+	 * Get the Kustom order and ensure that it's valid.
 	 *
 	 * @param string $klarna_order_id The Kustom order ID.
 	 *
