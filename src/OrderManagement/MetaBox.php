@@ -126,7 +126,7 @@ class MetaBox extends OrderMetabox {
 	/**
 	 * Prints the standard content for the OM Metabox
 	 *
-	 * @param object $klarna_order The Klarna order object.
+	 * @param object $klarna_order The Kustom order object.
 	 * @return void
 	 */
 	public function print_standard_content( $klarna_order ) {
@@ -175,7 +175,7 @@ class MetaBox extends OrderMetabox {
 	 * Output the actions dropdown for the metabox.
 	 *
 	 * @param int    $order_id The ID of the order being considered.
-	 * @param object $klarna_order The Klarna order object associated with this order.
+	 * @param object $klarna_order The Kustom order object associated with this order.
 	 */
 	protected function output_actions_dropdown( $order_id, $klarna_order ) {
 		$settings = $this->order_management->settings->get_settings( $order_id );
@@ -324,7 +324,7 @@ class MetaBox extends OrderMetabox {
 	 * Determine if output associated with the Capture option is wanted.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 *
 	 * @return bool Should Capture-related stuff be in the output?
@@ -338,7 +338,7 @@ class MetaBox extends OrderMetabox {
 			return false; // Already captured, can't capture again.
 		}
 		if ( in_array( $klarna_order->status, array( 'CAPTURED', 'PART_CAPTURED', 'CANCELLED' ), true ) ) {
-			return false; // Klarna says it's captured (in whole, or in part) at some point. Can't capture again.
+			return false; // Kustom says it's captured (in whole, or in part) at some point. Can't capture again.
 		}
 		if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 			return true;
@@ -351,7 +351,7 @@ class MetaBox extends OrderMetabox {
 	 * Determine if output associated with the Cancel option is wanted.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 *
 	 * @return bool Should we add the cancel option to the output?
@@ -375,7 +375,7 @@ class MetaBox extends OrderMetabox {
 	 * Capture option for kco_order_actions action list.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */
@@ -389,7 +389,7 @@ class MetaBox extends OrderMetabox {
 	 * Output the tip fragment for the Capture option, if relevant.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */
@@ -403,7 +403,7 @@ class MetaBox extends OrderMetabox {
 	 * Cancel option for kco_order_actions action list.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */
@@ -417,7 +417,7 @@ class MetaBox extends OrderMetabox {
 	 * Output the tip fragment for the Cancel option, if relevant.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */
@@ -431,7 +431,7 @@ class MetaBox extends OrderMetabox {
 	 * Sync option for kco_order_actions action list.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */
@@ -445,7 +445,7 @@ class MetaBox extends OrderMetabox {
 	 * Output the tip fragment for the Sync option, if relevant.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */

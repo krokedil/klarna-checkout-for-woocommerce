@@ -345,7 +345,7 @@ class KCO_Subscription {
 	/**
 	 * Propagate subscription-specific meta from the parent order to its subscriptions.
 	 *
-	 * These values (Klarna environment, KSS shipping data) are written to the parent order during
+	 * These values (Kustom environment, KSS shipping data) are written to the parent order during
 	 * checkout, after the subscription has already been created. Saving them to the subscription
 	 * here ensures the Data Copier can copy them to renewal orders automatically.
 	 *
