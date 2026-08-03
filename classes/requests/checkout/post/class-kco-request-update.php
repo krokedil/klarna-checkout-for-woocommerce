@@ -77,12 +77,20 @@ class KCO_Request_Update extends KCO_Request {
 
 		if ( kco_wc_prefill_allowed() ) {
 			// Built the same way as when the order is created: only fields that have a value are sent, since Kustom keeps whatever it already stored for the fields we omit.
-			$request_body['billing_address'] = KCO_Request_Create::get_billing_address_from_customer();
+			$billing_address = KCO_Request_Create::get_billing_address_from_customer();
+
+			if ( ! empty( $billing_address ) ) {
+				$request_body['billing_address'] = $billing_address;
+			}
 
 			if ( 'yes' === ( $this->settings['allow_separate_shipping'] ?? 'no' ) ) {
-				$request_body['shipping_address'] = KCO_Request_Create::get_shipping_address_from_customer();
-			} else {
-				$request_body['shipping_address'] = $request_body['billing_address'];
+				$shipping_address = KCO_Request_Create::get_shipping_address_from_customer();
+
+				if ( ! empty( $shipping_address ) ) {
+					$request_body['shipping_address'] = $shipping_address;
+				}
+			} elseif ( ! empty( $billing_address ) ) {
+				$request_body['shipping_address'] = $billing_address;
 			}
 		}
 
