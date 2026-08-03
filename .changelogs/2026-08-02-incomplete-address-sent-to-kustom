@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where an incomplete address could be sent to Kustom during checkout, preventing the customer from completing their purchase.
