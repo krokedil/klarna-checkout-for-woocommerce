@@ -5,12 +5,12 @@
  * Description: Kustom Checkout payment gateway for WooCommerce.
  * Author: Kustom
  * Author URI: https://klarna.com/
- * Version: 2.20.6
+ * Version: 2.20.7
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 9.7.0
- * WC tested up to: 10.8.1
+ * WC tested up to: 11.0
  *
  * Copyright (c) 2017-2026 Krokedil
  *
@@ -40,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.20.6' );
+define( 'KCO_WC_VERSION', '2.20.7' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -254,7 +254,6 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-api.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-confirmation.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-credentials.php';
-			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-email.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-fields.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gateway.php';
 			include_once KCO_WC_PLUGIN_PATH . '/classes/class-kco-gdpr.php';

@@ -396,8 +396,8 @@ jQuery( function ( $ ) {
 				)
 				$( "#billing_state" ).val( "region" in data.billing_address ? data.billing_address.region : "" )
 				// Trigger changes
-				$( "#billing_email" ).change()
-				$( "#billing_email" ).blur()
+				$( "#billing_email" ).trigger( "change" )
+				$( "#billing_email" ).trigger( "blur" )
 			}
 
 			if ( "shipping_address" in data && data.shipping_address !== null ) {
@@ -474,7 +474,10 @@ jQuery( function ( $ ) {
 				'<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' + error_message + "</div>",
 			) // eslint-disable-line max-len
 			$( className ).removeClass( "processing" ).unblock()
-			$( className ).find( ".input-text, select, input:checkbox" ).trigger( "validate" ).blur()
+			$( className )
+				.find( ".input-text, select, input:checkbox" )
+				.trigger( "validate" )
+				.trigger( "blur" )
 			$( document.body ).trigger( "checkout_error", [ error_message ] )
 		},
 
@@ -488,7 +491,7 @@ jQuery( function ( $ ) {
 				type: "POST",
 				dataType: "json",
 				data: {
-					message: message,
+					message: typeof message === "object" ? JSON.stringify( message ) : message,
 					nonce: kco_params.log_to_file_nonce,
 				},
 			} )
@@ -561,10 +564,10 @@ jQuery( function ( $ ) {
 								}
 							} catch ( err ) {
 								if ( data.messages ) {
-									kco_wc.logToFile( "Checkout error | " + data.messages )
+									kco_wc.logToFile( { type: "checkout_error", message: data.messages } )
 									kco_wc.failOrder( "submission", data.messages, callback )
 								} else {
-									kco_wc.logToFile( "Checkout error | No message" )
+									kco_wc.logToFile( { type: "checkout_error", message: "No message" } )
 									kco_wc.failOrder(
 										"submission",
 										'<div class="woocommerce-error">Checkout error</div>',
@@ -574,11 +577,12 @@ jQuery( function ( $ ) {
 							}
 						},
 						error: function ( data ) {
-							try {
-								kco_wc.logToFile( "AJAX error | " + JSON.stringify( data ) )
-							} catch ( e ) {
-								kco_wc.logToFile( "AJAX error | Failed to parse error message." )
-							}
+							const isHtmlResponse = ( data.responseText || "" ).trimStart().startsWith( "<" )
+							kco_wc.logToFile( {
+								type:     "ajax_error",
+								status:   data.status,
+								response: isHtmlResponse ? "[HTML body stripped]" : ( data.responseText || "" ),
+							} )
 							kco_wc.failOrder(
 								"ajax-error",
 								'<div class="woocommerce-error">Internal Server Error</div>',
@@ -643,20 +647,20 @@ jQuery( function ( $ ) {
 								"postal_code" in data && $( "#billing_postcode" ).val( data.postal_code )
 								"country" in data && $( "#billing_country" ).val( country )
 								"email" in data && $( "#billing_email" ).val( data.email )
-								$( "#billing_country" ).change()
-								$( "#billing_email" ).change()
-								$( "#billing_email" ).blur()
+								$( "#billing_country" ).trigger( "change" )
+								$( "#billing_email" ).trigger( "change" )
+								$( "#billing_email" ).trigger( "blur" )
 
 								kco_wc.update_checkout.fire()
 							} else {
 								$( "#ship-to-different-address-checkbox" ).prop( "checked", true )
-								$( "#ship-to-different-address-checkbox" ).change()
-								$( "#ship-to-different-address-checkbox" ).blur()
+								$( "#ship-to-different-address-checkbox" ).trigger( "change" )
+								$( "#ship-to-different-address-checkbox" ).trigger( "blur" )
 								"given_name" in data && $( "#shipping_first_name" ).val( data.given_name )
 								"family_name" in data && $( "#shipping_last_name" ).val( data.family_name )
 								"postal_code" in data && $( "#shipping_postcode" ).val( data.postal_code )
 								"country" in data && $( "#shipping_country" ).val( country )
-								$( "#shipping_country" ).change()
+								$( "#shipping_country" ).trigger( "change" )
 
 								$( "form.checkout" ).trigger( "update_checkout" )
 							}
@@ -671,9 +675,9 @@ jQuery( function ( $ ) {
 							"postal_code" in data && $( "#billing_postcode" ).val( data.postal_code )
 							"country" in data && $( "#billing_country" ).val( country )
 							"email" in data && $( "#billing_email" ).val( data.email )
-							$( "#billing_country" ).change()
-							$( "#billing_email" ).change()
-							$( "#billing_email" ).blur()
+							$( "#billing_country" ).trigger( "change" )
+							$( "#billing_email" ).trigger( "change" )
+							$( "#billing_email" ).trigger( "blur" )
 
 							kco_wc.update_checkout.fire()
 						},

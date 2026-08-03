@@ -59,13 +59,6 @@ class KCO_Fields {
 					'autocomplete' => 'off',
 				),
 			),
-			'add_to_email'               => array(
-				'title'    => __( 'Add Kustom Post Purchase info to order email', 'klarna-checkout-for-woocommerce' ),
-				'type'     => 'checkbox',
-				'label'    => __( 'This will add Kustom\'s Post Purchase information to the order emails that are sent. You can read more about this here: ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.klarna.com/guidelines/klarna-checkout-best-practices/post-purchase/order-confirmation/" target="_blank">Kustom URLs</a>',
-				'default'  => 'no',
-				'desc_tip' => true,
-			),
 			'testmode'                   => array(
 				'title'       => __( 'Test mode', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Test Mode', 'klarna-checkout-for-woocommerce' ),
