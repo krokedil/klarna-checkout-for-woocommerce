@@ -145,7 +145,7 @@ abstract class CheckoutFlow {
 	}
 
 	/**
-	 * Get the Kustom order for a order number, or throw an error.
+	 * Get the Kustom order for an order number, or throw an error.
 	 *
 	 * @param string $klarna_order_id The Kustom order ID.
 	 *
