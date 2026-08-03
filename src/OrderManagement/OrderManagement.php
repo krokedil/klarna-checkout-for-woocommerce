@@ -520,7 +520,7 @@ class OrderManagement {
 
 		if ( is_wp_error( $klarna_order ) ) {
 			// translators: %s Kustom error message.
-			$order->add_order_note( \sprintf( __( 'Could not refund Klarna order. %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() ) );
+			$order->add_order_note( \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() ) );
 			$order->save();
 
 			return new \WP_Error( 'object_error', 'Klarna order object is of type WP_Error.', $klarna_order );
@@ -560,7 +560,7 @@ class OrderManagement {
 		$response = $request->request();
 		if ( is_wp_error( $response ) ) {
 			// translators: %s Kustom error message.
-			$order->add_order_note( \sprintf( __( 'Could not refund Klarna order. %s.', 'klarna-checkout-for-woocommerce' ), $response->get_error_message() ) );
+			$order->add_order_note( \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $response->get_error_message() ) );
 			$order->save();
 
 			return new \WP_Error( 'unknown_error', 'Response object is of type WP_Error.', $response );
