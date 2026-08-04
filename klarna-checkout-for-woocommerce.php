@@ -32,6 +32,7 @@ use Krokedil\KustomCheckout\Blocks\BlockExtension;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
+use Krokedil\KustomCheckout\Elements\Settings as ElementsSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -129,6 +130,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var PickupPoints $pickup_points
 		 */
 		public $pickup_points;
+
+		/**
+		 * Reference to Elements settings class.
+		 *
+		 * @var ElementsSettings $elements_settings
+		 */
+		public $elements_settings;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -298,18 +306,19 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
 
 			// Set class variables.
-			$this->credentials      = new KCO_Credentials();
-			$this->merchant_urls    = new KCO_Merchant_URLs();
-			$this->logger           = new KCO_Logger();
-			$this->api              = new KCO_API();
-			$this->krokedil         = new KrokedilWooCommerce(
+			$this->credentials       = new KCO_Credentials();
+			$this->merchant_urls     = new KCO_Merchant_URLs();
+			$this->logger            = new KCO_Logger();
+			$this->api               = new KCO_API();
+			$this->krokedil          = new KrokedilWooCommerce(
 				array(
 					'slug'         => 'kco',
 					'price_format' => 'minor',
 				)
 			);
-			$this->order_management = new OrderManagement();
-			$this->pickup_points    = new PickupPoints();
+			$this->order_management  = new OrderManagement();
+			$this->pickup_points     = new PickupPoints();
+			$this->elements_settings = new ElementsSettings();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
