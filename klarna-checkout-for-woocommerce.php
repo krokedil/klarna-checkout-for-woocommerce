@@ -32,7 +32,7 @@ use Krokedil\KustomCheckout\Blocks\BlockExtension;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
-use Krokedil\KustomCheckout\Elements\Settings as ElementsSettings;
+use Krokedil\KustomCheckout\Elements\Elements;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -132,11 +132,11 @@ if ( ! class_exists( 'KCO' ) ) {
 		public $pickup_points;
 
 		/**
-		 * Reference to Elements settings class.
+		 * Reference to Elements class.
 		 *
-		 * @var ElementsSettings $elements_settings
+		 * @var Elements $elements
 		 */
-		public $elements_settings;
+		public $elements;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -306,19 +306,19 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
 
 			// Set class variables.
-			$this->credentials       = new KCO_Credentials();
-			$this->merchant_urls     = new KCO_Merchant_URLs();
-			$this->logger            = new KCO_Logger();
-			$this->api               = new KCO_API();
-			$this->krokedil          = new KrokedilWooCommerce(
+			$this->credentials      = new KCO_Credentials();
+			$this->merchant_urls    = new KCO_Merchant_URLs();
+			$this->logger           = new KCO_Logger();
+			$this->api              = new KCO_API();
+			$this->krokedil         = new KrokedilWooCommerce(
 				array(
 					'slug'         => 'kco',
 					'price_format' => 'minor',
 				)
 			);
-			$this->order_management  = new OrderManagement();
-			$this->pickup_points     = new PickupPoints();
-			$this->elements_settings = new ElementsSettings();
+			$this->order_management = new OrderManagement();
+			$this->pickup_points    = new PickupPoints();
+			$this->elements         = new Elements();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
