@@ -375,7 +375,7 @@ class OrderValidation {
 		$updated_order = wc_get_order( $order_response['order_id'] ?? null );
 
 		if ( ! $updated_order ) {
-			\KCO_Logger::log( "[Blocks] - Could not find the WooCommerce order for Klarna order $klarna_id." );
+			\KCO_Logger::log( "[Blocks] - Could not find the WooCommerce order for Kustom order $klarna_id." );
 			throw new Exception( 'Could not find the WooCommerce order.' );
 		}
 
