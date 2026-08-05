@@ -100,8 +100,8 @@ class UpsellValidator {
 			throw new UpsellException( "Could not retrieve KCO order for order ID {$this->kco_order_id}" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- ID is escaped on assignment.
 		}
 
-		if ( 'checkout_complete' !== $klarna_order['status'] || ! $klarna_order['payment_type_allows_increase'] ) {
-			throw new UpsellException( 'KCO order status is not checkout_complete or payment type does not allow increase, cannot add upsell items.' );
+		if ( 'checkout_complete' !== $klarna_order['status'] ) {
+			throw new UpsellException( 'KCO order status is not checkout_complete, cannot add upsell items.' );
 		}
 
 		return $klarna_order;
