@@ -107,7 +107,7 @@ class KCO_API {
 				}
 				if ( $has_currency_error ) {
 					WC()->session->set( 'reload_checkout', true );
-					KCO_Logger::log( 'Klarna BAD_VALUE purchase_currency mismatch for order ' . $klarna_order_id . '. Reloading checkout.' );
+					KCO_Logger::log( 'Kustom BAD_VALUE purchase_currency mismatch for order ' . $klarna_order_id . '. Reloading checkout.' );
 					return false;
 				}
 			}
