@@ -79,12 +79,12 @@ abstract class CheckoutFlow {
 	abstract public function process( $order );
 
 	/**
-	 * Get the Klarna order id for the order.
+	 * Get the Kustom order id for the order.
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
 	 *
-	 * @return string|null The Klarna order id or null if not set.
-	 * @throws Exception If there is an error retrieving the Klarna order id.
+	 * @return string|null The Kustom order id or null if not set.
+	 * @throws Exception If there is an error retrieving the Kustom order id.
 	 */
 	public function get_klarna_order_id( $order ) {
 		// For the initial subscription, the Kustom order ID should always exist in the session.
@@ -111,7 +111,7 @@ abstract class CheckoutFlow {
 	/**
 	 * Log extra shipping debug information.
 	 *
-	 * @param string    $klarna_order_id The Klarna order ID.
+	 * @param string    $klarna_order_id The Kustom order ID.
 	 * @param \WC_Order $order The WooCommerce order.
 	 *
 	 * @return void
@@ -145,12 +145,12 @@ abstract class CheckoutFlow {
 	}
 
 	/**
-	 * Get the klarna order for a order number, or throw an error.
+	 * Get the Kustom order for an order number, or throw an error.
 	 *
-	 * @param string $klarna_order_id The Klarna order ID.
+	 * @param string $klarna_order_id The Kustom order ID.
 	 *
 	 * @return array
-	 * @throws Exception If the Klarna order is not found or if there is an error.
+	 * @throws Exception If the Kustom order is not found or if there is an error.
 	 */
 	public function get_klarna_order( $klarna_order_id ) {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
@@ -166,7 +166,7 @@ abstract class CheckoutFlow {
 	 * Save metadata to the order.
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
-	 * @param array     $klarna_order The Klarna order data.
+	 * @param array     $klarna_order The Kustom order data.
 	 * @param string    $checkout_flow The checkout flow type (e.g., 'embedded', 'redirect').
 	 * @param bool      $save Whether to save the order metadata or not. Default is true.
 	 *

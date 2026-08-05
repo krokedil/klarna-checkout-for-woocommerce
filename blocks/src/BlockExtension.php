@@ -141,7 +141,7 @@ class BlockExtension {
 	}
 
 	/**
-	 * Update the shipping address in WooCommerce on change from Klarna.
+	 * Update the shipping address in WooCommerce on change from Kustom.
 	 *
 	 * @param array $data The data from the API.
 	 *
@@ -167,28 +167,28 @@ class BlockExtension {
 	}
 
 	/**
-	 * Get the address data for the Klarna Checkout block. Also updates the Klarna order if needed.
+	 * Get the address data for the Kustom Checkout block. Also updates the Kustom order if needed.
 	 *
 	 * @return array
-	 * @throws Exception If we can't get the Klarna order.
+	 * @throws Exception If we can't get the Kustom order.
 	 */
 	public function get_address() {
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
-		// Only run this if we have a Klarna order id.
+		// Only run this if we have a Kustom order id.
 		if ( ! $klarna_order_id ) {
 			return array();
 		}
 
-		// Maybe update the Klarna order.
+		// Maybe update the Kustom order.
 		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 
-		// If we did not get a Klarna order, get it instead.
+		// If we did not get a Kustom order, get it instead.
 		if ( ! $klarna_order ) {
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 		}
 
-		// If we still don't have a Klarna order, throw an exception.
+		// If we still don't have a Kustom order, throw an exception.
 		if ( ! $klarna_order ) {
 			throw new Exception( 'Could not get Klarna order' );
 		}

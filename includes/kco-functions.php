@@ -949,9 +949,9 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 }
 
 /**
- * Maybe set the pickup point for the Klarna order if it exists.
+ * Maybe set the pickup point for the Kustom order if it exists.
  *
- * @param array $klarna_order The Klarna order data.
+ * @param array $klarna_order The Kustom order data.
  * @return void
  */
 function kco_maybe_set_selected_pickup_point( $klarna_order ) {

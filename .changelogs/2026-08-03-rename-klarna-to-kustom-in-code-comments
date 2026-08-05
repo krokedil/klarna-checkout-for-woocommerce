@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: no
+
+Updated code comments and docblocks to refer to Kustom instead of Klarna

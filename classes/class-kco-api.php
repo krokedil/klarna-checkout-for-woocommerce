@@ -45,7 +45,7 @@ class KCO_API {
 	/**
 	 * Gets a Kustom Checkout order
 	 *
-	 * @param string $klarna_order_id The Klarna Checkout order id.
+	 * @param string $klarna_order_id The Kustom Checkout order id.
 	 * @return array|false
 	 */
 	public function get_klarna_order( $klarna_order_id ) {

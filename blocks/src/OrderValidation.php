@@ -15,9 +15,9 @@ defined( 'ABSPATH' ) || exit;
  */
 class OrderValidation {
 	/**
-	 * Validate the Klarna order.
+	 * Validate the Kustom order.
 	 *
-	 * @param string $klarna_order_id The Klarna order ID.
+	 * @param string $klarna_order_id The Kustom order ID.
 	 *
 	 * @return void
 	 * @throws Exception If the request is invalid or the order could not be verified.
@@ -42,10 +42,10 @@ class OrderValidation {
 		if ( $order ) {
 			self::validate_wc_order( $order );
 
-			// Set the klarna order id in the order meta data.
+			// Set the Kustom order id in the order meta data.
 			$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
 
-			// Set the customers billing email from the klarna order.
+			// Set the customers billing email from the Kustom order.
 			$order->set_billing_email( $klarna_order['billing_address']['email'] ?? '' );
 
 			$order->save();
@@ -65,7 +65,7 @@ class OrderValidation {
 	/**
 	 * Validate the hashes to ensure the order is valid.
 	 *
-	 * @param string $klarna_hash The hash from Klarna.
+	 * @param string $klarna_hash The hash from Kustom.
 	 * @param string $wc_hash The hash from WooCommerce.
 	 *
 	 * @return void
@@ -80,7 +80,7 @@ class OrderValidation {
 	/**
 	 * Validate the hashes to ensure the order is valid.
 	 *
-	 * @param array          $klarna_order The Klarna order.
+	 * @param array          $klarna_order The Kustom order.
 	 * @param SessionHandler $session The WooCommerce session handler.
 	 *
 	 * @return void
@@ -121,12 +121,12 @@ class OrderValidation {
 	}
 
 	/**
-	 * Get the Klarna order and ensure that its valid.
+	 * Get the Kustom order and ensure that it's valid.
 	 *
-	 * @param string $klarna_order_id The Klarna order ID.
+	 * @param string $klarna_order_id The Kustom order ID.
 	 *
 	 * @return array
-	 * @throws Exception If the request is invalid or the Klarna order could not be found.
+	 * @throws Exception If the request is invalid or the Kustom order could not be found.
 	 */
 	private static function get_klarna_order( $klarna_order_id ) {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
@@ -141,14 +141,14 @@ class OrderValidation {
 	/**
 	 * Validate the price to ensure the order is valid.
 	 *
-	 * @param int   $klarna_price The price from Klarna.
+	 * @param int   $klarna_price The price from Kustom.
 	 * @param float $wc_price The price from WooCommerce.
 	 *
 	 * @return void
 	 * @throws Exception If the prices do not match.
 	 */
 	private static function validate_price( $klarna_price, $wc_price ) {
-		// Divide the Klarna price by 100, to make it a floating point number.
+		// Divide the Kustom price by 100, to make it a floating point number.
 		$klarna_price = floatval( $klarna_price ) / 100;
 
 		$klarna_price = wc_format_decimal( $klarna_price, wc_get_price_decimals() );
@@ -162,7 +162,7 @@ class OrderValidation {
 	/**
 	 * Validate the order totals to ensure the order is valid.
 	 *
-	 * @param array     $klarna_order The Klarna order.
+	 * @param array     $klarna_order The Kustom order.
 	 * @param \WC_Order $order The WooCommerce order.
 	 *
 	 * @return void
@@ -199,13 +199,13 @@ class OrderValidation {
 	/**
 	 * Load the WooCommerce cart.
 	 *
-	 * @param array $klarna_order The Klarna order.
+	 * @param array $klarna_order The Kustom order.
 	 *
 	 * @return SessionHandler
 	 * @throws Exception If the cart could not be loaded.
 	 */
 	private static function load_wc_session( $klarna_order ) {
-		// Get the wc_cart_token from the klarna order merchant data.
+		// Get the wc_cart_token from the Kustom order merchant data.
 		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
 		$wc_cart_token        = $klarna_merchant_data['wc_cart_token'] ?? '';
 
@@ -230,7 +230,7 @@ class OrderValidation {
 	/**
 	 * Submit the WooCommerce order.
 	 *
-	 * @param array          $klarna_order The Klarna order.
+	 * @param array          $klarna_order The Kustom order.
 	 * @param \WC_Order|null $order The WooCommerce order, or null when it should be created from the cart token.
 	 *
 	 * @return \WC_Order The updated WooCommerce order after submission.
@@ -316,7 +316,7 @@ class OrderValidation {
 			$body['shipping_address']['company'] = $klarna_shipping_address['organization_name'];
 		}
 
-		// If the klarna order is a recurring order.
+		// If the Kustom order is a recurring order.
 		if ( isset( $klarna_order['recurring'] ) ) {
 			$body['payment_data'][] = array(
 				'key'   => '_kco_recurring_order',
