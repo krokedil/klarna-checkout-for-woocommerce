@@ -26,6 +26,8 @@ function kco_create_or_update_order() {
 	WC()->cart->calculate_totals();
 	if ( WC()->session->get( 'kco_wc_order_id' ) ) { // Check if we have an order id.
 		// Try to update the order, if it fails try to create new order.
+		// This is also how an order that expired at Kustom recovers: the update answers 404 with an empty body and
+		// fails, and the create below replaces the stale session id. Keep that fallback intact.
 		$klarna_order = KCO_WC()->api->update_klarna_order( WC()->session->get( 'kco_wc_order_id' ), null, true );
 		if ( ! $klarna_order ) {
 			// If update order failed try to create new order.

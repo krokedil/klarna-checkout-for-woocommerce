@@ -111,26 +111,11 @@ class KCO_Checkout {
 			return;
 		}
 
-		// Requested directly rather than through the API wrapper, which reduces every failure to false. The error
-		// has to be readable here to tell "this order is gone" apart from a transient failure.
-		$response = ( new KCO_Request_Retrieve() )->request( $klarna_order_id );
-		if ( is_wp_error( $response ) || empty( $response ) ) {
+		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+		if ( ! $klarna_order ) {
 			KCO_Logger::log( "Klarna order could not be retrieved during update for ID: $klarna_order_id " );
-
-			if ( is_wp_error( $response ) ) {
-				kco_print_error_message( $response );
-
-				// Only discard the stored order when Kustom answered that it is gone. A timeout or a 5xx is transient,
-				// and dropping the ID there would orphan the order and create a new one on every hiccup.
-				$error_code = $response->get_error_code();
-				if ( 'received_empty_body' === $error_code || 404 === $error_code ) {
-					WC()->session->__unset( 'kco_wc_order_id' );
-				}
-			}
 			return;
 		}
-
-		$klarna_order = $response;
 
 		$updated_klarna_order = false;
 		if ( 'checkout_incomplete' === $klarna_order['status'] ) {
