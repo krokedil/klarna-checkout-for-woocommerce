@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Save the customer shipping city from Kustom alongside postcode and country during block-based address updates.

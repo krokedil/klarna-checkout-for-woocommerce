@@ -153,6 +153,10 @@ class BlockExtension {
 			WC()->customer->set_shipping_postcode( $data['postal_code'] );
 		}
 
+		if ( isset( $data['city'] ) ) {
+			WC()->customer->set_shipping_city( $data['city'] );
+		}
+
 		if ( isset( $data['country'] ) ) {
 			WC()->customer->set_shipping_country( $data['country'] );
 		}
