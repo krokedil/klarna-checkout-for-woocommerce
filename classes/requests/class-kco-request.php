@@ -155,9 +155,11 @@ class KCO_Request {
 				// An expired order answers with an empty body. The checkout recovers by creating a new one, so keep this out of the customer's way.
 				// Only a genuinely empty body counts. A body we failed to decode is still a real error and has to reach the customer.
 				return new WP_Error( 'received_empty_body', "received empty body (HTTP {$code})", $data );
-			} elseif ( null === $errors ) {
+			} elseif ( JSON_ERROR_NONE !== json_last_error() ) {
 				// Not JSON at all, typically an HTML error page from something in front of Kustom. Keep the body out
 				// of the message so upstream markup is never rendered in the checkout, and log it instead.
+				// Asks json_last_error() rather than testing $errors for null, since a body of literal null decodes to
+				// null without being a decode failure.
 				KCO_Logger::log( "Unreadable error body (HTTP {$code}) from Kustom: " . substr( $body, 0, 500 ) . " URL: {$request_url}" );
 				return new WP_Error( $code, "the payment provider returned an unreadable error (HTTP {$code})", $data );
 			} elseif ( isset( $errors['error_messages'] ) && is_array( $errors['error_messages'] ) ) {
