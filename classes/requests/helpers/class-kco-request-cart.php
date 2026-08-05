@@ -245,15 +245,9 @@ class KCO_Request_Cart {
 				// Add images.
 				$klarna_checkout_settings = get_option( 'woocommerce_kco_settings', array() );
 				if ( isset( $klarna_checkout_settings['send_product_urls'] ) && 'yes' === $klarna_checkout_settings['send_product_urls'] ) {
-					// The placeholder product that YITH WAPO uses for add-ons sold individually is private and has no image. Refer to the product the add-on belongs to instead.
-					$url_product = kco_get_yith_wapo_addon_parent_product( $cart_item );
-					if ( ! $url_product ) {
-						$url_product = $product;
-					}
+					$image_url = $this->get_item_image_url( $product );
 
-					$image_url = $this->get_item_image_url( $url_product );
-
-					$klarna_item['product_url'] = $this->get_item_product_url( $url_product );
+					$klarna_item['product_url'] = $this->get_item_product_url( $product );
 					if ( $image_url ) {
 						$klarna_item['image_url'] = $image_url;
 					}
@@ -400,14 +394,9 @@ class KCO_Request_Cart {
 	 * @return string $item_name Cart item name.
 	 */
 	public function get_item_name( $cart_item ) {
-		// An add-on sold individually by YITH WAPO is added to the cart as a placeholder product that is named after the plugin.
-		$item_name = kco_get_yith_wapo_addon_name( $cart_item );
+		$item_name = substr( $cart_item['data']->get_name(), 0, 254 );
 
-		if ( empty( $item_name ) ) {
-			$item_name = $cart_item['data']->get_name();
-		}
-
-		return substr( wp_strip_all_tags( $item_name ), 0, 254 );
+		return wp_strip_all_tags( $item_name );
 	}
 
 	/**
