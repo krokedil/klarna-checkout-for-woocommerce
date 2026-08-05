@@ -566,6 +566,11 @@ function is_kco_confirmation() {
  * @return void
  */
 function kco_print_error_message( $wp_error ) {
+	// The checkout recovers from an empty body on its own by creating a new order, so don't alarm the customer.
+	if ( 'received_empty_body' === $wp_error->get_error_code() ) {
+		return;
+	}
+
 	if ( is_ajax() ) {
 		wc_add_notice( $wp_error->get_error_message(), 'error' );
 	} else {

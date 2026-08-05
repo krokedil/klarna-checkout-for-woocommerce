@@ -114,6 +114,8 @@ class KCO_Checkout {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 		if ( ! $klarna_order ) {
 			KCO_Logger::log( "Klarna order could not be retrieved during update for ID: $klarna_order_id " );
+			// The stored order is gone (e.g. it expired). Clear it so this render creates a fresh order instead of retrying the dead ID.
+			WC()->session->__unset( 'kco_wc_order_id' );
 			return;
 		}
 

@@ -152,7 +152,8 @@ class KCO_Request {
 			// Get the error messages.
 			$errors = json_decode( $body, true );
 			if ( empty( $errors ) ) {
-				return new WP_Error( $code, 'received empty body', $data );
+				// An expired order answers with an empty body. The checkout recovers by creating a new one, so keep this out of the customer's way.
+				return new WP_Error( 'received_empty_body', "received empty body (HTTP {$code})", $data );
 			} elseif ( isset( $errors['error_messages'] ) && is_array( $errors['error_messages'] ) ) {
 				foreach ( $errors['error_messages'] as $error ) {
 					$error_message = "$error_message  $error";
