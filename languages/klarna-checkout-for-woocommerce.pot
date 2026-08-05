@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-08-05 13:06+0000\n"
+"POT-Creation-Date: 2026-08-05 13:11+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -220,7 +220,7 @@ msgid "Product URLs"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:233
-msgid "Send product and product image URLs to Klarna"
+msgid "Send product and product image URLs to Kustom"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:238
@@ -591,11 +591,11 @@ msgid "Invalid order ID."
 msgstr ""
 
 #: ../src/CheckoutFlow/CheckoutFlow.php:105
-msgid "Klarna order ID not found."
+msgid "Kustom order ID not found."
 msgstr ""
 
 #: ../src/CheckoutFlow/CheckoutFlow.php:159
-msgid "Klarna order not found or an error occurred."
+msgid "Kustom order not found or an error occurred."
 msgstr ""
 
 #: ../src/CheckoutFlow/CheckoutFlow.php:285
@@ -627,11 +627,11 @@ msgid "Failed to retrieve the order from Kustom."
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:145
-msgid "Klarna Environment"
+msgid "Kustom Environment"
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:150
-msgid "Klarna order status"
+msgid "Kustom order status"
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:155
@@ -651,7 +651,7 @@ msgid "Order management"
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:273
-msgid "Disable this to turn off the automatic synchronization with the Klarna Merchant Portal. When disabled, any changes in either system have to be done manually."
+msgid "Disable this to turn off the automatic synchronization with the Kustom Merchant Portal. When disabled, any changes in either system have to be done manually."
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:384, ../src/OrderManagement/MetaBox.php:398
@@ -675,7 +675,7 @@ msgid "Get customer"
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:454
-msgid "Gets the customer data from Klarna and saves it to the WooCommerce order."
+msgid "Gets the customer data from Kustom and saves it to the WooCommerce order."
 msgstr ""
 
 #: ../src/OrderManagement/OrderLines.php:173

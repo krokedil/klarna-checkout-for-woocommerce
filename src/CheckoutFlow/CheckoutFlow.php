@@ -102,7 +102,7 @@ abstract class CheckoutFlow {
 		$klarna_order_id = ! empty( $klarna_order_id ) ? $klarna_order_id : WC()->session->get( 'kco_wc_order_id' );
 
 		if ( empty( $klarna_order_id ) ) {
-			throw new Exception( __( 'Klarna order ID not found.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
+			throw new Exception( __( 'Kustom order ID not found.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
 		}
 
 		return $klarna_order_id;
@@ -156,7 +156,7 @@ abstract class CheckoutFlow {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
 		if ( is_wp_error( $klarna_order ) || empty( $klarna_order ) ) {
-			throw new Exception( __( 'Klarna order not found or an error occurred.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
+			throw new Exception( __( 'Kustom order not found or an error occurred.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
 		}
 
 		return $klarna_order;

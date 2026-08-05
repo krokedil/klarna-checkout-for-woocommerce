@@ -142,12 +142,12 @@ class MetaBox extends OrderMetabox {
 		$environment = ! empty( $order->get_meta( '_wc_klarna_environment' ) ) ? $order->get_meta( '_wc_klarna_environment' ) : '';
 
 		self::output_info(
-			__( 'Klarna Environment', 'klarna-checkout-for-woocommerce' ),
+			__( 'Kustom Environment', 'klarna-checkout-for-woocommerce' ),
 			apply_filters( 'kom_meta_environment', $environment )
 		);
 
 		self::output_info(
-			__( 'Klarna order status', 'klarna-checkout-for-woocommerce' ),
+			__( 'Kustom order status', 'klarna-checkout-for-woocommerce' ),
 			apply_filters( 'kom_meta_order_status', $klarna_order->status )
 		);
 
@@ -270,7 +270,7 @@ class MetaBox extends OrderMetabox {
 
 		$om_status = $order->get_meta( $kom_disconnected_key ) ? 'disabled' : 'enabled';
 		$title     = __( 'Order management', 'klarna-checkout-for-woocommerce' );
-		$tip       = __( 'Disable this to turn off the automatic synchronization with the Klarna Merchant Portal. When disabled, any changes in either system have to be done manually.', 'klarna-checkout-for-woocommerce' );
+		$tip       = __( 'Disable this to turn off the automatic synchronization with the Kustom Merchant Portal. When disabled, any changes in either system have to be done manually.', 'klarna-checkout-for-woocommerce' );
 		$enabled   = 'enabled' === $om_status ? true : false;
 
 		ob_start();
@@ -451,7 +451,7 @@ class MetaBox extends OrderMetabox {
 	 */
 	public function output_tip_sync( $order_id, $klarna_order, $actions ) {
 		if ( $actions['sync'] ) {
-			$this->print_tip_fragment( __( 'Get customer', 'klarna-checkout-for-woocommerce' ), __( 'Gets the customer data from Klarna and saves it to the WooCommerce order.', 'klarna-checkout-for-woocommerce' ) );
+			$this->print_tip_fragment( __( 'Get customer', 'klarna-checkout-for-woocommerce' ), __( 'Gets the customer data from Kustom and saves it to the WooCommerce order.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 

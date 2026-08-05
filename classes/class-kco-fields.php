@@ -230,7 +230,7 @@ class KCO_Fields {
 			'send_product_urls'          => array(
 				'title'    => __( 'Product URLs', 'klarna-checkout-for-woocommerce' ),
 				'type'     => 'checkbox',
-				'label'    => __( 'Send product and product image URLs to Klarna', 'klarna-checkout-for-woocommerce' ),
+				'label'    => __( 'Send product and product image URLs to Kustom', 'klarna-checkout-for-woocommerce' ),
 				'default'  => 'yes',
 				'desc_tip' => true,
 			),
