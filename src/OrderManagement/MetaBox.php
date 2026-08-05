@@ -106,7 +106,7 @@ class MetaBox extends OrderMetabox {
 
 		// Check if the order has been paid.
 		if ( empty( $order->get_date_paid() ) && ! in_array( $order->get_status(), array( 'on-hold' ), true ) ) {
-			$this->print_error_content( __( 'The payment has not been finalized with Klarna.', 'klarna-checkout-for-woocommerce' ) );
+			$this->print_error_content( __( 'The payment has not been finalized with Kustom.', 'klarna-checkout-for-woocommerce' ) );
 			return;
 		}
 		// False if automatic settings are enabled, true if not. If true then show the option.
@@ -115,7 +115,7 @@ class MetaBox extends OrderMetabox {
 			$klarna_order = $this->order_management->retrieve_klarna_order( $order_id );
 
 			if ( is_wp_error( $klarna_order ) ) {
-				$this->print_error_content( __( 'Failed to retrieve the order from Klarna.', 'klarna-checkout-for-woocommerce' ) );
+				$this->print_error_content( __( 'Failed to retrieve the order from Kustom.', 'klarna-checkout-for-woocommerce' ) );
 				return;
 			}
 
@@ -395,7 +395,7 @@ class MetaBox extends OrderMetabox {
 	 */
 	public function output_tip_capture( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_capture( $order_id, $klarna_order, $actions ) ) {
-			$this->print_tip_fragment( __( 'Capture order', 'klarna-checkout-for-woocommerce' ), __( 'Activates the order with Klarna.', 'klarna-checkout-for-woocommerce' ) );
+			$this->print_tip_fragment( __( 'Capture order', 'klarna-checkout-for-woocommerce' ), __( 'Activates the order with Kustom.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -423,7 +423,7 @@ class MetaBox extends OrderMetabox {
 	 */
 	public function output_tip_cancel( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_cancel( $order_id, $klarna_order, $actions ) ) {
-			$this->print_tip_fragment( __( 'Cancel order', 'klarna-checkout-for-woocommerce' ), __( 'Cancels the order with Klarna.', 'klarna-checkout-for-woocommerce' ) );
+			$this->print_tip_fragment( __( 'Cancel order', 'klarna-checkout-for-woocommerce' ), __( 'Cancels the order with Kustom.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 

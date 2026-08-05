@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-06-30 13:45+0000\n"
+"POT-Creation-Date: 2026-08-05 13:06+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -29,7 +29,7 @@ msgstr ""
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:427, ../klarna-checkout-for-woocommerce.php:437
+#: ../klarna-checkout-for-woocommerce.php:426, ../klarna-checkout-for-woocommerce.php:436
 msgid "Your installation of Kustom Checkout for WooCommerce is not complete. If you installed this plugin directly from Github please refer to the README.DEV.md file in the plugin."
 msgstr ""
 
@@ -503,7 +503,7 @@ msgstr ""
 
 #. translators: Error message.
 #: ../classes/class-kco-subscription.php:476
-msgid "Subscription payment failed with Klarna. Message: %1$s"
+msgid "Subscription payment failed with Kustom. Message: %1$s"
 msgstr ""
 
 #: ../classes/class-kco-subscription.php:469
@@ -561,73 +561,44 @@ msgstr ""
 msgid "The product \"%s\" was not found in the Kustom order."
 msgstr ""
 
-#: ../classes/admin/class-kco-admin-notices.php:91
+#: ../classes/admin/class-kco-admin-notices.php:90
 msgid "You need to specify a terms page in WooCommerce Settings to be able to use Kustom Checkout. "
 msgstr ""
 
-#: ../classes/admin/class-kco-admin-notices.php:91, ../classes/admin/class-kco-admin-notices.php:108, ../classes/admin/class-kco-admin-notices.php:128, ../classes/admin/class-kco-admin-notices.php:147, ../classes/admin/class-kco-admin-notices.php:169, ../classes/admin/class-kco-admin-notices.php:232
+#: ../classes/admin/class-kco-admin-notices.php:90, ../classes/admin/class-kco-admin-notices.php:107, ../classes/admin/class-kco-admin-notices.php:127, ../classes/admin/class-kco-admin-notices.php:146, ../classes/admin/class-kco-admin-notices.php:209
 msgid "Read more here. "
 msgstr ""
 
-#: ../classes/admin/class-kco-admin-notices.php:108
+#: ../classes/admin/class-kco-admin-notices.php:107
 msgid "You need to enable and configure https to be able to use Kustom Checkout. "
 msgstr ""
 
 #. translators: %s: URL.
-#: ../classes/admin/class-kco-admin-notices.php:128
+#: ../classes/admin/class-kco-admin-notices.php:127
 msgid "It looks like you are using the Autoptimize plugin and have enabled their <i>Optimize shop cart/checkout</i> setting. This might cause conflicts with the Kustom Checkout plugin. You can deactivate this feature in the  <a href=\"%s\">Autoptimize settings page</a> (<i>→ Show advanced settings → Misc section</i>). "
 msgstr ""
 
-#: ../classes/admin/class-kco-admin-notices.php:147
+#: ../classes/admin/class-kco-admin-notices.php:146
 msgid "It looks as if you have a Optimizing or Caching plugin installed. Please make sure to not enable these features on the checkout page, as this can cause issues with Kustom Checkout. The checkout page should never be minified, concatenated, or cached. "
 msgstr ""
 
-#. translators: %s: URL.
-#: ../classes/admin/class-kco-admin-notices.php:169
-msgid "The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete <i>Klarna upstream for WooCommerce</i> and then install and activate <i>Klarna On-site Messaging for WooCommerce</i> via the new <a href=\"%s\">Kustom Add-ons page</a>. "
-msgstr ""
-
-#: ../classes/admin/class-kco-admin-notices.php:232
+#: ../classes/admin/class-kco-admin-notices.php:209
 msgid "It looks as if you don't have pretty permalinks enabled in WordPress. For Kustom Checkout for WooCommerce to function properly, this needs to be enabled. "
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:66, ../classes/admin/class-klarna-for-woocommerce-addons.php:78
-msgid "Kustom Add-ons"
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:177
-msgid "Install"
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:177
-msgid "Not installed"
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:180
-msgid "Activated"
-msgstr ""
-
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:183
-msgid "Deactivated"
-msgstr ""
-
-#: ../classes/admin/class-klarna-skin.php:84
-msgid "There was an error installing the addon. Please try again."
 msgstr ""
 
 #: ../src/CheckoutFlow/CheckoutFlow.php:24
 msgid "Invalid order ID."
 msgstr ""
 
-#: ../src/CheckoutFlow/CheckoutFlow.php:98
+#: ../src/CheckoutFlow/CheckoutFlow.php:105
 msgid "Klarna order ID not found."
 msgstr ""
 
-#: ../src/CheckoutFlow/CheckoutFlow.php:152
+#: ../src/CheckoutFlow/CheckoutFlow.php:159
 msgid "Klarna order not found or an error occurred."
 msgstr ""
 
-#: ../src/CheckoutFlow/CheckoutFlow.php:278
+#: ../src/CheckoutFlow/CheckoutFlow.php:285
 msgid "There was an error processing your payment. Please try again."
 msgstr ""
 
@@ -648,11 +619,11 @@ msgid "Customer redirected to Kustom Hosted Payment Page."
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:109
-msgid "The payment has not been finalized with Klarna."
+msgid "The payment has not been finalized with Kustom."
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:118
-msgid "Failed to retrieve the order from Klarna."
+msgid "Failed to retrieve the order from Kustom."
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:145
@@ -688,7 +659,7 @@ msgid "Capture order"
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:398
-msgid "Activates the order with Klarna."
+msgid "Activates the order with Kustom."
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:412, ../src/OrderManagement/MetaBox.php:426
@@ -696,7 +667,7 @@ msgid "Cancel order"
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:426
-msgid "Cancels the order with Klarna."
+msgid "Cancels the order with Kustom."
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:440, ../src/OrderManagement/MetaBox.php:454
@@ -741,27 +712,27 @@ msgid "%1$s updated the subscription recurring token from \"%2$s\" to \"%3$s\"."
 msgstr ""
 
 #: ../src/OrderManagement/OrderManagement.php:364
-msgid "Could not update Klarna order lines. An unknown error occurred."
+msgid "Could not update Kustom order lines. An unknown error occurred."
 msgstr ""
 
 #: ../src/OrderManagement/OrderManagement.php:362
-msgid "Could not update Klarna order lines: %s."
+msgid "Could not update Kustom order lines: %s."
 msgstr ""
 
-#. translators: %s: Error message from Klarna.
+#. translators: %s: Error message from Kustom.
 #: ../src/OrderManagement/OrderManagement.php:480
-msgid "Could not capture Klarna order. %s"
+msgid "Could not capture Kustom order. %s"
 msgstr ""
 
 #: ../src/OrderManagement/OrderManagement.php:470
-msgid "Klarna could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue."
+msgid "Kustom could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue."
 msgstr ""
 
 #: ../src/OrderManagement/OrderManagement.php:512, ../src/OrderManagement/OrderManagement.php:531
-msgid "Klarna order has not been captured and cannot be refunded."
+msgid "Kustom order has not been captured and cannot be refunded."
 msgstr ""
 
-#. translators: %s Klarna error message.
+#. translators: %s Kustom error message.
 #: ../src/OrderManagement/OrderManagement.php:523, ../src/OrderManagement/OrderManagement.php:563
 msgid "Could not refund Kustom order. %s."
 msgstr ""
@@ -772,7 +743,7 @@ msgstr ""
 
 #. translators: refund amount, refund id.
 #: ../src/OrderManagement/OrderManagement.php:572
-msgid "Processing a refund of %1$s with Klarna"
+msgid "Processing a refund of %1$s with Kustom"
 msgstr ""
 
 #. translators: 1: original amount, 2: return fee amount.
@@ -835,87 +806,87 @@ msgid "Something went wrong."
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:16
-msgid "Klarna Checkout address data"
+msgid "Kustom Checkout address data"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:21
-msgid "Klarna Checkout billing address data"
+msgid "Kustom Checkout billing address data"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:26
-msgid "Klarna Checkout billing address given name"
+msgid "Kustom Checkout billing address given name"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:31
-msgid "Klarna Checkout billing address family name"
+msgid "Kustom Checkout billing address family name"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:36
-msgid "Klarna Checkout billing address email"
+msgid "Kustom Checkout billing address email"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:41
-msgid "Klarna Checkout billing address phone"
+msgid "Kustom Checkout billing address phone"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:46
-msgid "Klarna Checkout billing address street address"
+msgid "Kustom Checkout billing address street address"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:51
-msgid "Klarna Checkout billing address postal code"
+msgid "Kustom Checkout billing address postal code"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:56
-msgid "Klarna Checkout billing address city"
+msgid "Kustom Checkout billing address city"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:61
-msgid "Klarna Checkout billing address region"
+msgid "Kustom Checkout billing address region"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:66
-msgid "Klarna Checkout billing address country"
+msgid "Kustom Checkout billing address country"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:73
-msgid "Klarna Checkout shipping address data"
+msgid "Kustom Checkout shipping address data"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:78
-msgid "Klarna Checkout shipping address given name"
+msgid "Kustom Checkout shipping address given name"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:83
-msgid "Klarna Checkout shipping address family name"
+msgid "Kustom Checkout shipping address family name"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:88
-msgid "Klarna Checkout shipping address email"
+msgid "Kustom Checkout shipping address email"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:93
-msgid "Klarna Checkout shipping address phone"
+msgid "Kustom Checkout shipping address phone"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:98
-msgid "Klarna Checkout shipping address street address"
+msgid "Kustom Checkout shipping address street address"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:103
-msgid "Klarna Checkout shipping address postal code"
+msgid "Kustom Checkout shipping address postal code"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:108
-msgid "Klarna Checkout shipping address city"
+msgid "Kustom Checkout shipping address city"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:113
-msgid "Klarna Checkout shipping address region"
+msgid "Kustom Checkout shipping address region"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:118
-msgid "Klarna Checkout shipping address country"
+msgid "Kustom Checkout shipping address country"
 msgstr ""
 
 #: ../classes/requests/helpers/class-kco-request-cart.php:169
