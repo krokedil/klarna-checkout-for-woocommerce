@@ -988,8 +988,12 @@ function kco_maybe_update_order_addresses( $order, $klarna_order ) {
 		 * @param array    $klarna_order The Kustom order.
 		 */
 		do_action( 'kco_wc_order_addresses_updated', $order, $changes, $klarna_order );
-	} catch ( Exception $e ) {
-		// Never let an address problem break the confirmation, the payment has already been made.
+	} catch ( Throwable $e ) {
+		/*
+		 * Never let an address problem break the confirmation, the payment has already been made. Throwable, and not
+		 * Exception, since a PHP error here would otherwise take down the confirmation page before payment_complete()
+		 * runs and leave a paid order stuck in pending.
+		 */
 		KCO_Logger::log( 'Failed to update the order addresses from the Kustom order: ' . $e->getMessage() );
 	}
 }
@@ -1272,7 +1276,10 @@ function kco_normalize_address_value( $value, $field ) {
 			$digits = preg_replace( '/\D/', '', $value );
 			return strlen( $digits ) > 9 ? substr( $digits, -9 ) : $digits;
 		default:
-			return mb_strtolower( preg_replace( '/\s+/u', ' ', $value ) );
+			$value = preg_replace( '/\s+/u', ' ', $value );
+
+			// WordPress does not polyfill mb_strtolower, and this runs on every confirmation, so do not assume mbstring.
+			return function_exists( 'mb_strtolower' ) ? mb_strtolower( $value ) : strtolower( $value );
 	}
 }
 
