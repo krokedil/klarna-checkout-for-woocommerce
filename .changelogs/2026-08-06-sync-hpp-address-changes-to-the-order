@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: yes
+
+The WooCommerce order billing and shipping address are now updated to match the Kustom order when the customer changes their address on the hosted payment page in the redirect flow.
