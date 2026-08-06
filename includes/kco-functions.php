@@ -971,12 +971,12 @@ function kco_maybe_update_order_addresses( $order, $klarna_order ) {
 		}
 
 		$order->save();
-		$order->add_order_note( kco_get_address_change_note( $order, $changes ) );
+		$order->add_order_note( kco_get_address_change_note( $changes ) );
 
 		$klarna_order_id = isset( $klarna_order['order_id'] ) ? $klarna_order['order_id'] : 'N/A';
 		KCO_Logger::log( "Kustom order ID: {$klarna_order_id} | WC Order ID: {$order->get_order_number()}: Order addresses updated from the Kustom order. The order totals were not recalculated. Changes: " . wp_json_encode( $changes ) );
 
-		if ( kco_address_changes_affect_totals( $order, $changes ) ) {
+		if ( kco_address_changes_affect_destination( $changes ) ) {
 			kco_flag_order_for_address_review( $order, $changes );
 		}
 
@@ -1277,33 +1277,16 @@ function kco_normalize_address_value( $value, $field ) {
 }
 
 /**
- * Whether any of the changed address fields can affect the tax rate.
+ * Whether any of the changed address fields can affect the shipping cost or the tax rate.
  *
- * Only a country change can. Within the same country the tax rate is the same regardless of where the order is shipped.
- *
- * @param array $changes The changed address fields.
- * @return bool
- */
-function kco_address_changes_affect_tax( $changes ) {
-	foreach ( $changes as $change ) {
-		if ( 'country' === $change['field'] ) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-/**
- * Whether any of the changed address fields can affect the shipping cost.
- *
- * WooCommerce shipping zones can match on state, postcode and city, so a change within the same country can still land
- * the order in another zone than the one the customer was quoted.
+ * WooCommerce shipping zones can match on state, postcode and city, and tax rates can be defined per state, postcode
+ * and city too, so a change within the same country can affect both. Rather than trying to work out whether this
+ * particular store is configured that way, any changed destination is treated as a risk.
  *
  * @param array $changes The changed address fields.
  * @return bool
  */
-function kco_address_changes_affect_shipping( $changes ) {
+function kco_address_changes_affect_destination( $changes ) {
 	foreach ( $changes as $change ) {
 		if ( in_array( $change['field'], array( 'country', 'state', 'postcode', 'city' ), true ) ) {
 			return true;
@@ -1314,31 +1297,12 @@ function kco_address_changes_affect_shipping( $changes ) {
 }
 
 /**
- * Whether a changed delivery destination could have made the order totals wrong.
- *
- * A shipping cost can only be wrong if the order was charged for shipping in the first place, so an order without a
- * shipping cost is unaffected by anything but a country change.
- *
- * @param WC_Order $order The WooCommerce order.
- * @param array    $changes The changed address fields.
- * @return bool
- */
-function kco_address_changes_affect_totals( $order, $changes ) {
-	if ( kco_address_changes_affect_tax( $changes ) ) {
-		return true;
-	}
-
-	return kco_address_changes_affect_shipping( $changes ) && (float) $order->get_shipping_total() > 0;
-}
-
-/**
  * Build the order note describing the address changes.
  *
- * @param WC_Order $order The WooCommerce order.
- * @param array    $changes The changed address fields.
+ * @param array $changes The changed address fields.
  * @return string
  */
-function kco_get_address_change_note( $order, $changes ) {
+function kco_get_address_change_note( $changes ) {
 	$labels = array(
 		'first_name' => __( 'First name', 'klarna-checkout-for-woocommerce' ),
 		'last_name'  => __( 'Last name', 'klarna-checkout-for-woocommerce' ),
@@ -1382,15 +1346,8 @@ function kco_get_address_change_note( $order, $changes ) {
 		$note .= ' ' . sprintf( __( 'Shipping address, %s.', 'klarna-checkout-for-woocommerce' ), implode( '; ', $grouped['shipping'] ) );
 	}
 
-	/*
-	 * The order total cannot be recalculated, since it would then no longer match the amount authorized in Kustom, so
-	 * point out what may now be wrong. The tax can only be wrong if the country changed, and the shipping cost only if
-	 * the order was charged for shipping at all.
-	 */
-	if ( kco_address_changes_affect_tax( $changes ) ) {
-		$note .= ' ' . __( 'The tax and the shipping cost were calculated for the previous country and have not been recalculated, since the order total would then no longer match the amount authorized in Kustom. Please verify them before shipping this order.', 'klarna-checkout-for-woocommerce' );
-	} elseif ( kco_address_changes_affect_shipping( $changes ) && (float) $order->get_shipping_total() > 0 ) {
-		$note .= ' ' . __( 'The shipping cost was calculated for the previous address and has not been recalculated, since the order total would then no longer match the amount authorized in Kustom. Please verify that the shipping cost still covers the new destination.', 'klarna-checkout-for-woocommerce' );
+	if ( kco_address_changes_affect_destination( $changes ) ) {
+		$note .= ' ' . __( 'The shipping cost and the tax were calculated for the previous address and have not been recalculated, since the order total would then no longer match the amount authorized in Kustom. Please verify both before shipping this order.', 'klarna-checkout-for-woocommerce' );
 	}
 
 	return $note;
@@ -1402,10 +1359,6 @@ function kco_get_address_change_note( $order, $changes ) {
  * The shipping cost and the tax were calculated for the previous address, and cannot be recalculated without changing
  * the order total away from the amount authorized in Kustom.
  *
- * By default only a country change holds the order, since that is the only change that can alter the tax rate. A change
- * within the same country is only a shipping zone risk, and merchants who use postcode based shipping zones can widen
- * this through the filter below.
- *
  * @param WC_Order $order The WooCommerce order.
  * @param array    $changes The changed address fields.
  * @return void
@@ -1414,17 +1367,15 @@ function kco_flag_order_for_address_review( $order, $changes ) {
 	/**
 	 * Filter whether the order should be put on hold when the delivery destination changed in Kustom.
 	 *
-	 * @param bool     $hold Whether to put the order on hold. True when the country changed.
+	 * @param bool     $hold Whether to put the order on hold.
 	 * @param WC_Order $order The WooCommerce order.
 	 * @param array    $changes The changed address fields.
 	 */
-	if ( ! apply_filters( 'kco_wc_hold_order_on_address_change', kco_address_changes_affect_tax( $changes ), $order, $changes ) ) {
+	if ( ! apply_filters( 'kco_wc_hold_order_on_address_change', true, $order, $changes ) ) {
 		return;
 	}
 
-	$reason = kco_address_changes_affect_tax( $changes )
-		? __( 'The delivery country was changed in Kustom after the order was created. Verify the tax and the shipping cost before processing the order.', 'klarna-checkout-for-woocommerce' )
-		: __( 'The delivery destination was changed in Kustom after the order was created. Verify the shipping cost before processing the order.', 'klarna-checkout-for-woocommerce' );
+	$reason = __( 'The delivery destination was changed in Kustom after the order was created. Verify the shipping cost and the tax before processing the order.', 'klarna-checkout-for-woocommerce' );
 
 	// The order was already paid by an earlier confirmation, so payment_complete() will not run again.
 	if ( ! empty( $order->get_date_paid() ) ) {
