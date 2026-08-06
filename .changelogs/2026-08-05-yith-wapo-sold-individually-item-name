@@ -1,4 +1,4 @@
 Type: Fix
 Needs Documentation: no
 
-Fixed an issue where add-ons sold individually by YITH WooCommerce Product Add-Ons were sent to Kustom as "Sold Individually -- YITH WooCommerce Product Addons", the name of the hidden placeholder product that plugin adds to the cart, instead of the add-on the customer selected. The selected add-on is now used as the order line name, and the product URL and image of the product the add-on belongs to are sent instead of the placeholder's. The name can be modified with the new 'kco_yith_wapo_addon_name' filter.
+Improved compatibility YITH WooCommerce Product Add-Ons 
