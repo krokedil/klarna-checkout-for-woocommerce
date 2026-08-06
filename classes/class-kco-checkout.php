@@ -26,6 +26,47 @@ class KCO_Checkout {
 		add_action( 'woocommerce_shipping_method_chosen', array( __CLASS__, 'maybe_throw_shipping_error' ), 9999 );
 		add_filter( 'woocommerce_order_needs_payment', array( $this, 'maybe_change_needs_payment' ), 999, 2 );
 		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'maybe_change_needs_payment_cart' ), 999, 1 );
+
+		// PW Gift Cards.
+		add_filter( 'pwgc_eligible_cart_amount', array( $this, 'exclude_shipping_from_gift_card_amount' ), 10, 2 );
+	}
+
+	/**
+	 * Stop a gift card from being redeemed against the shipping cost when shipping is selected in the iframe.
+	 *
+	 * Kustom keeps the shipping cost out of the order lines in that case and charges the selected shipping
+	 * option on top of order_amount, which the API requires to be zero or greater. A gift card large enough to
+	 * spill over into the shipping cost can therefore not be expressed: the order lines would have to sum to a
+	 * negative amount. The gift card is capped at the order lines total instead, so WooCommerce and Kustom
+	 * charge the same amount.
+	 *
+	 * @param float   $eligible_amount The cart amount that gift cards may be redeemed against.
+	 * @param WC_Cart $cart The WooCommerce cart.
+	 * @return float
+	 */
+	public function exclude_shipping_from_gift_card_amount( $eligible_amount, $cart ) {
+		if ( ! is_a( $cart, 'WC_Cart' ) || ! $cart->needs_shipping() ) {
+			return $eligible_amount;
+		}
+
+		if ( ! isset( WC()->session ) || 'kco' !== WC()->session->get( 'chosen_payment_method' ) ) {
+			return $eligible_amount;
+		}
+
+		$settings = get_option( 'woocommerce_kco_settings', array() );
+		if ( ! wc_string_to_bool( $settings['shipping_methods_in_iframe'] ?? 'no' ) ) {
+			return $eligible_amount;
+		}
+
+		// Mirrors KCO_Request_Cart::get_shipping_amount(), which is what gets left out of the order lines.
+		$base_location   = wc_get_base_location();
+		$shipping_amount = (float) $cart->get_shipping_total();
+		if ( 'US' !== $base_location['country'] ) {
+			$shipping_amount += (float) $cart->get_shipping_tax();
+		}
+
+		// Capped rather than subtracted, since the shipping cost may already have been excluded by PW Gift Cards.
+		return min( $eligible_amount, max( 0, $cart->total - $shipping_amount ) );
 	}
 
 	/**

@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: yes
+
+Fixed PW Gift Cards being charged for shipping twice when shipping methods are shown in the Kustom iframe. A gift card that covered the shipping cost as well as the products made the plugin add a "Surcharge" order line, so Kustom charged the shipping cost that WooCommerce had already deducted. Gift cards are now limited to the products when shipping is selected in the iframe, so WooCommerce and Kustom charge the same amount.
