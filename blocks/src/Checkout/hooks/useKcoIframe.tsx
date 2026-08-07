@@ -17,6 +17,15 @@ type Settings = {
 	countryCodes: any;
 };
 
+type AddressType = 'billing' | 'shipping';
+
+/**
+ * How long to wait for address events to settle before sending the change to WooCommerce.
+ * Kustom can emit billing_address_change and shipping_address_change back to back, and we only
+ * want a single cart update out of that burst.
+ */
+const ADDRESS_UPDATE_DEBOUNCE_MS = 100;
+
 /**
  * Custom hook to manage the Kustom Checkout iframe in WooCommerce.
  * Handles the visibility of elements, iframe creation, and event registration and handling.
@@ -45,6 +54,17 @@ export const useKcoIframe = (
 	// Refs to store the iframe wrapper and script elements for cleanup.
 	const kcoWrapperRef = useRef<HTMLDivElement | null>(null);
 	const scriptRef = useRef<HTMLScriptElement | null>(null);
+
+	// The latest address of each type received from Kustom, waiting to be sent to WooCommerce.
+	const pendingAddressRef = useRef<Record<AddressType, any>>({
+		billing: null,
+		shipping: null,
+	});
+	const addressUpdateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+		null
+	);
+	// Signature of the last address update we sent, so an unchanged address is not sent twice.
+	const lastSentAddressRef = useRef<string>('');
 
 	/**
 	 * Extracts HTML content and script content from the Kustom Checkout snippet.
@@ -111,35 +131,115 @@ export const useKcoIframe = (
 	);
 
 	/**
-	 * Handle changes to the shipping address in the Kustom Checkout iframe.
-	 * Sends a request to update the shipping address in the WooCommerce cart,
+	 * Convert a Kustom address into the shape WooCommerce expects, i.e. with an alpha2 country code.
+	 *
+	 * @param {any} address - The address object from Kustom.
+	 * @return {any} - The address with an alpha2 country code.
+	 */
+	const toWooCommerceAddress = useCallback(
+		(address: any): any => ({
+			...address,
+			country: address?.country
+				? getAlpha2CountryCodeFromAlpha3(address.country)
+				: '',
+		}),
+		[getAlpha2CountryCodeFromAlpha3]
+	);
+
+	/**
+	 * Send the addresses collected from the Kustom address events to the WooCommerce cart,
 	 * using the extensionCartUpdate function.
 	 *
-	 * @param {any} address - The shipping address object containing country and other details.
 	 * @return {Promise<void>}
 	 */
-	const onShippingAddressChanged = useCallback(
-		async (address: any): Promise<void> => {
+	const sendPendingAddresses = useCallback(async (): Promise<void> => {
+		const { billing, shipping } = pendingAddressRef.current;
+		pendingAddressRef.current = { billing: null, shipping: null };
+
+		// Kustom only emits shipping_address_change once the customer has entered a separate
+		// shipping address. When "same as billing" is used we only get the billing address, so
+		// that is what WooCommerce has to calculate shipping and taxes from.
+		const shippingAddress = shipping || billing;
+
+		if (!shippingAddress) {
+			return;
+		}
+
+		const data = {
+			action: 'address_changed',
+			billing: billing || {},
+			shipping: shippingAddress,
+		};
+
+		// Both events can describe the same address, so skip the round trip if nothing changed.
+		const signature = JSON.stringify(data);
+		if (signature === lastSentAddressRef.current) {
+			resumeKCO();
+			return;
+		}
+		lastSentAddressRef.current = signature;
+
+		const response = extensionCartUpdate({
+			namespace: 'kco-block',
+			data,
+		})
+			.then(() => {})
+			.catch((_error: any) => {
+				// Allow the same address to be sent again if the update failed.
+				lastSentAddressRef.current = '';
+			})
+			.finally(() => {});
+
+		return response;
+	}, [resumeKCO]);
+
+	/**
+	 * Record an address received from Kustom and schedule it to be sent to WooCommerce.
+	 * The update is debounced so a billing and a shipping event fired in quick succession
+	 * result in a single cart update rather than two competing ones.
+	 *
+	 * @param {AddressType} type    - Which address was changed, 'billing' or 'shipping'.
+	 * @param {any}         address - The address object from Kustom.
+	 * @return {void}
+	 */
+	const queueAddressUpdate = useCallback(
+		(type: AddressType, address: any): void => {
 			suspendKCO();
 
-			// Convert the country in the address to an alpha2 country code.
-			const countryCode = getAlpha2CountryCodeFromAlpha3(address.country);
-			address.country = countryCode;
+			pendingAddressRef.current[type] = toWooCommerceAddress(address);
 
-			const response = extensionCartUpdate({
-				namespace: 'kco-block',
-				data: {
-					action: 'shipping_address_changed',
-					...address,
-				},
-			})
-				.then(() => {})
-				.catch((_error: any) => {})
-				.finally(() => {});
+			if (addressUpdateTimerRef.current) {
+				clearTimeout(addressUpdateTimerRef.current);
+			}
 
-			return response;
+			addressUpdateTimerRef.current = setTimeout(() => {
+				addressUpdateTimerRef.current = null;
+				sendPendingAddresses();
+			}, ADDRESS_UPDATE_DEBOUNCE_MS);
 		},
-		[getAlpha2CountryCodeFromAlpha3, suspendKCO]
+		[suspendKCO, toWooCommerceAddress, sendPendingAddresses]
+	);
+
+	/**
+	 * Handle changes to the shipping address in the Kustom Checkout iframe.
+	 *
+	 * @param {any} address - The shipping address object containing country and other details.
+	 * @return {void}
+	 */
+	const onShippingAddressChanged = useCallback(
+		(address: any): void => queueAddressUpdate('shipping', address),
+		[queueAddressUpdate]
+	);
+
+	/**
+	 * Handle changes to the billing address in the Kustom Checkout iframe.
+	 *
+	 * @param {any} address - The billing address object containing country and other details.
+	 * @return {void}
+	 */
+	const onBillingAddressChanged = useCallback(
+		(address: any): void => queueAddressUpdate('billing', address),
+		[queueAddressUpdate]
 	);
 
 	/**
@@ -238,6 +338,15 @@ export const useKcoIframe = (
 				 */
 				shipping_address_change: onShippingAddressChanged,
 				/**
+				 * This event is triggered when the billing address is changed in the Kustom Checkout iframe.
+				 * Kustom does not emit shipping_address_change while the customer ships to their
+				 * billing address, so this is the only address event we get in that case.
+				 *
+				 * @param {any} address - The billing address object containing country and other details.
+				 * @return {void}
+				 */
+				billing_address_change: onBillingAddressChanged,
+				/**
 				 * This event is triggered when the shipping option is changed in the Kustom Checkout iframe.
 				 * It updates the shipping option in the WooCommerce cart.
 				 *
@@ -250,7 +359,6 @@ export const useKcoIframe = (
 				change: (_data: any) => {},
 				user_interacted: (_data: any) => {},
 				customer: (_data: any) => {},
-				billing_address_change: (_data: any) => {},
 				shipping_address_update_error: (_data: any) => {},
 				order_total_change: (_data: any) => {},
 				checkbox_change: (_data: any) => {},
@@ -261,7 +369,22 @@ export const useKcoIframe = (
 				/* eslint-enable jsdoc/require-jsdoc */
 			});
 		});
-	}, [onShippingAddressChanged, onShippingOptionChanged, onLoad]);
+	}, [
+		onShippingAddressChanged,
+		onBillingAddressChanged,
+		onShippingOptionChanged,
+		onLoad,
+	]);
+
+	useEffect(() => {
+		// Make sure a queued address update cannot fire after the component is gone.
+		return () => {
+			if (addressUpdateTimerRef.current) {
+				clearTimeout(addressUpdateTimerRef.current);
+				addressUpdateTimerRef.current = null;
+			}
+		};
+	}, []);
 
 	useEffect(() => {
 		// Only show the iframe if the Kustom Checkout is active, we have the content and it was not active before.
