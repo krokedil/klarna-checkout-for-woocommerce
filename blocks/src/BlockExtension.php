@@ -194,7 +194,7 @@ class BlockExtension {
 
 		// If we still don't have a Kustom order, throw an exception.
 		if ( ! $klarna_order ) {
-			throw new Exception( 'Could not get Klarna order' );
+			throw new Exception( 'Could not get Kustom order' );
 		}
 
 		// Convert the billing region to unicode format.
