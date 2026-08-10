@@ -614,6 +614,13 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 			if ( ! is_wp_error( $klarna_order ) ) {
+				/*
+				 * Update the addresses before anything that can change the order status, both so the status emails are
+				 * rendered from this order instance with the corrected address, and so the address is written even when
+				 * the validation below puts the order on hold.
+				 */
+				kco_maybe_update_order_addresses( $order, $klarna_order );
+
 				if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
 					return;
 				}
@@ -902,6 +909,504 @@ function kco_maybe_save_reference( $order_id, $klarna_order ) {
 		}
 		$order->save();
 	}
+}
+
+/**
+ * Maybe update the WooCommerce order addresses with the addresses from the Kustom order.
+ *
+ * In the redirect flow the WooCommerce order is created before the customer is sent to Kustom's hosted payment page,
+ * where the customer can still change their address. Kustom is the source of truth for the confirmed address, so any
+ * change made there is written back to the WooCommerce order.
+ *
+ * The order totals are deliberately NOT recalculated. The Kustom order amount is already authorized, and recalculating
+ * taxes for the new address could change the WooCommerce total so that it no longer matches Kustom. An order note is
+ * added instead, so the merchant can verify the shipping cost and tax manually.
+ *
+ * @param WC_Order $order The WooCommerce order. The order object is used, and not the order id, so that the address is
+ *                        set on the same instance that later triggers the order status emails.
+ * @param array    $klarna_order The Kustom order from the order management API.
+ * @return void
+ */
+function kco_maybe_update_order_addresses( $order, $klarna_order ) {
+	if ( ! $order instanceof WC_Order || ! is_array( $klarna_order ) ) {
+		return;
+	}
+
+	// Subscription addresses are handled separately, see KCO_Subscription::update_subscription_address().
+	if ( function_exists( 'wcs_is_subscription' ) && wcs_is_subscription( $order ) ) {
+		return;
+	}
+
+	$checkout_flow = $order->get_meta( '_wc_klarna_checkout_flow', true );
+
+	/**
+	 * Filter whether the Kustom order addresses should be written back to the WooCommerce order.
+	 *
+	 * Only the redirect flow needs this by default. In the embedded and block flows the address is already
+	 * synchronized before the WooCommerce order is created. Return true to enable it for every flow.
+	 *
+	 * @param bool     $update Whether to update the WooCommerce order addresses.
+	 * @param WC_Order $order The WooCommerce order.
+	 * @param array    $klarna_order The Kustom order.
+	 */
+	if ( ! apply_filters( 'kco_wc_update_order_addresses', 'redirect' === $checkout_flow, $order, $klarna_order ) ) {
+		return;
+	}
+
+	try {
+		$changes = array();
+
+		foreach ( array( 'billing', 'shipping' ) as $address_type ) {
+			$address = isset( $klarna_order[ $address_type . '_address' ] ) ? $klarna_order[ $address_type . '_address' ] : array();
+			if ( empty( $address ) || ! is_array( $address ) ) {
+				continue;
+			}
+
+			$changes = array_merge( $changes, kco_update_order_address( $order, $address_type, $address ) );
+		}
+
+		// Nothing changed. Do not save, log or add a note, so that repeated confirmations stay free of side effects.
+		if ( empty( $changes ) ) {
+			return;
+		}
+
+		$order->save();
+		$order->add_order_note( kco_get_address_change_note( $changes ) );
+
+		$klarna_order_id = isset( $klarna_order['order_id'] ) ? $klarna_order['order_id'] : 'N/A';
+		KCO_Logger::log( "Kustom order ID: {$klarna_order_id} | WC Order ID: {$order->get_order_number()}: Order addresses updated from the Kustom order. The order totals were not recalculated. Changes: " . wp_json_encode( $changes ) );
+
+		if ( kco_address_changes_affect_destination( $changes ) ) {
+			kco_flag_order_for_address_review( $order, $changes );
+		}
+
+		/**
+		 * Fires after the WooCommerce order addresses were updated from the Kustom order.
+		 *
+		 * @param WC_Order $order The WooCommerce order.
+		 * @param array    $changes The changed address fields.
+		 * @param array    $klarna_order The Kustom order.
+		 */
+		do_action( 'kco_wc_order_addresses_updated', $order, $changes, $klarna_order );
+	} catch ( Throwable $e ) {
+		/*
+		 * Never let an address problem break the confirmation, the payment has already been made. Throwable, and not
+		 * Exception, since a PHP error here would otherwise take down the confirmation page before payment_complete()
+		 * runs and leave a paid order stuck in pending.
+		 */
+		KCO_Logger::log( 'Failed to update the order addresses from the Kustom order: ' . $e->getMessage() );
+	}
+}
+
+/**
+ * Update a single WooCommerce order address from a Kustom address.
+ *
+ * Only fields that actually differ are written, see kco_address_values_match() for why.
+ *
+ * @param WC_Order $order The WooCommerce order.
+ * @param string   $address_type Either 'billing' or 'shipping'.
+ * @param array    $address The Kustom address.
+ * @return array A list of the changed fields.
+ */
+function kco_update_order_address( $order, $address_type, $address ) {
+	$changes = array();
+	$country = isset( $address['country'] ) ? $address['country'] : '';
+
+	foreach ( kco_get_address_field_map( $address_type ) as $klarna_key => $wc_field ) {
+		if ( ! isset( $address[ $klarna_key ] ) ) {
+			continue;
+		}
+
+		$new_value = sanitize_text_field( $address[ $klarna_key ] );
+
+		switch ( $wc_field ) {
+			case 'country':
+				$new_value = strtoupper( $new_value );
+				break;
+			case 'state':
+				$new_value = kco_get_wc_state_code( $new_value, $country );
+				break;
+			case 'email':
+				// WC_Order::set_billing_email() throws a WC_Data_Exception for an invalid email address.
+				if ( ! empty( $new_value ) && ! is_email( $new_value ) ) {
+					KCO_Logger::log( "Skipped updating the {$address_type} email on order {$order->get_order_number()}. '{$new_value}' is not a valid email address." );
+					$new_value = '';
+				}
+				break;
+		}
+
+		// An empty value means Kustom did not provide one, or that we could not resolve it. Keep what WooCommerce has.
+		if ( '' === $new_value ) {
+			continue;
+		}
+
+		$getter = "get_{$address_type}_{$wc_field}";
+		$setter = "set_{$address_type}_{$wc_field}";
+		if ( ! is_callable( array( $order, $getter ) ) || ! is_callable( array( $order, $setter ) ) ) {
+			continue;
+		}
+
+		$old_value = $order->{$getter}();
+		if ( kco_address_values_match( $old_value, $new_value, $wc_field ) ) {
+			continue;
+		}
+
+		$order->{$setter}( $new_value );
+
+		$changes[] = array(
+			'address' => $address_type,
+			'field'   => $wc_field,
+			'from'    => $old_value,
+			'to'      => $new_value,
+		);
+	}
+
+	$changes = array_merge( $changes, kco_maybe_clear_orphaned_state( $order, $address_type, $changes ) );
+
+	if ( 'shipping' === $address_type ) {
+		$changes = array_merge( $changes, kco_update_shipping_contact_meta( $order, $address ) );
+	}
+
+	return $changes;
+}
+
+/**
+ * Clear a state that is left over from the previous country after a country change.
+ *
+ * Kustom omits the region for countries that do not have one, so changing the country from e.g. US to SE would
+ * otherwise leave the old state on the order. Only done when the country changed in this run and Kustom did not supply
+ * a region for the new country, so that a state we just wrote is never discarded.
+ *
+ * @param WC_Order $order The WooCommerce order.
+ * @param string   $address_type Either 'billing' or 'shipping'.
+ * @param array    $changes The changes made to this address so far.
+ * @return array A list of the changed fields.
+ */
+function kco_maybe_clear_orphaned_state( $order, $address_type, $changes ) {
+	$country_changed = false;
+	$state_changed   = false;
+	foreach ( $changes as $change ) {
+		if ( 'country' === $change['field'] ) {
+			$country_changed = true;
+		} elseif ( 'state' === $change['field'] ) {
+			$state_changed = true;
+		}
+	}
+
+	// Kustom supplied a region for the new country, so there is nothing stale left behind.
+	if ( ! $country_changed || $state_changed ) {
+		return array();
+	}
+
+	$state = $order->{"get_{$address_type}_state"}();
+	if ( empty( $state ) ) {
+		return array();
+	}
+
+	$order->{"set_{$address_type}_state"}( '' );
+
+	return array(
+		array(
+			'address' => $address_type,
+			'field'   => 'state',
+			'from'    => $state,
+			'to'      => '',
+		),
+	);
+}
+
+/**
+ * Get the map of Kustom address keys to WooCommerce address fields.
+ *
+ * The shipping phone and email are excluded, since they need special handling, see kco_update_shipping_contact_meta().
+ * The 'attention' field is excluded as well, since it is already stored by kco_maybe_save_reference().
+ *
+ * @param string $address_type Either 'billing' or 'shipping'.
+ * @return array
+ */
+function kco_get_address_field_map( $address_type ) {
+	$map = array(
+		'given_name'        => 'first_name',
+		'family_name'       => 'last_name',
+		'organization_name' => 'company',
+		'street_address'    => 'address_1',
+		'street_address2'   => 'address_2',
+		'city'              => 'city',
+		'region'            => 'state',
+		'postal_code'       => 'postcode',
+		'country'           => 'country',
+	);
+
+	if ( 'billing' === $address_type ) {
+		$map['email'] = 'email';
+		$map['phone'] = 'phone';
+	}
+
+	/**
+	 * Filter the map of Kustom address keys to WooCommerce address fields.
+	 *
+	 * @param array  $map The field map, keyed by the Kustom address key.
+	 * @param string $address_type Either 'billing' or 'shipping'.
+	 */
+	return apply_filters( 'kco_wc_order_address_field_map', $map, $address_type );
+}
+
+/**
+ * Update the shipping phone and email from a Kustom shipping address.
+ *
+ * WooCommerce has no shipping email field, and WC_Order::set_shipping_phone was only added in WooCommerce 5.6.0, so
+ * both need to fall back to order meta. They are written at order creation from the Kustom order as it looked before
+ * the customer reached the hosted payment page, and shipping plugins read them, so they must be refreshed too.
+ *
+ * @param WC_Order $order The WooCommerce order.
+ * @param array    $address The Kustom shipping address.
+ * @return array A list of the changed fields.
+ */
+function kco_update_shipping_contact_meta( $order, $address ) {
+	$changes = array();
+
+	$phone = isset( $address['phone'] ) ? sanitize_text_field( $address['phone'] ) : '';
+	if ( ! empty( $phone ) ) {
+		$has_phone_field = defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' );
+		$old_phone       = $has_phone_field ? $order->get_shipping_phone() : $order->get_meta( '_shipping_phone', true );
+
+		if ( ! kco_address_values_match( $old_phone, $phone, 'phone' ) ) {
+			if ( $has_phone_field ) {
+				$order->set_shipping_phone( $phone );
+			} else {
+				$order->update_meta_data( '_shipping_phone', $phone );
+			}
+
+			$changes[] = array(
+				'address' => 'shipping',
+				'field'   => 'phone',
+				'from'    => $old_phone,
+				'to'      => $phone,
+			);
+		}
+	}
+
+	$email = isset( $address['email'] ) ? sanitize_text_field( $address['email'] ) : '';
+	if ( ! empty( $email ) && is_email( $email ) ) {
+		$old_email = $order->get_meta( '_shipping_email', true );
+
+		if ( ! kco_address_values_match( $old_email, $email, 'email' ) ) {
+			$order->update_meta_data( '_shipping_email', $email );
+
+			$changes[] = array(
+				'address' => 'shipping',
+				'field'   => 'email',
+				'from'    => $old_email,
+				'to'      => $email,
+			);
+		}
+	}
+
+	return $changes;
+}
+
+/**
+ * Get a WooCommerce state value for a Kustom region.
+ *
+ * Kustom returns the region name ("California") where WooCommerce expects the code ("CA") for countries that have a
+ * state list. kco_convert_region() falls back to an HTML encoded region name when it cannot resolve a code, so the
+ * result is only accepted if it is an actual state of the country. Countries without a state list accept a free text
+ * state, so the region is passed through as is for those. An empty string means the region could not be used, and the
+ * caller should leave the state untouched.
+ *
+ * @param string $region The region from the Kustom address.
+ * @param string $country The country from the Kustom address.
+ * @return string The WooCommerce state value, or an empty string if it could not be resolved.
+ */
+function kco_get_wc_state_code( $region, $country ) {
+	if ( empty( $region ) || empty( $country ) ) {
+		return '';
+	}
+
+	$states = WC()->countries->get_states( strtoupper( $country ) );
+
+	// The country has no state list, so WooCommerce accepts the region as free text.
+	if ( empty( $states ) ) {
+		return $region;
+	}
+
+	// kco_convert_region() expects a lowercase country code.
+	$state_code = kco_convert_region( $region, strtolower( $country ) );
+
+	return isset( $states[ $state_code ] ) ? $state_code : '';
+}
+
+/**
+ * Whether two address values are the same, ignoring the formatting differences that Kustom introduces.
+ *
+ * Kustom normalizes the values it stores: "12241" becomes "122 41", "enskede" becomes "Enskede" and "0700000000"
+ * becomes "+46700000000". Comparing the raw values would therefore report a change on every single order, so the
+ * comparison ignores those differences and nothing is written when only the formatting differs.
+ *
+ * @param string $old_value The current WooCommerce value.
+ * @param string $new_value The value from Kustom.
+ * @param string $field The WooCommerce address field name.
+ * @return bool
+ */
+function kco_address_values_match( $old_value, $new_value, $field ) {
+	return kco_normalize_address_value( $old_value, $field ) === kco_normalize_address_value( $new_value, $field );
+}
+
+/**
+ * Normalize an address value for comparison. The normalized value is never stored.
+ *
+ * @param string $value The value to normalize.
+ * @param string $field The WooCommerce address field name.
+ * @return string
+ */
+function kco_normalize_address_value( $value, $field ) {
+	$value = trim( (string) $value );
+
+	switch ( $field ) {
+		case 'postcode':
+			return wc_normalize_postcode( $value );
+		case 'country':
+		case 'state':
+			return strtoupper( $value );
+		case 'email':
+			return strtolower( $value );
+		case 'phone':
+			// Compare the subscriber number only, so that "+46700000000" and "0700000000" are treated as equal and
+			// every order's phone number is not silently migrated to another format.
+			$digits = preg_replace( '/\D/', '', $value );
+			return strlen( $digits ) > 9 ? substr( $digits, -9 ) : $digits;
+		default:
+			$value = preg_replace( '/\s+/u', ' ', $value );
+
+			// WordPress does not polyfill mb_strtolower, and this runs on every confirmation, so do not assume mbstring.
+			return function_exists( 'mb_strtolower' ) ? mb_strtolower( $value ) : strtolower( $value );
+	}
+}
+
+/**
+ * Whether any of the changed address fields can affect the shipping cost or the tax rate.
+ *
+ * WooCommerce shipping zones can match on state, postcode and city, and tax rates can be defined per state, postcode
+ * and city too, so a change within the same country can affect both. Rather than trying to work out whether this
+ * particular store is configured that way, any changed destination is treated as a risk.
+ *
+ * @param array $changes The changed address fields.
+ * @return bool
+ */
+function kco_address_changes_affect_destination( $changes ) {
+	foreach ( $changes as $change ) {
+		if ( in_array( $change['field'], array( 'country', 'state', 'postcode', 'city' ), true ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Build the order note describing the address changes.
+ *
+ * @param array $changes The changed address fields.
+ * @return string
+ */
+function kco_get_address_change_note( $changes ) {
+	$labels = array(
+		'first_name' => __( 'First name', 'klarna-checkout-for-woocommerce' ),
+		'last_name'  => __( 'Last name', 'klarna-checkout-for-woocommerce' ),
+		'company'    => __( 'Company', 'klarna-checkout-for-woocommerce' ),
+		'address_1'  => __( 'Address', 'klarna-checkout-for-woocommerce' ),
+		'address_2'  => __( 'Address line 2', 'klarna-checkout-for-woocommerce' ),
+		'city'       => __( 'City', 'klarna-checkout-for-woocommerce' ),
+		'state'      => __( 'State', 'klarna-checkout-for-woocommerce' ),
+		'postcode'   => __( 'Postcode', 'klarna-checkout-for-woocommerce' ),
+		'country'    => __( 'Country', 'klarna-checkout-for-woocommerce' ),
+		'email'      => __( 'Email', 'klarna-checkout-for-woocommerce' ),
+		'phone'      => __( 'Phone', 'klarna-checkout-for-woocommerce' ),
+	);
+
+	$grouped = array(
+		'billing'  => array(),
+		'shipping' => array(),
+	);
+
+	foreach ( $changes as $change ) {
+		$label = isset( $labels[ $change['field'] ] ) ? $labels[ $change['field'] ] : $change['field'];
+
+		$grouped[ $change['address'] ][] = sprintf(
+			// translators: 1: Address field label, 2: The previous value, 3: The new value.
+			__( '%1$s: "%2$s" to "%3$s"', 'klarna-checkout-for-woocommerce' ),
+			$label,
+			$change['from'],
+			$change['to']
+		);
+	}
+
+	$note = __( 'The customer changed their address in Kustom after the order was created. The order has been updated to match the Kustom order.', 'klarna-checkout-for-woocommerce' );
+
+	if ( ! empty( $grouped['billing'] ) ) {
+		// translators: %s: A list of the changed billing address fields.
+		$note .= ' ' . sprintf( __( 'Billing address, %s.', 'klarna-checkout-for-woocommerce' ), implode( '; ', $grouped['billing'] ) );
+	}
+
+	if ( ! empty( $grouped['shipping'] ) ) {
+		// translators: %s: A list of the changed shipping address fields.
+		$note .= ' ' . sprintf( __( 'Shipping address, %s.', 'klarna-checkout-for-woocommerce' ), implode( '; ', $grouped['shipping'] ) );
+	}
+
+	if ( kco_address_changes_affect_destination( $changes ) ) {
+		$note .= ' ' . __( 'The shipping cost and the tax were calculated for the previous address and have not been recalculated, since the order total would then no longer match the amount authorized in Kustom. Please verify both before shipping this order.', 'klarna-checkout-for-woocommerce' );
+	}
+
+	return $note;
+}
+
+/**
+ * Put the order on hold for manual review when a changed delivery destination could have made the totals wrong.
+ *
+ * The shipping cost and the tax were calculated for the previous address, and cannot be recalculated without changing
+ * the order total away from the amount authorized in Kustom.
+ *
+ * @param WC_Order $order The WooCommerce order.
+ * @param array    $changes The changed address fields.
+ * @return void
+ */
+function kco_flag_order_for_address_review( $order, $changes ) {
+	/**
+	 * Filter whether the order should be put on hold when the delivery destination changed in Kustom.
+	 *
+	 * @param bool     $hold Whether to put the order on hold.
+	 * @param WC_Order $order The WooCommerce order.
+	 * @param array    $changes The changed address fields.
+	 */
+	if ( ! apply_filters( 'kco_wc_hold_order_on_address_change', true, $order, $changes ) ) {
+		return;
+	}
+
+	$reason = __( 'The delivery destination was changed in Kustom after the order was created. Verify the shipping cost and the tax before processing the order.', 'klarna-checkout-for-woocommerce' );
+
+	// The order was already paid by an earlier confirmation, so payment_complete() will not run again.
+	if ( ! empty( $order->get_date_paid() ) ) {
+		if ( in_array( $order->get_status(), array( 'pending', 'processing' ), true ) ) {
+			$order->update_status( 'on-hold', $reason );
+		}
+
+		return;
+	}
+
+	/*
+	 * payment_complete() runs after this and would overwrite an on-hold status set here, so the status it completes to
+	 * is changed instead. That also avoids moving the order to a status that triggers a capture in Kustom.
+	 */
+	add_filter(
+		'woocommerce_payment_complete_order_status',
+		function ( $status, $order_id ) use ( $order ) {
+			return absint( $order_id ) === $order->get_id() ? 'on-hold' : $status;
+		},
+		10,
+		2
+	);
+
+	$order->add_order_note( $reason );
 }
 
 /**
