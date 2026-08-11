@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Handle the billing_address_change event in the block checkout. Kustom only emits shipping_address_change once the customer has entered a separate shipping address, so shipping and taxes were not recalculated while the customer shipped to their billing address.
