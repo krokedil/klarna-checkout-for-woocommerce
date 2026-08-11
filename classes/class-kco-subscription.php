@@ -345,7 +345,7 @@ class KCO_Subscription {
 	/**
 	 * Propagate subscription-specific meta from the parent order to its subscriptions.
 	 *
-	 * These values (Klarna environment, KSS shipping data) are written to the parent order during
+	 * These values (Kustom environment, KSS shipping data) are written to the parent order during
 	 * checkout, after the subscription has already been created. Saving them to the subscription
 	 * here ensures the Data Copier can copy them to renewal orders automatically.
 	 *
@@ -473,7 +473,7 @@ class KCO_Subscription {
 		} else {
 			$error_message = $create_order_response->get_error_message();
 			// Translators: Error message.
-			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Message: %1$s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
+			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Kustom. Message: %1$s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
 			foreach ( $subscriptions as $related_subscription ) {
 				$related_subscription->payment_failed();
 			}

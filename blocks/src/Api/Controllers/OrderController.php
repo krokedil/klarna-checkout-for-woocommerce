@@ -34,7 +34,7 @@ class OrderController extends Controller {
 	}
 
 	/**
-	 * Validate the order Klarna order.
+	 * Validate the Kustom order.
 	 *
 	 * @param \WP_REST_Request $request The request object.
 	 *
@@ -42,10 +42,10 @@ class OrderController extends Controller {
 	 */
 	public function validate( $request ) {
 		try {
-			// Get the Klarna order id from the request.
+			// Get the Kustom order id from the request.
 			$klarna_order_id = $request->get_param( 'id' );
 
-			// Validate the Klarna order.
+			// Validate the Kustom order.
 			OrderValidation::validate_kco_order( $klarna_order_id );
 
 			// Return a successful response with a 200 status code and empty body.

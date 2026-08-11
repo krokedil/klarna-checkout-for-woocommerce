@@ -8,7 +8,7 @@
         is intentionally excluded: those values are technical configuration
         and must remain identical across languages.
 
-        Order meta (Klarna order IDs, recurring tokens, capture IDs, hashes,
+        Order meta (Kustom order IDs, recurring tokens, capture IDs, hashes,
         URLs, etc.) is not registered: WooCommerce orders are not translated
         under WCML, and these values are per-order opaque identifiers that
         must never be modified by the translation layer.

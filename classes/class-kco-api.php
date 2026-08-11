@@ -45,7 +45,7 @@ class KCO_API {
 	/**
 	 * Gets a Kustom Checkout order
 	 *
-	 * @param string $klarna_order_id The Klarna Checkout order id.
+	 * @param string $klarna_order_id The Kustom Checkout order id.
 	 * @return array|false
 	 */
 	public function get_klarna_order( $klarna_order_id ) {
@@ -107,7 +107,7 @@ class KCO_API {
 				}
 				if ( $has_currency_error ) {
 					WC()->session->set( 'reload_checkout', true );
-					KCO_Logger::log( 'Klarna BAD_VALUE purchase_currency mismatch for order ' . $klarna_order_id . '. Reloading checkout.' );
+					KCO_Logger::log( 'Kustom BAD_VALUE purchase_currency mismatch for order ' . $klarna_order_id . '. Reloading checkout.' );
 					return false;
 				}
 			}

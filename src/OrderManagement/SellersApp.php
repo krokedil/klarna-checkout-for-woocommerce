@@ -150,8 +150,8 @@ class SellersApp {
 	/**
 	 * Processes order lines with order data received from Kustom.
 	 *
-	 * @param Klarna_Checkout_Order $klarna_order Kustom order.
-	 * @param WC_Order              $order WooCommerce order.
+	 * @param object   $klarna_order The Kustom order.
+	 * @param WC_Order $order WooCommerce order.
 	 *
 	 * @throws Exception WC_Data_Exception.
 	 */

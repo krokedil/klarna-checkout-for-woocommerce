@@ -598,7 +598,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		if ( apply_filters( 'kco_wc_lock_confirmation', false, $klarna_order_id, $order_id ) ) {
 			$did_lock = KCO_Confirmation::lock_kco_confirmation( $klarna_order_id, $order_id );
 			if ( ! $did_lock ) {
-				KCO_Logger::log( "Simultaneous confirmation attempt for Klarna order ID $klarna_order_id and WooCommerce order ID $order_id. Stopping process." );
+				KCO_Logger::log( "Simultaneous confirmation attempt for Kustom order ID $klarna_order_id and WooCommerce order ID $order_id. Stopping process." );
 				return;
 			}
 		}
@@ -949,9 +949,9 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 }
 
 /**
- * Maybe set the pickup point for the Klarna order if it exists.
+ * Maybe set the pickup point for the Kustom order if it exists.
  *
- * @param array $klarna_order The Klarna order data.
+ * @param array $klarna_order The Kustom order data.
  * @return void
  */
 function kco_maybe_set_selected_pickup_point( $klarna_order ) {

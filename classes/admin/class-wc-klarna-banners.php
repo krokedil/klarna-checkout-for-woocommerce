@@ -123,7 +123,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 
 				jQuery(document).ready(function($){
 
-					jQuery('.kb-dismiss').click(function(){
+					jQuery('.kb-dismiss').on('click', function(){
 						jQuery('#klarna-banner').slideUp();
 						jQuery.post(
 							ajaxurl,

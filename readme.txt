@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.4
 WC requires at least: 9.7.0
-WC tested up to: 10.9.1
-Stable tag: 2.20.7
+WC tested up to: 11.0.1
+Stable tag: 2.20.8
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,18 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-08-11    - version 2.20.8 =
+* Tweak         - Checkout error log entries now include the error type and HTTP status code, making it faster to diagnose failed orders.
+* Tweak         - Removed the "Add Kustom Post Purchase info to order email" setting and its associated functionality.
+* Tweak         - Replaced deprecated jQuery event shorthands (.change(), .blur(), .focus(), .click()) with .trigger() and .on() to remove jQuery Migrate warnings and prepare for jQuery 4.
+* Tweak         - Removed the "Kustom Add-ons" admin page.
+* Tweak         - Updated code comments and docblocks to refer to Kustom instead of Klarna
+* Fix           - Fixed a bug where checkout error details could be silently dropped from the debug log.
+* Fix           - Save the customer shipping city from Kustom alongside postcode and country during block-based address updates.
+* Fix           - Fixed "Undefined array key" warnings that could appear when retrieving stored credentials.
+* Fix           - Updated remaining naming references from Klarna to Kustom.
+* Fix           - Handle the billing_address_change event in the block checkout. Kustom only emits shipping_address_change once the customer has entered a separate shipping address, so shipping and taxes were not recalculated while the customer shipped to their billing address.
+
 = 2026-06-29    - version 2.20.7 =
 * Fix           - Fixed an issue where refunds on orders from non-base countries were sent to Kustom with the wrong VAT rate, resulting in an incorrect tax breakdown on the customer's refund receipt.
 * Fix           - Fixed an issue with WooCommerce version 10.9.x impacting the checkout block support. WooCommerce now only creates the order for the block checkout when the customer places the order, which caused an issue when placing the order.

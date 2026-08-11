@@ -185,7 +185,7 @@ class OrderManagement {
 	}
 
 	/**
-	 * Add refunds support to Klarna Payments gateway.
+	 * Add refunds support to the Kustom Checkout gateway.
 	 *
 	 * @param array $features Supported features.
 	 *
@@ -198,7 +198,7 @@ class OrderManagement {
 	}
 
 	/**
-	 * Cancels a Klarna order.
+	 * Cancels a Kustom order.
 	 *
 	 * @param int  $order_id Order ID.
 	 * @param bool $action If this was triggered through an action or not.
@@ -231,31 +231,31 @@ class OrderManagement {
 				return new \WP_Error( 'rejected_in_pending_flow', 'Order is being rejected in pending flow.' );
 			}
 
-			// Retrieve Klarna order first.
+			// Retrieve Kustom order first.
 			$klarna_order = $this->retrieve_klarna_order( $order_id );
 
 			if ( is_wp_error( $klarna_order ) ) {
-				$order->add_order_note( 'Klarna order could not be cancelled due to an error.' );
+				$order->add_order_note( 'Kustom order could not be cancelled due to an error.' );
 				$order->save();
 
-				return new \WP_Error( 'object_error', 'Klarna order object is of type WP_Error.', $klarna_order );
+				return new \WP_Error( 'object_error', 'Kustom order object is of type WP_Error.', $klarna_order );
 			}
 
 			// Captured, part-captured and cancelled orders cannot be cancelled.
 			if ( in_array( $klarna_order->status, array( 'CAPTURED', 'PART_CAPTURED' ), true ) ) {
-				$order->add_order_note( 'The Klarna order cannot be cancelled due to it already being captured.' );
+				$order->add_order_note( 'The Kustom order cannot be cancelled due to it already being captured.' );
 				$order->save();
-				return new \WP_Error( 'already_captured', 'Klarna order is captured and must be refunded.' );
+				return new \WP_Error( 'already_captured', 'Kustom order is captured and must be refunded.' );
 			} elseif ( 'CANCELLED' === $klarna_order->status ) {
-				$order->add_order_note( 'Klarna order has already been cancelled.' );
+				$order->add_order_note( 'Kustom order has already been cancelled.' );
 				$order->save();
-				return new \WP_Error( 'already_cancelled', 'Klarna order is already cancelled.' );
+				return new \WP_Error( 'already_cancelled', 'Kustom order is already cancelled.' );
 			} else {
 				$request  = new RequestPostCancel( $this, array( 'order_id' => $order_id ) );
 				$response = $this->report()->request( $request->request() );
 
 				if ( ! is_wp_error( $response ) ) {
-					$order->add_order_note( 'Klarna order cancelled.' );
+					$order->add_order_note( 'Kustom order cancelled.' );
 					$order->update_meta_data( '_wc_klarna_cancelled', 'yes' );
 					if ( $order->save() ) {
 						return true;
@@ -263,7 +263,7 @@ class OrderManagement {
 						return new \WP_Error( 'save_error', 'Could not save WooCommerce order object.' );
 					}
 				} else {
-					$order->add_order_note( 'Could not cancel Klarna order. ' . $response->get_error_message() . '.' );
+					$order->add_order_note( 'Could not cancel Kustom order. ' . $response->get_error_message() . '.' );
 					$order->save();
 					return new \WP_Error( 'unknown_error', 'Response object is of type WP_Error.', $response );
 				}
@@ -274,7 +274,7 @@ class OrderManagement {
 	}
 
 	/**
-	 * Updates Klarna order items.
+	 * Updates Kustom order items.
 	 *
 	 * @param int   $order_id Order ID.
 	 * @param array $items Order items.
@@ -333,13 +333,13 @@ class OrderManagement {
 				return new \WP_Error( 'not_allowed_status', 'Order is not in allowed status.' );
 			}
 
-			// Retrieve Klarna order first.
+			// Retrieve Kustom order first.
 			$klarna_order = $this->retrieve_klarna_order( $order_id );
 			if ( is_wp_error( $klarna_order ) ) {
-				$order->add_order_note( 'Klarna order could not be updated due to an error.' );
+				$order->add_order_note( 'Kustom order could not be updated due to an error.' );
 				$order->save();
 
-				return new \WP_Error( 'object_error', 'Klarna order object is of type WP_Error.', $klarna_order );
+				return new \WP_Error( 'object_error', 'Kustom order object is of type WP_Error.', $klarna_order );
 			}
 
 			if ( ! in_array( $klarna_order->status, array( 'CANCELLED', 'CAPTURED', 'PART_CAPTURED' ), true ) ) {
@@ -353,15 +353,15 @@ class OrderManagement {
 				);
 				$response = $this->report()->request( $request->request() );
 				if ( ! is_wp_error( $response ) ) {
-					$order->add_order_note( 'Klarna order updated.' );
+					$order->add_order_note( 'Kustom order updated.' );
 					$order->save();
 				} else {
 					$reason = $response->get_error_message();
 					if ( ! empty( $reason ) ) {
-						// translators: %s: error message from Klarna.
-						$order_note = sprintf( __( 'Could not update Klarna order lines: %s.', 'klarna-checkout-for-woocommerce' ), $reason );
+						// translators: %s: error message from Kustom.
+						$order_note = sprintf( __( 'Could not update Kustom order lines: %s.', 'klarna-checkout-for-woocommerce' ), $reason );
 					} else {
-						$order_note = __( 'Could not update Klarna order lines. An unknown error occurred.', 'klarna-checkout-for-woocommerce' );
+						$order_note = __( 'Could not update Kustom order lines. An unknown error occurred.', 'klarna-checkout-for-woocommerce' );
 					}
 
 					$order->add_order_note( $order_note );
@@ -375,7 +375,7 @@ class OrderManagement {
 	}
 
 	/**
-	 * Captures a Klarna order.
+	 * Captures a Kustom order.
 	 *
 	 * @param int  $order_id Order ID.
 	 * @param bool $action If this was triggered by an action.
@@ -403,47 +403,47 @@ class OrderManagement {
 				return new \WP_Error( 'not_paid', 'Order has not been paid.' );
 			}
 
-			// Do nothing if Klarna order was already captured.
+			// Do nothing if Kustom order was already captured.
 			if ( $order->get_meta( '_wc_klarna_capture_id', true ) ) {
-				$order->add_order_note( 'Klarna order has already been captured.' );
+				$order->add_order_note( 'Kustom order has already been captured.' );
 				$order->save();
 
 				return new \WP_Error( 'already_captured', 'Order has already been captured.' );
 			}
-			// Do nothing if we don't have Klarna order ID.
+			// Do nothing if we don't have Kustom order ID.
 			if ( ! $order->get_meta( '_wc_klarna_order_id', true ) && ! $order->get_transaction_id() ) {
-				$order->update_status( 'on-hold', 'Klarna order ID is missing, Klarna order could not be captured at this time.' );
-				return new \WP_Error( 'klarna_id_missing', 'Klarna order id is missing for order.' );
+				$order->update_status( 'on-hold', 'Kustom order ID is missing, Kustom order could not be captured at this time.' );
+				return new \WP_Error( 'klarna_id_missing', 'Kustom order id is missing for order.' );
 			}
-			// Retrieve Klarna order.
+			// Retrieve Kustom order.
 			$klarna_order = $this->retrieve_klarna_order( $order_id );
 
 			if ( is_wp_error( $klarna_order ) ) {
-				$order->update_status( 'on-hold', 'Klarna order could not be captured due to an error.' );
-				return new \WP_Error( 'object_error', 'Klarna order object is of type WP_Error.', $klarna_order );
+				$order->update_status( 'on-hold', 'Kustom order could not be captured due to an error.' );
+				return new \WP_Error( 'object_error', 'Kustom order object is of type WP_Error.', $klarna_order );
 			}
 			// Check if order is pending review.
 			if ( 'PENDING' === $klarna_order->fraud_status ) {
-				$order->update_status( 'on-hold', 'Klarna order is pending review and could not be captured at this time.' );
+				$order->update_status( 'on-hold', 'Kustom order is pending review and could not be captured at this time.' );
 				return new \WP_Error( 'pending_fraud_review', 'Order is pending fraud review and cannot be captured.' );
 			}
-			// Check if Klarna order has already been captured.
+			// Check if Kustom order has already been captured.
 			if ( in_array( $klarna_order->status, array( 'CAPTURED' ), true ) ) {
-				$order->add_order_note( 'Klarna order has already been captured on ' . $klarna_order->captures[0]->captured_at );
+				$order->add_order_note( 'Kustom order has already been captured on ' . $klarna_order->captures[0]->captured_at );
 				$order->update_meta_data( '_wc_klarna_capture_id', $klarna_order->captures[0]->capture_id );
 				$order->save();
 				return new \WP_Error( 'already_captured', 'Order has already been captured.' );
 			}
-			// Check if Klarna order has already been canceled.
+			// Check if Kustom order has already been canceled.
 			if ( 'CANCELLED' === $klarna_order->status ) {
-				$order->add_order_note( 'Klarna order failed to capture, the order has already been canceled' );
+				$order->add_order_note( 'Kustom order failed to capture, the order has already been canceled' );
 				$order->save();
 
 				return new \WP_Error( 'klarna_order_cancelled', 'Order is cancelled. Capture failed.' );
 			}
-			// Only send capture request if Klarna order fraud status is accepted.
+			// Only send capture request if Kustom order fraud status is accepted.
 			if ( 'ACCEPTED' !== $klarna_order->fraud_status ) {
-				$order->add_order_note( 'Klarna order could not be captured at this time.' );
+				$order->add_order_note( 'Kustom order could not be captured at this time.' );
 				$order->save();
 
 				return new \WP_Error( 'pending_fraud_review', 'Order is pending fraud review and cannot be captured.' );
@@ -459,15 +459,15 @@ class OrderManagement {
 				$response = $request->request();
 
 				if ( ! is_wp_error( $response ) ) {
-					$order->add_order_note( 'Klarna order captured. Capture amount: ' . $order->get_formatted_order_total( '', false ) . '. Capture ID: ' . $response );
+					$order->add_order_note( 'Kustom order captured. Capture amount: ' . $order->get_formatted_order_total( '', false ) . '. Capture ID: ' . $response );
 					$order->update_meta_data( '_wc_klarna_capture_id', $response );
 					$order->save();
 					return true;
 				}
 
-				/* The suggested approach by Klarna is to try again after some time. If that still fails, the merchant should inform the customer, and ask them to either "create a new subscription or add funds to their payment method if they wish to continue." */
+				/* The suggested approach by Kustom is to try again after some time. If that still fails, the merchant should inform the customer, and ask them to either "create a new subscription or add funds to their payment method if they wish to continue." */
 				if ( isset( $response->get_error_data()['code'] ) && 403 === $response->get_error_data()['code'] && 'PAYMENT_METHOD_FAILED' === $response->get_error_code() ) {
-					$order->update_status( 'on-hold', __( 'Klarna could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue.', 'klarna-checkout-for-woocommerce' ) );
+					$order->update_status( 'on-hold', __( 'Kustom could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue.', 'klarna-checkout-for-woocommerce' ) );
 					return new \WP_Error( 'capture_failed', 'Capture failed. Please try again later.' );
 				} else {
 					$error_message = $response->get_error_message();
@@ -476,8 +476,8 @@ class OrderManagement {
 						$error_message = str_replace( '. Capture not possible.', sprintf( ': %s %s.', $klarna_order->remaining_authorized_amount / 100, $klarna_order->purchase_currency ), $error_message );
 					}
 
-					// translators: %s: Error message from Klarna.
-					$order->update_status( 'on-hold', sprintf( __( 'Could not capture Klarna order. %s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
+					// translators: %s: Error message from Kustom.
+					$order->update_status( 'on-hold', sprintf( __( 'Could not capture Kustom order. %s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
 					return new \WP_Error( 'capture_failed', 'Capture failed.', $error_message );
 				}
 			}
@@ -485,7 +485,7 @@ class OrderManagement {
 	}
 
 	/**
-	 * Refund a Klarna order.
+	 * Refund a Kustom order.
 	 *
 	 * @param bool        $result Refund attempt result.
 	 * @param int         $order_id WooCommerce order ID.
@@ -507,28 +507,28 @@ class OrderManagement {
 			return new \WP_Error( 'order_sync_off', 'Order management is disabled' );
 		}
 
-		// Do nothing if Klarna order is not captured.
+		// Do nothing if Kustom order is not captured.
 		if ( ! $order->get_meta( '_wc_klarna_capture_id', true ) ) {
-			$order->add_order_note( __( 'Klarna order has not been captured and cannot be refunded.', 'klarna-checkout-for-woocommerce' ) );
+			$order->add_order_note( __( 'Kustom order has not been captured and cannot be refunded.', 'klarna-checkout-for-woocommerce' ) );
 			$order->save();
 
 			return new \WP_Error( 'not_captured', 'Order has not been captured and cannot be refunded.' );
 		}
 
-		// Retrieve Klarna order first.
+		// Retrieve Kustom order first.
 		$klarna_order = $this->retrieve_klarna_order( $order_id );
 
 		if ( is_wp_error( $klarna_order ) ) {
-			// translators: %s Klarna error message.
-			$order->add_order_note( \sprintf( __( 'Could not refund Klarna order. %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() ) );
+			// translators: %s Kustom error message.
+			$order->add_order_note( \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() ) );
 			$order->save();
 
-			return new \WP_Error( 'object_error', 'Klarna order object is of type WP_Error.', $klarna_order );
+			return new \WP_Error( 'object_error', 'Kustom order object is of type WP_Error.', $klarna_order );
 		}
 
-		// We've checked for the metadata `_wc_klarna_capture_id`, now we check for the Klarna status.
+		// We've checked for the metadata `_wc_klarna_capture_id`, now we check for the Kustom status.
 		if ( ! in_array( $klarna_order->status, array( 'CAPTURED', 'PART_CAPTURED' ), true ) ) {
-			$order->add_order_note( __( 'Klarna order has not been captured and cannot be refunded.', 'klarna-checkout-for-woocommerce' ) );
+			$order->add_order_note( __( 'Kustom order has not been captured and cannot be refunded.', 'klarna-checkout-for-woocommerce' ) );
 			$order->save();
 
 			return new \WP_Error( 'not_captured', 'Order has not been captured and cannot be refunded.' );
@@ -559,8 +559,8 @@ class OrderManagement {
 
 		$response = $request->request();
 		if ( is_wp_error( $response ) ) {
-			// translators: %s Klarna error message.
-			$order->add_order_note( \sprintf( __( 'Could not refund Klarna order. %s.', 'klarna-checkout-for-woocommerce' ), $response->get_error_message() ) );
+			// translators: %s Kustom error message.
+			$order->add_order_note( \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $response->get_error_message() ) );
 			$order->save();
 
 			return new \WP_Error( 'unknown_error', 'Response object is of type WP_Error.', $response );
@@ -569,7 +569,7 @@ class OrderManagement {
 		$applied_return_fees = apply_filters( 'klarna_applied_return_fees', array() );
 
 		// translators: refund amount, refund id.
-		$text = __( 'Processing a refund of %1$s with Klarna', 'klarna-checkout-for-woocommerce' );
+		$text = __( 'Processing a refund of %1$s with Kustom', 'klarna-checkout-for-woocommerce' );
 		if ( ! empty( \floatval( $applied_return_fees['amount'] ?? 0 ) ) ) {
 			$total_return_fee_amount     = $applied_return_fees['amount'] ?? 0;
 			$total_return_fee_tax_amount = $applied_return_fees['tax_amount'] ?? 0;
@@ -590,11 +590,11 @@ class OrderManagement {
 	}
 
 	/**
-	 * Retrieve a Klarna order.
+	 * Retrieve a Kustom order.
 	 *
 	 * @param int $order_id WooCommerce order ID.
 	 *
-	 * @return object $klarna_order Klarna Order.
+	 * @return object $klarna_order Kustom Order.
 	 */
 	public function retrieve_klarna_order( $order_id ) {
 		$request      = new RequestGetOrder(

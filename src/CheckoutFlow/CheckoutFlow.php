@@ -24,9 +24,16 @@ abstract class CheckoutFlow {
 			$message = __( 'Invalid order ID.', 'klarna-checkout-for-woocommerce' );
 			throw new Exception( esc_html( $message ) );
 		}
-		$handler = self::get_handler();
+		$handler         = self::get_handler();
+		$kustom_order_id = $order->get_meta( '_wc_klarna_order_id', true );
+		if ( empty( $kustom_order_id ) && WC()->session ) {
+			$kustom_order_id = WC()->session->get( 'kco_wc_order_id' );
+		}
+		if ( empty( $kustom_order_id ) ) {
+			$kustom_order_id = 'N/A';
+		}
 
-		\KCO_Logger::log( sprintf( 'Processing order %s|%s with flow %s.', $order->get_id(), $order->get_order_number(), get_class( $handler ) ) );
+		\KCO_Logger::log( \sprintf( 'Processing order %s|%s (Kustom ID: %s) with flow %s.', $order->get_id(), $order->get_order_number(), $kustom_order_id, \get_class( $handler ) ) );
 
 		return $handler->process( $order );
 	}
@@ -72,12 +79,12 @@ abstract class CheckoutFlow {
 	abstract public function process( $order );
 
 	/**
-	 * Get the Klarna order id for the order.
+	 * Get the Kustom order id for the order.
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
 	 *
-	 * @return string|null The Klarna order id or null if not set.
-	 * @throws Exception If there is an error retrieving the Klarna order id.
+	 * @return string|null The Kustom order id or null if not set.
+	 * @throws Exception If there is an error retrieving the Kustom order id.
 	 */
 	public function get_klarna_order_id( $order ) {
 		// For the initial subscription, the Kustom order ID should always exist in the session.
@@ -95,7 +102,7 @@ abstract class CheckoutFlow {
 		$klarna_order_id = ! empty( $klarna_order_id ) ? $klarna_order_id : WC()->session->get( 'kco_wc_order_id' );
 
 		if ( empty( $klarna_order_id ) ) {
-			throw new Exception( __( 'Klarna order ID not found.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
+			throw new Exception( __( 'Kustom order ID not found.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
 		}
 
 		return $klarna_order_id;
@@ -104,7 +111,7 @@ abstract class CheckoutFlow {
 	/**
 	 * Log extra shipping debug information.
 	 *
-	 * @param string    $klarna_order_id The Klarna order ID.
+	 * @param string    $klarna_order_id The Kustom order ID.
 	 * @param \WC_Order $order The WooCommerce order.
 	 *
 	 * @return void
@@ -138,18 +145,18 @@ abstract class CheckoutFlow {
 	}
 
 	/**
-	 * Get the klarna order for a order number, or throw an error.
+	 * Get the Kustom order for an order number, or throw an error.
 	 *
-	 * @param string $klarna_order_id The Klarna order ID.
+	 * @param string $klarna_order_id The Kustom order ID.
 	 *
 	 * @return array
-	 * @throws Exception If the Klarna order is not found or if there is an error.
+	 * @throws Exception If the Kustom order is not found or if there is an error.
 	 */
 	public function get_klarna_order( $klarna_order_id ) {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
 		if ( is_wp_error( $klarna_order ) || empty( $klarna_order ) ) {
-			throw new Exception( __( 'Klarna order not found or an error occurred.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
+			throw new Exception( __( 'Kustom order not found or an error occurred.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
 		}
 
 		return $klarna_order;
@@ -159,7 +166,7 @@ abstract class CheckoutFlow {
 	 * Save metadata to the order.
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
-	 * @param array     $klarna_order The Klarna order data.
+	 * @param array     $klarna_order The Kustom order data.
 	 * @param string    $checkout_flow The checkout flow type (e.g., 'embedded', 'redirect').
 	 * @param bool      $save Whether to save the order metadata or not. Default is true.
 	 *

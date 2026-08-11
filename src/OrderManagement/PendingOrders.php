@@ -15,7 +15,7 @@ class PendingOrders {
 	/**
 	 * Notification listener for Pending orders.
 	 *
-	 * @param string $klarna_order_id Klarna order ID.
+	 * @param string $klarna_order_id Kustom order ID.
 	 *
 	 * @link https://developers.klarna.com/en/us/kco-v3/pending-orders
 	 */

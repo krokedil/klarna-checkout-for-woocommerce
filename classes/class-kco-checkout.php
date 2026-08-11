@@ -113,7 +113,7 @@ class KCO_Checkout {
 
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 		if ( ! $klarna_order ) {
-			KCO_Logger::log( "Klarna order could not be retrieved during update for ID: $klarna_order_id " );
+			KCO_Logger::log( "Kustom order could not be retrieved during update for ID: $klarna_order_id " );
 			return;
 		}
 
