@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Resolved a compatibility conflict with the "Klarna for WooCommerce" plugin that could cause WooCommerce refund processing to fail when both plugins were active.
