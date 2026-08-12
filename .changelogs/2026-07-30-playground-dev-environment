@@ -1,4 +1,0 @@
-Type: Misc
-Needs Documentation: no
-
-Added a WordPress Playground development environment via @krokedil/wp-playground-tools (one-command local dev site with WooCommerce and Kustom Checkout preconfigured in test mode). Developer tooling only — nothing ships in the release zip.
