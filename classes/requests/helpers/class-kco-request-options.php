@@ -68,7 +68,7 @@ class KCO_Request_Options {
 	}
 
 	/**
-	 * Gets date of birth mandatory option.
+	 * Gets title mandatory option.
 	 *
 	 * @return bool
 	 */
@@ -101,7 +101,7 @@ class KCO_Request_Options {
 	}
 
 	/**
-	 * Gets date of birth mandatory option.
+	 * Gets national identification number validation mandatory option.
 	 *
 	 * @return bool
 	 */
@@ -186,17 +186,21 @@ class KCO_Request_Options {
 	/**
 	 * Gets shipping details note.
 	 *
-	 * @return string|bool The shipping details note, or false if the setting has no stored value.
+	 * @return string|false The shipping details note, or false if the setting has no stored value.
 	 */
 	private function get_shipping_details() {
-		return $this->settings['shipping_details'] ?? false;
+		if ( isset( $this->settings['shipping_details'] ) ) {
+			return $this->settings['shipping_details'];
+		}
+
+		return false;
 	}
 
 	/**
 	 * Checks option fields.
 	 *
 	 * @param string $field Field name.
-	 * @return array|bool
+	 * @return string|false The setting value, or false if the setting is unset or empty.
 	 */
 	private function check_option_field( $field ) {
 		if ( isset( $this->settings[ $field ] ) && '' !== $this->settings[ $field ] ) {
