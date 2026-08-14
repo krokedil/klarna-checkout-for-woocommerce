@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed "map_meta_cap was called incorrectly" notices that could appear when editing a custom post type (thanks @johvir!).
