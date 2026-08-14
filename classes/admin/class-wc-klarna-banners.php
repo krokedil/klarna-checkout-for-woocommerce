@@ -202,7 +202,7 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 		 * @return string
 		 */
 		public static function get_go_live_url() {
-			return 'https://www.portal.kustom.co';
+			return 'https://portal.kustom.co/onboarding';
 		}
 
 		/**
