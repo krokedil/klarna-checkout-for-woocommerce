@@ -49,8 +49,8 @@ class KCO_Request_Create_Recurring extends KCO_Request {
 		if ( class_exists( 'WC_Subscriptions_Product' ) ) {
 			$subscription_map = array();
 			foreach ( $order->get_items() as $item ) {
-				// Use the variation product when available so the subscription check and period/interval read from the variation, matching how get_item_reference resolves the line reference.
-				$product = $item->get_variation_id() ? wc_get_product( $item->get_variation_id() ) : wc_get_product( $item->get_product_id() );
+				// Resolves to the variation when the line item has one, so the subscription check and period/interval read from the variation, matching how get_item_reference resolves the line reference.
+				$product = $item->get_product();
 				if ( $product && WC_Subscriptions_Product::is_subscription( $product ) ) {
 					$subscription_map[ $order_data->get_item_reference( $item ) ] = array(
 						'name'           => $item->get_name(),
