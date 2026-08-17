@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed the PHP warning "undefined array key 'label'" that could appear on the checkout page for plugins that read checkout field labels, such as the Astra Pro add-on.
