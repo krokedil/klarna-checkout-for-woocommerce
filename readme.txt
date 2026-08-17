@@ -7,7 +7,7 @@ Tested up to: 7.0
 Requires PHP: 7.4
 WC requires at least: 9.7.0
 WC tested up to: 11.0.1
-Stable tag: 2.20.8
+Stable tag: 2.20.9
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,16 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-08-17    - version 2.20.9 =
+* Tweak         - Improved the error message shown to customers when a Klarna error occurs. Customers will now see a clear, readable message instead of a raw technical response.
+* Tweak         - Added the request URL to all order management log entries.
+* Tweak         - Updated the "Go live now" and "Get playground credentials" links in the Kustom go-live banner to point to the new Kustom portal domains.
+* Fix           - Fixed an issue where paying for an order containing a subscription product through the 'order pay' flow would fail with an API error. The subscription metadata on order lines is now only included when creating a recurring order, not on the initial checkout order request.
+* Fix           - Fixed an issue where a returning customer could get stuck at the checkout when the order from their previous visit had expired. The checkout now discards the expired order and creates a new one instead of retrying it.
+* Fix           - Fixed "Undefined array key" PHP warnings emitted on every checkout when a gateway setting has no stored value, e.g. on sites whose settings were seeded programmatically or that predate a setting being added.
+* Fix           - Resolved a compatibility conflict with the "Klarna for WooCommerce" plugin that could cause WooCommerce refund processing to fail when both plugins were active.
+* Fix           - Fixed "map_meta_cap was called incorrectly" notices that could appear when editing a custom post type (thanks @johvir!).
+
 = 2026-08-11    - version 2.20.8 =
 * Tweak         - Checkout error log entries now include the error type and HTTP status code, making it faster to diagnose failed orders.
 * Tweak         - Removed the "Add Kustom Post Purchase info to order email" setting and its associated functionality.

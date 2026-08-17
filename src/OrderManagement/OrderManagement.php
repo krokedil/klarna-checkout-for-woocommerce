@@ -497,9 +497,9 @@ class OrderManagement {
 	public function refund_klarna_order( $result, $order_id, $amount = null, $reason = '' ) {
 		$order = wc_get_order( $order_id );
 
-		// If the order was not paid using the plugin that instanced this class, bail.
+		// If the order was not paid using Kustom Checkout, return the original result.
 		if ( 'kco' !== $order->get_payment_method() ) {
-			return;
+			return $result;
 		}
 
 		// The merchant has disconnected the order from the order manager.
