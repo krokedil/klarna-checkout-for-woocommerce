@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where paying for an order containing a subscription product through the 'order pay' flow would fail with an API error. The subscription metadata on order lines is now only included when creating a recurring order, not on the initial checkout order request.

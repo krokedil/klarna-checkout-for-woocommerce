@@ -163,7 +163,11 @@ class KCO_Request {
 					$error_message = "$error_message  $error";
 				}
 			}
-			return new WP_Error( $code, "$body $error_message", $data );
+			$message = ! empty( $error_message ) ? trim( $error_message ) : $body;
+			$error   = new WP_Error( $code, $message, $data );
+			// Preserve the decoded response body so consumers can read structured fields (e.g. error_code) instead of parsing the readable message.
+			$error->add_data( $errors, 'klarna_error_body' );
+			return $error;
 		}
 		return json_decode( $body, true );
 	}
