@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Fixed an issue where a returning customer could get stuck at the checkout when the order from their previous visit had expired. The checkout now discards the expired order and creates a new one instead of retrying it.
