@@ -28,6 +28,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use Krokedil\KustomCheckout\Admin\StoreSetupChecks;
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
@@ -129,6 +130,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var PickupPoints $pickup_points
 		 */
 		public $pickup_points;
+
+		/**
+		 * Reference to the store setup checks class.
+		 *
+		 * @var StoreSetupChecks $store_setup_checks
+		 */
+		public $store_setup_checks;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -309,6 +317,10 @@ if ( ! class_exists( 'KCO' ) ) {
 			);
 			$this->order_management = new OrderManagement();
 			$this->pickup_points    = new PickupPoints();
+
+			if ( is_admin() ) {
+				$this->store_setup_checks = new StoreSetupChecks();
+			}
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
