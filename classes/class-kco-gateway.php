@@ -806,7 +806,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				$args = wp_remote_get( 'https://krokedil-settings-page-configs.s3.eu-north-1.amazonaws.com/main/configs/kustom-checkout-for-woocommerce.json' );
 
 				if ( is_wp_error( $args ) ) {
-					KP_Logger::log( 'Failed to fetch Kustom Checkout settings page config from remote source.' );
+					KCO_Logger::log( 'Failed to fetch Kustom Checkout settings page config from remote source.' );
 					return null;
 				}
 
@@ -819,16 +819,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$decoded_args['settings_navigation'] = true;
 
 			return $decoded_args;
-		}
-
-		/**
-		 * Callable function for the general content for the settings page.
-		 *
-		 * @return void
-		 */
-		public function settings_page_content() {
-			KP_Settings_Page::header_html();
-			echo $this->generate_settings_html( $this->get_form_fields(), false ); // phpcs:ignore
 		}
 
 		/**
