@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Added two switches to the Kustom Order Management settings for merchants who manage orders in the Kustom portal instead of in WooCommerce. "Order management" turns off the automatic capture, cancel and update of the Kustom order, greying out the individual settings it governs while leaving the manual actions in the order metabox available. "Refunds" controls whether refunds are sent to Kustom at all, so that WooCommerce only offers to refund manually and the return fee fields are hidden when it is disabled. Both are enabled by default, so existing stores are unaffected.

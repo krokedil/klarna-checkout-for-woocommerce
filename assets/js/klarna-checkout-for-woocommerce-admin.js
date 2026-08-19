@@ -117,4 +117,48 @@ jQuery( function ( $ ) {
 	} )
 
 	$( "body" ).on( "change", credentialsFields, testCredential )
+
+	/*
+	 * The order management master switch greys out the settings it governs. The refund setting is
+	 * deliberately left out: it has its own switch and must stay editable while order management is
+	 * off, which is exactly the case for merchants handling everything in the Kustom portal.
+	 */
+	var omMasterSwitch = $( "#woocommerce_kco_kom_enabled" )
+	var omDependentFields = $(
+		"#woocommerce_kco_kom_auto_capture, #woocommerce_kco_kom_auto_cancel, #woocommerce_kco_kom_auto_update, #woocommerce_kco_kom_auto_order_sync, #woocommerce_kco_kom_force_full_capture",
+	)
+
+	function toggleOmDependents() {
+		var disabled = ! omMasterSwitch.is( ":checked" )
+
+		// Drop the mirrors from any previous run before recreating the ones we still need below.
+		$( ".kco-setting-mirror" ).remove()
+
+		omDependentFields.each( function () {
+			var field = $( this )
+
+			field.prop( "disabled", disabled )
+			field.closest( "fieldset" ).toggleClass( "kco-setting--disabled", disabled )
+			field.closest( "tr" ).toggleClass( "kco-setting--disabled", disabled )
+
+			/*
+			 * A disabled checkbox is not posted, and WooCommerce reads an absent checkbox as "no".
+			 * Mirror the checked ones in a hidden field so that saving while the master switch is off
+			 * does not silently clear the merchant's choices.
+			 */
+			if ( disabled && field.is( ":checked" ) ) {
+				$( "<input>", {
+					type: "hidden",
+					class: "kco-setting-mirror",
+					name: field.attr( "name" ),
+					value: "1",
+				} ).insertAfter( field )
+			}
+		} )
+	}
+
+	if ( omMasterSwitch.length ) {
+		toggleOmDependents()
+		omMasterSwitch.on( "change", toggleOmDependents )
+	}
 } )

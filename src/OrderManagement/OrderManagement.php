@@ -92,19 +92,18 @@ class OrderManagement {
 			return;
 		}
 
-		$this->settings   = new Settings();
-		$this->metabox    = new MetaBox( $this );
-		$this->ajax       = new Ajax();
-		$this->return_fee = new ReturnFee();
-
-		add_action( 'kco_wc_supports', array( $this, 'add_gateway_support' ) );
+		$this->settings = new Settings();
+		$this->metabox  = new MetaBox( $this );
+		$this->ajax     = new Ajax();
 
 		$report_about        = array(
+			array( 'id' => 'kom_enabled' ),
 			array( 'id' => 'kom_auto_capture' ),
 			array( 'id' => 'kom_auto_cancel' ),
 			array( 'id' => 'kom_auto_update' ),
 			array( 'id' => 'kom_auto_order_sync' ),
 			array( 'id' => 'kom_force_full_capture' ),
+			array( 'id' => 'kom_enable_refunds' ),
 		);
 		$this->system_report = new SystemReport( 'kco', 'Kustom Order Management for WooCommerce', $report_about );
 
@@ -117,8 +116,17 @@ class OrderManagement {
 		// Update an order.
 		add_action( 'woocommerce_saved_order_items', array( $this, 'update_klarna_order_items' ), 10, 2 );
 
-		// Refund an order.
-		add_filter( 'wc_klarna_checkout_process_refund', array( $this, 'refund_klarna_order' ), 10, 4 );
+		/*
+		 * Refund an order. Gated at registration rather than inside the callback: when the merchant
+		 * refunds in the Kustom portal, the WooCommerce refund UI should not offer to refund through
+		 * Kustom at all, and the return fee fields should not be added to it.
+		 */
+		if ( $this->settings->is_refunds_enabled() ) {
+			$this->return_fee = new ReturnFee();
+
+			add_action( 'kco_wc_supports', array( $this, 'add_gateway_support' ) );
+			add_filter( 'wc_klarna_checkout_process_refund', array( $this, 'refund_klarna_order' ), 10, 4 );
+		}
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ) );
 	}
@@ -207,8 +215,7 @@ class OrderManagement {
 	 */
 	public function cancel_klarna_order( $order_id, $action = false ) {
 
-		$options = $this->settings->get_settings( $order_id );
-		if ( ! isset( $options['kom_auto_cancel'] ) || 'yes' === $options['kom_auto_cancel'] || $action ) {
+		if ( $this->settings->is_enabled( 'kom_auto_cancel', $order_id ) || $action ) {
 			$order = wc_get_order( $order_id );
 
 			// If the order was not paid using the plugin that instanced this class, bail.
@@ -283,8 +290,7 @@ class OrderManagement {
 	 * @return \WP_Error|null|true Returns true if updating was successful or a WP_Error object if not.
 	 */
 	public function update_klarna_order_items( $order_id, $items, $action = false ) {
-		$options = $this->settings->get_settings( $order_id );
-		$order   = wc_get_order( $order_id );
+		$order = wc_get_order( $order_id );
 
 		// If the order was not paid using the plugin that instanced this class, bail.
 		if ( 'kco' !== $order->get_payment_method() ) {
@@ -316,7 +322,7 @@ class OrderManagement {
 			}
 		}
 
-		if ( ! isset( $options['kom_auto_update'] ) || 'yes' === $options['kom_auto_update'] || $action ) {
+		if ( $this->settings->is_enabled( 'kom_auto_update', $order_id ) || $action ) {
 
 			// The merchant has disconnected the order from the order manager.
 			if ( $order->get_meta( '_kom_disconnect' ) ) {
@@ -383,15 +389,14 @@ class OrderManagement {
 	 * @return bool|null|\WP_Error Returns bool true if capture was successful or a WP_Error object if not.
 	 */
 	public function capture_klarna_order( $order_id, $action = false ) {
-		$options = $this->settings->get_settings( $order_id );
-		$order   = wc_get_order( $order_id );
+		$order = wc_get_order( $order_id );
 
 		// If the order was not paid using the plugin that instanced this class, bail.
 		if ( 'kco' !== $order->get_payment_method() ) {
 			return;
 		}
 
-		if ( ! isset( $options['kom_auto_capture'] ) || 'yes' === $options['kom_auto_capture'] || $action ) {
+		if ( $this->settings->is_enabled( 'kom_auto_capture', $order_id ) || $action ) {
 
 			// The merchant has disconnected the order from the order manager.
 			if ( $order->get_meta( '_kom_disconnect' ) ) {

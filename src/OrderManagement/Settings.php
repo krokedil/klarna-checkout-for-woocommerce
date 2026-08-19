@@ -27,17 +27,26 @@ class Settings {
 		$default_values = wp_parse_args(
 			get_option( 'kom_settings', array() ),
 			array(
+				'kom_enabled'            => 'yes',
 				'kom_auto_capture'       => 'yes',
 				'kom_auto_cancel'        => 'yes',
 				'kom_auto_update'        => 'yes',
 				'kom_auto_order_sync'    => 'yes',
 				'kom_force_full_capture' => 'no',
+				'kom_enable_refunds'     => 'yes',
 			)
 		);
 
 		$settings['kom'] = array(
 			'title' => 'Kustom Order Management',
 			'type'  => 'title',
+		);
+
+		$settings['kom_enabled'] = array(
+			'title'   => 'Order management',
+			'type'    => 'checkbox',
+			'default' => $default_values['kom_enabled'],
+			'label'   => __( 'Synchronize the Kustom order automatically from WooCommerce. Disable this if you activate and cancel orders in the Kustom portal instead. Manual actions remain available in the order metabox, and refunds are controlled separately below.', 'klarna-checkout-for-woocommerce' ),
 		);
 
 		$settings['kom_auto_capture'] = array(
@@ -75,7 +84,80 @@ class Settings {
 			'label'   => __( 'Force capture full order. Useful if the Kustom order has been updated by an ERP system.', 'klarna-checkout-for-woocommerce' ),
 		);
 
+		$settings['kom_enable_refunds'] = array(
+			'title'   => 'Refunds',
+			'type'    => 'checkbox',
+			'default' => $default_values['kom_enable_refunds'],
+			'label'   => __( 'Send refunds from WooCommerce to Kustom. Disable this if you refund in the Kustom portal instead, and WooCommerce will only offer to refund manually.', 'klarna-checkout-for-woocommerce' ),
+		);
+
 		return $settings;
+	}
+
+	/**
+	 * Read one of the order management switches that are not order specific.
+	 *
+	 * Deliberately reads the option directly instead of going through SettingsUtility: the switches
+	 * are read while the plugin is still bootstrapping on plugins_loaded, and SettingsUtility builds
+	 * its defaults from \KCO_Fields::fields(), which would trigger translation loading before init.
+	 *
+	 * The fields are saved as gateway settings, so "woocommerce_kco_settings" is the option to read,
+	 * not the legacy "kom_settings" that get_settings() falls back to.
+	 *
+	 * @param string $key           The setting to read.
+	 * @param string $default_value The value to use when the merchant has never saved the setting.
+	 * @return string
+	 */
+	private function get_global_setting( $key, $default_value = 'yes' ) {
+		$settings = get_option( 'woocommerce_kco_settings', array() );
+
+		return $settings[ $key ] ?? $default_value;
+	}
+
+	/**
+	 * Whether order management is enabled at all.
+	 *
+	 * This is the master switch for the automatic synchronization. When disabled, no Kustom order
+	 * is captured, cancelled or updated as a result of a WooCommerce order changing, but the manual
+	 * actions in the order metabox are still available. Refunds are controlled separately, see
+	 * is_refunds_enabled().
+	 *
+	 * @return bool
+	 */
+	public function is_om_enabled() {
+		return 'no' !== $this->get_global_setting( 'kom_enabled' );
+	}
+
+	/**
+	 * Whether refunds should be sent to Kustom from WooCommerce.
+	 *
+	 * Deliberately independent of the master switch: a merchant who handles everything in the Kustom
+	 * portal needs to be able to turn refunds off while order management is already disabled.
+	 *
+	 * @return bool
+	 */
+	public function is_refunds_enabled() {
+		return 'no' !== $this->get_global_setting( 'kom_enable_refunds' );
+	}
+
+	/**
+	 * Whether one of the automatic order management settings is enabled for an order.
+	 *
+	 * A missing value counts as enabled for backwards compatibility. Always false when the master
+	 * switch is off.
+	 *
+	 * @param string $key      The setting to check, e.g. "kom_auto_capture".
+	 * @param int    $order_id WooCommerce order ID.
+	 * @return bool
+	 */
+	public function is_enabled( $key, $order_id = 0 ) {
+		if ( ! $this->is_om_enabled() ) {
+			return false;
+		}
+
+		$options = $this->get_settings( $order_id );
+
+		return ! isset( $options[ $key ] ) || 'yes' === $options[ $key ];
 	}
 
 	/**

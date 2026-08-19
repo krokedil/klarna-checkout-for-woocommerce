@@ -178,12 +178,16 @@ class MetaBox extends OrderMetabox {
 	 * @param object $klarna_order The Kustom order object associated with this order.
 	 */
 	protected function output_actions_dropdown( $order_id, $klarna_order ) {
-		$settings = $this->order_management->settings->get_settings( $order_id );
+		$settings = $this->order_management->settings;
 
+		/*
+		 * An action is only offered here when it is not handled automatically, which also covers the
+		 * master switch being off: is_enabled() returns false, so the manual action is presented.
+		 */
 		$actions            = array();
-		$actions['capture'] = ( ! isset( $settings['kom_auto_capture'] ) || 'yes' === $settings['kom_auto_capture'] ) ? false : true;
-		$actions['cancel']  = ( ! isset( $settings['kom_auto_cancel'] ) || 'yes' === $settings['kom_auto_cancel'] ) ? false : true;
-		$actions['sync']    = ( ! isset( $settings['kom_auto_order_sync'] ) || 'yes' === $settings['kom_auto_order_sync'] ) ? false : true;
+		$actions['capture'] = ! $settings->is_enabled( 'kom_auto_capture', $order_id );
+		$actions['cancel']  = ! $settings->is_enabled( 'kom_auto_cancel', $order_id );
+		$actions['sync']    = ! $settings->is_enabled( 'kom_auto_order_sync', $order_id );
 		$actions['any']     = ( $actions['capture'] || $actions['cancel'] || $actions['sync'] );
 
 		ob_start();

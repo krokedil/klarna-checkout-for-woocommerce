@@ -475,3 +475,9 @@ input.bad_credential {
 #wpfooter{
 	position: unset !important;
 }
+
+/* Settings governed by the order management master switch, greyed out while it is off. */
+
+.kco-setting--disabled {
+	opacity: 0.5;
+}
