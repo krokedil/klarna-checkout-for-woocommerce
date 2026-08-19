@@ -244,10 +244,12 @@ class KCO_Request_Cart {
 
 				// Add images.
 				$klarna_checkout_settings = get_option( 'woocommerce_kco_settings', array() );
-				if ( isset( $klarna_checkout_settings ) && 'yes' === $klarna_checkout_settings['send_product_urls'] ) {
+				if ( isset( $klarna_checkout_settings['send_product_urls'] ) && 'yes' === $klarna_checkout_settings['send_product_urls'] ) {
+					$image_url = $this->get_item_image_url( $product );
+
 					$klarna_item['product_url'] = $this->get_item_product_url( $product );
-					if ( $this->get_item_image_url( $product ) ) {
-						$klarna_item['image_url'] = $this->get_item_image_url( $product );
+					if ( $image_url ) {
+						$klarna_item['image_url'] = $image_url;
 					}
 				}
 
