@@ -43,10 +43,10 @@ class Settings {
 		);
 
 		$settings['kom_enabled'] = array(
-			'title'   => 'Order management',
+			'title'   => 'Enable order management',
 			'type'    => 'checkbox',
 			'default' => $default_values['kom_enabled'],
-			'label'   => __( 'Synchronize the Kustom order automatically from WooCommerce. Disable this if you activate and cancel orders in the Kustom portal instead. Manual actions remain available in the order metabox, and refunds are controlled separately below.', 'klarna-checkout-for-woocommerce' ),
+			'label'   => __( 'Manage Kustom orders from WooCommerce. Disable this to turn off every setting below, so that captures, cancellations and refunds are handled in the Kustom portal instead. The manual actions in the order metabox remain available.', 'klarna-checkout-for-woocommerce' ),
 		);
 
 		$settings['kom_auto_capture'] = array(
@@ -117,10 +117,9 @@ class Settings {
 	/**
 	 * Whether order management is enabled at all.
 	 *
-	 * This is the master switch for the automatic synchronization. When disabled, no Kustom order
-	 * is captured, cancelled or updated as a result of a WooCommerce order changing, but the manual
-	 * actions in the order metabox are still available. Refunds are controlled separately, see
-	 * is_refunds_enabled().
+	 * This is the master switch for the whole section. When disabled, no Kustom order is captured,
+	 * cancelled, updated or refunded from WooCommerce, and every other setting in the section is
+	 * ignored. The manual actions in the order metabox are still available.
 	 *
 	 * @return bool
 	 */
@@ -131,17 +130,14 @@ class Settings {
 	/**
 	 * Whether refunds should be sent to Kustom from WooCommerce.
 	 *
-	 * Deliberately independent of the master switch: a merchant who handles everything in the Kustom
-	 * portal needs to be able to turn refunds off while order management is already disabled.
-	 *
 	 * @return bool
 	 */
 	public function is_refunds_enabled() {
-		return 'no' !== $this->get_global_setting( 'kom_enable_refunds' );
+		return $this->is_om_enabled() && 'no' !== $this->get_global_setting( 'kom_enable_refunds' );
 	}
 
 	/**
-	 * Whether one of the automatic order management settings is enabled for an order.
+	 * Whether one of the per order settings in the section is enabled for an order.
 	 *
 	 * A missing value counts as enabled for backwards compatibility. Always false when the master
 	 * switch is off.
