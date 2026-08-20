@@ -36,6 +36,13 @@ class StoreSetupChecks {
 	const DOCUMENTATION_URL = 'https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/install-and-activate/#step-1-required-wordpresswoocommerce-settings';
 
 	/**
+	 * HTML id of the section in the WooCommerce system status report, used as a deep link anchor.
+	 *
+	 * @var string
+	 */
+	const REPORT_ANCHOR = 'kco-store-setup-check';
+
+	/**
 	 * Class constructor.
 	 */
 	public function __construct() {
@@ -169,7 +176,7 @@ class StoreSetupChecks {
 			'passed'       => 2 === $decimals,
 			'message'      => sprintf(
 				/* translators: 1: the current number of decimals, 2: opening link tag to the WooCommerce general settings page, 3: closing link tag, 4: opening link tag to the plugin documentation, 5: closing link tag. */
-				esc_html__( 'Set to %1$d %2$shere%3$s. Read more about this strong recommendation in the %4$splugin docs%5$s.', 'klarna-checkout-for-woocommerce' ),
+				esc_html__( 'Currently set to %1$d %2$shere%3$s. Read more about this strong recommendation in the %4$splugin docs%5$s.', 'klarna-checkout-for-woocommerce' ),
 				$decimals,
 				$this->link_open( admin_url( 'admin.php?page=wc-settings&tab=general' ), false ),
 				'</a>',
@@ -193,11 +200,11 @@ class StoreSetupChecks {
 				color: #996800;
 			}
 		</style>
-		<table class="wc_status_table widefat kco-store-setup-check" cellspacing="0">
+		<table class="wc_status_table widefat kco-store-setup-check" cellspacing="0" id="<?php echo esc_attr( self::REPORT_ANCHOR ); ?>">
 			<thead>
 				<tr>
 					<th colspan="3" data-export-label="Kustom Checkout Store Setup Check">
-						<h2><?php esc_html_e( 'Kustom Checkout – Store setup check', 'klarna-checkout-for-woocommerce' ); ?><?php echo wc_help_tip( esc_html__( 'Checks of the WordPress and WooCommerce settings that Kustom Checkout requires or recommends.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wc_help_tip() returns escaped HTML. ?></h2>
+						<h2><?php esc_html_e( 'Kustom Checkout – Store setup check', 'klarna-checkout-for-woocommerce' ); ?><?php echo wc_help_tip( esc_html__( 'Checks store settings that Kustom Checkout requires or recommends.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wc_help_tip() returns escaped HTML. ?></h2>
 					</th>
 				</tr>
 			</thead>
@@ -246,16 +253,162 @@ class StoreSetupChecks {
 		}
 
 		$mark_class = self::TYPE_REQUIRED === $check['type'] ? 'error' : 'warning';
-		echo '<mark class="' . esc_attr( $mark_class ) . '"><span class="dashicons dashicons-warning"></span> ' . wp_kses(
-			$check['message'],
-			array(
-				'a' => array(
-					'href'   => array(),
-					'target' => array(),
-					'rel'    => array(),
-				),
-			)
-		) . '</mark>';
+		echo '<mark class="' . esc_attr( $mark_class ) . '"><span class="dashicons dashicons-warning"></span> ' . wp_kses( $check['message'], $this->allowed_message_html() ) . '</mark>';
+	}
+
+	/**
+	 * Returns the URL to the store setup check section in the WooCommerce system status report.
+	 *
+	 * @return string The URL.
+	 */
+	public function get_report_url() {
+		return admin_url( 'admin.php?page=wc-status#' . self::REPORT_ANCHOR );
+	}
+
+	/**
+	 * Outputs the content of the store setup check box in the settings page sidebar.
+	 *
+	 * Registered as a sidebar box content callback with the krokedil/settings-page
+	 * package, which renders the box wrapper and title.
+	 *
+	 * @return void
+	 */
+	public function output_sidebar_box_content() {
+		$checks = $this->get_checks();
+
+		$required_failed    = 0;
+		$recommended_failed = 0;
+		foreach ( $checks as $check ) {
+			if ( ! empty( $check['passed'] ) ) {
+				continue;
+			}
+
+			if ( self::TYPE_REQUIRED === $check['type'] ) {
+				++$required_failed;
+			} else {
+				++$recommended_failed;
+			}
+		}
+
+		$failed = array_filter(
+			$checks,
+			function ( $check ) {
+				return empty( $check['passed'] );
+			}
+		);
+
+		?>
+		<style>
+			.kco-store-setup-box__description {
+				opacity: 0.8;
+				margin-top: 4px;
+				margin-bottom: 12px;
+			}
+			.kco-store-setup-box__notice {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				padding: 8px 12px;
+				border-left-width: 4px;
+				border-left-style: solid;
+			}
+			.kco-store-setup-box__notice--success {
+				background: #edfaef;
+				border-left-color: #00a32a;
+			}
+			.kco-store-setup-box__notice--success .dashicons {
+				color: #00a32a;
+			}
+			.kco-store-setup-box__notice--warning {
+				background: #fcf9e8;
+				border-left-color: #dba617;
+			}
+			.kco-store-setup-box__notice--warning .dashicons {
+				color: #996800;
+			}
+			.kco-store-setup-box__notice--error {
+				background: #fcf0f1;
+				border-left-color: #d63638;
+			}
+			.kco-store-setup-box__notice--error .dashicons {
+				color: #d63638;
+			}
+			.kco-store-setup-box__label {
+				font-weight: 600;
+				margin-bottom: 0;
+			}
+			.kco-store-setup-box__message {
+				margin-top: 4px;
+				padding-left: 14px;
+			}
+		</style>
+		<p class="kco-store-setup-box__description"><?php esc_html_e( 'Checks store settings that Kustom Checkout requires or recommends.', 'klarna-checkout-for-woocommerce' ); ?></p>
+		<?php $this->output_sidebar_box_notice( count( $checks ), $required_failed, $recommended_failed ); ?>
+		<?php foreach ( $failed as $check ) : ?>
+			<div class="kco-store-setup-box__check">
+				<p class="kco-store-setup-box__label">&raquo;&nbsp;<?php echo esc_html( $check['label'] . $this->get_type_suffix( $check['type'] ) ); ?><?php echo wc_help_tip( $check['help'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wc_help_tip() returns escaped HTML. ?></p>
+				<p class="kco-store-setup-box__message"><?php echo wp_kses( $check['message'], $this->allowed_message_html() ); ?></p>
+			</div>
+		<?php endforeach; ?>
+		<p class="kco-store-setup-box__report-link"><a href="<?php echo esc_url( $this->get_report_url() ); ?>"><?php esc_html_e( 'View full report', 'klarna-checkout-for-woocommerce' ); ?></a></p>
+		<?php
+	}
+
+	/**
+	 * Outputs the summary notice at the top of the sidebar box.
+	 *
+	 * Green when every check passes, yellow when only recommended checks fail, and
+	 * red as soon as a required check fails.
+	 *
+	 * @param int $total              The total number of checks.
+	 * @param int $required_failed    The number of failing required checks.
+	 * @param int $recommended_failed The number of failing recommended checks.
+	 *
+	 * @return void
+	 */
+	private function output_sidebar_box_notice( $total, $required_failed, $recommended_failed ) {
+		$failed_count = $required_failed + $recommended_failed;
+
+		if ( 0 === $failed_count ) {
+			/* translators: %d: the number of checks. */
+			$message = sprintf( _n( 'All %d check passed.', 'All %d checks passed.', $total, 'klarna-checkout-for-woocommerce' ), $total );
+			$state   = 'success';
+			$icon    = 'dashicons-yes-alt';
+		} else {
+			if ( $required_failed > 0 && $recommended_failed > 0 ) {
+				/* translators: 1: the number of failing required checks, 2: the number of failing recommended checks. */
+				$fail_sentence = sprintf( _n( '%1$d required and %2$d recommended check fails.', '%1$d required and %2$d recommended checks fail.', $recommended_failed, 'klarna-checkout-for-woocommerce' ), $required_failed, $recommended_failed );
+			} elseif ( $required_failed > 0 ) {
+				/* translators: %d: the number of failing required checks. */
+				$fail_sentence = sprintf( _n( '%d required check fails.', '%d required checks fail.', $required_failed, 'klarna-checkout-for-woocommerce' ), $required_failed );
+			} else {
+				/* translators: %d: the number of failing recommended checks. */
+				$fail_sentence = sprintf( _n( '%d recommended check fails.', '%d recommended checks fail.', $recommended_failed, 'klarna-checkout-for-woocommerce' ), $recommended_failed );
+			}
+
+			$message = $fail_sentence;
+			$state   = $required_failed > 0 ? 'error' : 'warning';
+			$icon    = 'dashicons-warning';
+		}
+
+		?>
+		<p class="kco-store-setup-box__notice kco-store-setup-box__notice--<?php echo esc_attr( $state ); ?>"><span class="dashicons <?php echo esc_attr( $icon ); ?>"></span> <span><?php echo esc_html( $message ); ?></span></p>
+		<?php
+	}
+
+	/**
+	 * Returns the HTML tags allowed in a check message, for use with wp_kses().
+	 *
+	 * @return array The allowed HTML tags.
+	 */
+	private function allowed_message_html() {
+		return array(
+			'a' => array(
+				'href'   => array(),
+				'target' => array(),
+				'rel'    => array(),
+			),
+		);
 	}
 
 	/**

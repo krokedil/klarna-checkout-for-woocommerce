@@ -297,7 +297,20 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			if ( empty( $args ) ) {
 				$this->output_legacy_admin_options();
 			} else {
-				$args['icon']             = KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_black.png';
+				$args['icon'] = KCO_WC_PLUGIN_URL . '/assets/img/kustom_logo_black.png';
+
+				// Add the store setup check box to the settings page sidebar.
+				$store_setup_checks = KCO_WC()->store_setup_checks;
+				if ( ! empty( $store_setup_checks ) ) {
+					$args['sidebar']['boxes'] = array(
+						array(
+							'id'      => 'kco_store_setup_check',
+							'title'   => __( 'Store setup check', 'klarna-checkout-for-woocommerce' ),
+							'content' => array( $store_setup_checks, 'output_sidebar_box_content' ),
+						),
+					);
+				}
+
 				$gateway_page             = new Gateway( $this, $args );
 				$args['general_content']  = array( $gateway_page, 'output' );
 				$args['fallback_content'] = array( $this, 'output_legacy_admin_options' );

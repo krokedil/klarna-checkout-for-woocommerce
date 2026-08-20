@@ -4,39 +4,73 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "436a49ab090b295979368efe582b35be",
+    "content-hash": "72ccf2b597958e25735f8338037704b3",
     "packages": [
         {
             "name": "krokedil/settings-page",
-            "version": "1.3.4",
+            "version": "dev-develop-sidebar-boxes",
             "source": {
                 "type": "git",
                 "url": "https://github.com/krokedil/settings-page.git",
-                "reference": "2ebd903fc608206cf6fdd414a74c760a282e8159"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/krokedil/settings-page/zipball/2ebd903fc608206cf6fdd414a74c760a282e8159",
-                "reference": "2ebd903fc608206cf6fdd414a74c760a282e8159",
-                "shasum": ""
+                "reference": "2af856aadb7293cf4404ac54ca53ec8cac956577"
             },
             "require-dev": {
-                "php-stubs/woocommerce-stubs": "dev-master",
-                "wp-coding-standards/wpcs": "dev-develop"
+                "composer/installers": "^2.0",
+                "lucatume/wp-browser": "^4.5",
+                "php-stubs/woocommerce-stubs": "^8.4",
+                "szepeviktor/phpstan-wordpress": "^2.0",
+                "wp-coding-standards/wpcs": "^3.0",
+                "wpackagist-plugin/woocommerce": "10.8.1",
+                "wpackagist-theme/storefront": "4.6.2"
             },
+            "default-branch": true,
             "type": "library",
+            "extra": {
+                "installer-paths": {
+                    "tests/_plugins/{$name}/": [
+                        "type:wordpress-plugin"
+                    ],
+                    "tests/_themes/{$name}/": [
+                        "type:wordpress-theme"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Krokedil\\SettingsPage\\": "src/"
                 }
             },
             "scripts": {
+                "test": [
+                    "codecept run Integration"
+                ],
+                "test:debug": [
+                    "codecept run Integration --debug"
+                ],
+                "test:reset-db": [
+                    "@php -r \"is_file('tests/_wordpress/data/db.sqlite') && unlink('tests/_wordpress/data/db.sqlite');\""
+                ],
                 "makepot": [
                     "wp --allow-root i18n make-pot ./src ./languages/krokedil-settings.pot --domain=krokedil-settings"
+                ],
+                "phpstan": [
+                    "./vendor/bin/phpstan analyse --memory-limit=2G"
+                ],
+                "lint": [
+                    "vendor/bin/phpcs . --standard=phpcs.xml --extensions=php -q -s"
+                ],
+                "lint:fix": [
+                    "vendor/bin/phpcbf . --standard=phpcs.xml --extensions=php -q -s"
+                ],
+                "lint:changes": [
+                    "git diff --name-only HEAD~1 | grep '\\.php$' | xargs vendor/bin/phpcs --standard=phpcs.xml --extensions=php -q -s"
+                ],
+                "lint:fix:changes": [
+                    "git diff --name-only HEAD~1 | grep '\\.php$' | xargs vendor/bin/phpcbf --standard=phpcs.xml --extensions=php -q -s"
                 ]
             },
             "license": [
-                "GPL-V2"
+                "GPL-V3-or-later"
             ],
             "authors": [
                 {
@@ -45,11 +79,7 @@
                 }
             ],
             "description": "A package to help setup settings pages in WordPress and WooCommerce for Krokedil plugins to add the Addons and Support tabs",
-            "support": {
-                "source": "https://github.com/krokedil/settings-page/tree/1.3.4",
-                "issues": "https://github.com/krokedil/settings-page/issues"
-            },
-            "time": "2026-04-23T19:14:17+00:00"
+            "time": "2026-08-20T09:37:12+00:00"
         },
         {
             "name": "krokedil/shipping",
@@ -276,7 +306,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "krokedil/settings-page": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
