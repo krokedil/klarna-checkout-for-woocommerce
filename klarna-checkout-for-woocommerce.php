@@ -318,9 +318,8 @@ if ( ! class_exists( 'KCO' ) ) {
 			$this->order_management = new OrderManagement();
 			$this->pickup_points    = new PickupPoints();
 
-			if ( is_admin() ) {
-				$this->store_setup_checks = new StoreSetupChecks();
-			}
+			// Not admin-gated: KCO_Gateway::needs_setup() consults the checks in AJAX and REST contexts too.
+			$this->store_setup_checks = new StoreSetupChecks();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );

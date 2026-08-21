@@ -289,6 +289,29 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
+		 * Whether the gateway still requires setup before it can be enabled.
+		 *
+		 * Consulted by WooCommerce when the gateway is toggled on from the payments
+		 * settings page (both the modern and the legacy list), which blocks enabling
+		 * and points the merchant to the settings page instead, and exposed in the
+		 * wc-analytics payment gateways REST response. Note that the "Needs setup"
+		 * badge on the WooCommerce payments settings page is not driven by this
+		 * method, but by WooCommerce core's own Kustom Checkout payments provider.
+		 *
+		 * @return bool
+		 */
+		public function needs_setup() {
+			// No usable API credentials configured.
+			if ( empty( KCO_WC()->credentials ) || ! KCO_WC()->credentials->get_credentials_from_session() ) {
+				return true;
+			}
+
+			// A required store setup check fails.
+			$store_setup_checks = KCO_WC()->store_setup_checks;
+			return ! empty( $store_setup_checks ) && $store_setup_checks->has_failing_required_checks();
+		}
+
+		/**
 		 * Add sidebar to the settings page.
 		 */
 		public function admin_options() {

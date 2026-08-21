@@ -492,6 +492,17 @@ class StoreSetupChecks {
 	}
 
 	/**
+	 * Whether at least one required check fails.
+	 *
+	 * @return bool True when a required check fails.
+	 */
+	public function has_failing_required_checks() {
+		list( $required_failed ) = $this->get_failed_counts( $this->get_checks() );
+
+		return $required_failed > 0;
+	}
+
+	/**
 	 * Returns the translated sentence summarizing the failing checks.
 	 *
 	 * @param int $required_failed    The number of failing required checks.
