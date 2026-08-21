@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: no
+
+The authorization header is now redacted from the log created for requests when logging is enabled.
