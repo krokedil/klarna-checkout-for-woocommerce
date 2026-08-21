@@ -27,3 +27,6 @@ nightwatch.conf.js
 .changelogs/backup-*
 *.bak
 tmp*
+.playground/
+/pr-screenshots/
+.env
