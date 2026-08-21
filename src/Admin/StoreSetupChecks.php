@@ -49,6 +49,7 @@ class StoreSetupChecks {
 		// Priority 5 places the section above the Kustom Checkout request log.
 		add_action( 'woocommerce_system_status_report', array( $this, 'render' ), 5 );
 		add_action( 'admin_notices', array( $this, 'output_admin_notice' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_payments_page_script' ) );
 	}
 
 	/**
@@ -257,7 +258,8 @@ class StoreSetupChecks {
 		}
 
 		$mark_class = self::TYPE_REQUIRED === $check['type'] ? 'error' : 'warning';
-		echo '<mark class="' . esc_attr( $mark_class ) . '"><span class="dashicons dashicons-warning"></span> ' . wp_kses( $check['message'], $this->allowed_message_html() ) . '</mark>';
+		$message    = $check['message'] . ( empty( $check['read_more'] ) ? '' : ' ' . $check['read_more'] );
+		echo '<mark class="' . esc_attr( $mark_class ) . '"><span class="dashicons dashicons-warning"></span> ' . wp_kses( $message, $this->allowed_message_html() ) . '</mark>';
 	}
 
 	/**
@@ -500,6 +502,79 @@ class StoreSetupChecks {
 		list( $required_failed ) = $this->get_failed_counts( $this->get_checks() );
 
 		return $required_failed > 0;
+	}
+
+	/**
+	 * Returns the translated sentence summarizing the failing checks, or an empty string when all pass.
+	 *
+	 * @return string The sentence, e.g. "1 required and 1 recommended check fails.".
+	 */
+	public function get_failed_summary() {
+		list( $required_failed, $recommended_failed ) = $this->get_failed_counts( $this->get_checks() );
+
+		if ( $required_failed + $recommended_failed < 1 ) {
+			return '';
+		}
+
+		return $this->get_fail_sentence( $required_failed, $recommended_failed );
+	}
+
+	/**
+	 * Enqueues the script that shows the store setup status under the gateway on the
+	 * WooCommerce payments settings page.
+	 *
+	 * WooCommerce suppresses classic admin notices on that page, so the status is
+	 * injected into the gateway row client side instead, the same way the official
+	 * Stripe gateway shows its row notice there.
+	 *
+	 * @param string $hook The current admin page hook.
+	 *
+	 * @return void
+	 */
+	public function enqueue_payments_page_script( $hook ) {
+		if ( 'woocommerce_page_wc-settings' !== $hook ) {
+			return;
+		}
+
+		// Only the payments providers list: the checkout tab without a section.
+		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check of the current settings tab.
+		if ( 'checkout' !== $tab || isset( $_GET['section'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check of the current settings section.
+			return;
+		}
+
+		if ( ! $this->has_failing_required_checks() ) {
+			return;
+		}
+
+		$failed_rows = array();
+		foreach ( $this->get_checks() as $check ) {
+			if ( ! empty( $check['passed'] ) ) {
+				continue;
+			}
+
+			$failed_rows[] = array(
+				'label'   => $check['label'] . $this->get_type_suffix( $check['type'] ),
+				'message' => wp_kses( $check['message'], $this->allowed_message_html() ),
+			);
+		}
+
+		wp_register_script( 'kco-store-setup-payments-page', KCO_WC_PLUGIN_URL . '/assets/js/klarna-checkout-for-woocommerce-payments-page.js', array(), KCO_WC_VERSION, true );
+		wp_localize_script(
+			'kco-store-setup-payments-page',
+			'kcoStoreSetupNotice',
+			array(
+				'gatewayId' => 'kco',
+				'summary'   => sprintf(
+					/* translators: %s: summary of the failing checks. */
+					__( 'Kustom Checkout store setup, %s', 'klarna-checkout-for-woocommerce' ),
+					$this->get_failed_summary()
+				),
+				'checks'    => $failed_rows,
+				'linkText'  => __( 'Read more and view full report', 'klarna-checkout-for-woocommerce' ),
+				'reportUrl' => $this->get_report_url(),
+			)
+		);
+		wp_enqueue_script( 'kco-store-setup-payments-page' );
 	}
 
 	/**
