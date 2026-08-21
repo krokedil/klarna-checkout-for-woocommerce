@@ -35,6 +35,7 @@ class KCO_Settings_Saved {
 		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'update_settings' ), 10 );
 		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'check_if_test_credentials_exists' ), 15 );
 		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'check_api_credentials' ), 20 );
+		add_filter( 'woocommerce_settings_api_sanitized_fields_kco', array( $this, 'maybe_block_enable' ) );
 	}
 
 	/**
@@ -44,6 +45,44 @@ class KCO_Settings_Saved {
 	 */
 	public function update_settings() {
 		KCO_WC()->credentials->settings = get_option( 'woocommerce_kco_settings', array() );
+	}
+
+	/**
+	 * Blocks enabling the gateway from the settings page while a required store setup check fails.
+	 *
+	 * Mirrors the WooCommerce payments page toggle, which consults needs_setup() and refuses to
+	 * enable the gateway. An already enabled gateway is never disabled by this.
+	 *
+	 * @param array $settings The sanitized settings about to be saved.
+	 *
+	 * @return array The settings, with 'enabled' reset when enabling is blocked.
+	 */
+	public function maybe_block_enable( $settings ) {
+		if ( 'yes' !== ( $settings['enabled'] ?? 'no' ) ) {
+			return $settings;
+		}
+
+		// Never disable an already enabled gateway.
+		$saved = get_option( 'woocommerce_kco_settings', array() );
+		if ( 'yes' === ( $saved['enabled'] ?? 'no' ) ) {
+			return $settings;
+		}
+
+		$store_setup_checks = KCO_WC()->store_setup_checks;
+		if ( empty( $store_setup_checks ) || ! $store_setup_checks->has_failing_required_checks() ) {
+			return $settings;
+		}
+
+		$settings['enabled'] = 'no';
+		WC_Admin_Settings::add_error(
+			sprintf(
+				/* translators: %s: summary of the failing checks. */
+				__( 'Kustom Checkout could not be enabled: %s Review the store setup check in the sidebar.', 'klarna-checkout-for-woocommerce' ),
+				$store_setup_checks->get_failed_summary()
+			)
+		);
+
+		return $settings;
 	}
 
 	/**
