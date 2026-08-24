@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Fixed a fatal error that could occur when sending order lines to Kustom for an order containing a product that has since been deleted from the store.
