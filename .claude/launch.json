@@ -1,0 +1,35 @@
+{
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "playground-klarna-checkout-for-woocommerce-start",
+			"runtimeExecutable": "npm",
+			"runtimeArgs": [
+				"run",
+				"playground:start"
+			],
+			"port": 8910,
+			"autoPort": true
+		},
+		{
+			"name": "playground-klarna-checkout-for-woocommerce-development",
+			"runtimeExecutable": "npm",
+			"runtimeArgs": [
+				"run",
+				"playground:server-development"
+			],
+			"port": 8911,
+			"autoPort": true
+		},
+		{
+			"name": "playground-klarna-checkout-for-woocommerce-demo",
+			"runtimeExecutable": "npm",
+			"runtimeArgs": [
+				"run",
+				"playground:server-demo"
+			],
+			"port": 8912,
+			"autoPort": true
+		}
+	]
+}
