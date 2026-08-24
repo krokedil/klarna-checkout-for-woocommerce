@@ -3,11 +3,11 @@ Contributors: kustom, krokedil, automattic
 Tags: woocommerce, ecommerce, e-commerce, checkout, klarna
 Donate link: https://kustom.co
 Requires at least: 5.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 9.7.0
 WC tested up to: 11.0.1
-Stable tag: 2.20.9
+Stable tag: 2.20.10
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,11 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-08-24    - version 2.20.10 =
+* Tweak         - The authorization header is now redacted from the log created for requests when logging is enabled.
+* Fix           - Fixed a fatal error that could occur when sending order lines to Kustom for an order containing a product that has since beendeleted from the store.
+* Fix           - Fixed an issue where the cart block triggered excessive calls to Kustom on cart page visits.
+
 = 2026-08-17    - version 2.20.9 =
 * Tweak         - Improved the error message shown to customers when a Klarna error occurs. Customers will now see a clear, readable message instead of a raw technical response.
 * Tweak         - Added the request URL to all order management log entries.

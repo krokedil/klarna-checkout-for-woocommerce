@@ -93,7 +93,7 @@ class KCO_Request_Order {
 		);
 
 		$settings = get_option( 'woocommerce_kco_settings', array() );
-		if ( isset( $settings['send_product_urls'] ) && 'yes' === $settings['send_product_urls'] ) {
+		if ( ! empty( $product ) && isset( $settings['send_product_urls'] ) && 'yes' === $settings['send_product_urls'] ) {
 
 			$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'shop_single', false );
 			if ( $image_url ) {
