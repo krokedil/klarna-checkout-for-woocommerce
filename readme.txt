@@ -3,7 +3,7 @@ Contributors: kustom, krokedil, automattic
 Tags: woocommerce, ecommerce, e-commerce, checkout, klarna
 Donate link: https://kustom.co
 Requires at least: 5.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 9.7.0
 WC tested up to: 11.0.1
