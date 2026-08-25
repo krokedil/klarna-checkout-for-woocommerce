@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-08-24 08:20+0000\n"
+"POT-Creation-Date: 2026-08-25 14:09+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -801,7 +801,7 @@ msgstr ""
 msgid "Force capture full order. Useful if the Kustom order has been updated by an ERP system."
 msgstr ""
 
-#: ../blocks/src/Checkout/CheckoutBlock.php:136
+#: ../blocks/src/Checkout/CheckoutBlock.php:138
 msgid "Something went wrong."
 msgstr ""
 
