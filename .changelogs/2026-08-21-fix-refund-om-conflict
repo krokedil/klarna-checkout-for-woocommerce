@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where a Kustom refund could be registered with Kustom but then discarded by WooCommerce when another Klarna plugin also handled order management.

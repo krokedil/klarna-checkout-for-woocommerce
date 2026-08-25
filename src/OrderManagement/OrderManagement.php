@@ -117,8 +117,8 @@ class OrderManagement {
 		// Update an order.
 		add_action( 'woocommerce_saved_order_items', array( $this, 'update_klarna_order_items' ), 10, 2 );
 
-		// Refund an order.
-		add_filter( 'wc_klarna_checkout_process_refund', array( $this, 'refund_klarna_order' ), 10, 4 );
+		// Refund an order. Runs after lower-priority callbacks so they can't discard our result.
+		add_filter( 'wc_klarna_checkout_process_refund', array( $this, 'refund_klarna_order' ), PHP_INT_MAX, 4 );
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ) );
 	}
