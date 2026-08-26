@@ -109,7 +109,7 @@ echo "==> Setting placeholder Kustom Checkout settings (enabled, test mode, SE).
 # KUSTOM_TEST_MID_EU / KUSTOM_TEST_SECRET_EU. The placeholders here just
 # guarantee the option row exists so the filter has something to merge into.
 ${WP} option update woocommerce_kco_settings \
-'{"enabled":"yes","testmode":"yes", "logging":"yes", "allowed_customer_types":"B2C","test_merchant_id_eu":"placeholder","test_shared_secret_eu":"placeholder"}' \
+'{"enabled":"yes","testmode":"yes", "logging":"yes", "allowed_customer_types":"B2C","test_merchant_id_eu":"placeholder","test_shared_secret_eu":"placeholder", "send_product_urls": "yes", "allow_separate_shipping": "yes"}' \
 --format=json
 
 echo "==> Truncating Action Scheduler tables (must be empty in the dump, see header comment)..."
