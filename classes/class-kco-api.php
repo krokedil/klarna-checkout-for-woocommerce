@@ -70,9 +70,8 @@ class KCO_API {
 		// If the update results in a READ_ONLY_ORDER response, let's try to redirect the customer to thank you page.
 		if ( is_wp_error( $response ) ) {
 
-			// Data is returned as both json and string. Let's try to grab only the json data.
-			$error = strstr( $response->get_error_message(), '}', true ) . '}';
-			$error = json_decode( $error, true );
+			// Read the structured response body preserved by process_response.
+			$error = $response->get_error_data( 'klarna_error_body' );
 			if ( is_array( $error ) && 'READ_ONLY_ORDER' === ( $error['error_code'] ?? false ) ) {
 				$order = kco_get_order_by_klarna_id( $klarna_order_id, '2 day ago' );
 				if ( ! empty( $order ) ) {
