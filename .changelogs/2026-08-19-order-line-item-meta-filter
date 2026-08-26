@@ -1,0 +1,4 @@
+Type: Add
+Needs Documentation: yes
+
+Added the `kco_wc_order_line_include_item_meta` filter, which appends a cart or order item's WooCommerce meta data (variation attributes and product add-ons) to the order line name sent to Kustom. Disabled by default.
