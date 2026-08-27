@@ -53,6 +53,9 @@
   "config": {
     "process-timeout": 0,
     "platform-check": false,
+    "platform": {
+      "php": "8.0"
+    },
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true,
       "wpify/scoper": true,
