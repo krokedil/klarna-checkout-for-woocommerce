@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: ['7.4', '8.1', '8.4'] # Check minimum, recommended, and latest supported PHP versions for WordPress/WooCommerce
+        php: ['8.0', '8.1', '8.4'] # Check minimum, recommended, and latest supported PHP versions for WordPress/WooCommerce
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
