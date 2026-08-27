@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Fixed an issue where the cart block triggered excessive calls to Kustom on cart page visits.

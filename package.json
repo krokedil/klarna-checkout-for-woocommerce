@@ -8,6 +8,7 @@
   "license": "GPL-3.0+",
   "type": "commonjs",
   "devDependencies": {
+    "@krokedil/wp-playground-tools": "github:krokedil/wp-playground-tools#semver:^1",
     "@types/jquery": "^3.5.32",
     "@types/react": "^18.2.39",
     "@types/wordpress__blocks": "^12.5.11",
@@ -48,6 +49,14 @@
     "lint:css:fix": "wp-scripts lint-style --fix",
     "lint:js": "wp-scripts lint-js",
     "lint:js:fix": "wp-scripts lint-js --fix",
-    "build": "npx gulp CSS && npm run lint:js:fix && npx gulp JS && npx gulp makePOT && npx wp-scripts build"
+    "build": "npx gulp CSS && npm run lint:js:fix && npx gulp JS && npx gulp makePOT && npx wp-scripts build",
+    "playground:start": "node tools/playground.mjs start",
+    "playground:server-development": "node tools/playground.mjs server development",
+    "playground:server-demo": "node tools/playground.mjs server demo",
+    "playground:setup": "node tools/playground.mjs setup",
+    "screenshots": "node tools/playground.mjs screenshots"
+  },
+  "engines": {
+    "node": ">=20.19.0"
   }
 }

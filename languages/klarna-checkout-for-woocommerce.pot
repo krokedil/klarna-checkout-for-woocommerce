@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-08-17 11:07+0000\n"
+"POT-Creation-Date: 2026-08-24 08:20+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -435,7 +435,7 @@ msgstr ""
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:50, ../classes/class-kco-gateway.php:891, ../classes/class-kco-gateway.php:893, ../classes/class-kco-gateway.php:895, ../classes/class-kco-gateway.php:897, ../includes/admin/views/status-report.php:17
+#: ../classes/class-kco-gateway.php:50, ../classes/class-kco-gateway.php:881, ../classes/class-kco-gateway.php:883, ../classes/class-kco-gateway.php:885, ../classes/class-kco-gateway.php:887, ../includes/admin/views/status-report.php:17
 msgid "Kustom Checkout"
 msgstr ""
 

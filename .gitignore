@@ -27,6 +27,9 @@ nightwatch.conf.js
 .changelogs/backup-*
 *.bak
 tmp*
+.playground/
+/pr-screenshots/
+.env
 
 # Codeception / wp-browser test artefacts.
 /tests/_output/
