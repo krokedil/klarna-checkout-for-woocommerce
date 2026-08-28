@@ -1,0 +1,34 @@
+# Harness suite configuration
+#
+# Tests that cover the test harness itself, the WooCommerce Subscriptions
+# fakes and the artifact redaction, rather than the plugin. WordPress is still
+# booted: these test cases extend IntegrationTestCase / WPTestCase.
+#
+# Shares the SQLite database with the Integration suite, so the two must never
+# run at the same time.
+
+actor: HarnessTester
+bootstrap: _bootstrap.php
+modules:
+  enabled:
+    - lucatume\WPBrowser\Module\WPLoader
+  config:
+    lucatume\WPBrowser\Module\WPLoader:
+      wpRootFolder: "%WORDPRESS_ROOT_DIR%"
+      dbUrl: "%WORDPRESS_DB_URL%"
+      wpDebug: true
+      tablePrefix: "%TEST_TABLE_PREFIX%"
+      domain: "%WORDPRESS_DOMAIN%"
+      adminEmail: "admin@%WORDPRESS_DOMAIN%"
+      title: "Harness Tests"
+      skipInstall: true
+      plugins:
+        - "woocommerce/woocommerce.php"
+        - "./klarna-checkout-for-woocommerce.php"
+      theme: ""
+extensions:
+  enabled:
+    - Qameta\Allure\Codeception\AllureCodeception
+  config:
+    Qameta\Allure\Codeception\AllureCodeception:
+      outputDirectory: allure-results/harness

@@ -1,43 +1,114 @@
 {
-    "require-dev": {
-        "wp-coding-standards/wpcs": "^3.1",
-        "php-stubs/woocommerce-stubs": "^10.0",
-        "wpify/scoper": "3.1.3"
-    },
-    "autoload": {
-        "psr-4": {
-            "Krokedil\\KustomCheckout\\": "src/",
-            "Krokedil\\KustomCheckout\\Blocks\\": "blocks/src/"
-        }
-    },
-    "extra": {
-        "wpify-scoper": {
-            "prefix": "KrokedilKlarnaCheckoutDeps",
-            "folder": "dependencies",
-            "autorun": true,
-            "globals": [
-                "wordpress",
-                "woocommerce"
-            ]
-        }
-    },
-    "config": {
-        "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true,
-            "wpify/scoper": true
-        }
-    },
-    "scripts": {
-        "get-changelog": "bash .github/scripts/new-version.sh",
-        "update-version": "bash .github/scripts/new-version.sh update",
-        "create-changelog": "bash .github/scripts/new-changelog.sh",
-        "pre-release-check": [
-            "bash .github/scripts/check-changelog-master.sh",
-            "bash .github/scripts/check-version-and-compat.sh"
-        ],
-        "lint": "vendor/bin/phpcs . --standard=phpcs.xml --extensions=php -q",
-        "lint:fix": "vendor/bin/phpcbf . --standard=phpcs.xml --extensions=php -q",
-        "lint:changes": "git diff --name-only HEAD~1 | grep '\\.php$' | xargs vendor/bin/phpcs --standard=phpcs.xml --extensions=php -q",
-        "lint:fix:changes": "git diff --name-only HEAD~1 | grep '\\.php$' | xargs vendor/bin/phpcbf --standard=phpcs.xml --extensions=php -q"
+  "require-dev": {
+    "wp-coding-standards/wpcs": "^3.1",
+    "php-stubs/woocommerce-stubs": "^10.0",
+    "wpify/scoper": "3.1.3",
+    "lucatume/wp-browser": "^4.5",
+    "composer/installers": "^2.0",
+    "wpackagist-plugin/woocommerce": "^10.0",
+    "wpackagist-plugin/sqlite-database-integration": "^2.2",
+    "wpackagist-theme/storefront": "^4.6",
+    "allure-framework/allure-codeception": "^2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Krokedil\\KustomCheckout\\": "src/",
+      "Krokedil\\KustomCheckout\\Blocks\\": "blocks/src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "wpify-scoper": {
+      "prefix": "KrokedilKlarnaCheckoutDeps",
+      "folder": "dependencies",
+      "autorun": true,
+      "globals": [
+        "wordpress",
+        "woocommerce"
+      ]
+    },
+    "installer-paths": {
+      "tests/_plugins/{$name}/": [
+        "type:wordpress-plugin"
+      ],
+      "tests/_themes/{$name}/": [
+        "type:wordpress-theme"
+      ]
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org",
+      "only": [
+        "wpackagist-plugin/*",
+        "wpackagist-theme/*"
+      ]
+    }
+  ],
+  "config": {
+    "process-timeout": 0,
+    "platform-check": false,
+    "platform": {
+      "php": "8.0"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "wpify/scoper": true,
+      "composer/installers": true
+    }
+  },
+  "scripts": {
+    "get-changelog": "bash .github/scripts/new-version.sh",
+    "update-version": "bash .github/scripts/new-version.sh update",
+    "create-changelog": "bash .github/scripts/new-changelog.sh",
+    "pre-release-check": [
+      "bash .github/scripts/check-changelog-master.sh",
+      "bash .github/scripts/check-version-and-compat.sh"
+    ],
+    "lint": "vendor/bin/phpcs . --standard=phpcs.xml --extensions=php -q",
+    "lint:fix": "vendor/bin/phpcbf . --standard=phpcs.xml --extensions=php -q",
+    "lint:changes": "git diff --name-only HEAD~1 | grep '\\.php$' | xargs vendor/bin/phpcs --standard=phpcs.xml --extensions=php -q",
+    "lint:fix:changes": "git diff --name-only HEAD~1 | grep '\\.php$' | xargs vendor/bin/phpcbf --standard=phpcs.xml --extensions=php -q",
+    "lint:tests": "vendor/bin/phpcs --standard=tests/phpcs.xml tests -q",
+    "lint:tests:fix": "vendor/bin/phpcbf --standard=tests/phpcs.xml tests -q",
+    "test:bootstrap": "@php tests/_support_scripts/install-test-env.php",
+    "test:chromedriver": "vendor/bin/codecept chromedriver:update",
+    "post-autoload-dump-dev": [
+      "@test:bootstrap"
+    ],
+    "dev:start": "vendor/bin/codecept dev:start",
+    "dev:stop": "vendor/bin/codecept dev:stop",
+    "test:setup": [
+      "@test:bootstrap",
+      "vendor/bin/codecept build"
+    ],
+    "test:e2e": [
+      "@test:chromedriver",
+      "@test:setup",
+      "@dev:stop",
+      "vendor/bin/codecept run EndToEnd --xml report-endtoend.xml",
+      "@dev:stop"
+    ],
+    "test:integration": [
+      "@test:setup",
+      "vendor/bin/codecept run Integration --xml report-integration.xml"
+    ],
+    "test:integration:snapshots": [
+      "@test:setup",
+      "UPDATE_SNAPSHOTS=1 vendor/bin/codecept run Integration"
+    ],
+    "test:harness": [
+      "@test:setup",
+      "vendor/bin/codecept run Harness --xml report-harness.xml"
+    ],
+    "test:report": "bash tests/_support_scripts/generate-report.sh",
+    "test:report:share": "bash tests/_support_scripts/generate-report.sh --share",
+    "test:report:reset": "rm -rf tests/_output/allure-results tests/_output/report tests/_output/report-share tests/_output/record_* tests/_output/Tests.EndToEnd.*.html tests/_output/Tests.EndToEnd.*.png",
+    "test:regenerate-dump": "bash tests/_support_scripts/regenerate-dump.sh"
+  }
 }

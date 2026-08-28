@@ -1,0 +1,75 @@
+# EndToEnd suite configuration
+#
+# Run end-to-end tests.
+
+actor: EndToEndTester
+bootstrap: _bootstrap.php
+modules:
+  enabled:
+    - lucatume\WPBrowser\Module\WPWebDriver
+    - lucatume\WPBrowser\Module\WPDb
+    - lucatume\WPBrowser\Module\WPFilesystem
+    - lucatume\WPBrowser\Module\WPLoader
+  config:
+    lucatume\WPBrowser\Module\WPWebDriver:
+      url: "%WORDPRESS_URL%"
+      adminUsername: "%WORDPRESS_ADMIN_USER%"
+      adminPassword: "%WORDPRESS_ADMIN_PASSWORD%"
+      adminPath: "%WORDPRESS_ADMIN_PATH%"
+      browser: chrome
+      host: "%CHROMEDRIVER_HOST%"
+      port: "%CHROMEDRIVER_PORT%"
+      path: "/"
+      window_size: 1920x1080
+      wait: 10
+      pageload_timeout: 45
+      restart: true
+      capabilities:
+        "goog:chromeOptions":
+          args:
+            - "--headless"
+            - "--disable-gpu"
+            - "--disable-dev-shm-usage"
+            - "--proxy-server='direct://'"
+            - "--proxy-bypass-list=*"
+            - "--no-sandbox"
+        "goog:loggingPrefs":
+          browser: ALL
+          performance: ALL
+    lucatume\WPBrowser\Module\WPDb:
+      dbUrl: "%WORDPRESS_DB_URL%"
+      dump: "tests/Support/Data/dump.sql"
+      populate: true
+      cleanup: true
+      reconnect: false
+      url: "%WORDPRESS_URL%"
+      urlReplacement: false
+      tablePrefix: "%WORDPRESS_TABLE_PREFIX%"
+    lucatume\WPBrowser\Module\WPFilesystem:
+      wpRootFolder: "%WORDPRESS_ROOT_DIR%"
+    lucatume\WPBrowser\Module\WPLoader:
+      loadOnly: true
+      wpRootFolder: "%WORDPRESS_ROOT_DIR%"
+      dbUrl: "%WORDPRESS_DB_URL%"
+      domain: "%WORDPRESS_DOMAIN%"
+extensions:
+  enabled:
+    - Tests\Support\Extension\NgrokController
+    - Qameta\Allure\Codeception\AllureCodeception
+    - Tests\Support\Extension\ExampleNameReporter
+    - Tests\Support\Extension\ArtifactReporter
+    - Tests\Support\Extension\WordPressLogReporter
+  config:
+    Qameta\Allure\Codeception\AllureCodeception:
+      outputDirectory: allure-results/endtoend
+    Tests\Support\Extension\WordPressLogReporter:
+      wpRootFolder: "%WORDPRESS_ROOT_DIR%"
+    Tests\Support\Extension\NgrokController:
+      domain: "%NGROK_DOMAIN%" # CLI arg, e.g. kco-test-site
+      publicUrl: "https://%NGROK_DOMAIN%" # CLI arg, e.g. https://kco-test-site.ngrok.io
+      # What Kustom talks to, health checked before the suite and between tests: a
+      # stalled agent keeps running while the traffic through it hangs.
+      siteUrl: "%KCO_WORDPRESS_URL%"
+      authtoken: "%NGROK_AUTHTOKEN%"
+      forwardPort: "%BUILTIN_SERVER_PORT%"
+      waitForOnlineSeconds: 15
