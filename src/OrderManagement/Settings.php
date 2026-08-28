@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement;
 
+use Krokedil\KustomCheckout\Utility\SettingsUtility;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -27,6 +29,7 @@ class Settings {
 		$default_values = wp_parse_args(
 			get_option( 'kom_settings', array() ),
 			array(
+				'kom_enabled'            => 'yes',
 				'kom_auto_capture'       => 'yes',
 				'kom_auto_cancel'        => 'yes',
 				'kom_auto_update'        => 'yes',
@@ -40,9 +43,20 @@ class Settings {
 			'type'  => 'title',
 		);
 
+		$settings['kom_enabled'] = array(
+			'title'       => __( 'Enable order management', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'checkbox',
+			'class'       => 'krokedil_conditional_toggler krokedil_toggler_kom',
+			'default'     => $default_values['kom_enabled'],
+			'label'       => __( 'Let WooCommerce activate, cancel, update and credit Kustom orders.', 'klarna-checkout-for-woocommerce' ),
+			'description' => __( 'Disable this if you manage orders in the Kustom portal. Refunds must then be registered in WooCommerce with "Refund manually". The manual actions on individual orders remain available.', 'klarna-checkout-for-woocommerce' ),
+			'desc_tip'    => true,
+		);
+
 		$settings['kom_auto_capture'] = array(
 			'title'   => 'On order completion',
 			'type'    => 'checkbox',
+			'class'   => 'krokedil_conditional_setting krokedil_conditional_kom',
 			'default' => $default_values['kom_auto_capture'],
 			'label'   => __( 'Activate Kustom order automatically when WooCommerce order is marked complete.', 'klarna-checkout-for-woocommerce' ),
 		);
@@ -50,6 +64,7 @@ class Settings {
 		$settings['kom_auto_cancel'] = array(
 			'title'   => 'On order cancel',
 			'type'    => 'checkbox',
+			'class'   => 'krokedil_conditional_setting krokedil_conditional_kom',
 			'default' => $default_values['kom_auto_cancel'],
 			'label'   => __( 'Cancel Kustom order automatically when WooCommerce order is marked canceled.', 'klarna-checkout-for-woocommerce' ),
 		);
@@ -57,6 +72,7 @@ class Settings {
 		$settings['kom_auto_update'] = array(
 			'title'   => 'On order update',
 			'type'    => 'checkbox',
+			'class'   => 'krokedil_conditional_setting krokedil_conditional_kom',
 			'default' => $default_values['kom_auto_update'],
 			'label'   => __( 'Update Kustom order automatically when WooCommerce order is updated.', 'klarna-checkout-for-woocommerce' ),
 		);
@@ -64,6 +80,7 @@ class Settings {
 		$settings['kom_auto_order_sync'] = array(
 			'title'   => 'On order creation ( manual )',
 			'type'    => 'checkbox',
+			'class'   => 'krokedil_conditional_setting krokedil_conditional_kom',
 			'default' => $default_values['kom_auto_order_sync'],
 			'label'   => __( 'Gets the customer information from Kustom when creating a manual admin order and adding a Kustom order id as a transaction id.', 'klarna-checkout-for-woocommerce' ),
 		);
@@ -71,11 +88,23 @@ class Settings {
 		$settings['kom_force_full_capture'] = array(
 			'title'   => 'Force capture full order',
 			'type'    => 'checkbox',
+			'class'   => 'krokedil_conditional_setting krokedil_conditional_kom',
 			'default' => $default_values['kom_force_full_capture'],
 			'label'   => __( 'Force capture full order. Useful if the Kustom order has been updated by an ERP system.', 'klarna-checkout-for-woocommerce' ),
 		);
 
 		return $settings;
+	}
+
+	/**
+	 * Whether order management is enabled.
+	 *
+	 * Defaults to enabled so stores that never saw this setting are unaffected.
+	 *
+	 * @return bool
+	 */
+	public static function is_enabled() {
+		return wc_string_to_bool( SettingsUtility::get_setting( 'kom_enabled', 'yes' ) );
 	}
 
 	/**

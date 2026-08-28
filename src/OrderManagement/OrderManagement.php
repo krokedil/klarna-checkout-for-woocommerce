@@ -100,6 +100,7 @@ class OrderManagement {
 		add_action( 'kco_wc_supports', array( $this, 'add_gateway_support' ) );
 
 		$report_about        = array(
+			array( 'id' => 'kom_enabled' ),
 			array( 'id' => 'kom_auto_capture' ),
 			array( 'id' => 'kom_auto_cancel' ),
 			array( 'id' => 'kom_auto_update' ),
@@ -192,7 +193,10 @@ class OrderManagement {
 	 * @return array $features Supported features.
 	 */
 	public function add_gateway_support( $features ) {
-		$features[] = 'refunds';
+		// Without order management, refunds must be made in the Kustom portal and only registered in WooCommerce.
+		if ( Settings::is_enabled() ) {
+			$features[] = 'refunds';
+		}
 
 		return $features;
 	}
@@ -214,6 +218,11 @@ class OrderManagement {
 			// If the order was not paid using the plugin that instanced this class, bail.
 			if ( 'kco' !== $order->get_payment_method() ) {
 				return;
+			}
+
+			// The merchant manages orders outside of WooCommerce.
+			if ( ! $action && ! Settings::is_enabled() ) {
+				return new \WP_Error( 'order_management_disabled', 'Order management is disabled.' );
 			}
 
 			// The merchant has disconnected the order from the order manager.
@@ -318,6 +327,11 @@ class OrderManagement {
 
 		if ( ! isset( $options['kom_auto_update'] ) || 'yes' === $options['kom_auto_update'] || $action ) {
 
+			// The merchant manages orders outside of WooCommerce.
+			if ( ! $action && ! Settings::is_enabled() ) {
+				return new \WP_Error( 'order_management_disabled', 'Order management is disabled.' );
+			}
+
 			// The merchant has disconnected the order from the order manager.
 			if ( $order->get_meta( '_kom_disconnect' ) ) {
 				return new \WP_Error( 'order_sync_off', 'Order management is disabled' );
@@ -392,6 +406,11 @@ class OrderManagement {
 		}
 
 		if ( ! isset( $options['kom_auto_capture'] ) || 'yes' === $options['kom_auto_capture'] || $action ) {
+
+			// The merchant manages orders outside of WooCommerce.
+			if ( ! $action && ! Settings::is_enabled() ) {
+				return new \WP_Error( 'order_management_disabled', 'Order management is disabled.' );
+			}
 
 			// The merchant has disconnected the order from the order manager.
 			if ( $order->get_meta( '_kom_disconnect' ) ) {
@@ -499,6 +518,11 @@ class OrderManagement {
 
 		// If the order was not paid using Kustom Checkout, return the original result.
 		if ( 'kco' !== $order->get_payment_method() ) {
+			return $result;
+		}
+
+		// The merchant credits orders in the Kustom portal, so we must not do it here as well.
+		if ( ! Settings::is_enabled() ) {
 			return $result;
 		}
 
