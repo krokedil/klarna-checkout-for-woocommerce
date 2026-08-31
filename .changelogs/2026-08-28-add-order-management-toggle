@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Added an "Enable order management" setting. When disabled, WooCommerce no longer activates, cancels, updates or credits Kustom orders, and refunds can only be registered in WooCommerce with "Refund manually". The manual actions on individual orders are still available.
