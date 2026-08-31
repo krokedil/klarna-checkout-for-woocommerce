@@ -31,12 +31,45 @@ class Checkout {
 	 * @return array The shipping method ID for this shipping method.
 	 */
 	public function set_shipping_method( $chosen_shipping_methods ) {
+		$chosen           = $chosen_shipping_methods[0] ?? '';
 		$shipping_methods = WC()->shipping->get_shipping_methods();
+
 		// Only do this if we have Kustom Shipping Assistant active on the store, and the returned shipping method is NOT a real WooCommerce shipping method.
-		if ( isset( $shipping_methods['klarna_kss'] ) && ! isset( $shipping_methods[ $chosen_shipping_methods[0] ] ) ) {
-			return array( 'klarna_kss' );
+		if ( ! isset( $shipping_methods['klarna_kss'] ) || isset( $shipping_methods[ $chosen ] ) ) {
+			return $chosen_shipping_methods;
 		}
-		return $chosen_shipping_methods;
+
+		// WooCommerce matches the chosen method against zone rate ids ('klarna_kss:<instance>'), so a
+		// bare method id never matches and the zone silently falls back to its first available rate.
+		$rate_id = $this->get_shipping_rate_id();
+
+		return array( null !== $rate_id ? $rate_id : 'klarna_kss' );
+	}
+
+	/**
+	 * Get the rate id of the Kustom Shipping Assistant method in the zone matching the customer.
+	 *
+	 * @return string|null The rate id, or null if the zone has no Kustom Shipping Assistant method.
+	 */
+	private function get_shipping_rate_id() {
+		if ( ! WC()->cart ) {
+			return null;
+		}
+
+		$packages = WC()->cart->get_shipping_packages();
+		$package  = reset( $packages );
+		if ( empty( $package ) ) {
+			return null;
+		}
+
+		$zone = \WC_Shipping_Zones::get_zone_matching_package( $package );
+		foreach ( $zone->get_shipping_methods( true ) as $method ) {
+			if ( 'klarna_kss' === $method->id ) {
+				return $method->get_rate_id();
+			}
+		}
+
+		return null;
 	}
 
 	/**
