@@ -81,8 +81,10 @@ class FreeOrders {
 			$order->update_meta_data( '_wc_klarna_country', $klarna_country );
 
 			// Set shipping phone and email.
-			$order->update_meta_data( '_shipping_phone', sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
-			$order->update_meta_data( '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
+			$shipping_phone = $klarna_order['shipping_address']['phone'] ?? $klarna_order['billing_address']['phone'] ?? '';
+			$shipping_email = $klarna_order['shipping_address']['email'] ?? $klarna_order['billing_address']['email'] ?? '';
+			$order->update_meta_data( '_shipping_phone', sanitize_text_field( $shipping_phone ) );
+			$order->update_meta_data( '_shipping_email', sanitize_text_field( $shipping_email ) );
 
 			$order->save();
 
