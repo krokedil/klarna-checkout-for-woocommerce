@@ -55,7 +55,7 @@ class ShippingMethod extends \WC_Shipping_Method {
 			'title' => array(
 				'title'       => __( 'Kustom Shipping Assistant', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'title',
-				'description' => __( 'There are currently no settings for Kustom Shipping Assistant since this is controlled by the TMS-provider. If other plugins adds settings, these are shown below.', 'klarna-checkout-for-woocommerce' ),
+				'description' => __( 'There are currently no settings for Kustom Shipping Assistant since this is controlled by the TMS-provider. If other plugins add settings, these are shown below.', 'klarna-checkout-for-woocommerce' ),
 			),
 		);
 	}
