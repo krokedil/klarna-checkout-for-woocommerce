@@ -34,8 +34,12 @@ class Checkout {
 		$chosen           = $chosen_shipping_methods[0] ?? '';
 		$shipping_methods = WC()->shipping->get_shipping_methods();
 
+		// Kustom returns a rate id ('flat_rate:45') but get_shipping_methods() is keyed by method id.
+		$chosen_method_id = current( explode( ':', $chosen ) );
+		$is_wc_method     = 'klarna_kss' !== $chosen_method_id && isset( $shipping_methods[ $chosen_method_id ] );
+
 		// Only do this if we have Kustom Shipping Assistant active on the store, and the returned shipping method is NOT a real WooCommerce shipping method.
-		if ( ! isset( $shipping_methods['klarna_kss'] ) || isset( $shipping_methods[ $chosen ] ) ) {
+		if ( ! isset( $shipping_methods['klarna_kss'] ) || $is_wc_method ) {
 			return $chosen_shipping_methods;
 		}
 
