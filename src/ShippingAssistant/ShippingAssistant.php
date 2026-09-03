@@ -65,6 +65,16 @@ class ShippingAssistant {
 		add_filter( 'woocommerce_shipping_methods', array( $this, 'add_shipping_method' ) );
 		$this->settings = new Settings();
 
+		// Deferred to init: reading the settings translates the gateway field defaults, which WP forbids this early.
+		add_action( 'init', array( $this, 'init_modules' ) );
+	}
+
+	/**
+	 * Register the module's hooks at init, unless it is disabled.
+	 *
+	 * @return void
+	 */
+	public function init_modules() {
 		if ( ! Settings::is_enabled() ) {
 			return;
 		}
