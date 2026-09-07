@@ -24,11 +24,6 @@ class PendingOrdersTest extends IntegrationTestCase {
 		parent::setUp();
 
 		add_filter( 'pre_wp_mail', [ $this, 'recordMail' ], 10, 2 );
-
-		// The legacy post datastore warns about the lookup's meta_query, which WPTestCase fails on. HPOS does not.
-		if ( ! $this->isHposEnabled() ) {
-			$this->setExpectedIncorrectUsage( 'WC_Order_Data_Store_CPT::query' );
-		}
 	}
 
 	/**
@@ -137,10 +132,5 @@ class PendingOrdersTest extends IntegrationTestCase {
 
 	private function havePendingGatewayOrder( array $args = [] ): \WC_Order {
 		return $this->haveGatewayOrder( array_merge( [ 'status' => 'on-hold' ], $args ) );
-	}
-
-	private function isHposEnabled(): bool {
-		return class_exists( \Automattic\WooCommerce\Utilities\OrderUtil::class )
-			&& \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled();
 	}
 }
