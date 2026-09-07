@@ -167,8 +167,8 @@ class KCO_Checkout {
 			return $default;
 		}
 
-		// The Kustom Shipping Service sets the chosen shipping method to the method without the instance ID, so if $chosen method === 'klarna_kss' return $default.
-		if ( 'klarna_kss' === $chosen_method ) {
+		// Kustom Shipping Assistant owns the shipping method, so leave the assessment to it. Match on the method ID, which may or may not carry an instance suffix ('klarna_kss:1') depending on the plugin version.
+		if ( 'klarna_kss' === $chosen_method || 0 === strpos( $chosen_method, 'klarna_kss:' ) ) {
 			return $default;
 		}
 
