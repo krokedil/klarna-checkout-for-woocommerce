@@ -997,7 +997,7 @@ function kco_maybe_set_selected_pickup_point( $klarna_order ) {
  * Returns the WooCommerce order that has a matching Kustom order id saved as a meta field. If no order is found, returns false, and if many orders are found the newest one is returned.
  *
  * @param string      $klarna_order_id The Kustom order id.
- * @param string|null $date_after Optional. Date after which the order was created. Format 'YYYY-MM-DD'. Default null.
+ * @param string|null $date_after Optional. Only match orders created after this. Any strtotime()-parseable string, e.g. a relative '2 day ago' or a 'YYYY-MM-DD' date; wc_get_orders() compares it at day granularity. Default null.
  * @return WC_Order|false
  */
 function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
