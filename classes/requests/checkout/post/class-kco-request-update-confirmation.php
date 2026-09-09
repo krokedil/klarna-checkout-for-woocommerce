@@ -44,7 +44,7 @@ class KCO_Request_Update_Confirmation extends KCO_Request {
 	public function get_body( $klarna_order, $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		// Use the old Kustom order from a get request to prevent changing more then we need.
+		// Use the old Kustom order from a get request to prevent changing more than we need.
 		$copy_from_klarna = array(
 			'purchase_country',
 			'purchase_currency',
