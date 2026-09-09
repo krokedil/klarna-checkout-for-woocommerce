@@ -143,7 +143,7 @@ class OrderManagementTest extends IntegrationTestCase {
 	 * @param mixed $expected What a switched-off operation answers with.
 	 */
 	public function test_an_operation_is_skipped_when_it_is_switched_off( string $op, $expected ): void {
-		$this->haveGatewayCredentials( 'eu', [ self::AUTO_SETTINGS[ $op ] => 'no' ] );
+		$this->haveGatewayCredentials( [ self::AUTO_SETTINGS[ $op ] => 'no' ] );
 
 		$order = $this->haveOrderFor( $op );
 
@@ -157,7 +157,7 @@ class OrderManagementTest extends IntegrationTestCase {
 	 * @dataProvider provide_switchable_operations
 	 */
 	public function test_a_merchant_action_overrides_the_setting( string $op ): void {
-		$this->haveGatewayCredentials( 'eu', [ self::AUTO_SETTINGS[ $op ] => 'no' ] );
+		$this->haveGatewayCredentials( [ self::AUTO_SETTINGS[ $op ] => 'no' ] );
 
 		$order = $this->haveOrderFor( $op );
 		$this->willSucceed( $op );
@@ -416,7 +416,7 @@ class OrderManagementTest extends IntegrationTestCase {
 	}
 
 	public function test_force_full_capture_lets_the_api_decide_the_amount(): void {
-		$this->haveGatewayCredentials( 'eu', [ 'kom_force_full_capture' => 'yes' ] );
+		$this->haveGatewayCredentials( [ 'kom_force_full_capture' => 'yes' ] );
 
 		$order = $this->haveOrderFor( 'capture' );
 
@@ -604,7 +604,7 @@ class OrderManagementTest extends IntegrationTestCase {
 	private function configureUsStoreForOrderManagement(): void {
 		$this->deleteAllTaxRates();
 		$this->configureUsStore();
-		$this->haveGatewayCredentials( 'us' );
+		$this->haveGatewayCredentials();
 	}
 
 	private function refundIdOf( \WC_Order $order ): int {
