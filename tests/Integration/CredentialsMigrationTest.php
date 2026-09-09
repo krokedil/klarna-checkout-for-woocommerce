@@ -211,7 +211,19 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 		$this->assertFalse( get_option( CredentialsMigration::VERSION_OPTION ) );
 	}
 
-	public function test_notice_is_rendered_when_due(): void {
+	public function test_notice_is_rendered_when_due_for_eu_region(): void {
+		wp_set_current_user( 1 );
+		update_option( CredentialsMigration::NOTICE_OPTION, 'eu' );
+
+		ob_start();
+		( new CredentialsMigration() )->render_notice();
+		$output = ob_get_clean();
+
+		$this->assertStringContainsString( 'single set of credentials', $output );
+		$this->assertStringContainsString( 'entered for Europe', $output );
+	}
+
+	public function test_notice_is_rendered_when_due_for_us_region(): void {
 		wp_set_current_user( 1 );
 		update_option( CredentialsMigration::NOTICE_OPTION, 'us' );
 
@@ -220,7 +232,7 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 		$output = ob_get_clean();
 
 		$this->assertStringContainsString( 'single set of credentials', $output );
-		$this->assertStringContainsString( 'US', $output );
+		$this->assertStringContainsString( 'entered for the US', $output );
 	}
 
 	public function test_notice_is_not_rendered_when_not_due(): void {
