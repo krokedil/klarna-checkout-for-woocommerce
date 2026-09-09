@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where every Store API cart request (for example the mini-cart on ordinary page loads) triggered a request to Kustom for customers with an ongoing checkout session.

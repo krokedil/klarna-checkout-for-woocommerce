@@ -421,5 +421,5 @@ export const useKcoIframe = (
 		registerKCOEvents,
 	]);
 
-	return { isActive, elementsToHide, suspendKCO, resumeKCO };
+	return { isActive, elementsToHide, suspendKCO, resumeKCO, syncKCO: onLoad };
 };

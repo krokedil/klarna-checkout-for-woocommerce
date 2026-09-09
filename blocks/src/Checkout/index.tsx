@@ -7,7 +7,7 @@ import * as React from 'react';
  * Wordpress/WooCommerce dependencies
  */
 import { decodeEntities } from '@wordpress/html-entities';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 // @ts-ignore - Cant avoid this issue, but its loaded in by Webpack
 // eslint-disable-next-line import/no-unresolved
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
@@ -69,19 +69,39 @@ type KustomCheckoutProps = {
  */
 const KustomCheckout = (props: KustomCheckoutProps): JSX.Element => {
 	const { activePaymentMethod, billing, cartData } = props;
-	const { isActive, suspendKCO, resumeKCO } = useKcoIframe(
+	const { isActive, syncKCO } = useKcoIframe(
 		settings,
 		activePaymentMethod,
 		cartData
 	);
 
-	useEffect(() => {
-		if (!isActive) return; // If Kustom Checkout we don't want to do anything.
+	// Signature of the cart contents the Kustom order was last synced for.
+	const lastSyncedCartRef = useRef<string | null>(null);
 
-		// Suspend and resume the Kustom Checkout iframe when the cart total items change, this forces the iframe to reload with the new cart data.
-		suspendKCO();
-		resumeKCO();
-	}, [billing.cartTotalItems, isActive, resumeKCO, suspendKCO]);
+	useEffect(() => {
+		if (!isActive) return; // If Kustom Checkout is not active we don't want to do anything.
+
+		// Sync the WooCommerce cart to the Kustom order (and reload the iframe) when the cart
+		// contents or totals change — e.g. a quantity change or a coupon applied on the checkout
+		// page. The kco-block extension update is the only Store API request allowed to update
+		// the Kustom order, so the sync has to be requested explicitly.
+		const cartSignature = JSON.stringify({
+			total: billing?.cartTotal?.value,
+			items: (billing?.cartTotalItems ?? []).map(
+				(item: any) => item.value
+			),
+		});
+
+		if (lastSyncedCartRef.current === null) {
+			// First render: the snippet was just created from an up-to-date Kustom order.
+			lastSyncedCartRef.current = cartSignature;
+			return;
+		}
+
+		if (lastSyncedCartRef.current === cartSignature) return;
+		lastSyncedCartRef.current = cartSignature;
+		syncKCO({});
+	}, [billing, isActive, syncKCO]);
 
 	if (description === '') return null; // If the description is empty, we don't want to render anything.
 
