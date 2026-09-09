@@ -87,13 +87,13 @@ class KCO_Fields {
 				'default'  => 'two_column_right',
 				'desc_tip' => false,
 			),
-			// EU.
-			'credentials_eu'             => array(
-				'title' => 'API Credentials Europe',
+			// Credentials.
+			'credentials'                => array(
+				'title' => 'API Credentials',
 				'type'  => 'krokedil_section_start',
-				'id'    => 'credentials_eu',
+				'id'    => 'credentials',
 			),
-			'merchant_id_eu'             => array(
+			'merchant_id'                => array(
 				'title'             => __( 'Production Kustom API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
 				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
@@ -103,7 +103,7 @@ class KCO_Fields {
 					'autocomplete' => 'off',
 				),
 			),
-			'shared_secret_eu'           => array(
+			'shared_secret'              => array(
 				'title'             => __( 'Production Kustom API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
 				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
@@ -113,7 +113,7 @@ class KCO_Fields {
 					'autocomplete' => 'new-password',
 				),
 			),
-			'test_merchant_id_eu'        => array(
+			'test_merchant_id'           => array(
 				'title'             => __( 'Test Kustom API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
 				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
@@ -123,7 +123,7 @@ class KCO_Fields {
 					'autocomplete' => 'off',
 				),
 			),
-			'test_shared_secret_eu'      => array(
+			'test_shared_secret'         => array(
 				'title'             => __( 'Test Kustom API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
 				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
@@ -133,55 +133,7 @@ class KCO_Fields {
 					'autocomplete' => 'new-password',
 				),
 			),
-			'credentials_eu_end'         => array(
-				'type' => 'krokedil_section_end',
-			),
-			// US.
-			'credentials_us'             => array(
-				'title' => 'API Credentials United States',
-				'type'  => 'krokedil_section_start',
-			),
-			'merchant_id_us'             => array(
-				'title'             => __( 'Production Kustom API Username', 'klarna-checkout-for-woocommerce' ),
-				'type'              => 'text',
-				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
-				'default'           => '',
-				'desc_tip'          => false,
-				'custom_attributes' => array(
-					'autocomplete' => 'off',
-				),
-			),
-			'shared_secret_us'           => array(
-				'title'             => __( 'Production Kustom API Password', 'klarna-checkout-for-woocommerce' ),
-				'type'              => 'password',
-				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
-				'default'           => '',
-				'desc_tip'          => false,
-				'custom_attributes' => array(
-					'autocomplete' => 'new-password',
-				),
-			),
-			'test_merchant_id_us'        => array(
-				'title'             => __( 'Test Kustom API Username', 'klarna-checkout-for-woocommerce' ),
-				'type'              => 'text',
-				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
-				'default'           => '',
-				'desc_tip'          => false,
-				'custom_attributes' => array(
-					'autocomplete' => 'off',
-				),
-			),
-			'test_shared_secret_us'      => array(
-				'title'             => __( 'Test Kustom API Password', 'klarna-checkout-for-woocommerce' ),
-				'type'              => 'password',
-				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
-				'default'           => '',
-				'desc_tip'          => false,
-				'custom_attributes' => array(
-					'autocomplete' => 'new-password',
-				),
-			),
-			'credentials_us_end'         => array(
+			'credentials_end'            => array(
 				'type' => 'krokedil_section_end',
 			),
 			// Shipping.

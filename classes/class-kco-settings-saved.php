@@ -9,10 +9,8 @@
  * Class for checking settings on save.
  */
 class KCO_Settings_Saved {
-	const EU_PROD = 'European Production';
-	const EU_TEST = 'European Test';
-	const US_PROD = 'United States Production';
-	const US_TEST = 'United States Test';
+	const PROD = 'Production';
+	const TEST = 'Test';
 
 	/**
 	 * If there was an error detected or not.
@@ -61,41 +59,19 @@ class KCO_Settings_Saved {
 		}
 
 		if ( 'yes' !== $options['testmode'] ) {
-			// Check EU Production.
-			if ( '' !== $options['merchant_id_eu'] ) {
-				$username = $options['merchant_id_eu'];
-				$password = $options['shared_secret_eu'];
+			if ( '' !== $options['merchant_id'] ) {
+				$username = $options['merchant_id'];
+				$password = $options['shared_secret'];
 
-				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, false, 'EU' );
-				$this->process_test_response( $test_response, self::EU_PROD );
+				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, false );
+				$this->process_test_response( $test_response, self::PROD );
 			}
+		} elseif ( '' !== $options['test_merchant_id'] ) {
+			$username = $options['test_merchant_id'];
+			$password = $options['test_shared_secret'];
 
-			// Check US Production.
-			if ( '' !== $options['merchant_id_us'] ) {
-				$username = $options['merchant_id_us'];
-				$password = $options['shared_secret_us'];
-
-				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, false, 'US' );
-				$this->process_test_response( $test_response, self::US_PROD );
-			}
-		} else {
-			// Check EU Test.
-			if ( '' !== $options['test_merchant_id_eu'] ) {
-				$username = $options['test_merchant_id_eu'];
-				$password = $options['test_shared_secret_eu'];
-
-				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true, 'EU' );
-				$this->process_test_response( $test_response, self::EU_TEST );
-			}
-
-			// Check US Test.
-			if ( '' !== $options['test_merchant_id_us'] ) {
-				$username = $options['test_merchant_id_us'];
-				$password = $options['test_shared_secret_us'];
-
-				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true, 'US' );
-				$this->process_test_response( $test_response, self::US_TEST );
-			}
+			$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true );
+			$this->process_test_response( $test_response, self::TEST );
 		}
 
 		$this->maybe_handle_error();
@@ -148,15 +124,9 @@ class KCO_Settings_Saved {
 			return;
 		}
 
-		// Check if EU credentials are set. If they are, bail.
-		if ( isset( $options['test_merchant_id_eu'], $options['test_shared_secret_eu'] )
-		&& ( ! empty( $options['test_merchant_id_eu'] ) || ! empty( $options['test_shared_secret_eu'] ) ) ) {
-			return;
-		}
-
-		// Check if US credentials are set. If they are, bail.
-		if ( isset( $options['test_merchant_id_us'], $options['test_shared_secret_us'] )
-		&& ( ! empty( $options['test_merchant_id_us'] ) || ! empty( $options['test_shared_secret_us'] ) ) ) {
+		// Check if test credentials are set. If they are, bail.
+		if ( isset( $options['test_merchant_id'], $options['test_shared_secret'] )
+		&& ( ! empty( $options['test_merchant_id'] ) || ! empty( $options['test_shared_secret'] ) ) ) {
 			return;
 		}
 		$this->message[] = 'It looks like you have test mode active but no test credentials added. Please either turn off test mode or add test credentials.';

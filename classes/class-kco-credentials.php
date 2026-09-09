@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * KCO_Credentials class.
  *
- * Gets correct credentials based on customer country, store country and test/live mode.
+ * Gets correct credentials based on test/live mode.
  */
 class KCO_Credentials {
 
@@ -36,18 +36,10 @@ class KCO_Credentials {
 	 * @return bool|array $credentials
 	 */
 	public function get_credentials_from_session() {
-		$base_location = wc_get_base_location();
-
-		if ( 'US' === $base_location['country'] ) {
-			$country_string = 'us';
-		} else {
-			$country_string = 'eu';
-		}
-
 		$testmode      = $this->settings['testmode'] ?? 'no';
 		$test_string   = 'yes' === $testmode ? 'test_' : '';
-		$merchant_id   = $this->settings[ $test_string . 'merchant_id_' . $country_string ] ?? '';
-		$shared_secret = $this->settings[ $test_string . 'shared_secret_' . $country_string ] ?? '';
+		$merchant_id   = $this->settings[ $test_string . 'merchant_id' ] ?? '';
+		$shared_secret = $this->settings[ $test_string . 'shared_secret' ] ?? '';
 
 		// Merchant id and/or shared secret not found for matching country.
 		if ( '' === $merchant_id || '' === $shared_secret ) {

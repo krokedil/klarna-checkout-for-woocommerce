@@ -19,11 +19,10 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	 * @param string $username The username to use.
 	 * @param string $password The password to use.
 	 * @param bool   $testmode If its test mode or not.
-	 * @param string $endpoint The endpoint for the request.
 	 * @return array
 	 */
-	public function request( $username, $password, $testmode, $endpoint ) {
-		$request_url        = $this->get_test_endpoint( $testmode, $endpoint, $username, $password ) . 'checkout/v3/orders';
+	public function request( $username, $password, $testmode ) {
+		$request_url        = $this->get_test_endpoint( $testmode ) . 'checkout/v3/orders';
 		$request_args       = apply_filters( 'kco_wc_test_credentials', $this->get_request_args( $username, $password, $request_url ) );
 		$response           = wp_remote_request( $request_url, $request_args );
 		$code               = wp_remote_retrieve_response_code( $response );
@@ -88,17 +87,13 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	/**
 	 * Gets the endpoint for the test.
 	 *
-	 * @param bool   $testmode If its test mode or not.
-	 * @param string $endpoint The endpoint for the request.
-	 * @param string $username The username to use.
-	 * @param string $password The password to use.
+	 * @param bool $testmode If its test mode or not.
 	 */
-	public function get_test_endpoint( $testmode, $endpoint, $username, $password ) {
-		$country_string = 'US' === $endpoint ? '-na' : '';
-		$test_string    = $testmode ? '.playground' : '';
-		$domain         = 'kustom.co';
+	public function get_test_endpoint( $testmode ) {
+		$test_string = $testmode ? '.playground' : '';
+		$domain      = 'kustom.co';
 
-		return "https://api{$country_string}{$test_string}.{$domain}/";
+		return "https://api{$test_string}.{$domain}/";
 	}
 
 	/**
