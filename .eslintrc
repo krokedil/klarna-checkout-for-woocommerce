@@ -38,6 +38,6 @@
         "assets/",
         "gulpfile.js",
         "webpack.config.js",
-        "./tests/"
+        "tests/"
     ]
 }
