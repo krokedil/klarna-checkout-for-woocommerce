@@ -392,9 +392,34 @@ class KCO_Request_Cart {
 	 * @return string $item_name Cart item name.
 	 */
 	public function get_item_name( $cart_item ) {
-		$item_name = substr( $cart_item['data']->get_name(), 0, 254 );
+		$item_name = $cart_item['data']->get_name();
 
-		return wp_strip_all_tags( $item_name );
+		/**
+		 * Filter whether to append the item's WooCommerce meta data to the order line name.
+		 *
+		 * @param bool                     $include Whether to append the item meta data. Default false.
+		 * @param array|WC_Order_Item      $item    The cart item, or the order item in the 'order' context.
+		 * @param string                   $context Either 'cart' or 'order'.
+		 */
+		if ( apply_filters( 'kco_wc_order_line_include_item_meta', false, $cart_item, 'cart' ) ) {
+			$item_meta = array();
+
+			// WooCommerce returns the meta data as one "key: value" per line.
+			foreach ( preg_split( '/\R/', wc_get_formatted_cart_item_data( $cart_item, true ) ) as $line ) {
+				$pair = explode( ': ', $line, 2 );
+				$meta = isset( $pair[1] ) ? kco_format_order_line_meta( $pair[0], $pair[1] ) : kco_clean_order_line_name( $line );
+
+				if ( '' !== $meta ) {
+					$item_meta[] = $meta;
+				}
+			}
+
+			if ( ! empty( $item_meta ) ) {
+				$item_name .= ' (' . implode( ', ', $item_meta ) . ')';
+			}
+		}
+
+		return substr( kco_clean_order_line_name( $item_name ), 0, 254 );
 	}
 
 	/**

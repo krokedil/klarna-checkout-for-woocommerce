@@ -394,7 +394,30 @@ class OrderLines {
 		// Matching the item name from KCO order.
 		$order_line_item_name = $order_line_item->get_name();
 
-		return (string) wp_strip_all_tags( $order_line_item_name );
+		/**
+		 * Filter whether to append the item's WooCommerce meta data to the order line name.
+		 *
+		 * @param bool                $include Whether to append the item meta data. Default false.
+		 * @param array|WC_Order_Item $item    The order item, or the cart item in the 'cart' context.
+		 * @param string              $context Either 'cart' or 'order'.
+		 */
+		if ( $order_line_item instanceof \WC_Order_Item_Product
+			&& apply_filters( 'kco_wc_order_line_include_item_meta', false, $order_line_item, 'order' ) ) {
+			$item_meta = array();
+			foreach ( $order_line_item->get_formatted_meta_data() as $meta ) {
+				$formatted = kco_format_order_line_meta( $meta->display_key, $meta->display_value );
+
+				if ( '' !== $formatted ) {
+					$item_meta[] = $formatted;
+				}
+			}
+
+			if ( ! empty( $item_meta ) ) {
+				$order_line_item_name .= ' (' . implode( ', ', $item_meta ) . ')';
+			}
+		}
+
+		return substr( kco_clean_order_line_name( $order_line_item_name ), 0, 254 );
 	}
 
 	/**

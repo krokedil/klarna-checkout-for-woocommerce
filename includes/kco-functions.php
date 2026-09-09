@@ -1089,3 +1089,41 @@ function kco_cart_needs_payment() {
 	// A subscription in the cart always needs payment.
 	return $needs_payment || KCO_Subscription::cart_has_subscription();
 }
+
+/**
+ * Cleans a string for use in an order line name.
+ *
+ * @param string $text The text to clean.
+ * @return string
+ */
+function kco_clean_order_line_name( $text ) {
+	$text = html_entity_decode( wp_strip_all_tags( (string) $text ), ENT_QUOTES, 'UTF-8' );
+
+	// Returns null if the text is not valid UTF-8, in which case leave the text as it is.
+	$normalized = preg_replace( '/[\s\x{00A0}]+/u', ' ', $text );
+
+	return trim( null === $normalized ? $text : $normalized );
+}
+
+/**
+ * Formats an item meta data key and value pair for use in an order line name.
+ *
+ * @param string $key The meta data display key.
+ * @param string $value The meta data display value.
+ * @return string
+ */
+function kco_format_order_line_meta( $key, $value ) {
+	$key   = rtrim( kco_clean_order_line_name( $key ), ':' );
+	$value = kco_clean_order_line_name( $value );
+
+	if ( '' === $value ) {
+		return $key;
+	}
+
+	// Some plugins repeat the label in the value, which would otherwise read as "Gift wrap: Gift wrap".
+	if ( '' === $key || 0 === stripos( $value, $key ) ) {
+		return $value;
+	}
+
+	return "$key: $value";
+}
