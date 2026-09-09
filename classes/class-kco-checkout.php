@@ -167,7 +167,7 @@ class KCO_Checkout {
 			return $default;
 		}
 
-		// Kustom Shipping Assistant owns the shipping method, so leave the assessment to it. Match on the method ID, which may or may not carry an instance suffix ('klarna_kss:1') depending on the plugin version.
+		// Kustom Shipping Assistant owns the shipping method, so leave the assessment to it. The chosen value is a rate ID, which older versions of that plugin set to the bare method ID and newer ones to 'klarna_kss:<instance>'.
 		if ( 'klarna_kss' === $chosen_method || 0 === strpos( $chosen_method, 'klarna_kss:' ) ) {
 			return $default;
 		}

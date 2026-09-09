@@ -281,8 +281,10 @@ class CheckoutTest extends IntegrationTestCase {
 
 		WC()->session->set( 'chosen_payment_method', 'kco' );
 
-		$this->checkoutProcessCount = $GLOBALS['wp_actions']['woocommerce_checkout_process'] ?? 0;
-		do_action( 'woocommerce_checkout_process' );
+		// The guard only reads the count, so raise it rather than firing the action and
+		// running whatever a plugin has hooked to it.
+		$this->checkoutProcessCount                            = $GLOBALS['wp_actions']['woocommerce_checkout_process'] ?? 0;
+		$GLOBALS['wp_actions']['woocommerce_checkout_process'] = $this->checkoutProcessCount + 1;
 	}
 
 	private function arrangeFailure( string $scenario ): \WC_Order {
