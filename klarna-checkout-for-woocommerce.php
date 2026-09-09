@@ -29,6 +29,7 @@
  */
 
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
+use Krokedil\KustomCheckout\Compatibility;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
@@ -318,6 +319,9 @@ if ( ! class_exists( 'KCO' ) ) {
 			$autoloader_result = self::init_composer();
 			if ( $autoloader_result ) {
 				$this->block_extension = new BlockExtension();
+
+				// Register compatibility with third-party plugins late, once every plugin has been loaded.
+				add_action( 'plugins_loaded', array( Compatibility::class, 'register' ), 99 );
 			}
 		}
 
