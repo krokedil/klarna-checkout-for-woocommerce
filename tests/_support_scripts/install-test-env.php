@@ -114,7 +114,7 @@ if (is_file($wp_config_path)) {
     if (false === strpos($updated_contents, 'WP_DEBUG_LOG')) {
         $updated_contents = (string) preg_replace(
             "/(define\(\s*'WP_DEBUG'\s*,\s*true\s*\);)/",
-            "$1\ndefine( 'WP_DEBUG_LOG', true );\ndefine( 'WP_DEBUG_DISPLAY', false );",
+            "$1\ndefine( 'WP_DEBUG_LOG', true );\ndefine( 'WP_DEBUG_DISPLAY', false );\ndefine( 'SCRIPT_DEBUG', true );",
             $updated_contents,
             1
         );
@@ -122,7 +122,7 @@ if (is_file($wp_config_path)) {
 
     if ($updated_contents !== $wp_config_contents) {
         file_put_contents($wp_config_path, $updated_contents);
-        echo "Patched wp-config.php (WP_DEBUG=true, WP_DEBUG_LOG=true, WP_DEBUG_DISPLAY=false).\n";
+        echo "Patched wp-config.php (WP_DEBUG=true, WP_DEBUG_LOG=true, WP_DEBUG_DISPLAY=false, SCRIPT_DEBUG=true).\n";
     }
 }
 
