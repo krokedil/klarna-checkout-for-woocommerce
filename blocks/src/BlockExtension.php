@@ -34,10 +34,6 @@ class BlockExtension {
 	/**
 	 * Whether the current request is an extension update from the Kustom checkout block.
 	 *
-	 * The CartSchema extension data is serialized for every Store API cart response — mini-cart
-	 * fetches, add to cart, cart page hydration — and only requests from the Kustom checkout
-	 * block itself may trigger requests to Kustom.
-	 *
 	 * @var bool
 	 */
 	private $is_kco_block_request = false;
@@ -115,8 +111,7 @@ class BlockExtension {
 	 * @return void
 	 */
 	public function block_callback( $data ) {
-		// Flag the request as coming from the Kustom checkout block, so get_address() is
-		// allowed to sync the Kustom order when the cart response is serialized.
+		// Allow get_address() to sync the Kustom order when this request's cart response is serialized.
 		$this->is_kco_block_request = true;
 
 		switch ( $data['action'] ) {
@@ -237,12 +232,8 @@ class BlockExtension {
 	 * @throws Exception If we can't get the Kustom order.
 	 */
 	public function get_address() {
-		// Bail without touching the Kustom API unless this request came from the Kustom checkout
-		// block (the kco-block extensionCartUpdate). This data callback runs on every Store API
-		// cart serialization — e.g. mini-cart fetches on ordinary page loads — and syncing the
-		// Kustom order there caused a request to Kustom per page load for any shopper with an
-		// ongoing checkout session. The checkout page itself always force-syncs the Kustom order
-		// through CheckoutBlock::get_data() when it renders.
+		// This callback runs on every Store API cart serialization — mini-cart fetches included —
+		// so only requests from the Kustom checkout block may sync the Kustom order here.
 		if ( ! $this->is_kco_block_request || ! BlocksUtility::is_checkout_block_enabled() ) {
 			return array();
 		}

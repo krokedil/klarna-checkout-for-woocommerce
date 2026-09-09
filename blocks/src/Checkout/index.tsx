@@ -79,12 +79,10 @@ const KustomCheckout = (props: KustomCheckoutProps): JSX.Element => {
 	const lastSyncedCartRef = useRef<string | null>(null);
 
 	useEffect(() => {
-		if (!isActive) return; // If Kustom Checkout is not active we don't want to do anything.
+		if (!isActive) return;
 
-		// Sync the WooCommerce cart to the Kustom order (and reload the iframe) when the cart
-		// contents or totals change — e.g. a quantity change or a coupon applied on the checkout
-		// page. The kco-block extension update is the only Store API request allowed to update
-		// the Kustom order, so the sync has to be requested explicitly.
+		// Only the kco-block extension update may sync the Kustom order, so cart changes
+		// (quantity edits, coupons) must request the sync explicitly.
 		const cartSignature = JSON.stringify({
 			total: billing?.cartTotal?.value,
 			items: (billing?.cartTotalItems ?? []).map(
@@ -93,7 +91,7 @@ const KustomCheckout = (props: KustomCheckoutProps): JSX.Element => {
 		});
 
 		if (lastSyncedCartRef.current === null) {
-			// First render: the snippet was just created from an up-to-date Kustom order.
+			// First render: the snippet was just created, so the Kustom order is already in sync.
 			lastSyncedCartRef.current = cartSignature;
 			return;
 		}
