@@ -87,6 +87,13 @@ class KCO_API_Callbacks {
 				return;
 			}
 
+			/*
+			 * Update the addresses regardless of whether the order was already paid. The Kustom order is the source of
+			 * truth, and if the confirmation page raced Kustom finalizing the address, this is the last chance to
+			 * correct the order. A repeated push is a no-op, since only actual changes are written.
+			 */
+			kco_maybe_update_order_addresses( $order, $klarna_order );
+
 			if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
 				return;
 			}
