@@ -174,7 +174,7 @@ class CredentialsMigration {
 	}
 
 	/**
-	 * Clear the admin notice option when settings are re-saved since that should mean its resolved.
+	 * Clear the admin notice option when settings are re-saved since that should mean it's resolved.
 	 *
 	 * @return void
 	 */
