@@ -275,7 +275,7 @@ trait CanConfigureStore {
 
 	/** Forgets the gateway state the WooCommerce session carries between requests. */
 	protected function resetGatewaySession(): void {
-		foreach ( [ 'kco_wc_order_id', 'kco_update_md5', 'kco_shipping_data', 'kco_wc_prefill_consent' ] as $key ) {
+		foreach ( [ 'kco_wc_order_id', 'kco_update_md5', 'kco_shipping_data', 'kco_wc_prefill_consent', 'chosen_payment_method' ] as $key ) {
 			WC()->session->__unset( $key );
 		}
 	}
