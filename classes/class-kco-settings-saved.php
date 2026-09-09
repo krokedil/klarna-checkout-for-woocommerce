@@ -51,27 +51,27 @@ class KCO_Settings_Saved {
 	 */
 	public function check_api_credentials() {
 		// Get settings from KCO.
-		$options = get_option( 'woocommerce_kco_settings' );
+		$options = get_option( 'woocommerce_kco_settings', array() );
 
-		// If not enabled bail.
-		if ( $options && 'yes' !== $options['enabled'] ) {
+		// If not enabled bail, or we have no settings.
+		if ( empty( $options ) || 'yes' !== $options['enabled'] ) {
 			return;
 		}
 
 		if ( 'yes' !== $options['testmode'] ) {
-			if ( '' !== $options['merchant_id'] ) {
-				$username = $options['merchant_id'];
-				$password = $options['shared_secret'];
-
+			$username = $options['merchant_id'] ?? '';
+			$password = $options['shared_secret'] ?? '';
+			if ( ! empty( $username ) && ! empty( $password ) ) {
 				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, false );
 				$this->process_test_response( $test_response, self::PROD );
 			}
-		} elseif ( '' !== $options['test_merchant_id'] ) {
-			$username = $options['test_merchant_id'];
-			$password = $options['test_shared_secret'];
-
-			$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true );
-			$this->process_test_response( $test_response, self::TEST );
+		} else {
+			$username = $options['test_merchant_id'] ?? '';
+			$password = $options['test_shared_secret'] ?? '';
+			if ( ! empty( $username ) && ! empty( $password ) ) {
+				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true );
+				$this->process_test_response( $test_response, self::TEST );
+			}
 		}
 
 		$this->maybe_handle_error();
@@ -114,21 +114,26 @@ class KCO_Settings_Saved {
 	 * @return void
 	 */
 	public function check_if_test_credentials_exists() {
-		$options = get_option( 'woocommerce_kco_settings' );
+		$options = get_option( 'woocommerce_kco_settings', array() );
 		// If not enabled bail.
-		if ( 'yes' !== $options['enabled'] ) {
-			return;
-		}
-		// If testmode is not enabled, bail.
-		if ( ! isset( $options['testmode'] ) || 'yes' !== $options['testmode'] ) {
+		if ( empty( $options ) || 'yes' !== $options['enabled'] ) {
 			return;
 		}
 
-		// Check if test credentials are set. If they are, bail.
-		if ( isset( $options['test_merchant_id'], $options['test_shared_secret'] )
-		&& ( ! empty( $options['test_merchant_id'] ) || ! empty( $options['test_shared_secret'] ) ) ) {
+		$testmode = $options['testmode'] ?? 'yes';
+		// If testmode is not enabled, bail.
+		if ( ! wc_string_to_bool( $testmode ) ) {
 			return;
 		}
+
+		$test_merchant_id   = $options['test_merchant_id'] ?? '';
+		$test_shared_secret = $options['test_shared_secret'] ?? '';
+
+		// Check if test credentials are set. If they are, bail.
+		if ( ! empty( $test_merchant_id ) && ! empty( $test_shared_secret ) ) {
+			return;
+		}
+
 		$this->message[] = 'It looks like you have test mode active but no test credentials added. Please either turn off test mode or add test credentials.';
 		$this->error     = true;
 	}
