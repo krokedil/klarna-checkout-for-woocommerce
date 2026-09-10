@@ -14,6 +14,7 @@ use Tests\Support\IntegrationTestCase;
  * @covers \KCO_Request::get_api_url_base
  * @covers \KCO_Request::get_request_headers
  * @covers \KCO_Request_Cart
+ * @covers \KCO_Request_Update_Confirmation::get_body
  */
 class RequestsTest extends IntegrationTestCase {
 
@@ -164,6 +165,63 @@ class RequestsTest extends IntegrationTestCase {
 			'shipping'       => [ 'shipping' ],
 			'coupon'         => [ 'coupon' ],
 		];
+	}
+
+	/**
+	 * Kustom omits an optional field it has no value for (e.g. shipping_countries
+	 * on a store with shipping disabled) rather than sending it as null, so the
+	 * confirmation update must not invent the key back in.
+	 *
+	 * @dataProvider provide_omitted_fields
+	 */
+	public function test_the_confirmation_update_only_sends_fields_kustom_returned( string $field ): void {
+		$order        = $this->haveGatewayOrder();
+		$klarna_order = $this->kustomRetrievedOrder( [], [ $field ] );
+
+		$this->willRespondWith( [], 200, '/checkout/v3/orders/' . $klarna_order['order_id'] );
+		KCO_WC()->api->update_klarna_confirmation( $klarna_order['order_id'], $klarna_order, $order->get_id() );
+
+		$request = $this->gatewayRequestTo( '/checkout/v3/orders/' . $klarna_order['order_id'] );
+		$this->assertArrayNotHasKey( $field, $request['json'] );
+	}
+
+	/** @return array<string, array{0: string}> */
+	public function provide_omitted_fields(): array {
+		return [
+			'shipping is disabled' => [ 'shipping_countries' ],
+			'no billing countries' => [ 'billing_countries' ],
+			'no merchant data'     => [ 'merchant_data' ],
+			'no options'           => [ 'options' ],
+		];
+	}
+
+	/**
+	 * The fields the confirmation update carries when Kustom returned all of them.
+	 * The references are asserted rather than masked, because merchant_reference2 is
+	 * a bare int and the snapshot masking only survives inside a JSON string.
+	 */
+	public function test_the_confirmation_update_body_matches_the_snapshot(): void {
+		$order        = $this->haveGatewayOrder();
+		$klarna_order = $this->kustomRetrievedOrder( [ 'status' => 'checkout_complete' ] );
+
+		$this->willRespondWith( [], 200, '/checkout/v3/orders/' . $klarna_order['order_id'] );
+		KCO_WC()->api->update_klarna_confirmation( $klarna_order['order_id'], $klarna_order, $order->get_id() );
+
+		$body = $this->gatewayRequestTo( '/checkout/v3/orders/' . $klarna_order['order_id'] )['json'];
+
+		$this->assertSame( $order->get_order_number(), $body['merchant_reference1'] );
+		$this->assertSame( $order->get_id(), $body['merchant_reference2'] );
+
+		unset( $body['merchant_reference1'], $body['merchant_reference2'] );
+
+		$this->assertMatchesSnapshot(
+			$body,
+			'update-confirmation-se',
+			[
+				'<order-id>'  => $order->get_id(),
+				'<order-key>' => $order->get_order_key(),
+			]
+		);
 	}
 
 	/** @return array<string, scalar> Volatile values to mask out of the snapshot. */

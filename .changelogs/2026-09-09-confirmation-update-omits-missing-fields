@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed the PHP warning "undefined array key 'shipping_countries'" that appeared on every completed checkout in stores with shipping disabled.
