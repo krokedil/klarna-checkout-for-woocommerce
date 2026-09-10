@@ -31,8 +31,8 @@ class CredentialsMigration {
 	public const TARGET_VERSION = '2.21.0';
 
 	/**
-	 * Option holding the region ('eu' or 'us') the admin notice should explain, or
-	 * false when no notice is due.
+	 * Option set to 'yes' when the admin notice about defaulting to the EU
+	 * credentials is due, and absent otherwise.
 	 *
 	 * @var string
 	 */
@@ -75,6 +75,9 @@ class CredentialsMigration {
 	/**
 	 * Copies a store's existing EU/US credentials into the new single credential set.
 	 *
+	 * EU wins when both regions are filled in, and the store gets an admin notice
+	 * saying so.
+	 *
 	 * @return void
 	 */
 	public function migrate() {
@@ -91,14 +94,10 @@ class CredentialsMigration {
 			return;
 		}
 
-		if ( $has_eu && $has_us ) {
-			$base_location = wc_get_base_location();
-			$region        = 'US' === ( $base_location['country'] ?? '' ) ? 'us' : 'eu';
+		$this->copy_region( $settings, $has_eu ? 'eu' : 'us' );
 
-			$this->copy_region( $settings, $region );
-			update_option( self::NOTICE_OPTION, $region );
-		} else {
-			$this->copy_region( $settings, $has_us ? 'us' : 'eu' );
+		if ( $has_eu && $has_us ) {
+			update_option( self::NOTICE_OPTION, 'yes' );
 		}
 
 		update_option( 'woocommerce_kco_settings', $settings );
@@ -135,7 +134,7 @@ class CredentialsMigration {
 	}
 
 	/**
-	 * Renders the admin notice explaining which region's credentials were kept.
+	 * Renders the admin notice explaining that the EU credentials were kept.
 	 *
 	 * Dismissal is handled by WooCommerce's own generic `wc-hide-notice` handler,
 	 * the same mechanism every other notice in this plugin relies on.
@@ -143,9 +142,7 @@ class CredentialsMigration {
 	 * @return void
 	 */
 	public function render_notice() {
-		$region = get_option( self::NOTICE_OPTION );
-
-		if ( ! $region ) {
+		if ( ! get_option( self::NOTICE_OPTION ) ) {
 			return;
 		}
 
@@ -158,11 +155,7 @@ class CredentialsMigration {
 			return;
 		}
 
-		if ( 'us' === $region ) {
-			$message = __( 'Kustom Checkout for WooCommerce has been updated to use a single set of credentials for all regions. It looks like you had credentials configured for both Europe and the United States. Since your store is based in the US, we defaulted to the credentials previously entered for the US. Your other credentials are still stored in the database, and will be available again if you roll back to a previous version.', 'klarna-checkout-for-woocommerce' );
-		} else {
-			$message = __( 'Kustom Checkout for WooCommerce has been updated to use a single set of credentials for all regions. It looks like you had credentials configured for both Europe and the United States. Since your store is not based in the US, we defaulted to the credentials previously entered for Europe. Your other credentials are still stored in the database, and will be available again if you roll back to a previous version.', 'klarna-checkout-for-woocommerce' );
-		}
+		$message = __( 'Kustom Checkout for WooCommerce has been updated to use a single set of credentials for all regions. It looks like you had credentials configured for both Europe and the United States. We\'ve defaulted to the credentials previously entered for Europe. Your other credentials are still stored in the database, and will be available again if you roll back to a previous version.', 'klarna-checkout-for-woocommerce' );
 
 		$dismiss_url = wp_nonce_url( add_query_arg( 'wc-hide-notice', 'kco_credentials_migration' ), 'woocommerce_hide_notices_nonce', '_wc_notice_nonce' );
 		?>

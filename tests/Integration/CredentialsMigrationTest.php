@@ -25,7 +25,6 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 	}
 
 	public function test_eu_only_credentials_are_copied_to_the_new_fields(): void {
-		$this->configureStore( [ 'country' => 'SE', 'currency' => 'SEK', 'calc_taxes' => false ] );
 		$this->setGatewaySettings(
 			[
 				'merchant_id_eu'        => 'live-mid-eu',
@@ -51,7 +50,6 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 	}
 
 	public function test_us_only_credentials_are_copied_to_the_new_fields(): void {
-		$this->configureStore( [ 'country' => 'SE', 'currency' => 'SEK', 'calc_taxes' => false ] );
 		$this->setGatewaySettings(
 			[
 				'merchant_id_us'        => 'live-mid-us',
@@ -75,39 +73,12 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 		$this->assertFalse( get_option( CredentialsMigration::NOTICE_OPTION ) );
 	}
 
-	public function test_both_regions_filled_in_defaults_to_us_for_a_us_store(): void {
+	/**
+	 * EU always wins when both regions are filled in. The store is deliberately based
+	 * in the US here, since the base country used to pick the region and no longer does.
+	 */
+	public function test_both_regions_filled_in_defaults_to_eu_even_for_a_us_store(): void {
 		$this->configureStore( [ 'country' => 'US', 'currency' => 'USD', 'calc_taxes' => false ] );
-		$this->setGatewaySettings(
-			[
-				'merchant_id_eu'        => 'live-mid-eu',
-				'shared_secret_eu'      => 'live-secret-eu',
-				'test_merchant_id_eu'   => 'test-mid-eu',
-				'test_shared_secret_eu' => 'test-secret-eu',
-				'merchant_id_us'        => 'live-mid-us',
-				'shared_secret_us'      => 'live-secret-us',
-				'test_merchant_id_us'   => 'test-mid-us',
-				'test_shared_secret_us' => 'test-secret-us',
-			]
-		);
-
-		( new CredentialsMigration() )->migrate();
-
-		$settings = get_option( 'woocommerce_kco_settings' );
-
-		$this->assertSame( 'live-mid-us', $settings['merchant_id'] );
-		$this->assertSame( 'live-secret-us', $settings['shared_secret'] );
-		$this->assertSame( 'test-mid-us', $settings['test_merchant_id'] );
-		$this->assertSame( 'test-secret-us', $settings['test_shared_secret'] );
-
-		// Both old regions are still stored, untouched.
-		$this->assertSame( 'live-mid-eu', $settings['merchant_id_eu'] );
-		$this->assertSame( 'live-mid-us', $settings['merchant_id_us'] );
-
-		$this->assertSame( 'us', get_option( CredentialsMigration::NOTICE_OPTION ) );
-	}
-
-	public function test_both_regions_filled_in_defaults_to_eu_for_a_non_us_store(): void {
-		$this->configureStore( [ 'country' => 'DE', 'currency' => 'EUR', 'calc_taxes' => false ] );
 		$this->setGatewaySettings(
 			[
 				'merchant_id_eu'        => 'live-mid-eu',
@@ -127,12 +98,17 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 
 		$this->assertSame( 'live-mid-eu', $settings['merchant_id'] );
 		$this->assertSame( 'live-secret-eu', $settings['shared_secret'] );
+		$this->assertSame( 'test-mid-eu', $settings['test_merchant_id'] );
+		$this->assertSame( 'test-secret-eu', $settings['test_shared_secret'] );
 
-		$this->assertSame( 'eu', get_option( CredentialsMigration::NOTICE_OPTION ) );
+		// Both old regions are still stored, untouched.
+		$this->assertSame( 'live-mid-eu', $settings['merchant_id_eu'] );
+		$this->assertSame( 'live-mid-us', $settings['merchant_id_us'] );
+
+		$this->assertSame( 'yes', get_option( CredentialsMigration::NOTICE_OPTION ) );
 	}
 
 	public function test_neither_region_filled_in_does_nothing(): void {
-		$this->configureStore( [ 'country' => 'SE', 'currency' => 'SEK', 'calc_taxes' => false ] );
 		$this->setGatewaySettings( [ 'enabled' => 'yes' ] );
 
 		( new CredentialsMigration() )->migrate();
@@ -153,7 +129,7 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 	}
 
 	public function test_maybe_migrate_only_runs_once(): void {
-		$this->haveLegacyEuStore();
+		$this->haveLegacyEuCredentials();
 
 		$migration = new CredentialsMigration();
 		$migration->maybe_migrate();
@@ -175,7 +151,7 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 	 * this migration's target is left alone even on a first-ever call.
 	 */
 	public function test_a_store_already_past_the_target_version_is_skipped(): void {
-		$this->haveLegacyEuStore();
+		$this->haveLegacyEuCredentials();
 		update_option( CredentialsMigration::VERSION_OPTION, '99.0.0' );
 
 		( new CredentialsMigration() )->maybe_migrate();
@@ -189,7 +165,7 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 	 * migration by lowering the stored version rather than shipping code.
 	 */
 	public function test_a_store_below_the_target_version_migrates(): void {
-		$this->haveLegacyEuStore();
+		$this->haveLegacyEuCredentials();
 		update_option( CredentialsMigration::VERSION_OPTION, '2.20.11' );
 
 		( new CredentialsMigration() )->maybe_migrate();
@@ -203,7 +179,7 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 	 * `maybe_migrate()` itself, so nothing writes to the database on construction.
 	 */
 	public function test_the_constructor_does_not_migrate(): void {
-		$this->haveLegacyEuStore();
+		$this->haveLegacyEuCredentials();
 
 		new CredentialsMigration();
 
@@ -211,28 +187,16 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 		$this->assertFalse( get_option( CredentialsMigration::VERSION_OPTION ) );
 	}
 
-	public function test_notice_is_rendered_when_due_for_eu_region(): void {
+	public function test_notice_is_rendered_when_due(): void {
 		wp_set_current_user( 1 );
-		update_option( CredentialsMigration::NOTICE_OPTION, 'eu' );
+		update_option( CredentialsMigration::NOTICE_OPTION, 'yes' );
 
 		ob_start();
 		( new CredentialsMigration() )->render_notice();
 		$output = ob_get_clean();
 
 		$this->assertStringContainsString( 'single set of credentials', $output );
-		$this->assertStringContainsString( 'entered for Europe', $output );
-	}
-
-	public function test_notice_is_rendered_when_due_for_us_region(): void {
-		wp_set_current_user( 1 );
-		update_option( CredentialsMigration::NOTICE_OPTION, 'us' );
-
-		ob_start();
-		( new CredentialsMigration() )->render_notice();
-		$output = ob_get_clean();
-
-		$this->assertStringContainsString( 'single set of credentials', $output );
-		$this->assertStringContainsString( 'entered for the US', $output );
+		$this->assertStringContainsString( 'defaulted to the credentials previously entered for Europe', $output );
 	}
 
 	public function test_notice_is_not_rendered_when_not_due(): void {
@@ -252,7 +216,7 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 	 */
 	public function test_notice_is_not_rendered_once_dismissed_by_the_current_user(): void {
 		wp_set_current_user( 1 );
-		update_option( CredentialsMigration::NOTICE_OPTION, 'eu' );
+		update_option( CredentialsMigration::NOTICE_OPTION, 'yes' );
 		update_user_meta( get_current_user_id(), 'dismissed_kco_credentials_migration_notice', true );
 
 		ob_start();
@@ -263,13 +227,13 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 	}
 
 	/**
-	 * The notice names the region the store was defaulted to, which is only useful to
+	 * The notice asks the merchant to look at the credentials, which is only useful to
 	 * someone who can act on it. A shop's other users must not be shown a notice they
 	 * have no capability to dismiss.
 	 */
 	public function test_the_notice_is_hidden_from_users_who_cannot_manage_woocommerce(): void {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
-		update_option( CredentialsMigration::NOTICE_OPTION, 'us' );
+		update_option( CredentialsMigration::NOTICE_OPTION, 'yes' );
 
 		ob_start();
 		( new CredentialsMigration() )->render_notice();
@@ -284,7 +248,7 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 	 */
 	public function test_a_settings_save_clears_the_notice(): void {
 		$this->haveSavedGatewaySettings();
-		update_option( CredentialsMigration::NOTICE_OPTION, 'us' );
+		update_option( CredentialsMigration::NOTICE_OPTION, 'yes' );
 
 		// Constructing it is what registers the hook, so this covers the wiring too.
 		new CredentialsMigration();
@@ -296,7 +260,7 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 	public function test_the_notice_stops_rendering_after_a_settings_save(): void {
 		wp_set_current_user( 1 );
 		$this->haveSavedGatewaySettings();
-		update_option( CredentialsMigration::NOTICE_OPTION, 'eu' );
+		update_option( CredentialsMigration::NOTICE_OPTION, 'yes' );
 
 		$migration = new CredentialsMigration();
 		do_action( 'woocommerce_update_options_checkout_kco' );
@@ -317,8 +281,7 @@ class CredentialsMigrationTest extends IntegrationTestCase {
 		$this->setGatewaySettings( [ 'enabled' => 'no' ] );
 	}
 
-	private function haveLegacyEuStore(): void {
-		$this->configureStore( [ 'country' => 'SE', 'currency' => 'SEK', 'calc_taxes' => false ] );
+	private function haveLegacyEuCredentials(): void {
 		$this->setGatewaySettings(
 			[
 				'merchant_id_eu'   => 'live-mid-eu',
