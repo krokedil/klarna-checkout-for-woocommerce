@@ -17,10 +17,17 @@ var jsFiles = [
 	'assets/js/klarna-checkout-for-woocommerce-admin.js',
 	'src/OrderManagement/assets/js/klarna-order-management.js'
 ];
-var translateFiles = '**/*.php';
+var translateFiles = [
+	'**/*.php',
+	'!node_modules/**',
+	'!vendor/**',
+	'!dependencies/**',
+	'!tests/**',
+	'!blocks/build/**'
+];
 
 gulp.task('makePOT', function () {
-	return gulp.src('**/*.php')
+	return gulp.src(translateFiles)
 		.pipe(sort())
 		.pipe(wpPot({
 			domain: 'klarna-checkout-for-woocommerce',
@@ -34,7 +41,7 @@ gulp.task('makePOT', function () {
 });
 
 function makePot() {
-	return gulp.src('**/*.php')
+	return gulp.src(translateFiles)
 	.pipe(sort())
 	.pipe(wpPot({
 		domain: 'klarna-checkout-for-woocommerce',

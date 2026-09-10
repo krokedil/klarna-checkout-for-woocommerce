@@ -179,7 +179,7 @@ It pulls in the fixture traits:
 
 | Trait | Gives you |
 |---|---|
-| `CanConfigureStore` | `configureStore()`, `configureSwedishStore()`, `configureUsStore()`, `haveTaxRate()`, `haveTaxClass()`, `setGatewaySettings()`, `haveGatewayCredentials()`, `haveGatewayCredentialsForRegions()`, `reloadPaymentGateways()`, `resetGatewaySession()`. |
+| `CanConfigureStore` | `configureStore()`, `configureSwedishStore()`, `configureUsStore()`, `haveTaxRate()`, `haveTaxClass()`, `setGatewaySettings()`, `haveGatewayCredentials()`, `reloadPaymentGateways()`, `resetGatewaySession()`. |
 | `CanManageProducts` | `haveSimpleProduct()`, `haveVariableProduct()`. |
 | `CanBuildCartsAndOrders` | `haveCustomerAddress()`, `haveCartWith()`, `haveCartFee()`, `haveChosenFlatRateShipping()`, `simulateCheckoutPage()`, `haveOrder()`, `haveGatewayOrder()`, `haveCapturableGatewayOrder()`, `markAsGatewayOrder()`, `haveRefundForItems()`, plus the `swedishAddress()` and `usAddress()` presets. |
 | `CanInterceptHttp` | `willRespondWith()`, `willRejectWith()`, `httpRequests()`, `gatewayRequests()`, `gatewayRequestTo()`, `gatewayRequestsTo()`, `assertGatewayRequestCount()`, `assertNoGatewayRequests()`. |

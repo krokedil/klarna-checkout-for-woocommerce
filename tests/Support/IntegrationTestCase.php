@@ -39,9 +39,6 @@ abstract class IntegrationTestCase extends WPTestCase {
 	 * Store profile applied after the reset, before each test. One of `se`
 	 * (SE/SEK, 25% VAT), `se-no-tax`, `us` (US/USD, 8.5% sales tax), or null for
 	 * WooCommerce defaults with no credentials.
-	 *
-	 * The gateway resolves its credential set from the store's base country, so a
-	 * Swedish store signs with the `eu` pair and a US store with the `us` one.
 	 */
 	protected ?string $storeProfile = null;
 
@@ -65,15 +62,15 @@ abstract class IntegrationTestCase extends WPTestCase {
 				return;
 			case 'se':
 				$this->configureSwedishStore();
-				$this->haveGatewayCredentials( 'eu' );
+				$this->haveGatewayCredentials();
 				return;
 			case 'se-no-tax':
 				$this->configureStore( [ 'country' => 'SE', 'currency' => 'SEK', 'calc_taxes' => false ] );
-				$this->haveGatewayCredentials( 'eu' );
+				$this->haveGatewayCredentials();
 				return;
 			case 'us':
 				$this->configureUsStore();
-				$this->haveGatewayCredentials( 'us' );
+				$this->haveGatewayCredentials();
 				$this->haveCustomerAddress( $this->usAddress(), $this->usAddress() );
 				return;
 			default:

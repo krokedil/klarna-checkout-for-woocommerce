@@ -218,48 +218,26 @@ trait CanConfigureStore {
 	}
 
 	/**
-	 * Merges credentials for one region into the gateway settings.
-	 *
-	 * @param string $region Settings region code, `eu` or `us`.
+	 * Merges a credential pair into the gateway settings.
 	 */
-	protected function haveGatewayCredentials( string $region = 'eu', array $overrides = [], bool $testmode = true ): void {
-		$this->haveGatewayCredentialsForRegions( [ $region ], $overrides, $testmode );
-	}
-
-	/**
-	 * Merges credentials for several regions into the gateway settings.
-	 *
-	 * The settings option holds one merchant id / shared secret pair per region, and the
-	 * region a request uses is derived from the store's base country, so a cross border
-	 * scenario needs every pair present at once.
-	 *
-	 * @param array<int, string> $regions Settings region codes, for example `[ 'eu', 'us' ]`.
-	 */
-	protected function haveGatewayCredentialsForRegions( array $regions, array $overrides = [], bool $testmode = true ): void {
-		$prefix      = $testmode ? 'test_' : '';
-		$credentials = [];
-
-		foreach ( $regions as $region ) {
-			$region = strtolower( $region );
-
-			$credentials[ "{$prefix}merchant_id_{$region}" ]   = "mid-{$region}";
-			$credentials[ "{$prefix}shared_secret_{$region}" ] = "secret-{$region}";
-		}
+	protected function haveGatewayCredentials( array $overrides = [], bool $testmode = true ): void {
+		$prefix = $testmode ? 'test_' : '';
 
 		$this->setGatewaySettings(
 			array_merge(
 				[
-					'enabled'                 => 'yes',
-					'testmode'                => $testmode ? 'yes' : 'no',
+					'enabled'                    => 'yes',
+					'testmode'                   => $testmode ? 'yes' : 'no',
 					// These are all read off the raw option without a fallback, and a saved
 					// store always carries them, so the fixture has to as well. The values
 					// are the defaults in KCO_Fields::fields().
-					'allowed_customer_types'  => 'B2C',
-					'logging'                 => 'no',
-					'send_product_urls'       => 'yes',
-					'allow_separate_shipping' => 'no',
+					'allowed_customer_types'     => 'B2C',
+					'logging'                    => 'no',
+					'send_product_urls'          => 'yes',
+					'allow_separate_shipping'    => 'no',
+					"{$prefix}merchant_id"       => 'mid',
+					"{$prefix}shared_secret"     => 'secret',
 				],
-				$credentials,
 				$overrides
 			)
 		);

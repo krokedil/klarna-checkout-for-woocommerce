@@ -33,7 +33,7 @@ class RequestsTest extends IntegrationTestCase {
 	 * @dataProvider provide_endpoint_routing
 	 */
 	public function test_testmode_decides_the_host( bool $testmode, string $expected ): void {
-		$this->haveGatewayCredentials( 'eu', [], $testmode );
+		$this->haveGatewayCredentials( [], $testmode );
 
 		$this->assertSame( $expected, ( new \KCO_Request_Create() )->get_api_url_base() );
 	}
@@ -72,10 +72,10 @@ class RequestsTest extends IntegrationTestCase {
 	/** @return array<string, array{0: array, 1: array}> */
 	public function provide_signing(): array {
 		$both_modes = [
-			'merchant_id_eu'        => 'live-mid',
-			'shared_secret_eu'      => 'live-secret',
-			'test_merchant_id_eu'   => 'test-mid',
-			'test_shared_secret_eu' => 'test-secret',
+			'merchant_id'        => 'live-mid',
+			'shared_secret'      => 'live-secret',
+			'test_merchant_id'   => 'test-mid',
+			'test_shared_secret' => 'test-secret',
 		];
 
 		return [
@@ -230,13 +230,13 @@ class RequestsTest extends IntegrationTestCase {
 
 		switch ( $scenario ) {
 			case 'se-b2b':
-				$this->haveGatewayCredentials( 'eu', [ 'allowed_customer_types' => 'B2B' ] );
+				$this->haveGatewayCredentials( [ 'allowed_customer_types' => 'B2B' ] );
 				$this->flushGatewaySettingsCache();
 				break;
 			case 'us-sales-tax':
 				$this->deleteAllTaxRates();
 				$this->configureUsStore();
-				$this->haveGatewayCredentials( 'us' );
+				$this->haveGatewayCredentials();
 				$this->flushGatewaySettingsCache();
 				$this->haveCustomerAddress( $this->usAddress(), $this->usAddress() );
 				break;

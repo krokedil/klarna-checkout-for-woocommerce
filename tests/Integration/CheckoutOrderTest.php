@@ -147,7 +147,7 @@ class CheckoutOrderTest extends IntegrationTestCase {
 	public function test_a_us_store_sends_sales_tax_as_its_own_line(): void {
 		$this->deleteAllTaxRates();
 		$this->configureUsStore();
-		$this->haveGatewayCredentials( 'us' );
+		$this->haveGatewayCredentials();
 		$this->flushGatewaySettingsCache();
 		$this->haveCustomerAddress( $this->usAddress(), $this->usAddress() );
 		$this->reloadPaymentGateways();

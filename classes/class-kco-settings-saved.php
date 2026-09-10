@@ -9,10 +9,8 @@
  * Class for checking settings on save.
  */
 class KCO_Settings_Saved {
-	const EU_PROD = 'European Production';
-	const EU_TEST = 'European Test';
-	const US_PROD = 'United States Production';
-	const US_TEST = 'United States Test';
+	const PROD = 'Production';
+	const TEST = 'Test';
 
 	/**
 	 * If there was an error detected or not.
@@ -53,48 +51,26 @@ class KCO_Settings_Saved {
 	 */
 	public function check_api_credentials() {
 		// Get settings from KCO.
-		$options = get_option( 'woocommerce_kco_settings' );
+		$options = get_option( 'woocommerce_kco_settings', array() );
 
-		// If not enabled bail.
-		if ( $options && 'yes' !== $options['enabled'] ) {
+		// If not enabled bail, or we have no settings.
+		if ( empty( $options ) || 'yes' !== $options['enabled'] ) {
 			return;
 		}
 
 		if ( 'yes' !== $options['testmode'] ) {
-			// Check EU Production.
-			if ( '' !== $options['merchant_id_eu'] ) {
-				$username = $options['merchant_id_eu'];
-				$password = $options['shared_secret_eu'];
-
-				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, false, 'EU' );
-				$this->process_test_response( $test_response, self::EU_PROD );
-			}
-
-			// Check US Production.
-			if ( '' !== $options['merchant_id_us'] ) {
-				$username = $options['merchant_id_us'];
-				$password = $options['shared_secret_us'];
-
-				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, false, 'US' );
-				$this->process_test_response( $test_response, self::US_PROD );
+			$username = $options['merchant_id'] ?? '';
+			$password = $options['shared_secret'] ?? '';
+			if ( ! empty( $username ) && ! empty( $password ) ) {
+				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, false );
+				$this->process_test_response( $test_response, self::PROD );
 			}
 		} else {
-			// Check EU Test.
-			if ( '' !== $options['test_merchant_id_eu'] ) {
-				$username = $options['test_merchant_id_eu'];
-				$password = $options['test_shared_secret_eu'];
-
-				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true, 'EU' );
-				$this->process_test_response( $test_response, self::EU_TEST );
-			}
-
-			// Check US Test.
-			if ( '' !== $options['test_merchant_id_us'] ) {
-				$username = $options['test_merchant_id_us'];
-				$password = $options['test_shared_secret_us'];
-
-				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true, 'US' );
-				$this->process_test_response( $test_response, self::US_TEST );
+			$username = $options['test_merchant_id'] ?? '';
+			$password = $options['test_shared_secret'] ?? '';
+			if ( ! empty( $username ) && ! empty( $password ) ) {
+				$test_response = ( new KCO_Request_Test_Credentials() )->request( $username, $password, true );
+				$this->process_test_response( $test_response, self::TEST );
 			}
 		}
 
@@ -138,27 +114,26 @@ class KCO_Settings_Saved {
 	 * @return void
 	 */
 	public function check_if_test_credentials_exists() {
-		$options = get_option( 'woocommerce_kco_settings' );
+		$options = get_option( 'woocommerce_kco_settings', array() );
 		// If not enabled bail.
-		if ( 'yes' !== $options['enabled'] ) {
+		if ( empty( $options ) || 'yes' !== $options['enabled'] ) {
 			return;
 		}
+
+		$testmode = $options['testmode'] ?? 'yes';
 		// If testmode is not enabled, bail.
-		if ( ! isset( $options['testmode'] ) || 'yes' !== $options['testmode'] ) {
+		if ( ! wc_string_to_bool( $testmode ) ) {
 			return;
 		}
 
-		// Check if EU credentials are set. If they are, bail.
-		if ( isset( $options['test_merchant_id_eu'], $options['test_shared_secret_eu'] )
-		&& ( ! empty( $options['test_merchant_id_eu'] ) || ! empty( $options['test_shared_secret_eu'] ) ) ) {
+		$test_merchant_id   = $options['test_merchant_id'] ?? '';
+		$test_shared_secret = $options['test_shared_secret'] ?? '';
+
+		// Check if test credentials are set. If they are, bail.
+		if ( ! empty( $test_merchant_id ) && ! empty( $test_shared_secret ) ) {
 			return;
 		}
 
-		// Check if US credentials are set. If they are, bail.
-		if ( isset( $options['test_merchant_id_us'], $options['test_shared_secret_us'] )
-		&& ( ! empty( $options['test_merchant_id_us'] ) || ! empty( $options['test_shared_secret_us'] ) ) ) {
-			return;
-		}
 		$this->message[] = 'It looks like you have test mode active but no test credentials added. Please either turn off test mode or add test credentials.';
 		$this->error     = true;
 	}
