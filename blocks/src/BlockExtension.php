@@ -216,12 +216,33 @@ class BlockExtension {
 	}
 
 	/**
+	 * Checks if the current request may sync the Kustom order.
+	 *
+	 * @return bool
+	 */
+	private function is_checkout_context() {
+		// On a page render, only the checkout page itself may sync.
+		if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+			return is_checkout();
+		}
+
+		// In the Store API, only cart mutations may sync.
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : 'get';
+
+		return 'get' !== strtolower( $method );
+	}
+
+	/**
 	 * Get the address data for the Kustom Checkout block. Also updates the Kustom order if needed.
 	 *
 	 * @return array
 	 * @throws Exception If we can't get the Kustom order.
 	 */
 	public function get_address() {
+		if ( ! $this->is_checkout_context() ) {
+			return array();
+		}
+
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
 		// Only run this if we have a Kustom order id.
