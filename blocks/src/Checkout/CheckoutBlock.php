@@ -110,7 +110,9 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 	 */
 	private function get_data() {
 		$icon_url = plugins_url( 'assets/img/kustom_logo_primary.png', KCO_WC_MAIN_FILE );
-		if ( $this->is_admin() || WC()->cart->is_empty() || ! is_checkout() ) {
+		$cart     = WC()->cart;
+		if ( $this->is_admin() || ! is_checkout() || null === $cart || $cart->is_empty() ) {
+
 			return array(
 				'title'            => $this->get_setting( 'title' ),
 				'description'      => $this->get_setting( 'description' ),
