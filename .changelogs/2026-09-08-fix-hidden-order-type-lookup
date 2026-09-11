@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where push notifications were ignored for orders belonging to a custom order type that is hidden from the customer's order list, leaving authorized payments unconfirmed in WooCommerce.

@@ -24,11 +24,6 @@ class PendingOrdersTest extends IntegrationTestCase {
 		parent::setUp();
 
 		add_filter( 'pre_wp_mail', [ $this, 'recordMail' ], 10, 2 );
-
-		// The legacy post datastore warns about the lookup's meta_query, which WPTestCase fails on. HPOS does not.
-		if ( ! $this->isHposEnabled() ) {
-			$this->setExpectedIncorrectUsage( 'WC_Order_Data_Store_CPT::query' );
-		}
 	}
 
 	/**
@@ -135,12 +130,30 @@ class PendingOrdersTest extends IntegrationTestCase {
 		$this->assertStringContainsString( 'kustom-ref-from-om', $this->sentMail[0]['message'] );
 	}
 
-	private function havePendingGatewayOrder( array $args = [] ): \WC_Order {
-		return $this->haveGatewayOrder( array_merge( [ 'status' => 'on-hold' ], $args ) );
+	/**
+	 * The verdict has to reach an order whose type the customer never sees. The type is
+	 * registered in tests/_mu-plugins/07-kustom-hidden-order-type.php.
+	 */
+	public function test_resolves_an_order_of_a_type_hidden_from_customers(): void {
+		$order = new \KCO_Tests_Hidden_Order();
+		// Needs a real line item: without one needs_processing() is false, payment_complete()
+		// lands on 'completed' rather than 'processing', and that fires the capture.
+		$order->add_product( $this->haveSimpleProduct( [ 'price' => '100.00' ] ), 1 );
+		$order->set_status( 'on-hold' );
+		$order->calculate_totals( true );
+		$this->markAsGatewayOrder( $order, 'kustom-order-hidden-789' );
+
+		// Guards the fixture itself: a plain shop_order here would pass whatever the lookup does.
+		$this->assertNotContains( $order->get_type(), wc_get_order_types( 'view-orders' ) );
+
+		$this->willRetrieveManagedOrder( [ 'fraud_status' => 'ACCEPTED' ] );
+
+		PendingOrders::notification_listener( 'kustom-order-hidden-789' );
+
+		$this->assertSame( 'processing', $this->reload( $order )->get_status() );
 	}
 
-	private function isHposEnabled(): bool {
-		return class_exists( \Automattic\WooCommerce\Utilities\OrderUtil::class )
-			&& \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled();
+	private function havePendingGatewayOrder( array $args = [] ): \WC_Order {
+		return $this->haveGatewayOrder( array_merge( [ 'status' => 'on-hold' ], $args ) );
 	}
 }
