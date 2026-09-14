@@ -12,19 +12,35 @@ use Tests\Support\IntegrationTestCase;
 
 /**
  * The checkout entry point. Which flow handles a purchase, what each one stamps on
- * the order, and what it hands back to WooCommerce.
+ * the order, what it hands back to WooCommerce, and how it reads the shipping
+ * selection it is handed.
  *
  * @covers \Krokedil\KustomCheckout\CheckoutFlow\CheckoutFlow
  * @covers \KCO_Gateway::process_payment
+ * @covers \KCO_Checkout::maybe_register_shipping_error
  */
 class CheckoutTest extends IntegrationTestCase {
 
 	protected ?string $storeProfile = 'se';
 
+	/** The `woocommerce_checkout_process` count from before the shipping fixture raised it. */
+	private ?int $checkoutProcessCount = null;
+
 	protected function setUp(): void {
 		parent::setUp();
 
 		$this->haveCustomerAddress( $this->swedishAddress(), $this->swedishAddress() );
+	}
+
+	protected function tearDown(): void {
+		// did_action() counts never fall, and the assessment's first guard reads this one,
+		// so leaving it raised would arm the guard for every later test in the process.
+		if ( null !== $this->checkoutProcessCount ) {
+			$GLOBALS['wp_actions']['woocommerce_checkout_process'] = $this->checkoutProcessCount;
+			$this->checkoutProcessCount                            = null;
+		}
+
+		parent::tearDown();
 	}
 
 	/**
@@ -224,6 +240,51 @@ class CheckoutTest extends IntegrationTestCase {
 		$this->expectExceptionMessage( 'Invalid order ID.' );
 
 		$this->gateway()->process_payment( 999999999 );
+	}
+
+	/**
+	 * WooCommerce quietly swaps the chosen shipping method when it stops recognising it,
+	 * and the plugin turns that into an error the customer can act on. Kustom Shipping
+	 * Assistant owns the selection itself, so its rate must never be read as a swap.
+	 *
+	 * @dataProvider provide_shipping_selections
+	 */
+	public function test_a_shipping_selection_the_plugin_does_not_own_is_left_alone( string $chosen, string $default ): void {
+		$this->arrangeShippingAssessment();
+
+		$before = did_action( 'kco_checkout_shipping_error' );
+
+		$this->assertSame( $default, apply_filters( 'woocommerce_shipping_chosen_method', $default, [], $chosen ) );
+		$this->assertSame(
+			$before,
+			did_action( 'kco_checkout_shipping_error' ),
+			sprintf( 'A chosen method of "%s" must not register a shipping error.', $chosen )
+		);
+	}
+
+	/** @return array<string, array{0: string, 1: string}> */
+	public function provide_shipping_selections(): array {
+		return [
+			'the shipping assistant rate, carrying its zone instance' => [ 'klarna_kss:1', 'flat_rate:1' ],
+			'the shipping assistant method, carrying none'            => [ 'klarna_kss', 'flat_rate:1' ],
+			'a method WooCommerce did not swap'                       => [ 'flat_rate:1', 'flat_rate:1' ],
+		];
+	}
+
+	/**
+	 * The assessment only runs part way through a Kustom checkout that has the shipping
+	 * options inside the iframe.
+	 */
+	private function arrangeShippingAssessment(): void {
+		$this->haveGatewayCredentials( 'eu', [ 'shipping_methods_in_iframe' => 'yes' ] );
+		$this->flushGatewaySettingsCache();
+
+		WC()->session->set( 'chosen_payment_method', 'kco' );
+
+		// The guard only reads the count, so raise it rather than firing the action and
+		// running whatever a plugin has hooked to it.
+		$this->checkoutProcessCount                            = $GLOBALS['wp_actions']['woocommerce_checkout_process'] ?? 0;
+		$GLOBALS['wp_actions']['woocommerce_checkout_process'] = $this->checkoutProcessCount + 1;
 	}
 
 	private function arrangeFailure( string $scenario ): \WC_Order {
