@@ -470,6 +470,9 @@ class KCO_Subscription {
 
 			// The renewal has its own Kustom order, not the one inherited from the parent.
 			$renewal_order->update_meta_data( '_wc_klarna_order_id', $klarna_order_id );
+
+			// A renewal created before this fix can still carry the parent's capture id, which would skip capturing this charge.
+			$renewal_order->delete_meta_data( '_wc_klarna_capture_id' );
 			$renewal_order->save_meta_data();
 
 			// Complete the order that was charged. WC Subscriptions propagates this to the subscription.

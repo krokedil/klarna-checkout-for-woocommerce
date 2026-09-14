@@ -57,7 +57,6 @@ class SubscriptionsTest extends IntegrationTestCase {
 	 * @dataProvider provide_renewals
 	 */
 	public function test_a_renewal_charges_the_recurring_token( bool $succeeds, string $note ): void {
-		$this->markTestSkipped( 'Potentially broken test, skipping for now.' );
 		$parent = $this->haveGatewayOrder();
 		$parent->update_meta_data( '_kco_recurring_token', 'customer-token-1' );
 		$parent->save();
