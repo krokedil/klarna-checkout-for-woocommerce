@@ -467,16 +467,18 @@ class KCO_Subscription {
 
 			// Translators: Kustom order id.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Kustom. Kustom order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
-			foreach ( $subscriptions as $subscription ) {
-				$subscription->payment_complete( $klarna_order_id );
-			}
+
+			// The renewal has its own Kustom order, not the one inherited from the parent.
+			$renewal_order->update_meta_data( '_wc_klarna_order_id', $klarna_order_id );
+			$renewal_order->save_meta_data();
+
+			// Complete the order that was charged. WC Subscriptions propagates this to the subscription.
+			$renewal_order->payment_complete( $klarna_order_id );
 		} else {
 			$error_message = $create_order_response->get_error_message();
 			// Translators: Error message.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Kustom. Message: %1$s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
-			foreach ( $subscriptions as $related_subscription ) {
-				$related_subscription->payment_failed();
-			}
+			$renewal_order->update_status( 'failed' );
 		}
 	}
 
@@ -495,6 +497,10 @@ class KCO_Subscription {
 		if ( 'kco' !== $subscription->get_payment_method() ) {
 			return $renewal_order;
 		}
+
+		// The Data Copier inherits these from the subscription; they belong to the parent order, not this renewal.
+		$renewal_order->delete_meta_data( '_wc_klarna_order_id' );
+		$renewal_order->delete_meta_data( '_wc_klarna_capture_id' );
 
 		$parent = $subscription->get_parent();
 
