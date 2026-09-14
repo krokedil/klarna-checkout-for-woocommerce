@@ -59,6 +59,8 @@ class SubscriptionsTest extends IntegrationTestCase {
 	public function test_a_renewal_charges_the_recurring_token( bool $succeeds, string $note ): void {
 		$parent = $this->haveGatewayOrder();
 		$parent->update_meta_data( '_kco_recurring_token', 'customer-token-1' );
+		$parent->update_meta_data( '_wc_klarna_order_id', 'parent-kustom-order' );
+		$parent->update_meta_data( '_wc_klarna_capture_id', 'parent-kustom-capture' );
 		$parent->save();
 
 		$subscription = $this->haveSubscriptionFor( $parent );
@@ -69,6 +71,11 @@ class SubscriptionsTest extends IntegrationTestCase {
 			$this->reload( $subscription ),
 			[ 'items' => [ $this->haveSimpleProduct( [ 'price' => '100.00' ] ) ], 'billing' => $this->swedishAddress() ]
 		);
+
+		// What the Data Copier put on renewals created before those keys were excluded.
+		$renewal->update_meta_data( '_wc_klarna_order_id', 'parent-kustom-order' );
+		$renewal->update_meta_data( '_wc_klarna_capture_id', 'parent-kustom-capture' );
+		$renewal->save();
 
 		if ( $succeeds ) {
 			$this->willCreateRecurringOrder( 'customer-token-1', [ 'order_id' => 'kustom-renewal-1' ] );
@@ -86,8 +93,21 @@ class SubscriptionsTest extends IntegrationTestCase {
 		$this->assertStringEndsWith( '/customer-token/v1/tokens/customer-token-1/order', $request['url'] );
 		$this->assertOrderHasNote( $renewal, $note );
 
+		$settled = $this->reload( $renewal );
+
+		// The parent's identifiers must not survive the attempt, whichever way it went.
+		$this->assertNotSame( 'parent-kustom-order', $settled->get_meta( '_wc_klarna_order_id', true ) );
+		$this->assertSame( '', $settled->get_meta( '_wc_klarna_capture_id', true ) );
+
 		if ( $succeeds ) {
-			$this->assertSame( 'kustom-renewal-1', $this->reload( $renewal )->get_meta( '_wc_klarna_order_id', true ) );
+			$this->assertSame( 'kustom-renewal-1', $settled->get_meta( '_wc_klarna_order_id', true ) );
+
+			// The order that was charged is the order that must be settled, not the subscription's newest.
+			$this->assertFalse( $settled->needs_payment(), 'The charged renewal was left unpaid.' );
+			$this->assertNotEmpty( $settled->get_date_paid(), 'The charged renewal has no paid date.' );
+			$this->assertSame( 'kustom-renewal-1', $settled->get_transaction_id() );
+		} else {
+			$this->assertTrue( $settled->has_status( 'failed' ), 'A refused charge must fail the order that was charged.' );
 		}
 	}
 
@@ -145,10 +165,19 @@ class SubscriptionsTest extends IntegrationTestCase {
 
 		$renewal = $this->haveRenewalOrderFor( $this->reload( $subscription ) );
 
+		// The Data Copier does not exclude these, so a fresh renewal arrives carrying the parent's.
+		$renewal->update_meta_data( '_wc_klarna_order_id', 'parent-kustom-order' );
+		$renewal->update_meta_data( '_wc_klarna_capture_id', 'parent-kustom-capture' );
+		$renewal->save();
+
 		$copied = ( new \KCO_Subscription() )->copy_meta_fields_to_renewal_order(
 			$renewal,
 			$this->reload( $subscription )
 		);
+
+		// Identifiers belong to the parent order, not to this renewal.
+		$this->assertSame( '', $copied->get_meta( '_wc_klarna_order_id', true ) );
+		$this->assertSame( '', $copied->get_meta( '_wc_klarna_capture_id', true ) );
 
 		$this->assertSame( 'live', $copied->get_meta( '_wc_klarna_environment', true ) );
 		$this->assertSame( $kss_data, $copied->get_meta( '_kco_kss_data', true ) );
