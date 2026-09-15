@@ -44,9 +44,11 @@ class KCO_Checkout {
 		}
 
 		$fields['billing']['kco_shipping_data'] = array(
-			'type'    => 'hidden',
-			'class'   => array( 'kco_shipping_data' ),
-			'default' => $default,
+			'type'        => 'hidden',
+			'label'       => '',
+			'placeholder' => '',
+			'class'       => array( 'kco_shipping_data' ),
+			'default'     => $default,
 		);
 
 		return $fields;

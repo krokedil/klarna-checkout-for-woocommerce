@@ -22,3 +22,8 @@ trim_trailing_whitespace = false
 trim_trailing_whitespace = false
 indent_style = space
 indent_size = 2
+
+[{.eslintrc,.babelrc,.stylelintrc,tsconfig.json}]
+trim_trailing_whitespace = false
+indent_style = space
+indent_size = 4

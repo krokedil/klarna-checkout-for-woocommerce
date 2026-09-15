@@ -180,10 +180,12 @@ class MetaBox extends OrderMetabox {
 	protected function output_actions_dropdown( $order_id, $klarna_order ) {
 		$settings = $this->order_management->settings->get_settings( $order_id );
 
+		$om_enabled = Settings::is_enabled();
+
 		$actions            = array();
-		$actions['capture'] = ( ! isset( $settings['kom_auto_capture'] ) || 'yes' === $settings['kom_auto_capture'] ) ? false : true;
-		$actions['cancel']  = ( ! isset( $settings['kom_auto_cancel'] ) || 'yes' === $settings['kom_auto_cancel'] ) ? false : true;
-		$actions['sync']    = ( ! isset( $settings['kom_auto_order_sync'] ) || 'yes' === $settings['kom_auto_order_sync'] ) ? false : true;
+		$actions['capture'] = ! $om_enabled || 'yes' !== ( $settings['kom_auto_capture'] ?? 'yes' );
+		$actions['cancel']  = ! $om_enabled || 'yes' !== ( $settings['kom_auto_cancel'] ?? 'yes' );
+		$actions['sync']    = ! $om_enabled || 'yes' !== ( $settings['kom_auto_order_sync'] ?? 'yes' );
 		$actions['any']     = ( $actions['capture'] || $actions['cancel'] || $actions['sync'] );
 
 		ob_start();
