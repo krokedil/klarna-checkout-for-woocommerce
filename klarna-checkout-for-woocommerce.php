@@ -31,6 +31,7 @@
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
+use Krokedil\KustomCheckout\Migrations\CredentialsMigration;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -129,6 +130,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var PickupPoints $pickup_points
 		 */
 		public $pickup_points;
+
+		/**
+		 * Reference to the credentials migration class.
+		 *
+		 * @var CredentialsMigration $credentials_migration
+		 */
+		public $credentials_migration;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -297,6 +305,11 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
 
 			// Set class variables.
+			// A store still on the old per-region settings is consolidated here, before
+			// KCO_Credentials reads them.
+			$this->credentials_migration = new CredentialsMigration();
+			$this->credentials_migration->maybe_migrate();
+
 			$this->credentials      = new KCO_Credentials();
 			$this->merchant_urls    = new KCO_Merchant_URLs();
 			$this->logger           = new KCO_Logger();

@@ -7,9 +7,8 @@ namespace Tests\Integration;
 use Tests\Support\IntegrationTestCase;
 
 /**
- * Which merchant account a request signs itself with. The credential set is derived
- * from the store's base location, not from the shopper: `US` reads the `us` pair and
- * everything else the `eu` one.
+ * Kustom does not differentiate API keys by region, so the gateway signs every
+ * request with the single configured credential pair, chosen only by test/live mode.
  *
  * @covers \KCO_Credentials::get_credentials_from_session
  */
@@ -30,14 +29,10 @@ class CredentialsTest extends IntegrationTestCase {
 	/** @return array<string, array{0: string, 1: array, 2: mixed}> */
 	public function provide_credential_resolution(): array {
 		$both_modes = [
-			'merchant_id_eu'        => 'live-mid-eu',
-			'shared_secret_eu'      => 'live-secret-eu',
-			'test_merchant_id_eu'   => 'test-mid-eu',
-			'test_shared_secret_eu' => 'test-secret-eu',
-			'merchant_id_us'        => 'live-mid-us',
-			'shared_secret_us'      => 'live-secret-us',
-			'test_merchant_id_us'   => 'test-mid-us',
-			'test_shared_secret_us' => 'test-secret-us',
+			'merchant_id'        => 'live-mid',
+			'shared_secret'      => 'live-secret',
+			'test_merchant_id'   => 'test-mid',
+			'test_shared_secret' => 'test-secret',
 		];
 
 		$pair = static fn( string $mid, string $secret ): array => [
@@ -46,22 +41,21 @@ class CredentialsTest extends IntegrationTestCase {
 		];
 
 		return [
-			'test mode signs with the test keys' => [ 'SE', array_merge( [ 'testmode' => 'yes' ], $both_modes ), $pair( 'test-mid-eu', 'test-secret-eu' ) ],
-			'live mode signs with the live keys' => [ 'SE', array_merge( [ 'testmode' => 'no' ], $both_modes ), $pair( 'live-mid-eu', 'live-secret-eu' ) ],
-			'a US store reads the us pair'       => [ 'US', array_merge( [ 'testmode' => 'yes' ], $both_modes ), $pair( 'test-mid-us', 'test-secret-us' ) ],
-			// Every non-US base country resolves to the same 'eu' credential set.
-			'a German store still reads eu'      => [ 'DE', array_merge( [ 'testmode' => 'yes' ], $both_modes ), $pair( 'test-mid-eu', 'test-secret-eu' ) ],
-			'testmode defaults to live keys'     => [ 'SE', $both_modes, $pair( 'live-mid-eu', 'live-secret-eu' ) ],
+			'test mode signs with the test keys' => [ 'SE', array_merge( [ 'testmode' => 'yes' ], $both_modes ), $pair( 'test-mid', 'test-secret' ) ],
+			'live mode signs with the live keys' => [ 'SE', array_merge( [ 'testmode' => 'no' ], $both_modes ), $pair( 'live-mid', 'live-secret' ) ],
+			// The credential set does not depend on the store's base country.
+			'a US store reads the same pair'     => [ 'US', array_merge( [ 'testmode' => 'yes' ], $both_modes ), $pair( 'test-mid', 'test-secret' ) ],
+			'testmode defaults to live keys'     => [ 'SE', $both_modes, $pair( 'live-mid', 'live-secret' ) ],
 			'no credentials at all'              => [ 'SE', [ 'testmode' => 'yes' ], false ],
-			'a half-filled pair is refused'      => [ 'SE', [ 'testmode' => 'yes', 'test_merchant_id_eu' => 'mid-eu' ], false ],
+			'a half-filled pair is refused'      => [ 'SE', [ 'testmode' => 'yes', 'test_merchant_id' => 'mid' ], false ],
 			// WooCommerce settings sanitisation HTML-encodes ampersands and quotes.
-			'an HTML-encoded secret is decoded'  => [ 'SE', [ 'testmode' => 'yes', 'test_merchant_id_eu' => 'mid-eu', 'test_shared_secret_eu' => 'a&amp;b&quot;c' ], $pair( 'mid-eu', 'a&b"c' ) ],
+			'an HTML-encoded secret is decoded'  => [ 'SE', [ 'testmode' => 'yes', 'test_merchant_id' => 'mid', 'test_shared_secret' => 'a&amp;b&quot;c' ], $pair( 'mid', 'a&b"c' ) ],
 		];
 	}
 
 	public function test_the_resolved_credentials_can_be_replaced_by_filter(): void {
 		$this->configureStore( [ 'country' => 'SE', 'currency' => 'SEK', 'calc_taxes' => false ] );
-		$this->haveGatewayCredentials( 'eu' );
+		$this->haveGatewayCredentials();
 
 		add_filter(
 			'kco_wc_credentials_from_session',

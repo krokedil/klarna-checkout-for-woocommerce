@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Simplified the Kustom API credential settings into a single set of fields instead of separate Europe and United States entries.
