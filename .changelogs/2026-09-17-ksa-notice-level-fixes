@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed three PHP notices in the Kustom Shipping Assistant: a failed order lookup in the shipping option update callback no longer reads an array offset off a boolean, free orders fall back to the billing address when Kustom omits a shipping phone or email, and the cart shipping template no longer indexes an unset chosen shipping method.
