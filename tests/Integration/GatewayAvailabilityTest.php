@@ -21,7 +21,7 @@ class GatewayAvailabilityTest extends IntegrationTestCase {
 	 * @dataProvider provide_availability
 	 */
 	public function test_whether_the_gateway_offers_itself( array $overrides, bool $on_checkout, bool $expected ): void {
-		$this->haveGatewayCredentials( 'eu', $overrides );
+		$this->haveGatewayCredentials( $overrides );
 
 		if ( $on_checkout ) {
 			$this->simulateCheckoutPage();
@@ -36,8 +36,8 @@ class GatewayAvailabilityTest extends IntegrationTestCase {
 	/** @return array<string, array{0: array, 1: bool, 2: bool}> */
 	public function provide_availability(): array {
 		$blank_credentials = [
-			'test_merchant_id_eu'   => '',
-			'test_shared_secret_eu' => '',
+			'test_merchant_id'   => '',
+			'test_shared_secret' => '',
 		];
 
 		return [
@@ -47,19 +47,6 @@ class GatewayAvailabilityTest extends IntegrationTestCase {
 			'no credentials, on the checkout page'    => [ $blank_credentials, true, false ],
 			'no credentials, away from the checkout'  => [ $blank_credentials, false, true ],
 		];
-	}
-
-	/**
-	 * A store whose base country has no credential set cannot serve the checkout.
-	 */
-	public function test_a_store_without_a_credential_set_for_its_country_is_unavailable(): void {
-		$this->configureStore( [ 'country' => 'US:CA', 'currency' => 'USD', 'calc_taxes' => false ] );
-
-		// Only the EU pair is configured, and a US store reads the 'us' one.
-		$this->haveGatewayCredentials( 'eu' );
-		$this->simulateCheckoutPage();
-
-		$this->assertFalse( $this->gateway()->is_available() );
 	}
 
 	/**
@@ -101,7 +88,7 @@ class GatewayAvailabilityTest extends IntegrationTestCase {
 	 * match orders on.
 	 */
 	public function test_the_gateway_is_registered_under_its_own_id(): void {
-		$this->haveGatewayCredentials( 'eu' );
+		$this->haveGatewayCredentials();
 		$this->reloadPaymentGateways();
 
 		$this->assertArrayHasKey( 'kco', WC()->payment_gateways()->payment_gateways() );

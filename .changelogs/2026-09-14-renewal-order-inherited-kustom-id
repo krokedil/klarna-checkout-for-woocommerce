@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where renewal orders inherited the parent order's Kustom order ID, causing an unpaid renewal order to appear connected to the parent's Kustom order in the Kustom Order Management box.

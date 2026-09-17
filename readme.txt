@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 9.7.0
-WC tested up to: 11.0.1
-Stable tag: 2.20.10
+WC tested up to: 11.1.0
+Stable tag: 2.21.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,17 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-09-15    - version 2.21.0 =
+* Feature       - Added an "Enable order management" setting. When disabled, WooCommerce no longer activates, cancels, updates or credits Kustom orders, and refunds can only be registered in WooCommerce with "Refund manually". The manual actions on individual orders are still available.
+* Feature       - Simplified the Kustom API credential settings into a single set of fields instead of separate Europe and United States entries.
+* Fix           - Fixed the PHP warning "undefined array key 'label'" that could appear on the checkout page for plugins that read checkout field labels, such as the Astra Pro add-on.
+* Fix           - Fixed an issue where a Kustom refund could be registered with Kustom but then discarded by WooCommerce when another Klarna plugin also handled order management.
+* Fix           - Fixed an issue where push notifications were ignored for orders belonging to a custom order type that is hidden from the customer's order list, leaving authorized payments unconfirmed in WooCommerce.
+* Fix           - Fixed the PHP warning "undefined array key 'shipping_countries'" that appeared on every completed checkout in stores with shipping disabled.
+
+= 2026-08-25    - version 2.20.11 =
+* Fix           - Fixed a fatal error that could occur in the WordPress admin when creating or editing posts.
+
 = 2026-08-24    - version 2.20.10 =
 * Tweak         - The authorization header is now redacted from the log created for requests when logging is enabled.
 * Fix           - Fixed a fatal error that could occur when sending order lines to Kustom for an order containing a product that has since beendeleted from the store.

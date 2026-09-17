@@ -20,6 +20,12 @@ trait CanDriveE2EOrderManagement {
 	/** The order management metabox, which is only on the screen once the order page has rendered. */
 	private const KOM_METABOX = '#kustom-om';
 
+	/** The gateway's status inside the metabox. */
+	private const KOM_STATUS = '//div[@id="kustom-om"]//h4[contains(.,"Kustom order status")]/following-sibling::span[1]';
+
+	/** The marker a save leaves on the document it is about to navigate away from. */
+	private const KOM_LEAVING = 'komLeavingOrderScreen';
+
 	/** How long a save that talks to the gateway may take, in seconds. */
 	private const KOM_SAVE_TIMEOUT = 90;
 
@@ -52,11 +58,11 @@ trait CanDriveE2EOrderManagement {
 
 	/** The gateway's own status for the order, as the metabox just read it back. */
 	public function seeGatewayOrderStatusIs( string $status ): void {
-		$actual = trim(
-			(string) $this->grabTextFrom(
-				'//div[@id="kustom-om"]//h4[contains(.,"Kustom order status")]/following-sibling::span[1]'
-			)
-		);
+		// Waited for rather than read outright: the status is one live GET of the gateway's
+		// order, so the metabox can be on the screen a moment before the status is.
+		$this->waitForElement( self::KOM_STATUS, self::KOM_SAVE_TIMEOUT );
+
+		$actual = trim( (string) $this->grabTextFrom( self::KOM_STATUS ) );
 
 		Assert::assertSame( $status, $actual, "The gateway says the order is '{$actual}', expected '{$status}'." );
 	}
@@ -237,14 +243,52 @@ trait CanDriveE2EOrderManagement {
 		// Out from under the admin bar, which otherwise swallows the click.
 		$this->scrollTo( 'button.save_order', 0, -120 );
 
-		$this->waitOutOrderScreen( fn () => $this->click( 'button.save_order' ) );
+		// Marks the document being left. The metabox is on the screen before the save as well
+		// as after it, so waiting for it cannot tell the two apart, and the click returns as
+		// soon as the form is submitted - before the POST has even been sent. Without this
+		// every read that follows races the reload: the notes are read before WordPress has
+		// written them, and the metabox is read in the instant the new document replaces it.
+		$this->executeJS( 'window.' . self::KOM_LEAVING . ' = true;' );
+
+		try {
+			$this->click( 'button.save_order' );
+		} catch ( WebDriverException $e ) {
+			$this->comment( 'kom: the save outran the page load timeout, waiting it out anyway' );
+		}
+
+		$this->waitForOrderScreenReload();
+		$this->waitForElement( self::KOM_METABOX, self::KOM_SAVE_TIMEOUT );
+	}
+
+	/**
+	 * Waits until the browser is on the document the save loaded, which is the marker set
+	 * before the click being gone: a fresh document has a fresh window. Polled rather than
+	 * waited on with waitForJS(), since a command that lands in the unload window belongs to
+	 * neither document and errors instead of answering.
+	 */
+	private function waitForOrderScreenReload(): void {
+		$deadline = microtime( true ) + self::KOM_SAVE_TIMEOUT;
+
+		while ( microtime( true ) < $deadline ) {
+			try {
+				if ( $this->executeJS( 'return window.' . self::KOM_LEAVING . ' === undefined;' ) ) {
+					return;
+				}
+			} catch ( WebDriverException $e ) {
+				// Asked mid-navigation; the next poll reads the document that replaced it.
+			}
+
+			$this->wait( 0.25 );
+		}
+
+		Assert::fail( 'The order screen never reloaded after the save was submitted.' );
 	}
 
 	/**
 	 * Loads an order screen and waits for the metabox, tolerating a page load that outruns
-	 * the driver's budget: saving one is an API round trip before the response even
-	 * starts, and a capture spends ~30s of it. The driver stops the load when it gives up,
-	 * which leaves the screen it had already rendered, so the metabox is the real signal.
+	 * the driver's budget: opening one is an API round trip before the response even starts.
+	 * The driver stops the load when it gives up, which leaves the screen it had already
+	 * rendered, so the metabox is the real signal.
 	 */
 	private function waitOutOrderScreen( callable $navigate ): void {
 		try {

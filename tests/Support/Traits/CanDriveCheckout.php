@@ -18,41 +18,52 @@ trait CanDriveCheckout {
 	 * update reads that answer back field by field, so the canned body carries every
 	 * key `KCO_Request_Create` sends.
 	 */
-	protected function willCreateOrder( array $overrides = [] ): void {
+	protected function willCreateOrder( array $overrides = [], array $omit = [] ): void {
 		$this->willRespondWith(
-			array_merge(
-				[
-					'order_id'           => 'checkout-order-123',
-					'status'             => 'checkout_incomplete',
-					'purchase_country'   => 'SE',
-					'purchase_currency'  => 'SEK',
-					'locale'             => 'sv-SE',
-					'html_snippet'       => '<div id="checkout-snippet"></div>',
-					'merchant_urls'      => $this->kustomMerchantUrls(),
-					'billing_countries'  => [ 'SE' ],
-					'shipping_countries' => [ 'SE' ],
-					'merchant_data'      => '',
-					'options'            => [],
-					'order_amount'       => 12500,
-					'order_tax_amount'   => 2500,
-					'order_lines'        => [
-						[
-							'type'             => 'physical',
-							'reference'        => 'kustom-test-product',
-							'name'             => 'Kustom test product',
-							'quantity'         => 1,
-							'unit_price'       => 12500,
-							'tax_rate'         => 2500,
-							'total_amount'     => 12500,
-							'total_tax_amount' => 2500,
-						],
-					],
-				],
-				$overrides
-			),
+			$this->kustomRetrievedOrder( $overrides, $omit ),
 			200,
 			'/checkout/v3/orders'
 		);
+	}
+
+	/**
+	 * The order Kustom answers with, carrying every key `KCO_Request_Create` sends.
+	 * $omit drops keys outright, which `$overrides` cannot: Kustom omits optional
+	 * fields it has no value for, and a key set to null is a different case.
+	 */
+	protected function kustomRetrievedOrder( array $overrides = [], array $omit = [] ): array {
+		$order = array_merge(
+			[
+				'order_id'           => 'checkout-order-123',
+				'status'             => 'checkout_incomplete',
+				'purchase_country'   => 'SE',
+				'purchase_currency'  => 'SEK',
+				'locale'             => 'sv-SE',
+				'html_snippet'       => '<div id="checkout-snippet"></div>',
+				'merchant_urls'      => $this->kustomMerchantUrls(),
+				'billing_countries'  => [ 'SE' ],
+				'shipping_countries' => [ 'SE' ],
+				'merchant_data'      => '',
+				'options'            => [],
+				'order_amount'       => 12500,
+				'order_tax_amount'   => 2500,
+				'order_lines'        => [
+					[
+						'type'             => 'physical',
+						'reference'        => 'kustom-test-product',
+						'name'             => 'Kustom test product',
+						'quantity'         => 1,
+						'unit_price'       => 12500,
+						'tax_rate'         => 2500,
+						'total_amount'     => 12500,
+						'total_tax_amount' => 2500,
+					],
+				],
+			],
+			$overrides
+		);
+
+		return array_diff_key( $order, array_flip( $omit ) );
 	}
 
 	/**
@@ -71,14 +82,15 @@ trait CanDriveCheckout {
 	}
 
 	/** Queues a successful order read-back, which every confirmation path starts with. */
-	protected function willRetrieveOrder( array $overrides = [] ): void {
+	protected function willRetrieveOrder( array $overrides = [], array $omit = [] ): void {
 		$this->willCreateOrder(
 			array_merge(
 				[
 					'status' => 'checkout_complete',
 				],
 				$overrides
-			)
+			),
+			$omit
 		);
 	}
 

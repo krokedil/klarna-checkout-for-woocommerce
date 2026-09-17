@@ -22,8 +22,13 @@
     },
     "overrides": [
         {
-            "files": ["*.ts", "*.tsx"],
-            "rules": {"jsdoc/no-undefined-types": "off"}
+            "files": [
+                "*.ts",
+                "*.tsx"
+            ],
+            "rules": {
+                "jsdoc/no-undefined-types": "off"
+            }
         }
     ],
     "ignorePatterns": [
@@ -32,6 +37,7 @@
         "vendor/",
         "assets/",
         "gulpfile.js",
-        "webpack.config.js"
+        "webpack.config.js",
+        "tests/"
     ]
 }
