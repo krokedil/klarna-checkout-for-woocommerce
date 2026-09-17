@@ -2,6 +2,7 @@
 namespace Krokedil\KustomCheckout\OrderManagement\Request;
 
 use Krokedil\KustomCheckout\OrderManagement;
+use Krokedil\KustomCheckout\Utility\OrderUtility;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -189,7 +190,7 @@ abstract class Request {
 	protected function calculate_auth() {
 		$order = wc_get_order( $this->order_id );
 
-		if ( ! $order || 'kco' !== $order->get_payment_method() ) {
+		if ( ! OrderUtility::is_kustom_order( $order ) ) {
 			return new \WP_Error( 'wrong_gateway', 'This order was not created via Kustom Checkout for WooCommerce.' );
 		}
 

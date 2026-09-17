@@ -18,6 +18,7 @@ use Krokedil\KustomCheckout\OrderManagement\Request\Post\RequestPostCancel;
 use Krokedil\KustomCheckout\OrderManagement\MetaBox;
 use Krokedil\KustomCheckout\OrderManagement\Ajax;
 use Krokedil\KustomCheckout\OrderManagement\PendingOrders;
+use Krokedil\KustomCheckout\Utility\OrderUtility;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Support\SystemReport;
 
 /**
@@ -141,7 +142,7 @@ class OrderManagement {
 			return;
 		}
 
-		if ( 'kco' !== $order->get_payment_method() ) {
+		if ( ! OrderUtility::is_kustom_order( $order ) ) {
 			return;
 		}
 
@@ -216,7 +217,7 @@ class OrderManagement {
 			$order = wc_get_order( $order_id );
 
 			// If the order was not paid using the plugin that instanced this class, bail.
-			if ( 'kco' !== $order->get_payment_method() ) {
+			if ( ! OrderUtility::is_kustom_order( $order ) ) {
 				return;
 			}
 
@@ -517,7 +518,7 @@ class OrderManagement {
 		$order = wc_get_order( $order_id );
 
 		// If the order was not paid using Kustom Checkout, return the original result.
-		if ( 'kco' !== $order->get_payment_method() ) {
+		if ( ! OrderUtility::is_kustom_order( $order ) ) {
 			return $result;
 		}
 
@@ -531,8 +532,9 @@ class OrderManagement {
 			return new \WP_Error( 'order_sync_off', 'Order management is disabled' );
 		}
 
-		// Do nothing if Kustom order is not captured.
-		if ( ! $order->get_meta( '_wc_klarna_capture_id', true ) ) {
+		// Do nothing if Kustom order is not captured. An in-person payment is captured
+		// by Kustom at the tap, so it has no capture of ours; its status is checked below.
+		if ( ! $order->get_meta( '_wc_klarna_capture_id', true ) && ! OrderUtility::is_in_person_order( $order ) ) {
 			$order->add_order_note( __( 'Kustom order has not been captured and cannot be refunded.', 'klarna-checkout-for-woocommerce' ) );
 			$order->save();
 
