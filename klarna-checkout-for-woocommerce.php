@@ -33,6 +33,7 @@ use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\Migrations\CredentialsMigration;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
+use Krokedil\KustomCheckout\ShippingAssistant\ShippingAssistant;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -130,6 +131,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var PickupPoints $pickup_points
 		 */
 		public $pickup_points;
+
+		/**
+		 * Reference to shipping assistant class.
+		 *
+		 * @var ShippingAssistant $shipping_assistant
+		 */
+		public $shipping_assistant;
 
 		/**
 		 * Reference to the credentials migration class.
@@ -310,18 +318,19 @@ if ( ! class_exists( 'KCO' ) ) {
 			$this->credentials_migration = new CredentialsMigration();
 			$this->credentials_migration->maybe_migrate();
 
-			$this->credentials      = new KCO_Credentials();
-			$this->merchant_urls    = new KCO_Merchant_URLs();
-			$this->logger           = new KCO_Logger();
-			$this->api              = new KCO_API();
-			$this->krokedil         = new KrokedilWooCommerce(
+			$this->credentials        = new KCO_Credentials();
+			$this->merchant_urls      = new KCO_Merchant_URLs();
+			$this->logger             = new KCO_Logger();
+			$this->api                = new KCO_API();
+			$this->krokedil           = new KrokedilWooCommerce(
 				array(
 					'slug'         => 'kco',
 					'price_format' => 'minor',
 				)
 			);
-			$this->order_management = new OrderManagement();
-			$this->pickup_points    = new PickupPoints();
+			$this->order_management   = new OrderManagement();
+			$this->pickup_points      = new PickupPoints();
+			$this->shipping_assistant = new ShippingAssistant();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );

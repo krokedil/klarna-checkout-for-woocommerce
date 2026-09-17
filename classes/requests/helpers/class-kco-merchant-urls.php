@@ -111,21 +111,6 @@ class KCO_Merchant_URLs {
 	}
 
 	/**
-	 * Shipping option update URL.
-	 *
-	 * URL for shipping option update, must be https.
-	 *
-	 * @return string
-	 */
-	private function get_shipping_option_update_url() {
-
-		$shipping_option_update_url = home_url( '/wc-api/KCO_WC_Shipping_Option_Update/' );
-		$shipping_option_update_url = str_replace( 'http:', 'https:', $shipping_option_update_url );
-
-		return apply_filters( 'kco_wc_shipping_option_update_url', $shipping_option_update_url );
-	}
-
-	/**
 	 * Address update URL.
 	 *
 	 * URL for shipping, tax and purchase currency updates. Will be called on address changes, must be https.
