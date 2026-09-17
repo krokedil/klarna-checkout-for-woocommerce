@@ -92,6 +92,8 @@ class ShippingOptionUpdateController extends BaseController {
 				throw new \Exception( 'Selected shipping option not provided' );
 			}
 
+			KCO_WC()->logger->log( '[KSA Callback] shipping option response body for kco_id ' . $kco_id . ': ' . json_encode( $this->get_response_body( $body, $kco_id ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Kept as ported from standalone KSA.
+
 			// Return the response body.
 			return $this->success_response( $this->get_response_body( $body, $kco_id ) );
 		} catch ( \Exception $e ) {
