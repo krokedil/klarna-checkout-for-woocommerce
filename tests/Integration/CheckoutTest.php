@@ -51,7 +51,7 @@ class CheckoutTest extends IntegrationTestCase {
 	 */
 	public function test_the_flow_setting_picks_the_handler( string $flow, string $expected ): void {
 		$this->haveRedirectFlowEnabled();
-		$this->haveGatewayCredentials( 'eu', [ 'checkout_flow' => $flow ] );
+		$this->haveGatewayCredentials( [ 'checkout_flow' => $flow ] );
 		$this->flushGatewaySettingsCache();
 
 		$this->assertInstanceOf( $expected, CheckoutFlow::get_handler() );
@@ -68,7 +68,7 @@ class CheckoutTest extends IntegrationTestCase {
 
 	public function test_the_block_checkout_overrides_the_flow_setting(): void {
 		$this->haveRedirectFlowEnabled();
-		$this->haveGatewayCredentials( 'eu', [ 'checkout_flow' => 'redirect' ] );
+		$this->haveGatewayCredentials( [ 'checkout_flow' => 'redirect' ] );
 		$this->flushGatewaySettingsCache();
 
 		// The handler is picked off the checkout page's own content, not a setting.
@@ -234,7 +234,7 @@ class CheckoutTest extends IntegrationTestCase {
 
 	/** An order id nothing resolves must not be processed as if it were an order. */
 	public function test_an_order_id_that_does_not_resolve_is_refused(): void {
-		$this->haveGatewayCredentials( 'eu' );
+		$this->haveGatewayCredentials();
 		$this->flushGatewaySettingsCache();
 
 		$this->expectExceptionMessage( 'Invalid order ID.' );
@@ -289,7 +289,7 @@ class CheckoutTest extends IntegrationTestCase {
 
 	private function arrangeFailure( string $scenario ): \WC_Order {
 		$this->haveRedirectFlowEnabled();
-		$this->haveGatewayCredentials( 'eu', [ 'checkout_flow' => 'redirect' ] );
+		$this->haveGatewayCredentials( [ 'checkout_flow' => 'redirect' ] );
 		$this->flushGatewaySettingsCache();
 
 		if ( 'redirect-no-hpp' === $scenario ) {
@@ -307,7 +307,7 @@ class CheckoutTest extends IntegrationTestCase {
 	 */
 	private function arrangeFlow( string $flow, bool $testmode = true, array $klarna_order = [] ): void {
 		$this->haveRedirectFlowEnabled();
-		$this->haveGatewayCredentials( 'eu', [ 'checkout_flow' => $flow ], $testmode );
+		$this->haveGatewayCredentials( [ 'checkout_flow' => $flow ], $testmode );
 		$this->flushGatewaySettingsCache();
 		$this->simulateCheckoutPage();
 

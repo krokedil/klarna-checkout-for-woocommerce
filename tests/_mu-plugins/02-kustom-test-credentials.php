@@ -23,8 +23,8 @@ if (! defined('ABSPATH')) {
 /**
  * The credentials to overlay, keyed by setting name, read from env at call time.
  *
- * The gateway resolves its credential set from the store's base country: `US` reads the
- * `us` pair, everything else the `eu` one.
+ * The gateway reads a single `test_merchant_id` / `test_shared_secret` pair; the EU
+ * env vars are tried first, with the US ones as a fallback.
  *
  * @return array<string, string>
  */
@@ -35,20 +35,20 @@ function kco_tests_injected_credentials(): array
         'us' => ['mid' => 'KUSTOM_TEST_MID_US', 'secret' => 'KUSTOM_TEST_SECRET_US'],
     ];
 
-    $credentials = [];
-
-    foreach ($regions as $region => $env) {
+    foreach ($regions as $env) {
         $mid    = getenv($env['mid']);
         $secret = getenv($env['secret']);
         if (is_string($mid) && $mid !== '' && is_string($secret) && $secret !== '') {
             // testmode is forced on by the read filter, and that is the half of the
             // option the gateway reads.
-            $credentials['test_merchant_id_' . $region]   = $mid;
-            $credentials['test_shared_secret_' . $region] = $secret;
+            return [
+                'test_merchant_id'   => $mid,
+                'test_shared_secret' => $secret,
+            ];
         }
     }
 
-    return $credentials;
+    return [];
 }
 
 add_filter('option_woocommerce_kco_settings', static function ($settings) {
@@ -73,8 +73,8 @@ add_filter('option_woocommerce_kco_settings', static function ($settings) {
  * Strips the injected credentials back out on the way to the database.
  *
  * Matches on the value rather than the setting name, so a secret that some code path
- * copied into a different key (the live `merchant_id_*` / `shared_secret_*` pair, say)
- * is caught too. Runs last so it sees whatever every other filter settled on.
+ * copied into a different key (the live `merchant_id` / `shared_secret` pair, say) is
+ * caught too. Runs last so it sees whatever every other filter settled on.
  *
  * `update_option()` applies this before its add_option() fallback, so a missing option
  * row is covered by the same filter.

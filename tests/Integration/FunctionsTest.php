@@ -113,6 +113,24 @@ class FunctionsTest extends IntegrationTestCase {
 	}
 
 	/**
+	 * A type a site hides from the customer's order list is still ours to find by our
+	 * own meta: the lookup must not inherit wc_get_orders()'s customer-visibility
+	 * default. The type is registered in tests/_mu-plugins/07-kustom-hidden-order-type.php.
+	 */
+	public function test_finds_an_order_of_a_type_hidden_from_customers(): void {
+		$order = new \KCO_Tests_Hidden_Order();
+		$this->markAsGatewayOrder( $order, 'kustom-order-hidden-456' );
+
+		// Guards the fixture itself: a plain shop_order here would pass whatever the lookup does.
+		$this->assertNotContains( $order->get_type(), wc_get_order_types( 'view-orders' ) );
+
+		$found = kco_get_order_by_klarna_id( 'kustom-order-hidden-456' );
+
+		$this->assertNotEmpty( $found );
+		$this->assertSame( $order->get_id(), $found->get_id() );
+	}
+
+	/**
 	 * The order total guard. A mismatch is a shipped order nobody paid for, so it
 	 * stops the confirmation and parks the order for a human.
 	 *

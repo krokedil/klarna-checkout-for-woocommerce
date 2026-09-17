@@ -102,17 +102,6 @@ abstract class Request {
 	}
 
 	/**
-	 * Get the country code for the underlaying order.
-	 *
-	 * @return string
-	 */
-	protected function get_klarna_country() {
-		$order   = wc_get_order( $this->order_id );
-		$country = $order->get_meta( '_wc_klarna_country', true );
-		return $country ? $country : '';
-	}
-
-	/**
 	 * Get the API base URL.
 	 *
 	 * @return string
@@ -230,15 +219,8 @@ abstract class Request {
 			return '';
 		}
 
-		$prefix  = $this->use_playground() ? 'test_' : '';
-		$country = $this->get_klarna_country();
-		if ( 'US' === $country ) {
-				$country_string = 'us';
-		} else {
-			$country_string = 'eu';
-		}
-
-		$key = "{$prefix}{$component_name}_{$country_string}";
+		$prefix = $this->use_playground() ? 'test_' : '';
+		$key    = "{$prefix}{$component_name}";
 
 		if ( key_exists( $key, $options ) ) {
 			return $options[ $key ];
