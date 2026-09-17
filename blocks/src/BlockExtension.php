@@ -3,6 +3,9 @@ namespace Krokedil\KustomCheckout\Blocks;
 
 use Krokedil\KustomCheckout\Blocks\Api\Registry;
 use Krokedil\KustomCheckout\Blocks\Checkout\CheckoutBlock;
+use Krokedil\KustomCheckout\Blocks\InPersonPayments\BlockCheckout as InPersonBlockCheckout;
+use Krokedil\KustomCheckout\Blocks\InPersonPayments\CheckoutBlock as InPersonCheckoutBlock;
+use Krokedil\KustomCheckout\InPersonPayments\InPersonPayments;
 use Krokedil\KustomCheckout\Blocks\Schema\AddressSchema;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Automattic\WooCommerce\StoreApi\Schemas\V1\CartSchema;
@@ -63,6 +66,7 @@ class BlockExtension {
 				}
 				$this->overrides    = new Overrides();
 				$this->api_registry = new Registry();
+				new InPersonBlockCheckout();
 			},
 			5
 		);
@@ -119,6 +123,10 @@ class BlockExtension {
 
 				kco_update_wc_shipping( $data );
 				break;
+			case 'ipp_selected':
+			case 'ipp_deselected':
+				InPersonBlockCheckout::choose( 'ipp_selected' === $data['action'] );
+				break;
 			case 'load':
 				// No action needed here for now. We just want to trigger an update of the WooCommerce cart.
 				break;
@@ -143,6 +151,10 @@ class BlockExtension {
 				'woocommerce_blocks_payment_method_type_registration',
 				function ( $payment_method_registry ) {
 					$payment_method_registry->register( new CheckoutBlock() );
+
+					if ( InPersonPayments::is_enabled() ) {
+						$payment_method_registry->register( new InPersonCheckoutBlock() );
+					}
 				}
 			);
 		}
