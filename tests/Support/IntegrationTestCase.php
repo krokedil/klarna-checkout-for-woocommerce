@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
+use Krokedil\KustomCheckout\InPersonPayments\Devices;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Qameta\Allure\Allure;
 use Tests\Support\Reporting\Redactor;
@@ -142,6 +143,8 @@ abstract class IntegrationTestCase extends WPTestCase {
 		delete_option( 'kom_settings' );
 		$this->resetGatewaySession();
 		$this->resetFakeSubscriptions();
+
+		Devices::flush();
 	}
 
 	/**
