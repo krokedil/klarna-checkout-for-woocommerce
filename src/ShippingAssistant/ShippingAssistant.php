@@ -30,6 +30,13 @@ class ShippingAssistant {
 	protected $api_registry;
 
 	/**
+	 * The service that decides whether WooCommerce's shipping address gate applies. Only set when the module is enabled.
+	 *
+	 * @var ShippingCostRequiresAddress|null
+	 */
+	private $shipping_cost_requires_address;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -87,7 +94,22 @@ class ShippingAssistant {
 		new Checkout();
 		new MerchantUrls();
 
+		$this->shipping_cost_requires_address = new ShippingCostRequiresAddress();
+		add_filter( 'option_woocommerce_shipping_cost_requires_address', array( $this->shipping_cost_requires_address, 'maybe_disable' ) );
+
 		$this->api_registry = new ApiRegistry();
+	}
+
+	/**
+	 * Get the instance of the shipping cost requires address service.
+	 *
+	 * Exposed so the filter above can be removed with remove_filter() without
+	 * having to drop every other callback on the option.
+	 *
+	 * @return ShippingCostRequiresAddress|null
+	 */
+	public function shipping_cost_requires_address() {
+		return $this->shipping_cost_requires_address;
 	}
 
 	/**

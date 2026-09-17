@@ -83,7 +83,7 @@ class ShippingMethod extends \WC_Shipping_Method {
 		$label           = 'Kustom Shipping Assistant';
 		$cost            = 0;
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
-		$shipping_data   = get_transient( 'kss_data_' . $klarna_order_id );
+		$shipping_data   = empty( $klarna_order_id ) ? false : get_transient( 'kss_data_' . $klarna_order_id );
 		$rate            = array();
 
 		if ( ! empty( $shipping_data ) ) {
