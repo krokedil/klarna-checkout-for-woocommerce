@@ -32,6 +32,7 @@ use Krokedil\KustomCheckout\Blocks\BlockExtension;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\Migrations\CredentialsMigration;
+use Krokedil\KustomCheckout\InPersonPayments\InPersonPayments;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -123,6 +124,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var OrderManagement $order_management
 		 */
 		public $order_management;
+
+		/**
+		 * Reference to in-person payments class.
+		 *
+		 * @var InPersonPayments $in_person_payments
+		 */
+		public $in_person_payments;
 
 		/**
 		 * Reference to pickup points class.
@@ -322,6 +330,8 @@ if ( ! class_exists( 'KCO' ) ) {
 			);
 			$this->order_management = new OrderManagement();
 			$this->pickup_points    = new PickupPoints();
+
+			$this->in_person_payments = new InPersonPayments();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
