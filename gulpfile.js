@@ -10,12 +10,16 @@ var wpPot = require('gulp-wp-pot');
 
 var cssFiles = [
 	'assets/css/klarna-checkout-for-woocommerce.css',
-	'src/OrderManagement/assets/css/klarna-order-management.css'
+	'src/OrderManagement/assets/css/klarna-order-management.css',
+	'src/InPersonPayments/assets/css/kustom-ipp-admin.css',
+	'src/InPersonPayments/assets/css/kustom-ipp-checkout.css'
 ];
 var jsFiles = [
 	'assets/js/klarna-checkout-for-woocommerce.js',
 	'assets/js/klarna-checkout-for-woocommerce-admin.js',
-	'src/OrderManagement/assets/js/klarna-order-management.js'
+	'src/OrderManagement/assets/js/klarna-order-management.js',
+	'src/InPersonPayments/assets/js/kustom-ipp-admin.js',
+	'src/InPersonPayments/assets/js/kustom-ipp-checkout.js'
 ];
 var translateFiles = [
 	'**/*.php',

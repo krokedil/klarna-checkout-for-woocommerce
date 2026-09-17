@@ -5,6 +5,8 @@
  * @package Klarna_Checkout/Classes
  */
 
+use Krokedil\KustomCheckout\InPersonPayments\Settings\Fields as IppFields;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -366,6 +368,26 @@ class KCO_Fields {
 			}
 			$settings = $new_settings;
 		}
+
+		$settings = self::insert_after( $settings, 'checkout_section_end', IppFields::fields() );
+
 		return apply_filters( 'kco_wc_gateway_settings', $settings );
+	}
+
+	/**
+	 * Splice a set of fields in after a given key, keeping both key sets intact.
+	 *
+	 * @param array  $settings The settings to insert into.
+	 * @param string $after_key The key to insert after.
+	 * @param array  $fields The fields to insert.
+	 * @return array
+	 */
+	private static function insert_after( $settings, $after_key, $fields ) {
+		$offset = array_search( $after_key, array_keys( $settings ), true );
+		if ( false === $offset ) {
+			return $settings + $fields;
+		}
+
+		return array_merge( array_slice( $settings, 0, $offset + 1, true ), $fields, array_slice( $settings, $offset + 1, null, true ) );
 	}
 }
