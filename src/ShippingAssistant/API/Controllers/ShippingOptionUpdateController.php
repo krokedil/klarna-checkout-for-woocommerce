@@ -53,8 +53,8 @@ class ShippingOptionUpdateController extends BaseController {
 		// Get the order from Kustom.
 		$kco_order = KCO_WC()->api->get_klarna_order( $kco_id );
 
-		// If the order is not found return false.
-		if ( is_wp_error( $kco_order ) ) {
+		// get_klarna_order() returns false on failure, never a WP_Error.
+		if ( empty( $kco_order ) || ! isset( $kco_order['status'] ) ) {
 			return false;
 		}
 
