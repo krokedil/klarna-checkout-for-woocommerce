@@ -276,7 +276,7 @@ class CheckoutTest extends IntegrationTestCase {
 	 * options inside the iframe.
 	 */
 	private function arrangeShippingAssessment(): void {
-		$this->haveGatewayCredentials( 'eu', [ 'shipping_methods_in_iframe' => 'yes' ] );
+		$this->haveGatewayCredentials( [ 'shipping_methods_in_iframe' => 'yes' ] );
 		$this->flushGatewaySettingsCache();
 
 		WC()->session->set( 'chosen_payment_method', 'kco' );
