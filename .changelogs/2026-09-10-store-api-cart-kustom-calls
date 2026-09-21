@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where the Mini-Cart block triggered a Kustom API call on every page load.
