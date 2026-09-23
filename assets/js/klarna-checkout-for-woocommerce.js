@@ -321,7 +321,7 @@ jQuery( function ( $ ) {
 		 * Gets the Kustom order and starts the order submission
 		 */
 		getKlarnaOrder: function () {
-			console.log( "getKlarnaOrder" )
+			console.log( "getKustomOrder" )
 			kco_wc.preventPaymentMethodChange = true
 			$( ".woocommerce-checkout-review-order-table" ).block( {
 				message: null,

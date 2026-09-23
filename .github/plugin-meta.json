@@ -10,16 +10,6 @@
             "match": "contains"
           }
         ]
-      },
-      {
-        "url": "/wp-admin/admin.php?page=checkout-addons",
-        "assertions": [
-          {
-            "selector": "h1",
-            "text": "Kustom Add-ons",
-            "match": "contains"
-          }
-        ]
       }
     ]
   }

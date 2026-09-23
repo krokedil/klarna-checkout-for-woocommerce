@@ -45,7 +45,7 @@ class KCO_API {
 	/**
 	 * Gets a Kustom Checkout order
 	 *
-	 * @param string $klarna_order_id The Klarna Checkout order id.
+	 * @param string $klarna_order_id The Kustom Checkout order id.
 	 * @return array|false
 	 */
 	public function get_klarna_order( $klarna_order_id ) {
@@ -70,9 +70,8 @@ class KCO_API {
 		// If the update results in a READ_ONLY_ORDER response, let's try to redirect the customer to thank you page.
 		if ( is_wp_error( $response ) ) {
 
-			// Data is returned as both json and string. Let's try to grab only the json data.
-			$error = strstr( $response->get_error_message(), '}', true ) . '}';
-			$error = json_decode( $error, true );
+			// Read the structured response body preserved by process_response.
+			$error = $response->get_error_data( 'klarna_error_body' );
 			if ( is_array( $error ) && 'READ_ONLY_ORDER' === ( $error['error_code'] ?? false ) ) {
 				$order = kco_get_order_by_klarna_id( $klarna_order_id, '2 day ago' );
 				if ( ! empty( $order ) ) {
@@ -107,7 +106,7 @@ class KCO_API {
 				}
 				if ( $has_currency_error ) {
 					WC()->session->set( 'reload_checkout', true );
-					KCO_Logger::log( 'Klarna BAD_VALUE purchase_currency mismatch for order ' . $klarna_order_id . '. Reloading checkout.' );
+					KCO_Logger::log( 'Kustom BAD_VALUE purchase_currency mismatch for order ' . $klarna_order_id . '. Reloading checkout.' );
 					return false;
 				}
 			}

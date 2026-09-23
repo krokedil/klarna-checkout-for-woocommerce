@@ -3,11 +3,11 @@ Contributors: kustom, krokedil, automattic
 Tags: woocommerce, ecommerce, e-commerce, checkout, klarna
 Donate link: https://kustom.co
 Requires at least: 5.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 9.7.0
-WC tested up to: 11.0
-Stable tag: 2.20.7
+WC tested up to: 11.1.0
+Stable tag: 2.21.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,44 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-09-15    - version 2.21.0 =
+* Feature       - Added an "Enable order management" setting. When disabled, WooCommerce no longer activates, cancels, updates or credits Kustom orders, and refunds can only be registered in WooCommerce with "Refund manually". The manual actions on individual orders are still available.
+* Feature       - Simplified the Kustom API credential settings into a single set of fields instead of separate Europe and United States entries.
+* Fix           - Fixed the PHP warning "undefined array key 'label'" that could appear on the checkout page for plugins that read checkout field labels, such as the Astra Pro add-on.
+* Fix           - Fixed an issue where a Kustom refund could be registered with Kustom but then discarded by WooCommerce when another Klarna plugin also handled order management.
+* Fix           - Fixed an issue where push notifications were ignored for orders belonging to a custom order type that is hidden from the customer's order list, leaving authorized payments unconfirmed in WooCommerce.
+* Fix           - Fixed the PHP warning "undefined array key 'shipping_countries'" that appeared on every completed checkout in stores with shipping disabled.
+
+= 2026-08-25    - version 2.20.11 =
+* Fix           - Fixed a fatal error that could occur in the WordPress admin when creating or editing posts.
+
+= 2026-08-24    - version 2.20.10 =
+* Tweak         - The authorization header is now redacted from the log created for requests when logging is enabled.
+* Fix           - Fixed a fatal error that could occur when sending order lines to Kustom for an order containing a product that has since beendeleted from the store.
+* Fix           - Fixed an issue where the cart block triggered excessive calls to Kustom on cart page visits.
+
+= 2026-08-17    - version 2.20.9 =
+* Tweak         - Improved the error message shown to customers when a Klarna error occurs. Customers will now see a clear, readable message instead of a raw technical response.
+* Tweak         - Added the request URL to all order management log entries.
+* Tweak         - Updated the "Go live now" and "Get playground credentials" links in the Kustom go-live banner to point to the new Kustom portal domains.
+* Fix           - Fixed an issue where paying for an order containing a subscription product through the 'order pay' flow would fail with an API error. The subscription metadata on order lines is now only included when creating a recurring order, not on the initial checkout order request.
+* Fix           - Fixed an issue where a returning customer could get stuck at the checkout when the order from their previous visit had expired. The checkout now discards the expired order and creates a new one instead of retrying it.
+* Fix           - Fixed "Undefined array key" PHP warnings emitted on every checkout when a gateway setting has no stored value, e.g. on sites whose settings were seeded programmatically or that predate a setting being added.
+* Fix           - Resolved a compatibility conflict with the "Klarna for WooCommerce" plugin that could cause WooCommerce refund processing to fail when both plugins were active.
+* Fix           - Fixed "map_meta_cap was called incorrectly" notices that could appear when editing a custom post type (thanks @johvir!).
+
+= 2026-08-11    - version 2.20.8 =
+* Tweak         - Checkout error log entries now include the error type and HTTP status code, making it faster to diagnose failed orders.
+* Tweak         - Removed the "Add Kustom Post Purchase info to order email" setting and its associated functionality.
+* Tweak         - Replaced deprecated jQuery event shorthands (.change(), .blur(), .focus(), .click()) with .trigger() and .on() to remove jQuery Migrate warnings and prepare for jQuery 4.
+* Tweak         - Removed the "Kustom Add-ons" admin page.
+* Tweak         - Updated code comments and docblocks to refer to Kustom instead of Klarna
+* Fix           - Fixed a bug where checkout error details could be silently dropped from the debug log.
+* Fix           - Save the customer shipping city from Kustom alongside postcode and country during block-based address updates.
+* Fix           - Fixed "Undefined array key" warnings that could appear when retrieving stored credentials.
+* Fix           - Updated remaining naming references from Klarna to Kustom.
+* Fix           - Handle the billing_address_change event in the block checkout. Kustom only emits shipping_address_change once the customer has entered a separate shipping address, so shipping and taxes were not recalculated while the customer shipped to their billing address.
+
 = 2026-06-29    - version 2.20.7 =
 * Fix           - Fixed an issue where refunds on orders from non-base countries were sent to Kustom with the wrong VAT rate, resulting in an incorrect tax breakdown on the customer's refund receipt.
 * Fix           - Fixed an issue with WooCommerce version 10.9.x impacting the checkout block support. WooCommerce now only creates the order for the block checkout when the customer places the order, which caused an issue when placing the order.

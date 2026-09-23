@@ -44,9 +44,11 @@ class KCO_Checkout {
 		}
 
 		$fields['billing']['kco_shipping_data'] = array(
-			'type'    => 'hidden',
-			'class'   => array( 'kco_shipping_data' ),
-			'default' => $default,
+			'type'        => 'hidden',
+			'label'       => '',
+			'placeholder' => '',
+			'class'       => array( 'kco_shipping_data' ),
+			'default'     => $default,
 		);
 
 		return $fields;
@@ -113,7 +115,7 @@ class KCO_Checkout {
 
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 		if ( ! $klarna_order ) {
-			KCO_Logger::log( "Klarna order could not be retrieved during update for ID: $klarna_order_id " );
+			KCO_Logger::log( "Kustom order could not be retrieved during update for ID: $klarna_order_id " );
 			return;
 		}
 

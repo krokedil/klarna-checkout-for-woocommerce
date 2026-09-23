@@ -566,6 +566,11 @@ function is_kco_confirmation() {
  * @return void
  */
 function kco_print_error_message( $wp_error ) {
+	// The checkout recovers from an empty body on its own by creating a new order, so don't alarm the customer.
+	if ( 'received_empty_body' === $wp_error->get_error_code() ) {
+		return;
+	}
+
 	if ( is_ajax() ) {
 		wc_add_notice( $wp_error->get_error_message(), 'error' );
 	} else {
@@ -598,7 +603,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		if ( apply_filters( 'kco_wc_lock_confirmation', false, $klarna_order_id, $order_id ) ) {
 			$did_lock = KCO_Confirmation::lock_kco_confirmation( $klarna_order_id, $order_id );
 			if ( ! $did_lock ) {
-				KCO_Logger::log( "Simultaneous confirmation attempt for Klarna order ID $klarna_order_id and WooCommerce order ID $order_id. Stopping process." );
+				KCO_Logger::log( "Simultaneous confirmation attempt for Kustom order ID $klarna_order_id and WooCommerce order ID $order_id. Stopping process." );
 				return;
 			}
 		}
@@ -949,9 +954,9 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 }
 
 /**
- * Maybe set the pickup point for the Klarna order if it exists.
+ * Maybe set the pickup point for the Kustom order if it exists.
  *
- * @param array $klarna_order The Klarna order data.
+ * @param array $klarna_order The Kustom order data.
  * @return void
  */
 function kco_maybe_set_selected_pickup_point( $klarna_order ) {
@@ -992,7 +997,7 @@ function kco_maybe_set_selected_pickup_point( $klarna_order ) {
  * Returns the WooCommerce order that has a matching Kustom order id saved as a meta field. If no order is found, returns false, and if many orders are found the newest one is returned.
  *
  * @param string      $klarna_order_id The Kustom order id.
- * @param string|null $date_after Optional. Date after which the order was created. Format 'YYYY-MM-DD'. Default null.
+ * @param string|null $date_after Optional. Only match orders created after this. Any strtotime()-parseable string, e.g. a relative '2 day ago' or a 'YYYY-MM-DD' date; wc_get_orders() compares it at day granularity. Default null.
  * @return WC_Order|false
  */
 function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
@@ -1000,6 +1005,8 @@ function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
 		'meta_key'     => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- We need to query by meta key.
 		'meta_value'   => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- We need to query by meta value.
 		'meta_compare' => '=',
+		// Every registered order type, not wc_get_orders()'s default of wc_get_order_types( 'view-orders' ): the meta is ours, so a type's customer-visibility flag is irrelevant to this lookup.
+		'type'         => wc_get_order_types(),
 		'order'        => 'DESC',
 		'orderby'      => 'date',
 		'limit'        => 1,
@@ -1008,6 +1015,15 @@ function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
 	if ( $date_after ) {
 		$args['date_after'] = $date_after;
 	}
+
+	/**
+	 * Filters the query args used to look up a WooCommerce order by its Kustom order id.
+	 *
+	 * @param array       $args The wc_get_orders() args.
+	 * @param string      $klarna_order_id The Kustom order id being looked up.
+	 * @param string|null $date_after Optional date lower bound, if provided.
+	 */
+	$args = apply_filters( 'kco_wc_get_order_by_klarna_id_args', $args, $klarna_order_id, $date_after );
 
 	$orders = wc_get_orders( $args );
 

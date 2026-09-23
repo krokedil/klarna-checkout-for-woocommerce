@@ -27,3 +27,22 @@ nightwatch.conf.js
 .changelogs/backup-*
 *.bak
 tmp*
+.playground/
+/pr-screenshots/
+.env
+
+# Codeception / wp-browser test artefacts.
+/tests/_output/
+/tests/_generated/
+/tests/_wordpress/
+/tests/_plugins/
+/tests/_themes/
+/tests/.env
+/tests/.env.local
+/tests/.env.*.local
+/tests/Support/_generated/
+
+# Ignore any env files no matter where they are in the project.
+.env
+.env.local
+.env.*.local

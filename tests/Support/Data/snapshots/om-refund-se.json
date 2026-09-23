@@ -1,0 +1,31 @@
+{
+    "method": "POST",
+    "path": "https://api.playground.kustom.co/ordermanagement/v1/orders/kustom-order-123/refunds",
+    "body": {
+        "refunded_amount": 12500,
+        "description": "",
+        "reference": "<order-number>|<refund-id>",
+        "order_lines": [
+            {
+                "type": "physical",
+                "reference": "kco-test-1",
+                "name": "Kustom Test Product",
+                "quantity": 1,
+                "unit_price": 12500,
+                "tax_rate": 2500,
+                "total_amount": 12500,
+                "total_discount_amount": 0,
+                "total_tax_amount": 2500
+            },
+            {
+                "type": "return_fee",
+                "name": "Return fee",
+                "quantity": 1,
+                "unit_price": 0,
+                "tax_rate": 0,
+                "total_amount": 0,
+                "total_tax_amount": 0
+            }
+        ]
+    }
+}

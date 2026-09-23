@@ -1,0 +1,84 @@
+namespace: Tests
+support_namespace: Support
+paths:
+  tests: tests
+  output: tests/_output
+  data: tests/Support/Data
+  support: tests/Support
+  envs: tests/_envs
+actor_suffix: Tester
+params:
+  - tests/.env
+coverage:
+  enabled: true
+  include:
+    - klarna-checkout-for-woocommerce.php
+    - src/*
+    - classes/*
+    - includes/*
+  exclude:
+    # Scoped third-party code, vendored deps and the tests themselves.
+    - dependencies/*
+    - vendor/*
+    - node_modules/*
+    - tests/*
+    - assets/*
+    - blocks/*
+    - languages/*
+    - templates/*
+extensions:
+  enabled:
+    - Codeception\Extension\RunFailed
+    - lucatume\WPBrowser\Extension\ChromeDriverController
+    - lucatume\WPBrowser\Extension\BuiltInServerController
+    - lucatume\WPBrowser\Extension\Symlinker
+  config:
+    Codeception\Extension\Recorder:
+      # Codeception keys modules by the exact string the suite enables
+      # them under, so the short name `WPWebDriver` never resolves here
+      # and the Recorder silently disables itself.
+      module: lucatume\WPBrowser\Module\WPWebDriver
+      delete_successful: true
+      animate_slides: true
+    lucatume\WPBrowser\Extension\ChromeDriverController:
+      port: "%CHROMEDRIVER_PORT%"
+    lucatume\WPBrowser\Extension\BuiltInServerController:
+      workers: 24
+      port: "%BUILTIN_SERVER_PORT%"
+      docroot: "%WORDPRESS_ROOT_DIR%"
+      env:
+        DATABASE_TYPE: sqlite
+        DB_ENGINE: sqlite
+        DB_DIR: "%codecept_root_dir%/tests/Support/Data"
+        DB_FILE: db.sqlite
+        WORDPRESS_URL: "%WORDPRESS_URL%"
+        # What Kustom is told to call back on, used only by
+        # tests/_mu-plugins/01-kustom-public-url.php.
+        KCO_WORDPRESS_URL: "%KCO_WORDPRESS_URL%"
+        BUILTIN_SERVER_PORT: "%BUILTIN_SERVER_PORT%"
+        WORDPRESS_ADMIN_PASSWORD: "%WORDPRESS_ADMIN_PASSWORD%"
+        KUSTOM_TEST_MID_EU: "%KUSTOM_TEST_MID_EU%"
+        KUSTOM_TEST_SECRET_EU: "%KUSTOM_TEST_SECRET_EU%"
+        KUSTOM_TEST_MID_US: "%KUSTOM_TEST_MID_US%"
+        KUSTOM_TEST_SECRET_US: "%KUSTOM_TEST_SECRET_US%"
+    lucatume\WPBrowser\Extension\Symlinker:
+      wpRootFolder: "%WORDPRESS_ROOT_DIR%"
+      plugins:
+        - .
+        - tests/_plugins/woocommerce
+      themes:
+        - tests/_themes/storefront
+  commands:
+    - lucatume\WPBrowser\Command\RunOriginal
+    - lucatume\WPBrowser\Command\RunAll
+    - lucatume\WPBrowser\Command\GenerateWPUnit
+    - lucatume\WPBrowser\Command\DbExport
+    - lucatume\WPBrowser\Command\DbImport
+    - lucatume\WPBrowser\Command\MonkeyCachePath
+    - lucatume\WPBrowser\Command\MonkeyCacheClear
+    - lucatume\WPBrowser\Command\DevStart
+    - lucatume\WPBrowser\Command\DevStop
+    - lucatume\WPBrowser\Command\DevInfo
+    - lucatume\WPBrowser\Command\DevRestart
+    - lucatume\WPBrowser\Command\DevRebuild
+    - lucatume\WPBrowser\Command\ChromedriverUpdate

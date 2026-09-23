@@ -56,4 +56,13 @@
 		<exclude-pattern>src/</exclude-pattern>
 		<exclude-pattern>blocks/</exclude-pattern>
     </rule>
+
+	<!-- Add custom capabilities that are added by WooCommerce. -->
+	<rule ref="WordPress.WP.Capabilities">
+		<properties>
+			<property name="custom_capabilities" type="array">
+				<element value="manage_woocommerce" />
+			</property>
+		</properties>
+	</rule>
 </ruleset>

@@ -1,4 +1,0 @@
-Type: Tweak
-Needs Documentation: no
-
-Replaced deprecated jQuery event shorthands (.change(), .blur(), .focus(), .click()) with .trigger() and .on() to remove jQuery Migrate warnings and prepare for jQuery 4.

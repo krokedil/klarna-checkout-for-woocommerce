@@ -1,0 +1,169 @@
+name: Run E2E and Integration Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-e2e-integration-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Codeception (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.4"]
+    environment: e2e
+    env:
+      # Do not run the E2E suite on a fork PR.
+      RUN_E2E: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+
+      # One ngrok endpoint per PR number, so two open PRs never fight over the same tunnel.
+      NGROK_DOMAIN: kustom-test-${{ github.event.pull_request.number }}.internal
+      # Only Kustom's callbacks use the tunnel; the browser drives the site locally.
+      KCO_WORDPRESS_URL: https://kustom-test-${{ github.event.pull_request.number }}.krokedil.ngrok.io
+      WORDPRESS_URL: http://localhost:8080
+      WORDPRESS_DOMAIN: localhost
+
+      # The rest of the env variables to use for the tests.
+      WORDPRESS_DB_URL: sqlite://%codecept_root_dir%/tests/_wordpress/data/db.sqlite
+      WORDPRESS_TABLE_PREFIX: wp_
+      TEST_TABLE_PREFIX: test_
+      WORDPRESS_ROOT_DIR: tests/_wordpress
+      WORDPRESS_ADMIN_USER: admin
+      WORDPRESS_ADMIN_PATH: /wp-admin
+      BUILTIN_SERVER_PORT: 8080
+      CHROMEDRIVER_HOST: 127.0.0.1
+      CHROMEDRIVER_PORT: 16159
+      WORDPRESS_VERSION: 7.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo_sqlite, sqlite3, mbstring, mysqli, gd, zip, curl, dom, xml
+          coverage: none
+          tools: composer:v2
+      - name: Write tests/.env
+        env:
+          NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
+          KUSTOM_TEST_MID_EU: ${{ secrets.KUSTOM_TEST_MID_EU }}
+          KUSTOM_TEST_SECRET_EU: ${{ secrets.KUSTOM_TEST_SECRET_EU }}
+          WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}
+        run: |
+          {
+            echo "WORDPRESS_URL=${WORDPRESS_URL}"
+            echo "KCO_WORDPRESS_URL=${KCO_WORDPRESS_URL}"
+            echo "WORDPRESS_DOMAIN=${WORDPRESS_DOMAIN}"
+            echo "WORDPRESS_DB_URL=${WORDPRESS_DB_URL}"
+            echo "WORDPRESS_TABLE_PREFIX=${WORDPRESS_TABLE_PREFIX}"
+            echo "TEST_TABLE_PREFIX=${TEST_TABLE_PREFIX}"
+            echo "WORDPRESS_ROOT_DIR=${WORDPRESS_ROOT_DIR}"
+            echo "WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER}"
+            echo "WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD}"
+            echo "WORDPRESS_ADMIN_PATH=${WORDPRESS_ADMIN_PATH}"
+            echo "BUILTIN_SERVER_PORT=${BUILTIN_SERVER_PORT}"
+            echo "CHROMEDRIVER_HOST=${CHROMEDRIVER_HOST}"
+            echo "CHROMEDRIVER_PORT=${CHROMEDRIVER_PORT}"
+            echo "NGROK_DOMAIN=${NGROK_DOMAIN}"
+            echo "NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}"
+            echo "KUSTOM_TEST_MID_EU=${KUSTOM_TEST_MID_EU}"
+            echo "KUSTOM_TEST_SECRET_EU=${KUSTOM_TEST_SECRET_EU}"
+          } > tests/.env
+
+      # An empty secret makes the redaction tests and verify-no-secrets pass
+      # vacuously, which is worse than a red build.
+      - name: Fail if required secrets are missing
+        if: env.RUN_E2E == 'true'
+        env:
+          NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
+          KUSTOM_TEST_MID_EU: ${{ secrets.KUSTOM_TEST_MID_EU }}
+          KUSTOM_TEST_SECRET_EU: ${{ secrets.KUSTOM_TEST_SECRET_EU }}
+          WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}
+        run: |
+          missing=
+          for key in NGROK_AUTHTOKEN KUSTOM_TEST_MID_EU KUSTOM_TEST_SECRET_EU WORDPRESS_ADMIN_PASSWORD; do
+            [ -n "${!key}" ] || missing="${missing} ${key}"
+          done
+          if [ -n "${missing}" ]; then
+            echo "::error::Missing repository secrets:${missing}"
+            exit 1
+          fi
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer packages
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php${{ matrix.php }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php${{ matrix.php }}-composer-
+
+      - name: Install Composer dependencies
+        # The post-autoload-dump hook fires here and provisions tests/_wordpress/.
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Install ngrok
+        # NgrokController shells out to a bare `ngrok`, which the runner image does not ship.
+        if: env.RUN_E2E == 'true'
+        run: |
+          curl -sSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz \
+            | sudo tar -xz -C /usr/local/bin ngrok
+          ngrok version
+
+      - name: Match Chromedriver to installed Chrome
+        if: env.RUN_E2E == 'true'
+        run: composer test:chromedriver
+
+      # Run the Harness suite first, so the redaction tests run before the integration and E2E suites.
+      - name: Harness tests (gate, redaction must hold)
+        run: composer test:harness
+
+      # Shares the SQLite file with the Harness suite, so the two must not overlap.
+      - name: Integration tests
+        run: composer test:integration
+
+      - name: E2E tests
+        if: env.RUN_E2E == 'true'
+        run: composer test:e2e
+
+      - name: Note skipped E2E
+        if: env.RUN_E2E != 'true'
+        run: echo "::notice::E2E suite skipped - a fork PR has no access to the ngrok and Kustom secrets."
+
+      # Must run before the upload: tests/_output holds HTML snapshots, the WP debug
+      # log and ngrok.log, and artifacts on a public repo are downloadable.
+      - name: Scan artifacts for credentials
+        id: scan
+        if: always()
+        env:
+          NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
+          KUSTOM_TEST_MID_EU: ${{ secrets.KUSTOM_TEST_MID_EU }}
+          KUSTOM_TEST_SECRET_EU: ${{ secrets.KUSTOM_TEST_SECRET_EU }}
+          WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}
+        run: php tests/_support_scripts/verify-no-secrets.php tests/_output/report tests/_output/report-share
+
+      - name: Upload failure artifacts
+        # Only once the scan came back clean; a leaked artifact must never be published.
+        if: failure() && steps.scan.outcome == 'success'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: allure-results-php${{ matrix.php }}
+          path: |
+            tests/_output/
+            !tests/_output/cache/
+          retention-days: 7
+          if-no-files-found: ignore

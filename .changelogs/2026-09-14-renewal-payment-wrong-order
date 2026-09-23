@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where retrying payment on a subscription renewal order other than the most recent one left the authorized payment unregistered and uncaptured in WooCommerce.

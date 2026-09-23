@@ -459,13 +459,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
-			$suffix              = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-			$store_base_location = wc_get_base_location();
-			if ( 'US' === $store_base_location['country'] ) {
-				$location = 'US';
-			} else {
-				$location = $this->check_if_eu( $store_base_location['country'] );
-			}
+			$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 			wp_register_script(
 				'kco_admin',
@@ -474,73 +468,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				KCO_WC_VERSION,
 				false
 			);
-			$admin_localize_params = array(
-				'location' => $location,
-			);
-			wp_localize_script( 'kco_admin', 'kco_admin_params', $admin_localize_params );
 			wp_enqueue_script( 'kco_admin' );
-		}
-
-		/**
-		 * Detect if EU country.
-		 *
-		 * @param string $store_base_location The WooCommerce stores base country.
-		 */
-		private function check_if_eu( $store_base_location ) {
-			$eu_countries = array(
-				'AL',
-				'AD',
-				'AM',
-				'AT',
-				'BY',
-				'BE',
-				'BA',
-				'BG',
-				'CH',
-				'CY',
-				'CZ',
-				'DE',
-				'DK',
-				'EE',
-				'ES',
-				'FO',
-				'FI',
-				'FR',
-				'GB',
-				'GE',
-				'GI',
-				'GR',
-				'HU',
-				'HR',
-				'IE',
-				'IS',
-				'IT',
-				'LT',
-				'LU',
-				'LV',
-				'MC',
-				'MK',
-				'MT',
-				'NO',
-				'NL',
-				'PL',
-				'PT',
-				'RO',
-				'RU',
-				'SE',
-				'SI',
-				'SK',
-				'SM',
-				'TR',
-				'UA',
-				'VA',
-			);
-
-			if ( in_array( $store_base_location, $eu_countries, true ) ) {
-				return 'EU';
-			} else {
-				return '';
-			}
 		}
 
 		/**
@@ -806,7 +734,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				$args = wp_remote_get( 'https://krokedil-settings-page-configs.s3.eu-north-1.amazonaws.com/main/configs/kustom-checkout-for-woocommerce.json' );
 
 				if ( is_wp_error( $args ) ) {
-					KP_Logger::log( 'Failed to fetch Kustom Checkout settings page config from remote source.' );
+					KCO_Logger::log( 'Failed to fetch Kustom Checkout settings page config from remote source.' );
 					return null;
 				}
 
@@ -819,16 +747,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$decoded_args['settings_navigation'] = true;
 
 			return $decoded_args;
-		}
-
-		/**
-		 * Callable function for the general content for the settings page.
-		 *
-		 * @return void
-		 */
-		public function settings_page_content() {
-			KP_Settings_Page::header_html();
-			echo $this->generate_settings_html( $this->get_form_fields(), false ); // phpcs:ignore
 		}
 
 		/**

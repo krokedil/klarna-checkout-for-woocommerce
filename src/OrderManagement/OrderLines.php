@@ -55,7 +55,7 @@ class OrderLines {
 	public $order;
 
 	/**
-	 * Klarna country used for creating this order.
+	 * Kustom country used for creating this order.
 	 *
 	 * @var string
 	 */
@@ -106,7 +106,7 @@ class OrderLines {
 	}
 
 	/**
-	 * Process WooCommerce order items to Klarna Payments order lines.
+	 * Process WooCommerce order items to Kustom order lines.
 	 */
 	public function process_order_line_items() {
 		$order = wc_get_order( $this->order_id );
@@ -158,7 +158,7 @@ class OrderLines {
 		 */
 		foreach ( $order->get_items( 'coupon' ) as $order_item ) {
 
-			/* Only smart coupons are added to the capture order lines, or if the merchant is a Klarna US merchant. */
+			/* Only smart coupons are added to the capture order lines, or if the merchant is a Kustom US merchant. */
 			$coupon = new \WC_Coupon( $order_item->get_name() );
 			if ( 'smart_coupon' === $coupon->get_discount_type() || 'US' === $this->klarna_country ) {
 				$this->order_lines[] = $this->process_order_item_coupon( $order_item, $order );

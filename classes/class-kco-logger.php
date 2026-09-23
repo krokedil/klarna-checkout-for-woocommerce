@@ -79,6 +79,16 @@ class KCO_Logger {
 				$request_args['body'] = wp_json_encode( $request_body );
 			}
 		}
+
+		// Redact the authorization header if it is present.
+		foreach ( $request_args['headers'] as $header => $value ) {
+			if ( 'authorization' === strtolower( $header ) ) {
+				// If it is longer than 15 char., it most likely has a token. This is an assumption that is safe even if it is wrong.
+				$request_args['headers'][ $header ] = strlen( $value ) > 15 ? '[REDACTED]' : '[MISSING]';
+				break;
+			}
+		}
+
 		return array(
 			'id'             => $klarna_order_id,
 			'type'           => $method,

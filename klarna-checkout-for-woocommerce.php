@@ -5,12 +5,12 @@
  * Description: Kustom Checkout payment gateway for WooCommerce.
  * Author: Kustom
  * Author URI: https://klarna.com/
- * Version: 2.20.7
+ * Version: 2.21.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 9.7.0
- * WC tested up to: 11.0
+ * WC tested up to: 11.1.0
  *
  * Copyright (c) 2017-2026 Krokedil
  *
@@ -31,6 +31,7 @@
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
+use Krokedil\KustomCheckout\Migrations\CredentialsMigration;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 use Krokedil\KustomCheckout\Elements\Elements;
 
@@ -41,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.20.7' );
+define( 'KCO_WC_VERSION', '2.21.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -137,6 +138,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var Elements $elements
 		 */
 		public $elements;
+
+		/**
+		 * Reference to the credentials migration class.
+		 *
+		 * @var CredentialsMigration $credentials_migration
+		 */
+		public $credentials_migration;
 
 		/**
 		 * Returns the *Singleton* instance of this class.
@@ -275,7 +283,6 @@ if ( ! class_exists( 'KCO' ) ) {
 			// Admin includes.
 			if ( is_admin() ) {
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-kco-admin-notices.php';
-				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-for-woocommerce-addons.php';
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-wc-klarna-banners.php';
 			}
 
@@ -306,6 +313,11 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
 
 			// Set class variables.
+			// A store still on the old per-region settings is consolidated here, before
+			// KCO_Credentials reads them.
+			$this->credentials_migration = new CredentialsMigration();
+			$this->credentials_migration->maybe_migrate();
+
 			$this->credentials      = new KCO_Credentials();
 			$this->merchant_urls    = new KCO_Merchant_URLs();
 			$this->logger           = new KCO_Logger();
