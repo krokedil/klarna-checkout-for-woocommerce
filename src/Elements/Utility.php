@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\Elements;
 
+use Krokedil\KustomCheckout\Utility\SettingsUtility;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -11,6 +13,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Shared helpers for rendering Kustom Elements web components.
  */
 class Utility {
+	/**
+	 * Get the public API key for the current environment (test or production).
+	 *
+	 * @return string
+	 */
+	public static function get_public_api_key() {
+		return SettingsUtility::is_testmode()
+			? SettingsUtility::get_setting( 'elements_playground_public_api_key', '' )
+			: SettingsUtility::get_setting( 'elements_live_public_api_key', '' );
+	}
+
 	/**
 	 * Get the 5-character locale (language-COUNTRY) to use for Elements.
 	 *
@@ -38,7 +51,7 @@ class Utility {
 	 * @param array $atts Optional atts (locale, include, exclude).
 	 * @return string
 	 */
-	public static function render_shipping_element( $atts = array() ) {
+	public static function render_delivery_element( $atts = array() ) {
 		return self::render_element( 'kustom-delivery-method-display', $atts );
 	}
 
