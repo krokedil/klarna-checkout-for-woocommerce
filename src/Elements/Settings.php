@@ -51,6 +51,10 @@ class Settings {
 	 * @var string[]
 	 */
 	const CREDENTIAL_FIELDS = array(
+		'merchant_id',
+		'shared_secret',
+		'test_merchant_id',
+		'test_shared_secret',
 		'merchant_id_eu',
 		'shared_secret_eu',
 		'test_merchant_id_eu',

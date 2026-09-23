@@ -4,7 +4,7 @@
 import * as React from 'react';
 
 /**
- * Wordpress dependencies
+ * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 // @ts-ignore - The package does not ship type declarations.
