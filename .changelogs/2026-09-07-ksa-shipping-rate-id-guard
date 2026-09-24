@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where the customer could see a "shipping methods have been changed" error when placing an order with Kustom Shipping Assistant handling the shipping selection.
