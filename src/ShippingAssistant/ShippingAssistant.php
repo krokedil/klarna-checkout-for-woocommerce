@@ -57,7 +57,7 @@ class ShippingAssistant {
 					?>
 					<div class="notice notice-error">
 							<p><strong><?php esc_html_e( 'Kustom Shipping Assistant is now included in Kustom Checkout for WooCommerce.', 'klarna-checkout-for-woocommerce' ); ?></strong></p>
-							<p><?php esc_html_e( 'Deactivate the separate plugin, then enable it under WooCommerce → Settings → Payments → Kustom Checkout.', 'klarna-checkout-for-woocommerce' ); ?></p>
+							<p><?php esc_html_e( 'You no longer need the separate Kustom Shipping Assistant plugin. Deactivate it and your shipping zones and settings carry over.', 'klarna-checkout-for-woocommerce' ); ?></p>
 					</div>
 					<?php
 				}

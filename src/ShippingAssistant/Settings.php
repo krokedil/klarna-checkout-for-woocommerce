@@ -37,7 +37,7 @@ class Settings {
 			'title'       => __( 'Enable Kustom Shipping Assistant', 'klarna-checkout-for-woocommerce' ),
 			'type'        => 'checkbox',
 			'class'       => 'krokedil_conditional_toggler krokedil_toggler_ksa',
-			'default'     => 'no',
+			'default'     => self::get_enabled_default(),
 			'label'       => __( 'Let a TMS (transport management system) control shipping methods and pricing in the Kustom iframe.', 'klarna-checkout-for-woocommerce' ),
 			'description' => __( 'Enable this if your store uses a TMS-based shipping integration. Adds a "Kustom Shipping Assistant" shipping method for use in your shipping zones.', 'klarna-checkout-for-woocommerce' ),
 			'desc_tip'    => true,
@@ -62,13 +62,56 @@ class Settings {
 	/**
 	 * Whether Kustom Shipping Assistant is enabled.
 	 *
-	 * Defaults to disabled: unlike order management, this functionality never ran on a store unless a
-	 * separate TMS plugin was installed, so an opt-in default preserves that for every other store.
-	 *
 	 * @return bool
 	 */
 	public static function is_enabled() {
-		return wc_string_to_bool( SettingsUtility::get_setting( 'ksa_enabled', 'no' ) );
+		return wc_string_to_bool( SettingsUtility::get_setting( 'ksa_enabled', self::get_enabled_default() ) );
+	}
+
+	/**
+	 * The default for the enable setting, until it has been saved.
+	 *
+	 * Enabled for stores already using the standalone plugin, which is detected by its shipping method
+	 * being active in a zone. Every other store stays opt-in.
+	 *
+	 * @return string 'yes' or 'no'.
+	 */
+	public static function get_enabled_default() {
+		static $default = null;
+
+		if ( null !== $default ) {
+			return $default;
+		}
+
+		// A saved value makes the default irrelevant, so skip the zone lookup.
+		$saved = get_option( 'woocommerce_kco_settings', array() );
+		if ( is_array( $saved ) && isset( $saved['ksa_enabled'] ) ) {
+			$default = 'no';
+			return $default;
+		}
+
+		$default = wc_bool_to_string( self::has_active_shipping_method() );
+		return $default;
+	}
+
+	/**
+	 * Whether any shipping zone, including "Rest of the world", has the KSA shipping method enabled.
+	 *
+	 * @return bool
+	 */
+	private static function has_active_shipping_method() {
+		$data_store = \WC_Data_Store::load( 'shipping-zone' );
+		$zone_ids   = array_merge( array( 0 ), wp_list_pluck( $data_store->get_zones(), 'zone_id' ) );
+
+		foreach ( $zone_ids as $zone_id ) {
+			foreach ( $data_store->get_methods( absint( $zone_id ), true ) as $method ) {
+				if ( 'klarna_kss' === $method->method_id ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
