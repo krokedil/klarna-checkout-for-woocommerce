@@ -1,0 +1,80 @@
+<?php
+namespace Krokedil\KustomCheckout\Elements;
+
+use Krokedil\KustomCheckout\Utility\SettingsUtility;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Utility class.
+ *
+ * Shared helpers for rendering Kustom Elements web components.
+ */
+class Utility {
+	/**
+	 * Get the public API key for the current environment (test or production).
+	 *
+	 * @return string
+	 */
+	public static function get_public_api_key() {
+		return SettingsUtility::is_testmode()
+			? SettingsUtility::get_setting( 'elements_playground_public_api_key', '' )
+			: SettingsUtility::get_setting( 'elements_live_public_api_key', '' );
+	}
+
+	/**
+	 * Get the 5-character locale (language-COUNTRY) to use for Elements.
+	 *
+	 * @return string
+	 */
+	public static function get_locale() {
+		$locale = substr( str_replace( '_', '-', get_locale() ), 0, 5 );
+
+		return apply_filters( 'kco_elements_locale', $locale );
+	}
+
+	/**
+	 * Render the payment method display element.
+	 *
+	 * @param array $atts Optional atts (locale, include, exclude).
+	 * @return string
+	 */
+	public static function render_payment_element( $atts = array() ) {
+		return self::render_element( 'kustom-payment-method-display', $atts );
+	}
+
+	/**
+	 * Render the delivery method display element.
+	 *
+	 * @param array $atts Optional atts (locale, include, exclude).
+	 * @return string
+	 */
+	public static function render_delivery_element( $atts = array() ) {
+		return self::render_element( 'kustom-delivery-method-display', $atts );
+	}
+
+	/**
+	 * Build the markup for a Kustom Elements custom element tag.
+	 *
+	 * @param string $tag  The custom element tag name.
+	 * @param array  $atts Optional atts (locale, include, exclude).
+	 * @return string
+	 */
+	private static function render_element( $tag, $atts ) {
+		$locale = empty( $atts['locale'] ) ? self::get_locale() : $atts['locale'];
+
+		$html = sprintf( '<%1$s locale="%2$s"', esc_attr( $tag ), esc_attr( $locale ) );
+
+		foreach ( array( 'include', 'exclude' ) as $key ) {
+			if ( ! empty( $atts[ $key ] ) ) {
+				$html .= sprintf( ' %1$s="%2$s"', esc_attr( $key ), esc_attr( $atts[ $key ] ) );
+			}
+		}
+
+		$html .= sprintf( '></%1$s>', esc_attr( $tag ) );
+
+		return $html;
+	}
+}
