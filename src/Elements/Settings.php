@@ -183,7 +183,7 @@ class Settings {
 			'title'    => $title,
 			'type'     => 'select',
 			'options'  => self::get_product_placement_options(),
-			'default'  => '15',
+			'default'  => '',
 			// translators: %s: The product page hook name.
 			'desc_tip' => sprintf( __( 'Where on the product page the element is displayed. Uses the %s hook.', 'klarna-checkout-for-woocommerce' ), self::PRODUCT_HOOK ),
 		);
@@ -200,7 +200,7 @@ class Settings {
 			'title'    => $title,
 			'type'     => 'select',
 			'options'  => self::get_cart_placement_options(),
-			'default'  => 'woocommerce_cart_collaterals',
+			'default'  => '',
 			'desc_tip' => __( 'Where on the cart page the element is displayed. Each option uses a WooCommerce cart hook, from woocommerce_cart_collaterals (top) to woocommerce_after_cart (bottom).', 'klarna-checkout-for-woocommerce' ),
 		);
 	}
