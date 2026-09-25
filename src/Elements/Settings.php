@@ -215,7 +215,7 @@ class Settings {
 		$credentials = array();
 		foreach ( self::CREDENTIAL_FIELDS as $field ) {
 			if ( ! empty( $settings[ $field ] ) ) {
-				$credentials[] = trim( $settings[ $field ] );
+				$credentials[] = trim( sanitize_text_field( wp_kses_post( $settings[ $field ] ) ) );
 			}
 		}
 
@@ -224,7 +224,7 @@ class Settings {
 				continue;
 			}
 
-			$value = trim( sanitize_text_field( $settings[ $field ] ) );
+			$value = trim( sanitize_text_field( wp_kses_post( $settings[ $field ] ) ) );
 			if ( preg_match( '/\s/', $value ) || in_array( $value, $credentials, true ) ) {
 				$settings[ $field ] = '';
 				$this->add_invalid_key_error( $field );
