@@ -461,22 +461,59 @@ class KCO_Subscription {
 			$renewal_order->save_meta_data();
 		}
 
+		// A renewal created before these identifiers were excluded can still carry the parent's; they are never valid for this attempt.
+		$this->delete_inherited_klarna_ids( $renewal_order, $subscription );
+
 		$create_order_response = KCO_WC()->api->create_recurring_order( $order_id, $recurring_token );
 		if ( ! is_wp_error( $create_order_response ) ) {
 			$klarna_order_id = $create_order_response['order_id'];
 
 			// Translators: Kustom order id.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Kustom. Kustom order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
-			foreach ( $subscriptions as $subscription ) {
-				$subscription->payment_complete( $klarna_order_id );
-			}
+
+			// The renewal has its own Kustom order, not the one inherited from the parent.
+			$renewal_order->update_meta_data( '_wc_klarna_order_id', $klarna_order_id );
+			$renewal_order->save_meta_data();
+
+			// Complete the order that was charged. WC Subscriptions propagates this to the subscription.
+			$renewal_order->payment_complete( $klarna_order_id );
 		} else {
 			$error_message = $create_order_response->get_error_message();
 			// Translators: Error message.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Kustom. Message: %1$s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
-			foreach ( $subscriptions as $related_subscription ) {
-				$related_subscription->payment_failed();
+			$renewal_order->update_status( 'failed' );
+		}
+	}
+
+	/**
+	 * Removes Kustom identifiers a renewal order inherited from its subscription or parent order.
+	 *
+	 * @param WC_Order        $renewal_order The renewal order being charged.
+	 * @param WC_Subscription $subscription  The subscription the renewal belongs to.
+	 * @return void
+	 */
+	private function delete_inherited_klarna_ids( $renewal_order, $subscription ) {
+		$parent  = $subscription->get_parent();
+		$deleted = false;
+
+		foreach ( array( '_wc_klarna_order_id', '_wc_klarna_capture_id' ) as $meta_key ) {
+			$value = $renewal_order->get_meta( $meta_key, true );
+			if ( empty( $value ) ) {
+				continue;
 			}
+
+			// Only a value matching the subscription or parent is inherited; one the renewal earned itself stays.
+			$inherited = $value === $subscription->get_meta( $meta_key, true )
+				|| ( ! empty( $parent ) && $value === $parent->get_meta( $meta_key, true ) );
+
+			if ( $inherited ) {
+				$renewal_order->delete_meta_data( $meta_key );
+				$deleted = true;
+			}
+		}
+
+		if ( $deleted ) {
+			$renewal_order->save_meta_data();
 		}
 	}
 
@@ -495,6 +532,10 @@ class KCO_Subscription {
 		if ( 'kco' !== $subscription->get_payment_method() ) {
 			return $renewal_order;
 		}
+
+		// The Data Copier inherits these from the subscription; they belong to the parent order, not this renewal.
+		$renewal_order->delete_meta_data( '_wc_klarna_order_id' );
+		$renewal_order->delete_meta_data( '_wc_klarna_capture_id' );
 
 		$parent = $subscription->get_parent();
 

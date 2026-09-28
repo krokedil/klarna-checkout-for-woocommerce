@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "kustom/payment-element",
+	"title": "Kustom Payment Element",
+	"description": "Presents the available Kustom payment methods.",
+	"category": "woocommerce",
+	"icon": "money-alt",
+	"keywords": [ "kustom", "payment", "elements" ],
+	"textdomain": "klarna-checkout-for-woocommerce",
+	"attributes": {
+		"include": { "type": "string", "default": "" },
+		"exclude": { "type": "string", "default": "" }
+	},
+	"supports": {
+		"html": false,
+		"spacing": { "margin": true, "padding": true }
+	},
+	"example": {},
+	"editorScript": "kco-elements-paymentelement-block"
+}

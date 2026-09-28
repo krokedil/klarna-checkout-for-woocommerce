@@ -5,12 +5,12 @@
  * Description: Kustom Checkout payment gateway for WooCommerce.
  * Author: Kustom
  * Author URI: https://klarna.com/
- * Version: 2.21.0
+ * Version: 2.22.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 9.7.0
- * WC tested up to: 11.1.0
+ * WC tested up to: 11.1.2
  *
  * Copyright (c) 2017-2026 Krokedil
  *
@@ -33,6 +33,7 @@ use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\Migrations\CredentialsMigration;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
+use Krokedil\KustomCheckout\Elements\Elements;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -41,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.21.0' );
+define( 'KCO_WC_VERSION', '2.22.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -130,6 +131,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var PickupPoints $pickup_points
 		 */
 		public $pickup_points;
+
+		/**
+		 * Reference to Elements class.
+		 *
+		 * @var Elements $elements
+		 */
+		public $elements;
 
 		/**
 		 * Reference to the credentials migration class.
@@ -322,6 +330,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			);
 			$this->order_management = new OrderManagement();
 			$this->pickup_points    = new PickupPoints();
+			$this->elements         = new Elements();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );

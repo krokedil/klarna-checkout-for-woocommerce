@@ -216,12 +216,43 @@ class BlockExtension {
 	}
 
 	/**
+	 * Checks if the current request may sync the Kustom order.
+	 *
+	 * @return bool
+	 */
+	private function is_checkout_context() {
+		// On a page render, only the checkout page itself may sync.
+		if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+			return is_checkout();
+		}
+
+		// In the Store API, only the routes the checkout block posts to may sync. The cart routes
+		// are left out, since those are what the Mini-Cart block serialises on every page render.
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+		$path        = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
+
+		if ( ! preg_match( '#/wc/store/v\d+/(checkout|batch)$#', $path ) ) {
+			return false;
+		}
+
+		// Of those, only cart mutations may sync. HEAD falls through to the GET
+		// handler, so allowlist the write methods rather than excluding GET alone.
+		$method = strtoupper( sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) );
+
+		return in_array( $method, array( 'POST', 'PUT', 'PATCH', 'DELETE' ), true );
+	}
+
+	/**
 	 * Get the address data for the Kustom Checkout block. Also updates the Kustom order if needed.
 	 *
 	 * @return array
 	 * @throws Exception If we can't get the Kustom order.
 	 */
 	public function get_address() {
+		if ( ! $this->is_checkout_context() ) {
+			return array();
+		}
+
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
 		// Only run this if we have a Kustom order id.
