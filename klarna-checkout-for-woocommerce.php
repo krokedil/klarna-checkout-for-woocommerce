@@ -33,6 +33,7 @@ use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\Migrations\CredentialsMigration;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
+use Krokedil\KustomCheckout\Elements\Elements;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -130,6 +131,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var PickupPoints $pickup_points
 		 */
 		public $pickup_points;
+
+		/**
+		 * Reference to Elements class.
+		 *
+		 * @var Elements $elements
+		 */
+		public $elements;
 
 		/**
 		 * Reference to the credentials migration class.
@@ -322,6 +330,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			);
 			$this->order_management = new OrderManagement();
 			$this->pickup_points    = new PickupPoints();
+			$this->elements         = new Elements();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );
