@@ -52,7 +52,7 @@ export const ElementEdit = ( { name, attributes, setAttributes }: ElementEditPro
 			</InspectorControls>
 			<div { ...blockProps }>
 				<Disabled>
-					<ServerSideRender block={ name } attributes={ attributes } />
+					<ServerSideRender block={ name } attributes={ attributes } skipBlockSupportAttributes />
 				</Disabled>
 			</div>
 		</>

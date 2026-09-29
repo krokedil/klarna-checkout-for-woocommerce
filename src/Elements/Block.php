@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\Elements;
 
+use Krokedil\KustomCheckout\Utility\SettingsUtility;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -107,9 +109,12 @@ class Block {
 	 * @return string
 	 */
 	private function render_block( $element ) {
-		if ( empty( Utility::get_public_api_key() ) ) {
+		$public_api_key = Utility::get_public_api_key();
+		$is_preview     = defined( 'REST_REQUEST' ) && REST_REQUEST;
+
+		if ( empty( $public_api_key ) ) {
 			// Only explain the missing key in the editor preview, never to shoppers.
-			if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+			if ( ! $is_preview ) {
 				return '';
 			}
 
@@ -117,6 +122,12 @@ class Block {
 				'<p>%s</p>',
 				esc_html__( 'Add a Kustom Elements public API key in the Kustom Checkout settings to display this element.', 'klarna-checkout-for-woocommerce' )
 			);
+		} elseif ( $is_preview ) {
+			$testmode = SettingsUtility::is_testmode();
+			$status   = KeyValidator::get_status( $public_api_key, $testmode );
+			if ( KeyValidator::is_error( $status ) ) {
+				$element = sprintf( '<p>%s</p>', esc_html( KeyValidator::get_message( $status, $testmode ) ) );
+			}
 		}
 
 		return sprintf( '<div %1$s>%2$s</div>', get_block_wrapper_attributes(), $element );
