@@ -9,6 +9,7 @@ use Qameta\Allure\Allure;
 use Tests\Support\Reporting\Redactor;
 use Tests\Support\Reporting\SecretRegistry;
 use Tests\Support\Traits\CanBuildCartsAndOrders;
+use Tests\Support\Traits\CanCaptureLogs;
 use Tests\Support\Traits\CanConfigureStore;
 use Tests\Support\Traits\CanDriveCheckout;
 use Tests\Support\Traits\CanDriveOrderManagement;
@@ -31,6 +32,7 @@ abstract class IntegrationTestCase extends WPTestCase {
 	use CanDriveCheckout;
 	use CanFakeSubscriptions;
 	use CanSnapshotRequests;
+	use CanCaptureLogs;
 
 	/** @var \Tests\Support\Reporting\Redactor|null */
 	private static $reportRedactor = null;
@@ -82,6 +84,7 @@ abstract class IntegrationTestCase extends WPTestCase {
 		// Before resetHttpInterception(), which throws the recording away.
 		$this->attachHttpRequestsToReport();
 
+		$this->restoreLogging();
 		$this->resetStore();
 		$this->resetHttpInterception();
 
