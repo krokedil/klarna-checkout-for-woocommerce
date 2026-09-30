@@ -95,7 +95,8 @@ class LogMaskingTest extends IntegrationTestCase {
 	 * @dataProvider provide_fields_kept_readable
 	 */
 	public function test_the_log_keeps_what_support_reads( string $value, string $description ): void {
-		$this->makeRequest( 'retrieve' );
+		// A create, so the request carries the merchant URLs the plugin really sends.
+		$this->makeRequest( 'create' );
 
 		$this->assertStringContainsString( $value, $this->loggedText(), "The log lost the {$description}." );
 	}
@@ -110,7 +111,7 @@ class LogMaskingTest extends IntegrationTestCase {
 			// The order id is an identifier, not a credential, and is how logs are correlated.
 			'the order id'     => [ 'checkout-order-123', 'Kustom order id' ],
 			// A callback Kustom cannot reach is a common case, and the push URL carries no secret.
-			'the push URL'     => [ '/wc-api/KCO_WC_Push/', 'push URL' ],
+			'the push URL'     => [ '/wc-api/KCO_WC_Push/?kco-action=push&kco_wc_order_id={checkout.order.id}', 'push URL' ],
 			'the customer type' => [ '"type":"person"', 'customer type' ],
 		];
 	}
@@ -243,10 +244,17 @@ class LogMaskingTest extends IntegrationTestCase {
 
 	/** A plain message has no field names to go by, so an email address or order key is masked by its shape. */
 	public function test_a_plain_message_logs_no_email_or_order_key(): void {
-		\KCO_Logger::log( 'Order 1 placed by karl@example.com, see /checkout/order-received/1/?key=wc_order_abc123DEF' );
+		\KCO_Logger::log( 'Order 1 placed by karl@example.com, see /checkout/order-received/1/?key=wc_order_Kr90kxk5axFCS' );
 
-		$this->assertNotLogged( [ 'karl@example.com' => 'email', 'wc_order_abc123DEF' => 'order key' ] );
+		$this->assertNotLogged( [ 'karl@example.com' => 'email', 'wc_order_Kr90kxk5axFCS' => 'order key' ] );
 		$this->assertStringContainsString( '/checkout/order-received/1/', $this->loggedText() );
+	}
+
+	/** Only a real order key is masked by its shape, not a field name that starts the same way. */
+	public function test_a_field_name_like_an_order_key_is_kept_readable(): void {
+		\KCO_Logger::log( 'Missing WC session kco_wc_order_id, wc_order_shipping and wc_order_fully_refunded.' );
+
+		$this->assertStringContainsString( 'kco_wc_order_id, wc_order_shipping and wc_order_fully_refunded', $this->loggedText() );
 	}
 
 	/** Kustom addresses a recurring token by the path, so logging the URL would log the token. */

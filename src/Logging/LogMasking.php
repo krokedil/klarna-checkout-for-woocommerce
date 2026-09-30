@@ -221,7 +221,7 @@ class LogMasking {
 		}
 
 		$masked = preg_replace(
-			array( '/wc_order_[A-Za-z0-9]+/', '/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/' ),
+			array( '/\bwc_order_[A-Za-z0-9]{13,}\b/', '/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/' ),
 			KeyMasker::REDACTED,
 			$data
 		);
