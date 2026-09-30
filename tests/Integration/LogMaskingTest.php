@@ -157,12 +157,96 @@ class LogMaskingTest extends IntegrationTestCase {
 		$this->willCreateHpp();
 		KCO_WC()->api->create_klarna_hpp_url( 'checkout-order-123', $order->get_id() );
 
-		$entry = $this->loggedEntry( 'KCO create HPP' );
+		$success = $this->loggedEntry( 'KCO create HPP' )['request']['body']['merchant_urls']['success'];
 
-		$this->assertSame( '[REDACTED]', $entry['request']['body']['merchant_urls']['success'] );
+		$this->assertStringContainsString( 'key=[REDACTED]', $success, 'The rest of the URL is kept, since support reads it.' );
 		$this->assertStringNotContainsString( $order->get_order_key(), $this->loggedText() );
-		// The hosted payment page URL is a single use capability: whoever holds it can pay with it.
-		$this->assertStringNotContainsString( '/hpp/payment/hpp-1', $this->loggedText() );
+	}
+
+	/** The hosted payment page answers with links and a token that each let whoever holds them pay. */
+	public function test_the_hosted_payment_page_links_never_reach_the_log(): void {
+		$order = $this->haveGatewayOrder();
+
+		$this->willRespondWith(
+			[
+				'session_id'          => 'hpp-session-1',
+				'redirect_url'        => 'https://pay.playground.kustom.co/eu/hpp/payment/hpp-1',
+				'qr_code_url'         => 'https://pay.playground.kustom.co/eu/hpp/qr/hpp-1',
+				'distribution_url'    => 'https://api.playground.kustom.co/hpp/v1/sessions/hpp-1/distribution',
+				'distribution_module' => [ 'token' => 'hpp-token-1', 'standalone_url' => 'https://pay.playground.kustom.co/eu/hpp/standalone/hpp-1' ],
+			],
+			201,
+			'hpp/v1/sessions'
+		);
+		KCO_WC()->api->create_klarna_hpp_url( 'checkout-order-123', $order->get_id() );
+
+		$this->assertNotLogged( [ '/eu/hpp/' => 'hosted payment page link', 'hpp-token-1' => 'distribution token' ] );
+		$this->assertStringContainsString( 'hpp-session-1', $this->loggedText(), 'The log lost the session id.' );
+	}
+
+	/**
+	 * The checkout settings are named after the fields they configure, such as
+	 * phone_mandatory, but hold no personal data and are what a checkout issue is read for.
+	 */
+	public function test_a_checkout_setting_is_kept_readable(): void {
+		$options = [
+			'phone_mandatory'                          => true,
+			'date_of_birth_mandatory'                  => false,
+			'national_identification_number_mandatory' => false,
+			'verify_national_identification_number'    => true,
+			'title_mandatory'                          => false,
+		];
+
+		$this->makeRequest( 'retrieve', [ 'options' => $options ] );
+
+		$this->assertSame( $options, $this->loggedEntry( 'KCO get order' )['response']['body']['options'] );
+	}
+
+	/**
+	 * The block checkout submits the order to the Store API with the customer's details,
+	 * the order key and the recurring token, and logs that request too.
+	 */
+	public function test_the_store_api_order_submit_logs_no_customer_data(): void {
+		$order = $this->haveGatewayOrder();
+		$args  = [
+			'method'  => 'POST',
+			'headers' => [ 'Content-Type' => 'application/json', 'Cart-Token' => 'cart-token-1', 'Nonce' => 'nonce-1' ],
+			'body'    => wp_json_encode(
+				[
+					'billing_email'   => 'karl@example.com',
+					'billing_address' => [ 'first_name' => 'Karl', 'last_name' => 'Karlsson', 'address_1' => 'Storgatan 1', 'postcode' => '41106', 'city' => 'Göteborg' ],
+					'key'             => $order->get_order_key(),
+					'payment_data'    => [
+						[ 'key' => '_wc_klarna_order_id', 'value' => 'checkout-order-123' ],
+						[ 'key' => '_shipping_phone', 'value' => '+46701234567' ],
+						[ 'key' => '_kco_recurring_token', 'value' => 'customer-token-1' ],
+					],
+				]
+			),
+		];
+		$response = [ 'order_key' => $order->get_order_key(), 'customer_note' => 'Leave it with Karl next door' ];
+
+		\KCO_Logger::log( \KCO_Logger::format_log( 'checkout-order-123', 'POST', '[Blocks] - Submit WC Order', $args, $response, 200, 'https://example.com/wp-json/wc/store/v1/checkout/1' ) );
+
+		$this->assertNotLogged(
+			self::PERSONAL_DATA + [
+				$order->get_order_key()        => 'order key',
+				'customer-token-1'             => 'recurring token',
+				'cart-token-1'                 => 'Store API cart token',
+				'nonce-1'                      => 'Store API nonce',
+				'Leave it with Karl next door' => 'customer note',
+			]
+		);
+		$this->assertStringContainsString( 'checkout-order-123', $this->loggedText(), 'The log lost the Kustom order id in the payment data.' );
+		$this->assertStringContainsString( '41106', $this->loggedText(), 'The log lost the postcode.' );
+	}
+
+	/** A plain message has no field names to go by, so an email address or order key is masked by its shape. */
+	public function test_a_plain_message_logs_no_email_or_order_key(): void {
+		\KCO_Logger::log( 'Order 1 placed by karl@example.com, see /checkout/order-received/1/?key=wc_order_abc123DEF' );
+
+		$this->assertNotLogged( [ 'karl@example.com' => 'email', 'wc_order_abc123DEF' => 'order key' ] );
+		$this->assertStringContainsString( '/checkout/order-received/1/', $this->loggedText() );
 	}
 
 	/** Kustom addresses a recurring token by the path, so logging the URL would log the token. */
