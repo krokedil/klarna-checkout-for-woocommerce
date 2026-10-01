@@ -50,6 +50,10 @@ trait CanDriveE2EOrderManagement {
 		if ( ! $this->inOrderAdmin ) {
 			$this->loginAsAdmin();
 
+			// loginAsAdmin() returns once the auth cookie exists, which a retried login has
+			// before its redirect to wp-admin lands; navigating then gets aborted by that redirect.
+			$this->waitForJS( "return location.pathname.indexOf('/wp-admin') === 0 && document.readyState === 'complete';", 30 );
+
 			$this->inOrderAdmin = true;
 		}
 
