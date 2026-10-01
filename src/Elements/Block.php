@@ -76,7 +76,7 @@ class Block {
 	 * @return string
 	 */
 	public function render_payment_block( $attributes ) {
-		return $this->render_block( Utility::render_payment_element( $this->get_element_atts( $attributes ) ) );
+		return $this->render_block( Utility::render_payment_element( $this->get_element_atts( $attributes ) ), $attributes );
 	}
 
 	/**
@@ -86,7 +86,7 @@ class Block {
 	 * @return string
 	 */
 	public function render_delivery_block( $attributes ) {
-		return $this->render_block( Utility::render_delivery_element( $this->get_element_atts( $attributes ) ) );
+		return $this->render_block( Utility::render_delivery_element( $this->get_element_atts( $attributes ) ), $attributes );
 	}
 
 	/**
@@ -105,10 +105,11 @@ class Block {
 	/**
 	 * Wrap the element markup in the block wrapper, so block supports such as margin and padding apply.
 	 *
-	 * @param string $element The escaped element markup.
+	 * @param string $element    The escaped element markup.
+	 * @param array  $attributes The block attributes.
 	 * @return string
 	 */
-	private function render_block( $element ) {
+	private function render_block( $element, $attributes = array() ) {
 		$public_api_key = Utility::get_public_api_key();
 		$is_preview     = defined( 'REST_REQUEST' ) && REST_REQUEST;
 
@@ -128,6 +129,12 @@ class Block {
 			if ( KeyValidator::is_error( $status ) ) {
 				$element = sprintf( '<p>%s</p>', esc_html( KeyValidator::get_message( $status, $testmode ) ) );
 			}
+		}
+
+		$margin = $attributes['style']['spacing']['margin'] ?? null;
+		if ( ! empty( $margin ) ) {
+			$styles  = wp_style_engine_get_styles( array( 'spacing' => array( 'margin' => $margin ) ) );
+			$element = empty( $styles['css'] ) ? $element : sprintf( '<div style="%1$s">%2$s</div>', esc_attr( $styles['css'] ), $element );
 		}
 
 		return sprintf( '<div %1$s>%2$s</div>', get_block_wrapper_attributes(), $element );

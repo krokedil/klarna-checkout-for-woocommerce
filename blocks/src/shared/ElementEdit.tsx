@@ -8,7 +8,7 @@ import * as React from 'react';
  */
 import { __ } from '@wordpress/i18n';
 // @ts-ignore - The package does not ship type declarations.
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps, __experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles } from '@wordpress/block-editor';
 import { Disabled, PanelBody, TextControl } from '@wordpress/components';
 // @ts-ignore - The package does not ship type declarations.
 import ServerSideRender from '@wordpress/server-side-render';
@@ -16,6 +16,7 @@ import ServerSideRender from '@wordpress/server-side-render';
 type ElementAttributes = {
 	include: string;
 	exclude: string;
+	style?: Record< string, unknown >;
 };
 
 type ElementEditProps = {
@@ -31,6 +32,11 @@ type ElementEditProps = {
  */
 export const ElementEdit = ( { name, attributes, setAttributes }: ElementEditProps ) => {
 	const blockProps = useBlockProps();
+
+	// The margin is not serialized on the wrapper (see block.json), apply it to an inner element like the PHP render does.
+	const marginStyle = Object.fromEntries(
+		Object.entries( getSpacingClassesAndStyles( attributes ).style || {} ).filter( ( [ property ] ) => property.startsWith( 'margin' ) )
+	);
 
 	return (
 		<>
@@ -51,9 +57,11 @@ export const ElementEdit = ( { name, attributes, setAttributes }: ElementEditPro
 				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>
-				<Disabled>
-					<ServerSideRender block={ name } attributes={ attributes } skipBlockSupportAttributes />
-				</Disabled>
+				<div style={ marginStyle }>
+					<Disabled>
+						<ServerSideRender block={ name } attributes={ attributes } skipBlockSupportAttributes />
+					</Disabled>
+				</div>
 			</div>
 		</>
 	);
