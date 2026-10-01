@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 9.7.0
-WC tested up to: 11.1.0
-Stable tag: 2.21.0
+WC tested up to: 11.1.2
+Stable tag: 2.22.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,13 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-09-28    - version 2.22.0 =
+* Feature       - Added support for Kustom Elements. Show your customers the available Kustom payment methods and delivery options on product and cart pages, or anywhere else with a shortcode or block.
+* Fix           - Fixed an issue where the customer could see a "shipping methods have been changed" error when placing an order with Kustom Shipping Assistant handling the shipping selection.
+* Fix           - Fixed an issue where the Mini-Cart block triggered a Kustom API call on every page load.
+* Fix           - Fixed an issue where renewal orders inherited the parent order's Kustom order ID, causing an unpaid renewal order to appear connected to the parent's Kustom order in the Kustom Order Management box.
+* Fix           - Fixed an issue where retrying payment on a subscription renewal order other than the most recent one left the authorized payment unregistered and uncaptured in WooCommerce.
+
 = 2026-09-15    - version 2.21.0 =
 * Feature       - Added an "Enable order management" setting. When disabled, WooCommerce no longer activates, cancels, updates or credits Kustom orders, and refunds can only be registered in WooCommerce with "Refund manually". The manual actions on individual orders are still available.
 * Feature       - Simplified the Kustom API credential settings into a single set of fields instead of separate Europe and United States entries.
