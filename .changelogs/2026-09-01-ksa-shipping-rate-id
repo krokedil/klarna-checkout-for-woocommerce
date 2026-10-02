@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed the Kustom Shipping Assistant shipping method not being applied to the order, so a customer who selected a shipping option in the Kustom iframe could be charged the price of a different shipping method in the same shipping zone.
