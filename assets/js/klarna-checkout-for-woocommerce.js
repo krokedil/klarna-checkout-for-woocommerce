@@ -544,20 +544,7 @@ jQuery( function ( $ ) {
 						success: function ( data ) {
 							try {
 								if ( "success" === data.result ) {
-									let email = "N/A"
-									if (
-										"billing_address" in response.data &&
-										"email" in response.data.billing_address
-									) {
-										email = response.data.shipping_address.email
-									} else if (
-										"shipping_address" in response.data &&
-										"email" in response.data.shipping_address
-									) {
-										email = response.data.shipping_address.email
-									}
-
-									kco_wc.logToFile( `Successfully placed order [${email}]. Sending "should_proceed: true" to Kustom` )
+									kco_wc.logToFile( 'Successfully placed order. Sending "should_proceed: true" to Kustom' )
 									callback( { should_proceed: true } )
 								} else {
 									throw "Result failed"

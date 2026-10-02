@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: no
+
+Customer details and payment secrets are now masked in the plugin logs and the system status report.
