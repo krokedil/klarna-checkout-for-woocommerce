@@ -27,7 +27,7 @@ class EmbeddedFlow extends CheckoutFlow {
 		$order->save();
 
 		do_action( 'kco_wc_process_payment', $order->get_id(), $klarna_order );
-		\KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] was successfully processed." );
+		\KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) was successfully processed." );
 
 		return array(
 			'result' => 'success',
