@@ -129,6 +129,11 @@ class Elements {
 	 * @return bool
 	 */
 	public function is_active() {
+		/**
+		 * Filters whether the Kustom Elements should be considered active on every request.
+		 *
+		 * @param bool $show_everywhere Whether to load Kustom Elements on every request. Default false.
+		 */
 		if ( apply_filters( 'kco_elements_show_everywhere', false ) ) {
 			return true;
 		}
@@ -174,7 +179,14 @@ class Elements {
 		$default_src = $testmode
 			? 'https://js.playground.kustom.co/kustom-elements/v1/pre-load.js'
 			: 'https://js.live.kustom.co/kustom-elements/v1/pre-load.js';
-		$src         = apply_filters( 'kco_elements_script_src', $default_src, $testmode );
+
+		/**
+		 * Filters the source URL of the Kustom Elements SDK script.
+		 *
+		 * @param string $default_src The default script URL for the current environment.
+		 * @param bool   $testmode    Whether test mode is enabled.
+		 */
+		$src = apply_filters( 'kco_elements_script_src', $default_src, $testmode );
 
 		wp_register_script( self::SCRIPT_HANDLE, $src, array(), KCO_WC_VERSION, false );
 		add_filter( 'script_loader_tag', array( $this, 'add_script_attributes' ), 10, 2 );

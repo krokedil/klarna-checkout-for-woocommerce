@@ -64,6 +64,11 @@ class KCO_API_Callbacks {
 
 		// Let other plugins hook into the push notification.
 		// Used by Klarna_Checkout_Subscription::handle_push_cb_for_payment_method_change().
+		/**
+		 * Fires when a push notification is received from Kustom, before the WooCommerce order is processed.
+		 *
+		 * @param string $klarna_order_id The Kustom order ID.
+		 */
 		do_action( 'wc_klarna_push_cb', $klarna_order_id );
 
 		$order = kco_get_order_by_klarna_id( $klarna_order_id );
@@ -77,6 +82,11 @@ class KCO_API_Callbacks {
 		$order_id = $order->get_id();
 		if ( $order ) {
 			// Get the Kustom order data.
+			/**
+			 * Filters the Kustom order data retrieved during the push notification callback.
+			 *
+			 * @param array|WP_Error $klarna_order The Kustom order data from the order management API, or a WP_Error on failure.
+			 */
 			$klarna_order = apply_filters(
 				'kco_wc_api_callbacks_push_klarna_order',
 				KCO_WC()->api->get_klarna_om_order( $klarna_order_id )
@@ -98,6 +108,13 @@ class KCO_API_Callbacks {
 					// translators: Kustom order ID.
 					$note = sprintf( __( 'Payment via Kustom Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
 					$order->add_order_note( $note );
+					/**
+					 * Triggers after an accepted Kustom order has been completed.
+					 *
+					 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#add-additional-checkboxes Add additional checkboxes
+					 * @param int   $order_id     The WooCommerce order ID.
+					 * @param array $klarna_order The Kustom order data.
+					 */
 					do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
 				} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
 					$order->update_status( 'on-hold', __( 'Kustom Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );

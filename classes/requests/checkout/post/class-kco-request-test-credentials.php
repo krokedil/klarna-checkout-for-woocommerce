@@ -22,7 +22,13 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $username, $password, $testmode ) {
-		$request_url        = $this->get_test_endpoint( $testmode ) . 'checkout/v3/orders';
+		$request_url = $this->get_test_endpoint( $testmode ) . 'checkout/v3/orders';
+
+		/**
+		 * Filters the request arguments used to test the Kustom API credentials.
+		 *
+		 * @param array $request_args The request arguments passed to wp_remote_request().
+		 */
 		$request_args       = apply_filters( 'kco_wc_test_credentials', $this->get_request_args( $username, $password, $request_url ) );
 		$response           = wp_remote_request( $request_url, $request_args );
 		$code               = wp_remote_retrieve_response_code( $response );
@@ -71,6 +77,13 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 	 * @return array
 	 */
 	protected function get_request_args( $username, $password, $url = '' ) {
+			/**
+			 * Filters the timeout, in seconds, for requests to the Kustom API.
+			 *
+			 * @param int $timeout The request timeout in seconds. Default 10.
+			 */
+			$timeout = apply_filters( 'kco_wc_request_timeout', 10 );
+
 			return array(
 				'headers'    => array(
 					'Authorization'  => 'Basic ' . base64_encode( $username . ':' . $password ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Base64 used to calculate auth header.
@@ -80,7 +93,7 @@ class KCO_Request_Test_Credentials extends KCO_Request {
 				'user-agent' => $this->get_user_agent( $url ),
 				'method'     => 'POST',
 				'body'       => wp_json_encode( $this->get_body() ),
-				'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
+				'timeout'    => $timeout,
 			);
 	}
 

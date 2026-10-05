@@ -314,6 +314,11 @@ class KCO_Fields {
 		);
 
 		// Insert the "Checkout flow" setting after the "Checkout layout" setting.
+		/**
+		 * Filters whether to enable the redirected checkout flow setting.
+		 *
+		 * @param bool $enable_redirected_flow Whether to enable the redirected checkout flow. Default false.
+		 */
 		if ( apply_filters( 'kco_enable_redirected_flow', false ) ) {
 			$checkout_flow = array(
 				'title'       => __( 'Checkout flow', 'klarna-checkout-for-woocommerce' ),
@@ -366,6 +371,11 @@ class KCO_Fields {
 			}
 			$settings = $new_settings;
 		}
+		/**
+		 * Filters the Kustom Checkout gateway settings fields.
+		 *
+		 * @param array $settings The settings fields.
+		 */
 		return apply_filters( 'kco_wc_gateway_settings', $settings );
 	}
 }

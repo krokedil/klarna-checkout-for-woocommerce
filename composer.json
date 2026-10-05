@@ -8,7 +8,8 @@
     "wpackagist-plugin/woocommerce": "^10.0",
     "wpackagist-plugin/sqlite-database-integration": "^2.2",
     "wpackagist-theme/storefront": "^4.6",
-    "allure-framework/allure-codeception": "^2"
+    "allure-framework/allure-codeception": "^2",
+    "pronamic/wp-documentor": "1.3.2"
   },
   "autoload": {
     "psr-4": {
@@ -109,6 +110,7 @@
     "test:report": "bash tests/_support_scripts/generate-report.sh",
     "test:report:share": "bash tests/_support_scripts/generate-report.sh --share",
     "test:report:reset": "rm -rf tests/_output/allure-results tests/_output/report tests/_output/report-share tests/_output/record_* tests/_output/Tests.EndToEnd.*.html tests/_output/Tests.EndToEnd.*.png",
-    "test:regenerate-dump": "bash tests/_support_scripts/regenerate-dump.sh"
+    "test:regenerate-dump": "bash tests/_support_scripts/regenerate-dump.sh",
+    "doc:hooks": "vendor/bin/wp-documentor parse . --exclude=docs --exclude=tests --exclude=vendor --exclude=node_modules --exclude=languages --exclude=dependencies --exclude=blocks/build --format=markdown --type=filters --output=docs/hooks.md --relative=docs --prefix=kco_ --prefix=kom_ --prefix=klarna_ --prefix=wc_klarna_ --template=docs/templates/template.php"
   }
 }

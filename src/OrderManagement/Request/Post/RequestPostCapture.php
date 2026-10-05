@@ -74,6 +74,12 @@ class RequestPostCapture extends RequestPost {
 			}
 		}
 
+		/**
+		 * Filters the request body sent to Kustom when capturing an order.
+		 *
+		 * @param array $data     The capture request body.
+		 * @param int   $order_id The WooCommerce order ID.
+		 */
 		return apply_filters( 'kom_order_capture_args', $data, $this->order_id );
 	}
 

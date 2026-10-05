@@ -84,7 +84,14 @@ class KCO_Templates {
 		if ( is_checkout() ) {
 			$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			// Don't display KCO template if we have a cart that doesn't needs payment.
-			if ( apply_filters( 'kco_check_if_needs_payment', true ) && ! is_wc_endpoint_url( 'order-pay' ) ) {
+			/**
+			 * Filters whether Kustom Checkout should only be used when the cart or order needs payment.
+			 *
+			 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#display-kustom-checkout-even-on-free-orders Display Kustom Checkout even on free orders
+			 * @param bool $check_if_needs_payment Whether to check if payment is needed. Default true.
+			 */
+			$check_if_needs_payment = apply_filters( 'kco_check_if_needs_payment', true );
+			if ( $check_if_needs_payment && ! is_wc_endpoint_url( 'order-pay' ) ) {
 				if ( ! kco_cart_needs_payment() ) {
 					return $template;
 				}
@@ -102,6 +109,12 @@ class KCO_Templates {
 				if ( locate_template( 'woocommerce/klarna-checkout.php' ) ) {
 					$klarna_checkout_template = locate_template( 'woocommerce/klarna-checkout.php' );
 				} else {
+					/**
+					 * Filters the path to the Kustom Checkout template.
+					 *
+					 * @param string $template      The template path.
+					 * @param string $template_name The name of the WooCommerce template being overridden.
+					 */
 					$klarna_checkout_template = apply_filters( 'kco_locate_checkout_template', KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout.php', $template_name );
 				}
 

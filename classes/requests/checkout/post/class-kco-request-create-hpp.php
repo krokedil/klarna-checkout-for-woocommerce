@@ -21,7 +21,13 @@ class KCO_Request_Create_HPP extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $session_id, $order_id ) {
-		$request_url  = $this->get_api_url_base() . 'hpp/v1/sessions';
+		$request_url = $this->get_api_url_base() . 'hpp/v1/sessions';
+
+		/**
+		 * Filters the request arguments for creating a Kustom Hosted Payment Page session.
+		 *
+		 * @param array $request_args The request arguments passed to wp_remote_request().
+		 */
 		$request_args = apply_filters( 'wc_klarna_checkout_create_hpp_args', $this->get_request_args( $session_id, $order_id, $request_url ) );
 
 		$response = wp_remote_request( $request_url, $request_args );
@@ -44,12 +50,28 @@ class KCO_Request_Create_HPP extends KCO_Request {
 	 * @return array
 	 */
 	public function get_request_args( $session_id, $order_id, $url = '' ) {
+		/**
+		 * Filters the request body sent to Kustom when creating a Hosted Payment Page session.
+		 *
+		 * @param array  $body       The request body.
+		 * @param int    $order_id   The WooCommerce order ID.
+		 * @param string $session_id The Kustom Checkout session ID.
+		 */
+		$request_body = apply_filters( 'kco_wc_api_hpp_request_args', $this->get_body( $session_id, $order_id ), $order_id, $session_id );
+
+		/**
+		 * Filters the timeout, in seconds, for requests to the Kustom API.
+		 *
+		 * @param int $timeout The request timeout in seconds. Default 10.
+		 */
+		$timeout = apply_filters( 'kco_wc_request_timeout', 10 );
+
 		return array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'POST',
-			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_hpp_request_args', $this->get_body( $session_id, $order_id ), $order_id, $session_id ) ),
-			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
+			'body'       => wp_json_encode( $request_body ),
+			'timeout'    => $timeout,
 		);
 	}
 
