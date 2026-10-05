@@ -85,7 +85,7 @@ class KCO_API_Callbacks {
 			/**
 			 * Filters the Kustom order data retrieved during the push notification callback.
 			 *
-			 * @param array|WP_Error $klarna_order The Kustom order data from the order management API, or a WP_Error on failure.
+			 * @param array|false $klarna_order The Kustom order data from the order management API, or false on failure.
 			 */
 			$klarna_order = apply_filters(
 				'kco_wc_api_callbacks_push_klarna_order',

@@ -94,8 +94,8 @@ class FreeOrders {
 			/**
 			 * Triggers when a WooCommerce order is being processed for payment with Kustom Checkout.
 			 *
-			 * @param int   $order_id     The WooCommerce order ID.
-			 * @param array $klarna_order The Kustom order data.
+			 * @param int         $order_id     The WooCommerce order ID.
+			 * @param array|false $klarna_order The Kustom order data, or false if updating the Kustom order failed.
 			 */
 			do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
 

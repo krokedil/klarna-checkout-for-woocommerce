@@ -222,7 +222,7 @@ Source: [./templates/klarna-checkout.php](../templates/klarna-checkout.php), [li
 Argument | Type | Description
 -------- | ---- | -----------
 `$order_id` | `int` | The WooCommerce order ID.
-`$klarna_order` | `array` | The Kustom order data.
+`$klarna_order` | `array\|false` | The Kustom order data, or false if updating the Kustom order failed.
 
 Source: [./src/ShippingAssistant/FreeOrders.php](../src/ShippingAssistant/FreeOrders.php), [line 94](../src/ShippingAssistant/FreeOrders.php#L94-L100)
 
@@ -300,7 +300,7 @@ Source: [./src/CheckoutFlow/EmbeddedBlockFlow.php](../src/CheckoutFlow/EmbeddedB
 Argument | Type | Description
 -------- | ---- | -----------
 `$order_id` | `int` | The WooCommerce order ID.
-`$klarna_order` | `array` | The Kustom order data.
+`$klarna_order` | `array\|false` | The Kustom order data, or false if updating the Kustom order failed.
 
 Source: [./src/CheckoutFlow/EmbeddedFlow.php](../src/CheckoutFlow/EmbeddedFlow.php), [line 31](../src/CheckoutFlow/EmbeddedFlow.php#L31-L37)
 
@@ -949,7 +949,7 @@ Source: [./classes/requests/helpers/class-kco-request-cart.php](../classes/reque
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$klarna_order` | `array\|\WP_Error` | The Kustom order data from the order management API, or a WP_Error on failure.
+`$klarna_order` | `array\|false` | The Kustom order data from the order management API, or false on failure.
 
 Source: [./classes/class-kco-api-callbacks.php](../classes/class-kco-api-callbacks.php), [line 85](../classes/class-kco-api-callbacks.php#L85-L93)
 
