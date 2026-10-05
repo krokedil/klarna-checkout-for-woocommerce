@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Krokedil\KustomCheckout\Utility\ConfirmationUtility;
+
 /**
  * KCO_API class.
  *
@@ -73,26 +75,7 @@ class KCO_API {
 			// Read the structured response body preserved by process_response.
 			$error = $response->get_error_data( 'klarna_error_body' );
 			if ( is_array( $error ) && 'READ_ONLY_ORDER' === ( $error['error_code'] ?? false ) ) {
-				$order = kco_get_order_by_klarna_id( $klarna_order_id, '2 day ago' );
-				if ( ! empty( $order ) ) {
-
-					$redirect_url = $order->get_checkout_order_received_url();
-					if ( empty( $order->get_date_paid() ) ) {
-						// If this was not paid directly, we're not dealing with a zero-order purchase (e.g., free trial subscription), and we should redirect to the confirmation page instead.
-						$redirect_url = add_query_arg(
-							array(
-								'kco_confirm'  => 'yes',
-								'kco_order_id' => $klarna_order_id,
-								'order_id'     => $order->get_id(),
-								'key'          => $order->get_order_key(),
-							),
-							$order->get_checkout_order_received_url()
-						);
-					}
-
-					wp_safe_redirect( $redirect_url );
-					exit;
-				}
+				ConfirmationUtility::redirect( $klarna_order_id );
 			}
 
 			// Handle BAD_VALUE purchase_currency mismatch (e.g. customer changes country to one incompatible with the store currency).

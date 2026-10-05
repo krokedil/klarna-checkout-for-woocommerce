@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Krokedil\KustomCheckout\Utility\ConfirmationUtility;
 use Krokedil\KustomCheckout\Utility\SigningKeyUtility;
 
 /**
@@ -57,7 +58,13 @@ class KCO_Confirmation {
 		$order_key       = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		// Return if we don't have our parameters set.
-		if ( empty( $kco_confirm ) || empty( $klarna_order_id ) || empty( $order_key ) ) {
+		if ( empty( $kco_confirm ) || empty( $klarna_order_id ) ) {
+			return;
+		}
+
+		// The block checkout's confirmation URL has no order key, since Kustom gets it before the order exists.
+		if ( empty( $order_key ) ) {
+			ConfirmationUtility::redirect_from_session( $klarna_order_id );
 			return;
 		}
 
