@@ -11,9 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$shipping_id = WC()->session->get( 'chosen_shipping_methods' )[0];
-$packages    = WC()->shipping->get_packages();
-$rate        = null;
+$chosen_methods = WC()->session->get( 'chosen_shipping_methods', array() );
+$shipping_id    = $chosen_methods[0] ?? '';
+$packages       = WC()->shipping->get_packages();
+$rate           = null;
 foreach ( $packages as $package ) {
 	if ( isset( $package['rates'] ) && isset( $package['rates'][ $shipping_id ] ) ) {
 		$rate = $package['rates'][ $shipping_id ];

@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "kustom/delivery-element",
+	"title": "Kustom Delivery Element",
+	"description": "Presents the available delivery options. Requires Kustom Shipping Assistant (KSA) to be active and configured.",
+	"category": "woocommerce",
+	"icon": "car",
+	"keywords": [ "kustom", "delivery", "shipping", "elements" ],
+	"textdomain": "klarna-checkout-for-woocommerce",
+	"attributes": {
+		"include": { "type": "string", "default": "" },
+		"exclude": { "type": "string", "default": "" }
+	},
+	"supports": {
+		"html": false,
+		"spacing": { "margin": true, "padding": true }
+	},
+	"example": {},
+	"editorScript": "kco-elements-deliveryelement-block"
+}
