@@ -92,6 +92,32 @@ class CallbacksTest extends IntegrationTestCase {
 		$this->assertSame( [ $order->get_id() ], $fired );
 	}
 
+	public function test_a_confirmed_order_already_knows_whether_it_can_be_upsold(): void {
+		$order = $this->haveOrderAwaitingConfirmation();
+
+		$this->willRetrieveManagedOrder(
+			[
+				'order_amount'           => 12500,
+				'order_lines'            => $this->orderLinesFor( $order ),
+				'initial_payment_method' => [ 'type' => 'INVOICE' ],
+				'billing_address'        => [ 'country' => 'SE' ],
+			]
+		);
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertTrue( ( new \KCO_Gateway() )->upsell_available( $order->get_id() ) );
+		$lookups = array_filter(
+			$this->gatewayRequests(),
+			static function ( $request ) {
+				return str_ends_with( $request['url'], '/orders/kustom-order-123' );
+			}
+		);
+		$this->assertCount( 1, $lookups, 'Post Purchase Upsell asks right after the confirmation, which already had the answer.' );
+	}
+
 	/**
 	 * An order Kustom says a different total for must not be confirmed: it would ship
 	 * goods nobody paid for.

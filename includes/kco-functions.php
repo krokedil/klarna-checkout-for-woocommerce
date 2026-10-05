@@ -626,6 +626,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				kco_maybe_save_surcharge( $order_id, $klarna_order );
 				kco_maybe_save_org_nr( $order_id, $klarna_order );
 				kco_maybe_save_reference( $order_id, $klarna_order );
+				kco_maybe_save_upsell_available( $order, $klarna_order );
 
 				// Let other plugins hook into this sequence.
 				do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
@@ -907,6 +908,43 @@ function kco_maybe_save_reference( $order_id, $klarna_order ) {
 		}
 		$order->save();
 	}
+}
+
+/**
+ * Maybe saves whether a post purchase upsell can be added to the order, based on how it was paid.
+ *
+ * @param WC_Order $order The WooCommerce order.
+ * @param array    $klarna_order The Kustom order management order.
+ * @return bool|null Whether upsell is available, or null if the Kustom order has no payment method yet.
+ */
+function kco_maybe_save_upsell_available( $order, $klarna_order ) {
+	if ( ! isset( $klarna_order['initial_payment_method']['type'] ) ) {
+		return null;
+	}
+
+	// Set allowed payment methods for upsell based on country. https://docs.kustom.co/v3/order-management/manage-orders-with-the-api/view-and-change-orders#update-order-amount-1.
+	$allowed_payment_methods = array( 'INVOICE', 'B2B_INVOICE', 'BASE_ACCOUNT', 'DIRECT_DEBIT' );
+	switch ( $klarna_order['billing_address']['country'] ?? '' ) {
+		case 'AT':
+		case 'DE':
+		case 'DK':
+		case 'FI':
+		case 'FR':
+		case 'NL':
+		case 'NO':
+		case 'SE':
+			$allowed_payment_methods[] = 'FIXED_AMOUNT';
+			break;
+		case 'CH':
+			$allowed_payment_methods = array();
+			break;
+	}
+
+	$available = in_array( $klarna_order['initial_payment_method']['type'], $allowed_payment_methods, true );
+	$order->update_meta_data( '_kco_upsell_available', wc_bool_to_string( $available ) );
+	$order->save_meta_data();
+
+	return $available;
 }
 
 /**

@@ -658,6 +658,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 		/**
 		 * Check if upsell should be available for the Kustom order or not.
+		 * The answer is saved on the order, so only the first check asks Kustom.
 		 *
 		 * @param int $order_id The WooCommerce order id.
 		 * @return bool
@@ -670,36 +671,19 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return false;
 			}
 
+			// Post Purchase Upsell asks once per offer on every page load, and the answer cannot change after purchase.
+			$saved = $order->get_meta( '_kco_upsell_available', true );
+			if ( '' !== $saved ) {
+				return wc_string_to_bool( $saved );
+			}
+
 			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 			if ( is_wp_error( $klarna_order ) ) {
 				return false;
 			}
 
-			// If the needed keys are not set, return false.
-			if ( ! isset( $klarna_order['initial_payment_method'] ) || ! isset( $klarna_order['initial_payment_method']['type'] ) ) {
-				return false;
-			}
-
-			// Set allowed payment methods for upsell based on country. https://docs.kustom.co/v3/order-management/manage-orders-with-the-api/view-and-change-orders#update-order-amount-1.
-			$allowed_payment_methods = array( 'INVOICE', 'B2B_INVOICE', 'BASE_ACCOUNT', 'DIRECT_DEBIT' );
-			switch ( $klarna_order['billing_address']['country'] ) {
-				case 'AT':
-				case 'DE':
-				case 'DK':
-				case 'FI':
-				case 'FR':
-				case 'NL':
-				case 'NO':
-				case 'SE':
-					$allowed_payment_methods[] = 'FIXED_AMOUNT';
-					break;
-				case 'CH':
-					$allowed_payment_methods = array();
-					break;
-			}
-
-			return in_array( $klarna_order['initial_payment_method']['type'], $allowed_payment_methods, true );
+			return (bool) kco_maybe_save_upsell_available( $order, $klarna_order );
 		}
 
 		/**
