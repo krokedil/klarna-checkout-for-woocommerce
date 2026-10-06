@@ -1,4 +1,0 @@
-Type: Tweak
-Needs Documentation: no
-
-The "Shipping methods in iframe" setting now says it is required when Kustom Shipping Assistant is enabled, instead of referring to the separate Kustom Shipping Assistant plugin.
