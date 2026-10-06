@@ -126,6 +126,12 @@ class KCO_Checkout {
 		}
 
 		// If cart doesn't need payment anymore - reload the checkout page.
+		/**
+		 * Filters whether Kustom Checkout should only be used when the cart or order needs payment.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#display-kustom-checkout-even-on-free-orders Display Kustom Checkout even on free orders
+		 * @param bool $check_if_needs_payment Whether to check if payment is needed. Default true.
+		 */
 		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
 			$status = $updated_klarna_order ? $updated_klarna_order['status'] : $klarna_order['status'];
 			if ( ! kco_cart_needs_payment() && 'checkout_incomplete' === $status ) {
@@ -184,12 +190,23 @@ class KCO_Checkout {
 		 * Note however that this is not recommended. If you do this, and the shipping method that the customer selected is no longer available,
 		 * then unexpected issues might happen. Only do this if you are sure the chosen method actually exists and is available.
 		 */
+		/**
+		 * Filters whether to automatically correct the shipping method to the customer's chosen method instead of throwing a shipping error.
+		 *
+		 * @param bool   $auto_correct  Whether to auto-correct the shipping method. Default false.
+		 * @param string $default       The shipping method ID that WooCommerce would set as the default.
+		 * @param array  $rates         The shipping rates calculated when getting the default method.
+		 * @param string $chosen_method The shipping method ID chosen by the customer.
+		 */
 		if ( apply_filters( 'kco_shipping_auto_correct', false, $default, $rates, $chosen_method ) ) {
 			KCO_Logger::log( "Checkout error - Correcting the shipping method to the customers chosen method: $chosen_method" );
 			return $chosen_method;
 		}
 
 		// If we are not auto-correcting the shipping method, we return the default, but trigger our action. This is so we can throw the error at a later time.
+		/**
+		 * Fires when the shipping method was changed by WooCommerce during checkout, to throw a shipping error later in the process.
+		 */
 		do_action( 'kco_checkout_shipping_error' );
 		return $default;
 	}
@@ -235,6 +252,12 @@ class KCO_Checkout {
 		}
 
 		// Only if our filter is active and is set to false.
+		/**
+		 * Filters whether Kustom Checkout should only be used when the cart or order needs payment.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#display-kustom-checkout-even-on-free-orders Display Kustom Checkout even on free orders
+		 * @param bool $check_if_needs_payment Whether to check if payment is needed. Default true.
+		 */
 		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
 			return $wc_result;
 		}
@@ -251,6 +274,12 @@ class KCO_Checkout {
 	public function maybe_change_needs_payment_cart( $needs_payment ) {
 
 		// Only if our filter is active and is set to false.
+		/**
+		 * Filters whether Kustom Checkout should only be used when the cart or order needs payment.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#display-kustom-checkout-even-on-free-orders Display Kustom Checkout even on free orders
+		 * @param bool $check_if_needs_payment Whether to check if payment is needed. Default true.
+		 */
 		if ( apply_filters( 'kco_check_if_needs_payment', true ) ) {
 			return $needs_payment;
 		}

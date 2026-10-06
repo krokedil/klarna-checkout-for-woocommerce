@@ -151,6 +151,12 @@ class RequestPostRefund extends RequestPost {
 					if ( is_object( $product ) && method_exists( $product, 'is_downloadable' ) ) {
 							$type = $product->is_downloadable() || $product->is_virtual() ? 'digital' : 'physical';
 					} else {
+							/**
+							 * Filters the Kustom product type for a refunded item whose product no longer exists in WooCommerce.
+							 *
+							 * @param string                 $type The Kustom order line type. Default 'physical'.
+							 * @param \WC_Order_Item_Product $item The refunded order item.
+							 */
 							$type = apply_filters( 'kom_line_item_product_type', 'physical', $item );
 					}
 
@@ -273,6 +279,12 @@ class RequestPostRefund extends RequestPost {
 			}
 		}
 
+		/**
+		 * Filters the request body sent to Kustom when refunding an order.
+		 *
+		 * @param array $data     The refund request body.
+		 * @param int   $order_id The WooCommerce order ID.
+		 */
 		return apply_filters( 'kom_refund_order_args', $data, $this->order_id );
 	}
 

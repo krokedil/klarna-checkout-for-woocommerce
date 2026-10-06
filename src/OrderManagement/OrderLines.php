@@ -127,6 +127,12 @@ class OrderLines {
 		foreach ( $order->get_items() as $order_item ) {
 			$klarna_item = $this->process_order_item_product( $order_item, $order );
 
+			/**
+			 * Filters the Kustom order line for a WooCommerce order item product. Return a falsy value to exclude the line.
+			 *
+			 * @param array                  $klarna_item The Kustom order line data.
+			 * @param \WC_Order_Item_Product $order_item  The WooCommerce order item.
+			 */
 			$order_line_item = apply_filters( 'kom_wc_order_line_item', $klarna_item, $order_item );
 			if ( $order_line_item ) {
 				$this->order_lines[] = $order_line_item;
@@ -169,7 +175,14 @@ class OrderLines {
 		 * PW WooCommerce Gift Cards.
 		 */
 		foreach ( $order->get_items( 'pw_gift_card' ) as $gift_card ) {
-			$code             = $gift_card->get_card_number();
+			$code = $gift_card->get_card_number();
+
+			/**
+			 * Filters the reference (SKU) used for PW WooCommerce Gift Cards order lines sent to Kustom.
+			 *
+			 * @param string $sku  The gift card reference. Default 'gift_card'.
+			 * @param string $code The gift card number.
+			 */
 			$gift_card_sku    = apply_filters( 'klarna_pw_gift_card_sku', __( 'gift_card', 'klarna-checkout-for-woocommerce' ), $code );
 			$gift_card_amount = intval( $gift_card->get_amount() * -100 );
 			$order_item       = array(

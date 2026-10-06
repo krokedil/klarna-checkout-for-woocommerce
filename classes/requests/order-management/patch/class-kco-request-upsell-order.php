@@ -22,9 +22,26 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $klarna_order_id, $order_id, $upsell_uuid ) {
-		$request_url  = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id . '/authorization';
+		$request_url = $this->get_api_url_base() . 'ordermanagement/v1/orders/' . $klarna_order_id . '/authorization';
+
+		/**
+		 * Filters the request arguments for a Kustom order management request, such as acknowledging an order.
+		 *
+		 * @param array $request_args The request arguments passed to wp_remote_request().
+		 */
 		$request_args = apply_filters( 'kco_wc_acknowledge_order', $this->get_request_args( $order_id, $upsell_uuid, $request_url ) );
 
+		/**
+		 * Filters the request body sent to Kustom when creating or updating an order.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#modify-order-data-sent-to-kustom Modify order data sent to Kustom
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#anonymize-product-names-sent-to-kustom Anonymize product names sent to Kustom
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#set-a-forced-purchase-country Set a forced purchase country
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#only-accept-purchases-from-customer-over-18-years-of-age Only accept purchases from customer over 18 years of age
+		 * @param array  $body        The request body.
+		 * @param int    $order_id    The WooCommerce order ID.
+		 * @param string $upsell_uuid The unique ID of the upsell request.
+		 */
 		$body_array           = apply_filters( 'kco_wc_api_request_args', json_decode( $request_args['body'], true ), $order_id, $upsell_uuid );
 		$request_args['body'] = wp_json_encode( $body_array );
 
@@ -63,12 +80,19 @@ class KCO_Request_Upsell_Order extends KCO_Request {
 	 * @return array
 	 */
 	protected function get_request_args( $order_id, $upsell_uuid, $url = '' ) {
+		/**
+		 * Filters the timeout, in seconds, for requests to the Kustom API.
+		 *
+		 * @param int $timeout The request timeout in seconds. Default 10.
+		 */
+		$timeout = apply_filters( 'kco_wc_request_timeout', 10 );
+
 		return array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'PATCH',
 			'body'       => wp_json_encode( $this->get_body( $order_id, $upsell_uuid ) ),
-			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
+			'timeout'    => $timeout,
 		);
 	}
 

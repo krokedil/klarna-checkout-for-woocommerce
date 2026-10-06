@@ -274,11 +274,19 @@ abstract class Request {
 		if ( is_wp_error( $headers ) ) {
 			return $headers;
 		}
+
+		/**
+		 * Filters the timeout in seconds for order management requests to Kustom.
+		 *
+		 * @param int $timeout The request timeout in seconds. Default 10.
+		 */
+		$timeout = apply_filters( 'kom_request_timeout', 10 );
+
 		$args = array(
 			'headers'    => $headers,
 			'user-agent' => $this->get_user_agent(),
 			'method'     => $this->method,
-			'timeout'    => apply_filters( 'kom_request_timeout', 10 ),
+			'timeout'    => $timeout,
 		);
 		$body = $this->get_body();
 		if ( ! empty( $body ) ) {

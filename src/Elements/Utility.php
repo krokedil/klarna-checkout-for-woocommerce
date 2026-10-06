@@ -32,6 +32,11 @@ class Utility {
 	public static function get_locale() {
 		$locale = substr( str_replace( '_', '-', get_locale() ), 0, 5 );
 
+		/**
+		 * Filters the locale used for Kustom Elements.
+		 *
+		 * @param string $locale The 5-character locale (language-COUNTRY), derived from the WordPress locale.
+		 */
 		return apply_filters( 'kco_elements_locale', $locale );
 	}
 

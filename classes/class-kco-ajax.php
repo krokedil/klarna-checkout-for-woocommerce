@@ -293,6 +293,12 @@ class KCO_AJAX extends WC_AJAX {
 	public static function kco_customer_type_changed() {
 		check_ajax_referer( 'kco_customer_type_changed', 'nonce' );
 		$customer_type = isset( $_POST['customer_type'] ) ? sanitize_text_field( wp_unslash( $_POST['customer_type'] ) ) : ''; // phpcs:ignore
+		/**
+		 * Triggers when the customer changes the customer type in Kustom Checkout.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#customer-type-changed Customer type changed
+		 * @param string $customer_type The new customer type, e.g. 'person' or 'organization'.
+		 */
 		do_action( 'kco_customer_type_changed', $customer_type );
 	}
 
@@ -309,6 +315,12 @@ class KCO_AJAX extends WC_AJAX {
 
 		$key     = filter_input( INPUT_POST, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$checked = filter_input( INPUT_POST, 'checked', FILTER_VALIDATE_BOOLEAN );
+		/**
+		 * Triggers when a checkbox is changed in Kustom Checkout.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#add-a-fee-using-a-custom-checkbox Add a fee using a custom checkbox
+		 * @param array $checkbox The checkbox data, with the keys 'key' (string) and 'checked' (bool).
+		 */
 		do_action(
 			'kco_checkbox_changed',
 			array(
@@ -317,9 +329,16 @@ class KCO_AJAX extends WC_AJAX {
 			)
 		);
 
+		/**
+		 * Filters whether the checkout should be refreshed after a checkbox is changed in Kustom Checkout.
+		 *
+		 * @param bool $refresh_checkout Whether to refresh the checkout. Default false.
+		 */
+		$refresh_checkout = apply_filters( 'kco_ajax_refresh_checkout', false );
+
 		wp_send_json_success(
 			array(
-				'refresh_checkout' => apply_filters( 'kco_ajax_refresh_checkout', false ),
+				'refresh_checkout' => $refresh_checkout,
 			)
 		);
 	}

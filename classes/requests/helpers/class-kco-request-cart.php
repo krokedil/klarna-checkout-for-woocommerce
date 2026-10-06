@@ -163,10 +163,17 @@ class KCO_Request_Cart {
 			return $this->order_lines;
 		}
 
+		/**
+		 * Filters the name of the surcharge order line added when the order lines do not match the cart total.
+		 *
+		 * @param string $name The order line name. Default 'Surcharge'.
+		 */
+		$surcharge_name = apply_filters( 'kco_wc_surcharge_name', __( 'Surcharge', 'klarna-checkout-for-woocommerce' ) );
+
 		$adjust_item = array(
 			'type'                  => 'surcharge',
 			'reference'             => 'added-surcharge',
-			'name'                  => apply_filters( 'kco_wc_surcharge_name', __( 'Surcharge', 'klarna-checkout-for-woocommerce' ) ),
+			'name'                  => $surcharge_name,
 			'quantity'              => 1,
 			'unit_price'            => $amount_to_adjust,
 			'tax_rate'              => 0,
@@ -252,6 +259,12 @@ class KCO_Request_Cart {
 				}
 
 				/* This should better support get_catalog_visibility = hidden on product components.  */
+				/**
+				 * Filters a cart item order line before it is added to the Kustom order lines.
+				 *
+				 * @param array $klarna_item The order line formatted for Kustom. Return a falsy value to exclude it.
+				 * @param array $cart_item   The WooCommerce cart item.
+				 */
 				$cart_line_item = apply_filters( 'kco_wc_cart_line_item', $klarna_item, $cart_item );
 				if ( $cart_line_item ) {
 					$this->order_lines[] = $cart_line_item;
