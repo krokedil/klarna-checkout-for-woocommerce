@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where the checkout block sent a failing Kustom order update after a completed purchase. The customer is now sent straight to the thank you page instead of the checkout page being loaded first.

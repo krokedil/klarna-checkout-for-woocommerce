@@ -223,6 +223,11 @@ class BlockExtension {
 	private function is_checkout_context() {
 		// On a page render, only the checkout page itself may sync.
 		if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+			// The purchase is complete on the confirmation return, so Kustom answers 403 READ_ONLY_ORDER.
+			if ( isset( $_GET['kco_confirm'] ) || is_wc_endpoint_url( 'order-received' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only checks presence.
+				return false;
+			}
+
 			return is_checkout();
 		}
 
