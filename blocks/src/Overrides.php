@@ -15,9 +15,15 @@ class Overrides {
 	/**
 	 * Class constructor
 	 *
+	 * @param bool $register_hooks Whether to filter every request. Express buttons attach the filter per request instead.
+	 *
 	 * @return void
 	 */
-	public function __construct() {
+	public function __construct( $register_hooks = true ) {
+		if ( ! $register_hooks ) {
+			return;
+		}
+
 		add_filter( 'kco_wc_api_request_args', array( $this, 'override_request_body' ), 10, 2 );
 
 		// Important: Needs to be on a priority before 100, since WCS will process the order at 100.

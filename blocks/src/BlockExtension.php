@@ -3,6 +3,7 @@ namespace Krokedil\KustomCheckout\Blocks;
 
 use Krokedil\KustomCheckout\Blocks\Api\Registry;
 use Krokedil\KustomCheckout\Blocks\Checkout\CheckoutBlock;
+use Krokedil\KustomCheckout\Blocks\Express\ExpressPaymentMethod;
 use Krokedil\KustomCheckout\Blocks\Schema\AddressSchema;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Automattic\WooCommerce\StoreApi\Schemas\V1\CartSchema;
@@ -143,6 +144,7 @@ class BlockExtension {
 				'woocommerce_blocks_payment_method_type_registration',
 				function ( $payment_method_registry ) {
 					$payment_method_registry->register( new CheckoutBlock() );
+					$payment_method_registry->register( new ExpressPaymentMethod() );
 				}
 			);
 		}

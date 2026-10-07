@@ -598,6 +598,7 @@ function kco_unset_sessions() {
 	WC()->session->__unset( 'kco_valid_checkout' );
 	WC()->session->__unset( 'kco_wc_prefill_consent' );
 	WC()->session->__unset( 'kco_wc_order_id' );
+	WC()->session->__unset( Krokedil\KustomCheckout\Express\OrderCreator::SESSION_KEY );
 }
 
 /**
@@ -660,8 +661,10 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
 				// Set the merchant references for the order.
 				KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
-				// Empty cart to be safe.
-				WC()->cart->empty_cart();
+				// Empty cart to be safe, unless a product express purchase left the shopper's own cart out of it.
+				if ( ! Krokedil\KustomCheckout\Express\Express::is_product_express_order( $order ) ) {
+					WC()->cart->empty_cart();
+				}
 				// Check fraud status.
 				if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
 					// Payment complete and set transaction id.

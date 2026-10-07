@@ -55,6 +55,39 @@ class CallbacksTest extends IntegrationTestCase {
 		];
 	}
 
+	/**
+	 * A product express purchase never held the shopper's cart, so confirming it must not empty it.
+	 *
+	 * @dataProvider provide_express_contexts
+	 */
+	public function test_the_confirmation_empties_the_cart_unless_it_was_not_bought( string $express, bool $emptied ): void {
+		$order = $this->haveOrderAwaitingConfirmation();
+		$order->update_meta_data( '_kco_express', $express );
+		$order->save();
+		$this->haveCartWith( [ $this->haveSimpleProduct() ] );
+		$this->resetHttpInterception();
+
+		$this->willRetrieveManagedOrder(
+			[ 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ]
+		);
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertSame( 'processing', $this->statusOf( $order ) );
+		$this->assertSame( $emptied, WC()->cart->is_empty() );
+	}
+
+	/** @return array<string, array{0: string, 1: bool}> */
+	public function provide_express_contexts(): array {
+		return [
+			'iframe order'    => [ '', true ],
+			'cart express'    => [ 'cart', true ],
+			'product express' => [ 'product', false ],
+		];
+	}
+
 	public function test_an_accepted_order_records_the_kustom_reference_and_a_note(): void {
 		$order = $this->haveOrderAwaitingConfirmation();
 

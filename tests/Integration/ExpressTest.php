@@ -1,0 +1,326 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Integration;
+
+use Krokedil\KustomCheckout\Blocks\OrderValidation;
+use Krokedil\KustomCheckout\Express\Express;
+use Krokedil\KustomCheckout\Express\ExpressSession;
+use Krokedil\KustomCheckout\Express\OrderCreator;
+use Krokedil\KustomCheckout\Express\RestController;
+use Tests\Support\IntegrationTestCase;
+
+/**
+ * Express buttons: when they show, the Kustom order their createOrder hook asks for, and its validation.
+ *
+ * @covers \Krokedil\KustomCheckout\Express\Express
+ * @covers \Krokedil\KustomCheckout\Express\OrderCreator
+ * @covers \Krokedil\KustomCheckout\Express\ExpressSession
+ * @covers \Krokedil\KustomCheckout\Express\RestController
+ * @covers \Krokedil\KustomCheckout\Blocks\OrderValidation::validate_kco_order
+ */
+class ExpressTest extends IntegrationTestCase {
+
+	protected ?string $storeProfile = 'se';
+
+	protected function setUp(): void {
+		parent::setUp();
+
+		$this->haveCustomerAddress( $this->swedishAddress(), $this->swedishAddress() );
+		$this->haveExpressSettings();
+	}
+
+	protected function tearDown(): void {
+		WC()->session->__unset( OrderCreator::SESSION_KEY );
+		WC()->session->__unset( 'kco_wc_cart_token' );
+		WC()->session->__unset( 'kco_kss_enabled' );
+
+		parent::tearDown();
+	}
+
+	/**
+	 * @dataProvider provide_gating
+	 */
+	public function test_the_buttons_only_show_with_ksa_and_a_public_key( array $settings, bool $shown ): void {
+		$this->haveExpressSettings( $settings );
+		$this->haveCartWith( [ $this->haveSimpleProduct() ] );
+
+		$this->assertSame( $shown, Express::is_available() );
+		$this->assertSame( $shown, '' !== Express::render( Express::CONTEXT_CART ) );
+	}
+
+	/** @return array<string, array{0: array, 1: bool}> */
+	public function provide_gating(): array {
+		return [
+			'everything set up'                 => [ [], true ],
+			'KSA disabled'                      => [ [ 'ksa_enabled' => 'no' ], false ],
+			'no public key'                     => [ [ 'elements_playground_public_api_key' => '' ], false ],
+			'only the production key, testmode' => [ [ 'elements_playground_public_api_key' => '', 'elements_live_public_api_key' => 'pk_live' ], false ],
+			'gateway disabled'                  => [ [ 'enabled' => 'no' ], false ],
+		];
+	}
+
+	/**
+	 * @dataProvider provide_product_placements
+	 */
+	public function test_product_express_is_off_until_a_placement_is_chosen( ?string $position, bool $enabled ): void {
+		$this->haveExpressSettings( null === $position ? [] : [ 'elements_express_product_position' => $position ] );
+
+		$this->assertSame( $enabled, Express::is_product_express_enabled() );
+	}
+
+	/** @return array<string, array{0: ?string, 1: bool}> */
+	public function provide_product_placements(): array {
+		return [
+			'never saved'             => [ null, false ],
+			'disabled'                => [ '', false ],
+			'shortcode or block only' => [ 'manual', true ],
+			'after the add to cart'   => [ '35', true ],
+			'not a placement'         => [ '36', false ],
+		];
+	}
+
+	public function test_the_cart_express_order_matches_the_snapshot(): void {
+		$this->haveCartWith(
+			[
+				[ $this->haveSimpleProduct( [ 'name' => 'Express Product A', 'sku' => 'express-a' ] ), 2 ],
+				$this->haveSimpleProduct( [ 'name' => 'Express Product B', 'sku' => 'express-b', 'price' => '59.50' ] ),
+			]
+		);
+		$this->resetHttpInterception();
+		$this->willCreateOrder();
+
+		$response = $this->createExpressOrder( [ 'context' => 'cart' ] );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( [ 'order_id' => 'checkout-order-123' ], $response->get_data() );
+
+		$request       = $this->gatewayRequestTo( '/checkout/v3/orders' );
+		$merchant_data = json_decode( $request['json']['merchant_data'], true );
+
+		$this->assertSame( 'cart', $merchant_data['kco_express'] );
+		$this->assertTrue( $request['json']['options']['require_validate_callback_success'], 'Kustom must wait for the validation callback, which creates the order.' );
+		$this->assertStringEndsWith( '/validate', $request['json']['merchant_urls']['validation'] );
+		$this->assertRequestMatchesSnapshot( $request, 'express-create-cart', $this->merchantDataPlaceholders( $merchant_data ) );
+	}
+
+	public function test_an_express_order_id_is_kept_apart_from_the_iframe_order(): void {
+		$this->haveCartWith( [ $this->haveSimpleProduct() ] );
+		WC()->session->set( 'kco_wc_order_id', 'iframe-order-1' );
+		$this->resetHttpInterception();
+		$this->willCreateOrder();
+
+		$this->createExpressOrder( [ 'context' => 'cart' ] );
+
+		$this->assertSame( 'checkout-order-123', WC()->session->get( OrderCreator::SESSION_KEY ) );
+		$this->assertSame( 'iframe-order-1', WC()->session->get( 'kco_wc_order_id' ), 'An abandoned express order must never be picked up by the iframe.' );
+	}
+
+	public function test_product_express_buys_only_that_product_and_keeps_the_cart(): void {
+		$in_cart = [ $this->haveSimpleProduct(), $this->haveSimpleProduct() ];
+		$this->haveCartWith( $in_cart );
+		$cart_before = WC()->cart->get_cart_contents_count();
+		$express     = $this->haveSimpleProduct( [ 'name' => 'Express Product C', 'sku' => 'express-c', 'price' => '80.00' ] );
+		$this->resetHttpInterception();
+		$this->willCreateOrder();
+
+		$response = $this->createExpressOrder(
+			[
+				'context'    => 'product',
+				'product_id' => $express->get_id(),
+				'quantity'   => 3,
+			]
+		);
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$request       = $this->gatewayRequestTo( '/checkout/v3/orders' );
+		$merchant_data = json_decode( $request['json']['merchant_data'], true );
+
+		$this->assertSame( [ 'express-c' ], array_column( $request['json']['order_lines'], 'reference' ) );
+		$this->assertSame( 'product', $merchant_data['kco_express'] );
+		$this->assertSame( $cart_before, WC()->cart->get_cart_contents_count(), 'The shopper\'s own cart must be untouched.' );
+		$this->assertEqualsCanonicalizing(
+			array_map( static fn( $product ) => $product->get_id(), $in_cart ),
+			array_column( WC()->cart->get_cart(), 'product_id' )
+		);
+
+		$express_cart = ExpressSession::open( $merchant_data['wc_cart_token'] )->get( 'cart' );
+		$this->assertSame( [ $express->get_id() ], array_values( array_column( $express_cart, 'product_id' ) ), 'The cart token must load a cart holding only the express product.' );
+		$this->assertSame( [ 3 ], array_values( array_column( $express_cart, 'quantity' ) ) );
+
+		$this->assertRequestMatchesSnapshot( $request, 'express-create-product', $this->merchantDataPlaceholders( $merchant_data ) );
+	}
+
+	public function test_a_refused_product_express_order_leaves_the_cart_as_it_was(): void {
+		$this->haveCartWith( [ $this->haveSimpleProduct() ] );
+		$cart_hash = WC()->cart->get_cart_hash();
+		$this->resetHttpInterception();
+
+		$response = $this->createExpressOrder(
+			[
+				'context'    => 'product',
+				'product_id' => $this->haveSimpleProduct()->get_id(),
+			]
+		);
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertArrayNotHasKey( 'order_id', $response->get_data() );
+		$this->assertSame( $cart_hash, WC()->cart->get_cart_hash() );
+		$this->assertEmpty( WC()->session->get( OrderCreator::SESSION_KEY ) );
+	}
+
+	public function test_a_variable_product_needs_a_chosen_variation(): void {
+		[ $parent ] = $this->haveVariableProduct( [ 'Red' => [], 'Blue' => [] ] );
+		$this->resetHttpInterception();
+
+		$response = $this->createExpressOrder(
+			[
+				'context'    => 'product',
+				'product_id' => $parent->get_id(),
+			]
+		);
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertNoGatewayRequests( 'Nothing can be bought until a variation is chosen.' );
+	}
+
+	public function test_the_endpoint_refuses_a_request_without_the_nonce(): void {
+		$request = new \WP_REST_Request( 'POST', '/' . RestController::NAMESPACE . '/order' );
+
+		$this->assertFalse( ( new RestController() )->check_permission( $request ) );
+	}
+
+	/**
+	 * The sheet's shipping is written to the session the order is placed from, then the
+	 * order total, shipping included, has to match what the shopper approved.
+	 *
+	 * @dataProvider provide_express_totals
+	 */
+	public function test_an_express_order_is_validated_against_the_approved_total( array $kustom, bool $valid ): void {
+		$token = ExpressSession::create_token( (string) WC()->session->get_customer_id() );
+		$order = $this->haveOrder( [ 'items' => [ [ $this->haveSimpleProduct(), 1 ] ] ] );
+		$order->update_meta_data( '_fees_hash', 'fees' );
+		$order->update_meta_data( '_coupons_hash', 'coupons' );
+		$order->save();
+
+		$this->resetHttpInterception();
+		$this->willRetrieveOrder(
+			array_merge(
+				[
+					'status'                   => 'checkout_incomplete',
+					'merchant_reference2'      => '',
+					'merchant_data'            => wp_json_encode(
+						[
+							'kco_express'     => 'cart',
+							'wc_cart_token'   => $token,
+							'wc_fees_hash'    => 'fees',
+							'wc_coupons_hash' => 'coupons',
+						]
+					),
+					'selected_shipping_option' => [
+						'id'         => 'tms-option-1',
+						'name'       => 'Home delivery',
+						'price'      => 4900,
+						'tax_amount' => 980,
+						'tax_rate'   => 2500,
+					],
+				],
+				$kustom
+			)
+		);
+		$this->willRespondWith( [ 'order_id' => $order->get_id() ], 200, 'wc/store/v1/checkout' );
+
+		$failed = null;
+		try {
+			OrderValidation::validate_kco_order( 'checkout-order-123' );
+		} catch ( \Exception $e ) {
+			$failed = $e;
+		}
+
+		$session = ExpressSession::open( $token );
+		if ( $valid ) {
+			$this->assertNull( $failed );
+			$this->assertSame( 'cart', $this->reload( $order )->get_meta( Express::ORDER_META ) );
+			$this->assertSame( 'checkout-order-123', $session->get( 'kco_wc_order_id' ), 'process_payment() reads the Kustom order id from this session.' );
+			$this->assertTrue( $session->get( 'kco_kss_enabled' ), 'The KSA rate is only offered when the session enables it.' );
+			$this->assertSame( 4900, get_transient( 'kss_data_checkout-order-123' )['price'] ?? null );
+		} else {
+			$this->assertInstanceOf( \Exception::class, $failed );
+			$this->assertEmpty( $session->get( 'kco_wc_order_id' ), 'A failed validation must not leave the express order for the iframe to reuse.' );
+		}
+
+		delete_transient( 'kss_data_checkout-order-123' );
+	}
+
+	/** @return array<string, array{0: array, 1: bool}> */
+	public function provide_express_totals(): array {
+		// The order is one 100.00 product with 25% VAT, so 12500, and has no shipping line.
+		return [
+			'items plus the selected shipping'   => [ [ 'order_amount' => 7600 ], true ],
+			'shipping already in the order lines' => [
+				[
+					'order_amount' => 12500,
+					'order_lines'  => [ [ 'type' => 'shipping_fee', 'total_amount' => 4900 ] ],
+				],
+				true,
+			],
+			'a total the shopper did not approve' => [ [ 'order_amount' => 12500 ], false ],
+		];
+	}
+
+	/**
+	 * @dataProvider provide_order_received_pages
+	 */
+	public function test_the_order_received_page_keeps_the_cart_only_for_product_express( string $express, bool $cleared ): void {
+		$order = $this->haveGatewayOrder();
+		$order->update_meta_data( Express::ORDER_META, $express );
+		$order->save();
+		$GLOBALS['wp']->query_vars['order-received'] = (string) $order->get_id();
+
+		$this->assertSame( $cleared, apply_filters( 'woocommerce_should_clear_cart_after_payment', true ) );
+
+		unset( $GLOBALS['wp']->query_vars['order-received'] );
+	}
+
+	/** @return array<string, array{0: string, 1: bool}> */
+	public function provide_order_received_pages(): array {
+		return [
+			'iframe order'     => [ '', true ],
+			'cart express'     => [ 'cart', true ],
+			'product express'  => [ 'product', false ],
+		];
+	}
+
+	private function haveExpressSettings( array $overrides = [] ): void {
+		$this->haveGatewayCredentials(
+			array_merge(
+				[
+					'ksa_enabled'                        => 'yes',
+					'elements_playground_public_api_key' => 'pk_test_express',
+				],
+				$overrides
+			)
+		);
+	}
+
+	private function createExpressOrder( array $params ): \WP_REST_Response {
+		$request = new \WP_REST_Request( 'POST', '/' . RestController::NAMESPACE . '/order' );
+		foreach ( array_merge( [ 'quantity' => 1, 'variation' => [] ], $params ) as $key => $value ) {
+			$request->set_param( $key, $value );
+		}
+
+		return ( new RestController() )->create_order( $request );
+	}
+
+	/** The merchant data values that differ per run: the cart token, the nonce and the cart hashes. */
+	private function merchantDataPlaceholders( array $merchant_data ): array {
+		$placeholders = [];
+		foreach ( [ 'wc_cart_token', 'wc_nonce', 'wc_cart_hash', 'wc_shipping_hash', 'wc_fees_hash', 'wc_coupons_hash', 'wc_taxes_hash' ] as $key ) {
+			$placeholders[ "<{$key}>" ] = $merchant_data[ $key ] ?? '';
+		}
+
+		return $placeholders;
+	}
+}

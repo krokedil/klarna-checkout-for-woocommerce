@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\Elements;
 
+use Krokedil\KustomCheckout\Express\Express;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -24,6 +26,13 @@ class Block {
 	const DELIVERY_BLOCK = 'kustom/delivery-element';
 
 	/**
+	 * The express buttons block name.
+	 *
+	 * @var string
+	 */
+	const EXPRESS_BLOCK = 'kustom/express-element';
+
+	/**
 	 * Class constructor.
 	 */
 	public function __construct() {
@@ -37,6 +46,7 @@ class Block {
 		$blocks = array(
 			'PaymentElement'  => array( $this, 'render_payment_block' ),
 			'DeliveryElement' => array( $this, 'render_delivery_block' ),
+			'ExpressElement'  => array( $this, 'render_express_block' ),
 		);
 
 		foreach ( $blocks as $folder => $render_callback ) {
@@ -85,6 +95,28 @@ class Block {
 	 */
 	public function render_delivery_block( $attributes ) {
 		return $this->render_block( Utility::render_delivery_element( $this->get_element_atts( $attributes ) ) );
+	}
+
+	/**
+	 * Render callback for the Kustom Express Element block.
+	 *
+	 * @param array $attributes The block attributes.
+	 * @return string
+	 */
+	public function render_express_block( $attributes ) {
+		// The buttons need the shopper's cart and the frontend script, so the editor gets a placeholder.
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			$message = Express::is_available()
+				? __( 'Kustom express buttons are displayed here on the frontend.', 'klarna-checkout-for-woocommerce' )
+				: __( 'Enable Kustom Shipping Assistant and add a Kustom Elements public API key in the Kustom Checkout settings to display express buttons.', 'klarna-checkout-for-woocommerce' );
+
+			return sprintf( '<div %1$s><p>%2$s</p></div>', get_block_wrapper_attributes(), esc_html( $message ) );
+		}
+
+		$context = Express::resolve_context( sanitize_key( $attributes['context'] ?? 'auto' ) );
+		$element = $context ? Express::render( $context ) : '';
+
+		return $element ? sprintf( '<div %1$s>%2$s</div>', get_block_wrapper_attributes(), $element ) : '';
 	}
 
 	/**
