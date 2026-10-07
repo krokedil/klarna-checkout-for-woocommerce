@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where a free order placed in the block checkout with the "kco_check_if_needs_payment" filter returned the customer to the checkout page with a READ_ONLY_ORDER error instead of the thank you page.

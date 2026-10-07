@@ -18,6 +18,7 @@ use Tests\Support\IntegrationTestCase;
  * @covers \Krokedil\KustomCheckout\CheckoutFlow\CheckoutFlow
  * @covers \KCO_Gateway::process_payment
  * @covers \KCO_Checkout::maybe_register_shipping_error
+ * @covers \KCO_Checkout::maybe_change_needs_payment
  */
 class CheckoutTest extends IntegrationTestCase {
 
@@ -25,6 +26,9 @@ class CheckoutTest extends IntegrationTestCase {
 
 	/** The `woocommerce_checkout_process` count from before the shipping fixture raised it. */
 	private ?int $checkoutProcessCount = null;
+
+	/** The request URI from before the free order fixture pointed it at the Store API. */
+	private ?string $requestUri = null;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -38,6 +42,11 @@ class CheckoutTest extends IntegrationTestCase {
 		if ( null !== $this->checkoutProcessCount ) {
 			$GLOBALS['wp_actions']['woocommerce_checkout_process'] = $this->checkoutProcessCount;
 			$this->checkoutProcessCount                            = null;
+		}
+
+		if ( null !== $this->requestUri ) {
+			$_SERVER['REQUEST_URI'] = $this->requestUri;
+			$this->requestUri       = null;
 		}
 
 		parent::tearDown();
@@ -268,6 +277,37 @@ class CheckoutTest extends IntegrationTestCase {
 			'the shipping assistant rate, carrying its zone instance' => [ 'klarna_kss:1', 'flat_rate:1' ],
 			'the shipping assistant method, carrying none'            => [ 'klarna_kss', 'flat_rate:1' ],
 			'a method WooCommerce did not swap'                       => [ 'flat_rate:1', 'flat_rate:1' ],
+		];
+	}
+
+	/**
+	 * With free orders shown in Kustom, the block checkout must still hand a free order to the
+	 * gateway, or the order never gets the Kustom reference the confirmation looks it up by.
+	 *
+	 * @dataProvider provide_free_order_requests
+	 */
+	public function test_a_free_order_goes_through_kustom_only_when_shown_in_kustom( bool $store_api, bool $shown_in_kustom, bool $expected ): void {
+		if ( $store_api ) {
+			$this->requestUri       = $_SERVER['REQUEST_URI'] ?? '';
+			$_SERVER['REQUEST_URI'] = '/wp-json/wc/store/v1/checkout';
+		}
+
+		if ( $shown_in_kustom ) {
+			add_filter( 'kco_check_if_needs_payment', '__return_false' );
+		}
+
+		$order = $this->haveGatewayOrder( [ 'items' => [ [ $this->haveSimpleProduct( [ 'price' => '0.00' ] ), 1 ] ] ] );
+
+		$this->assertSame( 0.0, (float) $order->get_total() );
+		$this->assertSame( $expected, $order->needs_payment() );
+	}
+
+	/** @return array<string, array{0: bool, 1: bool, 2: bool}> */
+	public function provide_free_order_requests(): array {
+		return [
+			'the block checkout, free orders shown in Kustom'       => [ true, true, true ],
+			'the block checkout, free orders left to WooCommerce'   => [ true, false, false ],
+			'outside the checkout, free orders shown in Kustom'     => [ false, true, false ],
 		];
 	}
 

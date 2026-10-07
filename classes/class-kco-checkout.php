@@ -246,8 +246,8 @@ class KCO_Checkout {
 			return $wc_result;
 		}
 
-		// If we're not on the order-pay page or the checkout page, we should not change the needs payment.
-		if ( ! is_wc_endpoint_url( 'order-pay' ) && ! is_checkout() ) {
+		// If we're not on the order-pay page, the checkout page or placing the order through the Store API (block checkout), we should not change the needs payment.
+		if ( ! is_wc_endpoint_url( 'order-pay' ) && ! is_checkout() && ! WC()->is_store_api_request() ) {
 			return $wc_result;
 		}
 
