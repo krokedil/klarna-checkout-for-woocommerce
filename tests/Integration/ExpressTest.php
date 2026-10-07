@@ -8,6 +8,7 @@ use Krokedil\KustomCheckout\Blocks\OrderValidation;
 use Krokedil\KustomCheckout\Express\Express;
 use Krokedil\KustomCheckout\Express\ExpressSession;
 use Krokedil\KustomCheckout\Express\OrderCreator;
+use Krokedil\KustomCheckout\Express\RateLimiter;
 use Krokedil\KustomCheckout\Express\RestController;
 use Tests\Support\IntegrationTestCase;
 
@@ -18,6 +19,7 @@ use Tests\Support\IntegrationTestCase;
  * @covers \Krokedil\KustomCheckout\Express\OrderCreator
  * @covers \Krokedil\KustomCheckout\Express\ExpressSession
  * @covers \Krokedil\KustomCheckout\Express\RestController
+ * @covers \Krokedil\KustomCheckout\Express\RateLimiter
  * @covers \Krokedil\KustomCheckout\Blocks\OrderValidation::validate_kco_order
  */
 class ExpressTest extends IntegrationTestCase {
@@ -32,6 +34,9 @@ class ExpressTest extends IntegrationTestCase {
 	}
 
 	protected function tearDown(): void {
+		delete_transient( RateLimiter::TRANSIENT_PREFIX . RateLimiter::get_id() );
+		wp_set_current_user( 0 );
+		unset( $_SERVER['HTTP_X_FORWARDED_FOR'] );
 		delete_transient( 'kss_data_checkout-order-123' );
 		unset( $GLOBALS['wp']->query_vars['order-received'] );
 
@@ -225,6 +230,62 @@ class ExpressTest extends IntegrationTestCase {
 
 		$this->assertSame( 400, $response->get_status() );
 		$this->assertNoGatewayRequests( 'The setting must hold for the endpoint, not only for the button.' );
+	}
+
+	public function test_a_shopper_creating_too_many_express_orders_is_told_to_wait(): void {
+		$this->haveCartWith( [ $this->haveSimpleProduct() ] );
+		$this->resetHttpInterception();
+
+		for ( $i = 0; $i < 5; $i++ ) {
+			$this->willCreateOrder();
+			$this->assertSame( 200, $this->createExpressOrder( [ 'context' => 'cart' ] )->get_status() );
+		}
+
+		$response = $this->createExpressOrder( [ 'context' => 'cart' ] );
+
+		$this->assertSame( 429, $response->get_status() );
+		$this->assertGreaterThan( 0, (int) $response->get_headers()['Retry-After'] );
+		$this->assertGatewayRequestCount( 5, '/checkout/v3/orders', 'A refused attempt must not reach Kustom.' );
+	}
+
+	public function test_the_rate_limit_window_starts_over_once_it_has_passed(): void {
+		add_filter( 'kco_express_rate_limit', static fn() => [ 'limit' => 1, 'seconds' => 60 ] );
+		$key = RateLimiter::TRANSIENT_PREFIX . RateLimiter::get_id();
+
+		$this->assertFalse( RateLimiter::hit() );
+		$this->assertIsInt( RateLimiter::hit() );
+
+		set_transient( $key, [ 'count' => 1, 'reset' => time() - 1 ], 60 );
+
+		$this->assertFalse( RateLimiter::hit() );
+	}
+
+	public function test_guests_and_logged_in_shoppers_are_counted_apart(): void {
+		add_filter( 'kco_express_rate_limit', static fn() => [ 'limit' => 1, 'seconds' => 60 ] );
+
+		$this->assertFalse( RateLimiter::hit(), 'The guest\'s first attempt.' );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'customer' ] ) );
+		$this->assertFalse( RateLimiter::hit(), 'A logged-in shopper has a counter of their own.' );
+		delete_transient( RateLimiter::TRANSIENT_PREFIX . RateLimiter::get_id() );
+
+		wp_set_current_user( 0 );
+		$this->assertIsInt( RateLimiter::hit(), 'The guest\'s second attempt.' );
+	}
+
+	public function test_proxy_headers_only_identify_a_guest_when_the_store_trusts_them(): void {
+		$remote_addr                     = $_SERVER['REMOTE_ADDR'] ?? null;
+		$_SERVER['REMOTE_ADDR']          = '192.0.2.10';
+		$_SERVER['HTTP_X_FORWARDED_FOR'] = '198.51.100.20, 192.0.2.10';
+
+		$untrusted = RateLimiter::get_id();
+		add_filter( 'woocommerce_store_api_rate_limit_options', static fn( $options ) => array_merge( $options, [ 'proxy_support' => true ] ) );
+		$trusted = RateLimiter::get_id();
+
+		$_SERVER['REMOTE_ADDR'] = $remote_addr;
+
+		$this->assertSame( 'g' . md5( '192.0.2.10' ), $untrusted, 'Anyone can send X-Forwarded-For, so it is ignored by default.' );
+		$this->assertSame( 'g' . md5( '198.51.100.20' ), $trusted );
 	}
 
 	public function test_the_express_order_leaves_shipping_to_ksa(): void {

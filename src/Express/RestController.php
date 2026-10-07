@@ -106,6 +106,17 @@ class RestController {
 	public function create_order( $request ) {
 		$context = $request->get_param( 'context' );
 
+		// Before anything is created, in Kustom or in the session table.
+		$retry_after = RateLimiter::hit();
+		if ( false !== $retry_after ) {
+			\KCO_Logger::log( '[Express] Rate limit reached for ' . RateLimiter::get_id() . ", retry in {$retry_after} seconds." );
+
+			$response = new WP_REST_Response( array( 'message' => Express::get_error_message() ), 429 );
+			$response->header( 'Retry-After', (string) $retry_after );
+
+			return $response;
+		}
+
 		// The session cookie must exist for the confirmation to find this order, also for a guest with an empty cart.
 		if ( WC()->session instanceof \WC_Session_Handler && ! WC()->session->has_session() && ! headers_sent() ) {
 			WC()->session->set_customer_session_cookie( true );
