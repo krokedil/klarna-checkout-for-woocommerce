@@ -60,7 +60,7 @@ class CallbacksTest extends IntegrationTestCase {
 	 *
 	 * @dataProvider provide_express_contexts
 	 */
-	public function test_the_confirmation_empties_the_cart_unless_it_was_not_bought( string $express, bool $emptied ): void {
+	public function test_the_confirmation_keeps_the_cart_only_for_product_express( string $express, bool $emptied ): void {
 		$order = $this->haveOrderAwaitingConfirmation();
 		$order->update_meta_data( '_kco_express', $express );
 		$order->save();

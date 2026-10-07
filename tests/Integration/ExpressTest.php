@@ -32,9 +32,8 @@ class ExpressTest extends IntegrationTestCase {
 	}
 
 	protected function tearDown(): void {
-		WC()->session->__unset( OrderCreator::SESSION_KEY );
-		WC()->session->__unset( 'kco_wc_cart_token' );
-		WC()->session->__unset( 'kco_kss_enabled' );
+		delete_transient( 'kss_data_checkout-order-123' );
+		unset( $GLOBALS['wp']->query_vars['order-received'] );
 
 		parent::tearDown();
 	}
@@ -118,6 +117,7 @@ class ExpressTest extends IntegrationTestCase {
 	}
 
 	public function test_product_express_buys_only_that_product_and_keeps_the_cart(): void {
+		$this->haveExpressSettings( [ 'elements_express_product_position' => 'manual' ] );
 		$in_cart = [ $this->haveSimpleProduct(), $this->haveSimpleProduct() ];
 		$this->haveCartWith( $in_cart );
 		$cart_before = WC()->cart->get_cart_contents_count();
@@ -153,7 +153,29 @@ class ExpressTest extends IntegrationTestCase {
 		$this->assertRequestMatchesSnapshot( $request, 'express-create-product', $this->merchantDataPlaceholders( $merchant_data ) );
 	}
 
+	public function test_confirming_a_product_express_order_deletes_its_express_session(): void {
+		$this->haveExpressSettings( [ 'elements_express_product_position' => 'manual' ] );
+		$this->resetHttpInterception();
+		$this->willCreateOrder();
+		$this->createExpressOrder(
+			[
+				'context'    => 'product',
+				'product_id' => $this->haveSimpleProduct()->get_id(),
+			]
+		);
+		$token = json_decode( $this->gatewayRequestTo( '/checkout/v3/orders' )['json']['merchant_data'], true )['wc_cart_token'];
+		$order = $this->haveGatewayOrder();
+		$order->update_meta_data( Express::ORDER_META, 'product' );
+		$order->save();
+
+		do_action( 'kco_wc_confirm_klarna_order', $order->get_id(), [] ); // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment
+
+		$this->assertNull( ExpressSession::open( $token )->get( 'cart' ) );
+		$this->assertEmpty( WC()->session->get( OrderCreator::EXPRESS_SESSION_KEY ) );
+	}
+
 	public function test_a_refused_product_express_order_leaves_the_cart_as_it_was(): void {
+		$this->haveExpressSettings( [ 'elements_express_product_position' => 'manual' ] );
 		$this->haveCartWith( [ $this->haveSimpleProduct() ] );
 		$cart_hash = WC()->cart->get_cart_hash();
 		$this->resetHttpInterception();
@@ -172,6 +194,7 @@ class ExpressTest extends IntegrationTestCase {
 	}
 
 	public function test_a_variable_product_needs_a_chosen_variation(): void {
+		$this->haveExpressSettings( [ 'elements_express_product_position' => 'manual' ] );
 		[ $parent ] = $this->haveVariableProduct( [ 'Red' => [], 'Blue' => [] ] );
 		$this->resetHttpInterception();
 
@@ -192,15 +215,165 @@ class ExpressTest extends IntegrationTestCase {
 		$this->assertFalse( ( new RestController() )->check_permission( $request ) );
 	}
 
+	public function test_the_endpoint_refuses_product_express_while_it_is_disabled(): void {
+		$response = $this->createExpressOrder(
+			[
+				'context'    => 'product',
+				'product_id' => $this->haveSimpleProduct()->get_id(),
+			]
+		);
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertNoGatewayRequests( 'The setting must hold for the endpoint, not only for the button.' );
+	}
+
+	public function test_the_express_order_leaves_shipping_to_ksa(): void {
+		$this->haveCartWith( [ $this->haveSimpleProduct() ] );
+		$this->haveChosenFlatRateShipping( 'SE', '50.00' );
+		$this->recalculateCart();
+		$this->resetHttpInterception();
+		$this->willCreateOrder();
+
+		$this->createExpressOrder( [ 'context' => 'cart' ] );
+
+		$body = $this->gatewayRequestTo( '/checkout/v3/orders' )['json'];
+		$this->assertNotContains( 'shipping_fee', array_column( $body['order_lines'], 'type' ), 'KSA adds shipping in the sheet.' );
+		$this->assertSame(
+			$body['order_amount'],
+			array_sum( array_column( $body['order_lines'], 'total_amount' ) ),
+			'The API rejects an order whose lines do not sum to the order amount.'
+		);
+	}
+
 	/**
 	 * The sheet's shipping is written to the session the order is placed from, then the
 	 * order total, shipping included, has to match what the shopper approved.
 	 *
-	 * @dataProvider provide_express_totals
+	 * @dataProvider provide_approved_totals
 	 */
-	public function test_an_express_order_is_validated_against_the_approved_total( array $kustom, bool $valid ): void {
+	public function test_an_express_order_matching_the_approved_total_is_placed( array $kustom ): void {
+		[ $order, $token ] = $this->haveExpressOrderToValidate( $kustom );
+		$primed            = $this->captureSessionWhenTheOrderIsPlaced( $token );
+
+		OrderValidation::validate_kco_order( 'checkout-order-123' );
+
+		$this->assertSame( 'cart', $this->reload( $order )->get_meta( Express::ORDER_META ) );
+		$this->assertSame( 'checkout-order-123', $primed['kco_wc_order_id'] ?? null, 'process_payment() reads the Kustom order id from this session.' );
+		$this->assertTrue( $primed['kco_kss_enabled'] ?? null, 'The KSA rate is only offered when the session enables it.' );
+		$this->assertSame( 4900, get_transient( 'kss_data_checkout-order-123' )['price'] ?? null );
+		$this->assertNull( ExpressSession::open( $token )->get( 'kco_wc_order_id' ), 'The shopper\'s session must not keep the express order for the iframe to reuse.' );
+	}
+
+	/** @return array<string, array{0: array}> */
+	public function provide_approved_totals(): array {
+		// The order is one 100.00 product with 25% VAT, so 12500, and has no shipping line.
+		return [
+			'items plus the selected shipping'    => [ [ 'order_amount' => 7600 ] ],
+			'shipping already in the order lines' => [
+				[
+					'order_amount' => 12500,
+					'order_lines'  => [
+						[ 'type' => 'physical', 'reference' => 'express-validated', 'quantity' => 1 ],
+						[ 'type' => 'shipping_fee', 'reference' => 'shipping', 'quantity' => 1 ],
+					],
+				],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider provide_unapproved_orders
+	 */
+	public function test_an_express_order_the_shopper_did_not_approve_is_refused( array $kustom ): void {
+		[ , $token ] = $this->haveExpressOrderToValidate( $kustom );
+		$session     = ExpressSession::open( $token );
+		$session->set( 'kco_wc_order_id', 'iframe-order-1' );
+		ExpressSession::save( $session );
+
+		try {
+			OrderValidation::validate_kco_order( 'checkout-order-123' );
+			$this->fail( 'The order must not validate.' );
+		} catch ( \Exception $e ) {
+			$this->assertSame( 401, $e->getCode() );
+		}
+
+		$this->assertSame( 'iframe-order-1', ExpressSession::open( $token )->get( 'kco_wc_order_id' ), 'The session must get its iframe order back.' );
+	}
+
+	/** @return array<string, array{0: array}> */
+	public function provide_unapproved_orders(): array {
+		return [
+			'shipping on top of an approved 12500' => [ [ 'order_amount' => 12500 ] ],
+			'a different product, same total'      => [
+				[
+					'order_amount' => 7600,
+					'order_lines'  => [ [ 'type' => 'physical', 'reference' => 'something-else', 'quantity' => 1 ] ],
+				],
+			],
+			'one more of the product, same total'  => [
+				[
+					'order_amount' => 7600,
+					'order_lines'  => [ [ 'type' => 'physical', 'reference' => 'express-validated', 'quantity' => 2 ] ],
+				],
+			],
+		];
+	}
+
+	/**
+	 * The Store API request is where the primed session is read, so record it there.
+	 *
+	 * @return \ArrayObject<string, mixed>
+	 */
+	private function captureSessionWhenTheOrderIsPlaced( string $token ): \ArrayObject {
+		$primed = new \ArrayObject();
+		add_filter(
+			'pre_http_request',
+			static function ( $response, $args, $url ) use ( $primed, $token ) {
+				if ( false !== strpos( $url, 'wc/store/v1/checkout' ) ) {
+					$session = ExpressSession::open( $token );
+					foreach ( [ 'kco_wc_order_id', 'kco_kss_enabled' ] as $key ) {
+						$primed[ $key ] = $session->get( $key );
+					}
+				}
+				return $response;
+			},
+			1,
+			3
+		);
+
+		return $primed;
+	}
+
+	/**
+	 * @dataProvider provide_order_received_pages
+	 */
+	public function test_the_order_received_page_keeps_the_cart_only_for_product_express( string $express, bool $cleared ): void {
+		$order = $this->haveGatewayOrder();
+		$order->update_meta_data( Express::ORDER_META, $express );
+		$order->save();
+		$GLOBALS['wp']->query_vars['order-received'] = (string) $order->get_id();
+
+		$this->assertSame( $cleared, apply_filters( 'woocommerce_should_clear_cart_after_payment', true ) );
+	}
+
+	/** @return array<string, array{0: string, 1: bool}> */
+	public function provide_order_received_pages(): array {
+		return [
+			'iframe order'     => [ '', true ],
+			'cart express'     => [ 'cart', true ],
+			'product express'  => [ 'product', false ],
+		];
+	}
+
+	/**
+	 * A 12500 WooCommerce order the Store API answers with, and a Kustom express order
+	 * whose cart token points at the shopper's session and whose sheet chose 4900 shipping.
+	 *
+	 * @return array{0: \WC_Order, 1: string}
+	 */
+	private function haveExpressOrderToValidate( array $kustom ): array {
 		$token = ExpressSession::create_token( (string) WC()->session->get_customer_id() );
-		$order = $this->haveOrder( [ 'items' => [ [ $this->haveSimpleProduct(), 1 ] ] ] );
+		$order = $this->haveOrder( [ 'items' => [ [ $this->haveSimpleProduct( [ 'sku' => 'express-validated' ] ), 1 ] ] ] );
 		$order->update_meta_data( '_fees_hash', 'fees' );
 		$order->update_meta_data( '_coupons_hash', 'coupons' );
 		$order->save();
@@ -211,6 +384,7 @@ class ExpressTest extends IntegrationTestCase {
 				[
 					'status'                   => 'checkout_incomplete',
 					'merchant_reference2'      => '',
+					'order_lines'              => [ [ 'type' => 'physical', 'reference' => 'express-validated', 'quantity' => 1 ] ],
 					'merchant_data'            => wp_json_encode(
 						[
 							'kco_express'     => 'cart',
@@ -232,65 +406,7 @@ class ExpressTest extends IntegrationTestCase {
 		);
 		$this->willRespondWith( [ 'order_id' => $order->get_id() ], 200, 'wc/store/v1/checkout' );
 
-		$failed = null;
-		try {
-			OrderValidation::validate_kco_order( 'checkout-order-123' );
-		} catch ( \Exception $e ) {
-			$failed = $e;
-		}
-
-		$session = ExpressSession::open( $token );
-		if ( $valid ) {
-			$this->assertNull( $failed );
-			$this->assertSame( 'cart', $this->reload( $order )->get_meta( Express::ORDER_META ) );
-			$this->assertSame( 'checkout-order-123', $session->get( 'kco_wc_order_id' ), 'process_payment() reads the Kustom order id from this session.' );
-			$this->assertTrue( $session->get( 'kco_kss_enabled' ), 'The KSA rate is only offered when the session enables it.' );
-			$this->assertSame( 4900, get_transient( 'kss_data_checkout-order-123' )['price'] ?? null );
-		} else {
-			$this->assertInstanceOf( \Exception::class, $failed );
-			$this->assertEmpty( $session->get( 'kco_wc_order_id' ), 'A failed validation must not leave the express order for the iframe to reuse.' );
-		}
-
-		delete_transient( 'kss_data_checkout-order-123' );
-	}
-
-	/** @return array<string, array{0: array, 1: bool}> */
-	public function provide_express_totals(): array {
-		// The order is one 100.00 product with 25% VAT, so 12500, and has no shipping line.
-		return [
-			'items plus the selected shipping'   => [ [ 'order_amount' => 7600 ], true ],
-			'shipping already in the order lines' => [
-				[
-					'order_amount' => 12500,
-					'order_lines'  => [ [ 'type' => 'shipping_fee', 'total_amount' => 4900 ] ],
-				],
-				true,
-			],
-			'a total the shopper did not approve' => [ [ 'order_amount' => 12500 ], false ],
-		];
-	}
-
-	/**
-	 * @dataProvider provide_order_received_pages
-	 */
-	public function test_the_order_received_page_keeps_the_cart_only_for_product_express( string $express, bool $cleared ): void {
-		$order = $this->haveGatewayOrder();
-		$order->update_meta_data( Express::ORDER_META, $express );
-		$order->save();
-		$GLOBALS['wp']->query_vars['order-received'] = (string) $order->get_id();
-
-		$this->assertSame( $cleared, apply_filters( 'woocommerce_should_clear_cart_after_payment', true ) );
-
-		unset( $GLOBALS['wp']->query_vars['order-received'] );
-	}
-
-	/** @return array<string, array{0: string, 1: bool}> */
-	public function provide_order_received_pages(): array {
-		return [
-			'iframe order'     => [ '', true ],
-			'cart express'     => [ 'cart', true ],
-			'product express'  => [ 'product', false ],
-		];
+		return [ $order, $token ];
 	}
 
 	private function haveExpressSettings( array $overrides = [] ): void {

@@ -70,6 +70,7 @@ class Express {
 		add_action( 'init', array( $this, 'register_scripts' ) );
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 		add_filter( 'woocommerce_should_clear_cart_after_payment', array( $this, 'maybe_keep_cart_after_payment' ) );
+		add_action( 'kco_wc_confirm_klarna_order', array( $this, 'maybe_destroy_express_session' ) );
 	}
 
 	/**
@@ -96,9 +97,36 @@ class Express {
 	 * @return bool
 	 */
 	public static function is_product_express_enabled() {
-		$position = (string) SettingsUtility::get_setting( 'elements_express_product_position', '' );
+		return self::PLACEMENT_MANUAL === self::get_product_position() || null !== self::get_product_priority();
+	}
 
-		return self::PLACEMENT_MANUAL === $position || in_array( $position, ElementsSettings::PRODUCT_PRIORITIES, true );
+	/**
+	 * The product page priority from the placement setting, or null when it is not placed automatically.
+	 *
+	 * @return int|null
+	 */
+	private static function get_product_priority() {
+		$position = self::get_product_position();
+
+		return in_array( $position, ElementsSettings::PRODUCT_PRIORITIES, true ) ? absint( $position ) : null;
+	}
+
+	/**
+	 * The product placement setting value.
+	 *
+	 * @return string
+	 */
+	private static function get_product_position() {
+		return (string) SettingsUtility::get_setting( 'elements_express_product_position', '' );
+	}
+
+	/**
+	 * The message shown to the shopper when the express order could not be created.
+	 *
+	 * @return string
+	 */
+	public static function get_error_message() {
+		return __( 'Could not start express checkout, please try again or use checkout.', 'klarna-checkout-for-woocommerce' );
 	}
 
 	/**
@@ -109,9 +137,9 @@ class Express {
 			return;
 		}
 
-		$position = (string) SettingsUtility::get_setting( 'elements_express_product_position', '' );
-		if ( in_array( $position, ElementsSettings::PRODUCT_PRIORITIES, true ) ) {
-			add_action( ElementsSettings::PRODUCT_HOOK, array( $this, 'render_product_placement' ), absint( $position ) );
+		$priority = self::get_product_priority();
+		if ( null !== $priority ) {
+			add_action( ElementsSettings::PRODUCT_HOOK, array( $this, 'render_product_placement' ), $priority );
 		}
 
 		if ( self::is_product_express_enabled() ) {
@@ -295,7 +323,7 @@ class Express {
 				'publicApiKey' => ElementsUtility::get_public_api_key(),
 			),
 			'i18n'      => array(
-				'error' => __( 'Could not start express checkout, please try again or use checkout.', 'klarna-checkout-for-woocommerce' ),
+				'error' => self::get_error_message(),
 			),
 		);
 	}
@@ -371,6 +399,21 @@ class Express {
 		$order = wc_get_order( absint( $wp->query_vars['order-received'] ) );
 
 		return ! ( $order && self::is_product_express_order( $order ) );
+	}
+
+	/**
+	 * Delete the product express session once its purchase is confirmed, as only the shopper's own cart should remain.
+	 *
+	 * @param int $order_id The WooCommerce order ID.
+	 */
+	public function maybe_destroy_express_session( $order_id ) {
+		$order = wc_get_order( $order_id );
+		if ( ! $order || ! self::is_product_express_order( $order ) || ! WC()->session ) {
+			return;
+		}
+
+		ExpressSession::destroy( (string) WC()->session->get( OrderCreator::EXPRESS_SESSION_KEY ) );
+		WC()->session->__unset( OrderCreator::EXPRESS_SESSION_KEY );
 	}
 
 	/**

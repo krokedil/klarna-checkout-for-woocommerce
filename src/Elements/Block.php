@@ -108,7 +108,7 @@ class Block {
 		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 			$message = Express::is_available()
 				? __( 'Kustom express buttons are displayed here on the frontend.', 'klarna-checkout-for-woocommerce' )
-				: __( 'Enable Kustom Shipping Assistant and add a Kustom Elements public API key in the Kustom Checkout settings to display express buttons.', 'klarna-checkout-for-woocommerce' );
+				: __( 'Enable Kustom Checkout and Kustom Shipping Assistant, and add a Kustom Elements public API key, in the Kustom Checkout settings to display express buttons.', 'klarna-checkout-for-woocommerce' );
 
 			return sprintf( '<div %1$s><p>%2$s</p></div>', get_block_wrapper_attributes(), esc_html( $message ) );
 		}

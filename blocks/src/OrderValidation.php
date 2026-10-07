@@ -101,20 +101,57 @@ class OrderValidation {
 		$wc_cart_token        = $klarna_merchant_data['wc_cart_token'] ?? '';
 		$klarna_order_id      = $klarna_order['order_id'];
 
-		$previous_order_id = ExpressSession::prime_for_validation( $wc_cart_token, $klarna_order );
+		$previous = ExpressSession::prime_for_validation( $wc_cart_token, $klarna_order );
 
 		try {
 			$updated_order = self::submit_wc_order( $klarna_order, $order, $context );
+		} finally {
+			ExpressSession::restore_after_validation( $wc_cart_token, $klarna_order_id, $previous );
+		}
 
-			$updated_order->update_meta_data( Express::ORDER_META, $context );
-			$updated_order->save();
+		$updated_order->update_meta_data( Express::ORDER_META, $context );
+		$updated_order->save();
 
-			self::validate_hash( $klarna_merchant_data['wc_fees_hash'] ?? '', $updated_order->get_meta( '_fees_hash' ) );
-			self::validate_hash( $klarna_merchant_data['wc_coupons_hash'] ?? '', $updated_order->get_meta( '_coupons_hash' ) );
-			self::validate_express_total( $klarna_order, $updated_order );
-		} catch ( Exception $e ) {
-			ExpressSession::restore_after_failed_validation( $wc_cart_token, $klarna_order_id, $previous_order_id );
-			throw $e;
+		self::validate_hash( $klarna_merchant_data['wc_fees_hash'] ?? '', $updated_order->get_meta( '_fees_hash' ) );
+		self::validate_hash( $klarna_merchant_data['wc_coupons_hash'] ?? '', $updated_order->get_meta( '_coupons_hash' ) );
+		self::validate_express_items( $klarna_order, $updated_order );
+		self::validate_express_total( $klarna_order, $updated_order );
+	}
+
+	/**
+	 * Compare the products and quantities on the WooCommerce order with the Kustom order lines.
+	 *
+	 * Stands in for the cart hash, which the express flow cannot use, so a cart changed after the sheet opened is refused.
+	 *
+	 * @param array     $klarna_order The Kustom order.
+	 * @param \WC_Order $order        The WooCommerce order.
+	 *
+	 * @return void
+	 * @throws Exception If the items differ.
+	 */
+	private static function validate_express_items( $klarna_order, $order ) {
+		$klarna_items = array();
+		foreach ( $klarna_order['order_lines'] ?? array() as $line ) {
+			if ( in_array( $line['type'] ?? '', array( 'physical', 'digital' ), true ) ) {
+				$reference                  = (string) ( $line['reference'] ?? '' );
+				$klarna_items[ $reference ] = ( $klarna_items[ $reference ] ?? 0 ) + intval( $line['quantity'] ?? 0 );
+			}
+		}
+
+		$order_data = new \KCO_Request_Order();
+		$wc_items   = array();
+		foreach ( $order->get_items() as $item ) {
+			$line                   = $order_data->get_order_line_items( $item );
+			$reference              = (string) $line['reference'];
+			$wc_items[ $reference ] = ( $wc_items[ $reference ] ?? 0 ) + intval( $line['quantity'] );
+		}
+
+		ksort( $klarna_items );
+		ksort( $wc_items );
+
+		if ( $klarna_items !== $wc_items ) {
+			\KCO_Logger::log( "[Express] Order items mismatch for Kustom order {$klarna_order['order_id']}." );
+			throw new Exception( 'Could not validate the order, please try again.', 401 );
 		}
 	}
 

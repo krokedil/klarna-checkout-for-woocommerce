@@ -24,13 +24,14 @@ class ExpressSession {
 	 * @param int      $variation_id The variation ID, or 0.
 	 * @param int      $quantity     The quantity.
 	 * @param array    $variation    The variation attributes, keyed by attribute_* name.
-	 * @param callable $callback     Receives the express cart token. Its return value is returned.
+	 * @param callable $callback     Receives the express cart token and session key. Its return value is returned.
 	 * @return mixed
 	 * @throws Exception If the product could not be added to the express cart.
 	 */
 	public static function with_product_cart( $product_id, $variation_id, $quantity, $variation, $callback ) {
-		$token   = self::create_token( 't_' . substr( md5( wp_generate_uuid4() ), 0, 30 ) );
-		$session = self::open( $token );
+		$session_key = 't_' . substr( md5( wp_generate_uuid4() ), 0, 30 );
+		$token       = self::create_token( $session_key );
+		$session     = self::open( $token );
 
 		$original = array(
 			'session'  => WC()->session,
@@ -80,7 +81,7 @@ class ExpressSession {
 			$express_cart->calculate_totals();
 			$cart_session->set_session();
 
-			$result = call_user_func( $callback, $token );
+			$result = call_user_func( $callback, $token, $session_key );
 
 			$cart_session->set_session();
 			wc_clear_notices();
@@ -102,6 +103,13 @@ class ExpressSession {
 	}
 
 	/**
+	 * The session keys prime_for_validation() writes, which restore_after_validation() puts back.
+	 *
+	 * @var string[]
+	 */
+	const PRIMED_KEYS = array( 'kco_wc_order_id', 'chosen_payment_method', 'kco_kss_enabled', 'chosen_shipping_methods' );
+
+	/**
 	 * Prepare the session a validation callback submits, with what the express sheet chose in Kustom.
 	 *
 	 * In the iframe the checkout script syncs the KSA selection to the session as the shopper picks it. The express
@@ -109,12 +117,16 @@ class ExpressSession {
 	 *
 	 * @param string $token        The cart token from the merchant data.
 	 * @param array  $klarna_order The Kustom order.
-	 * @return string|null The Kustom order id the session held before, to restore if validation fails.
+	 * @return array The values the primed keys held before, for restore_after_validation().
 	 */
 	public static function prime_for_validation( $token, $klarna_order ) {
 		$session         = self::open( $token );
 		$klarna_order_id = $klarna_order['order_id'];
-		$previous        = $session->get( 'kco_wc_order_id' );
+
+		$previous = array();
+		foreach ( self::PRIMED_KEYS as $key ) {
+			$previous[ $key ] = $session->get( $key );
+		}
 
 		// Read by process_payment() and the KSA shipping method while the Store API places the order.
 		$session->set( 'kco_wc_order_id', $klarna_order_id );
@@ -141,25 +153,49 @@ class ExpressSession {
 	}
 
 	/**
-	 * Undo prime_for_validation() after a failed validation, so the iframe checkout does not reuse the express order.
+	 * Put back what prime_for_validation() replaced, once the Store API has placed the order or refused it.
 	 *
-	 * @param string      $token           The cart token from the merchant data.
-	 * @param string      $klarna_order_id The express Kustom order id.
-	 * @param string|null $previous        The Kustom order id the session held before.
+	 * For a cart express purchase this is the shopper's own session, which must not keep the express order id: the
+	 * iframe checkout would update and reuse it if the purchase is then abandoned.
+	 *
+	 * @param string $token           The cart token from the merchant data.
+	 * @param string $klarna_order_id The express Kustom order id.
+	 * @param array  $previous        What prime_for_validation() returned.
 	 */
-	public static function restore_after_failed_validation( $token, $klarna_order_id, $previous ) {
+	public static function restore_after_validation( $token, $klarna_order_id, $previous ) {
 		$session = self::open( $token );
 
-		if ( $session->get( 'kco_wc_order_id' ) === $klarna_order_id ) {
-			if ( $previous ) {
-				$session->set( 'kco_wc_order_id', $previous );
+		// Something else changed the session since, e.g. the shopper picked a new iframe order; leave it.
+		if ( $session->get( 'kco_wc_order_id' ) !== $klarna_order_id ) {
+			return;
+		}
+
+		foreach ( self::PRIMED_KEYS as $key ) {
+			if ( null === ( $previous[ $key ] ?? null ) ) {
+				$session->__unset( $key );
 			} else {
-				$session->__unset( 'kco_wc_order_id' );
+				$session->set( $key, $previous[ $key ] );
 			}
 		}
 
-		$session->__unset( 'kco_kss_enabled' );
 		self::save( $session );
+	}
+
+	/**
+	 * Delete an express session once its purchase is confirmed. Only express session keys (t_…) are accepted.
+	 *
+	 * @param string $customer_id The express session key.
+	 */
+	public static function destroy( $customer_id ) {
+		if ( 0 !== strpos( (string) $customer_id, 't_' ) ) {
+			return;
+		}
+
+		$GLOBALS['wpdb']->delete( $GLOBALS['wpdb']->prefix . 'woocommerce_sessions', array( 'session_key' => $customer_id ) );
+
+		if ( class_exists( 'WC_Cache_Helper' ) && defined( 'WC_SESSION_CACHE_GROUP' ) ) {
+			wp_cache_delete( \WC_Cache_Helper::get_cache_prefix( WC_SESSION_CACHE_GROUP ) . $customer_id, WC_SESSION_CACHE_GROUP );
+		}
 	}
 
 	/**

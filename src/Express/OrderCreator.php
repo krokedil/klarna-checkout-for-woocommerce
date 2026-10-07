@@ -24,6 +24,13 @@ class OrderCreator {
 	const SESSION_KEY = 'kco_express_order_id';
 
 	/**
+	 * The shopper's session key holding the product express session to delete once its purchase is confirmed.
+	 *
+	 * @var string
+	 */
+	const EXPRESS_SESSION_KEY = 'kco_express_session';
+
+	/**
 	 * The express context being created, read by the request filter.
 	 *
 	 * @var string
@@ -58,15 +65,19 @@ class OrderCreator {
 	 * @throws Exception If the product cannot be bought or Kustom refused the order.
 	 */
 	public function create_for_product( $product_id, $variation_id, $quantity, $variation ) {
+		$express_session = '';
 		$klarna_order_id = ExpressSession::with_product_cart(
 			$product_id,
 			$variation_id,
 			$quantity,
 			$variation,
-			function () {
+			function ( $token, $session_key ) use ( &$express_session ) {
+				$express_session = $session_key;
 				return $this->request( Express::CONTEXT_PRODUCT );
 			}
 		);
+
+		WC()->session->set( self::EXPRESS_SESSION_KEY, $express_session );
 
 		return $this->remember( $klarna_order_id );
 	}
@@ -107,12 +118,26 @@ class OrderCreator {
 	}
 
 	/**
-	 * Mark the Kustom order as an express purchase in its merchant data.
+	 * Mark the Kustom order as an express purchase in its merchant data, and leave shipping to KSA in the sheet.
+	 *
+	 * KSA's request modifier can add back a shipping line from the iframe order's override data, which belongs to a
+	 * different Kustom order, so every shipping line is removed here.
 	 *
 	 * @param array $args The request body.
 	 * @return array
 	 */
 	public function add_express_data( $args ) {
+		foreach ( $args['order_lines'] ?? array() as $key => $order_line ) {
+			if ( 'shipping_fee' === ( $order_line['type'] ?? '' ) ) {
+				unset( $args['order_lines'][ $key ] );
+				$args['order_amount']     -= $order_line['total_amount'] ?? 0;
+				$args['order_tax_amount'] -= $order_line['total_tax_amount'] ?? 0;
+			}
+		}
+		if ( isset( $args['order_lines'] ) ) {
+			$args['order_lines'] = array_values( $args['order_lines'] );
+		}
+
 		$merchant_data = json_decode( $args['merchant_data'] ?? '', true );
 		$merchant_data = is_array( $merchant_data ) ? $merchant_data : array();
 

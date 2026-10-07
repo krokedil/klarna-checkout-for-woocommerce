@@ -79,7 +79,10 @@ class RestController {
 	}
 
 	/**
-	 * Load the shopper's session, then verify the nonce, which WooCommerce ties to that session for guests.
+	 * Load the shopper's session, then verify the nonce.
+	 *
+	 * For a logged-in shopper the nonce is tied to the user. For guests it is the same for every visitor, since
+	 * WooCommerce only ties nonces to the guest session for its own actions, so it is CSRF protection only.
 	 *
 	 * @param WP_REST_Request $request The request.
 	 * @return bool
@@ -112,6 +115,7 @@ class RestController {
 			$creator = new OrderCreator();
 
 			if ( Express::CONTEXT_PRODUCT === $context ) {
+				$this->check_product( absint( $request->get_param( 'product_id' ) ) );
 				$klarna_order_id = $creator->create_for_product(
 					absint( $request->get_param( 'product_id' ) ),
 					absint( $request->get_param( 'variation_id' ) ),
@@ -126,13 +130,27 @@ class RestController {
 
 			return new WP_REST_Response(
 				array(
-					'message' => __( 'Could not start express checkout, please try again or use checkout.', 'klarna-checkout-for-woocommerce' ),
+					'message' => Express::get_error_message(),
 				),
 				400
 			);
 		}
 
 		return new WP_REST_Response( array( 'order_id' => $klarna_order_id ), 200 );
+	}
+
+	/**
+	 * Only offer what the button offers: product express enabled, and a simple or variable product.
+	 *
+	 * @param int $product_id The product ID.
+	 * @throws Exception If the product cannot be bought with product express.
+	 */
+	private function check_product( $product_id ) {
+		$product = wc_get_product( $product_id );
+
+		if ( ! Express::is_product_express_enabled() || ! $product || ! $product->is_type( array( 'simple', 'variable' ) ) ) {
+			throw new Exception( 'Product express is not available for this product.' );
+		}
 	}
 
 	/**
