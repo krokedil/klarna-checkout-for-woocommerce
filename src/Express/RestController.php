@@ -117,8 +117,9 @@ class RestController {
 			return $response;
 		}
 
-		// The session cookie must exist for the confirmation to find this order, also for a guest with an empty cart.
-		if ( WC()->session instanceof \WC_Session_Handler && ! WC()->session->has_session() && ! headers_sent() ) {
+		// The confirmation finds this order through the session cookie, so a guest always gets one for the current session.
+		// has_session() is no test: a stale cookie, e.g. after logout, still counts while WooCommerce has replaced it.
+		if ( WC()->session instanceof \WC_Session_Handler && ! is_user_logged_in() && ! headers_sent() ) {
 			WC()->session->set_customer_session_cookie( true );
 		}
 
