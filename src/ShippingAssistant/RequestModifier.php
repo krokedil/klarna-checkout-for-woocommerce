@@ -91,7 +91,7 @@ class RequestModifier {
 	 * @param array $request_args The request args for Kustom Checkout.
 	 * @return array
 	 */
-	public function remove_shipping( $request_args ) {
+	public static function remove_shipping( $request_args ) {
 		if ( isset( $request_args['order_lines'] ) ) {
 			foreach ( $request_args['order_lines'] as $key => $order_line ) {
 				if ( isset( $order_line['type'] ) && 'shipping_fee' === $order_line['type'] ) {

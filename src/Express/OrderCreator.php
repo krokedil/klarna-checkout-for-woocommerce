@@ -2,6 +2,7 @@
 namespace Krokedil\KustomCheckout\Express;
 
 use Krokedil\KustomCheckout\Blocks\Overrides;
+use Krokedil\KustomCheckout\ShippingAssistant\RequestModifier;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Exception;
 
@@ -127,16 +128,7 @@ class OrderCreator {
 	 * @return array
 	 */
 	public function add_express_data( $args ) {
-		foreach ( $args['order_lines'] ?? array() as $key => $order_line ) {
-			if ( 'shipping_fee' === ( $order_line['type'] ?? '' ) ) {
-				unset( $args['order_lines'][ $key ] );
-				$args['order_amount']     -= $order_line['total_amount'] ?? 0;
-				$args['order_tax_amount'] -= $order_line['total_tax_amount'] ?? 0;
-			}
-		}
-		if ( isset( $args['order_lines'] ) ) {
-			$args['order_lines'] = array_values( $args['order_lines'] );
-		}
+		$args = RequestModifier::remove_shipping( $args );
 
 		$merchant_data = json_decode( $args['merchant_data'] ?? '', true );
 		$merchant_data = is_array( $merchant_data ) ? $merchant_data : array();

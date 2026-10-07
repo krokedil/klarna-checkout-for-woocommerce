@@ -97,7 +97,7 @@ class Express {
 	 * @return bool
 	 */
 	public static function is_product_express_enabled() {
-		return self::PLACEMENT_MANUAL === self::get_product_position() || null !== self::get_product_priority();
+		return self::PLACEMENT_MANUAL === SettingsUtility::get_setting( 'elements_express_product_position', '' ) || null !== self::get_product_priority();
 	}
 
 	/**
@@ -106,18 +106,19 @@ class Express {
 	 * @return int|null
 	 */
 	private static function get_product_priority() {
-		$position = self::get_product_position();
+		$position = (string) SettingsUtility::get_setting( 'elements_express_product_position', '' );
 
 		return in_array( $position, ElementsSettings::PRODUCT_PRIORITIES, true ) ? absint( $position ) : null;
 	}
 
 	/**
-	 * The product placement setting value.
+	 * Whether a product can be bought with product express: simple and variable products only.
 	 *
-	 * @return string
+	 * @param mixed $product The product.
+	 * @return bool
 	 */
-	private static function get_product_position() {
-		return (string) SettingsUtility::get_setting( 'elements_express_product_position', '' );
+	public static function supports_product( $product ) {
+		return $product instanceof \WC_Product && $product->is_type( array( 'simple', 'variable' ) );
 	}
 
 	/**
@@ -235,7 +236,7 @@ class Express {
 	private static function get_product_data() {
 		$product = $GLOBALS['product'] ?? null;
 		$product = $product instanceof \WC_Product ? $product : wc_get_product( get_the_ID() );
-		if ( ! $product || ! $product->is_type( array( 'simple', 'variable' ) ) || ! $product->is_purchasable() ) {
+		if ( ! self::supports_product( $product ) || ! $product->is_purchasable() ) {
 			return array();
 		}
 

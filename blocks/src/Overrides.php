@@ -1,8 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\Blocks;
 
-use Automattic\WooCommerce\StoreApi\Utilities\JsonWebToken;
 use Krokedil\KustomCheckout\Blocks\Api\Controllers\OrderController;
+use Krokedil\KustomCheckout\Express\ExpressSession;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -144,25 +144,6 @@ class Overrides {
 	}
 
 	/**
-	 * Create a cart token for the current user.
-	 *
-	 * @return string
-	 */
-	private function create_cart_token() {
-		// Create a cart token for the Kustom order.
-		$cart_token = JsonWebToken::create(
-			array(
-				'user_id' => wc()->session->get_customer_id(),
-				'exp'     => time() + intval( apply_filters( 'wc_session_expiration', DAY_IN_SECONDS * 2 ) ),
-				'iss'     => 'wc/store/v1',
-			),
-			'@' . wp_salt()
-		);
-
-		return $cart_token;
-	}
-
-	/**
 	 * Set the merchant data for the Kustom Checkout API.
 	 *
 	 * @param array $args The request arguments.
@@ -183,7 +164,7 @@ class Overrides {
 		$merchant_data['wc_coupons_hash']  = $cart_hashes['coupons'] ?? '';
 		$merchant_data['wc_taxes_hash']    = $cart_hashes['taxes'] ?? '';
 
-		$cart_token = WC()->session->get( 'kco_wc_cart_token', $this->create_cart_token() );
+		$cart_token = WC()->session->get( 'kco_wc_cart_token', ExpressSession::create_token( wc()->session->get_customer_id() ) );
 
 		$merchant_data['wc_cart_token']       = $cart_token;
 		$merchant_data['wc_nonce']            = wp_create_nonce( 'wc_store_api' );

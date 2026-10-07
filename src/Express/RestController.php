@@ -157,9 +157,7 @@ class RestController {
 	 * @throws Exception If the product cannot be bought with product express.
 	 */
 	private function check_product( $product_id ) {
-		$product = wc_get_product( $product_id );
-
-		if ( ! Express::is_product_express_enabled() || ! $product || ! $product->is_type( array( 'simple', 'variable' ) ) ) {
+		if ( ! Express::is_product_express_enabled() || ! Express::supports_product( wc_get_product( $product_id ) ) ) {
 			throw new Exception( 'Product express is not available for this product.' );
 		}
 	}
