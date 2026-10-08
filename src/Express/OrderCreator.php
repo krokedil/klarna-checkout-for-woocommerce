@@ -94,7 +94,7 @@ class OrderCreator {
 		$this->context = $context;
 
 		// The block checkout already applies these overrides to every request when its page is in use.
-		$overrides = BlocksUtility::is_checkout_block_enabled() ? null : new Overrides( false );
+		$overrides = BlocksUtility::is_checkout_block_enabled() ? null : new Overrides();
 		if ( $overrides ) {
 			add_filter( 'kco_wc_api_request_args', array( $overrides, 'override_request_body' ), 10, 2 );
 		}

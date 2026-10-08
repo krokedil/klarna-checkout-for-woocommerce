@@ -64,6 +64,12 @@ class BlockExtension {
 				}
 				$this->overrides    = new Overrides();
 				$this->api_registry = new Registry();
+
+				add_filter( 'kco_wc_api_request_args', array( $this->overrides, 'override_request_body' ), 10, 2 );
+
+				// Important: Needs to be on a priority before 100, since WCS will process the order at 100.
+				// @TODO: Commented out for now until we can verify with WooCommerce why Subscriptions are not processed correctly when placing an order through the store api endpoint.
+				// add_filter( 'woocommerce_store_api_checkout_order_processed', array( $this->overrides, 'maybe_calculate_recurring_carts' ), 90 );.
 			},
 			5
 		);
