@@ -214,10 +214,12 @@ class ExpressTest extends IntegrationTestCase {
 		$this->assertNoGatewayRequests( 'Nothing can be bought until a variation is chosen.' );
 	}
 
-	public function test_the_endpoint_refuses_a_request_without_the_nonce(): void {
-		$request = new \WP_REST_Request( 'POST', '/' . RestController::NAMESPACE . '/order' );
+	public function test_the_endpoint_refuses_requests_while_express_is_unavailable(): void {
+		$this->assertTrue( ( new RestController() )->check_permission(), 'Cached pages carry no fresh nonce, so a guest needs none.' );
 
-		$this->assertFalse( ( new RestController() )->check_permission( $request ) );
+		$this->haveExpressSettings( [ 'ksa_enabled' => 'no' ] );
+
+		$this->assertFalse( ( new RestController() )->check_permission() );
 	}
 
 	public function test_a_cart_express_order_is_not_tied_to_the_draft_order(): void {

@@ -12,7 +12,6 @@ declare global {
 
 export type ExpressConfig = {
 	restUrl: string;
-	nonce: string;
 	restNonce: string;
 	locale: string;
 	currency: string;
@@ -111,7 +110,6 @@ export const createOrder = async (
 		headers: {
 			'Content-Type': 'application/json',
 			'X-WP-Nonce': config.restNonce,
-			'X-KCO-Express-Nonce': config.nonce,
 		},
 		body: JSON.stringify(body),
 	});

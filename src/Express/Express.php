@@ -315,7 +315,6 @@ class Express {
 	public static function get_script_config() {
 		return array(
 			'restUrl'   => RestController::get_url(),
-			'nonce'     => wp_create_nonce( RestController::NONCE_ACTION ),
 			'restNonce' => wp_create_nonce( 'wp_rest' ),
 			'locale'    => ElementsUtility::get_locale(),
 			'currency'  => strtolower( get_woocommerce_currency() ),

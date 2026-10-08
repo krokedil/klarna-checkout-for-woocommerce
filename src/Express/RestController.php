@@ -24,13 +24,6 @@ class RestController {
 	const NAMESPACE = 'kco-express/v1';
 
 	/**
-	 * The nonce action the frontend sends in the X-KCO-Express-Nonce header.
-	 *
-	 * @var string
-	 */
-	const NONCE_ACTION = 'kco_express';
-
-	/**
 	 * Register the routes.
 	 */
 	public function register_routes() {
@@ -79,22 +72,21 @@ class RestController {
 	}
 
 	/**
-	 * Load the shopper's session, then verify the nonce.
+	 * Load the shopper's session when express is available.
 	 *
-	 * For a logged-in shopper the nonce is tied to the user. For guests it is the same for every visitor, since
-	 * WooCommerce only ties nonces to the guest session for its own actions, so it is CSRF protection only.
+	 * No nonce of our own: a guest nonce is public and expires inside cached product pages. WordPress already checks
+	 * X-WP-Nonce for logged-in shoppers.
 	 *
-	 * @param WP_REST_Request $request The request.
 	 * @return bool
 	 */
-	public function check_permission( $request ) {
+	public function check_permission() {
 		if ( ! Express::is_available() ) {
 			return false;
 		}
 
 		wc_load_cart();
 
-		return (bool) wp_verify_nonce( $request->get_header( 'X-KCO-Express-Nonce' ) ?? '', self::NONCE_ACTION );
+		return true;
 	}
 
 	/**
