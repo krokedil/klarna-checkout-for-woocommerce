@@ -18,6 +18,7 @@ use Krokedil\KustomCheckout\OrderManagement\Request\Post\RequestPostCancel;
 use Krokedil\KustomCheckout\OrderManagement\MetaBox;
 use Krokedil\KustomCheckout\OrderManagement\Ajax;
 use Krokedil\KustomCheckout\OrderManagement\PendingOrders;
+use Krokedil\KustomCheckout\OrderManagement\Webhooks\Webhooks;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Support\SystemReport;
 
 /**
@@ -54,6 +55,13 @@ class OrderManagement {
 	 * @var ReturnFee $return_fee
 	 */
 	public $return_fee;
+
+	/**
+	 * Kustom webhooks handler.
+	 *
+	 * @var Webhooks $webhooks
+	 */
+	public $webhooks;
 
 	/**
 	 * SystemReport instance.
@@ -96,6 +104,7 @@ class OrderManagement {
 		$this->metabox    = new MetaBox( $this );
 		$this->ajax       = new Ajax();
 		$this->return_fee = new ReturnFee();
+		$this->webhooks   = new Webhooks( $this );
 
 		add_action( 'kco_wc_supports', array( $this, 'add_gateway_support' ) );
 
@@ -106,6 +115,7 @@ class OrderManagement {
 			array( 'id' => 'kom_auto_update' ),
 			array( 'id' => 'kom_auto_order_sync' ),
 			array( 'id' => 'kom_force_full_capture' ),
+			array( 'id' => 'kom_webhook_capture_sync' ),
 		);
 		$this->system_report = new SystemReport( 'kco', 'Kustom Order Management for WooCommerce', $report_about );
 

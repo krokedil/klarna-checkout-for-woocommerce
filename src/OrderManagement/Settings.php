@@ -1,6 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement;
 
+use Krokedil\KustomCheckout\OrderManagement\Webhooks\Webhooks;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -93,7 +94,77 @@ class Settings {
 			'label'   => __( 'Force capture full order. Useful if the Kustom order has been updated by an ERP system.', 'klarna-checkout-for-woocommerce' ),
 		);
 
+		$settings['kom_webhooks'] = array(
+			'title'       => __( 'Kustom webhooks', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'title',
+			'description' => $this->get_webhooks_description(),
+		);
+
+		$settings['kom_webhook_capture_sync'] = array(
+			'title'       => __( 'Sync captures from Kustom', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'checkbox',
+			'default'     => 'no',
+			'label'       => __( 'Register captures made in the Kustom Portal on the WooCommerce order.', 'klarna-checkout-for-woocommerce' ),
+			'description' => __( 'A fully captured order is set to Completed. Captures made from WooCommerce are recognized and not registered twice.', 'klarna-checkout-for-woocommerce' ),
+			'desc_tip'    => true,
+		);
+
+		$settings['kom_webhook_signing_secret'] = array(
+			'title'       => __( 'Production webhook signing secret', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'password',
+			'default'     => '',
+			'description' => __( 'The signing secret (whsec_...) of the webhook in the production Kustom Portal.', 'klarna-checkout-for-woocommerce' ),
+			'desc_tip'    => true,
+		);
+
+		$settings['kom_webhook_test_signing_secret'] = array(
+			'title'       => __( 'Test webhook signing secret', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'password',
+			'default'     => '',
+			'description' => __( 'The signing secret (whsec_...) of the webhook in the test Kustom Portal.', 'klarna-checkout-for-woocommerce' ),
+			'desc_tip'    => true,
+		);
+
 		return $settings;
+	}
+
+	/**
+	 * Get the description of the webhooks section, with the URL to enter in the Kustom Portal.
+	 *
+	 * @return string
+	 */
+	protected function get_webhooks_description() {
+		$description = __( 'In the Kustom Portal, go to Integrations → Webhooks, add an endpoint with the URL below and subscribe to capture.created. Then copy the signing secret here. Production and test have separate secrets.', 'klarna-checkout-for-woocommerce' );
+
+		// The REST URL needs the rewrite rules, which aren't set up if the settings are read very early.
+		if ( empty( $GLOBALS['wp_rewrite'] ) ) {
+			return $description;
+		}
+
+		return $description . '<br><code>' . esc_html( Webhooks::get_url() ) . '</code>';
+	}
+
+	/**
+	 * Whether captures made outside of WooCommerce should be registered from webhooks.
+	 *
+	 * @return bool
+	 */
+	public static function is_capture_sync_enabled() {
+		return wc_string_to_bool( SettingsUtility::get_setting( 'kom_webhook_capture_sync', 'no' ) );
+	}
+
+	/**
+	 * Get the configured webhook signing secrets.
+	 *
+	 * Both are returned, so a webhook is accepted regardless of which environment the order was placed in.
+	 *
+	 * @return string[]
+	 */
+	public static function get_webhook_secrets() {
+		return array(
+			SettingsUtility::get_setting( 'kom_webhook_signing_secret', '' ),
+			SettingsUtility::get_setting( 'kom_webhook_test_signing_secret', '' ),
+		);
 	}
 
 	/**
