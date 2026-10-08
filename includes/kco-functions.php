@@ -20,7 +20,7 @@ function kco_create_or_update_order() {
 		return;
 	}
 
-	// Bots and loopback requests can render the checkout with no cart, which would create an empty Kustom order.
+	// An empty cart, most often from previewing the checkout page in admin, would create an empty Kustom order.
 	if ( WC()->cart->is_empty() ) {
 		return;
 	}
