@@ -119,6 +119,31 @@ class CallbacksTest extends IntegrationTestCase {
 	}
 
 	/**
+	 * Only the order management order carries the id, the checkout order does not.
+	 */
+	public function test_a_confirmed_shipping_assistant_order_records_the_ingrid_transport_order(): void {
+		new \Krokedil\KustomCheckout\ShippingAssistant\Checkout();
+		$order = $this->haveOrderAwaitingConfirmation();
+
+		$this->willRetrieveManagedOrder(
+			[
+				'order_amount'             => 12500,
+				'order_lines'              => $this->orderLinesFor( $order ),
+				'selected_shipping_option' => [
+					'tms_reference' => 'VM2-8515d42eefbc403694b04a9f6e6352a0',
+					'tos_id'        => '01M3XWHGEYJXEXHH0EXFM3N8DX',
+				],
+			]
+		);
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertSame( '01M3XWHGEYJXEXHH0EXFM3N8DX', $this->reload( $order )->get_meta( 'ingrid_tos_id' ) );
+	}
+
+	/**
 	 * An order Kustom says a different total for must not be confirmed: it would ship
 	 * goods nobody paid for.
 	 */
