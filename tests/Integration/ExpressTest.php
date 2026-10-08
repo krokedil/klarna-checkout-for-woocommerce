@@ -247,6 +247,7 @@ class ExpressTest extends IntegrationTestCase {
 	}
 
 	public function test_a_shopper_creating_too_many_express_orders_is_told_to_wait(): void {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'customer' ] ) );
 		$this->haveCartWith( [ $this->haveSimpleProduct() ] );
 		$this->resetHttpInterception();
 
@@ -272,6 +273,14 @@ class ExpressTest extends IntegrationTestCase {
 		set_transient( $key, [ 'count' => 1, 'reset' => time() - 1 ], 60 );
 
 		$this->assertFalse( RateLimiter::hit() );
+	}
+
+	public function test_guests_get_a_looser_limit_since_a_proxy_may_give_them_one_ip(): void {
+		$this->assertSame( 30, RateLimiter::get_options()['limit'] );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'customer' ] ) );
+
+		$this->assertSame( 5, RateLimiter::get_options()['limit'] );
 	}
 
 	public function test_guests_and_logged_in_shoppers_are_counted_apart(): void {

@@ -55,21 +55,26 @@ class RateLimiter {
 	 * @return array{limit: int, seconds: int}
 	 */
 	public static function get_options() {
+		// Guests share a counter per IP, so a proxy that hides the client IP shares it across shoppers. Hence the
+		// looser guest limit; lower it with the filter when REMOTE_ADDR is the real client.
+		$limit = is_user_logged_in() ? 5 : 30;
+
 		/**
 		 * Filters how many express orders a shopper may create per time window.
 		 *
-		 * @param array $options The limit (number of creates) and seconds (window length). Default 5 per 60 seconds.
+		 * @param array $options The limit (number of creates) and seconds (window length). Default 60 seconds, with 5 creates
+		 *                       for a logged-in shopper and 30 for a guest IP address.
 		 */
 		$options = apply_filters(
 			'kco_express_rate_limit',
 			array(
-				'limit'   => 5,
+				'limit'   => $limit,
 				'seconds' => 60,
 			)
 		);
 
 		return array(
-			'limit'   => max( 1, absint( $options['limit'] ?? 5 ) ),
+			'limit'   => max( 1, absint( $options['limit'] ?? $limit ) ),
 			'seconds' => max( 1, absint( $options['seconds'] ?? 60 ) ),
 		);
 	}
