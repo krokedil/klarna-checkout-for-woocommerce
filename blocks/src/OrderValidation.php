@@ -1,8 +1,6 @@
 <?php
 namespace Krokedil\KustomCheckout\Blocks;
 
-use Automattic\WooCommerce\StoreApi\SessionHandler;
-use Automattic\WooCommerce\StoreApi\Utilities\JsonWebToken;
 use Krokedil\KustomCheckout\Express\Express;
 use Krokedil\KustomCheckout\Express\ExpressSession;
 use Exception;
@@ -197,31 +195,6 @@ class OrderValidation {
 	}
 
 	/**
-	 * Validate the hashes to ensure the order is valid.
-	 *
-	 * @param array          $klarna_order The Kustom order.
-	 * @param SessionHandler $session The WooCommerce session handler.
-	 *
-	 * @return void
-	 * @throws Exception If the hashes do not match.
-	 */
-	private static function validate_hashes( $klarna_order, $session ) {
-		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-
-		// Calculate the hashes for the cart and coupons applied in the session.
-		$wc_totals       = $session->get( 'cart_totals', array() );
-		$wc_cart_hash    = md5( wp_json_encode( $session->get( 'cart', array() ) ) . $wc_totals['total'] ?? 0 );
-		$wc_coupons_hash = md5( wp_json_encode( $session->get( 'applied_coupons', array() ) ) );
-
-		$klarna_cart_hash    = $klarna_merchant_data['wc_cart_hash'] ?? '';
-		$klarna_coupons_hash = $klarna_merchant_data['wc_coupons_hash'] ?? '';
-
-		// Compare the strings and ensure they are the same.
-		self::validate_hash( $klarna_cart_hash, $wc_cart_hash );
-		self::validate_hash( $klarna_coupons_hash, $wc_coupons_hash );
-	}
-
-	/**
 	 * Get the WooCommerce order and ensure it exists.
 	 *
 	 * @param string $merchant_reference The merchant reference. Should match the order ID in WooCommerce.
@@ -258,49 +231,6 @@ class OrderValidation {
 	}
 
 	/**
-	 * Validate the price to ensure the order is valid.
-	 *
-	 * @param int   $klarna_price The price from Kustom.
-	 * @param float $wc_price The price from WooCommerce.
-	 *
-	 * @return void
-	 * @throws Exception If the prices do not match.
-	 */
-	private static function validate_price( $klarna_price, $wc_price ) {
-		// Divide the Kustom price by 100, to make it a floating point number.
-		$klarna_price = floatval( $klarna_price ) / 100;
-
-		$klarna_price = wc_format_decimal( $klarna_price, wc_get_price_decimals() );
-		$wc_price     = wc_format_decimal( $wc_price, wc_get_price_decimals() );
-
-		if ( $klarna_price !== $wc_price ) {
-			throw new Exception( 'Failed to validate the order, please try again', 401 );
-		}
-	}
-
-	/**
-	 * Validate the order totals to ensure the order is valid.
-	 *
-	 * @param array     $klarna_order The Kustom order.
-	 * @param \WC_Order $order The WooCommerce order.
-	 *
-	 * @return void
-	 */
-	private static function validate_order_totals( $klarna_order, $order ) {
-		$selected_shipping                   = $klarna_order['selected_shipping_option'] ?? array();
-		$klarna_order_amount                 = $klarna_order['order_amount'] ?? 0;
-		$klarna_order_tax_amount             = $klarna_order['order_tax_amount'] ?? 0;
-		$klarna_selected_shipping_price      = $selected_shipping['price'] ?? 0;
-		$klarna_selected_shipping_tax_amount = $selected_shipping['tax_amount'] ?? 0;
-
-		$klarna_total     = $klarna_order_amount + $klarna_selected_shipping_price;
-		$klarna_tax_total = $klarna_order_tax_amount + $klarna_selected_shipping_tax_amount;
-
-		self::validate_price( $klarna_total, $order->get_total() );
-		self::validate_price( $klarna_tax_total, $order->get_total_tax() );
-	}
-
-	/**
 	 * Validate the WooCommerce order.
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
@@ -313,37 +243,6 @@ class OrderValidation {
 		if ( ! empty( $order->get_date_paid() ) ) {
 			throw new Exception( 'Order is already paid.', 400 );
 		}
-	}
-
-	/**
-	 * Load the WooCommerce cart.
-	 *
-	 * @param array $klarna_order The Kustom order.
-	 *
-	 * @return SessionHandler
-	 * @throws Exception If the cart could not be loaded.
-	 */
-	private static function load_wc_session( $klarna_order ) {
-		// Get the wc_cart_token from the Kustom order merchant data.
-		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-		$wc_cart_token        = $klarna_merchant_data['wc_cart_token'] ?? '';
-
-		if ( empty( $wc_cart_token ) ) {
-			throw new Exception( 'Failed to validate the order, please try again.', 400 );
-		}
-
-		if ( ! JsonWebToken::validate( $wc_cart_token, '@' . wp_salt() ) ) {
-			throw new Exception( 'Failed to validate the order, please try again.', 401 );
-		}
-
-		// Set the CartToken header to the server session.
-		$_SERVER['HTTP_CART_TOKEN'] = $wc_cart_token;
-		$session                    = new SessionHandler();
-		$session->init();
-		// Unset the shutdown action on the session handler. To prevent saving the session after we are done with it.
-		remove_action( 'shutdown', array( $session, 'save_data' ), 20 );
-
-		return $session;
 	}
 
 	/**
