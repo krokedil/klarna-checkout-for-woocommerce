@@ -70,7 +70,7 @@ class Express {
 		add_action( 'init', array( $this, 'register_scripts' ) );
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 		add_filter( 'woocommerce_should_clear_cart_after_payment', array( $this, 'maybe_keep_cart_after_payment' ) );
-		add_action( 'kco_wc_confirm_klarna_order', array( $this, 'maybe_destroy_express_session' ) );
+		add_action( 'kco_wc_confirm_klarna_order', array( $this, 'forget_express_order' ) );
 	}
 
 	/**
@@ -403,18 +403,24 @@ class Express {
 	}
 
 	/**
-	 * Delete the product express session once its purchase is confirmed, as only the shopper's own cart should remain.
+	 * Forget an express purchase once it is confirmed, and delete its product express session, as only the shopper's own
+	 * cart should remain. Other outstanding express purchases are kept, so they can still be confirmed.
 	 *
 	 * @param int $order_id The WooCommerce order ID.
 	 */
-	public function maybe_destroy_express_session( $order_id ) {
+	public function forget_express_order( $order_id ) {
 		$order = wc_get_order( $order_id );
-		if ( ! $order || ! self::is_product_express_order( $order ) || ! WC()->session instanceof \WC_Session_Handler ) {
+		if ( ! $order || empty( $order->get_meta( self::ORDER_META ) ) || ! WC()->session instanceof \WC_Session_Handler ) {
 			return;
 		}
 
-		WC()->session->delete_session( WC()->session->get( OrderCreator::EXPRESS_SESSION_KEY ) );
-		WC()->session->__unset( OrderCreator::EXPRESS_SESSION_KEY );
+		$klarna_order_id = (string) $order->get_meta( '_wc_klarna_order_id' );
+		$express_session = OrderCreator::get_remembered()[ $klarna_order_id ] ?? '';
+		if ( '' !== $express_session ) {
+			WC()->session->delete_session( $express_session );
+		}
+
+		OrderCreator::forget( $klarna_order_id );
 	}
 
 	/**

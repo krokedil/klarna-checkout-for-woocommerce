@@ -598,7 +598,6 @@ function kco_unset_sessions() {
 	WC()->session->__unset( 'kco_valid_checkout' );
 	WC()->session->__unset( 'kco_wc_prefill_consent' );
 	WC()->session->__unset( 'kco_wc_order_id' );
-	WC()->session->__unset( Krokedil\KustomCheckout\Express\OrderCreator::SESSION_KEY );
 }
 
 /**

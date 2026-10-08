@@ -18,18 +18,20 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class OrderCreator {
 	/**
-	 * The session key holding the Kustom order id of the latest express purchase, read on confirmation.
+	 * The session key mapping the Kustom order id of each outstanding express purchase to its product express session,
+	 * or '' for cart express. Read on confirmation, so each open sheet can still be confirmed when another was opened later.
 	 *
 	 * @var string
 	 */
-	const SESSION_KEY = 'kco_express_order_id';
+	const SESSION_KEY = 'kco_express_orders';
 
 	/**
-	 * The shopper's session key holding the product express session to delete once its purchase is confirmed.
+	 * How many outstanding express purchases the session keeps. Abandoned sheets are never confirmed, so without a cap
+	 * repeated creates would grow the shopper's session row without limit.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	const EXPRESS_SESSION_KEY = 'kco_express_session';
+	const MAX_REMEMBERED = 10;
 
 	/**
 	 * The express context being created, read by the request filter.
@@ -78,9 +80,7 @@ class OrderCreator {
 			}
 		);
 
-		WC()->session->set( self::EXPRESS_SESSION_KEY, $express_session );
-
-		return $this->remember( $klarna_order_id );
+		return $this->remember( $klarna_order_id, $express_session );
 	}
 
 	/**
@@ -148,11 +148,38 @@ class OrderCreator {
 	 * Kept out of kco_wc_order_id so an abandoned express order is never reused by the iframe checkout.
 	 *
 	 * @param string $klarna_order_id The Kustom order id.
+	 * @param string $express_session The product express session key, or '' for cart express.
 	 * @return string
 	 */
-	private function remember( $klarna_order_id ) {
-		WC()->session->set( self::SESSION_KEY, $klarna_order_id );
+	private function remember( $klarna_order_id, $express_session = '' ) {
+		$orders                     = self::get_remembered();
+		$orders[ $klarna_order_id ] = $express_session;
+
+		WC()->session->set( self::SESSION_KEY, array_slice( $orders, -self::MAX_REMEMBERED, null, true ) );
 
 		return $klarna_order_id;
+	}
+
+	/**
+	 * The shopper's outstanding express purchases: Kustom order id => product express session key, or '' for cart express.
+	 *
+	 * @return array<string, string>
+	 */
+	public static function get_remembered() {
+		$orders = WC()->session->get( self::SESSION_KEY );
+
+		return is_array( $orders ) ? $orders : array();
+	}
+
+	/**
+	 * Remove a confirmed express purchase from the shopper's session, keeping the others.
+	 *
+	 * @param string $klarna_order_id The Kustom order id.
+	 */
+	public static function forget( $klarna_order_id ) {
+		$orders = self::get_remembered();
+		unset( $orders[ $klarna_order_id ] );
+
+		WC()->session->set( self::SESSION_KEY, $orders );
 	}
 }

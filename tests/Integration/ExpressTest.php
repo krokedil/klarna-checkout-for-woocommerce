@@ -118,7 +118,7 @@ class ExpressTest extends IntegrationTestCase {
 
 		$this->createExpressOrder( [ 'context' => 'cart' ] );
 
-		$this->assertSame( 'checkout-order-123', WC()->session->get( OrderCreator::SESSION_KEY ) );
+		$this->assertSame( [ 'checkout-order-123' => '' ], OrderCreator::get_remembered() );
 		$this->assertSame( 'iframe-order-1', WC()->session->get( 'kco_wc_order_id' ), 'An abandoned express order must never be picked up by the iframe.' );
 	}
 
@@ -170,14 +170,36 @@ class ExpressTest extends IntegrationTestCase {
 			]
 		);
 		$token = json_decode( $this->gatewayRequestTo( '/checkout/v3/orders' )['json']['merchant_data'], true )['wc_cart_token'];
-		$order = $this->haveGatewayOrder();
+		$order = $this->haveGatewayOrder( [ 'kustom' => [ 'order_id' => 'checkout-order-123' ] ] );
 		$order->update_meta_data( Express::ORDER_META, 'product' );
 		$order->save();
 
 		do_action( 'kco_wc_confirm_klarna_order', $order->get_id(), [] ); // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment
 
 		$this->assertNull( ExpressSession::open( $token )->get( 'cart' ) );
-		$this->assertEmpty( WC()->session->get( OrderCreator::EXPRESS_SESSION_KEY ) );
+		$this->assertSame( [], OrderCreator::get_remembered() );
+	}
+
+	public function test_confirming_one_express_order_keeps_another_open_one(): void {
+		$this->haveExpressSettings( [ 'elements_express_product_position' => 'manual' ] );
+		$this->resetHttpInterception();
+		$this->willCreateOrder( [ 'order_id' => 'express-a' ] );
+		$this->willCreateOrder( [ 'order_id' => 'express-b' ] );
+		$this->createExpressOrder( [ 'context' => 'product', 'product_id' => $this->haveSimpleProduct()->get_id() ] );
+		$this->createExpressOrder( [ 'context' => 'product', 'product_id' => $this->haveSimpleProduct()->get_id() ] );
+		[ $token_a, $token_b ] = array_map(
+			static fn( $request ) => json_decode( $request['json']['merchant_data'], true )['wc_cart_token'],
+			$this->gatewayRequestsTo( '/checkout/v3/orders' )
+		);
+		$order = $this->haveGatewayOrder( [ 'kustom' => [ 'order_id' => 'express-a' ] ] );
+		$order->update_meta_data( Express::ORDER_META, 'product' );
+		$order->save();
+
+		do_action( 'kco_wc_confirm_klarna_order', $order->get_id(), [] ); // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment
+
+		$this->assertNull( ExpressSession::open( $token_a )->get( 'cart' ) );
+		$this->assertNotEmpty( ExpressSession::open( $token_b )->get( 'cart' ), 'The newer open sheet must keep its cart.' );
+		$this->assertSame( [ 'express-b' ], array_keys( OrderCreator::get_remembered() ), 'The newer order must still be confirmable.' );
 	}
 
 	public function test_a_refused_product_express_order_leaves_the_cart_as_it_was(): void {
@@ -196,7 +218,7 @@ class ExpressTest extends IntegrationTestCase {
 		$this->assertSame( 400, $response->get_status() );
 		$this->assertArrayNotHasKey( 'order_id', $response->get_data() );
 		$this->assertSame( $cart_hash, WC()->cart->get_cart_hash() );
-		$this->assertEmpty( WC()->session->get( OrderCreator::SESSION_KEY ) );
+		$this->assertSame( [], OrderCreator::get_remembered() );
 	}
 
 	public function test_a_variable_product_needs_a_chosen_variation(): void {

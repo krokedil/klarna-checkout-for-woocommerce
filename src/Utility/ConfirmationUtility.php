@@ -22,13 +22,13 @@ class ConfirmationUtility {
 			return;
 		}
 
-		// An express purchase keeps its order id under its own key, so the iframe never reuses it.
-		foreach ( array( 'kco_wc_order_id', OrderCreator::SESSION_KEY ) as $session_key ) {
-			$session_kustom_order_id = (string) WC()->session->get( $session_key );
-			if ( ! empty( $session_kustom_order_id ) && hash_equals( $session_kustom_order_id, (string) $kustom_order_id ) ) {
-				self::redirect( $kustom_order_id );
-				return;
-			}
+		$kustom_order_id         = (string) $kustom_order_id;
+		$session_kustom_order_id = (string) WC()->session->get( 'kco_wc_order_id' );
+		$is_iframe_order         = ! empty( $session_kustom_order_id ) && hash_equals( $session_kustom_order_id, $kustom_order_id );
+
+		// An express purchase keeps its order ids under their own key, so the iframe never reuses them.
+		if ( $is_iframe_order || ( '' !== $kustom_order_id && array_key_exists( $kustom_order_id, OrderCreator::get_remembered() ) ) ) {
+			self::redirect( $kustom_order_id );
 		}
 	}
 
