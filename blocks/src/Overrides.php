@@ -2,7 +2,7 @@
 namespace Krokedil\KustomCheckout\Blocks;
 
 use Krokedil\KustomCheckout\Blocks\Api\Controllers\OrderController;
-use Krokedil\KustomCheckout\Express\ExpressSession;
+use Krokedil\KustomCheckout\Utility\BlocksUtility;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -164,7 +164,7 @@ class Overrides {
 		$merchant_data['wc_coupons_hash']  = $cart_hashes['coupons'] ?? '';
 		$merchant_data['wc_taxes_hash']    = $cart_hashes['taxes'] ?? '';
 
-		$cart_token = WC()->session->get( 'kco_wc_cart_token', ExpressSession::create_token( wc()->session->get_customer_id() ) );
+		$cart_token = WC()->session->get( 'kco_wc_cart_token', BlocksUtility::create_cart_token( wc()->session->get_customer_id() ) );
 
 		$merchant_data['wc_cart_token']       = $cart_token;
 		$merchant_data['wc_nonce']            = wp_create_nonce( 'wc_store_api' );

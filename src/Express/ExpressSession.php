@@ -3,6 +3,7 @@ namespace Krokedil\KustomCheckout\Express;
 
 use Automattic\WooCommerce\StoreApi\SessionHandler;
 use Automattic\WooCommerce\StoreApi\Utilities\JsonWebToken;
+use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -30,7 +31,7 @@ class ExpressSession {
 	 */
 	public static function with_product_cart( $product_id, $variation_id, $quantity, $variation, $callback ) {
 		$session_key = 't_' . substr( md5( wp_generate_uuid4() ), 0, 30 );
-		$token       = self::create_token( $session_key );
+		$token       = BlocksUtility::create_cart_token( $session_key );
 		$session     = self::open( $token );
 
 		$original = array(
@@ -219,23 +220,6 @@ class ExpressSession {
 		}
 
 		return 'klarna_kss';
-	}
-
-	/**
-	 * Create a Store API cart token for a session key, the same way the block checkout overrides do.
-	 *
-	 * @param string $customer_id The session key the token should load.
-	 * @return string
-	 */
-	public static function create_token( $customer_id ) {
-		return JsonWebToken::create(
-			array(
-				'user_id' => $customer_id,
-				'exp'     => time() + intval( apply_filters( 'wc_session_expiration', DAY_IN_SECONDS * 2 ) ), // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment -- WooCommerce core hook.
-				'iss'     => 'wc/store/v1',
-			),
-			'@' . wp_salt()
-		);
 	}
 
 	/**

@@ -10,6 +10,7 @@ use Krokedil\KustomCheckout\Express\ExpressSession;
 use Krokedil\KustomCheckout\Express\OrderCreator;
 use Krokedil\KustomCheckout\Express\RateLimiter;
 use Krokedil\KustomCheckout\Express\RestController;
+use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Tests\Support\IntegrationTestCase;
 
 /**
@@ -456,7 +457,7 @@ class ExpressTest extends IntegrationTestCase {
 	 * @return array{0: \WC_Order, 1: string}
 	 */
 	private function haveExpressOrderToValidate( array $kustom ): array {
-		$token = ExpressSession::create_token( (string) WC()->session->get_customer_id() );
+		$token = BlocksUtility::create_cart_token( (string) WC()->session->get_customer_id() );
 		$order = $this->haveOrder( [ 'items' => [ [ $this->haveSimpleProduct( [ 'sku' => 'express-validated' ] ), 1 ] ] ] );
 		$order->update_meta_data( '_fees_hash', 'fees' );
 		$order->update_meta_data( '_coupons_hash', 'coupons' );
