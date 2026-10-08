@@ -147,6 +147,8 @@ const setupProduct = (container: HTMLElement, data: ButtonData): void => {
 	const render = (): void => {
 		// A variable product is disabled until a purchasable variation is chosen.
 		container.dataset.disabled = unit ? 'false' : 'true';
+		container.inert = !unit;
+		container.setAttribute('aria-disabled', unit ? 'false' : 'true');
 
 		const amounts = unit || {
 			unitAmount: data.unitAmount || 0,
