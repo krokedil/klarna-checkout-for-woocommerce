@@ -130,6 +130,9 @@ class OrderCreator {
 	public function add_express_data( $args ) {
 		$args = RequestModifier::remove_shipping( $args );
 
+		// Without a draft reference validation posts to /checkout, which rebuilds the draft from the cart and the sheet's shipping.
+		unset( $args['merchant_reference1'], $args['merchant_reference2'] );
+
 		$merchant_data = json_decode( $args['merchant_data'] ?? '', true );
 		$merchant_data = is_array( $merchant_data ) ? $merchant_data : array();
 

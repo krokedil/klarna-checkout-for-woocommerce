@@ -220,6 +220,18 @@ class ExpressTest extends IntegrationTestCase {
 		$this->assertFalse( ( new RestController() )->check_permission( $request ) );
 	}
 
+	public function test_a_cart_express_order_is_not_tied_to_the_draft_order(): void {
+		$this->haveCartWith( [ $this->haveSimpleProduct() ] );
+		WC()->session->set( 'store_api_draft_order', $this->haveOrder()->get_id() );
+		$this->resetHttpInterception();
+		$this->willCreateOrder();
+
+		$this->createExpressOrder( [ 'context' => 'cart' ] );
+
+		$body = $this->gatewayRequestTo( '/checkout/v3/orders' )['json'];
+		$this->assertArrayNotHasKey( 'merchant_reference2', $body, 'Paying the draft as is would ignore cart changes and the sheet\'s shipping.' );
+	}
+
 	public function test_the_endpoint_refuses_product_express_while_it_is_disabled(): void {
 		$response = $this->createExpressOrder(
 			[
