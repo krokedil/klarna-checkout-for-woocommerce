@@ -109,7 +109,7 @@ export const createOrder = async (
 		credentials: 'same-origin',
 		headers: {
 			'Content-Type': 'application/json',
-			'X-WP-Nonce': config.restNonce,
+			...(config.restNonce && { 'X-WP-Nonce': config.restNonce }),
 		},
 		body: JSON.stringify(body),
 	});

@@ -315,7 +315,8 @@ class Express {
 	public static function get_script_config() {
 		return array(
 			'restUrl'   => RestController::get_url(),
-			'restNonce' => wp_create_nonce( 'wp_rest' ),
+			// Guests send no nonce: theirs is the same for everyone and goes stale in cached pages, which WordPress rejects.
+			'restNonce' => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
 			'locale'    => ElementsUtility::get_locale(),
 			'currency'  => strtolower( get_woocommerce_currency() ),
 			'sdk'       => array(
