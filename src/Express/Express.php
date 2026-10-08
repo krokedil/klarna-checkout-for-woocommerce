@@ -408,11 +408,11 @@ class Express {
 	 */
 	public function maybe_destroy_express_session( $order_id ) {
 		$order = wc_get_order( $order_id );
-		if ( ! $order || ! self::is_product_express_order( $order ) || ! WC()->session ) {
+		if ( ! $order || ! self::is_product_express_order( $order ) || ! WC()->session instanceof \WC_Session_Handler ) {
 			return;
 		}
 
-		ExpressSession::destroy( (string) WC()->session->get( OrderCreator::EXPRESS_SESSION_KEY ) );
+		WC()->session->delete_session( WC()->session->get( OrderCreator::EXPRESS_SESSION_KEY ) );
 		WC()->session->__unset( OrderCreator::EXPRESS_SESSION_KEY );
 	}
 

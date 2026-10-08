@@ -182,23 +182,6 @@ class ExpressSession {
 	}
 
 	/**
-	 * Delete an express session once its purchase is confirmed. Only express session keys (t_…) are accepted.
-	 *
-	 * @param string $customer_id The express session key.
-	 */
-	public static function destroy( $customer_id ) {
-		if ( 0 !== strpos( (string) $customer_id, 't_' ) ) {
-			return;
-		}
-
-		$GLOBALS['wpdb']->delete( $GLOBALS['wpdb']->prefix . 'woocommerce_sessions', array( 'session_key' => $customer_id ) );
-
-		if ( class_exists( 'WC_Cache_Helper' ) && defined( 'WC_SESSION_CACHE_GROUP' ) ) {
-			wp_cache_delete( \WC_Cache_Helper::get_cache_prefix( WC_SESSION_CACHE_GROUP ) . $customer_id, WC_SESSION_CACHE_GROUP );
-		}
-	}
-
-	/**
 	 * The shipping rate id to choose for the option selected in Kustom.
 	 *
 	 * Mirrors ShippingAssistant\Checkout::set_shipping_method(), but matches the zone from the Kustom address,
