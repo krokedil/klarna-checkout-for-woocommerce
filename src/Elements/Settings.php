@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\Elements;
 
+use Krokedil\KustomCheckout\Express\Express;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -164,6 +166,17 @@ class Settings {
 
 		$settings['elements_shipping_product_position'] = $this->get_product_placement_field( __( 'Delivery Method Display placement on product pages', 'klarna-checkout-for-woocommerce' ) );
 		$settings['elements_shipping_cart_position']    = $this->get_cart_placement_field( __( 'Delivery Method Display placement on cart page', 'klarna-checkout-for-woocommerce' ) );
+
+		$settings['elements_express_title'] = array(
+			'title'       => __( 'Express Buttons', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'krokedil_subtitle',
+			'description' => __( 'One-click Apple Pay, Google Pay and Klarna purchases. Shown in the express area of the cart and checkout blocks and on the classic cart page. Requires Kustom Shipping Assistant (KSA) to be active and configured. You can also display it with the shortcode [kustom_express_element] or block Kustom Express Element.', 'klarna-checkout-for-woocommerce' ),
+		);
+
+		$product_express_field = $this->get_product_placement_field( __( 'Express buttons on product pages', 'klarna-checkout-for-woocommerce' ) );
+		$product_express_field['options'][ Express::PLACEMENT_MANUAL ] = __( 'Shortcode or block only', 'klarna-checkout-for-woocommerce' );
+		$product_express_field['description']                          = __( 'On product pages the express buttons buy only that product, and leave the customer\'s cart untouched.', 'klarna-checkout-for-woocommerce' );
+		$settings['elements_express_product_position']                 = $product_express_field;
 
 		$settings['elements_end'] = array(
 			'type' => 'krokedil_section_end',

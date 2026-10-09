@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\Utility;
 
+use Automattic\WooCommerce\StoreApi\Utilities\JsonWebToken;
+
 /**
  * Utility class for helper functions related to blocks.
  */
@@ -18,6 +20,23 @@ class BlocksUtility {
 
 		// Fallback to the original block check for all other cases.
 		return \WC_Blocks_Utils::has_block_in_page( wc_get_page_id( 'checkout' ), 'woocommerce/checkout' );
+	}
+
+	/**
+	 * Create a Store API cart token for a session key.
+	 *
+	 * @param string $customer_id The session key the token should load.
+	 * @return string
+	 */
+	public static function create_cart_token( $customer_id ) {
+		return JsonWebToken::create(
+			array(
+				'user_id' => $customer_id,
+				'exp'     => time() + intval( apply_filters( 'wc_session_expiration', DAY_IN_SECONDS * 2 ) ), // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment -- WooCommerce core hook.
+				'iss'     => 'wc/store/v1',
+			),
+			'@' . wp_salt()
+		);
 	}
 
 	/**

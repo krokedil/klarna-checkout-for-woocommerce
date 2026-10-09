@@ -1,0 +1,20 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "kustom/express-element",
+	"title": "Kustom Express Element",
+	"description": "One-click Apple Pay, Google Pay and Klarna purchases with Kustom express buttons.",
+	"category": "woocommerce",
+	"icon": "cart",
+	"keywords": [ "kustom", "express", "apple pay", "google pay", "elements" ],
+	"textdomain": "klarna-checkout-for-woocommerce",
+	"attributes": {
+		"context": { "type": "string", "default": "auto" }
+	},
+	"supports": {
+		"html": false,
+		"spacing": { "margin": true, "padding": true }
+	},
+	"example": {},
+	"editorScript": "kco-elements-expresselement-block"
+}

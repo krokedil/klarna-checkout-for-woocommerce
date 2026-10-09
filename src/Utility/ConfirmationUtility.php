@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\Utility;
 
+use Krokedil\KustomCheckout\Express\OrderCreator;
+
 /**
  * Class ConfirmationUtility
  *
@@ -16,12 +18,18 @@ class ConfirmationUtility {
 	 */
 	public static function redirect_from_session( $kustom_order_id ) {
 		// Tied to the session so that knowing a Kustom order id is not enough to obtain its order key.
-		$session_kustom_order_id = isset( WC()->session ) ? (string) WC()->session->get( 'kco_wc_order_id' ) : '';
-		if ( empty( $session_kustom_order_id ) || ! hash_equals( $session_kustom_order_id, (string) $kustom_order_id ) ) {
+		if ( ! isset( WC()->session ) ) {
 			return;
 		}
 
-		self::redirect( $kustom_order_id );
+		$kustom_order_id         = (string) $kustom_order_id;
+		$session_kustom_order_id = (string) WC()->session->get( 'kco_wc_order_id' );
+		$is_iframe_order         = ! empty( $session_kustom_order_id ) && hash_equals( $session_kustom_order_id, $kustom_order_id );
+
+		// An express purchase keeps its order ids under their own key, so the iframe never reuses them.
+		if ( $is_iframe_order || ( '' !== $kustom_order_id && array_key_exists( $kustom_order_id, OrderCreator::get_remembered() ) ) ) {
+			self::redirect( $kustom_order_id );
+		}
 	}
 
 	/**
