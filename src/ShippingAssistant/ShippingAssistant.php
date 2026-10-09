@@ -55,9 +55,12 @@ class ShippingAssistant {
 				'admin_notices',
 				function () {
 					?>
-					<div class="notice notice-error">
+					<div class="notice notice-warning">
 							<p><strong><?php esc_html_e( 'Kustom Shipping Assistant is now included in Kustom Checkout for WooCommerce.', 'klarna-checkout-for-woocommerce' ); ?></strong></p>
-							<p><?php esc_html_e( 'You no longer need the separate Kustom Shipping Assistant plugin. Deactivate it and your shipping zones and settings carry over.', 'klarna-checkout-for-woocommerce' ); ?></p>
+							<p>
+								<?php esc_html_e( 'Please deactivate the separate Kustom Shipping Assistant plugin. The built-in version takes over automatically and keeps your shipping zones and settings.', 'klarna-checkout-for-woocommerce' ); ?>
+								<a href="<?php echo esc_url( 'https://docs.krokedil.com/kustom-checkout-for-woocommerce/setup-and-configuration/kustom-shipping-assistant/' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Read more', 'klarna-checkout-for-woocommerce' ); ?></a>
+							</p>
 					</div>
 					<?php
 				}
