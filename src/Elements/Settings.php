@@ -2,6 +2,7 @@
 namespace Krokedil\KustomCheckout\Elements;
 
 use Krokedil\KustomCheckout\Express\Express;
+use Krokedil\KustomCheckout\Express\RestController;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -73,6 +74,7 @@ class Settings {
 	public function __construct() {
 		add_filter( 'kco_wc_gateway_settings', array( $this, 'extend_settings' ) );
 		add_filter( 'woocommerce_generate_krokedil_subtitle_html', array( $this, 'generate_krokedil_subtitle_html' ), 10, 3 );
+		add_filter( 'woocommerce_generate_kco_express_urls_html', array( $this, 'generate_kco_express_urls_html' ), 10, 3 );
 		add_filter( 'woocommerce_settings_api_sanitized_fields_kco', array( $this, 'sanitize_public_api_keys' ) );
 	}
 
@@ -171,6 +173,12 @@ class Settings {
 			'title'       => __( 'Express Buttons', 'klarna-checkout-for-woocommerce' ),
 			'type'        => 'krokedil_subtitle',
 			'description' => __( 'One-click Apple Pay, Google Pay and Klarna purchases. Shown in the express area of the cart and checkout blocks and on the classic cart page. Requires Kustom Shipping Assistant (KSA) to be active and configured. You can also display it with the shortcode [kustom_express_element] or block Kustom Express Element.', 'klarna-checkout-for-woocommerce' ),
+		);
+
+		$settings['elements_express_urls'] = array(
+			'title'       => __( 'Express merchant URLs', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'kco_express_urls',
+			'description' => __( 'Paste these into the Kustom Portal under Elements → Express buttons.', 'klarna-checkout-for-woocommerce' ),
 		);
 
 		$product_express_field = $this->get_product_placement_field( __( 'Express buttons on product pages', 'klarna-checkout-for-woocommerce' ) );
@@ -295,6 +303,41 @@ class Settings {
 				<?php if ( ! empty( $description ) ) : ?>
 					<p class="description"><?php echo wp_kses_post( $description ); ?></p>
 				<?php endif; ?>
+			</td>
+		</tr>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Render the express merchant URLs read-only, with copy buttons.
+	 *
+	 * @param string $html Unused (default filter argument).
+	 * @param string $key  The field key.
+	 * @param array  $data The field arguments.
+	 * @return string
+	 */
+	public function generate_kco_express_urls_html( $html, $key, $data ) {
+		$labels = array(
+			'push'         => __( 'Push URL', 'klarna-checkout-for-woocommerce' ),
+			'validation'   => __( 'Validation URL', 'klarna-checkout-for-woocommerce' ),
+			'confirmation' => __( 'Confirmation URL', 'klarna-checkout-for-woocommerce' ),
+		);
+
+		ob_start();
+		?>
+		<tr valign="top">
+			<th scope="row" class="titledesc"><?php echo esc_html( $data['title'] ?? '' ); ?></th>
+			<td class="forminp">
+				<?php foreach ( RestController::get_merchant_urls() as $name => $url ) : ?>
+					<p>
+						<label><?php echo esc_html( $labels[ $name ] ?? $name ); ?><br>
+							<input type="text" class="large-text code" readonly value="<?php echo esc_attr( $url ); ?>" onfocus="this.select()">
+						</label>
+						<button type="button" class="button" onclick="navigator.clipboard.writeText(this.previousElementSibling.querySelector('input').value)"><?php esc_html_e( 'Copy', 'klarna-checkout-for-woocommerce' ); ?></button>
+					</p>
+				<?php endforeach; ?>
+				<p class="description"><?php echo esc_html( $data['description'] ?? '' ); ?></p>
 			</td>
 		</tr>
 		<?php

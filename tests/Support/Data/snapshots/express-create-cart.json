@@ -7,9 +7,9 @@
         "merchant_urls": {
             "terms": "<site>/terms/",
             "checkout": "<site>/checkout/",
-            "confirmation": "<site>/checkout/?kco_confirm=yes&kco_order_id={checkout.order.id}",
-            "push": "<site>/wc-api/KCO_WC_Push/?kco-action=push&kco_wc_order_id={checkout.order.id}",
-            "validation": "<site>/wp-json/kco-block/order/{checkout.order.id}/validate"
+            "confirmation": "<site>/?kco-express-confirm={checkout.order.id}",
+            "push": "<site>/wp-json/kco-express/v1/push/{checkout.order.id}",
+            "validation": "<site>/wp-json/kco-express/v1/validate/{checkout.order.id}"
         },
         "billing_countries": [
             "AF",

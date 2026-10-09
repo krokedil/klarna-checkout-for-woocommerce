@@ -1,12 +1,10 @@
 <?php
 namespace Krokedil\KustomCheckout\Express;
 
-use Krokedil\KustomCheckout\Blocks\Api\Controllers\OrderController;
 use Krokedil\KustomCheckout\Elements\Elements;
 use Krokedil\KustomCheckout\Elements\Settings as ElementsSettings;
 use Krokedil\KustomCheckout\Elements\Utility as ElementsUtility;
 use Krokedil\KustomCheckout\ShippingAssistant\Settings as ShippingAssistantSettings;
-use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -71,6 +69,7 @@ class Express {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 		add_filter( 'woocommerce_should_clear_cart_after_payment', array( $this, 'maybe_keep_cart_after_payment' ) );
 		add_action( 'kco_wc_confirm_klarna_order', array( $this, 'forget_express_order' ) );
+		add_action( 'template_redirect', array( Confirmation::class, 'maybe_confirm' ) );
 	}
 
 	/**
@@ -374,14 +373,10 @@ class Express {
 	}
 
 	/**
-	 * Register the createOrder route, and the validation route when the block checkout has not already done so.
+	 * Register the express routes.
 	 */
 	public function register_routes() {
 		( new RestController() )->register_routes();
-
-		if ( ! BlocksUtility::is_checkout_block_enabled() ) {
-			( new OrderController() )->register_routes();
-		}
 	}
 
 	/**

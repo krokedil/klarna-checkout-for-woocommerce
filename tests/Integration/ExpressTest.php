@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use Krokedil\KustomCheckout\Blocks\OrderValidation;
+use Krokedil\KustomCheckout\Elements\Settings as ElementsSettings;
+use Krokedil\KustomCheckout\Express\Confirmation;
 use Krokedil\KustomCheckout\Express\Express;
 use Krokedil\KustomCheckout\Express\ExpressSession;
 use Krokedil\KustomCheckout\Express\OrderCreator;
@@ -21,6 +23,7 @@ use Tests\Support\IntegrationTestCase;
  * @covers \Krokedil\KustomCheckout\Express\ExpressSession
  * @covers \Krokedil\KustomCheckout\Express\RestController
  * @covers \Krokedil\KustomCheckout\Express\RateLimiter
+ * @covers \Krokedil\KustomCheckout\Express\Confirmation
  * @covers \Krokedil\KustomCheckout\Blocks\OrderValidation::validate_kco_order
  */
 class ExpressTest extends IntegrationTestCase {
@@ -106,7 +109,15 @@ class ExpressTest extends IntegrationTestCase {
 
 		$this->assertSame( 'cart', $merchant_data['kco_express'] );
 		$this->assertTrue( $request['json']['options']['require_validate_callback_success'], 'Kustom must wait for the validation callback, which creates the order.' );
-		$this->assertStringEndsWith( '/validate', $request['json']['merchant_urls']['validation'] );
+		$this->assertEquals(
+			[
+				'push'         => rest_url( 'kco-express/v1/push/{checkout.order.id}' ),
+				'validation'   => rest_url( 'kco-express/v1/validate/{checkout.order.id}' ),
+				'confirmation' => home_url( '/?kco-express-confirm={checkout.order.id}' ),
+			],
+			array_intersect_key( $request['json']['merchant_urls'], array_flip( [ 'push', 'validation', 'confirmation' ] ) ),
+			'The strings the merchant pastes into the Kustom Portal.'
+		);
 		$this->assertRequestMatchesSnapshot( $request, 'express-create-cart', $this->merchantDataPlaceholders( $merchant_data ) );
 	}
 
@@ -449,6 +460,82 @@ class ExpressTest extends IntegrationTestCase {
 		);
 
 		return $primed;
+	}
+
+	public function test_the_settings_show_the_urls_sent_to_kustom(): void {
+		$html = ( new ElementsSettings() )->generate_kco_express_urls_html( '', 'elements_express_urls', [ 'title' => 'URLs' ] );
+
+		foreach ( RestController::get_merchant_urls() as $url ) {
+			$this->assertStringContainsString( 'value="' . esc_attr( $url ) . '"', $html );
+		}
+	}
+
+	public function test_kustom_pushes_an_express_order_through_its_own_route(): void {
+		$order = $this->haveExpressOrderToConfirm();
+
+		$response = rest_do_request( new \WP_REST_Request( 'POST', '/kco-express/v1/push/kustom-order-123' ) );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'processing', $this->statusOf( $order ) );
+	}
+
+	public function test_kustom_validates_an_express_order_through_its_own_route(): void {
+		[ $order ] = $this->haveExpressOrderToValidate( [ 'order_amount' => 7600 ] );
+
+		$response = rest_do_request( new \WP_REST_Request( 'POST', '/kco-express/v1/validate/checkout-order-123' ) );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'cart', $this->reload( $order )->get_meta( Express::ORDER_META ) );
+	}
+
+	public function test_the_shopper_who_started_the_purchase_is_confirmed_with_the_order_key(): void {
+		$order = $this->haveExpressOrderToConfirm();
+		WC()->session->set( OrderCreator::SESSION_KEY, [ 'kustom-order-123' => '' ] );
+
+		$url = Confirmation::get_redirect_url( 'kustom-order-123' );
+
+		$this->assertStringContainsString( 'key=' . $order->get_order_key(), $url );
+		$this->assertStringContainsString( 'kco_confirm=yes', $url, 'The order-received page confirms it, as for the iframe.' );
+		$this->assertNoGatewayRequests();
+	}
+
+	public function test_an_express_order_is_confirmed_without_the_shoppers_session(): void {
+		$order = $this->haveExpressOrderToConfirm();
+
+		$url = Confirmation::get_redirect_url( 'kustom-order-123' );
+
+		$this->assertSame( 'processing', $this->statusOf( $order ) );
+		$this->assertStringContainsString( 'order-received', $url );
+		$this->assertStringNotContainsString( $order->get_order_key(), $url, 'Knowing a Kustom order id must not reveal the order.' );
+	}
+
+	public function test_a_confirmation_without_an_order_goes_to_the_cart(): void {
+		wc_clear_notices();
+
+		$this->assertSame( wc_get_cart_url(), Confirmation::get_redirect_url( 'unknown-order' ) );
+		$this->assertSame( 1, wc_notice_count( 'error' ) );
+	}
+
+	/**
+	 * A cart express order awaiting confirmation, and the Kustom answers that confirm it.
+	 */
+	private function haveExpressOrderToConfirm(): \WC_Order {
+		$order = $this->haveGatewayOrder( [ 'items' => [ [ $this->haveSimpleProduct( [ 'sku' => 'express-confirmed', 'price' => '100.00' ] ), 1 ] ] ] );
+		$order->update_meta_data( '_wc_klarna_order_id', 'kustom-order-123' );
+		$order->update_meta_data( Express::ORDER_META, 'cart' );
+		$order->save();
+
+		$this->resetHttpInterception();
+		$this->willRetrieveManagedOrder(
+			[
+				'order_amount' => 12500,
+				'order_lines'  => [ [ 'type' => 'physical', 'reference' => 'express-confirmed', 'name' => 'Express', 'quantity' => 1 ] ],
+			]
+		);
+		$this->willRespondWith( [], 204, '/acknowledge' );
+		$this->willRespondWith( [], 204, '/merchant-references' );
+
+		return $order;
 	}
 
 	/**

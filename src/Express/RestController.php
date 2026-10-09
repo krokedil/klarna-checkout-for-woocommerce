@@ -2,6 +2,7 @@
 namespace Krokedil\KustomCheckout\Express;
 
 use Exception;
+use Krokedil\KustomCheckout\Blocks\Api\Controllers\OrderController;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -13,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * REST controller class.
  *
- * The endpoint the express button's createOrder hook posts to.
+ * The endpoint the express button's createOrder hook posts to, and the push and validation callbacks of express orders.
  */
 class RestController {
 	/**
@@ -22,6 +23,13 @@ class RestController {
 	 * @var string
 	 */
 	const NAMESPACE = 'kco-express/v1';
+
+	/**
+	 * The route pattern of the Kustom order id in the push and validation routes.
+	 *
+	 * @var string
+	 */
+	const ID_PATTERN = '(?P<id>[\w-]+)';
 
 	/**
 	 * Register the routes.
@@ -60,6 +68,59 @@ class RestController {
 				),
 			)
 		);
+
+		// Kustom calls these server to server, and the Kustom order they name is read back from Kustom before anything is done.
+		register_rest_route(
+			self::NAMESPACE,
+			'/push/' . self::ID_PATTERN,
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'push' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/validate/' . self::ID_PATTERN,
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( new OrderController(), 'validate' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	/**
+	 * The push, validation and confirmation URLs of an express order. Also shown in the settings, for the Kustom Portal.
+	 *
+	 * @return array{push: string, validation: string, confirmation: string}
+	 */
+	public static function get_merchant_urls() {
+		$urls = array(
+			'push'         => rest_url( self::NAMESPACE . '/push/{checkout.order.id}' ),
+			'validation'   => rest_url( self::NAMESPACE . '/validate/{checkout.order.id}' ),
+			'confirmation' => home_url( '/?' . Confirmation::QUERY_VAR . '={checkout.order.id}' ),
+		);
+
+		/**
+		 * Filters the merchant URLs of an express order, sent to Kustom and shown in the settings.
+		 *
+		 * @param array $urls The push, validation and confirmation URLs.
+		 */
+		return apply_filters( 'kco_express_merchant_urls', $urls );
+	}
+
+	/**
+	 * Handle Kustom's push notification for an express order.
+	 *
+	 * @param WP_REST_Request $request The request.
+	 * @return WP_REST_Response
+	 */
+	public function push( $request ) {
+		\KCO_API_Callbacks::get_instance()->process_push( $request->get_param( 'id' ) );
+
+		return new WP_REST_Response( null, 200 );
 	}
 
 	/**
