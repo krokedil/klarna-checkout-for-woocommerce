@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "89341915114ecb38801017ea969149ed",
+    "content-hash": "4bcc1b48a9220a9dbbd00d4b2f2ad4af",
     "packages": [],
     "packages-dev": [
         {
@@ -2274,17 +2274,63 @@
             "time": "2026-07-16T18:17:41+00:00"
         },
         {
-            "name": "php-stubs/wordpress-stubs",
-            "version": "v7.0.1",
+            "name": "php-stubs/woocommerce-subscriptions-stubs",
+            "version": "v9.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/php-stubs/wordpress-stubs.git",
-                "reference": "4d0cc9d5c4efd2a46f8c53a40c38f1679a4194b6"
+                "url": "https://github.com/php-stubs/woocommerce-subscriptions-stubs.git",
+                "reference": "6621458394b01d71566975261e474e25891fe6eb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-stubs/wordpress-stubs/zipball/4d0cc9d5c4efd2a46f8c53a40c38f1679a4194b6",
-                "reference": "4d0cc9d5c4efd2a46f8c53a40c38f1679a4194b6",
+                "url": "https://api.github.com/repos/php-stubs/woocommerce-subscriptions-stubs/zipball/6621458394b01d71566975261e474e25891fe6eb",
+                "reference": "6621458394b01d71566975261e474e25891fe6eb",
+                "shasum": ""
+            },
+            "require": {
+                "php-stubs/woocommerce-stubs": "^10.2",
+                "php-stubs/wordpress-stubs": "^5.3 || ^6.0"
+            },
+            "require-dev": {
+                "php": "~7.4 || ~8.1",
+                "php-stubs/generator": "^0.8.0"
+            },
+            "suggest": {
+                "symfony/polyfill-php74": "Symfony polyfill backporting some PHP 7.4+ features to lower PHP versions",
+                "szepeviktor/phpstan-wordpress": "WordPress extensions for PHPStan"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "WooCommerce Subscriptions function and class declaration stubs for static analysis.",
+            "homepage": "https://github.com/php-stubs/woocommerce-subscriptions-stubs",
+            "keywords": [
+                "PHPStan",
+                "static analysis",
+                "subscription",
+                "woocommerce",
+                "wordpress"
+            ],
+            "support": {
+                "issues": "https://github.com/php-stubs/woocommerce-subscriptions-stubs/issues",
+                "source": "https://github.com/php-stubs/woocommerce-subscriptions-stubs/tree/v9.1.0"
+            },
+            "time": "2026-08-06T00:30:20+00:00"
+        },
+        {
+            "name": "php-stubs/wordpress-stubs",
+            "version": "v6.9.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-stubs/wordpress-stubs.git",
+                "reference": "90a9412826b9944f93b10bf41d795b5fe68abcd5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-stubs/wordpress-stubs/zipball/90a9412826b9944f93b10bf41d795b5fe68abcd5",
+                "reference": "90a9412826b9944f93b10bf41d795b5fe68abcd5",
                 "shasum": ""
             },
             "conflict": {
@@ -2294,7 +2340,7 @@
                 "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
                 "nikic/php-parser": "^5.5",
                 "php": "^7.4 || ^8.0",
-                "php-stubs/generator": "^0.9",
+                "php-stubs/generator": "^0.8.6",
                 "phpdocumentor/reflection-docblock": "^6.0",
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^9.5",
@@ -2321,9 +2367,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-stubs/wordpress-stubs/issues",
-                "source": "https://github.com/php-stubs/wordpress-stubs/tree/v7.0.1"
+                "source": "https://github.com/php-stubs/wordpress-stubs/tree/v6.9.4"
             },
-            "time": "2026-07-10T10:10:02+00:00"
+            "time": "2026-05-01T20:36:01+00:00"
         },
         {
             "name": "php-webdriver/webdriver",
@@ -2923,6 +2969,70 @@
                 "source": "https://github.com/phpstan/phpdoc-parser/tree/2.3.6"
             },
             "time": "2026-09-27T20:07:45+00:00"
+        },
+        {
+            "name": "phpstan/phpstan",
+            "version": "2.3.1",
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/6155239b488e95d26d1ebd95c6b4bb294d7f09db",
+                "reference": "6155239b488e95d26d1ebd95c6b4bb294d7f09db",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4|^8.0"
+            },
+            "conflict": {
+                "phpstan/phpstan-shim": "*"
+            },
+            "bin": [
+                "phpstan",
+                "phpstan.phar"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ondřej Mirtes"
+                },
+                {
+                    "name": "Markus Staab"
+                },
+                {
+                    "name": "Vincent Langlet"
+                }
+            ],
+            "description": "PHPStan - PHP Static Analysis Tool",
+            "keywords": [
+                "dev",
+                "static analysis"
+            ],
+            "support": {
+                "docs": "https://phpstan.org/user-guide/getting-started",
+                "forum": "https://github.com/phpstan/phpstan/discussions",
+                "issues": "https://github.com/phpstan/phpstan/issues",
+                "security": "https://github.com/phpstan/phpstan/security/policy",
+                "source": "https://github.com/phpstan/phpstan-src"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/ondrejmirtes",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/phpstan",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-10-08T21:09:11+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

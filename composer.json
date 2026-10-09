@@ -9,7 +9,10 @@
     "wpackagist-plugin/sqlite-database-integration": "^2.2",
     "wpackagist-theme/storefront": "^4.6",
     "allure-framework/allure-codeception": "^2",
-    "pronamic/wp-documentor": "1.3.2"
+    "pronamic/wp-documentor": "1.3.2",
+    "phpstan/phpstan": "^2.1",
+    "php-stubs/wordpress-stubs": "^6.0",
+    "php-stubs/woocommerce-subscriptions-stubs": "^9.1"
   },
   "autoload": {
     "psr-4": {
@@ -77,6 +80,8 @@
     "lint:fix:changes": "git diff --name-only HEAD~1 | grep '\\.php$' | xargs vendor/bin/phpcbf --standard=phpcs.xml --extensions=php -q",
     "lint:tests": "vendor/bin/phpcs --standard=tests/phpcs.xml tests -q",
     "lint:tests:fix": "vendor/bin/phpcbf --standard=tests/phpcs.xml tests -q",
+    "phpstan": "./vendor/bin/phpstan analyse --memory-limit=2G",
+    "phpstan:baseline": "./vendor/bin/phpstan analyse --memory-limit=2G --generate-baseline",
     "test:bootstrap": "@php tests/_support_scripts/install-test-env.php",
     "test:chromedriver": "vendor/bin/codecept chromedriver:update",
     "post-autoload-dump-dev": [
@@ -112,5 +117,9 @@
     "test:report:reset": "rm -rf tests/_output/allure-results tests/_output/report tests/_output/report-share tests/_output/record_* tests/_output/Tests.EndToEnd.*.html tests/_output/Tests.EndToEnd.*.png",
     "test:regenerate-dump": "bash tests/_support_scripts/regenerate-dump.sh",
     "doc:hooks": "vendor/bin/wp-documentor parse . --exclude=docs --exclude=tests --exclude=vendor --exclude=node_modules --exclude=languages --exclude=dependencies --exclude=blocks/build --format=markdown --type=filters --output=docs/hooks.md --relative=docs --prefix=kco_ --prefix=kom_ --prefix=klarna_ --prefix=wc_klarna_ --template=docs/templates/template.php"
+  },
+  "scripts-descriptions": {
+    "phpstan": "Run PHPStan static analysis at the level set in phpstan.neon. Findings that predate the analysis are suppressed by phpstan-baseline.neon, so a failure means new code introduced it.",
+    "phpstan:baseline": "Regenerate phpstan-baseline.neon from the current findings. Only run this when intentionally accepting new suppressions, otherwise fix the reported errors instead."
   }
 }

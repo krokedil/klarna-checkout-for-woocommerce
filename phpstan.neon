@@ -1,0 +1,43 @@
+includes:
+  - phpstan-baseline.neon
+
+parameters:
+  level: 5
+  phpVersion: 80000
+  treatPhpDocTypesAsCertain: false
+
+  paths:
+    - klarna-checkout-for-woocommerce.php
+    - src
+    - classes
+    - includes
+    - templates
+    - blocks/src
+
+  excludePaths:
+    - node_modules (?)
+    - tests (?)
+    - blocks/build (?)
+    - assets
+
+  scanFiles:
+    - phpstan-stubs.php
+
+  scanDirectories:
+    - vendor/php-stubs
+    - dependencies
+
+  bootstrapFiles:
+    - phpstan-bootstrap.php
+    - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+    - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+    - vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
+    - vendor/php-stubs/woocommerce-subscriptions-stubs/woocommerce-subscriptions-stubs.php
+
+  dynamicConstantNames:
+    - KCO_WC_VERSION
+    - KCO_WC_MIN_PHP_VER
+    - KCO_WC_MIN_WC_VER
+    - KCO_WC_MAIN_FILE
+    - KCO_WC_PLUGIN_PATH
+    - KCO_WC_PLUGIN_URL
