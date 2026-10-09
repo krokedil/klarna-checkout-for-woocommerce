@@ -27,6 +27,13 @@ class KCO_Confirmation {
 	protected static $instance;
 
 	/**
+	 * The value this request wrote to each lock it holds, so it only releases its own.
+	 *
+	 * @var array<string, string>
+	 */
+	private static $held_locks = array();
+
+	/**
 	 * Returns the *Singleton* instance of this class.
 	 *
 	 * @return self::$instance The *Singleton* instance.
@@ -229,38 +236,91 @@ class KCO_Confirmation {
 	}
 
 	/**
-	 * Lock a KCO order id and WooCommerce order id combination to prevent multiple simultaneous confirmations.
+	 * Lock a WooCommerce order to prevent multiple simultaneous confirmations.
 	 *
-	 * @param string $kco_id The KCO order id.
+	 * @param string $kco_id The KCO order id. Unused, the lock is per WooCommerce order.
 	 * @param string $order_id The WooCommerce order id.
 	 *
-	 * @return bool True if the lock was successful, false if there is already a lock for the given combination.
+	 * @return bool True if the lock was successful, false if the order is already locked.
 	 */
 	public static function lock_kco_confirmation( $kco_id, $order_id ) {
-		$key = "kco_confirm_{$kco_id}_{$order_id}";
-		if ( wp_using_ext_object_cache() ) {
-			return wp_cache_add( $key, true, 'kco_locks', MINUTE_IN_SECONDS );
+		global $wpdb;
+
+		$lock = self::get_lock_name( $order_id );
+		$now  = time();
+
+		// Atomic through the unique index on option_name. Object cache add() and transients are not,
+		// e.g. LiteSpeed's add() only checks the current process before writing to Redis.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- We need an atomic insert, add_option() upserts.
+		if ( $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} ( option_name, option_value, autoload ) VALUES ( %s, %s, 'no' )", $lock, $now ) ) ) {
+			self::$held_locks[ $lock ] = (string) $now;
+			return true;
 		}
 
-		return set_transient( $key, true, MINUTE_IN_SECONDS );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- We need the stored value, not a cached one.
+		$held_since = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $lock ) );
+		if ( null === $held_since && ! empty( $wpdb->last_error ) ) {
+			KCO_Logger::log( "Could not lock the confirmation of WooCommerce order ID $order_id: {$wpdb->last_error}" );
+		}
+
+		if ( null === $held_since || (int) $held_since > $now - MINUTE_IN_SECONDS ) {
+			return false;
+		}
+
+		// Take over a lock left by a request that died. Matching the old value lets only one request win.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- We need a compare-and-set, update_option() is unconditional.
+		$took_over = (bool) $wpdb->update(
+			$wpdb->options,
+			array( 'option_value' => $now ),
+			array(
+				'option_name'  => $lock,
+				'option_value' => $held_since,
+			)
+		);
+		if ( $took_over ) {
+			self::$held_locks[ $lock ] = (string) $now;
+		}
+
+		return $took_over;
 	}
 
 	/**
-	 * Unlock a KCO order id and WooCommerce order id combination after the confirmation process is done.
+	 * Unlock a WooCommerce order after the confirmation process is done.
 	 *
-	 * @param string $kco_id The KCO order id.
+	 * @param string $kco_id The KCO order id. Unused, the lock is per WooCommerce order.
 	 * @param string $order_id The WooCommerce order id.
 	 *
 	 * @return void
 	 */
 	public static function unlock_kco_confirmation( $kco_id, $order_id ) {
-		$key = "kco_confirm_{$kco_id}_{$order_id}";
-		if ( wp_using_ext_object_cache() ) {
-			wp_cache_delete( $key, 'kco_locks' );
+		global $wpdb;
+
+		$lock = self::get_lock_name( $order_id );
+		if ( ! isset( self::$held_locks[ $lock ] ) ) {
 			return;
 		}
 
-		delete_transient( $key );
+		// Only delete our own value. A request that ran past a minute may have lost the lock to a takeover.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- The lock row is written directly, so it is removed directly.
+		$wpdb->delete(
+			$wpdb->options,
+			array(
+				'option_name'  => $lock,
+				'option_value' => self::$held_locks[ $lock ],
+			)
+		);
+		unset( self::$held_locks[ $lock ] );
+	}
+
+	/**
+	 * Get the option name of the confirmation lock for an order.
+	 *
+	 * @param string $order_id The WooCommerce order id.
+	 *
+	 * @return string
+	 */
+	private static function get_lock_name( $order_id ) {
+		return 'kco_confirmation_lock_' . absint( $order_id );
 	}
 }
 KCO_Confirmation::get_instance();
