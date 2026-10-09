@@ -27,8 +27,9 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                # 8.0 is the floor declared in readme.txt and pinned in composer's platform
-                # config; the dev dependencies (Codeception 5, wp-browser 4) rule out 7.4.
+                # PHP versions that run the tooling, not the plugin's supported range. The
+                # dev dependencies (Codeception 5, wp-browser 4) need 8.0+, so 7.4 support
+                # (readme.txt) is checked through phpVersion in phpstan.neon instead.
                 php: ["8.0", "8.3", "8.5"]
         steps:
             - name: Checkout repository

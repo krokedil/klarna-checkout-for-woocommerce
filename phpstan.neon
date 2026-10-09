@@ -3,7 +3,7 @@ includes:
 
 parameters:
   level: 5
-  phpVersion: 80000
+  phpVersion: 70400
   treatPhpDocTypesAsCertain: false
 
   paths:

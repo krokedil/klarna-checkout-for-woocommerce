@@ -421,7 +421,7 @@ parameters:
 			path: classes/requests/helpers/class-kco-request-cart.php
 
 		-
-			message: '#^Method KCO_Request_Cart\:\:get_item_quantity\(\) should return int but returns float\.$#'
+			message: '#^Method KCO_Request_Cart\:\:get_item_quantity\(\) should return int but returns \(float\|false\)\.$#'
 			identifier: return.type
 			count: 1
 			path: classes/requests/helpers/class-kco-request-cart.php
@@ -457,7 +457,7 @@ parameters:
 			path: classes/requests/helpers/class-kco-request-cart.php
 
 		-
-			message: '#^Method KCO_Request_Cart\:\:get_order_tax_amount\(\) should return int but returns float\.$#'
+			message: '#^Method KCO_Request_Cart\:\:get_order_tax_amount\(\) should return int but returns \(float\|false\)\.$#'
 			identifier: return.type
 			count: 1
 			path: classes/requests/helpers/class-kco-request-cart.php
@@ -2137,7 +2137,7 @@ parameters:
 			path: src/OrderManagement/SellersApp.php
 
 		-
-			message: '#^Parameter \#6 \$instance_id of class WC_Shipping_Rate constructor expects int, string given\.$#'
+			message: '#^Parameter \#6 \$instance_id of class WC_Shipping_Rate constructor expects int, \(string\|false\) given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/OrderManagement/SellersApp.php
