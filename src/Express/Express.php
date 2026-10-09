@@ -329,6 +329,27 @@ class Express {
 	}
 
 	/**
+	 * The push, validation and confirmation URLs of an express order. Also shown in the settings, for the Kustom Portal.
+	 *
+	 * @return array{push: string, validation: string, confirmation: string}
+	 */
+	public static function get_merchant_urls() {
+		$urls = array(
+			'push'         => rest_url( RestController::NAMESPACE . '/push/{checkout.order.id}' ),
+			'validation'   => rest_url( RestController::NAMESPACE . '/validate/{checkout.order.id}' ),
+			'confirmation' => home_url( '/?' . Confirmation::QUERY_VAR . '={checkout.order.id}' ),
+		);
+
+		/**
+		 * Filters the merchant URLs of an express order, sent to Kustom and shown in the settings. Each must keep the
+		 * {checkout.order.id} placeholder, which Kustom replaces with the order id.
+		 *
+		 * @param array{push: string, validation: string, confirmation: string} $urls The push, validation and confirmation URLs.
+		 */
+		return apply_filters( 'kco_express_merchant_urls', $urls );
+	}
+
+	/**
 	 * Register the frontend script and its styles.
 	 */
 	public function register_scripts() {

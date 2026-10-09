@@ -2,7 +2,6 @@
 namespace Krokedil\KustomCheckout\Elements;
 
 use Krokedil\KustomCheckout\Express\Express;
-use Krokedil\KustomCheckout\Express\RestController;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -329,7 +328,7 @@ class Settings {
 		<tr valign="top">
 			<th scope="row" class="titledesc"><?php echo esc_html( $data['title'] ?? '' ); ?></th>
 			<td class="forminp">
-				<?php foreach ( RestController::get_merchant_urls() as $name => $url ) : ?>
+				<?php foreach ( Express::get_merchant_urls() as $name => $url ) : ?>
 					<p>
 						<label><?php echo esc_html( $labels[ $name ] ?? $name ); ?><br>
 							<input type="text" class="large-text code" readonly value="<?php echo esc_attr( $url ); ?>" onfocus="this.select()">

@@ -43,6 +43,7 @@ class ExpressTest extends IntegrationTestCase {
 		unset( $_SERVER['HTTP_X_FORWARDED_FOR'] );
 		delete_transient( 'kss_data_checkout-order-123' );
 		unset( $GLOBALS['wp']->query_vars['order-received'] );
+		wc_clear_notices();
 
 		parent::tearDown();
 	}
@@ -109,15 +110,6 @@ class ExpressTest extends IntegrationTestCase {
 
 		$this->assertSame( 'cart', $merchant_data['kco_express'] );
 		$this->assertTrue( $request['json']['options']['require_validate_callback_success'], 'Kustom must wait for the validation callback, which creates the order.' );
-		$this->assertEquals(
-			[
-				'push'         => rest_url( 'kco-express/v1/push/{checkout.order.id}' ),
-				'validation'   => rest_url( 'kco-express/v1/validate/{checkout.order.id}' ),
-				'confirmation' => home_url( '/?kco-express-confirm={checkout.order.id}' ),
-			],
-			array_intersect_key( $request['json']['merchant_urls'], array_flip( [ 'push', 'validation', 'confirmation' ] ) ),
-			'The strings the merchant pastes into the Kustom Portal.'
-		);
 		$this->assertRequestMatchesSnapshot( $request, 'express-create-cart', $this->merchantDataPlaceholders( $merchant_data ) );
 	}
 
@@ -465,7 +457,7 @@ class ExpressTest extends IntegrationTestCase {
 	public function test_the_settings_show_the_urls_sent_to_kustom(): void {
 		$html = ( new ElementsSettings() )->generate_kco_express_urls_html( '', 'elements_express_urls', [ 'title' => 'URLs' ] );
 
-		foreach ( RestController::get_merchant_urls() as $url ) {
+		foreach ( Express::get_merchant_urls() as $url ) {
 			$this->assertStringContainsString( 'value="' . esc_attr( $url ) . '"', $html );
 		}
 	}
@@ -507,6 +499,23 @@ class ExpressTest extends IntegrationTestCase {
 		$this->assertSame( 'processing', $this->statusOf( $order ) );
 		$this->assertStringContainsString( 'order-received', $url );
 		$this->assertStringNotContainsString( $order->get_order_key(), $url, 'Knowing a Kustom order id must not reveal the order.' );
+	}
+
+	public function test_an_express_order_kustom_does_not_confirm_goes_to_the_cart(): void {
+		$order = $this->haveExpressOrderToConfirm();
+		$this->resetHttpInterception();
+		$this->willRetrieveManagedOrder(
+			[
+				'fraud_status' => 'REJECTED',
+				'order_amount' => 12500,
+				'order_lines'  => [ [ 'type' => 'physical', 'reference' => 'express-confirmed', 'name' => 'Express', 'quantity' => 1 ] ],
+			]
+		);
+		wc_clear_notices();
+
+		$this->assertSame( wc_get_cart_url(), Confirmation::get_redirect_url( 'kustom-order-123' ), 'The keyless page would say the order was received.' );
+		$this->assertSame( 'cancelled', $this->statusOf( $order ) );
+		$this->assertSame( 1, wc_notice_count( 'error' ) );
 	}
 
 	public function test_a_confirmation_without_an_order_goes_to_the_cart(): void {

@@ -25,7 +25,8 @@ class Confirmation {
 	 */
 	public static function maybe_confirm() {
 		$kustom_order_id = isset( $_GET[ self::QUERY_VAR ] ) ? sanitize_text_field( wp_unslash( $_GET[ self::QUERY_VAR ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Kustom's redirect carries no nonce.
-		if ( '' === $kustom_order_id ) {
+		// Kustom order ids are UUIDs; anything else is not worth a query, a log line or a session.
+		if ( ! preg_match( '/^[\w-]{1,64}$/', $kustom_order_id ) ) {
 			return;
 		}
 
@@ -46,15 +47,7 @@ class Confirmation {
 	public static function get_redirect_url( $kustom_order_id ) {
 		$order = kco_get_order_by_klarna_id( $kustom_order_id, '2 day ago' );
 		if ( empty( $order ) ) {
-			\KCO_Logger::log( "[Express] Confirmation for Kustom order {$kustom_order_id}, but no WooCommerce order was placed with it." );
-
-			// A guest returning from another browser has no session cookie yet, which the notice needs.
-			if ( WC()->session instanceof \WC_Session_Handler && ! headers_sent() ) {
-				WC()->session->set_customer_session_cookie( true );
-			}
-			wc_add_notice( __( 'We could not find your order. Please contact us if you were charged.', 'klarna-checkout-for-woocommerce' ), 'error' );
-
-			return wc_get_cart_url();
+			return self::get_cart_url( "no WooCommerce order was placed with Kustom order {$kustom_order_id}" );
 		}
 
 		if ( array_key_exists( $kustom_order_id, OrderCreator::get_remembered() ) ) {
@@ -65,6 +58,30 @@ class Confirmation {
 		\KCO_Logger::log( "[Express] Confirm Kustom order {$kustom_order_id} without the shopper's session." );
 		kco_confirm_klarna_order( $order->get_id(), $kustom_order_id );
 
+		// Without the key the page always says the order was received, so a failed confirmation must not land there.
+		$order = wc_get_order( $order->get_id() );
+		if ( empty( $order->get_date_paid() ) && ! $order->has_status( 'on-hold' ) ) {
+			return self::get_cart_url( "Kustom order {$kustom_order_id} could not be confirmed, order status {$order->get_status()}" );
+		}
+
 		return remove_query_arg( 'key', $order->get_checkout_order_received_url() );
+	}
+
+	/**
+	 * The cart URL, with a notice that the order could not be confirmed.
+	 *
+	 * @param string $reason Why, for the log.
+	 * @return string
+	 */
+	private static function get_cart_url( $reason ) {
+		\KCO_Logger::log( "[Express] Confirmation sent to the cart: {$reason}." );
+
+		// A guest returning from another browser has no session cookie yet, which the notice needs.
+		if ( WC()->session instanceof \WC_Session_Handler && ! headers_sent() ) {
+			WC()->session->set_customer_session_cookie( true );
+		}
+		wc_add_notice( __( 'We could not confirm your order. Please contact us if you were charged.', 'klarna-checkout-for-woocommerce' ), 'error' );
+
+		return wc_get_cart_url();
 	}
 }

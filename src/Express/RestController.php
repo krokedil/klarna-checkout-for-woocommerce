@@ -92,33 +92,13 @@ class RestController {
 	}
 
 	/**
-	 * The push, validation and confirmation URLs of an express order. Also shown in the settings, for the Kustom Portal.
-	 *
-	 * @return array{push: string, validation: string, confirmation: string}
-	 */
-	public static function get_merchant_urls() {
-		$urls = array(
-			'push'         => rest_url( self::NAMESPACE . '/push/{checkout.order.id}' ),
-			'validation'   => rest_url( self::NAMESPACE . '/validate/{checkout.order.id}' ),
-			'confirmation' => home_url( '/?' . Confirmation::QUERY_VAR . '={checkout.order.id}' ),
-		);
-
-		/**
-		 * Filters the merchant URLs of an express order, sent to Kustom and shown in the settings.
-		 *
-		 * @param array $urls The push, validation and confirmation URLs.
-		 */
-		return apply_filters( 'kco_express_merchant_urls', $urls );
-	}
-
-	/**
 	 * Handle Kustom's push notification for an express order.
 	 *
 	 * @param WP_REST_Request $request The request.
 	 * @return WP_REST_Response
 	 */
 	public function push( $request ) {
-		\KCO_API_Callbacks::get_instance()->process_push( $request->get_param( 'id' ) );
+		\KCO_API_Callbacks::get_instance()->process_push( $request->get_url_params()['id'] );
 
 		return new WP_REST_Response( null, 200 );
 	}

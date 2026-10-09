@@ -119,8 +119,7 @@ class OrderCreator {
 	}
 
 	/**
-	 * Mark the Kustom order as an express purchase in its merchant data, set its express merchant URLs, and leave shipping
-	 * to KSA in the sheet.
+	 * Mark the Kustom order as an express purchase, with its own merchant URLs, and leave shipping to KSA in the sheet.
 	 *
 	 * KSA's request modifier can add back a shipping line from the iframe order's override data, which belongs to a
 	 * different Kustom order, so every shipping line is removed here.
@@ -141,7 +140,7 @@ class OrderCreator {
 		$args['merchant_data']        = wp_json_encode( $merchant_data );
 
 		// Not the iframe's URLs: the same strings the merchant pastes into the Kustom Portal.
-		$args['merchant_urls'] = array_merge( $args['merchant_urls'] ?? array(), RestController::get_merchant_urls() );
+		$args['merchant_urls'] = array_merge( $args['merchant_urls'] ?? array(), Express::get_merchant_urls() );
 
 		return $args;
 	}
