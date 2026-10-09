@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where the confirmation lock enabled by the "kco_wc_lock_confirmation" filter did not prevent duplicate order confirmations on stores using an object cache such as LiteSpeed Cache. The lock now also covers the push notification from Kustom.
