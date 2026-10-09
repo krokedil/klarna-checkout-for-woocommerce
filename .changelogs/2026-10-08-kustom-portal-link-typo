@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed the Kustom Portal link in the Kustom Elements settings, which pointed to the wrong domain.
