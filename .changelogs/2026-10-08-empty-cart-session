@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: no
+
+The checkout no longer creates a Kustom order when the cart is empty.
