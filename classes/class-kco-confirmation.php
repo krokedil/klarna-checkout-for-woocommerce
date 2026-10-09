@@ -27,6 +27,13 @@ class KCO_Confirmation {
 	protected static $instance;
 
 	/**
+	 * The value this request wrote to each lock it holds, so it only releases its own.
+	 *
+	 * @var array<string, string>
+	 */
+	private static $held_locks = array();
+
+	/**
 	 * Returns the *Singleton* instance of this class.
 	 *
 	 * @return self::$instance The *Singleton* instance.
@@ -246,6 +253,7 @@ class KCO_Confirmation {
 		// e.g. LiteSpeed's add() only checks the current process before writing to Redis.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- We need an atomic insert, add_option() upserts.
 		if ( $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} ( option_name, option_value, autoload ) VALUES ( %s, %s, 'no' )", $lock, $now ) ) ) {
+			self::$held_locks[ $lock ] = (string) $now;
 			return true;
 		}
 
@@ -261,7 +269,7 @@ class KCO_Confirmation {
 
 		// Take over a lock left by a request that died. Matching the old value lets only one request win.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- We need a compare-and-set, update_option() is unconditional.
-		return (bool) $wpdb->update(
+		$took_over = (bool) $wpdb->update(
 			$wpdb->options,
 			array( 'option_value' => $now ),
 			array(
@@ -269,6 +277,11 @@ class KCO_Confirmation {
 				'option_value' => $held_since,
 			)
 		);
+		if ( $took_over ) {
+			self::$held_locks[ $lock ] = (string) $now;
+		}
+
+		return $took_over;
 	}
 
 	/**
@@ -282,8 +295,21 @@ class KCO_Confirmation {
 	public static function unlock_kco_confirmation( $kco_id, $order_id ) {
 		global $wpdb;
 
+		$lock = self::get_lock_name( $order_id );
+		if ( ! isset( self::$held_locks[ $lock ] ) ) {
+			return;
+		}
+
+		// Only delete our own value. A request that ran past a minute may have lost the lock to a takeover.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- The lock row is written directly, so it is removed directly.
-		$wpdb->delete( $wpdb->options, array( 'option_name' => self::get_lock_name( $order_id ) ) );
+		$wpdb->delete(
+			$wpdb->options,
+			array(
+				'option_name'  => $lock,
+				'option_value' => self::$held_locks[ $lock ],
+			)
+		);
+		unset( self::$held_locks[ $lock ] );
 	}
 
 	/**

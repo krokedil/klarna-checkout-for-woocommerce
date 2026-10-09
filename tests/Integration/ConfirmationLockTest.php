@@ -71,6 +71,21 @@ class ConfirmationLockTest extends IntegrationTestCase {
 		$this->assertFalse( \KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', self::ORDER_ID ), 'The taken-over lock holds again.' );
 	}
 
+	public function test_a_request_that_lost_its_lock_leaves_the_new_owners_lock_alone(): void {
+		global $wpdb;
+
+		\KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', self::ORDER_ID );
+
+		$wpdb->update(
+			$wpdb->options,
+			[ 'option_value' => time() + 5 ],
+			[ 'option_name' => 'kco_confirmation_lock_' . self::ORDER_ID ]
+		);
+		\KCO_Confirmation::unlock_kco_confirmation( 'kustom-order-123', self::ORDER_ID );
+
+		$this->assertFalse( \KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', self::ORDER_ID ), 'The release must not delete a lock another request took over.' );
+	}
+
 	/** Inserts the option row just before the next INSERT for it runs, as a faster request would. */
 	private function anotherRequestInsertsFirst( string $option ): void {
 		global $wpdb;
