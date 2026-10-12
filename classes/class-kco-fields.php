@@ -238,6 +238,14 @@ class KCO_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
+			'display_on_free_orders'     => array(
+				'title'       => __( 'Display on free orders', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Display Kustom Checkout even when the order total is 0', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If unchecked, the standard WooCommerce checkout is shown when the order total is 0, for example after a 100% discount coupon.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
 			'show_subtotal_detail'       => array(
 				'title'       => __( 'Display subtotal details', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'select',
