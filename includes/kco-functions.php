@@ -22,7 +22,7 @@ function kco_create_or_update_order() {
 
 	// An empty cart, most often from previewing the checkout page in admin, would create an empty Kustom order.
 	if ( WC()->cart->is_empty() ) {
-		return;
+		return null;
 	}
 
 	// Need to calculate these here, because WooCommerce hasn't done it yet.
