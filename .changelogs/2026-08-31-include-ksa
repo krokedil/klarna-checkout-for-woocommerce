@@ -1,4 +1,4 @@
 Type: Feature
 Needs Documentation: yes
 
-Added an "Enable Kustom Shipping Assistant" setting, disabled by default, that lets a TMS control shipping methods and pricing in the Kustom iframe. The separate Kustom Shipping Assistant plugin is no longer required and should be deactivated.
+Added an "Enable Kustom Shipping Assistant" setting that lets a TMS control shipping methods and pricing in the Kustom iframe. It is on by default only for stores already using the Kustom Shipping Assistant shipping method. The separate Kustom Shipping Assistant plugin is no longer needed and should be deactivated.

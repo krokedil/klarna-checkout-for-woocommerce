@@ -19,6 +19,7 @@ class Checkout {
 	 */
 	public function __construct() {
 		add_action( 'kco_wc_process_payment', array( $this, 'add_shipping_details_to_order' ), 10, 2 );
+		add_action( 'kco_wc_confirm_klarna_order', array( $this, 'save_ingrid_tos_id' ), 10, 2 );
 		add_action( 'kco_update_shipping_data', array( $this, 'clear_shipping_and_recalculate' ) );
 		add_filter( 'kco_wc_chosen_shipping_method', array( $this, 'set_shipping_method' ) );
 		add_filter( 'kco_check_if_needs_payment', array( $this, 'change_check_if_needs_payment' ) );
@@ -109,6 +110,29 @@ class Checkout {
 			// Clear the kss_override_data_{order_id} transient since we have now saved the shipping data to the order.
 			delete_transient( "kss_override_data_$kco_id" );
 		}
+	}
+
+	/**
+	 * Saves the Ingrid transport order id on the order as ingrid_tos_id.
+	 * Kustom only adds it once the purchase is complete, so the checkout order at process payment lacks it.
+	 *
+	 * @param int   $order_id The WooCommerce order id.
+	 * @param array $klarna_order The Kustom order management order.
+	 * @return void
+	 */
+	public function save_ingrid_tos_id( $order_id, $klarna_order ) {
+		$tos_id = $klarna_order['selected_shipping_option']['tos_id'] ?? '';
+		if ( empty( $tos_id ) ) {
+			return;
+		}
+
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
+			return;
+		}
+
+		$order->update_meta_data( 'ingrid_tos_id', sanitize_text_field( $tos_id ) );
+		$order->save();
 	}
 
 	/**

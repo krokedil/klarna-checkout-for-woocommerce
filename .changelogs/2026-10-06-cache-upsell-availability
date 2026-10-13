@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where Post Purchase Upsell fetched the Kustom order several times on every page load to check whether an upsell was possible. The answer is now saved on the order when the purchase is confirmed.

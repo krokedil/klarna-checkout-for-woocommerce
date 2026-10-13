@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: no
+
+Orders placed with Kustom Shipping Assistant and Ingrid now save the Ingrid transport order id as the order meta "ingrid_tos_id".

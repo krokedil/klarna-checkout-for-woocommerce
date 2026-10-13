@@ -153,7 +153,7 @@ class KCO_Fields {
 			'shipping_methods_in_iframe' => array(
 				'title'       => __( 'Shipping methods in iframe', 'klarna-checkout-for-woocommerce' ),
 				// translators: 1: Configuration link, 2: Tax settings link.
-				'label'       => sprintf( __( 'Display Shipping methods in Kustom iframe.  If you are using the <b>Kustom Shipping Assistant</b> plugin, please follow the steps explained in the plugin documentation under the sections titled %1$s and %2$s', 'klarna-checkout-for-woocommerce' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#configuration" target="_blank">configuration</a>' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#tax-settings" target="_blank">tax settings</a>' ) ),
+				'label'       => sprintf( __( 'Display Shipping methods in Kustom iframe. Required when <b>Kustom Shipping Assistant</b> is enabled further down on this page. For setup, see the sections titled %1$s and %2$s in the documentation.', 'klarna-checkout-for-woocommerce' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#configuration" target="_blank">configuration</a>' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#tax-settings" target="_blank">tax settings</a>' ) ),
 				'type'        => 'checkbox',
 				'description' => __( 'If this option is checked, selection of shipping methods is done in Kustom iframe. Shipping price and name of the selected shipping method will still be displayed in WooCommerce order review.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'no',
@@ -238,6 +238,14 @@ class KCO_Fields {
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
+			'display_on_free_orders'     => array(
+				'title'       => __( 'Display on free orders', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Display Kustom Checkout even when the order total is 0', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If unchecked, the standard WooCommerce checkout is shown when the order total is 0, for example after a 100% discount coupon.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
 			'show_subtotal_detail'       => array(
 				'title'       => __( 'Display subtotal details', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'select',
@@ -314,6 +322,11 @@ class KCO_Fields {
 		);
 
 		// Insert the "Checkout flow" setting after the "Checkout layout" setting.
+		/**
+		 * Filters whether to enable the redirected checkout flow setting.
+		 *
+		 * @param bool $enable_redirected_flow Whether to enable the redirected checkout flow. Default false.
+		 */
 		if ( apply_filters( 'kco_enable_redirected_flow', false ) ) {
 			$checkout_flow = array(
 				'title'       => __( 'Checkout flow', 'klarna-checkout-for-woocommerce' ),
@@ -366,6 +379,11 @@ class KCO_Fields {
 			}
 			$settings = $new_settings;
 		}
+		/**
+		 * Filters the Kustom Checkout gateway settings fields.
+		 *
+		 * @param array $settings The settings fields.
+		 */
 		return apply_filters( 'kco_wc_gateway_settings', $settings );
 	}
 }

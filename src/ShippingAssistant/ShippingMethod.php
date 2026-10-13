@@ -133,6 +133,13 @@ class ShippingMethod extends \WC_Shipping_Method {
 			}
 		}
 
-		$this->add_rate( apply_filters( 'klarna_kss_shipping_method_add_rate', $rate ) );
+		/**
+		 * Filters the shipping rate from the Kustom Shipping Assistant before it is added to the shipping method.
+		 *
+		 * @param array $rate The shipping rate arguments (id, label, cost and optional meta_data). Empty if no shipping data is available.
+		 */
+		$rate = apply_filters( 'klarna_kss_shipping_method_add_rate', $rate );
+
+		$this->add_rate( $rate );
 	}
 }

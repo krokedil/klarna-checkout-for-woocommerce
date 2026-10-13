@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Added the setting "Display on free orders" to show Kustom Checkout when the order total is 0. It replaces the need for the "kco_check_if_needs_payment" filter, which still takes priority over the setting.

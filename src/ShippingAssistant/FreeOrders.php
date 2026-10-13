@@ -91,7 +91,12 @@ class FreeOrders {
 			// Update the order with new confirmation page url.
 			$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id, $order_id );
 
-			// Let other plugins hook into this sequence.
+			/**
+			 * Triggers when a WooCommerce order is being processed for payment with Kustom Checkout.
+			 *
+			 * @param int         $order_id     The WooCommerce order ID.
+			 * @param array|false $klarna_order The Kustom order data, or false if updating the Kustom order failed.
+			 */
 			do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
 
 			// Check that the transaction id got set correctly.

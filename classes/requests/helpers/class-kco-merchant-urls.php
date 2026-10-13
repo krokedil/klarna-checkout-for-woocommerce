@@ -30,6 +30,11 @@ class KCO_Merchant_URLs {
 			'push'         => $this->get_push_url(),                    // Required.
 		);
 
+		/**
+		 * Filters the merchant URLs sent to Kustom.
+		 *
+		 * @param array $merchant_urls The merchant URLs, keyed by terms, checkout, confirmation and push.
+		 */
 		return apply_filters( 'kco_wc_merchant_urls', $merchant_urls );
 	}
 
@@ -43,6 +48,11 @@ class KCO_Merchant_URLs {
 	private function get_terms_url() {
 		$terms_url = get_permalink( wc_get_page_id( 'terms' ) );
 
+		/**
+		 * Filters the terms and conditions URL sent to Kustom.
+		 *
+		 * @param string|false $terms_url The terms and conditions page URL, or false if it could not be found.
+		 */
 		return apply_filters( 'kco_wc_terms_url', $terms_url );
 	}
 
@@ -55,6 +65,11 @@ class KCO_Merchant_URLs {
 	 */
 	private function get_checkout_url() {
 		$checkout_url = wc_get_checkout_url();
+		/**
+		 * Filters the checkout URL sent to Kustom.
+		 *
+		 * @param string $checkout_url The checkout page URL.
+		 */
 		return apply_filters( 'kco_wc_checkout_url', $checkout_url );
 	}
 
@@ -87,6 +102,11 @@ class KCO_Merchant_URLs {
 			);
 		}
 
+		/**
+		 * Filters the confirmation URL sent to Kustom.
+		 *
+		 * @param string $confirmation_url The URL the customer is sent to after completing the purchase.
+		 */
 		return apply_filters( 'kco_wc_confirmation_url', $confirmation_url );
 	}
 
@@ -107,6 +127,11 @@ class KCO_Merchant_URLs {
 			home_url( '/wc-api/KCO_WC_Push/' )
 		);
 
+		/**
+		 * Filters the push notification URL sent to Kustom.
+		 *
+		 * @param string $push_url The URL Kustom calls to notify the store that an order has been placed.
+		 */
 		return apply_filters( 'kco_wc_push_url', $push_url );
 	}
 
@@ -123,6 +148,11 @@ class KCO_Merchant_URLs {
 
 		$address_update_url = str_replace( 'http:', 'https:', $address_update_url );
 
+		/**
+		 * Filters the address update callback URL sent to Kustom.
+		 *
+		 * @param string $address_update_url The URL Kustom calls when the customer changes their address.
+		 */
 		return apply_filters( 'kco_wc_address_update_url', $address_update_url );
 	}
 
@@ -138,6 +168,11 @@ class KCO_Merchant_URLs {
 		$country_change_url = home_url( '/wp-json/kcowc/v1/address/{checkout.order.id}' );
 		$country_change_url = str_replace( 'http:', 'https:', $country_change_url );
 
+		/**
+		 * Filters the country change callback URL sent to Kustom.
+		 *
+		 * @param string $country_change_url The URL Kustom calls when the customer changes their purchase country.
+		 */
 		return apply_filters( 'kco_wc_country_change_url', $country_change_url );
 	}
 
