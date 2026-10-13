@@ -560,6 +560,10 @@ asked for.
   `pageload_timeout` makes this worse, not better: it buys the loop fewer polls.
   The admin steps that need longer than 45s absorb the timeout themselves in
   `CanDriveE2EOrderManagement::waitOutOrderScreen()`.
+- **A login screen with `admin` filled in and an empty password.** wp-login.php
+  clears the password field 200ms after it loads, so a driver that types inside
+  that window loses it. Seen in CI, not locally, where the driver is slower.
+  `_mu-plugins/08-login-no-autofocus.php` turns that script off.
 - **A tunnel that goes away.** `NgrokController` checks the URL Chrome actually
   uses before every test and restarts the agent if it has stalled. The agent's log
   is kept at `tests/_output/ngrok.log`.
@@ -673,6 +677,7 @@ it. The gate is a backstop for mistakes, not the control.
 | `tests/_mu-plugins/03-woocommerce-sessions-upsert.php` | Creates the `session_key` unique index SQLite drops. |
 | `tests/_mu-plugins/05-kustom-test-admin-password.php` | Resets the admin password from `WORDPRESS_ADMIN_PASSWORD`. |
 | `tests/_mu-plugins/06-admin-screens-offline.php` | Drops the wp-admin requests that never answer here. |
+| `tests/_mu-plugins/08-login-no-autofocus.php` | Stops wp-login.php from clearing the password the driver typed. |
 | `tests/_support_scripts/install-test-env.php` | Idempotent WP scaffold, runs on `composer install`. |
 | `tests/_support_scripts/regenerate-dump.sh` | Rebuilds `dump.sql` from a clean install. |
 | `tests/_support_scripts/strip-actionscheduler-inserts.php` | Strips Action Scheduler data rows from the dump, whose serialized payloads SQLite cannot round-trip. |

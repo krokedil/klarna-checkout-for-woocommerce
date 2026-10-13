@@ -5,6 +5,8 @@
  * @package Klarna_Checkout/Classes
  */
 
+use Krokedil\KustomCheckout\Logging\LogMasking;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -23,32 +25,39 @@ class KCO_Logger {
 	/**
 	 * Logs an event.
 	 *
-	 * @param string $data The data string.
+	 * @param array|string $data The data to log.
 	 */
 	public static function log( $data ) {
-		$settings = get_option( 'woocommerce_kco_settings' );
+		$settings = get_option( 'woocommerce_kco_settings', array() );
+		$to_file  = wc_string_to_bool( $settings['logging'] ?? 'no' );
+		$to_db    = isset( $data['response']['code'] ) && ( $data['response']['code'] < 200 || $data['response']['code'] > 299 );
 
-		if ( 'yes' === $settings['logging'] ) {
-			$message = self::format_data( $data );
+		if ( ! $to_file && ! $to_db ) {
+			return;
+		}
+
+		$message = LogMasking::mask_entry( self::format_data( $data ) );
+
+		if ( $to_file ) {
 			if ( empty( self::$log ) ) {
 				self::$log = new WC_Logger();
 			}
 			self::$log->add( 'kustom-checkout-for-woocommerce', wp_json_encode( $message ) );
 		}
 
-		if ( isset( $data['response']['code'] ) && ( $data['response']['code'] < 200 || $data['response']['code'] > 299 ) ) {
-			self::log_to_db( $data );
+		if ( $to_db ) {
+			self::log_to_db( $message );
 		}
 	}
 
 	/**
 	 * Formats the log data to prevent json error.
 	 *
-	 * @param string $data Json string of data.
-	 * @return array
+	 * @param array|string $data The log entry, or a plain message.
+	 * @return array|string
 	 */
 	public static function format_data( $data ) {
-		if ( isset( $data['request']['body'] ) ) {
+		if ( isset( $data['request']['body'] ) && is_string( $data['request']['body'] ) ) {
 			$data['request']['body'] = json_decode( $data['request']['body'], true );
 		}
 		return $data;
@@ -67,36 +76,14 @@ class KCO_Logger {
 	 * @return array
 	 */
 	public static function format_log( $klarna_order_id, $method, $title, $request_args, $response, $code, $request_url = null ) {
-		// Unset the snippet to prevent issues in the response.
-		if ( isset( $response['html_snippet'] ) ) {
-			unset( $response['html_snippet'] );
-		}
-		// Unset the snippet to prevent issues in the request body.
-		if ( isset( $request_args['body'] ) ) {
-			$request_body = json_decode( $request_args['body'], true );
-			if ( isset( $request_body['html_snippet'] ) && $request_body['snippet'] ) {
-				unset( $request_body['html_snippet'] );
-				$request_args['body'] = wp_json_encode( $request_body );
-			}
-		}
-
-		// Redact the authorization header if it is present.
-		foreach ( $request_args['headers'] as $header => $value ) {
-			if ( 'authorization' === strtolower( $header ) ) {
-				// If it is longer than 15 char., it most likely has a token. This is an assumption that is safe even if it is wrong.
-				$request_args['headers'][ $header ] = strlen( $value ) > 15 ? '[REDACTED]' : '[MISSING]';
-				break;
-			}
-		}
-
 		return array(
 			'id'             => $klarna_order_id,
 			'type'           => $method,
 			'title'          => $title,
-			'request'        => $request_args,
-			'request_url'    => $request_url,
+			'request'        => LogMasking::mask_request( $request_args ),
+			'request_url'    => LogMasking::mask_request_url( $request_url ),
 			'response'       => array(
-				'body' => $response,
+				'body' => LogMasking::mask_response( $response ),
 				'code' => $code,
 			),
 			'timestamp'      => date( 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions -- Date is not used for display.

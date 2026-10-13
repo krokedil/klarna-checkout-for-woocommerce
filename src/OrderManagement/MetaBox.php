@@ -141,20 +141,29 @@ class MetaBox extends OrderMetabox {
 		$session_id  = $order->get_meta( '_kp_session_id' );
 		$environment = ! empty( $order->get_meta( '_wc_klarna_environment' ) ) ? $order->get_meta( '_wc_klarna_environment' ) : '';
 
-		self::output_info(
-			__( 'Kustom Environment', 'klarna-checkout-for-woocommerce' ),
-			apply_filters( 'kom_meta_environment', $environment )
-		);
+		/**
+		 * Filters the Kustom environment shown in the order management metabox.
+		 *
+		 * @param string $environment The Kustom environment the order was placed in ('test' or 'live'), or an empty string.
+		 */
+		$environment = apply_filters( 'kom_meta_environment', $environment );
+		self::output_info( __( 'Kustom Environment', 'klarna-checkout-for-woocommerce' ), $environment );
 
-		self::output_info(
-			__( 'Kustom order status', 'klarna-checkout-for-woocommerce' ),
-			apply_filters( 'kom_meta_order_status', $klarna_order->status )
-		);
+		/**
+		 * Filters the Kustom order status shown in the order management metabox.
+		 *
+		 * @param string $status The Kustom order status.
+		 */
+		$order_status = apply_filters( 'kom_meta_order_status', $klarna_order->status );
+		self::output_info( __( 'Kustom order status', 'klarna-checkout-for-woocommerce' ), $order_status );
 
-		self::output_info(
-			__( 'Initial Payment method', 'klarna-checkout-for-woocommerce' ),
-			apply_filters( 'kom_meta_payment_method', $klarna_order->initial_payment_method->description )
-		);
+		/**
+		 * Filters the initial payment method shown in the order management metabox.
+		 *
+		 * @param string $payment_method The description of the initial payment method of the Kustom order.
+		 */
+		$payment_method = apply_filters( 'kom_meta_payment_method', $klarna_order->initial_payment_method->description );
+		self::output_info( __( 'Initial Payment method', 'klarna-checkout-for-woocommerce' ), $payment_method );
 
 		if ( ! empty( $session_id ) ) {
 			$scheduled_actions = ScheduledActions::get_scheduled_actions( $session_id );
@@ -195,19 +204,45 @@ class MetaBox extends OrderMetabox {
 				<li class="wide" id="kom-capture">
 					<select class="kco_order_actions" name="kom_order_actions" id="kom_order_actions">
 						<option value=""><?php esc_attr_e( 'Choose an action...', 'woocommerce' ); ?></option>
-						<?php do_action( 'kom_meta_action_options', $order_id, $klarna_order, $actions ); ?>
+						<?php
+						/**
+						 * Triggers when the action options are output in the order management metabox actions dropdown.
+						 *
+						 * @param int    $order_id     The WooCommerce order ID.
+						 * @param object $klarna_order The Kustom order object.
+						 * @param array  $actions      The available order management actions, keyed by action (capture, cancel, sync, any) with boolean values.
+						 */
+						do_action( 'kom_meta_action_options', $order_id, $klarna_order, $actions );
+						?>
 					</select>
 					<button class="button wc-reload"><span><?php esc_html_e( 'Apply', 'woocommerce' ); ?></span></button>
 					<span class="woocommerce-help-tip" data-tip="
 					<?php
 					ob_start();
+
+					/**
+					 * Triggers when the help tip for the order management metabox actions is output.
+					 *
+					 * @param int    $order_id     The WooCommerce order ID.
+					 * @param object $klarna_order The Kustom order object.
+					 * @param array  $actions      The available order management actions, keyed by action (capture, cancel, sync, any) with boolean values.
+					 */
 					do_action( 'kom_meta_action_tips', $order_id, $klarna_order, $actions );
 					echo esc_attr( ob_get_clean() );
 					?>
 					"></span>
 				</li>
 			<?php else : ?>
-				<?php do_action( 'kom_meta_no_actions', $order_id, $klarna_order, $actions ); ?>
+				<?php
+				/**
+				 * Triggers in the order management metabox when no manual order management actions are available.
+				 *
+				 * @param int    $order_id     The WooCommerce order ID.
+				 * @param object $klarna_order The Kustom order object.
+				 * @param array  $actions      The available order management actions, keyed by action (capture, cancel, sync, any) with boolean values.
+				 */
+				do_action( 'kom_meta_no_actions', $order_id, $klarna_order, $actions );
+				?>
 			<?php endif; ?>
 		</ul>
 		<?php

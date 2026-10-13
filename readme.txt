@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 9.7.0
-WC tested up to: 11.1.2
-Stable tag: 2.22.0
+WC tested up to: 11.2.1
+Stable tag: 2.23.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,19 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-10-13    - version 2.23.0 =
+* Feature       - Added an "Enable Kustom Shipping Assistant" setting that lets a TMS control shipping methods and pricing in the Kustom iframe. It is on by default only for stores already using the Kustom Shipping Assistant shipping method. The separate Kustom Shipping Assistant plugin is no longer needed and should be deactivated.
+* Feature       - Added the setting "Display on free orders" to show Kustom Checkout when the order total is 0. It replaces the need for the "kco_check_if_needs_payment" filter, which still takes priority over the setting.
+* Tweak         - Customer details and payment secrets are now masked in the plugin logs and the system status report.
+* Tweak         - The checkout no longer creates a Kustom order when the cart is empty.
+* Tweak         - Orders placed with Kustom Shipping Assistant and Ingrid now save the Ingrid transport order id as the order meta "ingrid_tos_id".
+* Tweak         - Improved the admin notice asking you to deactivate the separate Kustom Shipping Assistant plugin.
+* Fix           - Fixed the Kustom Shipping Assistant shipping method not being applied to the order, so a customer who selected a shipping option in the Kustom iframe could be charged the price of a different shipping method in the same shipping zone.
+* Fix           - Fixed an issue where the checkout block sent a failing Kustom order update after a completed purchase. The customer is now sent straight to the thank you page instead of the checkout page being loaded first.
+* Fix           - Fixed an issue where Post Purchase Upsell fetched the Kustom order several times on every page load to check whether an upsell was possible. The answer is now saved on the order when the purchase is confirmed.
+* Fix           - Fixed an issue where a free order placed in the block checkout with the "kco_check_if_needs_payment" filter returned the customer to the checkout page with a READ_ONLY_ORDER error instead of the thank you page.
+* Fix           - Fixed the Kustom Portal link in the Kustom Elements settings, which pointed to the wrong domain.
+
 = 2026-09-28    - version 2.22.0 =
 * Feature       - Added support for Kustom Elements. Show your customers the available Kustom payment methods and delivery options on product and cart pages, or anywhere else with a shortcode or block.
 * Fix           - Fixed an issue where the customer could see a "shipping methods have been changed" error when placing an order with Kustom Shipping Assistant handling the shipping selection.

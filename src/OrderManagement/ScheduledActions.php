@@ -44,7 +44,11 @@ class ScheduledActions {
 	 */
 	public static function print_scheduled_actions( $session_id ) {
 
-		// Allow disabling the display of scheduled actions via a filter.
+		/**
+		 * Filters whether to skip displaying the scheduled actions for the order in the order management metabox.
+		 *
+		 * @param bool $skip Whether to skip displaying the scheduled actions. Default false.
+		 */
 		if ( apply_filters( 'kom_skip_scheduled_actions', false ) ) {
 			return;
 		}

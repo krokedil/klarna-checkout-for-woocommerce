@@ -51,6 +51,13 @@ class KCO_Credentials {
 			'shared_secret' => htmlspecialchars_decode( $shared_secret, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 ),
 		);
 
+		/**
+		 * Filters the Kustom API credentials used for the current request.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#change-the-api-keys-on-the-fly Change the API keys on the fly
+		 * @param array  $credentials The credentials, with the keys 'merchant_id' and 'shared_secret'.
+		 * @param string $testmode    Whether test mode is enabled, 'yes' or 'no'.
+		 */
 		return apply_filters( 'kco_wc_credentials_from_session', $credentials, $testmode );
 	}
 }

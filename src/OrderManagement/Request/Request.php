@@ -1,6 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request;
 
+use Krokedil\KustomCheckout\Logging\LogMasking;
 use Krokedil\KustomCheckout\OrderManagement;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -244,7 +245,7 @@ abstract class Request {
 		$body          = json_decode( wp_remote_retrieve_body( $response ) );
 
 		if ( $response_code < 200 || $response_code >= 300 ) { // Anything not in the 200 range is an error.
-			$data          = "URL: {$request_url} - " . wp_json_encode( $request_args );
+			$data          = "URL: {$request_url} - " . wp_json_encode( LogMasking::mask_request( $request_args ) );
 			$error_message = "API Error {$response_code}";
 
 			if ( null !== $body && property_exists( $body, 'error_messages' ) ) {
@@ -274,11 +275,19 @@ abstract class Request {
 		if ( is_wp_error( $headers ) ) {
 			return $headers;
 		}
+
+		/**
+		 * Filters the timeout in seconds for order management requests to Kustom.
+		 *
+		 * @param int $timeout The request timeout in seconds. Default 10.
+		 */
+		$timeout = apply_filters( 'kom_request_timeout', 10 );
+
 		$args = array(
 			'headers'    => $headers,
 			'user-agent' => $this->get_user_agent(),
 			'method'     => $this->method,
-			'timeout'    => apply_filters( 'kom_request_timeout', 10 ),
+			'timeout'    => $timeout,
 		);
 		$body = $this->get_body();
 		if ( ! empty( $body ) ) {
@@ -306,14 +315,10 @@ abstract class Request {
 	 * @return void
 	 */
 	protected function log_response( $response, $request_args, $request_url, $code ) {
-		foreach ( $request_args['headers'] as $header => $value ) {
-			if ( 'authorization' === strtolower( $header ) ) {
-				// If it is longer than 15 char., it most likely has a token. This is an assumption that is safe even if it is wrong.
-				$request_args['headers'][ $header ] = strlen( $value ) > 15 ? '[REDACTED]' : '[MISSING]';
-				break;
-			}
-		}
-		$log = \KCO_Logger::format_log( $this->klarna_order_id, $this->method, $this->log_title, $request_args, $response, $code, $request_url );
+		// Log the decoded body so the masking can reach into it. The rest of the HTTP response holds nothing a log needs.
+		$body = is_wp_error( $response ) ? array() : json_decode( wp_remote_retrieve_body( $response ), true );
+
+		$log = \KCO_Logger::format_log( $this->klarna_order_id, $this->method, $this->log_title, $request_args, $body, $code, $request_url );
 		\KCO_Logger::log( $log );
 	}
 }
