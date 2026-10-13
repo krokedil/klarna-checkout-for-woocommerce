@@ -73,25 +73,6 @@ class OrderManagement {
 	 * Init the plugin at plugins_loaded.
 	 */
 	public function init() {
-
-		// If the Klarna Order Management plugin is active, do nothing.
-		if ( class_exists( 'WC_Klarna_Order_Management' ) ) {
-
-			add_action(
-				'admin_notices',
-				function () {
-					?>
-					<div class="notice notice-error">
-							<p><strong><?php esc_html_e( 'Order Management is now included in Kustom Checkout for WooCommerce.', 'klarna-checkout-for-woocommerce' ); ?></strong></p>
-							<p><?php esc_html_e( 'You no longer need the separate Klarna Order Management plugin.', 'klarna-checkout-for-woocommerce' ); ?></p>
-					</div>
-					<?php
-				}
-			);
-
-			return;
-		}
-
 		$this->settings   = new Settings();
 		$this->metabox    = new MetaBox( $this );
 		$this->ajax       = new Ajax();
