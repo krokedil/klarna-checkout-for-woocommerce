@@ -19,6 +19,7 @@ use Tests\Support\IntegrationTestCase;
  * @covers \KCO_Gateway::process_payment
  * @covers \KCO_Checkout::maybe_register_shipping_error
  * @covers \KCO_Checkout::maybe_change_needs_payment
+ * @covers \Krokedil\KustomCheckout\Utility\SettingsUtility::check_if_needs_payment
  */
 class CheckoutTest extends IntegrationTestCase {
 
@@ -286,14 +287,22 @@ class CheckoutTest extends IntegrationTestCase {
 	 *
 	 * @dataProvider provide_free_order_requests
 	 */
-	public function test_a_free_order_goes_through_kustom_only_when_shown_in_kustom( bool $store_api, bool $shown_in_kustom, bool $expected ): void {
+	public function test_a_free_order_goes_through_kustom_only_when_shown_in_kustom( bool $store_api, string $shown_by, bool $expected ): void {
 		if ( $store_api ) {
 			$this->requestUri       = $_SERVER['REQUEST_URI'] ?? '';
 			$_SERVER['REQUEST_URI'] = '/wp-json/wc/store/v1/checkout';
 		}
 
-		if ( $shown_in_kustom ) {
+		if ( 'filter' === $shown_by ) {
 			add_filter( 'kco_check_if_needs_payment', '__return_false' );
+		}
+
+		if ( str_starts_with( $shown_by, 'setting' ) ) {
+			$this->haveGatewayCredentials( [ 'display_on_free_orders' => 'yes' ] );
+		}
+
+		if ( 'setting, filtered back' === $shown_by ) {
+			add_filter( 'kco_check_if_needs_payment', '__return_true' );
 		}
 
 		$order = $this->haveGatewayOrder( [ 'items' => [ [ $this->haveSimpleProduct( [ 'price' => '0.00' ] ), 1 ] ] ] );
@@ -302,12 +311,14 @@ class CheckoutTest extends IntegrationTestCase {
 		$this->assertSame( $expected, $order->needs_payment() );
 	}
 
-	/** @return array<string, array{0: bool, 1: bool, 2: bool}> */
+	/** @return array<string, array{0: bool, 1: string, 2: bool}> */
 	public function provide_free_order_requests(): array {
 		return [
-			'the block checkout, free orders shown in Kustom'       => [ true, true, true ],
-			'the block checkout, free orders left to WooCommerce'   => [ true, false, false ],
-			'outside the checkout, free orders shown in Kustom'     => [ false, true, false ],
+			'the block checkout, shown in Kustom by the filter'            => [ true, 'filter', true ],
+			'the block checkout, shown in Kustom by the setting'           => [ true, 'setting', true ],
+			'the block checkout, setting overridden by the filter'         => [ true, 'setting, filtered back', false ],
+			'the block checkout, free orders left to WooCommerce'          => [ true, '', false ],
+			'outside the checkout, shown in Kustom by the setting'         => [ false, 'setting', false ],
 		];
 	}
 
