@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2268a5ec61243243e545e021afe70e53",
+    "content-hash": "e54adb7c33248f480bac51b2f22597b1",
     "packages": [
         {
             "name": "krokedil/settings-page",
@@ -259,16 +259,16 @@
         },
         {
             "name": "krokedil/wp-api",
-            "version": "dev-develop",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/krokedil/wp-api.git",
-                "reference": "0882e7f2069b71e32655dba4a8406ccfcd256bde"
+                "reference": "3473dd2fb6b31ed5060ecd69877c98b5287ebe48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/krokedil/wp-api/zipball/0882e7f2069b71e32655dba4a8406ccfcd256bde",
-                "reference": "0882e7f2069b71e32655dba4a8406ccfcd256bde",
+                "url": "https://api.github.com/repos/krokedil/wp-api/zipball/3473dd2fb6b31ed5060ecd69877c98b5287ebe48",
+                "reference": "3473dd2fb6b31ed5060ecd69877c98b5287ebe48",
                 "shasum": ""
             },
             "require-dev": {
@@ -313,10 +313,10 @@
             ],
             "description": "A composer library for Krokedil WordPress plugins that contains classes for working with wp_remote_request to setup request classes. Also uses the WooCommerce logger to log request reponses.",
             "support": {
-                "source": "https://github.com/krokedil/wp-api/tree/develop",
+                "source": "https://github.com/krokedil/wp-api/tree/1.2.0",
                 "issues": "https://github.com/krokedil/wp-api/issues"
             },
-            "time": "2026-09-23T13:16:10+00:00"
+            "time": "2026-10-07T08:46:15+00:00"
         },
         {
             "name": "psr/container",
@@ -376,9 +376,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "krokedil/wp-api": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
