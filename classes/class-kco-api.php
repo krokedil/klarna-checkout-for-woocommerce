@@ -20,8 +20,8 @@ class KCO_API {
 	/**
 	 * Creates a Kustom Checkout order.
 	 *
-	 * @param int    $order_id The WooCommerce order id.
-	 * @param string $checkout_flow The checkout flow to use, either 'embedded' or 'redirect'.
+	 * @param int|false $order_id The WooCommerce order id.
+	 * @param string    $checkout_flow The checkout flow to use, either 'embedded' or 'redirect'.
 	 *
 	 * @return mixed
 	 */
@@ -260,7 +260,7 @@ class KCO_API {
 	 * Deprecated function, adds support for the get_snippet function.
 	 *
 	 * @param array $klarna_order The Kustom Checkout order.
-	 * @return object
+	 * @return string
 	 */
 	public function get_snippet( $klarna_order ) {
 		// Make Kustom order an object.

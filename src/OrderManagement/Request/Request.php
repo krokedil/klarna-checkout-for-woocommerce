@@ -1,7 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request;
 
-use Krokedil\KustomCheckout\OrderManagement;
+use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -121,7 +121,7 @@ abstract class Request {
 	/**
 	 * Make the request.
 	 *
-	 * @return object|WP_Error
+	 * @return object|\WP_Error
 	 */
 	public function request() {
 		$url  = $this->get_request_url();
@@ -136,7 +136,7 @@ abstract class Request {
 	/**
 	 * Get the request headers.
 	 *
-	 * @return array
+	 * @return array|\WP_Error
 	 */
 	protected function get_request_headers() {
 		$auth = $this->calculate_auth();
@@ -184,7 +184,7 @@ abstract class Request {
 	/**
 	 * Calculate basic auth for the request.
 	 *
-	 * @return string|WP_Error
+	 * @return string|\WP_Error
 	 */
 	protected function calculate_auth() {
 		$order = wc_get_order( $this->order_id );
@@ -231,10 +231,10 @@ abstract class Request {
 	/**
 	 * Processes the response checking for errors.
 	 *
-	 * @param object|WP_Error $response The response from the request.
-	 * @param array           $request_args The request args.
-	 * @param string          $request_url The request url.
-	 * @return array|WP_Error
+	 * @param object|\WP_Error $response The response from the request.
+	 * @param array            $request_args The request args.
+	 * @param string           $request_url The request url.
+	 * @return array|\WP_Error
 	 */
 	protected function process_response( $response, $request_args, $request_url ) {
 		if ( is_wp_error( $response ) ) {
@@ -267,7 +267,7 @@ abstract class Request {
 	/**
 	 * Builds the request args for a request.
 	 *
-	 * @return array|WP_Error
+	 * @return array|\WP_Error
 	 */
 	public function get_request_args() {
 		$headers = $this->get_request_headers();
@@ -307,10 +307,10 @@ abstract class Request {
 	/**
 	 * Standardized logging format for requests/responses.
 	 *
-	 * @param array|WP_Error $response The request response.
-	 * @param array          $request_args The arguments of the request.
-	 * @param string         $request_url The request URL.
-	 * @param int            $code The HTTP Response Code this request returned.
+	 * @param array|\WP_Error $response The request response.
+	 * @param array           $request_args The arguments of the request.
+	 * @param string          $request_url The request URL.
+	 * @param int             $code The HTTP Response Code this request returned.
 	 * @return void
 	 */
 	protected function log_response( $response, $request_args, $request_url, $code ) {

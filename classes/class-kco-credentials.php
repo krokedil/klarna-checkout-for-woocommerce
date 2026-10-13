@@ -19,7 +19,7 @@ class KCO_Credentials {
 	/**
 	 * Kustom Checkout for WooCommerce settings.
 	 *
-	 * @var $settings
+	 * @var array
 	 */
 	public $settings = array();
 
