@@ -18,96 +18,157 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "POT-Creation-Date: 2021-12-16 08:28+0000\n"
-"PO-Revision-Date: 2021-12-16 08:28+0000\n"
+"PO-Revision-Date: 2025-11-17 12:59+0000\n"
 "Language: sv_SE\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Loco-Version: 2.5.5; wp-5.8.2"
 
-#: ../klarna-checkout-for-woocommerce.php:163,
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:399
-msgid "Settings"
-msgstr ""
-
-#: ../klarna-checkout-for-woocommerce.php:164
-msgid "Support"
-msgstr ""
-
-#. translators: Kustom order ID.
-#: ../classes/class-kco-api-callbacks.php:110,
-#: ../includes/kco-functions.php:563
-msgid "Kustom order is under review, order ID: %s."
-msgstr ""
-
-#: ../classes/class-kco-api-callbacks.php:107
-msgid "Kustom Checkout order was rejected."
-msgstr ""
-
-#: ../classes/class-kco-api-callbacks.php:104,
-#: ../includes/kco-functions.php:555
-msgid "Payment via Kustom Checkout, order ID: %s"
-msgstr ""
-
-#: ../classes/class-kco-confirmation.php:121
-msgid "Failed getting the order for the external payment."
-msgstr ""
-
-#: ../classes/class-kco-confirmation.php:127
-msgid "Failed to find the payment method for the external payment."
-msgstr ""
-
-#: ../classes/class-kco-confirmation.php:137
-msgid "Something went wrong with the external payment. Please try again"
-msgstr ""
-
-#: ../classes/class-kco-email.php:36
-msgid "Kustom"
-msgstr ""
-
-#: ../classes/class-kco-email.php:37
-msgid "Kustom App"
-msgstr ""
-
-#: ../classes/class-kco-email.php:39
-msgid "Kustom order id:"
-msgstr ""
-
-#. translators: 1. Kustom customer service URL. 2. Kustoms app url.
-#: ../classes/class-kco-email.php:45
+#: ../classes/class-kco-fields.php:368
 msgid ""
-"Your payment is processed by our partner %1$s. You will shortly receive "
-"instructions on how to complete your payment. You can manage all your "
-"payments via kustom.co or in the %2$s"
-msgstr ""
-"Din betalning hanteras av vår partner %1$s. Du kommer inom kort få "
-"instruktioner på hur inbetalning ska ske. Du kan hantera alla dina "
-"betalningar via kustom.co eller via %2$s"
-
-#: ../classes/class-kco-fields.php:25
-msgid "Enable/Disable"
+"<strong>Embedded:</strong> the checkout is embedded in the WooCommerce "
+"checkout page and partially replaces the checkout form. <strong>Redirect:"
+"</strong> the customer is redirected to a payment page hosted by Kustom"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:26
-msgid "Enable Kustom Checkout"
+#: ../includes/kco-functions.php:708
+msgid ""
+"A mismatch between the WooCommerce and Kustom orders was identified. Please "
+"verify the order in the Kustom merchant portal before processing."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:32
-msgid "Title"
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:180
+msgid "Activated"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:34
-msgid "Payment method title."
+#: ../classes/class-kco-fields.php:402
+msgid "Add a terms and conditions checkbox inside Kustom Checkout iframe"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:39
-msgid "Description"
+#: ../classes/class-kco-fields.php:56
+msgid "Add Kustom Post Purchase info to order email"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:41
-msgid "Payment method description."
+#: ../classes/class-kco-fields.php:202
+msgid "Allow separate shipping address"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:46
-msgid "Other payment method button text"
+#: ../classes/class-kco-fields.php:257
+msgid "Allowed Customer Types"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:91
+msgid "API Endpoint"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:263
+msgid "B2B & B2C (defaults to B2B)"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:261
+msgid "B2B only"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:262
+msgid "B2C & B2B (defaults to B2C)"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:260
+msgid "B2C only"
+msgstr ""
+
+#. translators: %s is the field name.
+#: ../classes/class-kco-gateway.php:198
+msgid "Billing %s does not match Kustom order."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:309
+msgid "Checkout button color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:316
+msgid "Checkout button text color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:330
+msgid "Checkout checkbox checkmark color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:323
+msgid "Checkout checkbox color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:362
+msgid "Checkout flow"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:337
+msgid "Checkout header color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:79
+msgid "Checkout layout"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:344
+msgid "Checkout link color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:311
+msgid "Checkout page button color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:318
+msgid "Checkout page button text color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:332
+msgid "Checkout page checkbox checkmark color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:325
+msgid "Checkout page checkbox color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:339
+msgid "Checkout page header color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:346
+msgid "Checkout page link color"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:353
+msgid "Checkout page radius border in pixels"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:390
+msgid "Checkout privacy policy text"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:351
+msgid "Checkout radius border (px)"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:230
+msgid "Checkout settings"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:305
+msgid "Color Settings"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:32
+msgid "Correlation ID"
+msgstr ""
+
+#: ../classes/class-kco-subscription.php:468
+msgid ""
+"Could not retrieve new Kustom recurring token for subscription when customer "
+"changed payment method. Read the log for detailed information."
+msgstr ""
+
+#: ../src/CheckoutFlow/RedirectFlow.php:44
+msgid "Customer redirected to Kustom Hosted Payment Page."
 msgstr ""
 
 #: ../classes/class-kco-fields.php:48
@@ -117,428 +178,151 @@ msgid ""
 "Leave blank to use the default (and translatable) text."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:56
-msgid "Add Kustom Urls to order email"
+#: ../classes/class-kco-fields.php:241
+msgid "Date of birth mandatory"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:58
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:183
+msgid "Deactivated"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:39
+msgid "Description"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:396
+msgid "Display above checkout"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:397
+msgid "Display below checkout"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:284
+msgid "Display quantity fields"
+msgstr ""
+
+#. translators: 1: Configuration link, 2: Tax settings link.
+#: ../classes/class-kco-fields.php:211
 msgid ""
-"This will add Kustom urls to the order emails that are sent. You can read "
-"more about this here: "
+"Display Shipping methods in Kustom iframe.  If you are using the <b>Kustom "
+"Shipping Assistant</b> plugin, please follow the steps explained in the "
+"plugin documentation under the sections titled %1$s and %2$s"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:63
-msgid "Test mode"
+#: ../classes/class-kco-fields.php:292
+msgid "Display subtotal details"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:285
+msgid "Display the quantity selection fields on the checkout page"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:395
+msgid "Do not display"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:365
+msgid "Embedded"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:26
+msgid "Enable Kustom Checkout"
 msgstr ""
 
 #: ../classes/class-kco-fields.php:64
 msgid "Enable Test Mode"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:66
-msgid "Place the payment gateway in test mode using test API keys."
+#: ../classes/class-kco-fields.php:25
+msgid "Enable/Disable"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:71
-msgid "Logging"
+#: ../classes/class-kco-confirmation.php:116
+msgid "Failed getting the order for the external payment."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:72
-msgid "Log debug messages"
+#: ../classes/class-kco-confirmation.php:123
+msgid "Failed to find the payment method for the external payment."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:74
-msgid "Save debug messages to the WooCommerce System Status log."
+#: ../blocks/src/Api/Controllers/OrderController.php:92
+msgid "Failed to validate your order, please try again."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:84, ../classes/class-kco-fields.php:129
-msgid "Production Kustom API Username"
+#: ../classes/class-kco-fields.php:100
+msgid "Force klarna.com endpoint"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:86, ../classes/class-kco-fields.php:96,
-#: ../classes/class-kco-fields.php:106, ../classes/class-kco-fields.php:116,
-#: ../classes/class-kco-fields.php:131, ../classes/class-kco-fields.php:141,
-#: ../classes/class-kco-fields.php:151, ../classes/class-kco-fields.php:161
-msgid ""
-"Use API username and API password you downloaded in the Kustom Merchant "
-"Portal. Don’t use your email address."
+#: ../classes/class-kco-fields.php:101
+msgid "Force kustom.co endpoint"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:94, ../classes/class-kco-fields.php:139
-msgid "Production Kustom API Password"
+#: ../classes/class-kco-fields.php:99
+msgid "Force specific endpoint"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:104, ../classes/class-kco-fields.php:149
-msgid "Test Kustom API Username"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:114, ../classes/class-kco-fields.php:159
-msgid "Test Kustom API Password"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:170
-msgid "Shipping settings"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:174
-msgid "Separate shipping address"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:175
-msgid "Allow separate shipping address"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:177
-msgid ""
-"If this option is checked, customers will be able to enter shipping address "
-"different than their billing address in checkout."
-msgstr ""
-
-#: ../classes/class-kco-fields.php:182
-msgid "Shipping methods in iframe"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:183
-msgid "Display Shipping methods in Kustom iframe."
-msgstr ""
-
-#: ../classes/class-kco-fields.php:185
-msgid ""
-"If this option is checked, selection of shipping methods is done in Kustom "
-"iframe. Shipping price and name of the selected shipping method will still "
-"be displayed in WooCommerce order review."
-msgstr ""
-
-#: ../classes/class-kco-fields.php:190
-msgid "Shipping details"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:191
-msgid "Shipping details note shown to customer"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:193
-msgid "Will be shown to customer in thank you page."
-msgstr ""
-
-#: ../classes/class-kco-fields.php:202
-msgid "Checkout settings"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:206
-msgid "Product URLs"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:208
-msgid "Send product and product image URLs to Kustom"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:213
-msgid "Date of birth mandatory"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:214
-msgid "Make customer date of birth mandatory"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:216
+#: ../classes/class-kco-fields.php:244
 msgid "If checked, the customer cannot skip date of birth."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:221
-msgid "National identification number mandatory"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:222
-msgid ""
-"Makes the validation of national identification numbers mandatory for "
-"customers."
-msgstr ""
-
-#: ../classes/class-kco-fields.php:224
+#: ../classes/class-kco-fields.php:252
 msgid ""
 "If checked, the customer will have to complete a validation process for the "
 "national identification number ( SE, NO, FI and DK only ). This will also "
 "make national identification numbers mandatory."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:229
-msgid "Allowed Customer Types"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:232
-msgid "B2C only"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:233
-msgid "B2B only"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:234
-msgid "B2C & B2B (defaults to B2C)"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:235
-msgid "B2B & B2C (defaults to B2B)"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:237
+#: ../classes/class-kco-fields.php:204
 msgid ""
-"Select if you want to sell both to consumers and companies or only to one of "
-"them (available for SE, NO and FI). You need to contact Kustom directly to "
-"activate this with your account."
+"If this option is checked, customers will be able to enter shipping address "
+"different than their billing address in checkout."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:242
-msgid "Title mandatory (GB)"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:243
-msgid "Make customer title mandatory"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:245
+#: ../classes/class-kco-fields.php:213
 msgid ""
-"If unchecked, title becomes optional. Only available for orders for country "
-"GB."
+"If this option is checked, selection of shipping methods is done in Kustom "
+"iframe. Shipping price and name of the selected shipping method will still "
+"be displayed in WooCommerce order review."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:250
-msgid "Show prefill consent notice"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:251
-msgid "Only applicable for stores based in Germany and Austria"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:256
-msgid "Display quantity fields"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:257
-msgid "Display the quantity selection fields on the checkout page"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:259
+#: ../classes/class-kco-fields.php:287
 msgid ""
 "If this option is checked, the customer will be able to change the quantity "
 "of a product purchased on the checkout page as they would on the cart page."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:264
-msgid "Display subtotal details"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:267
-msgid "In the WooCommerce order review"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:268
-msgid "In the Kustom Checkout iFrame"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:269
-msgid "In both"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:271
-msgid "Select how you want to show the subtotal details on the checkout page."
-msgstr ""
-
-#: ../classes/class-kco-fields.php:277
-msgid "Color Settings"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:281
-msgid "Checkout button color"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:283
-msgid "Checkout page button color"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:288
-msgid "Checkout button text color"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:290
-msgid "Checkout page button text color"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:295
-msgid "Checkout checkbox color"
+#: ../classes/class-kco-fields.php:273
+msgid ""
+"If unchecked, title becomes optional. Only available for orders for country "
+"GB."
 msgstr ""
 
 #: ../classes/class-kco-fields.php:297
-msgid "Checkout page checkbox color"
+msgid "In both"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:302
-msgid "Checkout checkbox checkmark color"
+#: ../classes/class-kco-fields.php:296
+msgid "In the Kustom Checkout iFrame"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:304
-msgid "Checkout page checkbox checkmark color"
+#: ../classes/class-kco-fields.php:295
+msgid "In the WooCommerce order review"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:309
-msgid "Checkout header color"
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:177
+msgid "Install"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:311
-msgid "Checkout page header color"
+#: ../src/CheckoutFlow/CheckoutFlow.php:25
+msgid "Invalid order ID."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:316
-msgid "Checkout link color"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:318
-msgid "Checkout page link color"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:323
-msgid "Checkout radius border (px)"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:325
-msgid "Checkout page radius border in pixels"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:338
-msgid "Checkout privacy policy text"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:339
+#: ../classes/admin/class-kco-admin-notices.php:232
 msgid ""
-"Select if you want to show the <em>Checkout privacy policy</em> text on the "
-"checkout page, and where you want to display it."
-msgstr ""
-
-#: ../classes/class-kco-fields.php:343
-msgid "Do not display"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:344
-msgid "Display above checkout"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:345
-msgid "Display below checkout"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:349
-msgid "Terms and conditions checkbox"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:350
-msgid "Add a terms and conditions checkbox inside Kustom Checkout iframe"
-msgstr ""
-
-#: ../classes/class-kco-fields.php:352
-msgid ""
-"To change the text navigate to → Appearance → Customize → WooCommerce → "
-"Checkout."
-msgstr ""
-
-#: ../classes/class-kco-gateway.php:25, ../includes/kco-status-report.php:17
-msgid "Kustom Checkout"
-msgstr ""
-
-#: ../classes/class-kco-gateway.php:26
-msgid ""
-"The current Kustom Checkout replaces standard WooCommerce checkout page."
-msgstr ""
-
-#: ../classes/class-kco-gateway.php:281
-msgid "Please fill in all required checkout fields."
-msgstr ""
-
-#: ../classes/class-kco-gateway.php:284
-msgid "Please try again, something went wrong with processing your order."
-msgstr ""
-
-#: ../classes/class-kco-gateway.php:513
-msgid ""
-"Order address should not be changed and any changes you make will not be "
-"reflected in Kustom system."
-msgstr ""
-
-#: ../classes/class-kco-gateway.php:572
-msgid "Organisation number:"
-msgstr ""
-
-#: ../classes/class-kco-gateway.php:593, ../classes/class-kco-gateway.php:614
-msgid "Reference:"
-msgstr ""
-
-#: ../classes/class-kco-gdpr.php:40
-msgid "Kustom Checkout for WooCommerce"
-msgstr ""
-
-#: ../classes/class-kco-subscription.php:221
-msgid ""
-"Recurring token was missing from the Kustom order during the checkout "
-"process. Please contact Kustom for help."
-msgstr ""
-
-#: ../classes/class-kco-subscription.php:214
-msgid "Recurring token for subscription: %s"
-msgstr ""
-
-#. translators: Error message.
-#: ../classes/class-kco-subscription.php:291
-msgid "Subscription payment failed with Kustom. Message: %1$s"
-msgstr ""
-
-#: ../classes/class-kco-subscription.php:284
-msgid "Subscription payment made with Kustom. Kustom order id: %s"
-msgstr ""
-
-#: ../classes/class-kco-subscription.php:318
-msgid "Kustom recurring token"
-msgstr ""
-
-#: ../classes/class-kco-subscription.php:370
-msgid ""
-"Could not retrieve new Kustom recurring token for subscription when customer "
-"changed payment method. Read the log for detailed information."
-msgstr ""
-
-#: ../classes/class-kco-subscription.php:364
-msgid ""
-"Payment method changed via Kustom Checkout. New recurring token for "
-"subscription: %s"
-msgstr ""
-
-#: ../classes/class-kco-subscription.php:391
-msgid "Thank you, your subscription payment method is now updated."
-msgstr ""
-
-#: ../classes/class-kco-templates.php:179
-msgid "Failed to load Kustom Checkout template file."
-msgstr ""
-
-#: ../includes/kco-functions.php:77
-msgid "Select another payment method"
-msgstr ""
-
-#: ../includes/kco-functions.php:533
-msgid "Waiting for verification from Kustoms push notification"
-msgstr ""
-
-#: ../includes/kco-functions.php:528
-msgid "Kustom Checkout order was rejected"
-msgstr ""
-
-#: ../includes/kco-status-report.php:17
-msgid "Kustom Checkout System Status."
-msgstr ""
-
-#: ../classes/admin/class-kco-admin-notices.php:91
-msgid ""
-"You need to specify a terms page in WooCommerce Settings to be able to use "
-"Kustom Checkout. "
+"It looks as if you don't have pretty permalinks enabled in WordPress. For "
+"Kustom Checkout for WooCommerce to function properly, this needs to be "
+"enabled. "
 msgstr ""
 
 #: ../classes/admin/class-kco-admin-notices.php:147
@@ -550,74 +334,576 @@ msgid ""
 msgstr ""
 
 #. translators: %s: URL.
+#: ../classes/admin/class-kco-admin-notices.php:128
+msgid ""
+"It looks like you are using the Autoptimize plugin and have enabled their <i>"
+"Optimize shop cart/checkout</i> setting. This might cause conflicts with the "
+"Kustom Checkout plugin. You can deactivate this feature in the  <a "
+"href=\"%s\">Autoptimize settings page</a> (<i>→ Show advanced settings → "
+"Misc section</i>). "
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:16
+msgid "Klarna Checkout address data"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:56
+msgid "Klarna Checkout billing address city"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:66
+msgid "Klarna Checkout billing address country"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:21
+msgid "Klarna Checkout billing address data"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:36
+msgid "Klarna Checkout billing address email"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:31
+msgid "Klarna Checkout billing address family name"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:26
+msgid "Klarna Checkout billing address given name"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:41
+msgid "Klarna Checkout billing address phone"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:51
+msgid "Klarna Checkout billing address postal code"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:61
+msgid "Klarna Checkout billing address region"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:46
+msgid "Klarna Checkout billing address street address"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:108
+msgid "Klarna Checkout shipping address city"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:118
+msgid "Klarna Checkout shipping address country"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:73
+msgid "Klarna Checkout shipping address data"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:88
+msgid "Klarna Checkout shipping address email"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:83
+msgid "Klarna Checkout shipping address family name"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:78
+msgid "Klarna Checkout shipping address given name"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:93
+msgid "Klarna Checkout shipping address phone"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:103
+msgid "Klarna Checkout shipping address postal code"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:113
+msgid "Klarna Checkout shipping address region"
+msgstr ""
+
+#: ../blocks/src/Schema/AddressSchema.php:98
+msgid "Klarna Checkout shipping address street address"
+msgstr ""
+
+#: ../src/CheckoutFlow/CheckoutFlow.php:101
+msgid "Klarna order ID not found."
+msgstr ""
+
+#: ../src/CheckoutFlow/CheckoutFlow.php:155
+msgid "Klarna order not found or an error occurred."
+msgstr ""
+
+#: ../classes/class-kco-email.php:37
+msgid "Kustom"
+msgstr ""
+
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66,
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66,
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:78
+msgid "Kustom Add-ons"
+msgstr ""
+
+#: ../classes/class-kco-gateway.php:48,
+#: ../includes/admin/views/status-report.php:17
+msgid "Kustom Checkout"
+msgstr ""
+
+#: ../classes/class-kco-gdpr.php:40
+msgid "Kustom Checkout for WooCommerce"
+msgstr ""
+
+#: ../classes/class-kco-templates.php:177
+msgid ""
+"Kustom Checkout is not available. Please choose a different payment option "
+"or contact the store for assistance."
+msgstr ""
+
+#: ../includes/kco-functions.php:633
+msgid "Kustom Checkout order was rejected"
+msgstr ""
+
+#: ../classes/class-kco-api-callbacks.php:105
+msgid "Kustom Checkout order was rejected."
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:17
+msgid "Kustom Checkout System Status."
+msgstr ""
+
+#: ../classes/class-kco-gateway.php:752
+msgid ""
+"Kustom did not accept the new order amount, the order has not been updated"
+msgstr ""
+
+#: ../classes/class-kco-email.php:39
+msgid "Kustom order id:"
+msgstr ""
+
+#. translators: Kustom order ID.
+#: ../classes/class-kco-api-callbacks.php:108,
+#: ../includes/kco-functions.php:627
+msgid "Kustom order is under review, order ID: %s."
+msgstr ""
+
+#. translators: 1: Kustom order total, 2: WooCommerce order total.
+#: ../includes/kco-functions.php:678
+msgid ""
+"Kustom order total (%1$s) does not match WooCommerce order total (%2$s). "
+"Please verify the order with Kustom before processing."
+msgstr ""
+
+#: ../classes/class-kco-subscription.php:413
+msgid "Kustom recurring token"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:72
+msgid "Log debug messages"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:71
+msgid "Logging"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:242
+msgid "Make customer date of birth mandatory"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:271
+msgid "Make customer title mandatory"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:250
+msgid ""
+"Makes the validation of national identification numbers mandatory for "
+"customers."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:249
+msgid "National identification number mandatory"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:63
+msgid "No error logs"
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:137,
+#: ../klarna-checkout-for-woocommerce.php:147
+msgid "Nope"
+msgstr ""
+
+#: ../classes/admin/class-klarna-for-woocommerce-addons.php:177
+msgid "Not installed"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:82
+msgid "One column checkout"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:279
+msgid "Only applicable for stores based in Germany and Austria"
+msgstr ""
+
+#: ../classes/class-kco-gateway.php:568
+msgid ""
+"Order address should not be changed and any changes you make will not be "
+"reflected in Kustom system."
+msgstr ""
+
+#: ../classes/class-kco-gateway.php:627
+msgid "Organisation number:"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:46
+msgid "Other payment method button text"
+msgstr ""
+
+#: ../classes/class-kco-subscription.php:462
+msgid ""
+"Payment method changed via Kustom Checkout. New recurring token for "
+"subscription: %s"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:41
+msgid "Payment method description."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:34
+msgid "Payment method title."
+msgstr ""
+
+#: ../classes/class-kco-api-callbacks.php:101,
+#: ../includes/kco-functions.php:619
+msgid "Payment via Kustom Checkout, order ID: %s"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:66
+msgid "Place the payment gateway in test mode using test API keys."
+msgstr ""
+
+#: ../classes/class-kco-gateway.php:390
+msgid "Please fill in all required checkout fields."
+msgstr ""
+
+#: ../classes/class-kco-gateway.php:393
+msgid "Please try again, something went wrong with processing your order."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:234
+msgid "Product URLs"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:121, ../classes/class-kco-fields.php:166
+msgid "Production Kustom API Password"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:111, ../classes/class-kco-fields.php:156
+msgid "Production Kustom API Username"
+msgstr ""
+
+#: ../classes/admin/class-kco-admin-notices.php:91,
+#: ../classes/admin/class-kco-admin-notices.php:108,
+#: ../classes/admin/class-kco-admin-notices.php:128,
+#: ../classes/admin/class-kco-admin-notices.php:147,
+#: ../classes/admin/class-kco-admin-notices.php:169,
+#: ../classes/admin/class-kco-admin-notices.php:232
+msgid "Read more here. "
+msgstr ""
+
+#: ../classes/class-kco-fields.php:96
+msgid "Recommended"
+msgstr ""
+
+#: ../classes/class-kco-subscription.php:250
+msgid "Recurring token for subscription: %s"
+msgstr ""
+
+#: ../classes/class-kco-subscription.php:274
+msgid ""
+"Recurring token was missing from the Kustom order during the checkout "
+"process. Please contact Kustom for help."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:366
+msgid "Redirect"
+msgstr ""
+
+#: ../classes/class-kco-gateway.php:649, ../classes/class-kco-gateway.php:671
+msgid "Reference:"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:29
+msgid "Request"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:30
+msgid "Response Code"
+msgstr ""
+
+#: ../includes/admin/views/status-report.php:31
+msgid "Response Message"
+msgstr ""
+
+#: ../classes/requests/helpers/class-kco-request-cart.php:296,
+#: ../classes/requests/helpers/class-kco-request-cart.php:297
+msgid "Sales Tax"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:74
+msgid "Save debug messages to the WooCommerce System Status log."
+msgstr ""
+
+#: ../includes/kco-functions.php:168
+msgid "Select another payment method"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:299
+msgid "Select how you want to show the subtotal details on the checkout page."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:265
+msgid ""
+"Select if you want to sell both to consumers and companies or only to one of "
+"them (available for SE, NO, FI and DE). You need to contact Kustom directly "
+"to activate this with your account."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:391
+msgid ""
+"Select if you want to show the <em>Checkout privacy policy</em> text on the "
+"checkout page, and where you want to display it."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:93
+msgid ""
+"Select the API endpoint to use for Kustom Checkout. For stores that have "
+"created their API credentials through the Kustom portal, the API endpoint "
+"needs to be set to kustom.co instead of klarna.com. If you use the default "
+"option, the plugin will attempt to determine this automatically. But you can "
+"force the endpoint by using this setting if this is incorrect."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:236
+msgid "Send product and product image URLs to Klarna"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:201
+msgid "Separate shipping address"
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:190
+msgid "Settings"
+msgstr ""
+
+#: ../classes/requests/helpers/class-kco-request-cart.php:624,
+#: ../classes/requests/helpers/class-kco-request-cart.php:652
+msgid "Shipping"
+msgstr ""
+
+#. translators: %s is the field name.
+#: ../classes/class-kco-gateway.php:210
+msgid "Shipping %s does not match Kustom order."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:218
+msgid "Shipping details"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:219
+msgid "Shipping details note shown to customer"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:209
+msgid "Shipping methods in iframe"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:197
+msgid "Shipping settings"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:278
+msgid "Show prefill consent notice"
+msgstr ""
+
+#: ../classes/class-kco-confirmation.php:133
+msgid "Something went wrong with the external payment. Please try again"
+msgstr ""
+
+#. translators: Error message.
+#: ../classes/class-kco-subscription.php:355
+msgid "Subscription payment failed with Klarna. Message: %1$s"
+msgstr ""
+
+#: ../classes/class-kco-subscription.php:348
+msgid "Subscription payment made with Kustom. Kustom order id: %s"
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:191
+msgid "Support"
+msgstr ""
+
+#: ../classes/requests/helpers/class-kco-request-cart.php:169
+msgid "Surcharge"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:401
+msgid "Terms and conditions checkbox"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:141, ../classes/class-kco-fields.php:186
+msgid "Test Kustom API Password"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:131, ../classes/class-kco-fields.php:176
+msgid "Test Kustom API Username"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:63
+msgid "Test mode"
+msgstr ""
+
+#: ../classes/class-kco-subscription.php:489
+msgid "Thank you, your subscription payment method is now updated."
+msgstr ""
+
+#. translators: %s: URL.
 #: ../classes/admin/class-kco-admin-notices.php:169
 msgid ""
-"The <i>Kustom upstream for WooCommerce</i> plugin is now available as <i>"
+"The <i>Klarna upstream for WooCommerce</i> plugin is now available as <i>"
 "Klarna On-site Messaging for WooCommerce</i>. Please deactivate and delete "
-"<i>Kustom upstream for WooCommerce</i> and then install and activate <i>"
+"<i>Klarna upstream for WooCommerce</i> and then install and activate <i>"
 "Klarna On-site Messaging for WooCommerce</i> via the new <a href=\"%s\">"
 "Kustom Add-ons page</a>. "
 msgstr ""
 
-#: ../classes/admin/class-kco-admin-notices.php:232
+#: ../classes/class-kco-gateway.php:49
 msgid ""
-"It looks as if you don't have pretty permalinks enabled in WordPress. For "
-"Kustom Checkout for WooCommerce to function properly, this needs to be "
-"enabled. "
+"The current Kustom Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66,
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:66,
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:81,
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:398
-msgid "Kustom Add-ons"
+#: ../classes/class-kco-gateway.php:140
+msgid ""
+"The Kustom order could not be retrieved from the session. Please try again."
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:130
-msgid "Please install an add-on to be able to see the settings."
+#: ../classes/class-kco-gateway.php:133
+msgid ""
+"The Kustom order id could not be retrieved from the session. Please try "
+"again."
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:186
-msgid "Install"
+#. translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
+#: ../includes/kco-functions.php:759
+msgid "The product \"%1$s\" has a quantity mismatch. Expected %2$d found %3$d."
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:186
-msgid "Not installed"
+#. translators: %s: Product name.
+#: ../includes/kco-functions.php:769
+msgid "The product \"%s\" was not found in the Kustom order."
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:189
-msgid "Activated"
+#: ../classes/class-kco-checkout.php:206
+msgid ""
+"The shipping methods have been changed during the checkout process. Please "
+"verify your selected shipping method and try again."
 msgstr ""
 
-#: ../classes/admin/class-klarna-for-woocommerce-addons.php:192
-msgid "Deactivated"
-msgstr ""
-
-#: ../classes/admin/class-klarna-skin.php:87
+#: ../classes/admin/class-klarna-skin.php:84
 msgid "There was an error installing the addon. Please try again."
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:135
-msgid "Surcharge"
+#: ../src/CheckoutFlow/CheckoutFlow.php:220
+msgid "There was an error processing your payment. Please try again."
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:250,
-#: ../classes/requests/helpers/class-kco-request-cart.php:251
-msgid "Sales Tax"
+#: ../classes/class-kco-fields.php:58
+msgid ""
+"This will add Kustom's Post Purchase information to the order emails that "
+"are sent. You can read more about this here: "
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:283,
-#: ../classes/requests/helpers/class-kco-request-cart.php:280,
-#: ../classes/requests/helpers/class-kco-request-cart.php:352
-msgid "Gift card"
+#: ../includes/admin/views/status-report.php:27
+msgid "Time"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:373,
-#: ../classes/requests/helpers/class-kco-request-cart.php:396
-msgid "giftcard"
+#: ../classes/class-kco-fields.php:32
+msgid "Title"
 msgstr ""
 
-#: ../classes/requests/helpers/class-kco-request-cart.php:702,
-#: ../classes/requests/helpers/class-kco-request-cart.php:730
-msgid "Shipping"
+#: ../classes/class-kco-fields.php:270
+msgid "Title mandatory (GB)"
 msgstr ""
+
+#: ../classes/class-kco-fields.php:404
+msgid ""
+"To change the text navigate to → Appearance → Customize → WooCommerce → "
+"Checkout."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:84
+msgid "Two column checkout (Kustom Checkout in left column)"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:85
+msgid "Two column checkout (Kustom Checkout in left column) - Storefront light"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:83
+msgid "Two column checkout (Kustom Checkout in right column)"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:113, ../classes/class-kco-fields.php:123,
+#: ../classes/class-kco-fields.php:133, ../classes/class-kco-fields.php:143,
+#: ../classes/class-kco-fields.php:158, ../classes/class-kco-fields.php:168,
+#: ../classes/class-kco-fields.php:178, ../classes/class-kco-fields.php:188
+msgid ""
+"Use API username and API password you downloaded in the Kustom Merchant "
+"Portal. Don’t use your email address."
+msgstr ""
+
+#: ../classes/class-kco-fields.php:97
+msgid "Use plugin logic (default)"
+msgstr ""
+
+#: ../includes/kco-functions.php:638
+msgid "Waiting for verification from Kustom's push notification"
+msgstr ""
+
+#: ../classes/class-kco-fields.php:221
+msgid "Will be shown to customer in thank you page."
+msgstr ""
+
+#: ../classes/admin/class-kco-admin-notices.php:108
+msgid ""
+"You need to enable and configure https to be able to use Kustom Checkout. "
+msgstr ""
+
+#: ../classes/admin/class-kco-admin-notices.php:91
+msgid ""
+"You need to specify a terms page in WooCommerce Settings to be able to use "
+"Kustom Checkout. "
+msgstr ""
+
+#: ../klarna-checkout-for-woocommerce.php:407,
+#: ../klarna-checkout-for-woocommerce.php:417
+msgid ""
+"Your installation of Kustom Checkout for WooCommerce is not complete. If you "
+"installed this plugin directly from Github please refer to the README.DEV.md "
+"file in the plugin."
+msgstr ""
+
+#. translators: Kustom customer service URL.
+#: ../classes/class-kco-email.php:46
+#| msgid ""
+#| "Your payment is processed by our partner %1$s. You will shortly receive "
+#| "instructions on how to complete your payment. You can manage all your "
+#| "payments via kustom.co or in the %2$s"
+msgid ""
+"Your payment is processed by our partner %1$s. You will shortly receive "
+"instructions on how to complete your payment. You can manage all your "
+"payments via kustom.co."
+msgstr ""
+"Din betalning hanteras av vår partner %1$s. Du kommer inom kort få "
+"instruktioner på hur inbetalning ska ske. Du kan hantera alla dina "
+"betalningar via kustom.co eller via kustom.co."
