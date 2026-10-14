@@ -30,7 +30,8 @@ class KCO_Logger {
 	public static function log( $data ) {
 		$settings = get_option( 'woocommerce_kco_settings', array() );
 		$to_file  = wc_string_to_bool( $settings['logging'] ?? 'no' );
-		$to_db    = isset( $data['response']['code'] ) && ( $data['response']['code'] < 200 || $data['response']['code'] > 299 );
+		// Unmasked entries are kept out of the status report, which outlives the debugging session.
+		$to_db = LogMasking::is_enabled() && isset( $data['response']['code'] ) && ( $data['response']['code'] < 200 || $data['response']['code'] > 299 );
 
 		if ( ! $to_file && ! $to_db ) {
 			return;
@@ -42,7 +43,7 @@ class KCO_Logger {
 			if ( empty( self::$log ) ) {
 				self::$log = new WC_Logger();
 			}
-			self::$log->add( 'kustom-checkout-for-woocommerce', wp_json_encode( $message ) );
+			self::$log->add( LogMasking::SLUG, wp_json_encode( $message ) );
 		}
 
 		if ( $to_db ) {

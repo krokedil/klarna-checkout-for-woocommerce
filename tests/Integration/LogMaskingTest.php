@@ -310,6 +310,103 @@ class LogMaskingTest extends IntegrationTestCase {
 		);
 	}
 
+	/**
+	 * Masking is turned off for debugging with the wp-api filter, and a log that is only
+	 * partly unmasked misleads whoever reads it, so every logging path has to follow it.
+	 *
+	 * @dataProvider provide_logging_paths
+	 */
+	public function test_turning_masking_off_reaches_every_log_entry( string $scenario, array $expected ): void {
+		add_filter( 'krokedil_wp_api_mask_log_data', '__return_false' );
+
+		$this->{$scenario}();
+
+		foreach ( $expected as $value ) {
+			$this->assertStringContainsString( $value, $this->loggedText(), "The entry still masked {$value}." );
+		}
+		$this->assertStringNotContainsString( '[REDACTED]', $this->loggedText() );
+	}
+
+	/** @return array<string, array{0: string, 1: string[]}> */
+	public function provide_logging_paths(): array {
+		return [
+			'a checkout request'         => [ 'haveRetrievedOrder', [ 'Karlsson', '800101-1234', base64_encode( 'mid:secret' ) ] ],
+			'an order management request' => [ 'haveCancelledManagedOrder', [ 'Karlsson', '800101-1234' ] ],
+			'a recurring token URL'      => [ 'haveCreatedRecurringOrder', [ '/tokens/customer-token-1/order' ] ],
+			'a plain message'            => [ 'haveLoggedPlainMessage', [ 'karl@example.com', 'wc_order_Kr90kxk5axFCS' ] ],
+		];
+	}
+
+	/** The filter is told which plugin is logging, so turning it off for another one changes nothing here. */
+	public function test_turning_masking_off_for_another_plugin_keeps_these_logs_masked(): void {
+		add_filter(
+			'krokedil_wp_api_mask_log_data',
+			static function ( $enabled, $slug ) {
+				return 'kustom-checkout-for-woocommerce' === $slug ? $enabled : false;
+			},
+			10,
+			2
+		);
+
+		$this->haveRetrievedOrder();
+		$this->haveCancelledManagedOrder();
+		$this->haveLoggedPlainMessage();
+
+		$this->assertNotLogged( self::PERSONAL_DATA + [ base64_encode( 'mid:secret' ) => 'credentials' ] );
+	}
+
+	public function test_masking_comes_back_once_the_filter_is_removed(): void {
+		add_filter( 'krokedil_wp_api_mask_log_data', '__return_false' );
+		$this->haveRetrievedOrder();
+		$this->assertStringContainsString( 'Karlsson', $this->loggedText(), 'Fixture failed to turn masking off.' );
+
+		remove_filter( 'krokedil_wp_api_mask_log_data', '__return_false' );
+		$this->haveLoggingEnabled();
+		$this->haveRetrievedOrder();
+
+		$this->assertNotLogged( self::PERSONAL_DATA + [ base64_encode( 'mid:secret' ) => 'credentials' ] );
+	}
+
+	/**
+	 * The status report copy outlives the debugging session and is pasted into support
+	 * tickets, so an unmasked failure goes to the log file only.
+	 */
+	public function test_a_failed_request_is_not_stored_while_masking_is_off(): void {
+		add_filter( 'krokedil_wp_api_mask_log_data', '__return_false' );
+		$order        = $this->haveGatewayOrder();
+		$klarna_order = $this->kustomRetrievedOrder();
+
+		$this->willRejectWith( '/checkout/v3/orders/', 'Bad value: merchant_urls', 400 );
+		KCO_WC()->api->update_klarna_confirmation( $klarna_order['order_id'], $klarna_order, $order->get_id() );
+
+		$this->assertStringContainsString( 'Bad value: merchant_urls', $this->loggedText(), 'The failure was not logged to the file.' );
+		$this->assertSame( '', $this->storedLogText() );
+	}
+
+	private function haveRetrievedOrder(): void {
+		$this->makeRequest( 'retrieve' );
+	}
+
+	private function haveCancelledManagedOrder(): void {
+		$order = $this->haveCapturableGatewayOrder();
+
+		$this->willRetrieveManagedOrder( self::CUSTOMER );
+		$this->willCancel();
+
+		KCO_WC()->order_management->cancel_klarna_order( $order->get_id(), false );
+	}
+
+	private function haveCreatedRecurringOrder(): void {
+		$order = $this->haveGatewayOrder();
+
+		$this->willCreateRecurringOrder( 'customer-token-1' );
+		KCO_WC()->api->create_recurring_order( $order->get_id(), 'customer-token-1' );
+	}
+
+	private function haveLoggedPlainMessage(): void {
+		\KCO_Logger::log( 'Order 1 placed by karl@example.com, see /checkout/order-received/1/?key=wc_order_Kr90kxk5axFCS' );
+	}
+
 	/** Drives a request of the given kind, with the customer's details in Kustom's answer. */
 	private function makeRequest( string $request, array $overrides = [] ): void {
 		$answer = array_merge( self::CUSTOMER, $overrides );
