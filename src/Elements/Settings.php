@@ -71,6 +71,7 @@ class Settings {
 	public function __construct() {
 		add_filter( 'kco_wc_gateway_settings', array( $this, 'extend_settings' ) );
 		add_filter( 'woocommerce_generate_krokedil_subtitle_html', array( $this, 'generate_krokedil_subtitle_html' ), 10, 3 );
+		add_filter( 'woocommerce_generate_krokedil_elements_key_html', array( $this, 'generate_krokedil_elements_key_html' ), 10, 4 );
 		add_filter( 'woocommerce_settings_api_sanitized_fields_kco', array( $this, 'sanitize_public_api_keys' ) );
 	}
 
@@ -84,7 +85,7 @@ class Settings {
 			''   => __( 'Disabled', 'klarna-checkout-for-woocommerce' ),
 			'4'  => __( 'Above Title', 'klarna-checkout-for-woocommerce' ),
 			'7'  => __( 'Between Title and Price', 'klarna-checkout-for-woocommerce' ),
-			'15' => __( 'Between Price and Excerpt', 'klarna-checkout-for-woocommerce' ),
+			'15' => __( 'Between Price and Excerpt (recommended)', 'klarna-checkout-for-woocommerce' ),
 			'25' => __( 'Between Excerpt and Add to cart button', 'klarna-checkout-for-woocommerce' ),
 			'35' => __( 'Between Add to cart button and Product meta', 'klarna-checkout-for-woocommerce' ),
 			'45' => __( 'Between Product meta and Product sharing buttons', 'klarna-checkout-for-woocommerce' ),
@@ -104,7 +105,7 @@ class Settings {
 			'woocommerce_before_cart_totals'  => __( 'Above cart totals', 'klarna-checkout-for-woocommerce' ),
 			'woocommerce_proceed_to_checkout' => __( 'Between cart totals and proceed to checkout button', 'klarna-checkout-for-woocommerce' ),
 			'woocommerce_after_cart_totals'   => __( 'After proceed to checkout button', 'klarna-checkout-for-woocommerce' ),
-			'woocommerce_after_cart'          => __( 'Bottom of the page', 'klarna-checkout-for-woocommerce' ),
+			'woocommerce_after_cart'          => __( 'Bottom of the page (recommended)', 'klarna-checkout-for-woocommerce' ),
 		);
 	}
 
@@ -124,7 +125,7 @@ class Settings {
 
 		$settings['elements_live_public_api_key'] = array(
 			'title'             => __( 'Production public API key', 'klarna-checkout-for-woocommerce' ),
-			'type'              => 'text',
+			'type'              => 'krokedil_elements_key',
 			'description'       => sprintf(
 				// translators: %s: Kustom Portal link.
 				__( 'The public API keys used here are separate from the API Username and Password used for the payment integration above — find them in the %s under Elements → Installation script → data-public-api-key.', 'klarna-checkout-for-woocommerce' ),
@@ -139,7 +140,7 @@ class Settings {
 
 		$settings['elements_playground_public_api_key'] = array(
 			'title'             => __( 'Test public API key', 'klarna-checkout-for-woocommerce' ),
-			'type'              => 'text',
+			'type'              => 'krokedil_elements_key',
 			'description'       => __( 'Used when test mode is enabled.', 'klarna-checkout-for-woocommerce' ),
 			'default'           => '',
 			'custom_attributes' => array(
@@ -234,6 +235,8 @@ class Settings {
 			$settings[ $field ] = $value;
 		}
 
+		$this->validate_public_api_keys( $settings );
+
 		return $settings;
 	}
 
@@ -258,6 +261,81 @@ class Settings {
 				$label
 			)
 		);
+	}
+
+	/**
+	 * Verify the saved public API keys with Kustom, and show an admin error for keys that won't work on this site.
+	 *
+	 * @param array $settings The sanitized settings about to be saved.
+	 */
+	private function validate_public_api_keys( $settings ) {
+		foreach ( self::PUBLIC_API_KEY_FIELDS as $field ) {
+			$testmode = 'elements_playground_public_api_key' === $field;
+			$status   = KeyValidator::get_status( $settings[ $field ] ?? '', $testmode, true );
+
+			if ( KeyValidator::is_error( $status ) && class_exists( 'WC_Admin_Settings' ) ) {
+				\WC_Admin_Settings::add_error( KeyValidator::get_message( $status, $testmode ) );
+			}
+		}
+	}
+
+	/**
+	 * Render a public API key field: a regular text input, with the key's connection status below it.
+	 *
+	 * @param string                $html    The default field HTML (empty).
+	 * @param string                $key     The field key.
+	 * @param array                 $data    The field arguments.
+	 * @param \WC_Settings_API|null $gateway The settings instance rendering the field.
+	 * @return string
+	 */
+	public function generate_krokedil_elements_key_html( $html, $key, $data, $gateway = null ) {
+		if ( ! $gateway instanceof \WC_Settings_API ) {
+			return $html;
+		}
+
+		// Read from the gateway, since it holds the just saved values when the page renders after a save.
+		$testmode = 'elements_playground_public_api_key' === $key;
+		$status   = KeyValidator::get_status( $gateway->get_option( $key, '' ), $testmode );
+
+		if ( KeyValidator::STATUS_OK === $status ) {
+			$state = 'success';
+		} elseif ( KeyValidator::is_error( $status ) ) {
+			$state = 'error';
+		} elseif ( KeyValidator::STATUS_UNKNOWN === $status ) {
+			$state = 'warning';
+		} else {
+			// A missing key is only a problem when the elements are set to display in this environment.
+			$is_active = wc_string_to_bool( $gateway->get_option( 'testmode', 'no' ) ) === $testmode;
+			$state     = $is_active && $this->has_placements( $gateway ) ? 'error' : 'neutral';
+		}
+
+		$badge = sprintf(
+			'<span class="kco-elements-key-status kco-elements-key-status--%1$s">%2$s</span>',
+			esc_attr( $state ),
+			esc_html( KeyValidator::get_message( $status, $testmode ) )
+		);
+
+		// Show the status directly below the input, above the field description.
+		$data['type']        = 'text';
+		$data['description'] = $badge . ( $data['description'] ?? '' );
+
+		return $gateway->generate_text_html( $key, $data );
+	}
+
+	/**
+	 * Whether any product or cart page placement is enabled.
+	 *
+	 * @param \WC_Settings_API $gateway The settings instance.
+	 * @return bool
+	 */
+	private function has_placements( $gateway ) {
+		foreach ( array( 'elements_payment_product_position', 'elements_payment_cart_position', 'elements_shipping_product_position', 'elements_shipping_cart_position' ) as $option ) {
+			if ( ! empty( $gateway->get_option( $option, '' ) ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

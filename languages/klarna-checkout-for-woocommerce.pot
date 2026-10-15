@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-09-09 12:53+0000\n"
+"POT-Creation-Date: 2026-10-01 16:28+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -17,19 +17,19 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:161, ../klarna-checkout-for-woocommerce.php:171
+#: ../klarna-checkout-for-woocommerce.php:169, ../klarna-checkout-for-woocommerce.php:179
 msgid "Nope"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:217
+#: ../klarna-checkout-for-woocommerce.php:225
 msgid "Settings"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:218
+#: ../klarna-checkout-for-woocommerce.php:226
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:439, ../klarna-checkout-for-woocommerce.php:449
+#: ../klarna-checkout-for-woocommerce.php:448, ../klarna-checkout-for-woocommerce.php:458
 msgid "Your installation of Kustom Checkout for WooCommerce is not complete. If you installed this plugin directly from Github please refer to the README.DEV.md file in the plugin."
 msgstr ""
 
@@ -502,27 +502,27 @@ msgid "Recurring token for subscription: %s"
 msgstr ""
 
 #. translators: Error message.
-#: ../classes/class-kco-subscription.php:476
+#: ../classes/class-kco-subscription.php:483
 msgid "Subscription payment failed with Kustom. Message: %1$s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:469
+#: ../classes/class-kco-subscription.php:472
 msgid "Subscription payment made with Kustom. Kustom order id: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:583
+#: ../classes/class-kco-subscription.php:624
 msgid "Kustom recurring token"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:638
+#: ../classes/class-kco-subscription.php:679
 msgid "Could not retrieve new Kustom recurring token for subscription when customer changed payment method. Read the log for detailed information."
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:632
+#: ../classes/class-kco-subscription.php:673
 msgid "Payment method changed via Kustom Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:659
+#: ../classes/class-kco-subscription.php:700
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -618,12 +618,174 @@ msgstr ""
 msgid "Customer redirected to Kustom Hosted Payment Page."
 msgstr ""
 
-#: ../src/Migrations/CredentialsMigration.php:164
-msgid "Kustom Checkout for WooCommerce has been updated to use a single set of credentials for all regions. It looks like you had credentials configured for both Europe and the United States. Since your store is not based in the US, we defaulted to the credentials previously entered for Europe. Your other credentials are still stored in the database, and will be available again if you roll back to a previous version."
+#: ../src/Elements/Block.php:124
+msgid "Add a Kustom Elements public API key in the Kustom Checkout settings to display this element."
 msgstr ""
 
-#: ../src/Migrations/CredentialsMigration.php:162
-msgid "Kustom Checkout for WooCommerce has been updated to use a single set of credentials for all regions. It looks like you had credentials configured for both Europe and the United States. Since your store is based in the US, we defaulted to the credentials previously entered for the US. Your other credentials are still stored in the database, and will be available again if you roll back to a previous version."
+#: ../src/Elements/KeyValidator.php:110, ../src/Elements/Settings.php:255
+msgid "test"
+msgstr ""
+
+#: ../src/Elements/KeyValidator.php:111, ../src/Elements/Settings.php:254
+msgid "production"
+msgstr ""
+
+#. translators: %s: The site domain, e.g. https://example.com.
+#: ../src/Elements/KeyValidator.php:116
+msgid "Connected. Kustom Elements is allowed on %s."
+msgstr ""
+
+#: ../src/Elements/KeyValidator.php:118
+msgid "Not configured. Add a public API key to use Kustom Elements."
+msgstr ""
+
+#. translators: %s: The environment (production or test).
+#: ../src/Elements/KeyValidator.php:122
+msgid "The %s public API key was not recognized by Kustom. Copy the data-public-api-key from Elements → Installation script in the Kustom Portal."
+msgstr ""
+
+#. translators: 1: The environment (production or test), 2: The site domain, e.g. https://example.com.
+#: ../src/Elements/KeyValidator.php:128
+msgid "The %1$s public API key is valid, but %2$s is not an allowed domain. Add the domain under Elements in the Kustom Portal."
+msgstr ""
+
+#: ../src/Elements/KeyValidator.php:133
+msgid "The public API key could not be verified right now. Kustom Elements may still work, the check will be retried later."
+msgstr ""
+
+#: ../src/Elements/Settings.php:85, ../src/Elements/Settings.php:103
+msgid "Disabled"
+msgstr ""
+
+#: ../src/Elements/Settings.php:86
+msgid "Above Title"
+msgstr ""
+
+#: ../src/Elements/Settings.php:87
+msgid "Between Title and Price"
+msgstr ""
+
+#: ../src/Elements/Settings.php:88
+msgid "Between Price and Excerpt (recommended)"
+msgstr ""
+
+#: ../src/Elements/Settings.php:89
+msgid "Between Excerpt and Add to cart button"
+msgstr ""
+
+#: ../src/Elements/Settings.php:90
+msgid "Between Add to cart button and Product meta"
+msgstr ""
+
+#: ../src/Elements/Settings.php:91
+msgid "Between Product meta and Product sharing buttons"
+msgstr ""
+
+#: ../src/Elements/Settings.php:92
+msgid "After Product sharing buttons"
+msgstr ""
+
+#: ../src/Elements/Settings.php:104
+msgid "Above cross-sell"
+msgstr ""
+
+#: ../src/Elements/Settings.php:105
+msgid "Above cart totals"
+msgstr ""
+
+#: ../src/Elements/Settings.php:106
+msgid "Between cart totals and proceed to checkout button"
+msgstr ""
+
+#: ../src/Elements/Settings.php:107
+msgid "After proceed to checkout button"
+msgstr ""
+
+#: ../src/Elements/Settings.php:108
+msgid "Bottom of the page (recommended)"
+msgstr ""
+
+#: ../src/Elements/Settings.php:120
+msgid "Elements"
+msgstr ""
+
+#: ../src/Elements/Settings.php:123
+msgid "Display Kustom payment methods and delivery options on your store pages with Kustom Elements."
+msgstr ""
+
+#: ../src/Elements/Settings.php:127
+msgid "Production public API key"
+msgstr ""
+
+#. translators: %s: Kustom Portal link.
+#: ../src/Elements/Settings.php:131
+msgid "The public API keys used here are separate from the API Username and Password used for the payment integration above — find them in the %s under Elements → Installation script → data-public-api-key."
+msgstr ""
+
+#: ../src/Elements/Settings.php:132
+msgid "Kustom Portal"
+msgstr ""
+
+#: ../src/Elements/Settings.php:134
+msgid "The public API key used for Kustom Elements when test mode is disabled."
+msgstr ""
+
+#: ../src/Elements/Settings.php:142
+msgid "Test public API key"
+msgstr ""
+
+#: ../src/Elements/Settings.php:144
+msgid "Used when test mode is enabled."
+msgstr ""
+
+#: ../src/Elements/Settings.php:152
+msgid "Payment Method Display"
+msgstr ""
+
+#: ../src/Elements/Settings.php:154
+msgid "Presents the available Kustom payment methods on your store pages. You can also display it with the shortcode [kustom_payment_element] or block Kustom Payment Element."
+msgstr ""
+
+#: ../src/Elements/Settings.php:157
+msgid "Payment Method Display placement on product pages"
+msgstr ""
+
+#: ../src/Elements/Settings.php:158
+msgid "Payment Method Display placement on cart page"
+msgstr ""
+
+#: ../src/Elements/Settings.php:161
+msgid "Delivery Method Display"
+msgstr ""
+
+#: ../src/Elements/Settings.php:163
+msgid "Presents the available delivery options on your store pages. Requires Kustom Shipping Assistant (KSA) to be active and configured. You can also display it with the shortcode [kustom_delivery_element] or block Kustom Delivery Element."
+msgstr ""
+
+#: ../src/Elements/Settings.php:166
+msgid "Delivery Method Display placement on product pages"
+msgstr ""
+
+#: ../src/Elements/Settings.php:167
+msgid "Delivery Method Display placement on cart page"
+msgstr ""
+
+#. translators: %s: The product page hook name.
+#: ../src/Elements/Settings.php:189
+msgid "Where on the product page the element is displayed. Uses the %s hook."
+msgstr ""
+
+#: ../src/Elements/Settings.php:205
+msgid "Where on the cart page the element is displayed. Each option uses a WooCommerce cart hook, from woocommerce_cart_collaterals (top) to woocommerce_after_cart (bottom)."
+msgstr ""
+
+#. translators: %s: The environment (production or test).
+#: ../src/Elements/Settings.php:260
+msgid "The %s public API key for Kustom Elements is invalid and has been cleared. Use the data-public-api-key from the Elements installation script in the Kustom Portal, not the API Username or Password."
+msgstr ""
+
+#: ../src/Migrations/CredentialsMigration.php:158
+msgid "Kustom Checkout for WooCommerce has been updated to use a single set of credentials for all regions. It looks like you had credentials configured for both Europe and the United States. We've defaulted to the credentials previously entered for Europe. Your other credentials are still stored in the database, and will be available again if you roll back to a previous version."
 msgstr ""
 
 #: ../src/OrderManagement/MetaBox.php:109
