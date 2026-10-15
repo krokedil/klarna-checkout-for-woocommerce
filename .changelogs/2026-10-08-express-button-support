@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Added support for adding Kustom express buttons to the cart, the block cart and checkout, product pages, and a new shortcode and block.

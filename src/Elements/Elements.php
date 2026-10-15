@@ -1,6 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\Elements;
 
+use Krokedil\KustomCheckout\Express\Express;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -142,20 +143,23 @@ class Elements {
 		if ( $post instanceof \WP_Post
 			&& ( has_shortcode( $post->post_content, 'kustom_payment_element' )
 				|| has_shortcode( $post->post_content, 'kustom_delivery_element' )
+				|| has_shortcode( $post->post_content, 'kustom_express_element' )
 				|| has_block( Block::PAYMENT_BLOCK, $post )
-				|| has_block( Block::DELIVERY_BLOCK, $post ) )
+				|| has_block( Block::DELIVERY_BLOCK, $post )
+				|| has_block( Block::EXPRESS_BLOCK, $post ) )
 		) {
 			return true;
 		}
 
 		if ( is_product()
-			&& ( SettingsUtility::get_setting( 'elements_payment_product_position', '' ) || SettingsUtility::get_setting( 'elements_shipping_product_position', '' ) )
+			&& ( SettingsUtility::get_setting( 'elements_payment_product_position', '' ) || SettingsUtility::get_setting( 'elements_shipping_product_position', '' ) || Express::is_product_express_enabled() )
 		) {
 			return true;
 		}
 
+		// The cart always has an express placement: the classic cart hook, or the block cart's express area.
 		if ( is_cart()
-			&& ( SettingsUtility::get_setting( 'elements_payment_cart_position', '' ) || SettingsUtility::get_setting( 'elements_shipping_cart_position', '' ) )
+			&& ( SettingsUtility::get_setting( 'elements_payment_cart_position', '' ) || SettingsUtility::get_setting( 'elements_shipping_cart_position', '' ) || Express::is_available() )
 		) {
 			return true;
 		}
@@ -175,6 +179,17 @@ class Elements {
 
 		$this->public_api_key = $public_api_key;
 
+		wp_register_script( self::SCRIPT_HANDLE, self::get_script_src(), array(), KCO_WC_VERSION, false );
+		add_filter( 'script_loader_tag', array( $this, 'add_script_attributes' ), 10, 2 );
+		wp_add_inline_script( self::SCRIPT_HANDLE, $this->get_init_script(), 'after' );
+	}
+
+	/**
+	 * The Kustom Elements SDK script URL for the current environment.
+	 *
+	 * @return string
+	 */
+	public static function get_script_src() {
 		$testmode    = SettingsUtility::is_testmode();
 		$default_src = $testmode
 			? 'https://js.playground.kustom.co/kustom-elements/v1/pre-load.js'
@@ -186,11 +201,7 @@ class Elements {
 		 * @param string $default_src The default script URL for the current environment.
 		 * @param bool   $testmode    Whether test mode is enabled.
 		 */
-		$src = apply_filters( 'kco_elements_script_src', $default_src, $testmode );
-
-		wp_register_script( self::SCRIPT_HANDLE, $src, array(), KCO_WC_VERSION, false );
-		add_filter( 'script_loader_tag', array( $this, 'add_script_attributes' ), 10, 2 );
-		wp_add_inline_script( self::SCRIPT_HANDLE, $this->get_init_script(), 'after' );
+		return apply_filters( 'kco_elements_script_src', $default_src, $testmode );
 	}
 
 	/**

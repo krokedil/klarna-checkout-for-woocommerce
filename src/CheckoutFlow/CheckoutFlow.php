@@ -2,6 +2,7 @@
 namespace Krokedil\KustomCheckout\CheckoutFlow;
 
 use Exception;
+use Krokedil\KustomCheckout\Express\Express;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
@@ -54,8 +55,11 @@ abstract class CheckoutFlow {
 			return new RedirectFlow();
 		}
 
+		// Express orders are always placed through the Store API, like the block checkout. It puts the payment data in $_POST.
+		$is_express = WC()->is_store_api_request() && ! empty( $_POST[ Express::ORDER_META ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Only checks presence, set by OrderValidation.
+
 		// If the checkout block is enabled, use the embedded block flow no matter the setting.
-		if ( $blocks_enabled ) {
+		if ( $blocks_enabled || $is_express ) {
 			return new EmbeddedBlockFlow();
 		}
 
