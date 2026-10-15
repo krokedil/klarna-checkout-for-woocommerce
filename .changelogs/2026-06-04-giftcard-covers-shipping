@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where a gift card that covered the shipping cost was not fully applied when shipping is shown in the Kustom iframe.
