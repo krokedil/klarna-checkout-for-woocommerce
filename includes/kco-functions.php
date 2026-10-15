@@ -582,6 +582,11 @@ function kco_print_error_message( $wp_error ) {
 		return;
 	}
 
+	// A REST response is JSON, and the request logger already has the error.
+	if ( WC()->is_rest_api_request() ) {
+		return;
+	}
+
 	if ( is_ajax() ) {
 		wc_add_notice( $wp_error->get_error_message(), 'error' );
 	} else {
