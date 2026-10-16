@@ -315,7 +315,7 @@ class KCO_Confirmation {
 	/**
 	 * Get the option name of the confirmation lock for an order.
 	 *
-	 * @param int    $order_id The WooCommerce order id.
+	 * @param int $order_id The WooCommerce order id.
 	 *
 	 * @return string
 	 */
