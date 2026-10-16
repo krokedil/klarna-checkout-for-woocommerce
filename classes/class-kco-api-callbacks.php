@@ -19,7 +19,7 @@ class KCO_API_Callbacks {
 	/**
 	 * The reference the *Singleton* instance of this class.
 	 *
-	 * @var $instance
+	 * @var KCO_API_Callbacks
 	 */
 	private static $instance;
 

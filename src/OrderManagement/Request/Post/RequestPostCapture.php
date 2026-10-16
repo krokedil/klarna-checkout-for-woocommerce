@@ -1,7 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request\Post;
 
-use Krokedil\KustomCheckout\OrderManagement;
+use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 use Krokedil\KustomCheckout\OrderManagement\OrderLines;
 use Krokedil\KustomCheckout\OrderManagement\Request\RequestPost;
 

@@ -117,7 +117,7 @@ class KCO_Request_Cart {
 	/**
 	 * Gets order amount for Kustom API.
 	 *
-	 * @return int
+	 * @return float
 	 */
 	public function get_order_amount() {
 		$settings     = get_option( 'woocommerce_kco_settings' );
@@ -137,7 +137,7 @@ class KCO_Request_Cart {
 	/**
 	 * Gets order amount for Kustom API.
 	 *
-	 * @return int
+	 * @return float
 	 */
 	public function get_order_lines_total_amount() {
 		$total_amount = 0;
@@ -418,7 +418,7 @@ class KCO_Request_Cart {
 	 *
 	 * @param  array      $cart_item Cart item.
 	 * @param  WC_Product $product WooCommerce product.
-	 * @return integer $item_tax_amount Item tax amount.
+	 * @return float $item_tax_amount Item tax amount.
 	 */
 	public function get_item_tax_amount( $cart_item, $product ) {
 		if ( $this->separate_sales_tax ) {
@@ -440,7 +440,7 @@ class KCO_Request_Cart {
 	 *
 	 * @param  array  $cart_item Cart item.
 	 * @param  object $product   Product object.
-	 * @return integer $item_tax_rate Item tax percentage formatted for Kustom
+	 * @return float $item_tax_rate Item tax percentage formatted for Kustom
 	 */
 	public function get_item_tax_rate( $cart_item, $product ) {
 		if ( $product->is_taxable() && $cart_item['line_subtotal_tax'] > 0 ) {
@@ -522,7 +522,7 @@ class KCO_Request_Cart {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @return integer $item_discount_amount Cart item discount.
+	 * @return float $item_discount_amount Cart item discount.
 	 */
 	public function get_item_discount_amount() {
 
@@ -578,7 +578,7 @@ class KCO_Request_Cart {
 	 * @access public
 	 *
 	 * @param  array $cart_item Cart item.
-	 * @return integer $item_discount_rate Cart item discount rate.
+	 * @return float $item_discount_rate Cart item discount rate.
 	 */
 	public function get_item_discount_rate( $cart_item ) {
 		$item_discount_rate = ( 1 - ( $cart_item['line_total'] / $cart_item['line_subtotal'] ) ) * 100 * 100;

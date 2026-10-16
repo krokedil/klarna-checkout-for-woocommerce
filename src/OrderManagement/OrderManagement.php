@@ -217,7 +217,7 @@ class OrderManagement {
 
 			// If the order was not paid using the plugin that instanced this class, bail.
 			if ( 'kco' !== $order->get_payment_method() ) {
-				return;
+				return null;
 			}
 
 			// The merchant manages orders outside of WooCommerce.
@@ -297,7 +297,7 @@ class OrderManagement {
 
 		// If the order was not paid using the plugin that instanced this class, bail.
 		if ( 'kco' !== $order->get_payment_method() ) {
-			return;
+			return null;
 		}
 
 		// Are we on the subscription page?
@@ -409,7 +409,7 @@ class OrderManagement {
 
 		// If the order was not paid using the plugin that instanced this class, bail.
 		if ( 'kco' !== $order->get_payment_method() ) {
-			return;
+			return null;
 		}
 
 		if ( ! isset( $options['kom_auto_capture'] ) || 'yes' === $options['kom_auto_capture'] || $action ) {

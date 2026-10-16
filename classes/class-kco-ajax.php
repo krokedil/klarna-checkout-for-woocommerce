@@ -13,8 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * KCO_AJAX class.
  *
  * Registers AJAX actions for Kustom Checkout for WooCommerce.
- *
- * @extends WC_AJAX
  */
 class KCO_AJAX extends WC_AJAX {
 

@@ -18,8 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( class_exists( 'WC_Payment_Gateway' ) ) {
 	/**
 	 * KCO_Gateway class.
-	 *
-	 * @extends WC_Payment_Gateway
 	 */
 	class KCO_Gateway extends WC_Payment_Gateway {
 
@@ -38,7 +36,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		/**
 		 * Whether to show shipping methods in the iframe or not.
 		 *
-		 * @var bool $shipping_methods_in_iframe
+		 * @var bool|string $shipping_methods_in_iframe
 		 */
 		public $shipping_methods_in_iframe = false;
 

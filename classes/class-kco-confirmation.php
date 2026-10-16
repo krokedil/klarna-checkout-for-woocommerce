@@ -22,7 +22,7 @@ class KCO_Confirmation {
 	/**
 	 * The reference the *Singleton* instance of this class.
 	 *
-	 * @var $instance
+	 * @var KCO_Confirmation
 	 */
 	protected static $instance;
 
@@ -36,7 +36,7 @@ class KCO_Confirmation {
 	/**
 	 * Returns the *Singleton* instance of this class.
 	 *
-	 * @return self::$instance The *Singleton* instance.
+	 * @return KCO_Confirmation The *Singleton* instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -239,7 +239,7 @@ class KCO_Confirmation {
 	 * Lock a WooCommerce order to prevent multiple simultaneous confirmations.
 	 *
 	 * @param string $kco_id The KCO order id. Unused, the lock is per WooCommerce order.
-	 * @param string $order_id The WooCommerce order id.
+	 * @param int    $order_id The WooCommerce order id.
 	 *
 	 * @return bool True if the lock was successful, false if the order is already locked.
 	 */
@@ -288,7 +288,7 @@ class KCO_Confirmation {
 	 * Unlock a WooCommerce order after the confirmation process is done.
 	 *
 	 * @param string $kco_id The KCO order id. Unused, the lock is per WooCommerce order.
-	 * @param string $order_id The WooCommerce order id.
+	 * @param int    $order_id The WooCommerce order id.
 	 *
 	 * @return void
 	 */
@@ -315,7 +315,7 @@ class KCO_Confirmation {
 	/**
 	 * Get the option name of the confirmation lock for an order.
 	 *
-	 * @param string $order_id The WooCommerce order id.
+	 * @param int $order_id The WooCommerce order id.
 	 *
 	 * @return string
 	 */
