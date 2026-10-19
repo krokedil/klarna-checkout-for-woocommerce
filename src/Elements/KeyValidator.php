@@ -114,8 +114,6 @@ class KeyValidator {
 			case self::STATUS_OK:
 				// translators: %s: The site domain, e.g. https://example.com.
 				return sprintf( __( 'Connected. Kustom Elements is allowed on %s.', 'klarna-checkout-for-woocommerce' ), self::get_origin() );
-			case self::STATUS_MISSING:
-				return __( 'Not configured. Add a public API key to use Kustom Elements.', 'klarna-checkout-for-woocommerce' );
 			case self::STATUS_INVALID_KEY:
 				return sprintf(
 					// translators: %s: The environment (production or test).

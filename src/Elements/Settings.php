@@ -297,16 +297,18 @@ class Settings {
 		$testmode = 'elements_playground_public_api_key' === $key;
 		$status   = KeyValidator::get_status( $gateway->get_option( $key, '' ), $testmode );
 
+		// Like the other API key fields, an empty key gets no status.
+		$data['type'] = 'text';
+		if ( KeyValidator::STATUS_MISSING === $status ) {
+			return $gateway->generate_text_html( $key, $data );
+		}
+
 		if ( KeyValidator::STATUS_OK === $status ) {
 			$state = 'success';
 		} elseif ( KeyValidator::is_error( $status ) ) {
 			$state = 'error';
-		} elseif ( KeyValidator::STATUS_UNKNOWN === $status ) {
-			$state = 'warning';
 		} else {
-			// A missing key is only a problem when the elements are set to display in this environment.
-			$is_active = wc_string_to_bool( $gateway->get_option( 'testmode', 'no' ) ) === $testmode;
-			$state     = $is_active && $this->has_placements( $gateway ) ? 'error' : 'neutral';
+			$state = 'warning';
 		}
 
 		$badge = sprintf(
@@ -316,26 +318,9 @@ class Settings {
 		);
 
 		// Show the status directly below the input, above the field description.
-		$data['type']        = 'text';
 		$data['description'] = $badge . ( $data['description'] ?? '' );
 
 		return $gateway->generate_text_html( $key, $data );
-	}
-
-	/**
-	 * Whether any product or cart page placement is enabled.
-	 *
-	 * @param \WC_Settings_API $gateway The settings instance.
-	 * @return bool
-	 */
-	private function has_placements( $gateway ) {
-		foreach ( array( 'elements_payment_product_position', 'elements_payment_cart_position', 'elements_shipping_product_position', 'elements_shipping_cart_position' ) as $option ) {
-			if ( ! empty( $gateway->get_option( $option, '' ) ) ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
