@@ -331,7 +331,9 @@ order that came out. `OrderManagementCest.php` picks the order up from there and
 manages it from wp-admin. `TunnelCest.php` covers neither, and guards the one thing
 both depend on: a browser that arrives through the tunnel lands on the local site.
 `ActivationCest.php` is the smoke test: the plugin deactivates and reactivates
-cleanly from the plugins screen.
+cleanly from the plugins screen. `PushCallbackCest.php` sends Kustom's push
+notification to the site, which only a real request can reach, and checks that
+it takes and releases the confirmation lock.
 
 > **Not finished yet.** The iframe half of a purchase is missing.
 > `CanDriveE2ECheckout` carries the WooCommerce-side steps and waits for
@@ -678,6 +680,8 @@ it. The gate is a backstop for mistakes, not the control.
 | `tests/_mu-plugins/05-kustom-test-admin-password.php` | Resets the admin password from `WORDPRESS_ADMIN_PASSWORD`. |
 | `tests/_mu-plugins/06-admin-screens-offline.php` | Drops the wp-admin requests that never answer here. |
 | `tests/_mu-plugins/08-login-no-autofocus.php` | Stops wp-login.php from clearing the password the driver typed. |
+| `tests/_mu-plugins/09-kustom-push-lock.php` | Turns the confirmation lock on and records the push's Kustom lookups instead of sending them, when `PushCallbackCest` asks. |
+| `tests/_mu-plugins/10-wordpress-options-unique-name.php` | Creates the `option_name` unique index SQLite drops, which the confirmation lock relies on. |
 | `tests/_support_scripts/install-test-env.php` | Idempotent WP scaffold, runs on `composer install`. |
 | `tests/_support_scripts/regenerate-dump.sh` | Rebuilds `dump.sql` from a clean install. |
 | `tests/_support_scripts/strip-actionscheduler-inserts.php` | Strips Action Scheduler data rows from the dump, whose serialized payloads SQLite cannot round-trip. |

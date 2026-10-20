@@ -7,7 +7,7 @@ Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 9.7.0
 WC tested up to: 11.2.1
-Stable tag: 2.23.0
+Stable tag: 2.23.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,12 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-10-20    - version 2.23.1 =
+* Fix           - Fixed an issue where the confirmation lock enabled by the "kco_wc_lock_confirmation" filter did not prevent duplicate order confirmations on stores using an object cache such as LiteSpeed Cache. The lock now also covers the push notification from Kustom.
+* Fix           - Fixed the krokedil_wp_api_mask_log_data filter not turning off log masking. Returning false from it now logs every entry unmasked, for debugging only. Failed requests are not saved to the system status report while it is off.
+* Fix           - Fixed a PHP warning about an undefined array key "id" when placing an order with Kustom Shipping Assistant.
+* Fix           - Fixed PHP warnings and a false "order total does not match" note when Kustom's order management could not return the order during confirmation. The order is now set to on-hold to wait for Kustom's push notification, as intended.
+
 = 2026-10-13    - version 2.23.0 =
 * Feature       - Added an "Enable Kustom Shipping Assistant" setting that lets a TMS control shipping methods and pricing in the Kustom iframe. It is on by default only for stores already using the Kustom Shipping Assistant shipping method. The separate Kustom Shipping Assistant plugin is no longer needed and should be deactivated.
 * Feature       - Added the setting "Display on free orders" to show Kustom Checkout when the order total is 0. It replaces the need for the "kco_check_if_needs_payment" filter, which still takes priority over the setting.

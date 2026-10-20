@@ -3,6 +3,7 @@ namespace Krokedil\KustomCheckout\Logging;
 
 use KrokedilKlarnaCheckoutDeps\Krokedil\WpApi\FieldMasker;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WpApi\KeyMasker;
+use KrokedilKlarnaCheckoutDeps\Krokedil\WpApi\Masking;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -13,6 +14,11 @@ defined( 'ABSPATH' ) || exit;
  * API schemas, and match exactly, so a setting such as options.phone_mandatory stays readable.
  */
 class LogMasking {
+	/**
+	 * The slug the plugin logs under, which the krokedil_wp_api_mask_log_data filter receives.
+	 */
+	const SLUG = 'kustom-checkout-for-woocommerce';
+
 	/**
 	 * The address fields kept readable, since a rejected address is the most common thing a
 	 * support case is about. The last two are the WooCommerce Store API spelling.
@@ -78,6 +84,15 @@ class LogMasking {
 	);
 
 	/**
+	 * Whether log data is masked, which the krokedil_wp_api_mask_log_data filter can turn off.
+	 *
+	 * @return bool
+	 */
+	public static function is_enabled() {
+		return Masking::is_enabled( self::SLUG );
+	}
+
+	/**
 	 * The rules for a Kustom request or response body.
 	 *
 	 * @return array
@@ -114,6 +129,10 @@ class LogMasking {
 	 * @return array|string The masked args, or the failure marker.
 	 */
 	public static function mask_request( $request_args ) {
+		if ( ! self::is_enabled() ) {
+			return $request_args;
+		}
+
 		try {
 			if ( isset( $request_args['body'] ) && is_string( $request_args['body'] ) ) {
 				$decoded              = json_decode( $request_args['body'], true );
@@ -137,7 +156,7 @@ class LogMasking {
 	 * @return mixed The masked body, or the failure marker.
 	 */
 	public static function mask_response( $body ) {
-		if ( empty( $body ) || ! is_array( $body ) ) {
+		if ( empty( $body ) || ! is_array( $body ) || ! self::is_enabled() ) {
 			return $body;
 		}
 
@@ -156,7 +175,7 @@ class LogMasking {
 	 * @return string|null
 	 */
 	public static function mask_request_url( $request_url ) {
-		if ( ! is_string( $request_url ) ) {
+		if ( ! is_string( $request_url ) || ! self::is_enabled() ) {
 			return $request_url;
 		}
 
@@ -171,6 +190,10 @@ class LogMasking {
 	 * @return mixed The masked entry, or the failure marker.
 	 */
 	public static function mask_entry( $entry ) {
+		if ( ! self::is_enabled() ) {
+			return $entry;
+		}
+
 		// A failure here costs the entry, it never lets an unmasked one through.
 		try {
 			if ( is_array( $entry ) ) {

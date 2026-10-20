@@ -86,7 +86,7 @@ class Checkout {
 	 */
 	public function add_shipping_details_to_order( $order_id, $klarna_order ) {
 		if ( isset( $klarna_order['selected_shipping_option'] ) ) {
-			$kco_id = $klarna_order['id'];
+			$kco_id = $klarna_order['order_id'] ?? '';
 			$order  = wc_get_order( $order_id );
 
 			$shipping_details = $klarna_order['selected_shipping_option'];
