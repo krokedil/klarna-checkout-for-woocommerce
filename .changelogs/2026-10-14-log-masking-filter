@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: yes
-
-Fixed the krokedil_wp_api_mask_log_data filter not turning off log masking. Returning false from it now logs every entry unmasked, for debugging only. Failed requests are not saved to the system status report while it is off.
