@@ -103,7 +103,7 @@ class KCO_API_Callbacks {
 					KCO_WC()->api->get_klarna_om_order( $klarna_order_id )
 				);
 
-				if ( is_wp_error( $klarna_order ) ) {
+				if ( empty( $klarna_order ) || is_wp_error( $klarna_order ) ) {
 					KCO_WC()->logger->log( '[PUSH CALLBACK]: ERROR Push callback failed to get Kustom order data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 					return;
 				}
