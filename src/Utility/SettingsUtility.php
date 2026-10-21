@@ -57,6 +57,23 @@ class SettingsUtility {
 	}
 
 	/**
+	 * Check if Kustom Checkout should only be used when the cart or order needs payment.
+	 *
+	 * @return bool False if Kustom Checkout should be displayed on free orders.
+	 */
+	public static function check_if_needs_payment() {
+		$display_on_free_orders = wc_string_to_bool( self::get_setting( 'display_on_free_orders', 'no' ) );
+
+		/**
+		 * Filters whether Kustom Checkout should only be used when the cart or order needs payment.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#display-kustom-checkout-even-on-free-orders Display Kustom Checkout even on free orders
+		 * @param bool $check_if_needs_payment Whether to check if payment is needed. Defaults to the inverse of the "Display on free orders" setting.
+		 */
+		return apply_filters( 'kco_check_if_needs_payment', ! $display_on_free_orders );
+	}
+
+	/**
 	 * Get the default values for the settings.
 	 *
 	 * @return array

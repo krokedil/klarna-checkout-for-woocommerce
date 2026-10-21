@@ -19,25 +19,55 @@ $settings = get_option( 'woocommerce_kco_settings' );
 ?>
 
 <form name="checkout" class="checkout woocommerce-checkout kco-checkout">
-<?php do_action( 'kco_wc_before_wrapper' ); ?>
+<?php
+/**
+ * Fires before the Kustom Checkout wrapper.
+ */
+do_action( 'kco_wc_before_wrapper' );
+?>
 	<div id="kco-wrapper">
 		<div id="kco-order-review">
-			<?php do_action( 'kco_wc_before_order_review' ); ?>
+			<?php
+			/**
+			 * Fires before the order review in the Kustom Checkout page.
+			 */
+			do_action( 'kco_wc_before_order_review' );
+			?>
 			<?php
 			if ( ! isset( $settings['show_subtotal_detail'] ) || in_array( $settings['show_subtotal_detail'], array( 'woo', 'both' ), true ) ) {
 				woocommerce_order_review();
 			}
 			?>
-			<?php do_action( 'kco_wc_after_order_review' ); ?>
+			<?php
+			/**
+			 * Fires after the order review in the Kustom Checkout page.
+			 */
+			do_action( 'kco_wc_after_order_review' );
+			?>
 		</div>
 
 		<div id="kco-iframe">
-			<?php do_action( 'kco_wc_before_snippet' ); ?>
+			<?php
+			/**
+			 * Fires before the Kustom Checkout iframe snippet.
+			 */
+			do_action( 'kco_wc_before_snippet' );
+			?>
 			<?php kco_wc_show_snippet(); ?>
-			<?php do_action( 'kco_wc_after_snippet' ); ?>
+			<?php
+			/**
+			 * Fires after the Kustom Checkout iframe snippet.
+			 */
+			do_action( 'kco_wc_after_snippet' );
+			?>
 		</div>
 	</div>
-	<?php do_action( 'kco_wc_after_wrapper' ); ?>
+	<?php
+	/**
+	 * Fires after the Kustom Checkout wrapper.
+	 */
+	do_action( 'kco_wc_after_wrapper' );
+	?>
 </form>
 
 <?php do_action( 'woocommerce_after_checkout_form', WC()->checkout() ); ?>

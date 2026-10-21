@@ -20,6 +20,17 @@ class CallbacksTest extends IntegrationTestCase {
 
 	protected ?string $storeProfile = 'se';
 
+	/** What wp_using_ext_object_cache() was before a test changed it. */
+	private ?bool $usingObjectCache = null;
+
+	protected function tearDown(): void {
+		if ( null !== $this->usingObjectCache ) {
+			wp_using_ext_object_cache( $this->usingObjectCache );
+		}
+
+		parent::tearDown();
+	}
+
 	/**
 	 * What the fraud verdict does to the order.
 	 *
@@ -90,6 +101,57 @@ class CallbacksTest extends IntegrationTestCase {
 		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
 
 		$this->assertSame( [ $order->get_id() ], $fired );
+	}
+
+	public function test_a_confirmed_order_already_knows_whether_it_can_be_upsold(): void {
+		$order = $this->haveOrderAwaitingConfirmation();
+
+		$this->willRetrieveManagedOrder(
+			[
+				'order_amount'           => 12500,
+				'order_lines'            => $this->orderLinesFor( $order ),
+				'initial_payment_method' => [ 'type' => 'INVOICE' ],
+				'billing_address'        => [ 'country' => 'SE' ],
+			]
+		);
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertTrue( ( new \KCO_Gateway() )->upsell_available( $order->get_id() ) );
+		$lookups = array_filter(
+			$this->gatewayRequests(),
+			static function ( $request ) {
+				return str_ends_with( $request['url'], '/orders/kustom-order-123' );
+			}
+		);
+		$this->assertCount( 1, $lookups, 'Post Purchase Upsell asks right after the confirmation, which already had the answer.' );
+	}
+
+	/**
+	 * Only the order management order carries the id, the checkout order does not.
+	 */
+	public function test_a_confirmed_shipping_assistant_order_records_the_ingrid_transport_order(): void {
+		new \Krokedil\KustomCheckout\ShippingAssistant\Checkout();
+		$order = $this->haveOrderAwaitingConfirmation();
+
+		$this->willRetrieveManagedOrder(
+			[
+				'order_amount'             => 12500,
+				'order_lines'              => $this->orderLinesFor( $order ),
+				'selected_shipping_option' => [
+					'tms_reference' => 'VM2-8515d42eefbc403694b04a9f6e6352a0',
+					'tos_id'        => '01M3XWHGEYJXEXHH0EXFM3N8DX',
+				],
+			]
+		);
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertSame( '01M3XWHGEYJXEXHH0EXFM3N8DX', $this->reload( $order )->get_meta( 'ingrid_tos_id' ) );
 	}
 
 	/**
@@ -171,6 +233,48 @@ class CallbacksTest extends IntegrationTestCase {
 			'no order id at all'     => [ 'no-order' ],
 			'the order already paid' => [ 'already-paid' ],
 		];
+	}
+
+	/**
+	 * A cache flush stands in for a second PHP process, as with LiteSpeed's non-atomic add().
+	 *
+	 * @dataProvider provide_object_caches
+	 */
+	public function test_a_locked_confirmation_stops_a_second_request_for_the_same_order( bool $object_cache ): void {
+		$order = $this->haveOrderAwaitingConfirmation();
+		add_filter( 'kco_wc_lock_confirmation', '__return_true' );
+		$this->usingObjectCache = wp_using_ext_object_cache( $object_cache );
+
+		$this->assertTrue( \KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', $order->get_id() ), 'The first request takes the lock.' );
+		wp_cache_flush();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertNoGatewayRequests( 'The second request must stop before it confirms the order again.' );
+	}
+
+	/** @return array<string, array{0: bool}> */
+	public function provide_object_caches(): array {
+		return [
+			'without an object cache'                          => [ false ],
+			'with an object cache not shared across processes' => [ true ],
+		];
+	}
+
+	public function test_a_finished_confirmation_releases_the_lock(): void {
+		$order = $this->haveOrderAwaitingConfirmation();
+		add_filter( 'kco_wc_lock_confirmation', '__return_true' );
+
+		$this->willRetrieveManagedOrder(
+			[ 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ]
+		);
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertNotNull( $this->reload( $order )->get_date_paid(), 'The confirmation must finish.' );
+		$this->assertTrue( \KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', $order->get_id() ), 'The lock is released afterwards.' );
 	}
 
 	public function test_the_callback_endpoints_are_registered(): void {
