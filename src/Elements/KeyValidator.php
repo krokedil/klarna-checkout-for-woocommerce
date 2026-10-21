@@ -20,19 +20,19 @@ class KeyValidator {
 	/**
 	 * Get the cached status of a public API key, validating it if there is no cached result.
 	 *
-	 * @param string $key      The public API key.
-	 * @param bool   $testmode Whether the key is for the test (playground) environment.
-	 * @param bool   $refresh  Whether to skip the cache and validate again.
+	 * @param string $key            The public API key.
+	 * @param bool   $testmode       Whether the key is for the test (playground) environment.
+	 * @param bool   $recheck_errors Whether to validate again when the cached status is an error, e.g. after the domain was added in the Kustom Portal.
 	 * @return string One of the STATUS_* constants.
 	 */
-	public static function get_status( $key, $testmode, $refresh = false ) {
+	public static function get_status( $key, $testmode, $recheck_errors = false ) {
 		if ( empty( $key ) ) {
 			return self::STATUS_MISSING;
 		}
 
 		$transient = self::get_transient_name( $key, $testmode );
-		$status    = $refresh ? false : get_transient( $transient );
-		if ( is_string( $status ) && '' !== $status ) {
+		$status    = get_transient( $transient );
+		if ( is_string( $status ) && '' !== $status && ! ( $recheck_errors && self::is_error( $status ) ) ) {
 			return $status;
 		}
 
