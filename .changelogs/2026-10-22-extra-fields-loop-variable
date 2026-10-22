@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where the checkout script stopped initializing if another script on the page declared a global variable named `i`.
