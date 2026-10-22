@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where the margin set on the Kustom Elements blocks was not applied correctly, on the page and in the block editor.
