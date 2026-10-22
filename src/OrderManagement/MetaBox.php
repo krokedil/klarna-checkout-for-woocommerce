@@ -91,7 +91,7 @@ class MetaBox extends OrderMetabox {
 	/**
 	 * Render the metabox content.
 	 *
-	 * @param WP_Post $post The WordPress post.
+	 * @param \WP_Post $post The WordPress post.
 	 *
 	 * @return void
 	 */
@@ -511,8 +511,8 @@ class MetaBox extends OrderMetabox {
 	/**
 	 * Handles KOM Actions
 	 *
-	 * @param int     $post_id Post ID.
-	 * @param WP_Post $post Post Object.
+	 * @param int      $post_id Post ID.
+	 * @param \WP_Post $post Post Object.
 	 */
 	public function process_kom_actions( $post_id, $post ) {
 		$klarna_order_id = filter_input( INPUT_POST, 'klarna_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );

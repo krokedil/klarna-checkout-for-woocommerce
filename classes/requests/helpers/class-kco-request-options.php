@@ -114,7 +114,7 @@ class KCO_Request_Options {
 	/**
 	 * Gets the allowed customer types
 	 *
-	 * @return string
+	 * @return array
 	 */
 	private function get_allowed_customer_types() {
 

@@ -17,12 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 function kco_create_or_update_order() {
 	// Make sure cart is initialized.
 	if ( ! WC()->cart ) {
-		return;
+		return null;
 	}
 
 	// An empty cart, most often from previewing the checkout page in admin, would create an empty Kustom order.
 	if ( WC()->cart->is_empty() ) {
-		return;
+		return null;
 	}
 
 	// Need to calculate these here, because WooCommerce hasn't done it yet.
@@ -37,7 +37,7 @@ function kco_create_or_update_order() {
 			$klarna_order = KCO_WC()->api->create_klarna_order();
 			if ( ! $klarna_order ) {
 				// If failed then bail.
-				return;
+				return null;
 			}
 			WC()->session->set( 'kco_wc_order_id', $klarna_order['order_id'] );
 			set_transient( "kustom_customer_id_{$klarna_order['order_id']}", WC()->session->get_customer_id(), WEEK_IN_SECONDS * 2 );
@@ -53,7 +53,7 @@ function kco_create_or_update_order() {
 		// Create new order, since we dont have one.
 		$klarna_order = KCO_WC()->api->create_klarna_order();
 		if ( ! $klarna_order ) {
-			return;
+			return null;
 		}
 		WC()->session->set( 'kco_wc_order_id', $klarna_order['order_id'] );
 		set_transient( "kustom_customer_id_{$klarna_order['order_id']}", WC()->session->get_customer_id(), WEEK_IN_SECONDS * 2 );
@@ -80,7 +80,7 @@ function kco_create_or_update_order_pay_for_order() {
 			$klarna_order = KCO_WC()->api->create_klarna_order( $order_id );
 			if ( ! $klarna_order ) {
 				// If failed then bail.
-				return;
+				return null;
 			}
 			$order->update_meta_data( 'kco_wc_order_id', $klarna_order['order_id'] );
 			$order->save();
@@ -91,7 +91,7 @@ function kco_create_or_update_order_pay_for_order() {
 		// Create new order, since we dont have one.
 		$klarna_order = KCO_WC()->api->create_klarna_order( $order_id );
 		if ( ! $klarna_order ) {
-			return;
+			return null;
 		}
 		$order->update_meta_data( 'kco_wc_order_id', $klarna_order['order_id'] );
 		$order->save();

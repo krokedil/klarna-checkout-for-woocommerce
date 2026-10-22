@@ -16,9 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class KCO_Logger {
 	/**
-	 * Log message string
+	 * The WooCommerce logger instance.
 	 *
-	 * @var $log
+	 * @var WC_Logger|null
 	 */
 	private static $log;
 
@@ -67,13 +67,13 @@ class KCO_Logger {
 	/**
 	 * Formats the log data to be logged.
 	 *
-	 * @param string $klarna_order_id The Kustom order id.
-	 * @param string $method The method.
-	 * @param string $title The title for the log.
-	 * @param array  $request_args The request args.
-	 * @param array  $response The response.
-	 * @param string $code The status code.
-	 * @param string $request_url The request url.
+	 * @param string|null $klarna_order_id The Kustom order id.
+	 * @param string      $method The method.
+	 * @param string      $title The title for the log.
+	 * @param array       $request_args The request args.
+	 * @param array       $response The response.
+	 * @param int|string  $code The status code.
+	 * @param string|null $request_url The request url.
 	 * @return array
 	 */
 	public static function format_log( $klarna_order_id, $method, $title, $request_args, $response, $code, $request_url = null ) {
