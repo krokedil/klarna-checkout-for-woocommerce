@@ -133,6 +133,7 @@ One file per area of the plugin:
 | `RequestsTest.php` | Host routing, the auth header, and the cart payload builder. |
 | `FunctionsTest.php` | The helpers in `includes/kco-functions.php`: country and region conversion, the order total and content guards, and the B2B meta. |
 | `SubscriptionsTest.php` | The recurring token and the unattended renewal that charges it. |
+| `ExpressTest.php` | Express buttons: when they show, the Kustom order the createOrder endpoint creates for the cart or one product, and the validation of an express order. |
 | `SampleTest.php` | The smoke test wp-browser scaffolds: the plugin is active and the factories work. |
 
 Most methods are data-provider driven, so the case count runs well ahead of the

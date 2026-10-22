@@ -51,7 +51,7 @@ class ConfirmationUtility {
 	 *
 	 * @return string
 	 */
-	private static function get_confirmation_url( $order, $kustom_order_id ) {
+	public static function get_confirmation_url( $order, $kustom_order_id ) {
 		// A zero-amount purchase, e.g. a free trial subscription, is paid directly and has nothing to confirm.
 		if ( ! empty( $order->get_date_paid() ) ) {
 			return $order->get_checkout_order_received_url();

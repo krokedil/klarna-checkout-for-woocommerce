@@ -60,6 +60,15 @@ class KCO_API_Callbacks {
 			return;
 		}
 
+		$this->process_push( $klarna_order_id );
+	}
+
+	/**
+	 * Handle a push notification for a Kustom order. Also used by the express push route.
+	 *
+	 * @param string $klarna_order_id The Kustom order ID.
+	 */
+	public function process_push( $klarna_order_id ) {
 		KCO_WC()->logger->log( 'Push callback hit for order: ' . $klarna_order_id );
 
 		// Let other plugins hook into the push notification.
