@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
+use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
 /**
  * KCO_Templates class.
@@ -84,13 +85,7 @@ class KCO_Templates {
 		if ( is_checkout() ) {
 			$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			// Don't display KCO template if we have a cart that doesn't needs payment.
-			/**
-			 * Filters whether Kustom Checkout should only be used when the cart or order needs payment.
-			 *
-			 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#display-kustom-checkout-even-on-free-orders Display Kustom Checkout even on free orders
-			 * @param bool $check_if_needs_payment Whether to check if payment is needed. Default true.
-			 */
-			$check_if_needs_payment = apply_filters( 'kco_check_if_needs_payment', true );
+			$check_if_needs_payment = SettingsUtility::check_if_needs_payment();
 			if ( $check_if_needs_payment && ! is_wc_endpoint_url( 'order-pay' ) ) {
 				if ( ! kco_cart_needs_payment() ) {
 					return $template;

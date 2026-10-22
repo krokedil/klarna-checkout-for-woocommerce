@@ -35,7 +35,7 @@ class EmbeddedFlow extends CheckoutFlow {
 		 * @param array|false $klarna_order The Kustom order data, or false if updating the Kustom order failed.
 		 */
 		do_action( 'kco_wc_process_payment', $order_id, $klarna_order );
-		\KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) associated with [{$order->get_billing_email()}] was successfully processed." );
+		\KCO_Logger::log( "Order {$order_number} ({$klarna_order_id}) was successfully processed." );
 
 		return array(
 			'result' => 'success',

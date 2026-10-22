@@ -21,7 +21,7 @@ type ElementAttributes = {
 type ElementEditProps = {
 	name: string;
 	attributes: ElementAttributes;
-	setAttributes: ( attributes: Partial< ElementAttributes > ) => void;
+	setAttributes: (attributes: Partial<ElementAttributes>) => void;
 };
 
 /**
@@ -29,30 +29,46 @@ type ElementEditProps = {
  *
  * @param {ElementEditProps} props The block edit props.
  */
-export const ElementEdit = ( { name, attributes, setAttributes }: ElementEditProps ) => {
+export const ElementEdit = ({
+	name,
+	attributes,
+	setAttributes,
+}: ElementEditProps) => {
 	const blockProps = useBlockProps();
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings', 'klarna-checkout-for-woocommerce' ) }>
+				<PanelBody
+					title={__('Settings', 'klarna-checkout-for-woocommerce')}
+				>
 					<TextControl
-						label={ __( 'Include', 'klarna-checkout-for-woocommerce' ) }
-						help={ __( 'Optional. Comma-separated list of methods to show.', 'klarna-checkout-for-woocommerce' ) }
-						value={ attributes.include }
-						onChange={ ( include: string ) => setAttributes( { include } ) }
+						label={__('Include', 'klarna-checkout-for-woocommerce')}
+						help={__(
+							'Optional. Comma-separated list of methods to show.',
+							'klarna-checkout-for-woocommerce'
+						)}
+						value={attributes.include}
+						onChange={(include: string) =>
+							setAttributes({ include })
+						}
 					/>
 					<TextControl
-						label={ __( 'Exclude', 'klarna-checkout-for-woocommerce' ) }
-						help={ __( 'Optional. Comma-separated list of methods to hide.', 'klarna-checkout-for-woocommerce' ) }
-						value={ attributes.exclude }
-						onChange={ ( exclude: string ) => setAttributes( { exclude } ) }
+						label={__('Exclude', 'klarna-checkout-for-woocommerce')}
+						help={__(
+							'Optional. Comma-separated list of methods to hide.',
+							'klarna-checkout-for-woocommerce'
+						)}
+						value={attributes.exclude}
+						onChange={(exclude: string) =>
+							setAttributes({ exclude })
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...blockProps }>
+			<div {...blockProps}>
 				<Disabled>
-					<ServerSideRender block={ name } attributes={ attributes } />
+					<ServerSideRender block={name} attributes={attributes} />
 				</Disabled>
 			</div>
 		</>
@@ -60,4 +76,7 @@ export const ElementEdit = ( { name, attributes, setAttributes }: ElementEditPro
 };
 
 // Dynamic block, rendered by PHP.
+/**
+ *
+ */
 export const ElementSave = (): null => null;
