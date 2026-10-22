@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-10-20 06:28+0000\n"
+"POT-Creation-Date: 2026-10-21 11:36+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -630,146 +630,165 @@ msgstr ""
 msgid "Customer redirected to Kustom Hosted Payment Page."
 msgstr ""
 
-#: ../src/Elements/Block.php:118
+#: ../src/Elements/Block.php:124
 msgid "Add a Kustom Elements public API key in the Kustom Checkout settings to display this element."
 msgstr ""
 
-#: ../src/Elements/Settings.php:84, ../src/Elements/Settings.php:102
+#: ../src/Elements/KeyValidator.php:110, ../src/Elements/Settings.php:255
+msgid "test"
+msgstr ""
+
+#: ../src/Elements/KeyValidator.php:111, ../src/Elements/Settings.php:254
+msgid "production"
+msgstr ""
+
+#. translators: %s: The site domain, e.g. https://example.com.
+#: ../src/Elements/KeyValidator.php:116
+msgid "Connected. Kustom Elements is allowed on %s."
+msgstr ""
+
+#. translators: %s: The environment (production or test).
+#: ../src/Elements/KeyValidator.php:120
+msgid "The %s public API key was not recognized by Kustom. Copy the data-public-api-key from Elements → Installation script in the Kustom Portal."
+msgstr ""
+
+#. translators: 1: The environment (production or test), 2: The site domain, e.g. https://example.com.
+#: ../src/Elements/KeyValidator.php:126
+msgid "The %1$s public API key is valid, but %2$s is not an allowed domain. Add the domain under Elements in the Kustom Portal."
+msgstr ""
+
+#: ../src/Elements/KeyValidator.php:131
+msgid "The public API key could not be verified right now. Kustom Elements may still work, the check will be retried later."
+msgstr ""
+
+#: ../src/Elements/Settings.php:85, ../src/Elements/Settings.php:103
 msgid "Disabled"
 msgstr ""
 
-#: ../src/Elements/Settings.php:85
+#: ../src/Elements/Settings.php:86
 msgid "Above Title"
 msgstr ""
 
-#: ../src/Elements/Settings.php:86
+#: ../src/Elements/Settings.php:87
 msgid "Between Title and Price"
 msgstr ""
 
-#: ../src/Elements/Settings.php:87
-msgid "Between Price and Excerpt"
-msgstr ""
-
 #: ../src/Elements/Settings.php:88
-msgid "Between Excerpt and Add to cart button"
+msgid "Between Price and Excerpt (recommended)"
 msgstr ""
 
 #: ../src/Elements/Settings.php:89
-msgid "Between Add to cart button and Product meta"
+msgid "Between Excerpt and Add to cart button"
 msgstr ""
 
 #: ../src/Elements/Settings.php:90
-msgid "Between Product meta and Product sharing buttons"
+msgid "Between Add to cart button and Product meta"
 msgstr ""
 
 #: ../src/Elements/Settings.php:91
+msgid "Between Product meta and Product sharing buttons"
+msgstr ""
+
+#: ../src/Elements/Settings.php:92
 msgid "After Product sharing buttons"
 msgstr ""
 
-#: ../src/Elements/Settings.php:103
+#: ../src/Elements/Settings.php:104
 msgid "Above cross-sell"
 msgstr ""
 
-#: ../src/Elements/Settings.php:104
+#: ../src/Elements/Settings.php:105
 msgid "Above cart totals"
 msgstr ""
 
-#: ../src/Elements/Settings.php:105
+#: ../src/Elements/Settings.php:106
 msgid "Between cart totals and proceed to checkout button"
 msgstr ""
 
-#: ../src/Elements/Settings.php:106
+#: ../src/Elements/Settings.php:107
 msgid "After proceed to checkout button"
 msgstr ""
 
-#: ../src/Elements/Settings.php:107
-msgid "Bottom of the page"
+#: ../src/Elements/Settings.php:108
+msgid "Bottom of the page (recommended)"
 msgstr ""
 
-#: ../src/Elements/Settings.php:119
+#: ../src/Elements/Settings.php:120
 msgid "Elements"
 msgstr ""
 
-#: ../src/Elements/Settings.php:122
+#: ../src/Elements/Settings.php:123
 msgid "Display Kustom payment methods and delivery options on your store pages with Kustom Elements."
 msgstr ""
 
-#: ../src/Elements/Settings.php:126
+#: ../src/Elements/Settings.php:127
 msgid "Production public API key"
 msgstr ""
 
 #. translators: %s: Kustom Portal link.
-#: ../src/Elements/Settings.php:130
+#: ../src/Elements/Settings.php:131
 msgid "The public API keys used here are separate from the API Username and Password used for the payment integration above — find them in the %s under Elements → Installation script → data-public-api-key."
 msgstr ""
 
-#: ../src/Elements/Settings.php:131
+#: ../src/Elements/Settings.php:132
 msgid "Kustom Portal"
 msgstr ""
 
-#: ../src/Elements/Settings.php:133
+#: ../src/Elements/Settings.php:134
 msgid "The public API key used for Kustom Elements when test mode is disabled."
 msgstr ""
 
-#: ../src/Elements/Settings.php:141
+#: ../src/Elements/Settings.php:142
 msgid "Test public API key"
 msgstr ""
 
-#: ../src/Elements/Settings.php:143
+#: ../src/Elements/Settings.php:144
 msgid "Used when test mode is enabled."
 msgstr ""
 
-#: ../src/Elements/Settings.php:151
+#: ../src/Elements/Settings.php:152
 msgid "Payment Method Display"
 msgstr ""
 
-#: ../src/Elements/Settings.php:153
+#: ../src/Elements/Settings.php:154
 msgid "Presents the available Kustom payment methods on your store pages. You can also display it with the shortcode [kustom_payment_element] or block Kustom Payment Element."
 msgstr ""
 
-#: ../src/Elements/Settings.php:156
+#: ../src/Elements/Settings.php:157
 msgid "Payment Method Display placement on product pages"
 msgstr ""
 
-#: ../src/Elements/Settings.php:157
+#: ../src/Elements/Settings.php:158
 msgid "Payment Method Display placement on cart page"
 msgstr ""
 
-#: ../src/Elements/Settings.php:160
+#: ../src/Elements/Settings.php:161
 msgid "Delivery Method Display"
 msgstr ""
 
-#: ../src/Elements/Settings.php:162
+#: ../src/Elements/Settings.php:163
 msgid "Presents the available delivery options on your store pages. Requires Kustom Shipping Assistant (KSA) to be active and configured. You can also display it with the shortcode [kustom_delivery_element] or block Kustom Delivery Element."
 msgstr ""
 
-#: ../src/Elements/Settings.php:165
+#: ../src/Elements/Settings.php:166
 msgid "Delivery Method Display placement on product pages"
 msgstr ""
 
-#: ../src/Elements/Settings.php:166
+#: ../src/Elements/Settings.php:167
 msgid "Delivery Method Display placement on cart page"
 msgstr ""
 
 #. translators: %s: The product page hook name.
-#: ../src/Elements/Settings.php:188
+#: ../src/Elements/Settings.php:189
 msgid "Where on the product page the element is displayed. Uses the %s hook."
 msgstr ""
 
-#: ../src/Elements/Settings.php:204
+#: ../src/Elements/Settings.php:205
 msgid "Where on the cart page the element is displayed. Each option uses a WooCommerce cart hook, from woocommerce_cart_collaterals (top) to woocommerce_after_cart (bottom)."
 msgstr ""
 
-#: ../src/Elements/Settings.php:251
-msgid "production"
-msgstr ""
-
-#: ../src/Elements/Settings.php:252
-msgid "test"
-msgstr ""
-
 #. translators: %s: The environment (production or test).
-#: ../src/Elements/Settings.php:257
+#: ../src/Elements/Settings.php:260
 msgid "The %s public API key for Kustom Elements is invalid and has been cleared. Use the data-public-api-key from the Elements installation script in the Kustom Portal, not the API Username or Password."
 msgstr ""
 
