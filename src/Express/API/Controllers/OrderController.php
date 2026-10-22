@@ -1,43 +1,29 @@
 <?php
-namespace Krokedil\KustomCheckout\Express;
+namespace Krokedil\KustomCheckout\Express\API\Controllers;
 
 use Exception;
-use Krokedil\KustomCheckout\Blocks\Api\Controllers\OrderController;
+use Krokedil\KustomCheckout\Express\{Express, OrderCreator, RateLimiter};
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+\defined( 'ABSPATH' ) || exit;
 
 /**
- * REST controller class.
+ * Class OrderController.
  *
- * The endpoint the express button's createOrder hook posts to, and the push and validation callbacks of express orders.
+ * The endpoint the express button's createOrder hook posts to.
  */
-class RestController {
+class OrderController extends BaseController {
 	/**
-	 * The REST namespace.
+	 * Register the routes for the controller.
 	 *
-	 * @var string
-	 */
-	const NAMESPACE = 'kco-express/v1';
-
-	/**
-	 * The route pattern of the Kustom order id in the push and validation routes.
-	 *
-	 * @var string
-	 */
-	const ID_PATTERN = '(?P<id>[\w-]+)';
-
-	/**
-	 * Register the routes.
+	 * @return void
 	 */
 	public function register_routes() {
 		register_rest_route(
-			self::NAMESPACE,
-			'/order',
+			$this->namespace,
+			$this->get_request_path( 'order' ),
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'create_order' ),
@@ -68,48 +54,6 @@ class RestController {
 				),
 			)
 		);
-
-		// Kustom calls these server to server, and the Kustom order they name is read back from Kustom before anything is done.
-		register_rest_route(
-			self::NAMESPACE,
-			'/push/' . self::ID_PATTERN,
-			array(
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => array( $this, 'push' ),
-				'permission_callback' => '__return_true',
-			)
-		);
-
-		register_rest_route(
-			self::NAMESPACE,
-			'/validate/' . self::ID_PATTERN,
-			array(
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => array( new OrderController(), 'validate' ),
-				'permission_callback' => '__return_true',
-			)
-		);
-	}
-
-	/**
-	 * Handle Kustom's push notification for an express order.
-	 *
-	 * @param WP_REST_Request $request The request.
-	 * @return WP_REST_Response
-	 */
-	public function push( $request ) {
-		\KCO_API_Callbacks::get_instance()->process_push( $request->get_url_params()['id'] );
-
-		return new WP_REST_Response( null, 200 );
-	}
-
-	/**
-	 * The URL of the create order route.
-	 *
-	 * @return string
-	 */
-	public static function get_url() {
-		return rest_url( self::NAMESPACE . '/order' );
 	}
 
 	/**

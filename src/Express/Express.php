@@ -4,6 +4,8 @@ namespace Krokedil\KustomCheckout\Express;
 use Krokedil\KustomCheckout\Elements\Elements;
 use Krokedil\KustomCheckout\Elements\Settings as ElementsSettings;
 use Krokedil\KustomCheckout\Elements\Utility as ElementsUtility;
+use Krokedil\KustomCheckout\Express\API\ApiRegistry;
+use Krokedil\KustomCheckout\Express\API\Controllers\{CallbackController, OrderController};
 use Krokedil\KustomCheckout\ShippingAssistant\Settings as ShippingAssistantSettings;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
@@ -61,15 +63,23 @@ class Express {
 	const CART_PRIORITY = 30;
 
 	/**
+	 * The API registry for the express routes.
+	 *
+	 * @var ApiRegistry
+	 */
+	protected $api_registry;
+
+	/**
 	 * Class constructor.
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'add_placements' ) );
 		add_action( 'init', array( $this, 'register_scripts' ) );
-		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 		add_filter( 'woocommerce_should_clear_cart_after_payment', array( $this, 'maybe_keep_cart_after_payment' ) );
 		add_action( 'kco_wc_confirm_klarna_order', array( $this, 'forget_express_order' ) );
 		add_action( 'template_redirect', array( Confirmation::class, 'maybe_confirm' ) );
+
+		$this->api_registry = new ApiRegistry();
 	}
 
 	/**
@@ -313,7 +323,7 @@ class Express {
 	 */
 	public static function get_script_config() {
 		return array(
-			'restUrl'   => RestController::get_url(),
+			'restUrl'   => KCO_WC()->express->api_registry()->get_request_path( OrderController::class, 'order' ),
 			// Guests send no nonce: theirs is the same for everyone and goes stale in cached pages, which WordPress rejects.
 			'restNonce' => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
 			'locale'    => ElementsUtility::get_locale(),
@@ -334,9 +344,10 @@ class Express {
 	 * @return array{push: string, validation: string, confirmation: string}
 	 */
 	public static function get_merchant_urls() {
-		$urls = array(
-			'push'         => rest_url( RestController::NAMESPACE . '/push/{checkout.order.id}' ),
-			'validation'   => rest_url( RestController::NAMESPACE . '/validate/{checkout.order.id}' ),
+		$api_registry = KCO_WC()->express->api_registry();
+		$urls         = array(
+			'push'         => $api_registry->get_request_path( CallbackController::class, 'push/{checkout.order.id}' ),
+			'validation'   => $api_registry->get_request_path( CallbackController::class, 'validate/{checkout.order.id}' ),
 			'confirmation' => home_url( '/?' . Confirmation::QUERY_VAR . '={checkout.order.id}' ),
 		);
 
@@ -394,10 +405,12 @@ class Express {
 	}
 
 	/**
-	 * Register the express routes.
+	 * Get the instance of the API registry class.
+	 *
+	 * @return ApiRegistry
 	 */
-	public function register_routes() {
-		( new RestController() )->register_routes();
+	public function api_registry() {
+		return $this->api_registry;
 	}
 
 	/**

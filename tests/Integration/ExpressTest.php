@@ -11,7 +11,7 @@ use Krokedil\KustomCheckout\Express\Express;
 use Krokedil\KustomCheckout\Express\ExpressSession;
 use Krokedil\KustomCheckout\Express\OrderCreator;
 use Krokedil\KustomCheckout\Express\RateLimiter;
-use Krokedil\KustomCheckout\Express\RestController;
+use Krokedil\KustomCheckout\Express\API\Controllers\OrderController;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Tests\Support\IntegrationTestCase;
 
@@ -21,7 +21,8 @@ use Tests\Support\IntegrationTestCase;
  * @covers \Krokedil\KustomCheckout\Express\Express
  * @covers \Krokedil\KustomCheckout\Express\OrderCreator
  * @covers \Krokedil\KustomCheckout\Express\ExpressSession
- * @covers \Krokedil\KustomCheckout\Express\RestController
+ * @covers \Krokedil\KustomCheckout\Express\API\Controllers\OrderController
+ * @covers \Krokedil\KustomCheckout\Express\API\Controllers\CallbackController
  * @covers \Krokedil\KustomCheckout\Express\RateLimiter
  * @covers \Krokedil\KustomCheckout\Express\Confirmation
  * @covers \Krokedil\KustomCheckout\Blocks\OrderValidation::validate_kco_order
@@ -241,11 +242,11 @@ class ExpressTest extends IntegrationTestCase {
 	}
 
 	public function test_the_endpoint_refuses_requests_while_express_is_unavailable(): void {
-		$this->assertTrue( ( new RestController() )->check_permission(), 'Cached pages carry no fresh nonce, so a guest needs none.' );
+		$this->assertTrue( ( new OrderController() )->check_permission(), 'Cached pages carry no fresh nonce, so a guest needs none.' );
 
 		$this->haveExpressSettings( [ 'ksa_enabled' => 'no' ] );
 
-		$this->assertFalse( ( new RestController() )->check_permission() );
+		$this->assertFalse( ( new OrderController() )->check_permission() );
 	}
 
 	public function test_a_cart_express_order_is_not_tied_to_the_draft_order(): void {
@@ -625,12 +626,12 @@ class ExpressTest extends IntegrationTestCase {
 	}
 
 	private function createExpressOrder( array $params ): \WP_REST_Response {
-		$request = new \WP_REST_Request( 'POST', '/' . RestController::NAMESPACE . '/order' );
+		$request = new \WP_REST_Request( 'POST', '/kco-express/v1/order' );
 		foreach ( array_merge( [ 'quantity' => 1, 'variation' => [] ], $params ) as $key => $value ) {
 			$request->set_param( $key, $value );
 		}
 
-		return ( new RestController() )->create_order( $request );
+		return ( new OrderController() )->create_order( $request );
 	}
 
 	/** The merchant data values that differ per run: the cart token, the nonce and the cart hashes. */
