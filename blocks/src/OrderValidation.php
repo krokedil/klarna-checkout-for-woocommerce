@@ -166,8 +166,9 @@ class OrderValidation {
 		$klarna_total      = intval( $klarna_order['order_amount'] ?? 0 );
 		$has_shipping_line = in_array( 'shipping_fee', array_column( $klarna_order['order_lines'] ?? array(), 'type' ), true );
 
-		// KSA keeps the selected option outside the order lines until the purchase completes.
-		if ( ! $has_shipping_line ) {
+		// KSA keeps the selected option outside the order lines until the purchase completes. With the shipping option update
+		// callback Kustom charges only order_amount, so an option the callback never priced must fail here.
+		if ( ! $has_shipping_line && empty( $klarna_order['merchant_urls']['shipping_option_update'] ) ) {
 			$klarna_total += intval( $klarna_order['selected_shipping_option']['price'] ?? 0 );
 		}
 
