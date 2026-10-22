@@ -142,6 +142,9 @@ class OrderCreator {
 		// Not the iframe's URLs: the same strings the merchant pastes into the Kustom Portal.
 		$args['merchant_urls'] = array_merge( $args['merchant_urls'] ?? array(), Express::get_merchant_urls() );
 
+		// Kustom never calls it for the option the sheet preselects, which would leave that shipping unpaid. Without it Kustom prices shipping itself.
+		unset( $args['merchant_urls']['shipping_option_update'] );
+
 		return $args;
 	}
 

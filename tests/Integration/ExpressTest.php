@@ -356,6 +356,13 @@ class ExpressTest extends IntegrationTestCase {
 		);
 	}
 
+	public function test_the_express_order_never_asks_for_the_shipping_option_update_callback(): void {
+		// KSA adds the URL from a filter registered at boot, so feed it in directly.
+		$args = ( new OrderCreator() )->add_express_data( [ 'merchant_urls' => [ 'shipping_option_update' => 'https://example.com/callback' ] ] );
+
+		$this->assertArrayNotHasKey( 'shipping_option_update', $args['merchant_urls'], 'Kustom never calls it for the option the sheet preselects, so Kustom prices shipping itself.' );
+	}
+
 	/**
 	 * The sheet's shipping is written to the session the order is placed from, then the
 	 * order total, shipping included, has to match what the shopper approved.
@@ -415,6 +422,12 @@ class ExpressTest extends IntegrationTestCase {
 	public function provide_unapproved_orders(): array {
 		return [
 			'shipping on top of an approved 12500' => [ [ 'order_amount' => 12500 ] ],
+			'unpriced shipping with the callback'  => [
+				[
+					'order_amount'  => 7600,
+					'merchant_urls' => [ 'shipping_option_update' => 'https://example.com/callback' ],
+				],
+			],
 			'a different product, same total'      => [
 				[
 					'order_amount' => 7600,
