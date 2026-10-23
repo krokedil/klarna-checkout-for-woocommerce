@@ -73,9 +73,16 @@ export const useKcoIframe = (
 	);
 	// Signature of the last address update we sent, so an unchanged address is not sent twice.
 	const lastSentAddressRef = useRef<string>('');
-	// Signature of the last extension data we sent, for the same reason. Starts empty so a
-	// checkout without extension data sends nothing, while clearing a filled form still does.
-	const lastSentExtensionDataRef = useRef<string>('{}');
+	// Signature of the last extension data we sent, for the same reason. Starts unsent so the first
+	// snapshot always goes out, even an empty one that clears what an earlier page stored.
+	const lastSentExtensionDataRef = useRef<string>('');
+	// The extension data object last seen in the store, and the push waiting to go out.
+	const lastSeenExtensionDataRef = useRef<unknown>(null);
+	const extensionUpdateTimerRef = useRef<ReturnType<
+		typeof setTimeout
+	> | null>(null);
+	// Whether we suspended the iframe for an extension data push, so only we resume it.
+	const extensionSuspendedRef = useRef<boolean>(false);
 	// Stops watching the contact step for fields from other plugins.
 	const stopContactStepRef = useRef<(() => void) | null>(null);
 
@@ -207,6 +214,21 @@ export const useKcoIframe = (
 	}, [resumeKCO]);
 
 	/**
+	 * Read the extension data third party blocks keep in the checkout data store.
+	 *
+	 * @return {Record<string, unknown>} - The extension data, keyed by namespace.
+	 */
+	const getExtensionData = useCallback((): Record<string, unknown> => {
+		const globals = window as any;
+		const checkoutStore = globals?.wc?.wcBlocksData?.CHECKOUT_STORE_KEY;
+
+		return checkoutStore
+			? (globals?.wp?.data?.select(checkoutStore)?.getExtensionData?.() ??
+					{})
+			: {};
+	}, []);
+
+	/**
 	 * Send the checkout block's extension data to the WooCommerce session.
 	 * The Kustom order is submitted server side from the validation callback, which cannot read the
 	 * browser's checkout store, so the data has to be stored before the shopper pays.
@@ -214,30 +236,32 @@ export const useKcoIframe = (
 	 * @return {Promise<void>}
 	 */
 	const sendExtensionData = useCallback(async (): Promise<void> => {
-		const globals = window as any;
-		const checkoutStore = globals?.wc?.wcBlocksData?.CHECKOUT_STORE_KEY;
-		const extensions = checkoutStore
-			? (globals?.wp?.data?.select(checkoutStore)?.getExtensionData?.() ??
-				{})
-			: {};
+		extensionUpdateTimerRef.current = null;
+		const extensions = getExtensionData();
+		const signature = JSON.stringify(extensions);
 
 		// Nothing changed since the last push, so skip the round trip.
-		const signature = JSON.stringify(extensions);
-		if (signature === lastSentExtensionDataRef.current) {
-			return;
-		}
-		lastSentExtensionDataRef.current = signature;
+		if (signature !== lastSentExtensionDataRef.current) {
+			lastSentExtensionDataRef.current = signature;
 
-		try {
-			await extensionCartUpdate({
-				namespace: 'kco-block',
-				data: { action: 'extension_data_changed', extensions },
-			});
-		} catch (_error) {
-			// Allow the same data to be sent again if the update failed.
-			lastSentExtensionDataRef.current = '';
+			try {
+				await extensionCartUpdate({
+					namespace: 'kco-block',
+					data: { action: 'extension_data_changed', extensions },
+				});
+			} catch (_error) {
+				// Send again on the next store change, since the session does not have this data.
+				lastSentExtensionDataRef.current = '';
+				lastSeenExtensionDataRef.current = null;
+			}
 		}
-	}, []);
+
+		// Let the shopper pay again, unless a newer change is already waiting to be sent.
+		if (extensionSuspendedRef.current && !extensionUpdateTimerRef.current) {
+			extensionSuspendedRef.current = false;
+			resumeKCO();
+		}
+	}, [getExtensionData, resumeKCO]);
 
 	/**
 	 * Record an address received from Kustom and schedule it to be sent to WooCommerce.
@@ -439,27 +463,61 @@ export const useKcoIframe = (
 			return;
 		}
 
-		let timer: ReturnType<typeof setTimeout> | null = null;
+		/**
+		 * Schedule a push when the extension data changed since it was last sent.
+		 *
+		 * @param {boolean} holdPayment - Whether to suspend the iframe until the push is stored.
+		 * @return {void}
+		 */
+		const onStoreChange = (holdPayment: boolean): void => {
+			const extensions = getExtensionData();
+
+			// The store returns the same object until something changes, so most calls stop here.
+			if (extensions === lastSeenExtensionDataRef.current) {
+				return;
+			}
+			lastSeenExtensionDataRef.current = extensions;
+
+			if (
+				JSON.stringify(extensions) === lastSentExtensionDataRef.current
+			) {
+				return;
+			}
+
+			// The validation callback reads the session, so the shopper must not pay before this is stored.
+			if (holdPayment && !extensionSuspendedRef.current) {
+				extensionSuspendedRef.current = true;
+				suspendKCO();
+			}
+
+			if (extensionUpdateTimerRef.current) {
+				clearTimeout(extensionUpdateTimerRef.current);
+			}
+			extensionUpdateTimerRef.current = setTimeout(
+				sendExtensionData,
+				EXTENSION_DATA_DEBOUNCE_MS
+			);
+		};
 
 		// Third party fields write straight to the checkout data store, and there is no event to
 		// listen for, so watch the store itself and push once the changes settle.
-		const unsubscribe = globals.wp.data.subscribe(() => {
-			if (timer) {
-				clearTimeout(timer);
-			}
-			timer = setTimeout(sendExtensionData, EXTENSION_DATA_DEBOUNCE_MS);
-		});
+		const unsubscribe = globals.wp.data.subscribe(() =>
+			onStoreChange(true)
+		);
 
 		// Send whatever was already filled in before the iframe was shown.
-		sendExtensionData();
+		onStoreChange(false);
 
 		return () => {
-			if (timer) {
-				clearTimeout(timer);
+			if (extensionUpdateTimerRef.current) {
+				clearTimeout(extensionUpdateTimerRef.current);
+				extensionUpdateTimerRef.current = null;
 			}
+			lastSeenExtensionDataRef.current = null;
+			extensionSuspendedRef.current = false;
 			unsubscribe();
 		};
-	}, [isActive, sendExtensionData]);
+	}, [isActive, getExtensionData, sendExtensionData, suspendKCO]);
 
 	useEffect(() => {
 		// Only show the iframe if the Kustom Checkout is active, we have the content and it was not active before.
