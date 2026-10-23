@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	addIframe,
 	getElementsToHide,
+	hideContactStepWhenEmpty,
 	hideElements,
 	removeIframe,
 	showElements,
@@ -75,6 +76,8 @@ export const useKcoIframe = (
 	// Signature of the last extension data we sent, for the same reason. Starts empty so a
 	// checkout without extension data sends nothing, while clearing a filled form still does.
 	const lastSentExtensionDataRef = useRef<string>('{}');
+	// Stops watching the contact step for fields from other plugins.
+	const stopContactStepRef = useRef<(() => void) | null>(null);
 
 	/**
 	 * Extracts HTML content and script content from the Kustom Checkout snippet.
@@ -462,6 +465,7 @@ export const useKcoIframe = (
 		// Only show the iframe if the Kustom Checkout is active, we have the content and it was not active before.
 		if (isActive && htmlContent && !prevIsActive.current) {
 			hideElements(elementsToHide);
+			stopContactStepRef.current = hideContactStepWhenEmpty();
 			// Add the iframe and script to the WooCommerce checkout page.
 			kcoWrapperRef.current = addIframe(htmlContent);
 			scriptRef.current = document.createElement('script');
@@ -480,6 +484,8 @@ export const useKcoIframe = (
 			if (kcoWrapperRef.current) removeIframe(kcoWrapperRef.current);
 
 			showElements(elementsToHide);
+			stopContactStepRef.current?.();
+			stopContactStepRef.current = null;
 			document.body.removeChild(scriptRef.current);
 			kcoWrapperRef.current = null;
 			scriptRef.current = null;
