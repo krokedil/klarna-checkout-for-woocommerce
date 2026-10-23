@@ -27,6 +27,13 @@ type AddressType = 'billing' | 'shipping';
 const ADDRESS_UPDATE_DEBOUNCE_MS = 100;
 
 /**
+ * How long to wait for the checkout data store to settle before sending extension data.
+ * Typing in a third party field emits a store change per keystroke, and we only want one
+ * cart update once the shopper stops.
+ */
+const EXTENSION_DATA_DEBOUNCE_MS = 500;
+
+/**
  * Custom hook to manage the Kustom Checkout iframe in WooCommerce.
  * Handles the visibility of elements, iframe creation, and event registration and handling.
  *
@@ -65,6 +72,9 @@ export const useKcoIframe = (
 	);
 	// Signature of the last address update we sent, so an unchanged address is not sent twice.
 	const lastSentAddressRef = useRef<string>('');
+	// Signature of the last extension data we sent, for the same reason. Starts empty so a
+	// checkout without extension data sends nothing, while clearing a filled form still does.
+	const lastSentExtensionDataRef = useRef<string>('{}');
 
 	/**
 	 * Extracts HTML content and script content from the Kustom Checkout snippet.
@@ -192,6 +202,39 @@ export const useKcoIframe = (
 
 		return response;
 	}, [resumeKCO]);
+
+	/**
+	 * Send the checkout block's extension data to the WooCommerce session.
+	 * The Kustom order is submitted server side from the validation callback, which cannot read the
+	 * browser's checkout store, so the data has to be stored before the shopper pays.
+	 *
+	 * @return {Promise<void>}
+	 */
+	const sendExtensionData = useCallback(async (): Promise<void> => {
+		const globals = window as any;
+		const checkoutStore = globals?.wc?.wcBlocksData?.CHECKOUT_STORE_KEY;
+		const extensions = checkoutStore
+			? (globals?.wp?.data?.select(checkoutStore)?.getExtensionData?.() ??
+				{})
+			: {};
+
+		// Nothing changed since the last push, so skip the round trip.
+		const signature = JSON.stringify(extensions);
+		if (signature === lastSentExtensionDataRef.current) {
+			return;
+		}
+		lastSentExtensionDataRef.current = signature;
+
+		try {
+			await extensionCartUpdate({
+				namespace: 'kco-block',
+				data: { action: 'extension_data_changed', extensions },
+			});
+		} catch (_error) {
+			// Allow the same data to be sent again if the update failed.
+			lastSentExtensionDataRef.current = '';
+		}
+	}, []);
 
 	/**
 	 * Record an address received from Kustom and schedule it to be sent to WooCommerce.
@@ -385,6 +428,35 @@ export const useKcoIframe = (
 			}
 		};
 	}, []);
+
+	useEffect(() => {
+		const globals = window as any;
+
+		if (!isActive || 'function' !== typeof globals?.wp?.data?.subscribe) {
+			return;
+		}
+
+		let timer: ReturnType<typeof setTimeout> | null = null;
+
+		// Third party fields write straight to the checkout data store, and there is no event to
+		// listen for, so watch the store itself and push once the changes settle.
+		const unsubscribe = globals.wp.data.subscribe(() => {
+			if (timer) {
+				clearTimeout(timer);
+			}
+			timer = setTimeout(sendExtensionData, EXTENSION_DATA_DEBOUNCE_MS);
+		});
+
+		// Send whatever was already filled in before the iframe was shown.
+		sendExtensionData();
+
+		return () => {
+			if (timer) {
+				clearTimeout(timer);
+			}
+			unsubscribe();
+		};
+	}, [isActive, sendExtensionData]);
 
 	useEffect(() => {
 		// Only show the iframe if the Kustom Checkout is active, we have the content and it was not active before.

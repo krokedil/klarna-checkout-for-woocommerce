@@ -247,6 +247,25 @@ class OrderValidation {
 	}
 
 	/**
+	 * Get the extension data the checkout block script stashed in the session.
+	 *
+	 * @param string $wc_cart_token The cart token from the Kustom order merchant data.
+	 *
+	 * @return array
+	 */
+	private static function get_stashed_extension_data( $wc_cart_token ) {
+		try {
+			$session = ExpressSession::open( $wc_cart_token );
+		} catch ( Exception $e ) {
+			return array();
+		}
+
+		$extensions = $session->get( 'kco_wc_extension_data', array() );
+
+		return is_array( $extensions ) ? $extensions : array();
+	}
+
+	/**
 	 * Submit the WooCommerce order.
 	 *
 	 * @param array          $klarna_order The Kustom order.
@@ -320,6 +339,13 @@ class OrderValidation {
 				'phone'      => ! empty( $klarna_shipping_address['phone'] ) ? $klarna_shipping_address['phone'] : ( $klarna_billing_address['phone'] ?? '' ),
 			),
 		);
+
+		// Pass on the extension data the checkout block collected in the browser. Not for express
+		// orders, which never pass through the checkout page, so that data is not theirs.
+		$extensions = $express_context ? array() : self::get_stashed_extension_data( $wc_cart_token );
+		if ( ! empty( $extensions ) ) {
+			$body['extensions'] = $extensions;
+		}
 
 		// The order key is required by the Store API to pay for an existing order, and omitted for the create flow.
 		if ( $order ) {
