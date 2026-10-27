@@ -15,6 +15,16 @@ namespace Automattic\WooCommerce\StoreApi {
 		 * @return void
 		 */
 		public function init() {}
+
+		/**
+		 * @return array
+		 */
+		public function get_session_data() {}
+
+		/**
+		 * @return void
+		 */
+		public function save_data() {}
 	}
 }
 

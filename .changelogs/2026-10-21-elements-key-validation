@@ -1,4 +1,0 @@
-Type: Enhancement
-Needs Documentation: yes
-
-The Kustom Elements public API keys are now verified with Kustom. The settings page shows whether each key works on your site, and saving the settings shows an error if a key is not recognized or your domain is not allowed in the Kustom Portal. The Kustom Elements blocks show the same error in the block editor.

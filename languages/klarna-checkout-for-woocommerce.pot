@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-10-21 11:36+0000\n"
+"POT-Creation-Date: 2026-10-27 07:12+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -17,32 +17,32 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:177, ../klarna-checkout-for-woocommerce.php:187
+#: ../klarna-checkout-for-woocommerce.php:185, ../klarna-checkout-for-woocommerce.php:195
 msgid "Nope"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:233
+#: ../klarna-checkout-for-woocommerce.php:243
 msgid "Settings"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:234
+#: ../klarna-checkout-for-woocommerce.php:244
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:457, ../klarna-checkout-for-woocommerce.php:467
+#: ../klarna-checkout-for-woocommerce.php:468, ../klarna-checkout-for-woocommerce.php:478
 msgid "Your installation of Kustom Checkout for WooCommerce is not complete. If you installed this plugin directly from Github please refer to the README.DEV.md file in the plugin."
 msgstr ""
 
 #. translators: Kustom order ID.
-#: ../classes/class-kco-api-callbacks.php:134, ../includes/kco-functions.php:689
+#: ../classes/class-kco-api-callbacks.php:143, ../includes/kco-functions.php:696
 msgid "Kustom order is under review, order ID: %s."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:131
+#: ../classes/class-kco-api-callbacks.php:140
 msgid "Kustom Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:120, ../includes/kco-functions.php:674
+#: ../classes/class-kco-api-callbacks.php:129, ../includes/kco-functions.php:681
 msgid "Payment via Kustom Checkout, order ID: %s"
 msgstr ""
 
@@ -447,57 +447,57 @@ msgstr ""
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:50, ../classes/class-kco-gateway.php:825, ../classes/class-kco-gateway.php:827, ../classes/class-kco-gateway.php:829, ../classes/class-kco-gateway.php:831, ../includes/admin/views/status-report.php:17
+#: ../classes/class-kco-gateway.php:48, ../classes/class-kco-gateway.php:823, ../classes/class-kco-gateway.php:825, ../classes/class-kco-gateway.php:827, ../classes/class-kco-gateway.php:829, ../includes/admin/views/status-report.php:17
 msgid "Kustom Checkout"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:51
+#: ../classes/class-kco-gateway.php:49
 msgid "The current Kustom Checkout replaces standard WooCommerce checkout page."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:144
+#: ../classes/class-kco-gateway.php:142
 msgid "The Kustom order id could not be retrieved from the session. Please try again."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:151
+#: ../classes/class-kco-gateway.php:149
 msgid "The Kustom order could not be retrieved from the session. Please try again."
 msgstr ""
 
 #. translators: %s is the field name.
-#: ../classes/class-kco-gateway.php:212
+#: ../classes/class-kco-gateway.php:210
 msgid "Billing %s does not match Kustom order."
 msgstr ""
 
 #. translators: %s is the field name.
-#: ../classes/class-kco-gateway.php:224
+#: ../classes/class-kco-gateway.php:222
 msgid "Shipping %s does not match Kustom order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:324
+#: ../classes/class-kco-gateway.php:322
 msgid "Could not load the enhanced settings page. Showing the standard settings instead."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:453
+#: ../classes/class-kco-gateway.php:451
 msgid "Please fill in all required checkout fields."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:456
+#: ../classes/class-kco-gateway.php:454
 msgid "Please try again, something went wrong with processing your order."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:564
+#: ../classes/class-kco-gateway.php:562
 msgid "Order address should not be changed and any changes you make will not be reflected in Kustom system."
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:623
+#: ../classes/class-kco-gateway.php:621
 msgid "Organisation number:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:645, ../classes/class-kco-gateway.php:667
+#: ../classes/class-kco-gateway.php:643, ../classes/class-kco-gateway.php:665
 msgid "Reference:"
 msgstr ""
 
-#: ../classes/class-kco-gateway.php:732
+#: ../classes/class-kco-gateway.php:730
 msgid "Kustom did not accept the new order amount, the order has not been updated"
 msgstr ""
 
@@ -546,30 +546,30 @@ msgstr ""
 msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:700
+#: ../includes/kco-functions.php:707
 msgid "Waiting for verification from Kustom's push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:695
+#: ../includes/kco-functions.php:702
 msgid "Kustom Checkout order was rejected"
 msgstr ""
 
 #. translators: 1: Kustom order total, 2: WooCommerce order total.
-#: ../includes/kco-functions.php:745
+#: ../includes/kco-functions.php:752
 msgid "Kustom order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Kustom before processing."
 msgstr ""
 
-#: ../includes/kco-functions.php:775
+#: ../includes/kco-functions.php:782
 msgid "A mismatch between the WooCommerce and Kustom orders was identified. Please verify the order in the Kustom merchant portal before processing."
 msgstr ""
 
 #. translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
-#: ../includes/kco-functions.php:826
+#: ../includes/kco-functions.php:833
 msgid "The product \"%1$s\" has a quantity mismatch. Expected %2$d found %3$d."
 msgstr ""
 
 #. translators: %s: Product name.
-#: ../includes/kco-functions.php:836
+#: ../includes/kco-functions.php:843
 msgid "The product \"%s\" was not found in the Kustom order."
 msgstr ""
 
@@ -598,19 +598,19 @@ msgstr ""
 msgid "It looks as if you don't have pretty permalinks enabled in WordPress. For Kustom Checkout for WooCommerce to function properly, this needs to be enabled. "
 msgstr ""
 
-#: ../src/CheckoutFlow/CheckoutFlow.php:24
+#: ../src/CheckoutFlow/CheckoutFlow.php:25
 msgid "Invalid order ID."
 msgstr ""
 
-#: ../src/CheckoutFlow/CheckoutFlow.php:105
+#: ../src/CheckoutFlow/CheckoutFlow.php:109
 msgid "Kustom order ID not found."
 msgstr ""
 
-#: ../src/CheckoutFlow/CheckoutFlow.php:159
+#: ../src/CheckoutFlow/CheckoutFlow.php:163
 msgid "Kustom order not found or an error occurred."
 msgstr ""
 
-#: ../src/CheckoutFlow/CheckoutFlow.php:285
+#: ../src/CheckoutFlow/CheckoutFlow.php:289
 msgid "There was an error processing your payment. Please try again."
 msgstr ""
 
@@ -630,15 +630,23 @@ msgstr ""
 msgid "Customer redirected to Kustom Hosted Payment Page."
 msgstr ""
 
-#: ../src/Elements/Block.php:124
+#: ../src/Elements/Block.php:111
+msgid "Kustom express buttons are displayed here on the frontend."
+msgstr ""
+
+#: ../src/Elements/Block.php:112
+msgid "Enable Kustom Checkout and Kustom Shipping Assistant, and add a Kustom Elements public API key, in the Kustom Checkout settings to display express buttons."
+msgstr ""
+
+#: ../src/Elements/Block.php:155
 msgid "Add a Kustom Elements public API key in the Kustom Checkout settings to display this element."
 msgstr ""
 
-#: ../src/Elements/KeyValidator.php:110, ../src/Elements/Settings.php:255
+#: ../src/Elements/KeyValidator.php:110, ../src/Elements/Settings.php:275
 msgid "test"
 msgstr ""
 
-#: ../src/Elements/KeyValidator.php:111, ../src/Elements/Settings.php:254
+#: ../src/Elements/KeyValidator.php:111, ../src/Elements/Settings.php:274
 msgid "production"
 msgstr ""
 
@@ -661,138 +669,190 @@ msgstr ""
 msgid "The public API key could not be verified right now. Kustom Elements may still work, the check will be retried later."
 msgstr ""
 
-#: ../src/Elements/Settings.php:85, ../src/Elements/Settings.php:103
+#: ../src/Elements/Settings.php:88, ../src/Elements/Settings.php:106
 msgid "Disabled"
 msgstr ""
 
-#: ../src/Elements/Settings.php:86
+#: ../src/Elements/Settings.php:89
 msgid "Above Title"
 msgstr ""
 
-#: ../src/Elements/Settings.php:87
+#: ../src/Elements/Settings.php:90
 msgid "Between Title and Price"
 msgstr ""
 
-#: ../src/Elements/Settings.php:88
+#: ../src/Elements/Settings.php:91
 msgid "Between Price and Excerpt (recommended)"
 msgstr ""
 
-#: ../src/Elements/Settings.php:89
+#: ../src/Elements/Settings.php:92
 msgid "Between Excerpt and Add to cart button"
 msgstr ""
 
-#: ../src/Elements/Settings.php:90
+#: ../src/Elements/Settings.php:93
 msgid "Between Add to cart button and Product meta"
 msgstr ""
 
-#: ../src/Elements/Settings.php:91
+#: ../src/Elements/Settings.php:94
 msgid "Between Product meta and Product sharing buttons"
 msgstr ""
 
-#: ../src/Elements/Settings.php:92
+#: ../src/Elements/Settings.php:95
 msgid "After Product sharing buttons"
 msgstr ""
 
-#: ../src/Elements/Settings.php:104
+#: ../src/Elements/Settings.php:107
 msgid "Above cross-sell"
 msgstr ""
 
-#: ../src/Elements/Settings.php:105
+#: ../src/Elements/Settings.php:108
 msgid "Above cart totals"
 msgstr ""
 
-#: ../src/Elements/Settings.php:106
+#: ../src/Elements/Settings.php:109
 msgid "Between cart totals and proceed to checkout button"
 msgstr ""
 
-#: ../src/Elements/Settings.php:107
+#: ../src/Elements/Settings.php:110
 msgid "After proceed to checkout button"
 msgstr ""
 
-#: ../src/Elements/Settings.php:108
+#: ../src/Elements/Settings.php:111
 msgid "Bottom of the page (recommended)"
 msgstr ""
 
-#: ../src/Elements/Settings.php:120
+#: ../src/Elements/Settings.php:123
 msgid "Elements"
 msgstr ""
 
-#: ../src/Elements/Settings.php:123
+#: ../src/Elements/Settings.php:126
 msgid "Display Kustom payment methods and delivery options on your store pages with Kustom Elements."
 msgstr ""
 
-#: ../src/Elements/Settings.php:127
+#: ../src/Elements/Settings.php:130
 msgid "Production public API key"
 msgstr ""
 
 #. translators: %s: Kustom Portal link.
-#: ../src/Elements/Settings.php:131
+#: ../src/Elements/Settings.php:134
 msgid "The public API keys used here are separate from the API Username and Password used for the payment integration above — find them in the %s under Elements → Installation script → data-public-api-key."
 msgstr ""
 
-#: ../src/Elements/Settings.php:132
+#: ../src/Elements/Settings.php:135
 msgid "Kustom Portal"
 msgstr ""
 
-#: ../src/Elements/Settings.php:134
+#: ../src/Elements/Settings.php:137
 msgid "The public API key used for Kustom Elements when test mode is disabled."
 msgstr ""
 
-#: ../src/Elements/Settings.php:142
+#: ../src/Elements/Settings.php:145
 msgid "Test public API key"
 msgstr ""
 
-#: ../src/Elements/Settings.php:144
+#: ../src/Elements/Settings.php:147
 msgid "Used when test mode is enabled."
 msgstr ""
 
-#: ../src/Elements/Settings.php:152
+#: ../src/Elements/Settings.php:155
 msgid "Payment Method Display"
 msgstr ""
 
-#: ../src/Elements/Settings.php:154
+#: ../src/Elements/Settings.php:157
 msgid "Presents the available Kustom payment methods on your store pages. You can also display it with the shortcode [kustom_payment_element] or block Kustom Payment Element."
 msgstr ""
 
-#: ../src/Elements/Settings.php:157
+#: ../src/Elements/Settings.php:160
 msgid "Payment Method Display placement on product pages"
 msgstr ""
 
-#: ../src/Elements/Settings.php:158
+#: ../src/Elements/Settings.php:161
 msgid "Payment Method Display placement on cart page"
 msgstr ""
 
-#: ../src/Elements/Settings.php:161
+#: ../src/Elements/Settings.php:164
 msgid "Delivery Method Display"
 msgstr ""
 
-#: ../src/Elements/Settings.php:163
+#: ../src/Elements/Settings.php:166
 msgid "Presents the available delivery options on your store pages. Requires Kustom Shipping Assistant (KSA) to be active and configured. You can also display it with the shortcode [kustom_delivery_element] or block Kustom Delivery Element."
 msgstr ""
 
-#: ../src/Elements/Settings.php:166
+#: ../src/Elements/Settings.php:169
 msgid "Delivery Method Display placement on product pages"
 msgstr ""
 
-#: ../src/Elements/Settings.php:167
+#: ../src/Elements/Settings.php:170
 msgid "Delivery Method Display placement on cart page"
 msgstr ""
 
+#: ../src/Elements/Settings.php:173
+msgid "Express Buttons"
+msgstr ""
+
+#: ../src/Elements/Settings.php:175
+msgid "One-click Apple Pay, Google Pay and Klarna purchases. Shown in the express area of the cart and checkout blocks and on the classic cart page. Requires Kustom Shipping Assistant (KSA) to be active and configured. You can also display it with the shortcode [kustom_express_element] or block Kustom Express Element."
+msgstr ""
+
+#: ../src/Elements/Settings.php:179
+msgid "Express merchant URLs"
+msgstr ""
+
+#: ../src/Elements/Settings.php:181
+msgid "Paste these into the Kustom Portal under Elements → Express buttons."
+msgstr ""
+
+#: ../src/Elements/Settings.php:184
+msgid "Express buttons on product pages"
+msgstr ""
+
+#: ../src/Elements/Settings.php:185
+msgid "Shortcode or block only"
+msgstr ""
+
+#: ../src/Elements/Settings.php:186
+msgid "On product pages the express buttons buy only that product, and leave the customer's cart untouched."
+msgstr ""
+
 #. translators: %s: The product page hook name.
-#: ../src/Elements/Settings.php:189
+#: ../src/Elements/Settings.php:209
 msgid "Where on the product page the element is displayed. Uses the %s hook."
 msgstr ""
 
-#: ../src/Elements/Settings.php:205
+#: ../src/Elements/Settings.php:225
 msgid "Where on the cart page the element is displayed. Each option uses a WooCommerce cart hook, from woocommerce_cart_collaterals (top) to woocommerce_after_cart (bottom)."
 msgstr ""
 
 #. translators: %s: The environment (production or test).
-#: ../src/Elements/Settings.php:260
+#: ../src/Elements/Settings.php:280
 msgid "The %s public API key for Kustom Elements is invalid and has been cleared. Use the data-public-api-key from the Elements installation script in the Kustom Portal, not the API Username or Password."
 msgstr ""
 
-#: ../src/Migrations/CredentialsMigration.php:158
+#: ../src/Elements/Settings.php:384
+msgid "Push URL"
+msgstr ""
+
+#: ../src/Elements/Settings.php:385
+msgid "Validation URL"
+msgstr ""
+
+#: ../src/Elements/Settings.php:386
+msgid "Confirmation URL"
+msgstr ""
+
+#: ../src/Elements/Settings.php:399
+msgid "Copy"
+msgstr ""
+
+#: ../src/Express/Confirmation.php:83
+msgid "We could not confirm your order. Please contact us if you were charged."
+msgstr ""
+
+#: ../src/Express/Express.php:139
+msgid "Could not start express checkout, please try again or use checkout."
+msgstr ""
+
+#: ../src/Migrations/CredentialsMigration.php:175
 msgid "Kustom Checkout for WooCommerce has been updated to use a single set of credentials for all regions. It looks like you had credentials configured for both Europe and the United States. We've defaulted to the credentials previously entered for Europe. Your other credentials are still stored in the database, and will be available again if you roll back to a previous version."
 msgstr ""
 
@@ -864,7 +924,7 @@ msgstr ""
 msgid "Gift card"
 msgstr ""
 
-#: ../src/OrderManagement/OrderLines.php:350, ../src/OrderManagement/OrderLines.php:351, ../classes/requests/helpers/class-kco-request-cart.php:307, ../classes/requests/helpers/class-kco-request-cart.php:308, ../src/OrderManagement/Request/Post/RequestPostRefund.php:241, ../src/OrderManagement/Request/Post/RequestPostRefund.php:242
+#: ../src/OrderManagement/OrderLines.php:350, ../src/OrderManagement/OrderLines.php:351, ../classes/requests/helpers/class-kco-request-cart.php:307, ../classes/requests/helpers/class-kco-request-cart.php:308, ../src/OrderManagement/Request/Post/RequestPostRefund.php:242, ../src/OrderManagement/Request/Post/RequestPostRefund.php:243
 msgid "Sales Tax"
 msgstr ""
 
@@ -1180,6 +1240,6 @@ msgstr ""
 msgid "Failed to validate your order, please try again."
 msgstr ""
 
-#: ../src/OrderManagement/Request/Post/RequestPostRefund.php:270
+#: ../src/OrderManagement/Request/Post/RequestPostRefund.php:271
 msgid "Return fee"
 msgstr ""

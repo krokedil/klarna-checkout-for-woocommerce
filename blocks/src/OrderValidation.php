@@ -139,6 +139,10 @@ class OrderValidation {
 		$order_data = new \KCO_Request_Order();
 		$wc_items   = array();
 		foreach ( $order->get_items() as $item ) {
+			if ( ! $item instanceof \WC_Order_Item_Product ) {
+				continue;
+			}
+
 			$line                   = $order_data->get_order_line_items( $item );
 			$reference              = (string) $line['reference'];
 			$wc_items[ $reference ] = ( $wc_items[ $reference ] ?? 0 ) + intval( $line['quantity'] );
