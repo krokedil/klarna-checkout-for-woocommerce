@@ -52,7 +52,7 @@ For help setting up and configuring Kustom Checkout for WooCommerce please refer
 == Changelog ==
 = 2026-10-27    - version 2.24.0 =
 * Feature       - Added support for adding Kustom express buttons to the cart, the block cart and checkout, product pages, and a new shortcode and block.
-* Enhancement   - The Kustom Elements public API keys are now verified with Kustom. The settings page shows whether each key works on your site, and saving the settings shows an error if a key is not recognized or your domain is not allowed in the Kustom Portal. The Kustom Elements blocks show the same errorin the block editor.
+* Enhancement   - Kustom Elements API keys are now validated with Kustom. The settings page reports invalid keys or unauthorized domains, and blocks show the same errors in the editor.
 * Tweak         - The "Support" link on the Plugins page now opens the support tab on the Kustom Checkout settings page instead of krokedil.se.
 * Fix           - Fixed a PHP warning when an order with Kustom Shipping Assistant shipping was placed, which also stopped a shipping option changed by the TMS from being saved to the order with its updated name and price.
 * Fix           - Fixed the "Dismiss" link on the credentials migration notice being misaligned on admin pages outside WooCommerce, such as the plugins page.
