@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Fixed a PHP warning when an order with Kustom Shipping Assistant shipping was placed, which also stopped a shipping option changed by the TMS from being saved to the order with its updated name and price.
