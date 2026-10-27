@@ -223,7 +223,7 @@ jQuery( function ( $ ) {
 			$( ".woocommerce-additional-fields" ).appendTo( "#kco-extra-checkout-fields" )
 			var form = $( 'form[name="checkout"] input, form[name="checkout"] select, textarea' )
 			var checkout_add_ons_moved = false
-			for ( i = 0; i < form.length; i++ ) {
+			for ( let i = 0; i < form.length; i++ ) {
 				var name = form[ i ].name.replace( "[]", "\\[\\]" ) // Escape any empty "array" keys to prevent errors.
 				// Check if field is inside the order review.
 				if ( $( "table.woocommerce-checkout-review-order-table" ).find( form[ i ] ).length ) {
