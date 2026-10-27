@@ -5,7 +5,7 @@
  * Description: Kustom Checkout payment gateway for WooCommerce.
  * Author: Kustom
  * Author URI: https://klarna.com/
- * Version: 2.23.1
+ * Version: 2.24.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
@@ -35,6 +35,7 @@ use Krokedil\KustomCheckout\Migrations\CredentialsMigration;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 use Krokedil\KustomCheckout\ShippingAssistant\ShippingAssistant;
 use Krokedil\KustomCheckout\Elements\Elements;
+use Krokedil\KustomCheckout\Express\Express;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -43,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.23.1' );
+define( 'KCO_WC_VERSION', '2.24.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -148,6 +149,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		public $elements;
 
 		/**
+		 * Kustom express buttons.
+		 *
+		 * @var Express $express
+		 */
+		public $express;
+
+		/**
 		 * Reference to the credentials migration class.
 		 *
 		 * @var CredentialsMigration $credentials_migration
@@ -229,9 +237,11 @@ if ( ! class_exists( 'KCO' ) ) {
 		 */
 		public function plugin_action_links( $links ) {
 			$setting_link = $this->get_setting_link();
+			$support_link = add_query_arg( 'subsection', 'support', $setting_link );
+
 			$plugin_links = array(
 				'<a href="' . $setting_link . '">' . __( 'Settings', 'klarna-checkout-for-woocommerce' ) . '</a>',
-				'<a href="http://krokedil.se/">' . __( 'Support', 'klarna-checkout-for-woocommerce' ) . '</a>',
+				'<a href="' . $support_link . '">' . __( 'Support', 'klarna-checkout-for-woocommerce' ) . '</a>',
 			);
 
 			return array_merge( $plugin_links, $links );
@@ -340,6 +350,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			$this->pickup_points      = new PickupPoints();
 			$this->shipping_assistant = new ShippingAssistant();
 			$this->elements           = new Elements();
+			$this->express            = new Express();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );

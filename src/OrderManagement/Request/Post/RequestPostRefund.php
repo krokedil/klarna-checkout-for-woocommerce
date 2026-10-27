@@ -1,6 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request\Post;
 
+use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 use Krokedil\KustomCheckout\OrderManagement\Request\RequestPost;
 use Krokedil\KustomCheckout\OrderManagement\OrderLines;
 use Krokedil\KustomCheckout\OrderManagement\Utility;
@@ -196,7 +197,7 @@ class RequestPostRefund extends RequestPost {
 				/**
 				 * Process Shipping
 				 *
-				 * @var WC_Order_Item_Shipping $shipping_item WooCommerce order item *shipping*.
+				 * @var \WC_Order_Item_Shipping $shipping_item WooCommerce order item *shipping*.
 				 */
 				foreach ( $refunded_shipping_items as $shipping_item ) {
 
@@ -297,7 +298,7 @@ class RequestPostRefund extends RequestPost {
 	 *
 	 * @param \WC_Order      $order      The WooCommerce order.
 	 * @param \WC_Order_Item $order_item The WooCommerce order item.
-	 * @return int
+	 * @return float
 	 */
 	private function get_order_item_tax_rate( $order, $order_item ) {
 		// If the item has no tax, the rate is 0.
@@ -325,7 +326,7 @@ class RequestPostRefund extends RequestPost {
 	 * Returns the id of the refunded order.
 	 *
 	 * @param int $order_id The WooCommerce order id.
-	 * @return string
+	 * @return int
 	 */
 	public function get_refunded_order_id( $order_id ) {
 		$order = wc_get_order( $order_id );

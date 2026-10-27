@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\Elements;
 
+use Krokedil\KustomCheckout\Express\Express;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -71,6 +73,8 @@ class Settings {
 	public function __construct() {
 		add_filter( 'kco_wc_gateway_settings', array( $this, 'extend_settings' ) );
 		add_filter( 'woocommerce_generate_krokedil_subtitle_html', array( $this, 'generate_krokedil_subtitle_html' ), 10, 3 );
+		add_filter( 'woocommerce_generate_krokedil_elements_key_html', array( $this, 'generate_krokedil_elements_key_html' ), 10, 4 );
+		add_filter( 'woocommerce_generate_kco_express_urls_html', array( $this, 'generate_kco_express_urls_html' ), 10, 3 );
 		add_filter( 'woocommerce_settings_api_sanitized_fields_kco', array( $this, 'sanitize_public_api_keys' ) );
 	}
 
@@ -84,7 +88,7 @@ class Settings {
 			''   => __( 'Disabled', 'klarna-checkout-for-woocommerce' ),
 			'4'  => __( 'Above Title', 'klarna-checkout-for-woocommerce' ),
 			'7'  => __( 'Between Title and Price', 'klarna-checkout-for-woocommerce' ),
-			'15' => __( 'Between Price and Excerpt', 'klarna-checkout-for-woocommerce' ),
+			'15' => __( 'Between Price and Excerpt (recommended)', 'klarna-checkout-for-woocommerce' ),
 			'25' => __( 'Between Excerpt and Add to cart button', 'klarna-checkout-for-woocommerce' ),
 			'35' => __( 'Between Add to cart button and Product meta', 'klarna-checkout-for-woocommerce' ),
 			'45' => __( 'Between Product meta and Product sharing buttons', 'klarna-checkout-for-woocommerce' ),
@@ -104,7 +108,7 @@ class Settings {
 			'woocommerce_before_cart_totals'  => __( 'Above cart totals', 'klarna-checkout-for-woocommerce' ),
 			'woocommerce_proceed_to_checkout' => __( 'Between cart totals and proceed to checkout button', 'klarna-checkout-for-woocommerce' ),
 			'woocommerce_after_cart_totals'   => __( 'After proceed to checkout button', 'klarna-checkout-for-woocommerce' ),
-			'woocommerce_after_cart'          => __( 'Bottom of the page', 'klarna-checkout-for-woocommerce' ),
+			'woocommerce_after_cart'          => __( 'Bottom of the page (recommended)', 'klarna-checkout-for-woocommerce' ),
 		);
 	}
 
@@ -124,7 +128,7 @@ class Settings {
 
 		$settings['elements_live_public_api_key'] = array(
 			'title'             => __( 'Production public API key', 'klarna-checkout-for-woocommerce' ),
-			'type'              => 'text',
+			'type'              => 'krokedil_elements_key',
 			'description'       => sprintf(
 				// translators: %s: Kustom Portal link.
 				__( 'The public API keys used here are separate from the API Username and Password used for the payment integration above — find them in the %s under Elements → Installation script → data-public-api-key.', 'klarna-checkout-for-woocommerce' ),
@@ -139,7 +143,7 @@ class Settings {
 
 		$settings['elements_playground_public_api_key'] = array(
 			'title'             => __( 'Test public API key', 'klarna-checkout-for-woocommerce' ),
-			'type'              => 'text',
+			'type'              => 'krokedil_elements_key',
 			'description'       => __( 'Used when test mode is enabled.', 'klarna-checkout-for-woocommerce' ),
 			'default'           => '',
 			'custom_attributes' => array(
@@ -164,6 +168,23 @@ class Settings {
 
 		$settings['elements_shipping_product_position'] = $this->get_product_placement_field( __( 'Delivery Method Display placement on product pages', 'klarna-checkout-for-woocommerce' ) );
 		$settings['elements_shipping_cart_position']    = $this->get_cart_placement_field( __( 'Delivery Method Display placement on cart page', 'klarna-checkout-for-woocommerce' ) );
+
+		$settings['elements_express_title'] = array(
+			'title'       => __( 'Express Buttons', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'krokedil_subtitle',
+			'description' => __( 'One-click Apple Pay, Google Pay and Klarna purchases. Shown in the express area of the cart and checkout blocks and on the classic cart page. Requires Kustom Shipping Assistant (KSA) to be active and configured. You can also display it with the shortcode [kustom_express_element] or block Kustom Express Element.', 'klarna-checkout-for-woocommerce' ),
+		);
+
+		$settings['elements_express_urls'] = array(
+			'title'       => __( 'Express merchant URLs', 'klarna-checkout-for-woocommerce' ),
+			'type'        => 'kco_express_urls',
+			'description' => __( 'Paste these into the Kustom Portal under Elements → Express buttons.', 'klarna-checkout-for-woocommerce' ),
+		);
+
+		$product_express_field = $this->get_product_placement_field( __( 'Express buttons on product pages', 'klarna-checkout-for-woocommerce' ) );
+		$product_express_field['options'][ Express::PLACEMENT_MANUAL ] = __( 'Shortcode or block only', 'klarna-checkout-for-woocommerce' );
+		$product_express_field['description']                          = __( 'On product pages the express buttons buy only that product, and leave the customer\'s cart untouched.', 'klarna-checkout-for-woocommerce' );
+		$settings['elements_express_product_position']                 = $product_express_field;
 
 		$settings['elements_end'] = array(
 			'type' => 'krokedil_section_end',
@@ -234,6 +255,8 @@ class Settings {
 			$settings[ $field ] = $value;
 		}
 
+		$this->validate_public_api_keys( $settings );
+
 		return $settings;
 	}
 
@@ -261,6 +284,66 @@ class Settings {
 	}
 
 	/**
+	 * Verify the saved public API keys with Kustom, and show an admin error for keys that won't work on this site.
+	 *
+	 * @param array $settings The sanitized settings about to be saved.
+	 */
+	private function validate_public_api_keys( $settings ) {
+		foreach ( self::PUBLIC_API_KEY_FIELDS as $field ) {
+			$testmode = 'elements_playground_public_api_key' === $field;
+			$status   = KeyValidator::get_status( $settings[ $field ] ?? '', $testmode, true );
+
+			if ( KeyValidator::is_error( $status ) && class_exists( 'WC_Admin_Settings' ) ) {
+				\WC_Admin_Settings::add_error( KeyValidator::get_message( $status, $testmode ) );
+			}
+		}
+	}
+
+	/**
+	 * Render a public API key field: a regular text input, with the key's connection status below it.
+	 *
+	 * @param string                $html    The default field HTML (empty).
+	 * @param string                $key     The field key.
+	 * @param array                 $data    The field arguments.
+	 * @param \WC_Settings_API|null $gateway The settings instance rendering the field.
+	 * @return string
+	 */
+	public function generate_krokedil_elements_key_html( $html, $key, $data, $gateway = null ) {
+		if ( ! $gateway instanceof \WC_Settings_API ) {
+			return $html;
+		}
+
+		// Read from the gateway, since it holds the just saved values when the page renders after a save.
+		$testmode = 'elements_playground_public_api_key' === $key;
+		$status   = KeyValidator::get_status( $gateway->get_option( $key, '' ), $testmode );
+
+		// Like the other API key fields, an empty key gets no status.
+		$data['type'] = 'text';
+		if ( KeyValidator::STATUS_MISSING === $status ) {
+			return $gateway->generate_text_html( $key, $data );
+		}
+
+		if ( KeyValidator::STATUS_OK === $status ) {
+			$state = 'success';
+		} elseif ( KeyValidator::is_error( $status ) ) {
+			$state = 'error';
+		} else {
+			$state = 'warning';
+		}
+
+		$badge = sprintf(
+			'<span class="kco-elements-key-status kco-elements-key-status--%1$s">%2$s</span>',
+			esc_attr( $state ),
+			esc_html( KeyValidator::get_message( $status, $testmode ) )
+		);
+
+		// Show the status directly below the input, above the field description.
+		$data['description'] = $badge . ( $data['description'] ?? '' );
+
+		return $gateway->generate_text_html( $key, $data );
+	}
+
+	/**
 	 * Render a plain sub-heading/info row inside a settings section.
 	 *
 	 * @param string $html Unused (default filter argument).
@@ -282,6 +365,41 @@ class Settings {
 				<?php if ( ! empty( $description ) ) : ?>
 					<p class="description"><?php echo wp_kses_post( $description ); ?></p>
 				<?php endif; ?>
+			</td>
+		</tr>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Render the express merchant URLs read-only, with copy buttons.
+	 *
+	 * @param string $html Unused (default filter argument).
+	 * @param string $key  The field key.
+	 * @param array  $data The field arguments.
+	 * @return string
+	 */
+	public function generate_kco_express_urls_html( $html, $key, $data ) {
+		$labels = array(
+			'push'         => __( 'Push URL', 'klarna-checkout-for-woocommerce' ),
+			'validation'   => __( 'Validation URL', 'klarna-checkout-for-woocommerce' ),
+			'confirmation' => __( 'Confirmation URL', 'klarna-checkout-for-woocommerce' ),
+		);
+
+		ob_start();
+		?>
+		<tr valign="top">
+			<th scope="row" class="titledesc"><?php echo esc_html( $data['title'] ?? '' ); ?></th>
+			<td class="forminp">
+				<?php foreach ( Express::get_merchant_urls() as $name => $url ) : ?>
+					<p>
+						<label><?php echo esc_html( $labels[ $name ] ?? $name ); ?><br>
+							<input type="text" class="large-text code" readonly value="<?php echo esc_attr( $url ); ?>" onfocus="this.select()">
+						</label>
+						<button type="button" class="button" onclick="navigator.clipboard.writeText(this.previousElementSibling.querySelector('input').value)"><?php esc_html_e( 'Copy', 'klarna-checkout-for-woocommerce' ); ?></button>
+					</p>
+				<?php endforeach; ?>
+				<p class="description"><?php echo esc_html( $data['description'] ?? '' ); ?></p>
 			</td>
 		</tr>
 		<?php

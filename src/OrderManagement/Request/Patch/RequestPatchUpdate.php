@@ -1,6 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request\Patch;
 
+use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 use Krokedil\KustomCheckout\OrderManagement\OrderLines;
 use Krokedil\KustomCheckout\OrderManagement\Request\RequestPatch;
 

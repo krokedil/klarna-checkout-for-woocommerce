@@ -24,6 +24,10 @@ tmp*
 readme.dev.md
 .prettierignore
 scoper.custom.php
+phpstan.neon
+phpstan-baseline.neon
+phpstan-bootstrap.php
+phpstan-stubs.php
 pnpm-lock.yaml
 /.changelogs
 

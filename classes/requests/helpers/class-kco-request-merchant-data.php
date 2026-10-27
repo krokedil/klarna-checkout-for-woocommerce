@@ -21,7 +21,7 @@ class KCO_Request_Merchant_Data {
 	 * Gets merchant data for Kustom purchase.
 	 *
 	 * @param int|null $order_id The WooCommerce order ID, if available.
-	 * @return array
+	 * @return string|false JSON-encoded merchant data.
 	 */
 	public static function get_merchant_data( $order_id = null ) {
 		$merchant_data = array();

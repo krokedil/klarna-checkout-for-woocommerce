@@ -34,7 +34,7 @@ class KCO_Templates {
 	/**
 	 * Returns the *Singleton* instance of this class.
 	 *
-	 * @return self::$instance The *Singleton* instance.
+	 * @return KCO_Templates The *Singleton* instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {

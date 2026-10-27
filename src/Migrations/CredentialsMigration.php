@@ -51,6 +51,7 @@ class CredentialsMigration {
 	 */
 	public function __construct() {
 		add_action( 'admin_notices', array( $this, 'render_notice' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_notice_style' ) );
 		add_action( 'woocommerce_update_options_checkout_kco', array( $this, 'clear_notice' ) );
 	}
 
@@ -134,24 +135,40 @@ class CredentialsMigration {
 	}
 
 	/**
-	 * Renders the admin notice explaining that the EU credentials were kept.
+	 * Loads WooCommerce's notice stylesheet, which positions the dismiss link.
 	 *
-	 * Dismissal is handled by WooCommerce's own generic `wc-hide-notice` handler,
-	 * the same mechanism every other notice in this plugin relies on.
+	 * WooCommerce only loads it on screens where it has notices of its own, so
+	 * without this the dismiss link is unstyled on e.g. the plugins screen.
+	 *
+	 * @return void
+	 */
+	public function enqueue_notice_style() {
+		if ( ! $this->should_show_notice() || ! defined( 'WC_PLUGIN_FILE' ) ) {
+			return;
+		}
+
+		wp_enqueue_style( 'woocommerce-activation', plugins_url( '/assets/css/activation.css', WC_PLUGIN_FILE ), array(), WC_VERSION );
+	}
+
+	/**
+	 * Whether the notice is due and the current user should see it.
+	 *
+	 * @return bool
+	 */
+	private function should_show_notice() {
+		// Only show this for users that can manage WooCommerce settings.
+		return get_option( self::NOTICE_OPTION )
+			&& current_user_can( 'manage_woocommerce' )
+			&& ! get_user_meta( get_current_user_id(), 'dismissed_kco_credentials_migration_notice', true );
+	}
+
+	/**
+	 * Renders the admin notice explaining that the EU credentials were kept.
 	 *
 	 * @return void
 	 */
 	public function render_notice() {
-		if ( ! get_option( self::NOTICE_OPTION ) ) {
-			return;
-		}
-
-		// Only show this for users that can manage WooCommerce settings.
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			return;
-		}
-
-		if ( get_user_meta( get_current_user_id(), 'dismissed_kco_credentials_migration_notice', true ) ) {
+		if ( ! $this->should_show_notice() ) {
 			return;
 		}
 

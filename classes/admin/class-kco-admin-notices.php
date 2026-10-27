@@ -23,21 +23,21 @@ class KCO_Admin_Notices {
 	/**
 	 * The reference the *Singleton* instance of this class.
 	 *
-	 * @var $instance
+	 * @var KCO_Admin_Notices
 	 */
 	protected static $instance;
 
 	/**
 	 * Checks if KCO gateway is enabled.
 	 *
-	 * @var $enabled
+	 * @var string
 	 */
 	protected $enabled;
 
 	/**
 	 * Returns the *Singleton* instance of this class.
 	 *
-	 * @return self::$instance The *Singleton* instance.
+	 * @return KCO_Admin_Notices The *Singleton* instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
