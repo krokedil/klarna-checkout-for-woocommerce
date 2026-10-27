@@ -7,36 +7,6 @@ parameters:
 			path: blocks/src/BlockExtension.php
 
 		-
-			message: '#^Property Krokedil\\KustomCheckout\\Blocks\\BlockExtension\:\:\$overrides is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: blocks/src/BlockExtension.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 1
-			path: blocks/src/OrderValidation.php
-
-		-
-			message: '#^Static method Krokedil\\KustomCheckout\\Blocks\\OrderValidation\:\:load_wc_session\(\) is unused\.$#'
-			identifier: method.unused
-			count: 1
-			path: blocks/src/OrderValidation.php
-
-		-
-			message: '#^Static method Krokedil\\KustomCheckout\\Blocks\\OrderValidation\:\:validate_hashes\(\) is unused\.$#'
-			identifier: method.unused
-			count: 1
-			path: blocks/src/OrderValidation.php
-
-		-
-			message: '#^Static method Krokedil\\KustomCheckout\\Blocks\\OrderValidation\:\:validate_order_totals\(\) is unused\.$#'
-			identifier: method.unused
-			count: 1
-			path: blocks/src/OrderValidation.php
-
-		-
 			message: '#^Parameter \#1 \$order_id of method KCO_Merchant_URLs\:\:get_urls\(\) expects string\|null, int\|null given\.$#'
 			identifier: argument.type
 			count: 1
