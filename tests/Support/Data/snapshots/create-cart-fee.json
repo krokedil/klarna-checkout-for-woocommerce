@@ -527,7 +527,8 @@
             "require_client_validation": true,
             "require_client_validation_callback_response": true,
             "phone_mandatory": true,
-            "show_subtotal_detail": false
+            "show_subtotal_detail": false,
+            "confirmation_page_upsell": false
         },
         "customer": {
             "type": "person"
