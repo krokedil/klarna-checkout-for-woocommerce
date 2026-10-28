@@ -3,6 +3,7 @@ namespace Krokedil\KustomCheckout\Blocks;
 
 use Krokedil\KustomCheckout\Blocks\Api\Registry;
 use Krokedil\KustomCheckout\Blocks\Checkout\CheckoutBlock;
+use Krokedil\KustomCheckout\Blocks\Express\ExpressPaymentMethod;
 use Krokedil\KustomCheckout\Blocks\InPersonPayments\BlockCheckout as InPersonBlockCheckout;
 use Krokedil\KustomCheckout\Blocks\InPersonPayments\CheckoutBlock as InPersonCheckoutBlock;
 use Krokedil\KustomCheckout\InPersonPayments\InPersonPayments;
@@ -67,6 +68,12 @@ class BlockExtension {
 				$this->overrides    = new Overrides();
 				$this->api_registry = new Registry();
 				new InPersonBlockCheckout();
+
+				add_filter( 'kco_wc_api_request_args', array( $this->overrides, 'override_request_body' ), 10, 2 );
+
+				// Important: Needs to be on a priority before 100, since WCS will process the order at 100.
+				// @TODO: Commented out for now until we can verify with WooCommerce why Subscriptions are not processed correctly when placing an order through the store api endpoint.
+				// add_filter( 'woocommerce_store_api_checkout_order_processed', array( $this->overrides, 'maybe_calculate_recurring_carts' ), 90 );.
 			},
 			5
 		);
@@ -151,6 +158,7 @@ class BlockExtension {
 				'woocommerce_blocks_payment_method_type_registration',
 				function ( $payment_method_registry ) {
 					$payment_method_registry->register( new CheckoutBlock() );
+					$payment_method_registry->register( new ExpressPaymentMethod() );
 
 					if ( InPersonPayments::is_enabled() ) {
 						$payment_method_registry->register( new InPersonCheckoutBlock() );
@@ -228,12 +236,48 @@ class BlockExtension {
 	}
 
 	/**
+	 * Checks if the current request may sync the Kustom order.
+	 *
+	 * @return bool
+	 */
+	private function is_checkout_context() {
+		// On a page render, only the checkout page itself may sync.
+		if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+			// The purchase is complete on the confirmation return, so Kustom answers 403 READ_ONLY_ORDER.
+			if ( isset( $_GET['kco_confirm'] ) || is_wc_endpoint_url( 'order-received' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only checks presence.
+				return false;
+			}
+
+			return is_checkout();
+		}
+
+		// In the Store API, only the routes the checkout block posts to may sync. The cart routes
+		// are left out, since those are what the Mini-Cart block serialises on every page render.
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+		$path        = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
+
+		if ( ! preg_match( '#/wc/store/v\d+/(checkout|batch)$#', $path ) ) {
+			return false;
+		}
+
+		// Of those, only cart mutations may sync. HEAD falls through to the GET
+		// handler, so allowlist the write methods rather than excluding GET alone.
+		$method = strtoupper( sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) );
+
+		return in_array( $method, array( 'POST', 'PUT', 'PATCH', 'DELETE' ), true );
+	}
+
+	/**
 	 * Get the address data for the Kustom Checkout block. Also updates the Kustom order if needed.
 	 *
 	 * @return array
 	 * @throws Exception If we can't get the Kustom order.
 	 */
 	public function get_address() {
+		if ( ! $this->is_checkout_context() ) {
+			return array();
+		}
+
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
 		// Only run this if we have a Kustom order id.

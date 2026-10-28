@@ -223,7 +223,7 @@ jQuery( function ( $ ) {
 			$( ".woocommerce-additional-fields" ).appendTo( "#kco-extra-checkout-fields" )
 			var form = $( 'form[name="checkout"] input, form[name="checkout"] select, textarea' )
 			var checkout_add_ons_moved = false
-			for ( i = 0; i < form.length; i++ ) {
+			for ( let i = 0; i < form.length; i++ ) {
 				var name = form[ i ].name.replace( "[]", "\\[\\]" ) // Escape any empty "array" keys to prevent errors.
 				// Check if field is inside the order review.
 				if ( $( "table.woocommerce-checkout-review-order-table" ).find( form[ i ] ).length ) {
@@ -544,20 +544,7 @@ jQuery( function ( $ ) {
 						success: function ( data ) {
 							try {
 								if ( "success" === data.result ) {
-									let email = "N/A"
-									if (
-										"billing_address" in response.data &&
-										"email" in response.data.billing_address
-									) {
-										email = response.data.shipping_address.email
-									} else if (
-										"shipping_address" in response.data &&
-										"email" in response.data.shipping_address
-									) {
-										email = response.data.shipping_address.email
-									}
-
-									kco_wc.logToFile( `Successfully placed order [${email}]. Sending "should_proceed: true" to Kustom` )
+									kco_wc.logToFile( 'Successfully placed order. Sending "should_proceed: true" to Kustom' )
 									callback( { should_proceed: true } )
 								} else {
 									throw "Result failed"

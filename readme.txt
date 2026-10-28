@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 9.7.0
-WC tested up to: 11.1.0
-Stable tag: 2.21.0
+WC tested up to: 11.2.1
+Stable tag: 2.24.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,40 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-10-27    - version 2.24.0 =
+* Feature       - Added support for adding Kustom express buttons to the cart, the block cart and checkout, product pages, and a new shortcode and block.
+* Enhancement   - Kustom Elements API keys are now validated with Kustom. The settings page reports invalid keys or unauthorized domains, and blocks show the same errors in the editor.
+* Tweak         - The "Support" link on the Plugins page now opens the support tab on the Kustom Checkout settings page instead of krokedil.se.
+* Fix           - Fixed a PHP warning when an order with Kustom Shipping Assistant shipping was placed, which also stopped a shipping option changed by the TMS from being saved to the order with its updated name and price.
+* Fix           - Fixed the "Dismiss" link on the credentials migration notice being misaligned on admin pages outside WooCommerce, such as the plugins page.
+* Fix           - Fixed an issue where the margin set on the Kustom Elements blocks was not applied correctly, on the page and in the block editor.
+
+= 2026-10-20    - version 2.23.1 =
+* Fix           - Fixed an issue where the confirmation lock enabled by the "kco_wc_lock_confirmation" filter did not prevent duplicate order confirmations on stores using an object cache such as LiteSpeed Cache. The lock now also covers the push notification from Kustom.
+* Fix           - Fixed the krokedil_wp_api_mask_log_data filter not turning off log masking. Returning false from it now logs every entry unmasked, for debugging only. Failed requests are not saved to the system status report while it is off.
+* Fix           - Fixed a PHP warning about an undefined array key "id" when placing an order with Kustom Shipping Assistant.
+* Fix           - Fixed PHP warnings and a false "order total does not match" note when Kustom's order management could not return the order during confirmation. The order is now set to on-hold to wait for Kustom's push notification, as intended.
+
+= 2026-10-13    - version 2.23.0 =
+* Feature       - Added an "Enable Kustom Shipping Assistant" setting that lets a TMS control shipping methods and pricing in the Kustom iframe. It is on by default only for stores already using the Kustom Shipping Assistant shipping method. The separate Kustom Shipping Assistant plugin is no longer needed and should be deactivated.
+* Feature       - Added the setting "Display on free orders" to show Kustom Checkout when the order total is 0. It replaces the need for the "kco_check_if_needs_payment" filter, which still takes priority over the setting.
+* Tweak         - Customer details and payment secrets are now masked in the plugin logs and the system status report.
+* Tweak         - The checkout no longer creates a Kustom order when the cart is empty.
+* Tweak         - Orders placed with Kustom Shipping Assistant and Ingrid now save the Ingrid transport order id as the order meta "ingrid_tos_id".
+* Tweak         - Improved the admin notice asking you to deactivate the separate Kustom Shipping Assistant plugin.
+* Fix           - Fixed the Kustom Shipping Assistant shipping method not being applied to the order, so a customer who selected a shipping option in the Kustom iframe could be charged the price of a different shipping method in the same shipping zone.
+* Fix           - Fixed an issue where the checkout block sent a failing Kustom order update after a completed purchase. The customer is now sent straight to the thank you page instead of the checkout page being loaded first.
+* Fix           - Fixed an issue where Post Purchase Upsell fetched the Kustom order several times on every page load to check whether an upsell was possible. The answer is now saved on the order when the purchase is confirmed.
+* Fix           - Fixed an issue where a free order placed in the block checkout with the "kco_check_if_needs_payment" filter returned the customer to the checkout page with a READ_ONLY_ORDER error instead of the thank you page.
+* Fix           - Fixed the Kustom Portal link in the Kustom Elements settings, which pointed to the wrong domain.
+
+= 2026-09-28    - version 2.22.0 =
+* Feature       - Added support for Kustom Elements. Show your customers the available Kustom payment methods and delivery options on product and cart pages, or anywhere else with a shortcode or block.
+* Fix           - Fixed an issue where the customer could see a "shipping methods have been changed" error when placing an order with Kustom Shipping Assistant handling the shipping selection.
+* Fix           - Fixed an issue where the Mini-Cart block triggered a Kustom API call on every page load.
+* Fix           - Fixed an issue where renewal orders inherited the parent order's Kustom order ID, causing an unpaid renewal order to appear connected to the parent's Kustom order in the Kustom Order Management box.
+* Fix           - Fixed an issue where retrying payment on a subscription renewal order other than the most recent one left the authorized payment unregistered and uncaptured in WooCommerce.
+
 = 2026-09-15    - version 2.21.0 =
 * Feature       - Added an "Enable order management" setting. When disabled, WooCommerce no longer activates, cancels, updates or credits Kustom orders, and refunds can only be registered in WooCommerce with "Refund manually". The manual actions on individual orders are still available.
 * Feature       - Simplified the Kustom API credential settings into a single set of fields instead of separate Europe and United States entries.

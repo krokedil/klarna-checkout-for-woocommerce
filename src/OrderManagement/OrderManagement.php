@@ -218,7 +218,7 @@ class OrderManagement {
 
 			// If the order was not paid using the plugin that instanced this class, bail.
 			if ( ! OrderUtility::is_kustom_order( $order ) ) {
-				return;
+				return null;
 			}
 
 			// The merchant manages orders outside of WooCommerce.
@@ -298,7 +298,7 @@ class OrderManagement {
 
 		// If the order was not paid using the plugin that instanced this class, bail.
 		if ( 'kco' !== $order->get_payment_method() ) {
-			return;
+			return null;
 		}
 
 		// Are we on the subscription page?
@@ -343,8 +343,15 @@ class OrderManagement {
 				return new \WP_Error( 'not_paid', 'Order has not been paid.' );
 			}
 
+			/**
+			 * Filters the WooCommerce order statuses in which order updates are synced to Kustom.
+			 *
+			 * @param string[] $allowed_statuses The allowed order statuses, without the "wc-" prefix. Default array( 'on-hold' ).
+			 */
+			$allowed_statuses = apply_filters( 'kom_allowed_update_statuses', array( 'on-hold' ) );
+
 			// Changes are only possible if order is an allowed order status.
-			if ( ! in_array( $order->get_status(), apply_filters( 'kom_allowed_update_statuses', array( 'on-hold' ) ), true ) ) {
+			if ( ! in_array( $order->get_status(), $allowed_statuses, true ) ) {
 				return new \WP_Error( 'not_allowed_status', 'Order is not in allowed status.' );
 			}
 
@@ -403,7 +410,7 @@ class OrderManagement {
 
 		// If the order was not paid using the plugin that instanced this class, bail.
 		if ( 'kco' !== $order->get_payment_method() ) {
-			return;
+			return null;
 		}
 
 		if ( ! isset( $options['kom_auto_capture'] ) || 'yes' === $options['kom_auto_capture'] || $action ) {
@@ -592,6 +599,11 @@ class OrderManagement {
 			return new \WP_Error( 'unknown_error', 'Response object is of type WP_Error.', $response );
 		}
 
+		/**
+		 * Filters the return fees applied to the refund, used when writing the refund order note.
+		 *
+		 * @param array $applied_return_fees The applied return fee data, with 'amount' and 'tax_amount' keys. Default empty array.
+		 */
 		$applied_return_fees = apply_filters( 'klarna_applied_return_fees', array() );
 
 		// translators: refund amount, refund id.

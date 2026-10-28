@@ -22,7 +22,13 @@ class KCO_Request_Create extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $order_id = null, $checkout_flow = 'embedded' ) {
-		$request_url       = $this->get_api_url_base() . 'checkout/v3/orders';
+		$request_url = $this->get_api_url_base() . 'checkout/v3/orders';
+
+		/**
+		 * Filters the request arguments for creating a Kustom Checkout order.
+		 *
+		 * @param array $request_args The request arguments passed to wp_remote_request().
+		 */
 		$request_args      = apply_filters( 'kco_wc_create_order', $this->get_request_args( $order_id, $checkout_flow, $request_url ) );
 		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
@@ -46,9 +52,17 @@ class KCO_Request_Create extends KCO_Request {
 	public function get_body( $order_id, $checkout_flow ) {
 		$request_options = new KCO_Request_Options();
 
+		/**
+		 * Filters the locale sent to Kustom.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#change-the-locale-sent-to-kustom Change the locale sent to Kustom
+		 * @param string $locale The locale, derived from the WordPress locale (for example "en-US").
+		 */
+		$locale = apply_filters( 'kco_locale', substr( str_replace( '_', '-', get_locale() ), 0, 5 ) );
+
 		$request_body = array(
 			'purchase_country'   => $this->get_purchase_country(),
-			'locale'             => apply_filters( 'kco_locale', substr( str_replace( '_', '-', get_locale() ), 0, 5 ) ),
+			'locale'             => $locale,
 			'merchant_urls'      => KCO_WC()->merchant_urls->get_urls( $order_id ),
 			'billing_countries'  => KCO_Request_Countries::get_billing_countries(),
 			'shipping_countries' => KCO_Request_Countries::get_shipping_countries(),
@@ -370,12 +384,31 @@ class KCO_Request_Create extends KCO_Request {
 	 * @return array
 	 */
 	protected function get_request_args( $order_id, $checkout_flow, $url = '' ) {
+		/**
+		 * Filters the request body sent to Kustom when creating or updating an order.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#modify-order-data-sent-to-kustom Modify order data sent to Kustom
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#anonymize-product-names-sent-to-kustom Anonymize product names sent to Kustom
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#set-a-forced-purchase-country Set a forced purchase country
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#only-accept-purchases-from-customer-over-18-years-of-age Only accept purchases from customer over 18 years of age
+		 * @param array    $body     The request body.
+		 * @param int|null $order_id The WooCommerce order ID, or null when no order exists yet.
+		 */
+		$request_body = apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id, $checkout_flow ), $order_id );
+
+		/**
+		 * Filters the timeout, in seconds, for requests to the Kustom API.
+		 *
+		 * @param int $timeout The request timeout in seconds. Default 10.
+		 */
+		$timeout = apply_filters( 'kco_wc_request_timeout', 10 );
+
 		return array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'POST',
-			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id, $checkout_flow ), $order_id ) ),
-			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
+			'body'       => wp_json_encode( $request_body ),
+			'timeout'    => $timeout,
 		);
 	}
 }

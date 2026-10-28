@@ -12,19 +12,45 @@ use Tests\Support\IntegrationTestCase;
 
 /**
  * The checkout entry point. Which flow handles a purchase, what each one stamps on
- * the order, and what it hands back to WooCommerce.
+ * the order, what it hands back to WooCommerce, and how it reads the shipping
+ * selection it is handed.
  *
  * @covers \Krokedil\KustomCheckout\CheckoutFlow\CheckoutFlow
  * @covers \KCO_Gateway::process_payment
+ * @covers \KCO_Checkout::maybe_register_shipping_error
+ * @covers \KCO_Checkout::maybe_change_needs_payment
+ * @covers \Krokedil\KustomCheckout\Utility\SettingsUtility::check_if_needs_payment
  */
 class CheckoutTest extends IntegrationTestCase {
 
 	protected ?string $storeProfile = 'se';
 
+	/** The `woocommerce_checkout_process` count from before the shipping fixture raised it. */
+	private ?int $checkoutProcessCount = null;
+
+	/** The request URI from before the free order fixture pointed it at the Store API. */
+	private ?string $requestUri = null;
+
 	protected function setUp(): void {
 		parent::setUp();
 
 		$this->haveCustomerAddress( $this->swedishAddress(), $this->swedishAddress() );
+	}
+
+	protected function tearDown(): void {
+		// did_action() counts never fall, and the assessment's first guard reads this one,
+		// so leaving it raised would arm the guard for every later test in the process.
+		if ( null !== $this->checkoutProcessCount ) {
+			$GLOBALS['wp_actions']['woocommerce_checkout_process'] = $this->checkoutProcessCount;
+			$this->checkoutProcessCount                            = null;
+		}
+
+		if ( null !== $this->requestUri ) {
+			$_SERVER['REQUEST_URI'] = $this->requestUri;
+			$this->requestUri       = null;
+		}
+
+		parent::tearDown();
 	}
 
 	/**
@@ -224,6 +250,92 @@ class CheckoutTest extends IntegrationTestCase {
 		$this->expectExceptionMessage( 'Invalid order ID.' );
 
 		$this->gateway()->process_payment( 999999999 );
+	}
+
+	/**
+	 * WooCommerce quietly swaps the chosen shipping method when it stops recognising it,
+	 * and the plugin turns that into an error the customer can act on. Kustom Shipping
+	 * Assistant owns the selection itself, so its rate must never be read as a swap.
+	 *
+	 * @dataProvider provide_shipping_selections
+	 */
+	public function test_a_shipping_selection_the_plugin_does_not_own_is_left_alone( string $chosen, string $default ): void {
+		$this->arrangeShippingAssessment();
+
+		$before = did_action( 'kco_checkout_shipping_error' );
+
+		$this->assertSame( $default, apply_filters( 'woocommerce_shipping_chosen_method', $default, [], $chosen ) );
+		$this->assertSame(
+			$before,
+			did_action( 'kco_checkout_shipping_error' ),
+			sprintf( 'A chosen method of "%s" must not register a shipping error.', $chosen )
+		);
+	}
+
+	/** @return array<string, array{0: string, 1: string}> */
+	public function provide_shipping_selections(): array {
+		return [
+			'the shipping assistant rate, carrying its zone instance' => [ 'klarna_kss:1', 'flat_rate:1' ],
+			'the shipping assistant method, carrying none'            => [ 'klarna_kss', 'flat_rate:1' ],
+			'a method WooCommerce did not swap'                       => [ 'flat_rate:1', 'flat_rate:1' ],
+		];
+	}
+
+	/**
+	 * With free orders shown in Kustom, the block checkout must still hand a free order to the
+	 * gateway, or the order never gets the Kustom reference the confirmation looks it up by.
+	 *
+	 * @dataProvider provide_free_order_requests
+	 */
+	public function test_a_free_order_goes_through_kustom_only_when_shown_in_kustom( bool $store_api, string $shown_by, bool $expected ): void {
+		if ( $store_api ) {
+			$this->requestUri       = $_SERVER['REQUEST_URI'] ?? '';
+			$_SERVER['REQUEST_URI'] = '/wp-json/wc/store/v1/checkout';
+		}
+
+		if ( 'filter' === $shown_by ) {
+			add_filter( 'kco_check_if_needs_payment', '__return_false' );
+		}
+
+		if ( str_starts_with( $shown_by, 'setting' ) ) {
+			$this->haveGatewayCredentials( [ 'display_on_free_orders' => 'yes' ] );
+		}
+
+		if ( 'setting, filtered back' === $shown_by ) {
+			add_filter( 'kco_check_if_needs_payment', '__return_true' );
+		}
+
+		$order = $this->haveGatewayOrder( [ 'items' => [ [ $this->haveSimpleProduct( [ 'price' => '0.00' ] ), 1 ] ] ] );
+
+		$this->assertSame( 0.0, (float) $order->get_total() );
+		$this->assertSame( $expected, $order->needs_payment() );
+	}
+
+	/** @return array<string, array{0: bool, 1: string, 2: bool}> */
+	public function provide_free_order_requests(): array {
+		return [
+			'the block checkout, shown in Kustom by the filter'            => [ true, 'filter', true ],
+			'the block checkout, shown in Kustom by the setting'           => [ true, 'setting', true ],
+			'the block checkout, setting overridden by the filter'         => [ true, 'setting, filtered back', false ],
+			'the block checkout, free orders left to WooCommerce'          => [ true, '', false ],
+			'outside the checkout, shown in Kustom by the setting'         => [ false, 'setting', false ],
+		];
+	}
+
+	/**
+	 * The assessment only runs part way through a Kustom checkout that has the shipping
+	 * options inside the iframe.
+	 */
+	private function arrangeShippingAssessment(): void {
+		$this->haveGatewayCredentials( [ 'shipping_methods_in_iframe' => 'yes' ] );
+		$this->flushGatewaySettingsCache();
+
+		WC()->session->set( 'chosen_payment_method', 'kco' );
+
+		// The guard only reads the count, so raise it rather than firing the action and
+		// running whatever a plugin has hooked to it.
+		$this->checkoutProcessCount                            = $GLOBALS['wp_actions']['woocommerce_checkout_process'] ?? 0;
+		$GLOBALS['wp_actions']['woocommerce_checkout_process'] = $this->checkoutProcessCount + 1;
 	}
 
 	private function arrangeFailure( string $scenario ): \WC_Order {

@@ -84,6 +84,11 @@ class KCO_Request_Shipping_Options {
 			}
 		}
 
+		/**
+		 * Filters the shipping options sent to Kustom.
+		 *
+		 * @param array $shipping_options The shipping options, formatted for Kustom.
+		 */
 		return apply_filters( 'kco_wc_shipping_options', $shipping_options );
 	}
 }

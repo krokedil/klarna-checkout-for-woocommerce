@@ -1,6 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request\Patch;
 
+use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 use Krokedil\KustomCheckout\OrderManagement\OrderLines;
 use Krokedil\KustomCheckout\OrderManagement\Request\RequestPatch;
 
@@ -41,6 +42,12 @@ class RequestPatchUpdate extends RequestPatch {
 		$lines_processor = new OrderLines( $this->order_id );
 		$data            = $lines_processor->order_lines();
 
+		/**
+		 * Filters the request body sent to Kustom when updating the order lines of an order.
+		 *
+		 * @param array $data     The order lines request body.
+		 * @param int   $order_id The WooCommerce order ID.
+		 */
 		return apply_filters( 'kom_order_update_args', $data, $this->order_id );
 	}
 }

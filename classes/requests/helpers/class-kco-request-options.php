@@ -114,7 +114,7 @@ class KCO_Request_Options {
 	/**
 	 * Gets the allowed customer types
 	 *
-	 * @return string
+	 * @return array
 	 */
 	private function get_allowed_customer_types() {
 
@@ -256,6 +256,12 @@ class KCO_Request_Options {
 				'required' => true,
 			);
 		}
+		/**
+		 * Filters the additional checkboxes displayed in Kustom Checkout.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#add-additional-checkboxes Add additional checkboxes
+		 * @param array $additional_checkboxes The additional checkboxes, each an array with id, text, checked and required keys.
+		 */
 		return apply_filters( 'kco_additional_checkboxes', $additional_checkboxes );
 	}
 
