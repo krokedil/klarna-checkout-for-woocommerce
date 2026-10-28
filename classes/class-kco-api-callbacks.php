@@ -24,7 +24,7 @@ class KCO_API_Callbacks {
 	/**
 	 * The reference the *Singleton* instance of this class.
 	 *
-	 * @var $instance
+	 * @var KCO_API_Callbacks
 	 */
 	private static $instance;
 
@@ -92,10 +92,24 @@ class KCO_API_Callbacks {
 			return;
 		}
 
+		$this->process_push( $klarna_order_id );
+	}
+
+	/**
+	 * Handle a push notification for a Kustom order. Also used by the express push route.
+	 *
+	 * @param string $klarna_order_id The Kustom order ID.
+	 */
+	public function process_push( $klarna_order_id ) {
 		KCO_WC()->logger->log( 'Push callback hit for order: ' . $klarna_order_id );
 
 		// Let other plugins hook into the push notification.
 		// Used by Klarna_Checkout_Subscription::handle_push_cb_for_payment_method_change().
+		/**
+		 * Fires when a push notification is received from Kustom, before the WooCommerce order is processed.
+		 *
+		 * @param string $klarna_order_id The Kustom order ID.
+		 */
 		do_action( 'wc_klarna_push_cb', $klarna_order_id );
 
 		$this->process_push_for_order( $klarna_order_id );
@@ -120,6 +134,8 @@ class KCO_API_Callbacks {
 		}
 		set_transient( $lock_key, 1, 2 * MINUTE_IN_SECONDS );
 
+		$did_lock = false;
+		$order_id = null;
 		try {
 			$order = kco_get_order_by_klarna_id( $klarna_order_id );
 			if ( empty( $order ) ) {
@@ -131,14 +147,27 @@ class KCO_API_Callbacks {
 			$order_id = $order->get_id();
 			$settings = get_option( 'woocommerce_kco_settings', array() );
 
+			if ( apply_filters( 'kco_wc_lock_confirmation', false, $klarna_order_id, $order_id ) ) {
+				$did_lock = KCO_Confirmation::lock_kco_confirmation( $klarna_order_id, $order_id );
+				if ( ! $did_lock ) {
+					KCO_WC()->logger->log( "[PUSH CALLBACK]: Simultaneous push callback for Kustom order ID $klarna_order_id and WooCommerce order ID $order_id. Stopping process." );
+					return;
+				}
+			}
+
 			// Get the Kustom order data.
+			/**
+			 * Filters the Kustom order data retrieved during the push notification callback.
+			 *
+			 * @param array|false $klarna_order The Kustom order data from the order management API, or false on failure.
+			 */
 			$klarna_order = apply_filters(
 				'kco_wc_api_callbacks_push_klarna_order',
 				KCO_WC()->api->get_klarna_om_order( $klarna_order_id )
 			);
 
-			if ( is_wp_error( $klarna_order ) ) {
-				KCO_WC()->logger->log( 'ERROR Push callback failed to get Kustom order data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
+			if ( empty( $klarna_order ) || is_wp_error( $klarna_order ) ) {
+				KCO_WC()->logger->log( '[PUSH CALLBACK]: ERROR Push callback failed to get Kustom order data for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
 				return;
 			}
 
@@ -166,6 +195,13 @@ class KCO_API_Callbacks {
 					// translators: Kustom order ID.
 					$note = sprintf( __( 'Payment via Kustom Checkout, order ID: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['order_id'] ) );
 					$order->add_order_note( $note );
+					/**
+					 * Triggers after an accepted Kustom order has been completed.
+					 *
+					 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#add-additional-checkboxes Add additional checkboxes
+					 * @param int   $order_id     The WooCommerce order ID.
+					 * @param array $klarna_order The Kustom order data.
+					 */
 					do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
 				} elseif ( 'REJECTED' === $klarna_order['fraud_status'] ) {
 					$order->update_status( 'on-hold', __( 'Kustom Checkout order was rejected.', 'klarna-checkout-for-woocommerce' ) );
@@ -185,6 +221,9 @@ class KCO_API_Callbacks {
 			// Push processing succeeded; drop any pending fallback action for this order.
 			UpsellFallback::cancel( $klarna_order_id );
 		} finally {
+			if ( $did_lock ) {
+				KCO_Confirmation::unlock_kco_confirmation( $klarna_order_id, $order_id );
+			}
 			delete_transient( $lock_key );
 		}
 	}

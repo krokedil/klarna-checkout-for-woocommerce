@@ -3,11 +3,11 @@ Contributors: kustom, krokedil, automattic
 Tags: woocommerce, ecommerce, e-commerce, checkout, klarna
 Donate link: https://kustom.co
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 7.4
-WC requires at least: 5.6.0
-WC tested up to: 10.7.0
-Stable tag: 2.20.1
+WC requires at least: 9.7.0
+WC tested up to: 11.2.1
+Stable tag: 2.24.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,10 +36,10 @@ Installment, revolving and other flexible financing plans let customers pay when
 * Get your store approved by Kustom, and start selling.
 
 == Installation ==
-1. Upload plugin folder to to the "/wp-content/plugins/" directory.
+1. Upload plugin folder to the "/wp-content/plugins/" directory.
 2. Activate the plugin through the "Plugins" menu in WordPress.
 3. Go WooCommerce Settings –> Payment Gateways and configure your Kustom Checkout settings.
-4. Read more about the configuration process in the [plugin documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
+4. Read more about the configuration process in the [plugin documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 
 == Frequently Asked Questions ==
@@ -47,9 +47,112 @@ Installment, revolving and other flexible financing plans let customers pay when
 Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria, the Netherlands, UK and United States.
 
 = Where can I find Kustom Checkout for WooCommerce documentation? =
-For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/).
+For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-10-27    - version 2.24.0 =
+* Feature       - Added support for adding Kustom express buttons to the cart, the block cart and checkout, product pages, and a new shortcode and block.
+* Enhancement   - Kustom Elements API keys are now validated with Kustom. The settings page reports invalid keys or unauthorized domains, and blocks show the same errors in the editor.
+* Tweak         - The "Support" link on the Plugins page now opens the support tab on the Kustom Checkout settings page instead of krokedil.se.
+* Fix           - Fixed a PHP warning when an order with Kustom Shipping Assistant shipping was placed, which also stopped a shipping option changed by the TMS from being saved to the order with its updated name and price.
+* Fix           - Fixed the "Dismiss" link on the credentials migration notice being misaligned on admin pages outside WooCommerce, such as the plugins page.
+* Fix           - Fixed an issue where the margin set on the Kustom Elements blocks was not applied correctly, on the page and in the block editor.
+
+= 2026-10-20    - version 2.23.1 =
+* Fix           - Fixed an issue where the confirmation lock enabled by the "kco_wc_lock_confirmation" filter did not prevent duplicate order confirmations on stores using an object cache such as LiteSpeed Cache. The lock now also covers the push notification from Kustom.
+* Fix           - Fixed the krokedil_wp_api_mask_log_data filter not turning off log masking. Returning false from it now logs every entry unmasked, for debugging only. Failed requests are not saved to the system status report while it is off.
+* Fix           - Fixed a PHP warning about an undefined array key "id" when placing an order with Kustom Shipping Assistant.
+* Fix           - Fixed PHP warnings and a false "order total does not match" note when Kustom's order management could not return the order during confirmation. The order is now set to on-hold to wait for Kustom's push notification, as intended.
+
+= 2026-10-13    - version 2.23.0 =
+* Feature       - Added an "Enable Kustom Shipping Assistant" setting that lets a TMS control shipping methods and pricing in the Kustom iframe. It is on by default only for stores already using the Kustom Shipping Assistant shipping method. The separate Kustom Shipping Assistant plugin is no longer needed and should be deactivated.
+* Feature       - Added the setting "Display on free orders" to show Kustom Checkout when the order total is 0. It replaces the need for the "kco_check_if_needs_payment" filter, which still takes priority over the setting.
+* Tweak         - Customer details and payment secrets are now masked in the plugin logs and the system status report.
+* Tweak         - The checkout no longer creates a Kustom order when the cart is empty.
+* Tweak         - Orders placed with Kustom Shipping Assistant and Ingrid now save the Ingrid transport order id as the order meta "ingrid_tos_id".
+* Tweak         - Improved the admin notice asking you to deactivate the separate Kustom Shipping Assistant plugin.
+* Fix           - Fixed the Kustom Shipping Assistant shipping method not being applied to the order, so a customer who selected a shipping option in the Kustom iframe could be charged the price of a different shipping method in the same shipping zone.
+* Fix           - Fixed an issue where the checkout block sent a failing Kustom order update after a completed purchase. The customer is now sent straight to the thank you page instead of the checkout page being loaded first.
+* Fix           - Fixed an issue where Post Purchase Upsell fetched the Kustom order several times on every page load to check whether an upsell was possible. The answer is now saved on the order when the purchase is confirmed.
+* Fix           - Fixed an issue where a free order placed in the block checkout with the "kco_check_if_needs_payment" filter returned the customer to the checkout page with a READ_ONLY_ORDER error instead of the thank you page.
+* Fix           - Fixed the Kustom Portal link in the Kustom Elements settings, which pointed to the wrong domain.
+
+= 2026-09-28    - version 2.22.0 =
+* Feature       - Added support for Kustom Elements. Show your customers the available Kustom payment methods and delivery options on product and cart pages, or anywhere else with a shortcode or block.
+* Fix           - Fixed an issue where the customer could see a "shipping methods have been changed" error when placing an order with Kustom Shipping Assistant handling the shipping selection.
+* Fix           - Fixed an issue where the Mini-Cart block triggered a Kustom API call on every page load.
+* Fix           - Fixed an issue where renewal orders inherited the parent order's Kustom order ID, causing an unpaid renewal order to appear connected to the parent's Kustom order in the Kustom Order Management box.
+* Fix           - Fixed an issue where retrying payment on a subscription renewal order other than the most recent one left the authorized payment unregistered and uncaptured in WooCommerce.
+
+= 2026-09-15    - version 2.21.0 =
+* Feature       - Added an "Enable order management" setting. When disabled, WooCommerce no longer activates, cancels, updates or credits Kustom orders, and refunds can only be registered in WooCommerce with "Refund manually". The manual actions on individual orders are still available.
+* Feature       - Simplified the Kustom API credential settings into a single set of fields instead of separate Europe and United States entries.
+* Fix           - Fixed the PHP warning "undefined array key 'label'" that could appear on the checkout page for plugins that read checkout field labels, such as the Astra Pro add-on.
+* Fix           - Fixed an issue where a Kustom refund could be registered with Kustom but then discarded by WooCommerce when another Klarna plugin also handled order management.
+* Fix           - Fixed an issue where push notifications were ignored for orders belonging to a custom order type that is hidden from the customer's order list, leaving authorized payments unconfirmed in WooCommerce.
+* Fix           - Fixed the PHP warning "undefined array key 'shipping_countries'" that appeared on every completed checkout in stores with shipping disabled.
+
+= 2026-08-25    - version 2.20.11 =
+* Fix           - Fixed a fatal error that could occur in the WordPress admin when creating or editing posts.
+
+= 2026-08-24    - version 2.20.10 =
+* Tweak         - The authorization header is now redacted from the log created for requests when logging is enabled.
+* Fix           - Fixed a fatal error that could occur when sending order lines to Kustom for an order containing a product that has since beendeleted from the store.
+* Fix           - Fixed an issue where the cart block triggered excessive calls to Kustom on cart page visits.
+
+= 2026-08-17    - version 2.20.9 =
+* Tweak         - Improved the error message shown to customers when a Klarna error occurs. Customers will now see a clear, readable message instead of a raw technical response.
+* Tweak         - Added the request URL to all order management log entries.
+* Tweak         - Updated the "Go live now" and "Get playground credentials" links in the Kustom go-live banner to point to the new Kustom portal domains.
+* Fix           - Fixed an issue where paying for an order containing a subscription product through the 'order pay' flow would fail with an API error. The subscription metadata on order lines is now only included when creating a recurring order, not on the initial checkout order request.
+* Fix           - Fixed an issue where a returning customer could get stuck at the checkout when the order from their previous visit had expired. The checkout now discards the expired order and creates a new one instead of retrying it.
+* Fix           - Fixed "Undefined array key" PHP warnings emitted on every checkout when a gateway setting has no stored value, e.g. on sites whose settings were seeded programmatically or that predate a setting being added.
+* Fix           - Resolved a compatibility conflict with the "Klarna for WooCommerce" plugin that could cause WooCommerce refund processing to fail when both plugins were active.
+* Fix           - Fixed "map_meta_cap was called incorrectly" notices that could appear when editing a custom post type (thanks @johvir!).
+
+= 2026-08-11    - version 2.20.8 =
+* Tweak         - Checkout error log entries now include the error type and HTTP status code, making it faster to diagnose failed orders.
+* Tweak         - Removed the "Add Kustom Post Purchase info to order email" setting and its associated functionality.
+* Tweak         - Replaced deprecated jQuery event shorthands (.change(), .blur(), .focus(), .click()) with .trigger() and .on() to remove jQuery Migrate warnings and prepare for jQuery 4.
+* Tweak         - Removed the "Kustom Add-ons" admin page.
+* Tweak         - Updated code comments and docblocks to refer to Kustom instead of Klarna
+* Fix           - Fixed a bug where checkout error details could be silently dropped from the debug log.
+* Fix           - Save the customer shipping city from Kustom alongside postcode and country during block-based address updates.
+* Fix           - Fixed "Undefined array key" warnings that could appear when retrieving stored credentials.
+* Fix           - Updated remaining naming references from Klarna to Kustom.
+* Fix           - Handle the billing_address_change event in the block checkout. Kustom only emits shipping_address_change once the customer has entered a separate shipping address, so shipping and taxes were not recalculated while the customer shipped to their billing address.
+
+= 2026-06-29    - version 2.20.7 =
+* Fix           - Fixed an issue where refunds on orders from non-base countries were sent to Kustom with the wrong VAT rate, resulting in an incorrect tax breakdown on the customer's refund receipt.
+* Fix           - Fixed an issue with WooCommerce version 10.9.x impacting the checkout block support. WooCommerce now only creates the order for the block checkout when the customer places the order, which caused an issue when placing the order.
+
+= 2026-06-23    - version 2.20.6 =
+* Enhancement   - Added support for Kustom Shipping Assistant (KSA). The plugin now registers a pickup points service and sets the selected pickup point from the Klarna order's shipping data when available. The WooCommerce customer ID is also stored as a transient tied to the Klarna order ID to support KSA order flows.
+* Enhancement   - Hide the payment options section in the checkout block when Kustom Checkout is the only available payment method.
+* Change        - Bumped the minimum supported version of WooCommerce to 9.7
+* Tweak         - Order total comparison now displays prices with two decimals in order note.
+* Fix           - Fixed an issue where renewal orders for subscriptions could fail to be created or processed when another plugin hooked into WooCommerce Subscriptions' renewal order creation after Kustom Checkout. 
+* Fix           - Fixed a critical error that could occur when refunding an order with free (zero-cost) shipping.
+* Fix           - Fixed an issue where customers changing the payment method on a subscription could fail to reach Kustom's payment page, caused by the Kustom payment domains (pay.kustom.co) missing from the allowed redirect hosts.
+
+= 2026-06-04    - version 2.20.5 =
+* Fix           - Corrected handling of the shipping phone field in Checkout Blocks to align with changes introduced in WooCommerce 10.8.0.
+
+= 2026-06-02    - version 2.20.4 =
+* Enhancement   - [Support] Explicitly disabled autoloading the system report option to prevent it from being loaded on every request, as it is only needed when issuing a request, and viewing the system report.
+* Fix           - [Support] The $form_field variable can sometimes be missing keys that are available in the $setting array when "MU"-plugins are used. Added a check to ensure that the keys exist in both arrays before attempting to access them, preventing potential undefined key errors.
+* Fix           - Update links in README
+* Fix           - Fixed an issue that could allow customers from unsupported countries to complete checkout and place an order.
+* Tweak         - The integrated order management now uses the same logging file and logging setting as the rest of Kustom Checkout for WooCommerce.
+
+= 2026-05-28    - version 2.20.3 =
+* Fix           - Resolved a potential checkout error introduced by WooCommerce 10.8.0, where shipping phone became a required field. The shipping phone value is now populated as needed.
+
+= 2026-05-18    - version 2.20.2 =
+* Enhancement   - When multiple payment methods are used, the fallback logo has been changed from Klarna to Kustom.
+* Enhancement   - Added WPML configuration file for improved multilingual compatibility.
+* Fix           - Fixed an issue where the manual order management action dropdown would render incorrectly in the order metabox.
+
 = 2026-05-05    - version 2.20.1 =
 * Fix           - Fixed a critical error when attempting to renew an orphaned subscription.
 * Fix           - Addressed an undefined shipping_company array warning.

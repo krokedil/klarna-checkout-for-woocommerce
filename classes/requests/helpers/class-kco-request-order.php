@@ -24,7 +24,7 @@ class KCO_Request_Order {
 	/**
 	 * Total tax of order.
 	 *
-	 * @var int
+	 * @var int|float
 	 */
 	public $total_tax = 0;
 
@@ -55,7 +55,7 @@ class KCO_Request_Order {
 	 * Gets the order amount
 	 *
 	 * @param int $order_id The WooCommerce order id.
-	 * @return int
+	 * @return float
 	 */
 	public function get_order_amount( $order_id ) {
 		$order = wc_get_order( $order_id );
@@ -65,7 +65,7 @@ class KCO_Request_Order {
 	/**
 	 * Get total tax of order.
 	 *
-	 * @return int
+	 * @return float
 	 */
 	public function get_total_tax() {
 		return round( $this->total_tax );
@@ -92,16 +92,8 @@ class KCO_Request_Order {
 			'tax_rate'         => $this->get_order_line_tax_rate( $order, $order_item ),
 		);
 
-		if ( class_exists( 'WC_Subscriptions_Product' ) && WC_Subscriptions_Product::is_subscription( $product ) ) {
-			$order_line['subscription'] = array(
-				'name'           => $order_line['name'],
-				'interval'       => strtoupper( WC_Subscriptions_Product::get_period( $product ) ),
-				'interval_count' => absint( WC_Subscriptions_Product::get_interval( $product ) ),
-			);
-		}
-
 		$settings = get_option( 'woocommerce_kco_settings', array() );
-		if ( isset( $settings['send_product_urls'] ) && 'yes' === $settings['send_product_urls'] ) {
+		if ( ! empty( $product ) && isset( $settings['send_product_urls'] ) && 'yes' === $settings['send_product_urls'] ) {
 
 			$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'shop_single', false );
 			if ( $image_url ) {
@@ -162,7 +154,7 @@ class KCO_Request_Order {
 	 *
 	 * @param WC_Order $order The WooCommerce order.
 	 * @param mixed    $order_item If not false the WooCommerce order item WC_Order_Item.
-	 * @return int
+	 * @return float
 	 */
 	public function get_order_line_tax_rate( $order, $order_item = false ) {
 		$tax_items = $order->get_items( 'tax' );
@@ -185,7 +177,7 @@ class KCO_Request_Order {
 	 *
 	 * @param WC_Order       $order WC order.
 	 * @param boolean|object $order_item Order item.
-	 * @return int
+	 * @return float
 	 */
 	public function get_item_total_amount( $order, $order_item = false ) {
 		if ( $this->separate_sales_tax ) {
@@ -208,7 +200,7 @@ class KCO_Request_Order {
 	 *
 	 * @param WC_Order       $order WC order.
 	 * @param boolean|object $order_item Order item.
-	 * @return int
+	 * @return float
 	 */
 	public function get_item_unit_price( $order, $order_item = false ) {
 		if ( $this->separate_sales_tax ) {
@@ -224,7 +216,7 @@ class KCO_Request_Order {
 	 *
 	 * @param WC_Order       $order WC order.
 	 * @param boolean|object $order_item Order item.
-	 * @return int
+	 * @return float
 	 */
 	public function get_item_total_tax_amount( $order, $order_item = false ) {
 		if ( $this->separate_sales_tax ) {
@@ -257,7 +249,7 @@ class KCO_Request_Order {
 	 * Get shipping total tax amount.
 	 *
 	 * @param WC_Order $order WC order.
-	 * @return int
+	 * @return float
 	 */
 	public function get_shipping_total_tax_amount( $order ) {
 		if ( $this->separate_sales_tax ) {
@@ -277,7 +269,7 @@ class KCO_Request_Order {
 	 *
 	 * @param WC_Order       $order WC order.
 	 * @param boolean|object $order_fee Order fee.
-	 * @return int
+	 * @return float
 	 */
 	public function get_fee_total_amount( $order, $order_fee ) {
 		if ( $this->separate_sales_tax ) {
@@ -299,7 +291,7 @@ class KCO_Request_Order {
 	 * Get fee unit price.
 	 *
 	 * @param boolean|object $order_fee Order fee.
-	 * @return int
+	 * @return float
 	 */
 	public function get_fee_unit_price( $order_fee ) {
 		if ( $this->separate_sales_tax ) {
@@ -316,7 +308,7 @@ class KCO_Request_Order {
 	 *
 	 * @param WC_Order       $order WC order.
 	 * @param boolean|object $order_fee Order fee.
-	 * @return int
+	 * @return float
 	 */
 	public function get_fee_total_tax_amount( $order, $order_fee ) {
 		if ( $this->separate_sales_tax ) {

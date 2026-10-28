@@ -22,7 +22,13 @@ class KCO_Request_Update extends KCO_Request {
 	 * @return array|false|WP_Error
 	 */
 	public function request( $klarna_order_id, $order_id = null, $force = false ) {
-		$request_url  = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
+		$request_url = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
+
+		/**
+		 * Filters the request arguments for updating a Kustom Checkout order.
+		 *
+		 * @param array $request_args The request arguments passed to wp_remote_request().
+		 */
 		$request_args = apply_filters( 'kco_wc_update_order', $this->get_request_args( $order_id, $request_url ) );
 
 		// Check if we need to update.
@@ -53,10 +59,18 @@ class KCO_Request_Update extends KCO_Request {
 
 		$request_options = new KCO_Request_Options();
 
+		/**
+		 * Filters the locale sent to Kustom.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#change-the-locale-sent-to-kustom Change the locale sent to Kustom
+		 * @param string $locale The locale, derived from the WordPress locale (for example "en-US").
+		 */
+		$locale = apply_filters( 'kco_locale', substr( str_replace( '_', '-', get_locale() ), 0, 5 ) );
+
 		$request_body = array(
 			'purchase_country'   => $this->get_purchase_country(),
 			'purchase_currency'  => get_woocommerce_currency(),
-			'locale'             => apply_filters( 'kco_locale', substr( str_replace( '_', '-', get_locale() ), 0, 5 ) ),
+			'locale'             => $locale,
 			'merchant_urls'      => KCO_WC()->merchant_urls->get_urls( $order_id ),
 			'order_amount'       => $cart_data->get_order_amount(),
 			'order_lines'        => $cart_data->get_order_lines(),
@@ -76,33 +90,22 @@ class KCO_Request_Update extends KCO_Request {
 		}
 
 		if ( kco_wc_prefill_allowed() ) {
-			$request_body['billing_address'] = array(
-				'email'             => WC()->checkout()->get_value( 'billing_email' ),
-				'postal_code'       => WC()->checkout()->get_value( 'billing_postcode' ),
-				'country'           => WC()->checkout()->get_value( 'billing_country' ),
-				'phone'             => WC()->checkout()->get_value( 'billing_phone' ),
-				'given_name'        => WC()->checkout()->get_value( 'billing_first_name' ),
-				'family_name'       => WC()->checkout()->get_value( 'billing_last_name' ),
-				'organization_name' => WC()->checkout()->get_value( 'billing_company' ),
-				'street_address'    => WC()->checkout()->get_value( 'billing_address_1' ),
-				'street_address2'   => WC()->checkout()->get_value( 'billing_address_2' ),
-				'city'              => WC()->checkout()->get_value( 'billing_city' ),
-				'region'            => WC()->checkout()->get_value( 'billing_state' ),
-			);
+			// Built the same way as when the order is created: only fields that have a value are sent, since Kustom keeps whatever it already stored for the fields we omit.
+			$billing_address = KCO_Request_Create::get_billing_address_from_customer();
 
-			$request_body['shipping_address'] = array(
-				'postal_code'       => WC()->checkout()->get_value( 'shipping_postcode' ),
-				'country'           => WC()->checkout()->get_value( 'shipping_country' ),
-				'given_name'        => WC()->checkout()->get_value( 'shipping_first_name' ),
-				'family_name'       => WC()->checkout()->get_value( 'shipping_last_name' ),
-				'organization_name' => WC()->checkout()->get_value( 'shipping_company' ),
-				'street_address'    => WC()->checkout()->get_value( 'shipping_address_1' ),
-				'street_address2'   => WC()->checkout()->get_value( 'shipping_address_2' ),
-				'city'              => WC()->checkout()->get_value( 'shipping_city' ),
-				'region'            => WC()->checkout()->get_value( 'shipping_state' ),
-			);
+			if ( ! empty( $billing_address ) ) {
+				$request_body['billing_address'] = $billing_address;
+			}
 
-			$request_body['shipping_address'] = wp_parse_args( $request_body['billing_address'], $request_body['shipping_address'] ?? array() );
+			if ( 'yes' === ( $this->settings['allow_separate_shipping'] ?? 'no' ) ) {
+				$shipping_address = KCO_Request_Create::get_shipping_address_from_customer();
+
+				if ( ! empty( $shipping_address ) ) {
+					$request_body['shipping_address'] = $shipping_address;
+				}
+			} elseif ( ! empty( $billing_address ) ) {
+				$request_body['shipping_address'] = $billing_address;
+			}
 		}
 
 		if ( ( array_key_exists( 'shipping_methods_in_iframe', $this->settings ) && 'yes' === $this->settings['shipping_methods_in_iframe'] ) && WC()->cart->needs_shipping() ) {
@@ -123,12 +126,31 @@ class KCO_Request_Update extends KCO_Request {
 	 * @return array
 	 */
 	protected function get_request_args( $order_id, $url = '' ) {
+		/**
+		 * Filters the request body sent to Kustom when creating or updating an order.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#modify-order-data-sent-to-kustom Modify order data sent to Kustom
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#anonymize-product-names-sent-to-kustom Anonymize product names sent to Kustom
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#set-a-forced-purchase-country Set a forced purchase country
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#only-accept-purchases-from-customer-over-18-years-of-age Only accept purchases from customer over 18 years of age
+		 * @param array    $body     The request body.
+		 * @param int|null $order_id The WooCommerce order ID, or null when no order exists yet.
+		 */
+		$request_body = apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id ), $order_id );
+
+		/**
+		 * Filters the timeout, in seconds, for requests to the Kustom API.
+		 *
+		 * @param int $timeout The request timeout in seconds. Default 10.
+		 */
+		$timeout = apply_filters( 'kco_wc_request_timeout', 10 );
+
 		return array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'POST',
-			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $order_id ), $order_id ) ),
-			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
+			'body'       => wp_json_encode( $request_body ),
+			'timeout'    => $timeout,
 		);
 	}
 }

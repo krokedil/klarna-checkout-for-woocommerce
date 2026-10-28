@@ -69,12 +69,12 @@ class KCO_Request_Options {
 	}
 
 	/**
-	 * Gets date of birth mandatory option.
+	 * Gets title mandatory option.
 	 *
 	 * @return bool
 	 */
 	private function get_title_mandatory() {
-		$title_mandatory = isset( $this->settings ) && 'yes' === $this->settings['title_mandatory'];
+		$title_mandatory = isset( $this->settings['title_mandatory'] ) && 'yes' === $this->settings['title_mandatory'];
 
 		return $title_mandatory;
 	}
@@ -85,7 +85,7 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_allow_separate_shipping_address() {
-		$allow_separate_shipping = isset( $this->settings ) && 'yes' === $this->settings['allow_separate_shipping'];
+		$allow_separate_shipping = isset( $this->settings['allow_separate_shipping'] ) && 'yes' === $this->settings['allow_separate_shipping'];
 
 		return $allow_separate_shipping;
 	}
@@ -96,18 +96,18 @@ class KCO_Request_Options {
 	 * @return bool
 	 */
 	private function get_dob_mandatory() {
-		$dob_mandatory = isset( $this->settings ) && 'yes' === $this->settings['dob_mandatory'];
+		$dob_mandatory = isset( $this->settings['dob_mandatory'] ) && 'yes' === $this->settings['dob_mandatory'];
 
 		return $dob_mandatory;
 	}
 
 	/**
-	 * Gets date of birth mandatory option.
+	 * Gets national identification number validation mandatory option.
 	 *
 	 * @return bool
 	 */
 	private function get_nin_validation_mandatory() {
-		$nin_validation_mandatory = isset( $this->settings ) && isset( $this->settings['nin_validation_mandatory'] ) && 'yes' === $this->settings['nin_validation_mandatory'];
+		$nin_validation_mandatory = isset( $this->settings['nin_validation_mandatory'] ) && 'yes' === $this->settings['nin_validation_mandatory'];
 
 		return $nin_validation_mandatory;
 	}
@@ -115,7 +115,7 @@ class KCO_Request_Options {
 	/**
 	 * Gets the allowed customer types
 	 *
-	 * @return string
+	 * @return array
 	 */
 	private function get_allowed_customer_types() {
 
@@ -187,10 +187,10 @@ class KCO_Request_Options {
 	/**
 	 * Gets shipping details note.
 	 *
-	 * @return bool
+	 * @return string|false The shipping details note, or false if the setting has no stored value.
 	 */
 	private function get_shipping_details() {
-		if ( isset( $this->settings ) ) {
+		if ( isset( $this->settings['shipping_details'] ) ) {
 			return $this->settings['shipping_details'];
 		}
 
@@ -201,10 +201,10 @@ class KCO_Request_Options {
 	 * Checks option fields.
 	 *
 	 * @param string $field Field name.
-	 * @return array|bool
+	 * @return string|false The setting value, or false if the setting is unset or empty.
 	 */
 	private function check_option_field( $field ) {
-		if ( isset( $this->settings ) && '' !== $this->settings[ $field ] ) {
+		if ( isset( $this->settings[ $field ] ) && '' !== $this->settings[ $field ] ) {
 			return $this->settings[ $field ];
 		}
 
@@ -257,6 +257,12 @@ class KCO_Request_Options {
 				'required' => true,
 			);
 		}
+		/**
+		 * Filters the additional checkboxes displayed in Kustom Checkout.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#add-additional-checkboxes Add additional checkboxes
+		 * @param array $additional_checkboxes The additional checkboxes, each an array with id, text, checked and required keys.
+		 */
 		return apply_filters( 'kco_additional_checkboxes', $additional_checkboxes );
 	}
 

@@ -59,13 +59,6 @@ class KCO_Fields {
 					'autocomplete' => 'off',
 				),
 			),
-			'add_to_email'               => array(
-				'title'    => __( 'Add Kustom Post Purchase info to order email', 'klarna-checkout-for-woocommerce' ),
-				'type'     => 'checkbox',
-				'label'    => __( 'This will add Kustom\'s Post Purchase information to the order emails that are sent. You can read more about this here: ', 'klarna-checkout-for-woocommerce' ) . '<a href="https://docs.klarna.com/guidelines/klarna-checkout-best-practices/post-purchase/order-confirmation/" target="_blank">Kustom URLs</a>',
-				'default'  => 'no',
-				'desc_tip' => true,
-			),
 			'testmode'                   => array(
 				'title'       => __( 'Test mode', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Test Mode', 'klarna-checkout-for-woocommerce' ),
@@ -94,13 +87,13 @@ class KCO_Fields {
 				'default'  => 'two_column_right',
 				'desc_tip' => false,
 			),
-			// EU.
-			'credentials_eu'             => array(
-				'title' => 'API Credentials Europe',
+			// Credentials.
+			'credentials'                => array(
+				'title' => 'API Credentials',
 				'type'  => 'krokedil_section_start',
-				'id'    => 'credentials_eu',
+				'id'    => 'credentials',
 			),
-			'merchant_id_eu'             => array(
+			'merchant_id'                => array(
 				'title'             => __( 'Production Kustom API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
 				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
@@ -110,7 +103,7 @@ class KCO_Fields {
 					'autocomplete' => 'off',
 				),
 			),
-			'shared_secret_eu'           => array(
+			'shared_secret'              => array(
 				'title'             => __( 'Production Kustom API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
 				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
@@ -120,7 +113,7 @@ class KCO_Fields {
 					'autocomplete' => 'new-password',
 				),
 			),
-			'test_merchant_id_eu'        => array(
+			'test_merchant_id'           => array(
 				'title'             => __( 'Test Kustom API Username', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'text',
 				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
@@ -130,7 +123,7 @@ class KCO_Fields {
 					'autocomplete' => 'off',
 				),
 			),
-			'test_shared_secret_eu'      => array(
+			'test_shared_secret'         => array(
 				'title'             => __( 'Test Kustom API Password', 'klarna-checkout-for-woocommerce' ),
 				'type'              => 'password',
 				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
@@ -140,55 +133,7 @@ class KCO_Fields {
 					'autocomplete' => 'new-password',
 				),
 			),
-			'credentials_eu_end'         => array(
-				'type' => 'krokedil_section_end',
-			),
-			// US.
-			'credentials_us'             => array(
-				'title' => 'API Credentials United States',
-				'type'  => 'krokedil_section_start',
-			),
-			'merchant_id_us'             => array(
-				'title'             => __( 'Production Kustom API Username', 'klarna-checkout-for-woocommerce' ),
-				'type'              => 'text',
-				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
-				'default'           => '',
-				'desc_tip'          => false,
-				'custom_attributes' => array(
-					'autocomplete' => 'off',
-				),
-			),
-			'shared_secret_us'           => array(
-				'title'             => __( 'Production Kustom API Password', 'klarna-checkout-for-woocommerce' ),
-				'type'              => 'password',
-				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
-				'default'           => '',
-				'desc_tip'          => false,
-				'custom_attributes' => array(
-					'autocomplete' => 'new-password',
-				),
-			),
-			'test_merchant_id_us'        => array(
-				'title'             => __( 'Test Kustom API Username', 'klarna-checkout-for-woocommerce' ),
-				'type'              => 'text',
-				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
-				'default'           => '',
-				'desc_tip'          => false,
-				'custom_attributes' => array(
-					'autocomplete' => 'off',
-				),
-			),
-			'test_shared_secret_us'      => array(
-				'title'             => __( 'Test Kustom API Password', 'klarna-checkout-for-woocommerce' ),
-				'type'              => 'password',
-				'description'       => __( 'Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address.', 'klarna-checkout-for-woocommerce' ),
-				'default'           => '',
-				'desc_tip'          => false,
-				'custom_attributes' => array(
-					'autocomplete' => 'new-password',
-				),
-			),
-			'credentials_us_end'         => array(
+			'credentials_end'            => array(
 				'type' => 'krokedil_section_end',
 			),
 			// Shipping.
@@ -208,7 +153,7 @@ class KCO_Fields {
 			'shipping_methods_in_iframe' => array(
 				'title'       => __( 'Shipping methods in iframe', 'klarna-checkout-for-woocommerce' ),
 				// translators: 1: Configuration link, 2: Tax settings link.
-				'label'       => sprintf( __( 'Display Shipping methods in Kustom iframe.  If you are using the <b>Kustom Shipping Assistant</b> plugin, please follow the steps explained in the plugin documentation under the sections titled %1$s and %2$s', 'klarna-checkout-for-woocommerce' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#configuration" target="_blank">configuration</a>' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#tax-settings" target="_blank">tax settings</a>' ) ),
+				'label'       => sprintf( __( 'Display Shipping methods in Kustom iframe. Required when <b>Kustom Shipping Assistant</b> is enabled further down on this page. For setup, see the sections titled %1$s and %2$s in the documentation.', 'klarna-checkout-for-woocommerce' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#configuration" target="_blank">configuration</a>' ), ( '<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#tax-settings" target="_blank">tax settings</a>' ) ),
 				'type'        => 'checkbox',
 				'description' => __( 'If this option is checked, selection of shipping methods is done in Kustom iframe. Shipping price and name of the selected shipping method will still be displayed in WooCommerce order review.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'no',
@@ -237,7 +182,7 @@ class KCO_Fields {
 			'send_product_urls'          => array(
 				'title'    => __( 'Product URLs', 'klarna-checkout-for-woocommerce' ),
 				'type'     => 'checkbox',
-				'label'    => __( 'Send product and product image URLs to Klarna', 'klarna-checkout-for-woocommerce' ),
+				'label'    => __( 'Send product and product image URLs to Kustom', 'klarna-checkout-for-woocommerce' ),
 				'default'  => 'yes',
 				'desc_tip' => true,
 			),
@@ -290,6 +235,14 @@ class KCO_Fields {
 				'label'       => __( 'Display the quantity selection fields on the checkout page', 'klarna-checkout-for-woocommerce' ),
 				'type'        => 'checkbox',
 				'description' => __( 'If this option is checked, the customer will be able to change the quantity of a product purchased on the checkout page as they would on the cart page.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
+			'display_on_free_orders'     => array(
+				'title'       => __( 'Display on free orders', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Display Kustom Checkout even when the order total is 0', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If unchecked, the standard WooCommerce checkout is shown when the order total is 0, for example after a 100% discount coupon.', 'klarna-checkout-for-woocommerce' ),
 				'default'     => 'no',
 				'desc_tip'    => true,
 			),
@@ -394,6 +347,11 @@ class KCO_Fields {
 		);
 
 		// Insert the "Checkout flow" setting after the "Checkout layout" setting.
+		/**
+		 * Filters whether to enable the redirected checkout flow setting.
+		 *
+		 * @param bool $enable_redirected_flow Whether to enable the redirected checkout flow. Default false.
+		 */
 		if ( apply_filters( 'kco_enable_redirected_flow', false ) ) {
 			$checkout_flow = array(
 				'title'       => __( 'Checkout flow', 'klarna-checkout-for-woocommerce' ),
@@ -446,6 +404,11 @@ class KCO_Fields {
 			}
 			$settings = $new_settings;
 		}
+		/**
+		 * Filters the Kustom Checkout gateway settings fields.
+		 *
+		 * @param array $settings The settings fields.
+		 */
 		return apply_filters( 'kco_wc_gateway_settings', $settings );
 	}
 }

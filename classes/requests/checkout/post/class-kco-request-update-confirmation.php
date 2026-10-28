@@ -22,7 +22,13 @@ class KCO_Request_Update_Confirmation extends KCO_Request {
 	 * @return array
 	 */
 	public function request( $klarna_order_id, $klarna_order, $order_id ) {
-		$request_url       = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
+		$request_url = $this->get_api_url_base() . 'checkout/v3/orders/' . $klarna_order_id;
+
+		/**
+		 * Filters the request arguments for updating a Kustom Checkout order.
+		 *
+		 * @param array $request_args The request arguments passed to wp_remote_request().
+		 */
 		$request_args      = apply_filters( 'kco_wc_update_order', $this->get_request_args( $klarna_order, $order_id, $request_url ) );
 		$response          = wp_remote_request( $request_url, $request_args );
 		$code              = wp_remote_retrieve_response_code( $response );
@@ -43,22 +49,28 @@ class KCO_Request_Update_Confirmation extends KCO_Request {
 	 */
 	public function get_body( $klarna_order, $order_id ) {
 		$order = wc_get_order( $order_id );
-		// Use the old Kustom order from a get request to prevent changing more then we need.
-		$request_args                                  = array(
-			'purchase_country'    => $klarna_order['purchase_country'],
-			'purchase_currency'   => $klarna_order['purchase_currency'],
-			'locale'              => $klarna_order['locale'],
-			'merchant_urls'       => $klarna_order['merchant_urls'],
-			'order_amount'        => $klarna_order['order_amount'],
-			'order_lines'         => $klarna_order['order_lines'],
-			'order_tax_amount'    => $klarna_order['order_tax_amount'],
-			'billing_countries'   => $klarna_order['billing_countries'],
-			'shipping_countries'  => $klarna_order['shipping_countries'],
-			'merchant_data'       => $klarna_order['merchant_data'],
-			'options'             => $klarna_order['options'],
-			'merchant_reference1' => $order->get_order_number(),
-			'merchant_reference2' => $order_id,
+
+		// Use the old Kustom order from a get request to prevent changing more than we need.
+		$copy_from_klarna = array(
+			'purchase_country',
+			'purchase_currency',
+			'locale',
+			'merchant_urls',
+			'order_amount',
+			'order_lines',
+			'order_tax_amount',
+			'billing_countries',
+			'shipping_countries',
+			'merchant_data',
+			'options',
 		);
+
+		// Kustom omits optional fields it has no value for, so copy only what came back.
+		$request_args = array_intersect_key( $klarna_order, array_flip( $copy_from_klarna ) );
+
+		$request_args['merchant_reference1'] = $order->get_order_number();
+		$request_args['merchant_reference2'] = $order_id;
+
 		$request_args['merchant_urls']['confirmation'] = add_query_arg(
 			array(
 				'kco_confirm'  => 'yes',
@@ -79,12 +91,31 @@ class KCO_Request_Update_Confirmation extends KCO_Request {
 	 * @return array
 	 */
 	protected function get_request_args( $klarna_order, $order_id, $url = '' ) {
+		/**
+		 * Filters the request body sent to Kustom when creating or updating an order.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#modify-order-data-sent-to-kustom Modify order data sent to Kustom
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#anonymize-product-names-sent-to-kustom Anonymize product names sent to Kustom
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#set-a-forced-purchase-country Set a forced purchase country
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#only-accept-purchases-from-customer-over-18-years-of-age Only accept purchases from customer over 18 years of age
+		 * @param array $body     The request body.
+		 * @param int   $order_id The WooCommerce order ID.
+		 */
+		$request_body = apply_filters( 'kco_wc_api_request_args', $this->get_body( $klarna_order, $order_id ), $order_id );
+
+		/**
+		 * Filters the timeout, in seconds, for requests to the Kustom API.
+		 *
+		 * @param int $timeout The request timeout in seconds. Default 10.
+		 */
+		$timeout = apply_filters( 'kco_wc_request_timeout', 10 );
+
 		return array(
 			'headers'    => $this->get_request_headers(),
 			'user-agent' => $this->get_user_agent( $url ),
 			'method'     => 'POST',
-			'body'       => wp_json_encode( apply_filters( 'kco_wc_api_request_args', $this->get_body( $klarna_order, $order_id ), $order_id ) ),
-			'timeout'    => apply_filters( 'kco_wc_request_timeout', 10 ),
+			'body'       => wp_json_encode( $request_body ),
+			'timeout'    => $timeout,
 		);
 	}
 }

@@ -18,8 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( class_exists( 'WC_Payment_Gateway' ) ) {
 	/**
 	 * KCO_Gateway class.
-	 *
-	 * @extends WC_Payment_Gateway
 	 */
 	class KCO_Gateway extends WC_Payment_Gateway {
 
@@ -38,7 +36,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		/**
 		 * Whether to show shipping methods in the iframe or not.
 		 *
-		 * @var bool $shipping_methods_in_iframe
+		 * @var bool|string $shipping_methods_in_iframe
 		 */
 		public $shipping_methods_in_iframe = false;
 
@@ -50,7 +48,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$this->method_title       = __( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' );
 			$this->method_description = __( 'The current Kustom Checkout replaces standard WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' );
 			$this->has_fields         = false;
-			$this->supports           = apply_filters(
+
+			/**
+			 * Filters the features supported by the Kustom Checkout gateway.
+			 *
+			 * @param string[] $supports The supported features.
+			 */
+			$this->supports = apply_filters(
 				'kco_wc_supports',
 				array(
 					'products',
@@ -146,6 +150,9 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
+			// Maybe set the selected pickup point.
+			kco_maybe_set_selected_pickup_point( $klarna_order );
+
 			// Mapping of the Woo/Kustom address fields.
 			$address_fields_key = array(
 				'first_name' => 'given_name',
@@ -233,6 +240,12 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			}
 
 			$icon_html = $this->get_gateway_icon_html( $current_country );
+			/**
+			 * Filters the HTML for the Kustom Checkout payment method icon.
+			 *
+			 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#modify-payment-method-icon Modify payment method icon
+			 * @param string $icon_html The icon HTML.
+			 */
 			return apply_filters( 'wc_klarna_checkout_icon_html', $icon_html );
 		}
 
@@ -257,6 +270,14 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return bool
 		 */
 		public function process_refund( $order_id, $amount = null, $reason = '' ) {
+			/**
+			 * Filters the result of a refund processed through the Kustom Checkout gateway.
+			 *
+			 * @param bool       $result   Whether the refund was successful. Default false.
+			 * @param int        $order_id The WooCommerce order ID.
+			 * @param float|null $amount   The refund amount.
+			 * @param string     $reason   The reason for the refund.
+			 */
 			return apply_filters( 'wc_klarna_checkout_process_refund', false, $order_id, $amount, $reason );
 		}
 
@@ -395,7 +416,19 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				}
 			}
 
-			$standard_woo_checkout_fields = apply_filters( 'kco_ignored_checkout_fields', array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'terms', 'terms-field', '_wp_http_referer', 'ship_to_different_address', 'account_username', 'account_password' ) );
+			/**
+			 * Filters the timeout duration in seconds for the Kustom Checkout order submission.
+			 *
+			 * @param int $timeout_time The timeout duration in seconds. Default 20.
+			 */
+			$timeout_time = apply_filters( 'kco_checkout_timeout_duration', 20 );
+
+			/**
+			 * Filters the checkout field names that are ignored by Kustom Checkout, since Kustom collects the data in the iframe.
+			 *
+			 * @param string[] $fields The ignored checkout field names.
+			 */
+			$standard_woo_checkout_fields = apply_filters( 'kco_ignored_checkout_fields', array( 'billing_first_name', 'billing_last_name', 'billing_address_1', 'billing_address_2', 'billing_postcode', 'billing_city', 'billing_phone', 'billing_email', 'billing_state', 'billing_country', 'billing_company', 'shipping_first_name', 'shipping_last_name', 'shipping_address_1', 'shipping_address_2', 'shipping_postcode', 'shipping_city', 'shipping_state', 'shipping_country', 'shipping_company', 'shipping_phone', 'terms', 'terms-field', '_wp_http_referer', 'ship_to_different_address', 'account_username', 'account_password' ) );
 			$checkout_localize_params     = array(
 				'update_cart_url'                 => WC_AJAX::get_endpoint( 'kco_wc_update_cart' ),
 				'update_cart_nonce'               => wp_create_nonce( 'kco_wc_update_cart' ),
@@ -419,7 +452,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'email_exists'                    => $email_exists,
 				'must_login_message'              => apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) ),
 				'timeout_message'                 => __( 'Please try again, something went wrong with processing your order.', 'klarna-checkout-for-woocommerce' ),
-				'timeout_time'                    => apply_filters( 'kco_checkout_timeout_duration', 20 ),
+				'timeout_time'                    => $timeout_time,
 				'countries'                       => kco_get_country_codes(),
 				'pay_for_order'                   => $pay_for_order,
 				'no_shipping_message'             => apply_filters( 'woocommerce_no_shipping_available_html', __( 'There are no shipping options available. Please ensure that your address has been entered correctly, or contact us if you need any help.', 'woocommerce' ) ),
@@ -456,13 +489,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
-			$suffix              = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-			$store_base_location = wc_get_base_location();
-			if ( 'US' === $store_base_location['country'] ) {
-				$location = 'US';
-			} else {
-				$location = $this->check_if_eu( $store_base_location['country'] );
-			}
+			$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 			wp_register_script(
 				'kco_admin',
@@ -471,73 +498,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				KCO_WC_VERSION,
 				false
 			);
-			$admin_localize_params = array(
-				'location' => $location,
-			);
-			wp_localize_script( 'kco_admin', 'kco_admin_params', $admin_localize_params );
 			wp_enqueue_script( 'kco_admin' );
-		}
-
-		/**
-		 * Detect if EU country.
-		 *
-		 * @param string $store_base_location The WooCommerce stores base country.
-		 */
-		private function check_if_eu( $store_base_location ) {
-			$eu_countries = array(
-				'AL',
-				'AD',
-				'AM',
-				'AT',
-				'BY',
-				'BE',
-				'BA',
-				'BG',
-				'CH',
-				'CY',
-				'CZ',
-				'DE',
-				'DK',
-				'EE',
-				'ES',
-				'FO',
-				'FI',
-				'FR',
-				'GB',
-				'GE',
-				'GI',
-				'GR',
-				'HU',
-				'HR',
-				'IE',
-				'IS',
-				'IT',
-				'LT',
-				'LU',
-				'LV',
-				'MC',
-				'MK',
-				'MT',
-				'NO',
-				'NL',
-				'PL',
-				'PT',
-				'RO',
-				'RU',
-				'SE',
-				'SI',
-				'SK',
-				'SM',
-				'TR',
-				'UA',
-				'VA',
-			);
-
-			if ( in_array( $store_base_location, $eu_countries, true ) ) {
-				return 'EU';
-			} else {
-				return '';
-			}
 		}
 
 		/**
@@ -727,6 +688,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 
 		/**
 		 * Check if upsell should be available for the Kustom order or not.
+		 * The answer is saved on the order, so only the first check asks Kustom.
 		 *
 		 * @param int $order_id The WooCommerce order id.
 		 * @return bool
@@ -739,36 +701,19 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return false;
 			}
 
+			// Post Purchase Upsell asks once per offer on every page load, and the answer cannot change after purchase.
+			$saved = $order->get_meta( '_kco_upsell_available', true );
+			if ( '' !== $saved ) {
+				return wc_string_to_bool( $saved );
+			}
+
 			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
 			if ( is_wp_error( $klarna_order ) ) {
 				return false;
 			}
 
-			// If the needed keys are not set, return false.
-			if ( ! isset( $klarna_order['initial_payment_method'] ) || ! isset( $klarna_order['initial_payment_method']['type'] ) ) {
-				return false;
-			}
-
-			// Set allowed payment methods for upsell based on country. https://docs.kustom.co/v3/order-management/manage-orders-with-the-api/view-and-change-orders#update-order-amount-1.
-			$allowed_payment_methods = array( 'INVOICE', 'B2B_INVOICE', 'BASE_ACCOUNT', 'DIRECT_DEBIT' );
-			switch ( $klarna_order['billing_address']['country'] ) {
-				case 'AT':
-				case 'DE':
-				case 'DK':
-				case 'FI':
-				case 'FR':
-				case 'NL':
-				case 'NO':
-				case 'SE':
-					$allowed_payment_methods[] = 'FIXED_AMOUNT';
-					break;
-				case 'CH':
-					$allowed_payment_methods = array();
-					break;
-			}
-
-			return in_array( $klarna_order['initial_payment_method']['type'], $allowed_payment_methods, true );
+			return (bool) kco_maybe_save_upsell_available( $order, $klarna_order );
 		}
 
 		/**
@@ -803,7 +748,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				$args = wp_remote_get( 'https://krokedil-settings-page-configs.s3.eu-north-1.amazonaws.com/main/configs/kustom-checkout-for-woocommerce.json' );
 
 				if ( is_wp_error( $args ) ) {
-					KP_Logger::log( 'Failed to fetch Kustom Checkout settings page config from remote source.' );
+					KCO_Logger::log( 'Failed to fetch Kustom Checkout settings page config from remote source.' );
 					return null;
 				}
 
@@ -816,16 +761,6 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 			$decoded_args['settings_navigation'] = true;
 
 			return $decoded_args;
-		}
-
-		/**
-		 * Callable function for the general content for the settings page.
-		 *
-		 * @return void
-		 */
-		public function settings_page_content() {
-			KP_Settings_Page::header_html();
-			echo $this->generate_settings_html( $this->get_form_fields(), false ); // phpcs:ignore
 		}
 
 		/**
@@ -891,7 +826,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				case 'FI':
 					return '<img src="' . esc_url( KCO_WC_PLUGIN_URL . '/assets/img/kustom_gateway_fi.png' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px; max-width: 90%;"  width="250"/>';
 				default:
-					return '<img src="' . esc_url( 'https://cdn.klarna.com/1.0/shared/image/generic/logo/en_us/basic/logo_black.png?width=100' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px" width="100"/>';
+					return '<img src="' . esc_url( KCO_WC_PLUGIN_URL . '/assets/img/kustom_badge.svg' ) . '" alt="' . esc_attr__( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' ) . '" style="border-radius:0px" width="75"/>';
 			}
 		}
 	}

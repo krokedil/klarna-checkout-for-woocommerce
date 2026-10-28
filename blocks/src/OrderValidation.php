@@ -1,8 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\Blocks;
 
-use Automattic\WooCommerce\StoreApi\SessionHandler;
-use Automattic\WooCommerce\StoreApi\Utilities\JsonWebToken;
+use Krokedil\KustomCheckout\Express\Express;
+use Krokedil\KustomCheckout\Express\ExpressSession;
 use Exception;
 
 defined( 'ABSPATH' ) || exit;
@@ -15,9 +15,9 @@ defined( 'ABSPATH' ) || exit;
  */
 class OrderValidation {
 	/**
-	 * Validate the Klarna order.
+	 * Validate the Kustom order.
 	 *
-	 * @param string $klarna_order_id The Klarna order ID.
+	 * @param string $klarna_order_id The Kustom order ID.
 	 *
 	 * @return void
 	 * @throws Exception If the request is invalid or the order could not be verified.
@@ -28,27 +28,36 @@ class OrderValidation {
 		}
 
 		$klarna_order         = self::get_klarna_order( $klarna_order_id );
-		$merchant_reference   = $klarna_order['merchant_reference2']; // Get the merchant reference from the klarna order.
 		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-		// If the merchant reference or klarna merchant data is empty, throw an exception.
-		if ( empty( $merchant_reference ) || empty( $klarna_merchant_data ) ) {
+		// The merchant data (which carries the cart token used to place the order) is always required.
+		if ( empty( $klarna_merchant_data ) ) {
 			throw new Exception( 'Could not validate the order, please try again.', 400 );
 		}
 
-		// Get the order from the merchant reference.
-		$order = self::get_wc_order( $merchant_reference );
+		// On WooCommerce 10.9.x there is no early draft order, so the reference may be empty and the order is created from
+		// the cart token below. When a reference exists, we validate and reuse that existing order instead.
+		$merchant_reference = $klarna_order['merchant_reference2'] ?? '';
+		$order              = ! empty( $merchant_reference ) ? self::get_wc_order( $merchant_reference ) : null;
 
-		self::validate_wc_order( $order );
+		if ( $order ) {
+			self::validate_wc_order( $order );
 
-		// Set the klarna order id in the order meta data.
-		$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
+			// Set the Kustom order id in the order meta data.
+			$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
 
-		// Set the customers billing email from the klarna order.
-		$order->set_billing_email( $klarna_order['billing_address']['email'] ?? '' );
+			// Set the customers billing email from the Kustom order.
+			$order->set_billing_email( $klarna_order['billing_address']['email'] ?? '' );
 
-		$order->save();
+			$order->save();
+		}
 
-		// Attempt to submit the order to WooCommerce using the store api.
+		$express_context = self::get_express_context( $klarna_merchant_data );
+		if ( $express_context ) {
+			self::validate_express_order( $klarna_order, $order, $express_context );
+			return;
+		}
+
+		// Submit the order via the store api. When no order exists yet it is created from the cart token.
 		$updated_order = self::submit_wc_order( $klarna_order, $order );
 
 		// Compare the order hashes to the once stored in the merchant data to ensure the order is valid.
@@ -60,9 +69,125 @@ class OrderValidation {
 	}
 
 	/**
+	 * The express context stored in the merchant data, or an empty string for an iframe order.
+	 *
+	 * @param array $klarna_merchant_data The decoded merchant data.
+	 *
+	 * @return string
+	 */
+	private static function get_express_context( $klarna_merchant_data ) {
+		$context = $klarna_merchant_data['kco_express'] ?? '';
+
+		return in_array( $context, array( Express::CONTEXT_CART, Express::CONTEXT_PRODUCT ), true ) ? $context : '';
+	}
+
+	/**
+	 * Submit and validate an order placed with an express button.
+	 *
+	 * The sheet's shipping choice never reached WooCommerce, so it is written to the cart token's session first. That
+	 * changes the cart, shipping and tax hashes taken at creation, so the order total is compared with Kustom's instead.
+	 *
+	 * @param array          $klarna_order The Kustom order.
+	 * @param \WC_Order|null $order        The existing WooCommerce order, if any.
+	 * @param string         $context      The express context.
+	 *
+	 * @return void
+	 * @throws Exception If the order could not be submitted or does not match the Kustom order.
+	 */
+	private static function validate_express_order( $klarna_order, $order, $context ) {
+		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
+		$wc_cart_token        = $klarna_merchant_data['wc_cart_token'] ?? '';
+		$klarna_order_id      = $klarna_order['order_id'];
+
+		$previous = ExpressSession::prime_for_validation( $wc_cart_token, $klarna_order );
+
+		try {
+			$updated_order = self::submit_wc_order( $klarna_order, $order, $context );
+		} finally {
+			ExpressSession::restore_after_validation( $wc_cart_token, $klarna_order_id, $previous );
+		}
+
+		$updated_order->update_meta_data( Express::ORDER_META, $context );
+		$updated_order->save();
+
+		self::validate_hash( $klarna_merchant_data['wc_fees_hash'] ?? '', $updated_order->get_meta( '_fees_hash' ) );
+		self::validate_hash( $klarna_merchant_data['wc_coupons_hash'] ?? '', $updated_order->get_meta( '_coupons_hash' ) );
+		self::validate_express_items( $klarna_order, $updated_order );
+		self::validate_express_total( $klarna_order, $updated_order );
+	}
+
+	/**
+	 * Compare the products and quantities on the WooCommerce order with the Kustom order lines.
+	 *
+	 * Stands in for the cart hash, which the express flow cannot use, so a cart changed after the sheet opened is refused.
+	 *
+	 * @param array     $klarna_order The Kustom order.
+	 * @param \WC_Order $order        The WooCommerce order.
+	 *
+	 * @return void
+	 * @throws Exception If the items differ.
+	 */
+	private static function validate_express_items( $klarna_order, $order ) {
+		$klarna_items = array();
+		foreach ( $klarna_order['order_lines'] ?? array() as $line ) {
+			if ( in_array( $line['type'] ?? '', array( 'physical', 'digital' ), true ) ) {
+				$reference                  = (string) ( $line['reference'] ?? '' );
+				$klarna_items[ $reference ] = ( $klarna_items[ $reference ] ?? 0 ) + intval( $line['quantity'] ?? 0 );
+			}
+		}
+
+		$order_data = new \KCO_Request_Order();
+		$wc_items   = array();
+		foreach ( $order->get_items() as $item ) {
+			if ( ! $item instanceof \WC_Order_Item_Product ) {
+				continue;
+			}
+
+			$line                   = $order_data->get_order_line_items( $item );
+			$reference              = (string) $line['reference'];
+			$wc_items[ $reference ] = ( $wc_items[ $reference ] ?? 0 ) + intval( $line['quantity'] );
+		}
+
+		ksort( $klarna_items );
+		ksort( $wc_items );
+
+		if ( $klarna_items !== $wc_items ) {
+			\KCO_Logger::log( "[Express] Order items mismatch for Kustom order {$klarna_order['order_id']}." );
+			throw new Exception( 'Could not validate the order, please try again.', 401 );
+		}
+	}
+
+	/**
+	 * Compare the WooCommerce order total with what the shopper approved in the sheet, shipping included.
+	 *
+	 * @param array     $klarna_order The Kustom order.
+	 * @param \WC_Order $order        The WooCommerce order.
+	 *
+	 * @return void
+	 * @throws Exception If the totals differ by more than the rounding tolerance used at confirmation.
+	 */
+	private static function validate_express_total( $klarna_order, $order ) {
+		$klarna_total      = intval( $klarna_order['order_amount'] ?? 0 );
+		$has_shipping_line = in_array( 'shipping_fee', array_column( $klarna_order['order_lines'] ?? array(), 'type' ), true );
+
+		// KSA keeps the selected option outside the order lines until the purchase completes. With the shipping option update
+		// callback Kustom charges only order_amount, so an option the callback never priced must fail here.
+		if ( ! $has_shipping_line && empty( $klarna_order['merchant_urls']['shipping_option_update'] ) ) {
+			$klarna_total += intval( $klarna_order['selected_shipping_option']['price'] ?? 0 );
+		}
+
+		$wc_total = intval( wc_format_decimal( $order->get_total() * 100, 0 ) );
+
+		if ( abs( $klarna_total - $wc_total ) > 1 ) {
+			\KCO_Logger::log( "[Express] Order total mismatch for Kustom order {$klarna_order['order_id']}: Kustom {$klarna_total}, WooCommerce {$wc_total}." );
+			throw new Exception( 'Could not validate the order, please try again.', 401 );
+		}
+	}
+
+	/**
 	 * Validate the hashes to ensure the order is valid.
 	 *
-	 * @param string $klarna_hash The hash from Klarna.
+	 * @param string $klarna_hash The hash from Kustom.
 	 * @param string $wc_hash The hash from WooCommerce.
 	 *
 	 * @return void
@@ -72,31 +197,6 @@ class OrderValidation {
 		if ( ! hash_equals( $klarna_hash, $wc_hash ) ) {
 			throw new Exception( 'Could not validate the order, please try again.', 401 );
 		}
-	}
-
-	/**
-	 * Validate the hashes to ensure the order is valid.
-	 *
-	 * @param array          $klarna_order The Klarna order.
-	 * @param SessionHandler $session The WooCommerce session handler.
-	 *
-	 * @return void
-	 * @throws Exception If the hashes do not match.
-	 */
-	private static function validate_hashes( $klarna_order, $session ) {
-		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-
-		// Calculate the hashes for the cart and coupons applied in the session.
-		$wc_totals       = $session->get( 'cart_totals', array() );
-		$wc_cart_hash    = md5( wp_json_encode( $session->get( 'cart', array() ) ) . $wc_totals['total'] ?? 0 );
-		$wc_coupons_hash = md5( wp_json_encode( $session->get( 'applied_coupons', array() ) ) );
-
-		$klarna_cart_hash    = $klarna_merchant_data['wc_cart_hash'] ?? '';
-		$klarna_coupons_hash = $klarna_merchant_data['wc_coupons_hash'] ?? '';
-
-		// Compare the strings and ensure they are the same.
-		self::validate_hash( $klarna_cart_hash, $wc_cart_hash );
-		self::validate_hash( $klarna_coupons_hash, $wc_coupons_hash );
 	}
 
 	/**
@@ -118,12 +218,12 @@ class OrderValidation {
 	}
 
 	/**
-	 * Get the Klarna order and ensure that its valid.
+	 * Get the Kustom order and ensure that it's valid.
 	 *
-	 * @param string $klarna_order_id The Klarna order ID.
+	 * @param string $klarna_order_id The Kustom order ID.
 	 *
 	 * @return array
-	 * @throws Exception If the request is invalid or the Klarna order could not be found.
+	 * @throws Exception If the request is invalid or the Kustom order could not be found.
 	 */
 	private static function get_klarna_order( $klarna_order_id ) {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
@@ -133,49 +233,6 @@ class OrderValidation {
 		}
 
 		return $klarna_order;
-	}
-
-	/**
-	 * Validate the price to ensure the order is valid.
-	 *
-	 * @param int   $klarna_price The price from Klarna.
-	 * @param float $wc_price The price from WooCommerce.
-	 *
-	 * @return void
-	 * @throws Exception If the prices do not match.
-	 */
-	private static function validate_price( $klarna_price, $wc_price ) {
-		// Divide the Klarna price by 100, to make it a floating point number.
-		$klarna_price = floatval( $klarna_price ) / 100;
-
-		$klarna_price = wc_format_decimal( $klarna_price, wc_get_price_decimals() );
-		$wc_price     = wc_format_decimal( $wc_price, wc_get_price_decimals() );
-
-		if ( $klarna_price !== $wc_price ) {
-			throw new Exception( 'Failed to validate the order, please try again', 401 );
-		}
-	}
-
-	/**
-	 * Validate the order totals to ensure the order is valid.
-	 *
-	 * @param array     $klarna_order The Klarna order.
-	 * @param \WC_Order $order The WooCommerce order.
-	 *
-	 * @return void
-	 */
-	private static function validate_order_totals( $klarna_order, $order ) {
-		$selected_shipping                   = $klarna_order['selected_shipping_option'] ?? array();
-		$klarna_order_amount                 = $klarna_order['order_amount'] ?? 0;
-		$klarna_order_tax_amount             = $klarna_order['order_tax_amount'] ?? 0;
-		$klarna_selected_shipping_price      = $selected_shipping['price'] ?? 0;
-		$klarna_selected_shipping_tax_amount = $selected_shipping['tax_amount'] ?? 0;
-
-		$klarna_total     = $klarna_order_amount + $klarna_selected_shipping_price;
-		$klarna_tax_total = $klarna_order_tax_amount + $klarna_selected_shipping_tax_amount;
-
-		self::validate_price( $klarna_total, $order->get_total() );
-		self::validate_price( $klarna_tax_total, $order->get_total_tax() );
 	}
 
 	/**
@@ -194,46 +251,16 @@ class OrderValidation {
 	}
 
 	/**
-	 * Load the WooCommerce cart.
-	 *
-	 * @param array $klarna_order The Klarna order.
-	 *
-	 * @return SessionHandler
-	 * @throws Exception If the cart could not be loaded.
-	 */
-	private static function load_wc_session( $klarna_order ) {
-		// Get the wc_cart_token from the klarna order merchant data.
-		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-		$wc_cart_token        = $klarna_merchant_data['wc_cart_token'] ?? '';
-
-		if ( empty( $wc_cart_token ) ) {
-			throw new Exception( 'Failed to validate the order, please try again.', 400 );
-		}
-
-		if ( ! JsonWebToken::validate( $wc_cart_token, '@' . wp_salt() ) ) {
-			throw new Exception( 'Failed to validate the order, please try again.', 401 );
-		}
-
-		// Set the CartToken header to the server session.
-		$_SERVER['HTTP_CART_TOKEN'] = $wc_cart_token;
-		$session                    = new SessionHandler();
-		$session->init();
-		// Unset the shutdown action on the session handler. To prevent saving the session after we are done with it.
-		remove_action( 'shutdown', array( $session, 'save_data' ), 20 );
-
-		return $session;
-	}
-
-	/**
 	 * Submit the WooCommerce order.
 	 *
-	 * @param array     $klarna_order The Klarna order.
-	 * @param \WC_Order $order The WooCommerce order.
+	 * @param array          $klarna_order The Kustom order.
+	 * @param \WC_Order|null $order The WooCommerce order, or null when it should be created from the cart token.
+	 * @param string         $express_context The express context, or an empty string for an iframe order.
 	 *
 	 * @return \WC_Order The updated WooCommerce order after submission.
 	 * @throws Exception If the order could not be submitted.
 	 */
-	private static function submit_wc_order( $klarna_order, $order ) {
+	private static function submit_wc_order( $klarna_order, $order = null, $express_context = '' ) {
 		$settings                = get_option( 'woocommerce_kco_settings', array() );
 		$klarna_billing_address  = $klarna_order['billing_address'] ?? array();
 		$klarna_shipping_address = $klarna_order['shipping_address'] ?? array();
@@ -243,10 +270,10 @@ class OrderValidation {
 		$wc_nonce                = $klarna_merchant_data['wc_nonce'] ?? '';
 		$wp_logged_in_cookie     = $klarna_merchant_data['wp_logged_in_cookie'] ?? null;
 
-		$request_url = rest_url( 'wc/store/v1/checkout/' . $order->get_id() );
+		// Pay for the existing order, or post to the base endpoint so the Store API creates it from the cart token.
+		$request_url = $order ? rest_url( 'wc/store/v1/checkout/' . $order->get_id() ) : rest_url( 'wc/store/v1/checkout' );
 
 		$body = array(
-			'key'              => $order->get_order_key(),
 			'payment_method'   => 'kco',
 			'billing_email'    => $klarna_billing_address['email'] ?? '',
 			'payment_data'     => array(
@@ -268,11 +295,11 @@ class OrderValidation {
 				),
 				array(
 					'key'   => '_shipping_email',
-					'value' => $klarna_shipping_address['email'] ?? '',
+					'value' => $klarna_shipping_address['email'] ?? $klarna_billing_address['email'] ?? '',
 				),
 				array(
 					'key'   => '_shipping_phone',
-					'value' => $klarna_shipping_address['phone'] ?? '',
+					'value' => $klarna_shipping_address['phone'] ?? $klarna_billing_address['phone'] ?? '',
 				),
 			),
 			'billing_address'  => array(
@@ -294,8 +321,14 @@ class OrderValidation {
 				'state'      => $klarna_shipping_address['region'] ?? '',
 				'postcode'   => $klarna_shipping_address['postal_code'] ?? '',
 				'country'    => strtoupper( $klarna_shipping_address['country'] ?? '' ),
+				'phone'      => ! empty( $klarna_shipping_address['phone'] ) ? $klarna_shipping_address['phone'] : ( $klarna_billing_address['phone'] ?? '' ),
 			),
 		);
+
+		// The order key is required by the Store API to pay for an existing order, and omitted for the create flow.
+		if ( $order ) {
+			$body['key'] = $order->get_order_key();
+		}
 
 		// Set the billing company name if it exists.
 		if ( isset( $klarna_billing_address['organization_name'] ) ) {
@@ -307,7 +340,15 @@ class OrderValidation {
 			$body['shipping_address']['company'] = $klarna_shipping_address['organization_name'];
 		}
 
-		// If the klarna order is a recurring order.
+		// Read by CheckoutFlow::get_handler(), so an express order on a classic checkout store uses the block flow.
+		if ( $express_context ) {
+			$body['payment_data'][] = array(
+				'key'   => Express::ORDER_META,
+				'value' => $express_context,
+			);
+		}
+
+		// If the Kustom order is a recurring order.
 		if ( isset( $klarna_order['recurring'] ) ) {
 			$body['payment_data'][] = array(
 				'key'   => '_kco_recurring_order',
@@ -366,7 +407,7 @@ class OrderValidation {
 		$updated_order = wc_get_order( $order_response['order_id'] ?? null );
 
 		if ( ! $updated_order ) {
-			\KCO_Logger::log( "[Blocks] - Could not find the WooCommerce order for Klarna order $klarna_id." );
+			\KCO_Logger::log( "[Blocks] - Could not find the WooCommerce order for Kustom order $klarna_id." );
 			throw new Exception( 'Could not find the WooCommerce order.' );
 		}
 

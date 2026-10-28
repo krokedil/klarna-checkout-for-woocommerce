@@ -38,7 +38,7 @@ class KCO_Subscription {
 		add_filter( 'allowed_redirect_hosts', array( $this, 'extend_allowed_domains_list' ) );
 
 		// Since not all metadata is copied to the renewal subscription, we have to manually copy them over.
-		add_action( 'wcs_renewal_order_created', array( $this, 'copy_meta_fields_to_renewal_order' ), 10, 2 );
+		add_filter( 'wcs_renewal_order_created', array( $this, 'copy_meta_fields_to_renewal_order' ), 10, 2 );
 
 		// This is required for non-trial, free subscriptions products to be processed in KCO, since WC Subscriptions does not consider them as needing payment.
 		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'allow_processing_free_subscription' ) );
@@ -306,14 +306,24 @@ class KCO_Subscription {
 
 					// Do not overwrite any existing phone number in case the customer has changed payment method (and thus shipping details).
 					if ( empty( $subscription->get_shipping_phone() ) ) {
-
-						// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
-						if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
-							$subscription->set_shipping_phone( $kco_order['shipping_address']['phone'] );
-						} else {
-							$subscription->update_meta_data( '_shipping_phone', $kco_order['shipping_address']['phone'] );
+						$shipping_phone = $kco_order['shipping_address']['phone'] ?? $kco_order['billing_address']['phone'] ?? '';
+						if ( ! empty( $shipping_phone ) ) {
+							// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
+							if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
+								$subscription->set_shipping_phone( sanitize_text_field( $shipping_phone ) );
+							} else {
+								$subscription->update_meta_data( '_shipping_phone', sanitize_text_field( $shipping_phone ) );
+							}
 						}
 					}
+
+					if ( empty( $subscription->get_meta( '_shipping_email' ) ) ) {
+						$shipping_email = $kco_order['shipping_address']['email'] ?? $kco_order['billing_address']['email'] ?? '';
+						if ( ! empty( $shipping_email ) ) {
+							$subscription->update_meta_data( '_shipping_email', sanitize_text_field( $shipping_email ) );
+						}
+					}
+
 					$subscription->save();
 				}
 
@@ -335,7 +345,7 @@ class KCO_Subscription {
 	/**
 	 * Propagate subscription-specific meta from the parent order to its subscriptions.
 	 *
-	 * These values (Klarna environment, KSS shipping data) are written to the parent order during
+	 * These values (Kustom environment, KSS shipping data) are written to the parent order during
 	 * checkout, after the subscription has already been created. Saving them to the subscription
 	 * here ensures the Data Copier can copy them to renewal orders automatically.
 	 *
@@ -451,22 +461,59 @@ class KCO_Subscription {
 			$renewal_order->save_meta_data();
 		}
 
+		// A renewal created before these identifiers were excluded can still carry the parent's; they are never valid for this attempt.
+		$this->delete_inherited_klarna_ids( $renewal_order, $subscription );
+
 		$create_order_response = KCO_WC()->api->create_recurring_order( $order_id, $recurring_token );
 		if ( ! is_wp_error( $create_order_response ) ) {
 			$klarna_order_id = $create_order_response['order_id'];
 
 			// Translators: Kustom order id.
 			$renewal_order->add_order_note( sprintf( __( 'Subscription payment made with Kustom. Kustom order id: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order_id ) );
-			foreach ( $subscriptions as $subscription ) {
-				$subscription->payment_complete( $klarna_order_id );
-			}
+
+			// The renewal has its own Kustom order, not the one inherited from the parent.
+			$renewal_order->update_meta_data( '_wc_klarna_order_id', $klarna_order_id );
+			$renewal_order->save_meta_data();
+
+			// Complete the order that was charged. WC Subscriptions propagates this to the subscription.
+			$renewal_order->payment_complete( $klarna_order_id );
 		} else {
 			$error_message = $create_order_response->get_error_message();
 			// Translators: Error message.
-			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Klarna. Message: %1$s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
-			foreach ( $subscriptions as $related_subscription ) {
-				$related_subscription->payment_failed();
+			$renewal_order->add_order_note( sprintf( __( 'Subscription payment failed with Kustom. Message: %1$s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
+			$renewal_order->update_status( 'failed' );
+		}
+	}
+
+	/**
+	 * Removes Kustom identifiers a renewal order inherited from its subscription or parent order.
+	 *
+	 * @param WC_Order        $renewal_order The renewal order being charged.
+	 * @param WC_Subscription $subscription  The subscription the renewal belongs to.
+	 * @return void
+	 */
+	private function delete_inherited_klarna_ids( $renewal_order, $subscription ) {
+		$parent  = $subscription->get_parent();
+		$deleted = false;
+
+		foreach ( array( '_wc_klarna_order_id', '_wc_klarna_capture_id' ) as $meta_key ) {
+			$value = $renewal_order->get_meta( $meta_key, true );
+			if ( empty( $value ) ) {
+				continue;
 			}
+
+			// Only a value matching the subscription or parent is inherited; one the renewal earned itself stays.
+			$inherited = $value === $subscription->get_meta( $meta_key, true )
+				|| ( ! empty( $parent ) && $value === $parent->get_meta( $meta_key, true ) );
+
+			if ( $inherited ) {
+				$renewal_order->delete_meta_data( $meta_key );
+				$deleted = true;
+			}
+		}
+
+		if ( $deleted ) {
+			$renewal_order->save_meta_data();
 		}
 	}
 
@@ -479,12 +526,16 @@ class KCO_Subscription {
 	 *
 	 * @param  WC_Order        $renewal_order Woo renewal order.
 	 * @param  WC_Subscription $subscription Woo subscription.
-	 * @return void
+	 * @return WC_Order
 	 */
 	public function copy_meta_fields_to_renewal_order( $renewal_order, $subscription ) {
 		if ( 'kco' !== $subscription->get_payment_method() ) {
-			return;
+			return $renewal_order;
 		}
+
+		// The Data Copier inherits these from the subscription; they belong to the parent order, not this renewal.
+		$renewal_order->delete_meta_data( '_wc_klarna_order_id' );
+		$renewal_order->delete_meta_data( '_wc_klarna_capture_id' );
 
 		$parent = $subscription->get_parent();
 
@@ -541,6 +592,7 @@ class KCO_Subscription {
 		}
 
 		$renewal_order->save_meta_data();
+		return $renewal_order;
 	}
 
 	/**
@@ -698,11 +750,15 @@ class KCO_Subscription {
 		$subscription->set_shipping_city( $klarna_order['shipping_address']['city'] );
 
 		// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
+		$shipping_phone = $klarna_order['shipping_address']['phone'] ?? $klarna_order['billing_address']['phone'] ?? '';
 		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
-			$subscription->set_shipping_phone( $klarna_order['shipping_address']['phone'] );
+			$subscription->set_shipping_phone( sanitize_text_field( $shipping_phone ) );
 		} else {
-			$subscription->update_meta_data( '_shipping_phone', $klarna_order['shipping_address']['phone'] );
+			$subscription->update_meta_data( '_shipping_phone', sanitize_text_field( $shipping_phone ) );
 		}
+
+		$shipping_email = $klarna_order['shipping_address']['email'] ?? $klarna_order['billing_address']['email'] ?? '';
+		$subscription->update_meta_data( '_shipping_email', sanitize_text_field( $shipping_email ) );
 
 		$subscription->save();
 	}
@@ -717,6 +773,8 @@ class KCO_Subscription {
 	public function extend_allowed_domains_list( $hosts ) {
 		$hosts[] = 'pay.playground.klarna.com';
 		$hosts[] = 'pay.klarna.com';
+		$hosts[] = 'pay.playground.kustom.co';
+		$hosts[] = 'pay.kustom.co';
 		return $hosts;
 	}
 }

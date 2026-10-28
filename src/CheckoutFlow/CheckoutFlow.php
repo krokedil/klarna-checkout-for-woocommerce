@@ -2,6 +2,7 @@
 namespace Krokedil\KustomCheckout\CheckoutFlow;
 
 use Exception;
+use Krokedil\KustomCheckout\Express\Express;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
@@ -24,9 +25,16 @@ abstract class CheckoutFlow {
 			$message = __( 'Invalid order ID.', 'klarna-checkout-for-woocommerce' );
 			throw new Exception( esc_html( $message ) );
 		}
-		$handler = self::get_handler();
+		$handler         = self::get_handler();
+		$kustom_order_id = $order->get_meta( '_wc_klarna_order_id', true );
+		if ( empty( $kustom_order_id ) && WC()->session ) {
+			$kustom_order_id = WC()->session->get( 'kco_wc_order_id' );
+		}
+		if ( empty( $kustom_order_id ) ) {
+			$kustom_order_id = 'N/A';
+		}
 
-		\KCO_Logger::log( sprintf( 'Processing order %s|%s with flow %s.', $order->get_id(), $order->get_order_number(), get_class( $handler ) ) );
+		\KCO_Logger::log( \sprintf( 'Processing order %s|%s (Kustom ID: %s) with flow %s.', $order->get_id(), $order->get_order_number(), $kustom_order_id, \get_class( $handler ) ) );
 
 		return $handler->process( $order );
 	}
@@ -47,8 +55,11 @@ abstract class CheckoutFlow {
 			return new RedirectFlow();
 		}
 
+		// Express orders are always placed through the Store API, like the block checkout. It puts the payment data in $_POST.
+		$is_express = WC()->is_store_api_request() && ! empty( $_POST[ Express::ORDER_META ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Only checks presence, set by OrderValidation.
+
 		// If the checkout block is enabled, use the embedded block flow no matter the setting.
-		if ( $blocks_enabled ) {
+		if ( $blocks_enabled || $is_express ) {
 			return new EmbeddedBlockFlow();
 		}
 
@@ -72,12 +83,12 @@ abstract class CheckoutFlow {
 	abstract public function process( $order );
 
 	/**
-	 * Get the Klarna order id for the order.
+	 * Get the Kustom order id for the order.
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
 	 *
-	 * @return string|null The Klarna order id or null if not set.
-	 * @throws Exception If there is an error retrieving the Klarna order id.
+	 * @return string|null The Kustom order id or null if not set.
+	 * @throws Exception If there is an error retrieving the Kustom order id.
 	 */
 	public function get_klarna_order_id( $order ) {
 		// For the initial subscription, the Kustom order ID should always exist in the session.
@@ -95,7 +106,7 @@ abstract class CheckoutFlow {
 		$klarna_order_id = ! empty( $klarna_order_id ) ? $klarna_order_id : WC()->session->get( 'kco_wc_order_id' );
 
 		if ( empty( $klarna_order_id ) ) {
-			throw new Exception( __( 'Klarna order ID not found.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
+			throw new Exception( __( 'Kustom order ID not found.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
 		}
 
 		return $klarna_order_id;
@@ -104,7 +115,7 @@ abstract class CheckoutFlow {
 	/**
 	 * Log extra shipping debug information.
 	 *
-	 * @param string    $klarna_order_id The Klarna order ID.
+	 * @param string    $klarna_order_id The Kustom order ID.
 	 * @param \WC_Order $order The WooCommerce order.
 	 *
 	 * @return void
@@ -138,18 +149,18 @@ abstract class CheckoutFlow {
 	}
 
 	/**
-	 * Get the klarna order for a order number, or throw an error.
+	 * Get the Kustom order for an order number, or throw an error.
 	 *
-	 * @param string $klarna_order_id The Klarna order ID.
+	 * @param string $klarna_order_id The Kustom order ID.
 	 *
 	 * @return array
-	 * @throws Exception If the Klarna order is not found or if there is an error.
+	 * @throws Exception If the Kustom order is not found or if there is an error.
 	 */
 	public function get_klarna_order( $klarna_order_id ) {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
 		if ( is_wp_error( $klarna_order ) || empty( $klarna_order ) ) {
-			throw new Exception( __( 'Klarna order not found or an error occurred.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
+			throw new Exception( __( 'Kustom order not found or an error occurred.', 'klarna-checkout-for-woocommerce' ) ); // phpcs:ignore
 		}
 
 		return $klarna_order;
@@ -159,7 +170,7 @@ abstract class CheckoutFlow {
 	 * Save metadata to the order.
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
-	 * @param array     $klarna_order The Klarna order data.
+	 * @param array     $klarna_order The Kustom order data.
 	 * @param string    $checkout_flow The checkout flow type (e.g., 'embedded', 'redirect').
 	 * @param bool      $save Whether to save the order metadata or not. Default is true.
 	 *
@@ -187,20 +198,81 @@ abstract class CheckoutFlow {
 		$klarna_country = wc_get_base_location()['country'];
 		$order->update_meta_data( '_wc_klarna_country', $klarna_country );
 
-		if ( isset( $klarna_order['shipping_address']['phone'] ) ) {
-
+		$shipping_phone = $klarna_order['shipping_address']['phone'] ?? $klarna_order['billing_address']['phone'] ?? '';
+		if ( ! empty( $shipping_phone ) ) {
 			// NOTE: Since we declare support for WC v4+, and WC_Order::set_shipping_phone was only added in 5.6.0, we need to use update_meta_data instead. There is no default shipping email field in WC.
 			if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '5.6.0', '>=' ) ) {
-				$order->set_shipping_phone( sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+				$order->set_shipping_phone( sanitize_text_field( $shipping_phone ) );
 			} else {
-				$order->update_meta_data( '_shipping_phone', sanitize_text_field( $klarna_order['shipping_address']['phone'] ) );
+				$order->update_meta_data( '_shipping_phone', sanitize_text_field( $shipping_phone ) );
 			}
 		}
 
-		$order->update_meta_data( '_shipping_email', sanitize_text_field( $klarna_order['shipping_address']['email'] ) );
+		$shipping_email = $klarna_order['shipping_address']['email'] ?? $klarna_order['billing_address']['email'] ?? '';
+		$order->update_meta_data( '_shipping_email', sanitize_text_field( $shipping_email ) );
+
+		$this->maybe_set_selected_pickup_point_on_order( $order, $klarna_order );
 
 		if ( $save ) {
 			$order->save();
+		}
+	}
+
+	/**
+	 * Reconcile the selected pickup point on the order's shipping line with the Kustom order data.
+	 *
+	 * When Kustom Shipping Assistant is backed by WooCommerce (via Kroconnect's KSA integration), the customer
+	 * may pick a pickup point in the iframe after the WC shipping rate was built. In that window the order's
+	 * shipping line meta can disagree with what the customer actually selected. The Kustom order is the source
+	 * of truth, so we copy `selected_shipping_option.delivery_details.pickup_location` onto the matching
+	 * shipping line. Lines without `krokedil_pickup_points` meta belong to other TMS integrations and are left
+	 * untouched.
+	 *
+	 * @param \WC_Order $order The WooCommerce order.
+	 * @param array     $klarna_order The Kustom order data.
+	 *
+	 * @return void
+	 */
+	protected function maybe_set_selected_pickup_point_on_order( $order, $klarna_order ) {
+		$pickup_location    = $klarna_order['selected_shipping_option']['delivery_details']['pickup_location'] ?? null;
+		$shipping_method_id = $klarna_order['selected_shipping_option']['id'] ?? null;
+
+		if ( empty( $pickup_location['id'] ) || empty( $shipping_method_id ) ) {
+			return;
+		}
+
+		foreach ( $order->get_items( 'shipping' ) as $shipping_line ) {
+			/**
+			 * Shipping line item.
+			 *
+			 * @var \WC_Order_Item_Shipping $shipping_line
+			 */
+			$instance_id = $shipping_line->get_instance_id();
+			$rate_id     = $instance_id ? $shipping_line->get_method_id() . ':' . $instance_id : $shipping_line->get_method_id();
+
+			if ( $rate_id !== $shipping_method_id ) {
+				continue;
+			}
+
+			$pickup_points_json = $shipping_line->get_meta( 'krokedil_pickup_points' );
+			if ( empty( $pickup_points_json ) ) {
+				continue;
+			}
+
+			$pickup_points = json_decode( $pickup_points_json, true );
+			if ( ! is_array( $pickup_points ) ) {
+				continue;
+			}
+
+			foreach ( $pickup_points as $pickup_point ) {
+				if ( ! isset( $pickup_point['id'] ) || (string) $pickup_point['id'] !== (string) $pickup_location['id'] ) {
+					continue;
+				}
+
+				$shipping_line->update_meta_data( 'krokedil_selected_pickup_point_id', $pickup_point['id'] );
+				$shipping_line->update_meta_data( 'krokedil_selected_pickup_point', wp_json_encode( $pickup_point ) );
+				break;
+			}
 		}
 	}
 

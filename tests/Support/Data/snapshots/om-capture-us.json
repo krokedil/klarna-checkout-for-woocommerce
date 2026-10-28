@@ -1,0 +1,39 @@
+{
+    "method": "POST",
+    "path": "https://api.playground.kustom.co/ordermanagement/v1/orders/kustom-order-123/captures",
+    "body": {
+        "order_lines": [
+            {
+                "reference": "kco-test-1",
+                "type": "physical",
+                "name": "Kustom Test Product",
+                "quantity": 2,
+                "unit_price": 10000,
+                "tax_rate": 850,
+                "total_amount": 20000,
+                "total_discount_amount": 0,
+                "total_tax_amount": 0
+            },
+            {
+                "type": "sales_tax",
+                "reference": "Sales Tax",
+                "name": "Sales Tax",
+                "quantity": 1,
+                "unit_price": 1700,
+                "tax_rate": 0,
+                "total_amount": 1700,
+                "total_discount_amount": 0,
+                "total_tax_amount": 0
+            }
+        ],
+        "order_amount": 23400,
+        "order_tax_amount": 1700,
+        "shipping_info": [
+            {
+                "tracking_number": "",
+                "tracking_uri": ""
+            }
+        ],
+        "captured_amount": 21700
+    }
+}

@@ -12,6 +12,8 @@ on:
       - "**.tsx"
       - ".distignore"
       - "phpcs.xml"
+      - "phpstan.neon"
+      - "phpstan-baseline.neon"
       - "composer.json"
       - "composer.lock"
       - "composer-dependencies.json"

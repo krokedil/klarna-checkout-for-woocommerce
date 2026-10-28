@@ -25,7 +25,12 @@ jQuery( function ( $ ) {
 		// True or false if we need to update the Kustom order. Set to false on initial page load.
 		klarnaUpdateNeeded: false,
 		shippingEmailExists: false,
-		shippingPhoneExists: false,
+
+		// True when the KCO iframe is currently suspended, to prevent double-suspend calls.
+		suspended: false,
+		// True once a shipping address is known (via shipping_address_change or change event).
+		// Prevents api.suspend from being called before Kustom has an address to fetch shipping for.
+		shippingAddressKnown: false,
 
 		redirectAttemptCount: 0,
 
@@ -109,12 +114,16 @@ jQuery( function ( $ ) {
 		},
 
 		/**
-		 * Resumes the Kustom Iframe
+		 * Suspends the Kustom Iframe.
+		 * Will not suspend again if already suspended, and will not suspend before a shipping
+		 * address is known (to avoid triggering premature KSA external TMS shipping fetches).
 		 * @param {boolean} autoResumeBool
 		 */
 		kcoSuspend: function ( autoResumeBool ) {
-			if ( window._klarnaCheckout && ! kco_wc.validation ) {
+			if ( window._klarnaCheckout && ! kco_wc.validation && ! kco_wc.suspended && kco_wc.shippingAddressKnown ) {
+				kco_wc.log( "kcoSuspend", autoResumeBool )
 				window._klarnaCheckout( function ( api ) {
+					kco_wc.suspended = true
 					api.suspend( {
 						autoResume: {
 							enabled: autoResumeBool,
@@ -125,10 +134,12 @@ jQuery( function ( $ ) {
 		},
 
 		/**
-		 * Resumes the KCO Iframe
+		 * Resumes the KCO Iframe. Only resumes if we actually suspended it.
 		 */
 		kcoResume: function () {
-			if ( window._klarnaCheckout && ! kco_wc.validation ) {
+			if ( window._klarnaCheckout && ! kco_wc.validation && kco_wc.suspended ) {
+				kco_wc.suspended = false
+				kco_wc.log( "kcoResume" )
 				window._klarnaCheckout( function ( api ) {
 					api.resume()
 				} )
@@ -212,7 +223,7 @@ jQuery( function ( $ ) {
 			$( ".woocommerce-additional-fields" ).appendTo( "#kco-extra-checkout-fields" )
 			var form = $( 'form[name="checkout"] input, form[name="checkout"] select, textarea' )
 			var checkout_add_ons_moved = false
-			for ( i = 0; i < form.length; i++ ) {
+			for ( let i = 0; i < form.length; i++ ) {
 				var name = form[ i ].name.replace( "[]", "\\[\\]" ) // Escape any empty "array" keys to prevent errors.
 				// Check if field is inside the order review.
 				if ( $( "table.woocommerce-checkout-review-order-table" ).find( form[ i ] ).length ) {
@@ -234,9 +245,6 @@ jQuery( function ( $ ) {
 							$( "div#wc_checkout_add_ons" ).appendTo( "#kco-extra-checkout-fields" )
 						}
 					} else if ( 0 < $( "p#" + name + "_field" ).length ) {
-						if ( name === "shipping_phone" ) {
-							kco_wc.shippingPhoneExists = true
-						}
 						if ( name === "shipping_email" ) {
 							kco_wc.shippingEmailExists = true
 						}
@@ -313,7 +321,7 @@ jQuery( function ( $ ) {
 		 * Gets the Kustom order and starts the order submission
 		 */
 		getKlarnaOrder: function () {
-			console.log( "getKlarnaOrder" )
+			console.log( "getKustomOrder" )
 			kco_wc.preventPaymentMethodChange = true
 			$( ".woocommerce-checkout-review-order-table" ).block( {
 				message: null,
@@ -388,8 +396,8 @@ jQuery( function ( $ ) {
 				)
 				$( "#billing_state" ).val( "region" in data.billing_address ? data.billing_address.region : "" )
 				// Trigger changes
-				$( "#billing_email" ).change()
-				$( "#billing_email" ).blur()
+				$( "#billing_email" ).trigger( "change" )
+				$( "#billing_email" ).trigger( "blur" )
 			}
 
 			if ( "shipping_address" in data && data.shipping_address !== null ) {
@@ -419,13 +427,11 @@ jQuery( function ( $ ) {
 					"country" in data.shipping_address ? data.shipping_address.country.toUpperCase() : "",
 				)
 				$( "#shipping_state" ).val( "region" in data.shipping_address ? data.shipping_address.region : "" )
+				$( "#shipping_phone" ).val( "phone" in data.shipping_address ? data.shipping_address.phone : "" )
 
-				// extra shipping fields (email, phone).
+				// extra shipping fields (email).
 				if ( kco_wc.shippingEmailExists === true && $( "#shipping_email" ) ) {
 					$( "#shipping_email" ).val( "email" in data.shipping_address ? data.shipping_address.email : "" )
-				}
-				if ( kco_wc.shippingPhoneExists === true && $( "#shipping_phone" ) ) {
-					$( "#shipping_phone" ).val( "phone" in data.shipping_address ? data.shipping_address.phone : "" )
 				}
 			}
 		},
@@ -468,7 +474,10 @@ jQuery( function ( $ ) {
 				'<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' + error_message + "</div>",
 			) // eslint-disable-line max-len
 			$( className ).removeClass( "processing" ).unblock()
-			$( className ).find( ".input-text, select, input:checkbox" ).trigger( "validate" ).blur()
+			$( className )
+				.find( ".input-text, select, input:checkbox" )
+				.trigger( "validate" )
+				.trigger( "blur" )
 			$( document.body ).trigger( "checkout_error", [ error_message ] )
 		},
 
@@ -482,7 +491,7 @@ jQuery( function ( $ ) {
 				type: "POST",
 				dataType: "json",
 				data: {
-					message: message,
+					message: typeof message === "object" ? JSON.stringify( message ) : message,
 					nonce: kco_params.log_to_file_nonce,
 				},
 			} )
@@ -498,9 +507,17 @@ jQuery( function ( $ ) {
 			}
 		},
 
-		updateShipping: function ( data ) {
-			kco_wc.kcoSuspend( true )
-			$( "#kco_shipping_data" ).val( JSON.stringify( data ) )
+		updateShipping: function (data) {
+			const serializedData = JSON.stringify(data)
+
+			// If the update succeeded but the data is the same as before, we won't trigger the update_checkout event to avoid an infinite loop.
+			const current = $("#kco_shipping_data").val()
+			if (current === serializedData) {
+				return
+			}
+
+			$("#kco_shipping_data").val(serializedData)
+
 			$( "body" ).trigger( "kco_shipping_option_changed", [ data ] )
 			$( "body" ).trigger( "update_checkout" )
 		},
@@ -527,30 +544,17 @@ jQuery( function ( $ ) {
 						success: function ( data ) {
 							try {
 								if ( "success" === data.result ) {
-									let email = "N/A"
-									if (
-										"billing_address" in response.data &&
-										"email" in response.data.billing_address
-									) {
-										email = response.data.shipping_address.email
-									} else if (
-										"shipping_address" in response.data &&
-										"email" in response.data.shipping_address
-									) {
-										email = response.data.shipping_address.email
-									}
-
-									kco_wc.logToFile( `Successfully placed order [${email}]. Sending "should_proceed: true" to Kustom` )
+									kco_wc.logToFile( 'Successfully placed order. Sending "should_proceed: true" to Kustom' )
 									callback( { should_proceed: true } )
 								} else {
 									throw "Result failed"
 								}
 							} catch ( err ) {
 								if ( data.messages ) {
-									kco_wc.logToFile( "Checkout error | " + data.messages )
+									kco_wc.logToFile( { type: "checkout_error", message: data.messages } )
 									kco_wc.failOrder( "submission", data.messages, callback )
 								} else {
-									kco_wc.logToFile( "Checkout error | No message" )
+									kco_wc.logToFile( { type: "checkout_error", message: "No message" } )
 									kco_wc.failOrder(
 										"submission",
 										'<div class="woocommerce-error">Checkout error</div>',
@@ -560,11 +564,12 @@ jQuery( function ( $ ) {
 							}
 						},
 						error: function ( data ) {
-							try {
-								kco_wc.logToFile( "AJAX error | " + JSON.stringify( data ) )
-							} catch ( e ) {
-								kco_wc.logToFile( "AJAX error | Failed to parse error message." )
-							}
+							const isHtmlResponse = ( data.responseText || "" ).trimStart().startsWith( "<" )
+							kco_wc.logToFile( {
+								type:     "ajax_error",
+								status:   data.status,
+								response: isHtmlResponse ? "[HTML body stripped]" : ( data.responseText || "" ),
+							} )
 							kco_wc.failOrder(
 								"ajax-error",
 								'<div class="woocommerce-error">Internal Server Error</div>',
@@ -616,6 +621,7 @@ jQuery( function ( $ ) {
 						shipping_address_change: function ( data ) {
 							// The shipping_address_change event is triggered when Checkout has detected a complete and valid shipping address for the customer. The shipping address will always be the same as billing address, unless a separate shipping address has been provided by the customer.
 							kco_wc.log( "shipping_address_change", data )
+							kco_wc.shippingAddressKnown = true
 
 							var country = kco_wc.convertCountry( data.country.toUpperCase() )
 
@@ -625,23 +631,31 @@ jQuery( function ( $ ) {
 							if ( "billing_only" === kco_params.woocommerce_ship_to_destination ) {
 								"given_name" in data && $( "#billing_first_name" ).val( data.given_name )
 								"family_name" in data && $( "#billing_last_name" ).val( data.family_name )
+								"street_address" in data && $( "#billing_address_1" ).val( data.street_address )
+								"street_address2" in data && $( "#billing_address_2" ).val( data.street_address2 )
+								"city" in data && $( "#billing_city" ).val( data.city )
 								"postal_code" in data && $( "#billing_postcode" ).val( data.postal_code )
 								"country" in data && $( "#billing_country" ).val( country )
+								"phone" in data && $( "#billing_phone" ).val( data.phone )
 								"email" in data && $( "#billing_email" ).val( data.email )
-								$( "#billing_country" ).change()
-								$( "#billing_email" ).change()
-								$( "#billing_email" ).blur()
+								$( "#billing_country" ).trigger( "change" )
+								$( "#billing_email" ).trigger( "change" )
+								$( "#billing_email" ).trigger( "blur" )
 
 								kco_wc.update_checkout.fire()
 							} else {
 								$( "#ship-to-different-address-checkbox" ).prop( "checked", true )
-								$( "#ship-to-different-address-checkbox" ).change()
-								$( "#ship-to-different-address-checkbox" ).blur()
+								$( "#ship-to-different-address-checkbox" ).trigger( "change" )
+								$( "#ship-to-different-address-checkbox" ).trigger( "blur" )
 								"given_name" in data && $( "#shipping_first_name" ).val( data.given_name )
 								"family_name" in data && $( "#shipping_last_name" ).val( data.family_name )
+								"street_address" in data && $( "#shipping_address_1" ).val( data.street_address )
+								"street_address2" in data && $( "#shipping_address_2" ).val( data.street_address2 )
+								"city" in data && $( "#shipping_city" ).val( data.city )
 								"postal_code" in data && $( "#shipping_postcode" ).val( data.postal_code )
 								"country" in data && $( "#shipping_country" ).val( country )
-								$( "#shipping_country" ).change()
+								"phone" in data && $( "#shipping_phone" ).val( data.phone )
+								$( "#shipping_country" ).trigger( "change" )
 
 								$( "form.checkout" ).trigger( "update_checkout" )
 							}
@@ -653,18 +667,25 @@ jQuery( function ( $ ) {
 							var country = kco_wc.convertCountry( data.country.toUpperCase() )
 							"given_name" in data && $( "#billing_first_name" ).val( data.given_name )
 							"family_name" in data && $( "#billing_last_name" ).val( data.family_name )
+							"street_address" in data && $( "#billing_address_1" ).val( data.street_address )
+							"street_address2" in data && $( "#billing_address_2" ).val( data.street_address2 )
+							"city" in data && $( "#billing_city" ).val( data.city )
 							"postal_code" in data && $( "#billing_postcode" ).val( data.postal_code )
 							"country" in data && $( "#billing_country" ).val( country )
+							"phone" in data && $( "#billing_phone" ).val( data.phone )
 							"email" in data && $( "#billing_email" ).val( data.email )
-							$( "#billing_country" ).change()
-							$( "#billing_email" ).change()
-							$( "#billing_email" ).blur()
+							$( "#billing_country" ).trigger( "change" )
+							$( "#billing_email" ).trigger( "change" )
+							$( "#billing_email" ).trigger( "blur" )
 
 							kco_wc.update_checkout.fire()
 						},
 						change: function ( data ) {
 							// The change event is triggered when the user changes postal code, country or email in their billing address. It is also triggered for given/family name except in the AT & DE markets.
 							kco_wc.log( "change", data )
+							if ( data.country && data.postal_code ) {
+								kco_wc.shippingAddressKnown = true
+							}
 						},
 						order_total_change: function ( data ) {
 							kco_wc.log( "order_total_change", data )

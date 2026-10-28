@@ -3,6 +3,7 @@ namespace Krokedil\KustomCheckout\Blocks;
 
 use Krokedil\KustomCheckout\Blocks\Api\Registry;
 use Krokedil\KustomCheckout\Blocks\Checkout\CheckoutBlock;
+use Krokedil\KustomCheckout\Blocks\Express\ExpressPaymentMethod;
 use Krokedil\KustomCheckout\Blocks\Schema\AddressSchema;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Automattic\WooCommerce\StoreApi\Schemas\V1\CartSchema;
@@ -63,6 +64,12 @@ class BlockExtension {
 				}
 				$this->overrides    = new Overrides();
 				$this->api_registry = new Registry();
+
+				add_filter( 'kco_wc_api_request_args', array( $this->overrides, 'override_request_body' ), 10, 2 );
+
+				// Important: Needs to be on a priority before 100, since WCS will process the order at 100.
+				// @TODO: Commented out for now until we can verify with WooCommerce why Subscriptions are not processed correctly when placing an order through the store api endpoint.
+				// add_filter( 'woocommerce_store_api_checkout_order_processed', array( $this->overrides, 'maybe_calculate_recurring_carts' ), 90 );.
 			},
 			5
 		);
@@ -105,10 +112,18 @@ class BlockExtension {
 	 */
 	public function block_callback( $data ) {
 		switch ( $data['action'] ) {
+			case 'address_changed':
+				$this->address_changed( $data );
+				break;
 			case 'shipping_address_changed':
+				// Kept for shoppers still running a cached copy of the previous script.
 				$this->shipping_address_changed( $data );
 				break;
 			case 'shipping_option_changed':
+				// Ensure we have KCO set as the chosen payment method,
+				// this is needed to ensure that the Kustom Shipping Assistant is available for the package.
+				WC()->session->set( 'chosen_payment_method', 'kco' );
+
 				kco_update_wc_shipping( $data );
 				break;
 			case 'load':
@@ -135,62 +150,140 @@ class BlockExtension {
 				'woocommerce_blocks_payment_method_type_registration',
 				function ( $payment_method_registry ) {
 					$payment_method_registry->register( new CheckoutBlock() );
+					$payment_method_registry->register( new ExpressPaymentMethod() );
 				}
 			);
 		}
 	}
 
 	/**
-	 * Update the shipping address in WooCommerce on change from Klarna.
+	 * Update the customer addresses in WooCommerce on change from Kustom.
+	 *
+	 * Kustom only emits shipping_address_change once the customer has entered a separate shipping
+	 * address. While they ship to their billing address we only get billing_address_change, so the
+	 * script sends the billing address as the shipping address as well in that case.
+	 *
+	 * @param array $data The data from the API.
+	 *
+	 * @return void
+	 */
+	public function address_changed( $data ) {
+		$this->set_customer_address( 'billing', $data['billing'] ?? array() );
+		$this->set_customer_address( 'shipping', $data['shipping'] ?? array() );
+	}
+
+	/**
+	 * Set one of the customer addresses in WooCommerce from a Kustom address.
+	 *
+	 * @param string $type    The address type, either 'billing' or 'shipping'.
+	 * @param array  $address The address from Kustom.
+	 *
+	 * @return void
+	 */
+	private function set_customer_address( $type, $address ) {
+		if ( ! is_array( $address ) || empty( $address ) ) {
+			return;
+		}
+
+		$fields = array(
+			'postal_code' => 'postcode',
+			'city'        => 'city',
+			'country'     => 'country',
+			'given_name'  => 'first_name',
+			'family_name' => 'last_name',
+		);
+
+		foreach ( $fields as $klarna_field => $wc_field ) {
+			// Only set the data if the field is set, and skip empty values to not clear what we already have.
+			if ( ! isset( $address[ $klarna_field ] ) || '' === $address[ $klarna_field ] ) {
+				continue;
+			}
+
+			$setter = "set_{$type}_{$wc_field}";
+
+			// Ensure the method exists before calling it to avoid fatal errors.
+			if ( ! method_exists( WC()->customer, $setter ) ) {
+				continue;
+			}
+
+			WC()->customer->$setter( $address[ $klarna_field ] );
+		}
+	}
+
+	/**
+	 * Update the shipping address in WooCommerce on change from Kustom.
+	 *
+	 * @deprecated Superseded by address_changed(), which handles both address types.
 	 *
 	 * @param array $data The data from the API.
 	 *
 	 * @return void
 	 */
 	public function shipping_address_changed( $data ) {
-		// Only set the data if the field is set.
-		if ( isset( $data['postal_code'] ) ) {
-			WC()->customer->set_shipping_postcode( $data['postal_code'] );
-		}
-
-		if ( isset( $data['country'] ) ) {
-			WC()->customer->set_shipping_country( $data['country'] );
-		}
-
-		if ( isset( $data['given_name'] ) ) {
-			WC()->customer->set_shipping_first_name( $data['given_name'] );
-		}
-
-		if ( isset( $data['family_name'] ) ) {
-			WC()->customer->set_shipping_last_name( $data['family_name'] );
-		}
+		$this->set_customer_address( 'shipping', $data );
 	}
 
 	/**
-	 * Get the address data for the Klarna Checkout block. Also updates the Klarna order if needed.
+	 * Checks if the current request may sync the Kustom order.
+	 *
+	 * @return bool
+	 */
+	private function is_checkout_context() {
+		// On a page render, only the checkout page itself may sync.
+		if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+			// The purchase is complete on the confirmation return, so Kustom answers 403 READ_ONLY_ORDER.
+			if ( isset( $_GET['kco_confirm'] ) || is_wc_endpoint_url( 'order-received' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only checks presence.
+				return false;
+			}
+
+			return is_checkout();
+		}
+
+		// In the Store API, only the routes the checkout block posts to may sync. The cart routes
+		// are left out, since those are what the Mini-Cart block serialises on every page render.
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+		$path        = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
+
+		if ( ! preg_match( '#/wc/store/v\d+/(checkout|batch)$#', $path ) ) {
+			return false;
+		}
+
+		// Of those, only cart mutations may sync. HEAD falls through to the GET
+		// handler, so allowlist the write methods rather than excluding GET alone.
+		$method = strtoupper( sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) );
+
+		return in_array( $method, array( 'POST', 'PUT', 'PATCH', 'DELETE' ), true );
+	}
+
+	/**
+	 * Get the address data for the Kustom Checkout block. Also updates the Kustom order if needed.
 	 *
 	 * @return array
-	 * @throws Exception If we can't get the Klarna order.
+	 * @throws Exception If we can't get the Kustom order.
 	 */
 	public function get_address() {
+		if ( ! $this->is_checkout_context() ) {
+			return array();
+		}
+
 		$klarna_order_id = WC()->session->get( 'kco_wc_order_id' );
 
-		// Only run this if we have a Klarna order id.
+		// Only run this if we have a Kustom order id.
 		if ( ! $klarna_order_id ) {
 			return array();
 		}
 
-		// Maybe update the Klarna order.
+		// Maybe update the Kustom order.
 		$klarna_order = KCO_WC()->api->update_klarna_order( $klarna_order_id );
 
-		// If we did not get a Klarna order, get it instead.
+		// If we did not get a Kustom order, get it instead.
 		if ( ! $klarna_order ) {
 			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 		}
 
-		// If we still don't have a Klarna order, throw an exception.
+		// If we still don't have a Kustom order, throw an exception.
 		if ( ! $klarna_order ) {
-			throw new Exception( 'Could not get Klarna order' );
+			throw new Exception( 'Could not get Kustom order' );
 		}
 
 		// Convert the billing region to unicode format.

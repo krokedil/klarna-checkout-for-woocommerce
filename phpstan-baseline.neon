@@ -1,0 +1,709 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Property Krokedil\\KustomCheckout\\Blocks\\BlockExtension\:\:\$api_registry is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: blocks/src/BlockExtension.php
+
+		-
+			message: '#^Parameter \#1 \$order_id of method KCO_Merchant_URLs\:\:get_urls\(\) expects string\|null, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: blocks/src/Overrides.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between null and null will always evaluate to false\.$#'
+			identifier: notIdentical.alwaysFalse
+			count: 1
+			path: classes/admin/class-kco-admin-notices.php
+
+		-
+			message: '#^Parameter \#1 \(array\) of echo cannot be converted to string\.$#'
+			identifier: echo.nonString
+			count: 1
+			path: classes/admin/class-wc-klarna-banners.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between ''kco'' and 0\|0\.0\|''''\|''0''\|array\{\}\|false\|null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: classes/admin/class-wc-klarna-banners.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 1
+			path: classes/class-kco-ajax.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 5
+			path: classes/class-kco-ajax.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 1
+			path: classes/class-kco-api-callbacks.php
+
+		-
+			message: '#^Parameter \#2 \$order_id of method KCO_Request_Set_Merchant_Reference\:\:request\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/class-kco-api.php
+
+		-
+			message: '#^Parameter \#2 \$order_id of method KCO_Request_Upsell_Order\:\:request\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/class-kco-api.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: classes/class-kco-checkout.php
+
+		-
+			message: '#^Property WooCommerce\:\:\$session \(WC_Session\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: classes/class-kco-checkout.php
+
+		-
+			message: '#^Access to an undefined property WooCommerce\:\:\$payment_gateways\.$#'
+			identifier: property.notFound
+			count: 1
+			path: classes/class-kco-confirmation.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: classes/class-kco-fields.php
+
+		-
+			message: '#^Access to an undefined property WooCommerce\:\:\$payment_gateways\.$#'
+			identifier: property.notFound
+			count: 1
+			path: classes/class-kco-gateway.php
+
+		-
+			message: '#^If condition is always false\.$#'
+			identifier: if.alwaysFalse
+			count: 1
+			path: classes/class-kco-gateway.php
+
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 1
+			path: classes/class-kco-gateway.php
+
+		-
+			message: '#^Parameter \#1 \$parent_options of static method WC_Klarna_Banners\:\:settings_sidebar\(\) expects array, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/class-kco-gateway.php
+
+		-
+			message: '#^Call to an undefined method WC_Order\:\:get_parent\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: classes/class-kco-subscription.php
+
+		-
+			message: '#^Parameter \#1 \$key of function sanitize_key expects string, int\<min, \-1\>\|int\<1, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/class-kco-subscription.php
+
+		-
+			message: '#^Access to an undefined property WooCommerce\:\:\$payment_gateways\.$#'
+			identifier: property.notFound
+			count: 2
+			path: classes/class-kco-templates.php
+
+		-
+			message: '#^Call to an undefined method WC_Order_Item\:\:get_product\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: classes/requests/checkout/post/class-kco-request-create-recurring.php
+
+		-
+			message: '#^Parameter \#1 \$order_line_item of method KCO_Request_Order\:\:get_item_reference\(\) expects WC_Order_Item_Coupon\|WC_Order_Item_Fee\|WC_Order_Item_Product\|WC_Order_Item_Shipping, WC_Order_Item given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/requests/checkout/post/class-kco-request-create-recurring.php
+
+		-
+			message: '#^Method KCO_Request_Order\:\:get_total_tax\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: classes/requests/checkout/post/class-kco-request-create.php
+
+		-
+			message: '#^Parameter \#1 \$order_id of method KCO_Merchant_URLs\:\:get_urls\(\) expects string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/requests/checkout/post/class-kco-request-create.php
+
+		-
+			message: '#^Parameter \#2 \$order_id of method KCO_Request_Update_Confirmation\:\:get_request_args\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/requests/checkout/post/class-kco-request-update-confirmation.php
+
+		-
+			message: '#^Parameter \#1 \$order_id of method KCO_Request_Update\:\:get_request_args\(\) expects string, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/requests/checkout/post/class-kco-request-update.php
+
+		-
+			message: '#^Parameter \#1 \$order_id of static method KCO_Request_Merchant_Data\:\:get_merchant_data\(\) expects int\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/requests/checkout/post/class-kco-request-update.php
+
+		-
+			message: '#^Method KCO_Merchant_URLs\:\:get_address_update_url\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: classes/requests/helpers/class-kco-merchant-urls.php
+
+		-
+			message: '#^Method KCO_Merchant_URLs\:\:get_country_change_url\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: classes/requests/helpers/class-kco-merchant-urls.php
+
+		-
+			message: '#^Method KCO_Merchant_URLs\:\:get_session_id\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: classes/requests/helpers/class-kco-merchant-urls.php
+
+		-
+			message: '#^Method KCO_Merchant_URLs\:\:get_session_id\(\) should return string but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: classes/requests/helpers/class-kco-merchant-urls.php
+
+		-
+			message: '#^Access to an undefined property WC_Cart\:\:\$shipping_tax_total\.$#'
+			identifier: property.notFound
+			count: 3
+			path: classes/requests/helpers/class-kco-request-cart.php
+
+		-
+			message: '#^Access to an undefined property WC_Cart\:\:\$shipping_total\.$#'
+			identifier: property.notFound
+			count: 2
+			path: classes/requests/helpers/class-kco-request-cart.php
+
+		-
+			message: '#^Access to an undefined property WC_Cart\:\:\$tax_total\.$#'
+			identifier: property.notFound
+			count: 1
+			path: classes/requests/helpers/class-kco-request-cart.php
+
+		-
+			message: '#^Access to an undefined property WC_Cart\:\:\$total\.$#'
+			identifier: property.notFound
+			count: 1
+			path: classes/requests/helpers/class-kco-request-cart.php
+
+		-
+			message: '#^Access to an undefined property WooCommerce\:\:\$shipping\.$#'
+			identifier: property.notFound
+			count: 2
+			path: classes/requests/helpers/class-kco-request-cart.php
+
+		-
+			message: '#^Method KCO_Request_Cart\:\:get_item_quantity\(\) should return int but returns \(float\|false\)\.$#'
+			identifier: return.type
+			count: 1
+			path: classes/requests/helpers/class-kco-request-cart.php
+
+		-
+			message: '#^Method KCO_Request_Cart\:\:get_item_total_amount\(\) invoked with 2 parameters, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: classes/requests/helpers/class-kco-request-cart.php
+
+		-
+			message: '#^Method KCO_Request_Cart\:\:get_order_tax_amount\(\) should return int but returns \(float\|false\)\.$#'
+			identifier: return.type
+			count: 1
+			path: classes/requests/helpers/class-kco-request-cart.php
+
+		-
+			message: '#^Parameter \#1 \$attachment_id of function wp_get_attachment_image_url expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/requests/helpers/class-kco-request-cart.php
+
+		-
+			message: '#^Parameter \#3 \$offset of function strpos expects int, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/requests/helpers/class-kco-request-cart.php
+
+		-
+			message: '#^Method KCO_Request_Options\:\:get_purchase_country\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: classes/requests/helpers/class-kco-request-options.php
+
+		-
+			message: '#^Binary operation "\*" between string and 100 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: classes/requests/helpers/class-kco-request-order.php
+
+		-
+			message: '#^Binary operation "\+" between string and string results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: classes/requests/helpers/class-kco-request-order.php
+
+		-
+			message: '#^Call to an undefined method WC_Order_Item\:\:get_rate_id\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: classes/requests/helpers/class-kco-request-order.php
+
+		-
+			message: '#^Cannot call method get_quantity\(\) on bool\|object\.$#'
+			identifier: method.nonObject
+			count: 6
+			path: classes/requests/helpers/class-kco-request-order.php
+
+		-
+			message: '#^Cannot call method get_total\(\) on bool\|object\.$#'
+			identifier: method.nonObject
+			count: 12
+			path: classes/requests/helpers/class-kco-request-order.php
+
+		-
+			message: '#^Cannot call method get_total_tax\(\) on bool\|object\.$#'
+			identifier: method.nonObject
+			count: 7
+			path: classes/requests/helpers/class-kco-request-order.php
+
+		-
+			message: '#^Method KCO_Request_Order\:\:get_order_line_items\(\) invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: classes/requests/helpers/class-kco-request-order.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 2
+			path: classes/requests/helpers/class-kco-request-order.php
+
+		-
+			message: '#^Parameter \#1 \$attachment_id of function wp_get_attachment_image_url expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/requests/helpers/class-kco-request-order.php
+
+		-
+			message: '#^Parameter \#1 \$order_item of method KCO_Request_Order\:\:get_order_line_items\(\) expects WC_Order_Item_Product, WC_Order_Item given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/requests/helpers/class-kco-request-order.php
+
+		-
+			message: '#^Access to an undefined property WooCommerce\:\:\$shipping\.$#'
+			identifier: property.notFound
+			count: 1
+			path: classes/requests/helpers/class-kco-request-shipping-options.php
+
+		-
+			message: '#^Parameter \#1 \$order_id of method KCO_Request_Set_Merchant_Reference\:\:get_request_args\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/requests/order-management/patch/class-kco-request-set-merchant-reference.php
+
+		-
+			message: '#^Parameter \#1 \$order_id of method KCO_Request_Upsell_Order\:\:get_request_args\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/requests/order-management/patch/class-kco-request-upsell-order.php
+
+		-
+			message: '#^Access to an undefined property WooCommerce\:\:\$payment_gateways\.$#'
+			identifier: property.notFound
+			count: 1
+			path: includes/kco-functions.php
+
+		-
+			message: '#^Binary operation "/" between string and 100 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: includes/kco-functions.php
+
+		-
+			message: '#^Call to function is_numeric\(\) with float will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: includes/kco-functions.php
+
+		-
+			message: '#^Parameter \#1 \$js of function kco_add_inline_script expects string, list\<string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: includes/kco-functions.php
+
+		-
+			message: '#^Parameter \#1 \$order_item of method KCO_Request_Order\:\:get_order_line_items\(\) expects WC_Order_Item_Product, WC_Order_Item given\.$#'
+			identifier: argument.type
+			count: 1
+			path: includes/kco-functions.php
+
+		-
+			message: '#^Property WooCommerce\:\:\$cart \(WC_Cart\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: includes/kco-functions.php
+
+		-
+			message: '#^Variable \$name might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: includes/kco-functions.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 1
+			path: klarna-checkout-for-woocommerce.php
+
+		-
+			message: '#^Variable \$klarna_order on left side of \?\? is never defined\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/CheckoutFlow/CheckoutFlow.php
+
+		-
+			message: '#^If condition is always false\.$#'
+			identifier: if.alwaysFalse
+			count: 1
+			path: src/OrderManagement/Ajax.php
+
+		-
+			message: '#^Parameter \#2 \$value of method WC_Data\:\:update_meta_data\(\) expects array\|string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/Ajax.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 3
+			path: src/OrderManagement/Ajax.php
+
+		-
+			message: '#^Parameter \#1 \$post_id of method Krokedil\\KustomCheckout\\OrderManagement\\SellersApp\:\:populate_klarna_order\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/MetaBox.php
+
+		-
+			message: '#^Parameter \#2 \$value of method WC_Data\:\:update_meta_data\(\) expects array\|string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/MetaBox.php
+
+		-
+			message: '#^Binary operation "\*" between string and 100 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 2
+			path: src/OrderManagement/OrderLines.php
+
+		-
+			message: '#^Binary operation "\+" between float and string results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/OrderManagement/OrderLines.php
+
+		-
+			message: '#^Binary operation "\+" between string and float results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/OrderManagement/OrderLines.php
+
+		-
+			message: '#^Binary operation "\+" between string and string results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 5
+			path: src/OrderManagement/OrderLines.php
+
+		-
+			message: '#^Call to an undefined method WC_Order_Item\:\:get_amount\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/OrderManagement/OrderLines.php
+
+		-
+			message: '#^Call to an undefined method WC_Order_Item\:\:get_card_number\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/OrderManagement/OrderLines.php
+
+		-
+			message: '#^Variable \$coupon_amount might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: src/OrderManagement/OrderLines.php
+
+		-
+			message: '#^Variable \$coupon_reference might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/OrderManagement/OrderLines.php
+
+		-
+			message: '#^Variable \$coupon_tax_amount might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: src/OrderManagement/OrderLines.php
+
+		-
+			message: '#^Method Krokedil\\KustomCheckout\\OrderManagement\\OrderManagement\:\:capture_klarna_order\(\) should return bool\|WP_Error\|null but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/OrderManagement/OrderManagement.php
+
+		-
+			message: '#^Parameter \#1 \$price of function wc_price expects float, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/OrderManagement.php
+
+		-
+			message: '#^Parameter \#2 \$value of method WC_Data\:\:update_meta_data\(\) expects array\|string, object given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/OrderManagement.php
+
+		-
+			message: '#^Property Krokedil\\KustomCheckout\\OrderManagement\\OrderManagement\:\:\$metabox \(Krokedil\\KustomCheckout\\OrderManagement\\MetaBox\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/OrderManagement/OrderManagement.php
+
+		-
+			message: '#^Parameter \#2 \$value of method WC_Data\:\:update_meta_data\(\) expects array\|string, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/PendingOrders.php
+
+		-
+			message: '#^Property KCO\:\:\$order_management \(Krokedil\\KustomCheckout\\OrderManagement\\OrderManagement\) on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.property
+			count: 1
+			path: src/OrderManagement/PendingOrders.php
+
+		-
+			message: '#^Binary operation "\*" between string and 100 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 2
+			path: src/OrderManagement/Request/Post/RequestPostRefund.php
+
+		-
+			message: '#^Call to an undefined method WC_Order_Item\:\:get_rate_id\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/OrderManagement/Request/Post/RequestPostRefund.php
+
+		-
+			message: '#^Call to an undefined method WC_Order_Item\:\:get_taxes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/OrderManagement/Request/Post/RequestPostRefund.php
+
+		-
+			message: '#^Call to an undefined method WC_Order_Item\:\:get_total_tax\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/OrderManagement/Request/Post/RequestPostRefund.php
+
+		-
+			message: '#^Parameter \#1 \$num of function abs expects float\|int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/OrderManagement/Request/Post/RequestPostRefund.php
+
+		-
+			message: '#^Variable \$data might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/OrderManagement/Request/Post/RequestPostRefund.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 2
+			path: src/OrderManagement/ReturnFee.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/OrderManagement/ReturnFee.php
+
+		-
+			message: '#^Parameter \#1 \$value of method WC_Order_Refund\:\:set_amount\(\) expects string, float given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/ReturnFee.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, int\<0, max\> given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/OrderManagement/ScheduledActions.php
+
+		-
+			message: '#^Access to an undefined property WC_Shipping_Rate\:\:\$cost\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Access to an undefined property WC_Shipping_Rate\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Access to an undefined property WC_Shipping_Rate\:\:\$label\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Access to an undefined property WC_Shipping_Rate\:\:\$taxes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Parameter \#1 \$order_id of method Krokedil\\KustomCheckout\\OrderManagement\\OrderManagement\:\:retrieve_klarna_order\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Parameter \#1 \$value of method WC_Abstract_Order\:\:set_cart_tax\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Parameter \#1 \$value of method WC_Abstract_Order\:\:set_shipping_tax\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Parameter \#1 \$value of method WC_Abstract_Order\:\:set_shipping_total\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Parameter \#1 \$value of method WC_Abstract_Order\:\:set_total\(\) expects string, \(float\|int\) given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Parameter \#6 \$instance_id of class WC_Shipping_Rate constructor expects int, \(string\|false\) given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between ''kco'' and ''kco'' will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between true and true will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/OrderManagement/SellersApp.php
+
+		-
+			message: '#^Parameter \#1 \$attachment_id of function wp_get_attachment_image_url expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/OrderManagement/Utility.php
+
+		-
+			message: '#^Access to an undefined property WooCommerce\:\:\$shipping\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/ShippingAssistant/Checkout.php
+
+		-
+			message: '#^Call to an undefined method WC_Session\:\:get_session_data\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/ShippingAssistant/Checkout.php
+
+		-
+			message: '#^Binary operation "\+" between string and string results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/ShippingAssistant/CompareTotals.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: src/ShippingAssistant/FreeOrders.php
+
+		-
+			message: '#^Access to an undefined property WooCommerce\:\:\$shipping\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/ShippingAssistant/RequestModifier.php
+
+		-
+			message: '#^Call to an undefined method WC_Data_Store\:\:get_methods\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/ShippingAssistant/Settings.php
+
+		-
+			message: '#^Call to an undefined method WC_Data_Store\:\:get_zones\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/ShippingAssistant/Settings.php
+
+		-
+			message: '#^Property WooCommerce\:\:\$session \(WC_Session\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/Utility/ConfirmationUtility.php
+
+		-
+			message: '#^Variable \$checkout might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: templates/klarna-checkout.php
+
+		-
+			message: '#^Access to an undefined property WooCommerce\:\:\$shipping\.$#'
+			identifier: property.notFound
+			count: 1
+			path: templates/kss-cart-shipping.php

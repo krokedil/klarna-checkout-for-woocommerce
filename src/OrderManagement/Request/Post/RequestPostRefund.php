@@ -1,6 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request\Post;
 
+use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 use Krokedil\KustomCheckout\OrderManagement\Request\RequestPost;
 use Krokedil\KustomCheckout\OrderManagement\OrderLines;
 use Krokedil\KustomCheckout\OrderManagement\Utility;
@@ -120,23 +121,22 @@ class RequestPostRefund extends RequestPost {
 				/**
 				 * Process order item products.
 				 *
-				 * @var WC_Order_Item_Product $item WooCommerce order item product.
+				 * @var \WC_Order_Item_Product $item WooCommerce order item product.
 				 */
 				foreach ( $refunded_items as $item ) {
 					$product = wc_get_product( $item->get_product_id() );
 
+					$order_line_tax_rate = 0;
+					$refunded_item_id    = absint( $item->get_meta( '_refunded_item_id' ) );
 					/**
-					 * Get the order line total from order for calculation.
+					 * Get the tax rate WooCommerce applied to the matching order item.
 					 *
-					 * @var WC_Order_Item_Product $order_item WooCommerce order item product.
+					 * @var \WC_Order_Item_Product $order_item WooCommerce order item product.
 					 */
 					foreach ( $order_items as $order_item ) {
-						if ( $item->get_product_id() === $order_item->get_product_id() ) {
-							$order_line_total    = round( ( $order->get_line_subtotal( $order_item, false ) * 100 ) );
-							$order_line_tax      = round( ( $order->get_line_tax( $order_item ) * 100 ) );
-							$tax_rates           = \WC_Tax::get_base_tax_rates( $order_item->get_tax_class() );
-							$first_tax_rate      = reset( $tax_rates );
-							$order_line_tax_rate = ( 0 !== $order_line_tax && 0 !== $order_line_total ) ? ( $first_tax_rate['rate'] * 100 ?? round( ( $order_line_tax / $order_line_total ) * 100 * 100 ) ) : 0;
+						if ( $order_item->get_id() === $refunded_item_id ) {
+							$order_line_tax_rate = $this->get_order_item_tax_rate( $order, $order_item );
+							break;
 						}
 					}
 
@@ -152,6 +152,12 @@ class RequestPostRefund extends RequestPost {
 					if ( is_object( $product ) && method_exists( $product, 'is_downloadable' ) ) {
 							$type = $product->is_downloadable() || $product->is_virtual() ? 'digital' : 'physical';
 					} else {
+							/**
+							 * Filters the Kustom product type for a refunded item whose product no longer exists in WooCommerce.
+							 *
+							 * @param string                 $type The Kustom order line type. Default 'physical'.
+							 * @param \WC_Order_Item_Product $item The refunded order item.
+							 */
 							$type = apply_filters( 'kom_line_item_product_type', 'physical', $item );
 					}
 
@@ -191,13 +197,13 @@ class RequestPostRefund extends RequestPost {
 				/**
 				 * Process Shipping
 				 *
-				 * @var WC_Order_Item_Shipping $shipping_item WooCommerce order item *shipping*.
+				 * @var \WC_Order_Item_Shipping $shipping_item WooCommerce order item *shipping*.
 				 */
 				foreach ( $refunded_shipping_items as $shipping_item ) {
 
 					$order_shipping_total    = round( $order->get_shipping_total() * 100 );
 					$order_shipping_tax      = round( $order->get_shipping_tax() * 100 );
-					$order_shipping_tax_rate = 0 === $order_shipping_total ? 0 : round( ( $order_shipping_tax / $order_shipping_total ) * 10000 );
+					$order_shipping_tax_rate = empty( $order_shipping_total ) ? 0 : round( ( $order_shipping_tax / $order_shipping_total ) * 10000 );
 
 					$type                = 'shipping_fee';
 					$reference           = $shipping_item->get_method_id() . ':' . $shipping_item->get_instance_id();
@@ -274,14 +280,53 @@ class RequestPostRefund extends RequestPost {
 			}
 		}
 
+		/**
+		 * Filters the request body sent to Kustom when refunding an order.
+		 *
+		 * @param array $data     The refund request body.
+		 * @param int   $order_id The WooCommerce order ID.
+		 */
 		return apply_filters( 'kom_refund_order_args', $data, $this->order_id );
+	}
+
+	/**
+	 * Get the tax rate WooCommerce applied to an order item.
+	 *
+	 * Reads the rate from the order's tax data instead of recalculating it from the
+	 * line totals, since WooCommerce is not always consistent with computed tax rates.
+	 * The rate is returned in basis points (e.g. 25% becomes 2500).
+	 *
+	 * @param \WC_Order      $order      The WooCommerce order.
+	 * @param \WC_Order_Item $order_item The WooCommerce order item.
+	 * @return float
+	 */
+	private function get_order_item_tax_rate( $order, $order_item ) {
+		// If the item has no tax, the rate is 0.
+		if ( '0' === (string) $order_item->get_total_tax() ) {
+			return 0;
+		}
+
+		$item_taxes = $order_item->get_taxes()['total'] ?? array();
+		if ( empty( $item_taxes ) ) {
+			return 0;
+		}
+
+		$rate_id = key( $item_taxes );
+
+		foreach ( $order->get_items( 'tax' ) as $tax_item ) {
+			if ( $tax_item->get_rate_id() === $rate_id ) {
+				return round( floatval( \WC_Tax::get_rate_percent_value( $rate_id ) ) * 100 );
+			}
+		}
+
+		return 0;
 	}
 
 	/**
 	 * Returns the id of the refunded order.
 	 *
 	 * @param int $order_id The WooCommerce order id.
-	 * @return string
+	 * @return int
 	 */
 	public function get_refunded_order_id( $order_id ) {
 		$order = wc_get_order( $order_id );

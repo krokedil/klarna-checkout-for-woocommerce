@@ -12,14 +12,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * KCO_Credentials class.
  *
- * Gets correct credentials based on customer country, store country and test/live mode.
+ * Gets correct credentials based on test/live mode.
  */
 class KCO_Credentials {
 
 	/**
 	 * Kustom Checkout for WooCommerce settings.
 	 *
-	 * @var $settings
+	 * @var array
 	 */
 	public $settings = array();
 
@@ -36,17 +36,10 @@ class KCO_Credentials {
 	 * @return bool|array $credentials
 	 */
 	public function get_credentials_from_session() {
-		$base_location = wc_get_base_location();
-
-		if ( 'US' === $base_location['country'] ) {
-			$country_string = 'us';
-		} else {
-			$country_string = 'eu';
-		}
-
-		$test_string   = 'yes' === $this->settings['testmode'] ? 'test_' : '';
-		$merchant_id   = $this->settings[ $test_string . 'merchant_id_' . $country_string ];
-		$shared_secret = $this->settings[ $test_string . 'shared_secret_' . $country_string ];
+		$testmode      = $this->settings['testmode'] ?? 'no';
+		$test_string   = 'yes' === $testmode ? 'test_' : '';
+		$merchant_id   = $this->settings[ $test_string . 'merchant_id' ] ?? '';
+		$shared_secret = $this->settings[ $test_string . 'shared_secret' ] ?? '';
 
 		// Merchant id and/or shared secret not found for matching country.
 		if ( '' === $merchant_id || '' === $shared_secret ) {
@@ -54,10 +47,17 @@ class KCO_Credentials {
 		}
 
 		$credentials = array(
-			'merchant_id'   => $this->settings[ $test_string . 'merchant_id_' . $country_string ],
-			'shared_secret' => htmlspecialchars_decode( $this->settings[ $test_string . 'shared_secret_' . $country_string ], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 ),
+			'merchant_id'   => $merchant_id,
+			'shared_secret' => htmlspecialchars_decode( $shared_secret, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 ),
 		);
 
-		return apply_filters( 'kco_wc_credentials_from_session', $credentials, $this->settings['testmode'] );
+		/**
+		 * Filters the Kustom API credentials used for the current request.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#change-the-api-keys-on-the-fly Change the API keys on the fly
+		 * @param array  $credentials The credentials, with the keys 'merchant_id' and 'shared_secret'.
+		 * @param string $testmode    Whether test mode is enabled, 'yes' or 'no'.
+		 */
+		return apply_filters( 'kco_wc_credentials_from_session', $credentials, $testmode );
 	}
 }
