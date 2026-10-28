@@ -5,6 +5,8 @@
  * @package Klarna_Checkout/Classes/Requests
  */
 
+use Krokedil\KustomCheckout\Logging\LogMasking;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -147,18 +149,27 @@ class KCO_Request {
 		$code = wp_remote_retrieve_response_code( $response );
 		// Check the status code, if its not between 200 and 299 then its an error.
 		if ( $code < 200 || $code > 299 ) {
-			$data          = 'URL: ' . $request_url . ' - ' . wp_json_encode( $this->sanitize_request_args( $request_args ) );
+			$data          = 'URL: ' . LogMasking::mask_request_url( $request_url ) . ' - ' . wp_json_encode( $this->sanitize_request_args( $request_args ) );
 			$error_message = '';
 			// Get the error messages.
 			$errors = json_decode( $body, true );
-			if ( empty( $errors ) ) {
-				return new WP_Error( $code, 'received empty body', $data );
+			if ( '' === trim( $body ) ) {
+				// An expired order answers with an empty body. The checkout recovers by creating a new one, so keep this out of the customer's way.
+				// Only a genuinely empty body counts. A body we failed to decode is still a real error and has to reach the customer.
+				return new WP_Error( 'received_empty_body', "received empty body (HTTP {$code})", $data );
+			} elseif ( JSON_ERROR_NONE !== json_last_error() ) {
+				KCO_Logger::log( "Unreadable error body (HTTP {$code}) from Kustom: " . substr( $body, 0, 500 ) . ' URL: ' . LogMasking::mask_request_url( $request_url ) );
+				return new WP_Error( $code, "the payment provider returned an unreadable error (HTTP {$code})", $data );
 			} elseif ( isset( $errors['error_messages'] ) && is_array( $errors['error_messages'] ) ) {
 				foreach ( $errors['error_messages'] as $error ) {
 					$error_message = "$error_message  $error";
 				}
 			}
-			return new WP_Error( $code, "$body $error_message", $data );
+			$message = ! empty( $error_message ) ? trim( $error_message ) : $body;
+			$error   = new WP_Error( $code, $message, $data );
+			// Preserve the decoded response body so consumers can read structured fields (e.g. error_code) instead of parsing the readable message.
+			$error->add_data( $errors, 'klarna_error_body' );
+			return $error;
 		}
 		return json_decode( $body, true );
 	}
@@ -167,18 +178,9 @@ class KCO_Request {
 	 * Remove sensitive data from the log.
 	 *
 	 * @param array $request_args The request data to sanitize.
-	 * @return array The request data sanitized.
+	 * @return array|string The request data sanitized, or the failure marker.
 	 */
 	protected function sanitize_request_args( $request_args ) {
-		// Do not log the authorization token.
-		foreach ( $request_args['headers'] as $header => $value ) {
-			if ( 'authorization' === strtolower( $header ) ) {
-				// If it is longer than 15 char., it most likely has a token. This is an assumption that is safe even if it is wrong.
-				$request_args['headers'][ $header ] = strlen( $value ) > 15 ? '[REDACTED]' : '[MISSING]';
-				break;
-			}
-		}
-
-		return $request_args;
+		return LogMasking::mask_request( $request_args );
 	}
 }

@@ -471,6 +471,51 @@ input.bad_credential {
 	border-color: #bb2525!important;
 }
 
+/* Elements settings: sub-headings that group the fields below them. */
+.form-table td.kco-settings-subtitle {
+	padding: 24px 0 4px;
+	border-top: 1px solid #dcdcde;
+}
+
+.form-table td.kco-settings-subtitle h4 {
+	margin: 0 0 6px;
+	font-size: 16px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.form-table td.kco-settings-subtitle p.description {
+	margin-top: 0;
+}
+
+/* Elements settings: connection status below each public API key. */
+.kco-elements-key-status {
+	display: block;
+	max-width: 400px;
+	box-sizing: border-box;
+	margin: 2px 0 8px;
+	padding: 6px 10px;
+	border-left: 4px solid #c3c4c7;
+	background: #f6f7f7;
+	font-style: normal;
+	color: #1d2327;
+}
+
+.kco-elements-key-status--success {
+	border-left-color: #00a32a;
+	background: #edfaef;
+}
+
+.kco-elements-key-status--warning {
+	border-left-color: #dba617;
+	background: #fcf9e8;
+}
+
+.kco-elements-key-status--error {
+	border-left-color: #d63638;
+	background: #fcf0f1;
+}
+
 /* fix for the footer */
 #wpfooter{
 	position: unset !important;

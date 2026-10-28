@@ -22,14 +22,14 @@ class OrderLines {
 	/**
 	 * Kustom order amount.
 	 *
-	 * @var integer
+	 * @var int|float
 	 */
 	public $order_amount = 0;
 
 	/**
 	 * Kustom order tax amount.
 	 *
-	 * @var integer
+	 * @var int|float
 	 */
 	public $order_tax_amount = 0;
 
@@ -50,12 +50,12 @@ class OrderLines {
 	/**
 	 * WooCommerce order.
 	 *
-	 * @var bool|WC_Order|WC_Order_Refund
+	 * @var bool|\WC_Order|\WC_Order_Refund
 	 */
 	public $order;
 
 	/**
-	 * Klarna country used for creating this order.
+	 * Kustom country used for creating this order.
 	 *
 	 * @var string
 	 */
@@ -106,7 +106,7 @@ class OrderLines {
 	}
 
 	/**
-	 * Process WooCommerce order items to Klarna Payments order lines.
+	 * Process WooCommerce order items to Kustom order lines.
 	 */
 	public function process_order_line_items() {
 		$order = wc_get_order( $this->order_id );
@@ -122,11 +122,17 @@ class OrderLines {
 		/**
 		 * Process order item products.
 		 *
-		 * @var WC_Order_Item_Product $order_item WooCommerce order item product.
+		 * @var \WC_Order_Item_Product $order_item WooCommerce order item product.
 		 */
 		foreach ( $order->get_items() as $order_item ) {
 			$klarna_item = $this->process_order_item_product( $order_item, $order );
 
+			/**
+			 * Filters the Kustom order line for a WooCommerce order item product. Return a falsy value to exclude the line.
+			 *
+			 * @param array                  $klarna_item The Kustom order line data.
+			 * @param \WC_Order_Item_Product $order_item  The WooCommerce order item.
+			 */
 			$order_line_item = apply_filters( 'kom_wc_order_line_item', $klarna_item, $order_item );
 			if ( $order_line_item ) {
 				$this->order_lines[] = $order_line_item;
@@ -136,7 +142,7 @@ class OrderLines {
 		/**
 		 * Process order item shipping.
 		 *
-		 * @var WC_Order_Item_Shipping $order_item WooCommerce order item shipping.
+		 * @var \WC_Order_Item_Shipping $order_item WooCommerce order item shipping.
 		 */
 		foreach ( $order->get_items( 'shipping' ) as $order_item ) {
 			$this->order_lines[] = $this->process_order_item_shipping( $order_item, $order );
@@ -145,7 +151,7 @@ class OrderLines {
 		/**
 		 * Process order item fee.
 		 *
-		 * @var WC_Order_Item_Fee $order_item WooCommerce order item fee.
+		 * @var \WC_Order_Item_Fee $order_item WooCommerce order item fee.
 		 */
 		foreach ( $order->get_items( 'fee' ) as $order_item ) {
 			$this->order_lines[] = $this->process_order_item_fee( $order_item, $order );
@@ -154,11 +160,11 @@ class OrderLines {
 		/**
 		 * Process order item coupon.
 		 *
-		 * @var WC_Order_Item_Coupon $order_item WooCommerce order item coupon.
+		 * @var \WC_Order_Item_Coupon $order_item WooCommerce order item coupon.
 		 */
 		foreach ( $order->get_items( 'coupon' ) as $order_item ) {
 
-			/* Only smart coupons are added to the capture order lines, or if the merchant is a Klarna US merchant. */
+			/* Only smart coupons are added to the capture order lines, or if the merchant is a Kustom US merchant. */
 			$coupon = new \WC_Coupon( $order_item->get_name() );
 			if ( 'smart_coupon' === $coupon->get_discount_type() || 'US' === $this->klarna_country ) {
 				$this->order_lines[] = $this->process_order_item_coupon( $order_item, $order );
@@ -169,7 +175,14 @@ class OrderLines {
 		 * PW WooCommerce Gift Cards.
 		 */
 		foreach ( $order->get_items( 'pw_gift_card' ) as $gift_card ) {
-			$code             = $gift_card->get_card_number();
+			$code = $gift_card->get_card_number();
+
+			/**
+			 * Filters the reference (SKU) used for PW WooCommerce Gift Cards order lines sent to Kustom.
+			 *
+			 * @param string $sku  The gift card reference. Default 'gift_card'.
+			 * @param string $code The gift card number.
+			 */
 			$gift_card_sku    = apply_filters( 'klarna_pw_gift_card_sku', __( 'gift_card', 'klarna-checkout-for-woocommerce' ), $code );
 			$gift_card_amount = intval( $gift_card->get_amount() * -100 );
 			$order_item       = array(
@@ -197,8 +210,8 @@ class OrderLines {
 	/**
 	 * Process order item product and return it formatted for the request.
 	 *
-	 * @param WC_Order_Item_Product $order_item WooCommerce order item product.
-	 * @param WC_Order              $order The WooCommerce order.
+	 * @param \WC_Order_Item_Product $order_item WooCommerce order item product.
+	 * @param \WC_Order              $order The WooCommerce order.
 	 * @return array
 	 */
 	public function process_order_item_product( $order_item, $order ) {
@@ -225,8 +238,8 @@ class OrderLines {
 	/**
 	 * Process order item shipping and return it formatted for the request.
 	 *
-	 * @param WC_Order_Item_Shipping $order_item WooCommerce order item shipping.
-	 * @param WC_Order               $order The WooCommerce order.
+	 * @param \WC_Order_Item_Shipping $order_item WooCommerce order item shipping.
+	 * @param \WC_Order               $order The WooCommerce order.
 	 * @return array
 	 */
 	public function process_order_item_shipping( $order_item, $order ) {
@@ -248,8 +261,8 @@ class OrderLines {
 	/**
 	 * Process order item fee and return it formatted for the request.
 	 *
-	 * @param WC_Order_Item_Fee $order_item WooCommerce order item fee.
-	 * @param WC_Order          $order The WooCommerce order.
+	 * @param \WC_Order_Item_Fee $order_item WooCommerce order item fee.
+	 * @param \WC_Order          $order The WooCommerce order.
 	 * @return array
 	 */
 	public function process_order_item_fee( $order_item, $order ) {
@@ -269,8 +282,8 @@ class OrderLines {
 	/**
 	 * Process order item coupon and return it formatted for the request.
 	 *
-	 * @param WC_Order_Item_Coupon $order_item WooCommerce order item coupon.
-	 * @param WC_Order             $order The WooCommerce order.
+	 * @param \WC_Order_Item_Coupon $order_item WooCommerce order item coupon.
+	 * @param \WC_Order             $order The WooCommerce order.
 	 * @return array
 	 */
 	public function process_order_item_coupon( $order_item, $order ) {
@@ -353,7 +366,7 @@ class OrderLines {
 	/**
 	 * Get cart item reference.
 	 *
-	 * @param WC_Order_Item_Product|WC_Order_Item_Shipping|WC_Order_Item_Fee|WC_Order_Item_Coupon $order_line_item WooCommerce order line item.
+	 * @param \WC_Order_Item_Product|\WC_Order_Item_Shipping|\WC_Order_Item_Fee|\WC_Order_Item_Coupon $order_line_item WooCommerce order line item.
 	 *
 	 * @return string $item_reference Cart item reference.
 	 */
@@ -386,7 +399,7 @@ class OrderLines {
 	/**
 	 * Get cart item name.
 	 *
-	 * @param  WC_Order_Item_Product|WC_Order_Item_Shipping|WC_Order_Item_Fee|WC_Order_Item_Coupon $order_line_item Order line item.
+	 * @param  \WC_Order_Item_Product|\WC_Order_Item_Shipping|\WC_Order_Item_Fee|\WC_Order_Item_Coupon $order_line_item Order line item.
 	 *
 	 * @return string $order_line_item_name Order line item name.
 	 */
@@ -400,7 +413,7 @@ class OrderLines {
 	/**
 	 * Get cart item quantity.
 	 *
-	 * @param WC_Order_Item_Product|WC_Order_Item_Shipping|WC_Order_Item_Fee|WC_Order_Item_Coupon $order_line_item Order line item.
+	 * @param \WC_Order_Item_Product|\WC_Order_Item_Shipping|\WC_Order_Item_Fee|\WC_Order_Item_Coupon $order_line_item Order line item.
 	 *
 	 * @return integer Cart item quantity.
 	 */
@@ -415,9 +428,9 @@ class OrderLines {
 	/**
 	 * Get cart item price.
 	 *
-	 * @param  WC_Order_Item_Product|WC_Order_Item_Shipping|WC_Order_Item_Fee|WC_Order_Item_Coupon $order_line_item Order line item.
+	 * @param  \WC_Order_Item_Product|\WC_Order_Item_Shipping|\WC_Order_Item_Fee|\WC_Order_Item_Coupon $order_line_item Order line item.
 	 *
-	 * @return integer $item_price Cart item price.
+	 * @return float $item_price Cart item price.
 	 */
 	public function get_item_unit_price( $order_line_item ) {
 		if ( 'shipping' === $order_line_item->get_type() ) {
@@ -456,9 +469,9 @@ class OrderLines {
 	/**
 	 * Gets the order line tax rate.
 	 *
-	 * @param WC_Order $order The WooCommerce order.
-	 * @param mixed    $order_item If not false the WooCommerce order item WC_Order_Item_Product|WC_Order_Item_Shipping|WC_Order_Item_Fee|WC_Order_Item_Coupon.
-	 * @return int
+	 * @param \WC_Order $order The WooCommerce order.
+	 * @param mixed     $order_item If not false the WooCommerce order item WC_Order_Item_Product|WC_Order_Item_Shipping|WC_Order_Item_Fee|WC_Order_Item_Coupon.
+	 * @return float
 	 */
 	public function get_item_tax_rate( $order, $order_item = false ) {
 		if ( 'coupon' === $order_item->get_type() ) {
@@ -468,7 +481,7 @@ class OrderLines {
 		/**
 		 * Loop through the WooCommerce tax items.
 		 *
-		 * @var WC_Order_Item_Tax $tax_item The WooCommerce tax item.
+		 * @var \WC_Order_Item_Tax $tax_item The WooCommerce tax item.
 		 */
 		foreach ( $tax_items as $tax_item ) {
 			$rate_id = $tax_item->get_rate_id();
@@ -489,9 +502,9 @@ class OrderLines {
 	/**
 	 * Get order line item total amount.
 	 *
-	 * @param WC_Order_Item_Product|WC_Order_Item_Shipping|WC_Order_Item_Fee|WC_Order_Item_Coupon $order_line_item Order line item.
+	 * @param \WC_Order_Item_Product|\WC_Order_Item_Shipping|\WC_Order_Item_Fee|\WC_Order_Item_Coupon $order_line_item Order line item.
 	 *
-	 * @return integer $item_total_amount Cart item total amount.
+	 * @return float $item_total_amount Cart item total amount.
 	 */
 	public function get_item_total_amount( $order_line_item ) {
 		if ( 'shipping' === $order_line_item->get_type() ) {
@@ -522,9 +535,9 @@ class OrderLines {
 	/**
 	 * Calculate item tax percentage.
 	 *
-	 * @param  WC_Order_Item_Product|WC_Order_Item_Shipping|WC_Order_Item_Fee|WC_Order_Item_Coupon $order_line_item Order line item.
+	 * @param  \WC_Order_Item_Product|\WC_Order_Item_Shipping|\WC_Order_Item_Fee|\WC_Order_Item_Coupon $order_line_item Order line item.
 	 *
-	 * @return integer $item_tax_amount Item tax amount.
+	 * @return float $item_tax_amount Item tax amount.
 	 */
 	public function get_item_tax_amount( $order_line_item ) {
 		if ( $this->separate_sales_tax ) {
@@ -543,9 +556,9 @@ class OrderLines {
 	/**
 	 * Get cart item discount.
 	 *
-	 * @param WC_Order_Item_Product|WC_Order_Item_Shipping|WC_Order_Item_Fee|WC_Order_Item_Coupon $order_line_item Order line item.
+	 * @param \WC_Order_Item_Product|\WC_Order_Item_Shipping|\WC_Order_Item_Fee|\WC_Order_Item_Coupon $order_line_item Order line item.
 	 *
-	 * @return integer $item_discount_amount Cart item discount.
+	 * @return float $item_discount_amount Cart item discount.
 	 */
 	public function get_item_discount_amount( $order_line_item ) {
 		if ( $order_line_item['subtotal'] > $order_line_item['total'] ) {
@@ -564,7 +577,7 @@ class OrderLines {
 	/**
 	 * Get cart item discount.
 	 *
-	 * @param WC_Order_Item_Product $order_line_item Order line item.
+	 * @param \WC_Order_Item_Product $order_line_item Order line item.
 	 *
 	 * @return string $item_type Order item type.
 	 */

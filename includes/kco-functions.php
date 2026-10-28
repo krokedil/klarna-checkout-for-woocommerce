@@ -17,7 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 function kco_create_or_update_order() {
 	// Make sure cart is initialized.
 	if ( ! WC()->cart ) {
-		return;
+		return null;
+	}
+
+	// An empty cart, most often from previewing the checkout page in admin, would create an empty Kustom order.
+	if ( WC()->cart->is_empty() ) {
+		return null;
 	}
 
 	// Need to calculate these here, because WooCommerce hasn't done it yet.
@@ -32,7 +37,7 @@ function kco_create_or_update_order() {
 			$klarna_order = KCO_WC()->api->create_klarna_order();
 			if ( ! $klarna_order ) {
 				// If failed then bail.
-				return;
+				return null;
 			}
 			WC()->session->set( 'kco_wc_order_id', $klarna_order['order_id'] );
 			set_transient( "kustom_customer_id_{$klarna_order['order_id']}", WC()->session->get_customer_id(), WEEK_IN_SECONDS * 2 );
@@ -48,7 +53,7 @@ function kco_create_or_update_order() {
 		// Create new order, since we dont have one.
 		$klarna_order = KCO_WC()->api->create_klarna_order();
 		if ( ! $klarna_order ) {
-			return;
+			return null;
 		}
 		WC()->session->set( 'kco_wc_order_id', $klarna_order['order_id'] );
 		set_transient( "kustom_customer_id_{$klarna_order['order_id']}", WC()->session->get_customer_id(), WEEK_IN_SECONDS * 2 );
@@ -75,7 +80,7 @@ function kco_create_or_update_order_pay_for_order() {
 			$klarna_order = KCO_WC()->api->create_klarna_order( $order_id );
 			if ( ! $klarna_order ) {
 				// If failed then bail.
-				return;
+				return null;
 			}
 			$order->update_meta_data( 'kco_wc_order_id', $klarna_order['order_id'] );
 			$order->save();
@@ -86,7 +91,7 @@ function kco_create_or_update_order_pay_for_order() {
 		// Create new order, since we dont have one.
 		$klarna_order = KCO_WC()->api->create_klarna_order( $order_id );
 		if ( ! $klarna_order ) {
-			return;
+			return null;
 		}
 		$order->update_meta_data( 'kco_wc_order_id', $klarna_order['order_id'] );
 		$order->save();
@@ -108,6 +113,11 @@ function kco_wc_show_snippet( $pay_for_order = false ) {
 	}
 
 	if ( isset( $klarna_order['html_snippet'] ) ) {
+		/**
+		 * Fires before the Kustom Checkout iframe snippet is output.
+		 *
+		 * @param array $klarna_order The Kustom order data.
+		 */
 		do_action( 'kco_wc_show_snippet', $klarna_order );
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- We trust the HTML snippet.
 		echo kco_extract_script( $klarna_order['html_snippet'] );
@@ -190,11 +200,17 @@ function kco_wc_show_another_gateway_button() {
  * @return void
  */
 function kco_wc_add_extra_checkout_fields() {
+	/**
+	 * Fires before the extra checkout fields container.
+	 */
 	do_action( 'kco_wc_before_extra_fields' );
 	?>
 	<div id="kco-extra-checkout-fields">
 	</div>
 	<?php
+	/**
+	 * Fires after the extra checkout fields container.
+	 */
 	do_action( 'kco_wc_after_extra_fields' );
 }
 
@@ -566,6 +582,16 @@ function is_kco_confirmation() {
  * @return void
  */
 function kco_print_error_message( $wp_error ) {
+	// The checkout recovers from an empty body on its own by creating a new order, so don't alarm the customer.
+	if ( 'received_empty_body' === $wp_error->get_error_code() ) {
+		return;
+	}
+
+	// A REST response is JSON, and the request logger already has the error.
+	if ( WC()->is_rest_api_request() ) {
+		return;
+	}
+
 	if ( is_ajax() ) {
 		wc_add_notice( $wp_error->get_error_message(), 'error' );
 	} else {
@@ -595,10 +621,18 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 	if ( $order_id ) {
 
 		$did_lock = false;
+		/**
+		 * Filters whether to lock the order confirmation to prevent simultaneous confirmations of the same order.
+		 *
+		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#prevent-duplicate-order-confirmations Prevent duplicate order confirmations
+		 * @param bool   $lock            Whether to lock the confirmation. Default false.
+		 * @param string $klarna_order_id The Kustom order ID.
+		 * @param int    $order_id        The WooCommerce order ID.
+		 */
 		if ( apply_filters( 'kco_wc_lock_confirmation', false, $klarna_order_id, $order_id ) ) {
 			$did_lock = KCO_Confirmation::lock_kco_confirmation( $klarna_order_id, $order_id );
 			if ( ! $did_lock ) {
-				KCO_Logger::log( "Simultaneous confirmation attempt for Klarna order ID $klarna_order_id and WooCommerce order ID $order_id. Stopping process." );
+				KCO_Logger::log( "Simultaneous confirmation attempt for Kustom order ID $klarna_order_id and WooCommerce order ID $order_id. Stopping process." );
 				return;
 			}
 		}
@@ -613,7 +647,7 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 			// Get the Kustom OM order.
 			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
-			if ( ! is_wp_error( $klarna_order ) ) {
+			if ( ! empty( $klarna_order ) && ! is_wp_error( $klarna_order ) ) {
 				if ( ! kco_validate_order_total( $klarna_order, $order ) || ! kco_validate_order_content( $klarna_order, $order ) ) {
 					return;
 				}
@@ -621,16 +655,25 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				kco_maybe_save_surcharge( $order_id, $klarna_order );
 				kco_maybe_save_org_nr( $order_id, $klarna_order );
 				kco_maybe_save_reference( $order_id, $klarna_order );
+				kco_maybe_save_upsell_available( $order, $klarna_order );
 
 				// Let other plugins hook into this sequence.
+				/**
+				 * Triggers when a Kustom order is being confirmed, before it is acknowledged in Kustom.
+				 *
+				 * @param int   $order_id     The WooCommerce order ID.
+				 * @param array $klarna_order The Kustom order data.
+				 */
 				do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
 
 				// Acknowledge order in Kustom.
 				KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
 				// Set the merchant references for the order.
 				KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
-				// Empty cart to be safe.
-				WC()->cart->empty_cart();
+				// Empty cart to be safe, unless a product express purchase left the shopper's own cart out of it.
+				if ( ! Krokedil\KustomCheckout\Express\Express::is_product_express_order( $order ) ) {
+					WC()->cart->empty_cart();
+				}
 				// Check fraud status.
 				if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
 					// Payment complete and set transaction id.
@@ -639,6 +682,13 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 					$order->add_order_note( $note );
 					$order->payment_complete( $klarna_order_id );
 					KCO_Logger::log( $klarna_order_id . ': Fraud status accepted for order ' . $order->get_order_number() . '. payment_complete triggered.' );
+					/**
+					 * Triggers after an accepted Kustom order has been completed.
+					 *
+					 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#add-additional-checkboxes Add additional checkboxes
+					 * @param int   $order_id     The WooCommerce order ID.
+					 * @param array $klarna_order The Kustom order data.
+					 */
 					do_action( 'kco_wc_payment_complete', $order_id, $klarna_order );
 				} elseif ( 'PENDING' === $klarna_order['fraud_status'] ) {
 					// Set status to on-hold.
@@ -905,6 +955,43 @@ function kco_maybe_save_reference( $order_id, $klarna_order ) {
 }
 
 /**
+ * Maybe saves whether a post purchase upsell can be added to the order, based on how it was paid.
+ *
+ * @param WC_Order $order The WooCommerce order.
+ * @param array    $klarna_order The Kustom order management order.
+ * @return bool|null Whether upsell is available, or null if the Kustom order has no payment method yet.
+ */
+function kco_maybe_save_upsell_available( $order, $klarna_order ) {
+	if ( ! isset( $klarna_order['initial_payment_method']['type'] ) ) {
+		return null;
+	}
+
+	// Set allowed payment methods for upsell based on country. https://docs.kustom.co/v3/order-management/manage-orders-with-the-api/view-and-change-orders#update-order-amount-1.
+	$allowed_payment_methods = array( 'INVOICE', 'B2B_INVOICE', 'BASE_ACCOUNT', 'DIRECT_DEBIT' );
+	switch ( $klarna_order['billing_address']['country'] ?? '' ) {
+		case 'AT':
+		case 'DE':
+		case 'DK':
+		case 'FI':
+		case 'FR':
+		case 'NL':
+		case 'NO':
+		case 'SE':
+			$allowed_payment_methods[] = 'FIXED_AMOUNT';
+			break;
+		case 'CH':
+			$allowed_payment_methods = array();
+			break;
+	}
+
+	$available = in_array( $klarna_order['initial_payment_method']['type'], $allowed_payment_methods, true );
+	$order->update_meta_data( '_kco_upsell_available', wc_bool_to_string( $available ) );
+	$order->save_meta_data();
+
+	return $available;
+}
+
+/**
  * Undocumented function
  *
  * @param array|bool $data The shipping data from Kustom False if not set.
@@ -934,6 +1021,11 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 	}
 
 	$data['currency'] = $klarna_order['purchase_currency'];
+	/**
+	 * Triggers when the shipping data selected in Kustom Checkout is updated.
+	 *
+	 * @param array $data The selected shipping option data from Kustom, including the currency.
+	 */
 	do_action( 'kco_update_shipping_data', $data );
 
 	set_transient( 'kss_data_' . $klarna_order_id, $data, HOUR_IN_SECONDS );
@@ -942,16 +1034,23 @@ function kco_update_wc_shipping( $data, $klarna_order = false ) {
 
 	KCO_Logger::Log( "Set chosen shipping method for $klarna_order_id " . wp_json_encode( $chosen_shipping_methods ) );
 
-	WC()->session->set( 'chosen_shipping_methods', apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods ) );
+	/**
+	 * Filters the chosen shipping methods set from the shipping option selected in Kustom Checkout.
+	 *
+	 * @param string[] $chosen_shipping_methods The chosen shipping method IDs.
+	 */
+	$chosen_shipping_methods = apply_filters( 'kco_wc_chosen_shipping_method', $chosen_shipping_methods );
+
+	WC()->session->set( 'chosen_shipping_methods', $chosen_shipping_methods );
 
 	// Maybe set the selected pickup point as well from the chosen shipping method if it exists.
 	kco_maybe_set_selected_pickup_point( $klarna_order );
 }
 
 /**
- * Maybe set the pickup point for the Klarna order if it exists.
+ * Maybe set the pickup point for the Kustom order if it exists.
  *
- * @param array $klarna_order The Klarna order data.
+ * @param array $klarna_order The Kustom order data.
  * @return void
  */
 function kco_maybe_set_selected_pickup_point( $klarna_order ) {
@@ -992,7 +1091,7 @@ function kco_maybe_set_selected_pickup_point( $klarna_order ) {
  * Returns the WooCommerce order that has a matching Kustom order id saved as a meta field. If no order is found, returns false, and if many orders are found the newest one is returned.
  *
  * @param string      $klarna_order_id The Kustom order id.
- * @param string|null $date_after Optional. Date after which the order was created. Format 'YYYY-MM-DD'. Default null.
+ * @param string|null $date_after Optional. Only match orders created after this. Any strtotime()-parseable string, e.g. a relative '2 day ago' or a 'YYYY-MM-DD' date; wc_get_orders() compares it at day granularity. Default null.
  * @return WC_Order|false
  */
 function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
@@ -1000,6 +1099,8 @@ function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
 		'meta_key'     => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- We need to query by meta key.
 		'meta_value'   => $klarna_order_id, // phpcs:ignore WordPress.DB.SlowDBQuery -- We need to query by meta value.
 		'meta_compare' => '=',
+		// Every registered order type, not wc_get_orders()'s default of wc_get_order_types( 'view-orders' ): the meta is ours, so a type's customer-visibility flag is irrelevant to this lookup.
+		'type'         => wc_get_order_types(),
 		'order'        => 'DESC',
 		'orderby'      => 'date',
 		'limit'        => 1,
@@ -1008,6 +1109,15 @@ function kco_get_order_by_klarna_id( $klarna_order_id, $date_after = null ) {
 	if ( $date_after ) {
 		$args['date_after'] = $date_after;
 	}
+
+	/**
+	 * Filters the query args used to look up a WooCommerce order by its Kustom order id.
+	 *
+	 * @param array       $args            The wc_get_orders() args.
+	 * @param string      $klarna_order_id The Kustom order id being looked up.
+	 * @param string|null $date_after      Optional date lower bound, if provided.
+	 */
+	$args = apply_filters( 'kco_wc_get_order_by_klarna_id_args', $args, $klarna_order_id, $date_after );
 
 	$orders = wc_get_orders( $args );
 

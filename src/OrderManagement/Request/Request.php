@@ -1,7 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement\Request;
 
-use Krokedil\KustomCheckout\OrderManagement;
+use Krokedil\KustomCheckout\Logging\LogMasking;
+use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -102,17 +103,6 @@ abstract class Request {
 	}
 
 	/**
-	 * Get the country code for the underlaying order.
-	 *
-	 * @return string
-	 */
-	protected function get_klarna_country() {
-		$order   = wc_get_order( $this->order_id );
-		$country = $order->get_meta( '_wc_klarna_country', true );
-		return $country ? $country : '';
-	}
-
-	/**
 	 * Get the API base URL.
 	 *
 	 * @return string
@@ -132,7 +122,7 @@ abstract class Request {
 	/**
 	 * Make the request.
 	 *
-	 * @return object|WP_Error
+	 * @return object|\WP_Error
 	 */
 	public function request() {
 		$url  = $this->get_request_url();
@@ -147,7 +137,7 @@ abstract class Request {
 	/**
 	 * Get the request headers.
 	 *
-	 * @return array
+	 * @return array|\WP_Error
 	 */
 	protected function get_request_headers() {
 		$auth = $this->calculate_auth();
@@ -195,7 +185,7 @@ abstract class Request {
 	/**
 	 * Calculate basic auth for the request.
 	 *
-	 * @return string|WP_Error
+	 * @return string|\WP_Error
 	 */
 	protected function calculate_auth() {
 		$order = wc_get_order( $this->order_id );
@@ -230,15 +220,8 @@ abstract class Request {
 			return '';
 		}
 
-		$prefix  = $this->use_playground() ? 'test_' : '';
-		$country = $this->get_klarna_country();
-		if ( 'US' === $country ) {
-				$country_string = 'us';
-		} else {
-			$country_string = 'eu';
-		}
-
-		$key = "{$prefix}{$component_name}_{$country_string}";
+		$prefix = $this->use_playground() ? 'test_' : '';
+		$key    = "{$prefix}{$component_name}";
 
 		if ( key_exists( $key, $options ) ) {
 			return $options[ $key ];
@@ -249,10 +232,10 @@ abstract class Request {
 	/**
 	 * Processes the response checking for errors.
 	 *
-	 * @param object|WP_Error $response The response from the request.
-	 * @param array           $request_args The request args.
-	 * @param string          $request_url The request url.
-	 * @return array|WP_Error
+	 * @param object|\WP_Error $response The response from the request.
+	 * @param array            $request_args The request args.
+	 * @param string           $request_url The request url.
+	 * @return array|\WP_Error
 	 */
 	protected function process_response( $response, $request_args, $request_url ) {
 		if ( is_wp_error( $response ) ) {
@@ -262,7 +245,7 @@ abstract class Request {
 		$body          = json_decode( wp_remote_retrieve_body( $response ) );
 
 		if ( $response_code < 200 || $response_code >= 300 ) { // Anything not in the 200 range is an error.
-			$data          = "URL: {$request_url} - " . wp_json_encode( $request_args );
+			$data          = "URL: {$request_url} - " . wp_json_encode( LogMasking::mask_request( $request_args ) );
 			$error_message = "API Error {$response_code}";
 
 			if ( null !== $body && property_exists( $body, 'error_messages' ) ) {
@@ -278,25 +261,33 @@ abstract class Request {
 			}
 		}
 
-		$this->log_response( $response, $request_args, $response_code );
+		$this->log_response( $response, $request_args, $request_url, $response_code );
 		return $processed_response;
 	}
 
 	/**
 	 * Builds the request args for a request.
 	 *
-	 * @return array|WP_Error
+	 * @return array|\WP_Error
 	 */
 	public function get_request_args() {
 		$headers = $this->get_request_headers();
 		if ( is_wp_error( $headers ) ) {
 			return $headers;
 		}
+
+		/**
+		 * Filters the timeout in seconds for order management requests to Kustom.
+		 *
+		 * @param int $timeout The request timeout in seconds. Default 10.
+		 */
+		$timeout = apply_filters( 'kom_request_timeout', 10 );
+
 		$args = array(
 			'headers'    => $headers,
 			'user-agent' => $this->get_user_agent(),
 			'method'     => $this->method,
-			'timeout'    => apply_filters( 'kom_request_timeout', 10 ),
+			'timeout'    => $timeout,
 		);
 		$body = $this->get_body();
 		if ( ! empty( $body ) ) {
@@ -317,20 +308,17 @@ abstract class Request {
 	/**
 	 * Standardized logging format for requests/responses.
 	 *
-	 * @param array|WP_Error $response The request response.
-	 * @param array          $request_args The arguments of the request.
-	 * @param int            $code The HTTP Response Code this request returned.
+	 * @param array|\WP_Error $response The request response.
+	 * @param array           $request_args The arguments of the request.
+	 * @param string          $request_url The request URL.
+	 * @param int             $code The HTTP Response Code this request returned.
 	 * @return void
 	 */
-	protected function log_response( $response, $request_args, $code ) {
-		foreach ( $request_args['headers'] as $header => $value ) {
-			if ( 'authorization' === strtolower( $header ) ) {
-				// If it is longer than 15 char., it most likely has a token. This is an assumption that is safe even if it is wrong.
-				$request_args['headers'][ $header ] = strlen( $value ) > 15 ? '[REDACTED]' : '[MISSING]';
-				break;
-			}
-		}
-		$log = \KCO_Logger::format_log( $this->klarna_order_id, $this->method, $this->log_title, $request_args, $response, $code );
+	protected function log_response( $response, $request_args, $request_url, $code ) {
+		// Log the decoded body so the masking can reach into it. The rest of the HTTP response holds nothing a log needs.
+		$body = is_wp_error( $response ) ? array() : json_decode( wp_remote_retrieve_body( $response ), true );
+
+		$log = \KCO_Logger::format_log( $this->klarna_order_id, $this->method, $this->log_title, $request_args, $body, $code, $request_url );
 		\KCO_Logger::log( $log );
 	}
 }

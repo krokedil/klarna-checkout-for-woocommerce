@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Krokedil\KustomCheckout\Utility\ConfirmationUtility;
+
 /**
  * KCO_API class.
  *
@@ -18,8 +20,8 @@ class KCO_API {
 	/**
 	 * Creates a Kustom Checkout order.
 	 *
-	 * @param int    $order_id The WooCommerce order id.
-	 * @param string $checkout_flow The checkout flow to use, either 'embedded' or 'redirect'.
+	 * @param int|false $order_id The WooCommerce order id.
+	 * @param string    $checkout_flow The checkout flow to use, either 'embedded' or 'redirect'.
 	 *
 	 * @return mixed
 	 */
@@ -45,7 +47,7 @@ class KCO_API {
 	/**
 	 * Gets a Kustom Checkout order
 	 *
-	 * @param string $klarna_order_id The Klarna Checkout order id.
+	 * @param string $klarna_order_id The Kustom Checkout order id.
 	 * @return array|false
 	 */
 	public function get_klarna_order( $klarna_order_id ) {
@@ -70,30 +72,10 @@ class KCO_API {
 		// If the update results in a READ_ONLY_ORDER response, let's try to redirect the customer to thank you page.
 		if ( is_wp_error( $response ) ) {
 
-			// Data is returned as both json and string. Let's try to grab only the json data.
-			$error = strstr( $response->get_error_message(), '}', true ) . '}';
-			$error = json_decode( $error, true );
+			// Read the structured response body preserved by process_response.
+			$error = $response->get_error_data( 'klarna_error_body' );
 			if ( is_array( $error ) && 'READ_ONLY_ORDER' === ( $error['error_code'] ?? false ) ) {
-				$order = kco_get_order_by_klarna_id( $klarna_order_id, '2 day ago' );
-				if ( ! empty( $order ) ) {
-
-					$redirect_url = $order->get_checkout_order_received_url();
-					if ( empty( $order->get_date_paid() ) ) {
-						// If this was not paid directly, we're not dealing with a zero-order purchase (e.g., free trial subscription), and we should redirect to the confirmation page instead.
-						$redirect_url = add_query_arg(
-							array(
-								'kco_confirm'  => 'yes',
-								'kco_order_id' => $klarna_order_id,
-								'order_id'     => $order->get_id(),
-								'key'          => $order->get_order_key(),
-							),
-							$order->get_checkout_order_received_url()
-						);
-					}
-
-					wp_safe_redirect( $redirect_url );
-					exit;
-				}
+				ConfirmationUtility::redirect( $klarna_order_id );
 			}
 
 			// Handle BAD_VALUE purchase_currency mismatch (e.g. customer changes country to one incompatible with the store currency).
@@ -107,7 +89,7 @@ class KCO_API {
 				}
 				if ( $has_currency_error ) {
 					WC()->session->set( 'reload_checkout', true );
-					KCO_Logger::log( 'Klarna BAD_VALUE purchase_currency mismatch for order ' . $klarna_order_id . '. Reloading checkout.' );
+					KCO_Logger::log( 'Kustom BAD_VALUE purchase_currency mismatch for order ' . $klarna_order_id . '. Reloading checkout.' );
 					return false;
 				}
 			}
@@ -278,7 +260,7 @@ class KCO_API {
 	 * Deprecated function, adds support for the get_snippet function.
 	 *
 	 * @param array $klarna_order The Kustom Checkout order.
-	 * @return object
+	 * @return string
 	 */
 	public function get_snippet( $klarna_order ) {
 		// Make Kustom order an object.

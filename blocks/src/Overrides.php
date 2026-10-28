@@ -1,8 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\Blocks;
 
-use Automattic\WooCommerce\StoreApi\Utilities\JsonWebToken;
 use Krokedil\KustomCheckout\Blocks\Api\Controllers\OrderController;
+use Krokedil\KustomCheckout\Utility\BlocksUtility;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -12,19 +12,6 @@ defined( 'ABSPATH' ) || exit;
  * Handles the overrides for Kustom Checkout filters and actions where needed for the block checkout support.
  */
 class Overrides {
-	/**
-	 * Class constructor
-	 *
-	 * @return void
-	 */
-	public function __construct() {
-		add_filter( 'kco_wc_api_request_args', array( $this, 'override_request_body' ), 10, 2 );
-
-		// Important: Needs to be on a priority before 100, since WCS will process the order at 100.
-		// @TODO: Commented out for now until we can verify with WooCommerce why Subscriptions are not processed correctly when placing an order through the store api endpoint.
-		// add_filter( 'woocommerce_store_api_checkout_order_processed', array( $this, 'maybe_calculate_recurring_carts' ), 90 );.
-	}
-
 	/**
 	 * Maybe calculate recurring carts.
 	 *
@@ -49,7 +36,7 @@ class Overrides {
 	}
 
 	/**
-	 * Override the request body for the Klarna Checkout API.
+	 * Override the request body for the Kustom Checkout API.
 	 *
 	 * @param array    $args The request arguments.
 	 * @param int|null $order_id The WooCommerce order ID.
@@ -97,7 +84,7 @@ class Overrides {
 	}
 
 	/**
-	 * Override the options for the Klarna Checkout API.
+	 * Override the options for the Kustom Checkout API.
 	 *
 	 * @param array $args The request arguments.
 	 *
@@ -111,7 +98,7 @@ class Overrides {
 	}
 
 	/**
-	 * Override the merchant URLs for the Klarna Checkout API.
+	 * Override the merchant URLs for the Kustom Checkout API.
 	 *
 	 * @param array          $args The request arguments.
 	 * @param \WC_Order|null $draft_order The WooCommerce order, or null if it does not exist yet.
@@ -125,7 +112,7 @@ class Overrides {
 	}
 
 	/**
-	 * Set the merchant reference for the Klarna Checkout API.
+	 * Set the merchant reference for the Kustom Checkout API.
 	 *
 	 * @param array     $args The request arguments.
 	 * @param \WC_Order $draft_order The WooCommerce order.
@@ -138,26 +125,7 @@ class Overrides {
 	}
 
 	/**
-	 * Create a cart token for the current user.
-	 *
-	 * @return string
-	 */
-	private function create_cart_token() {
-		// Create a cart token for the Klarna order.
-		$cart_token = JsonWebToken::create(
-			array(
-				'user_id' => wc()->session->get_customer_id(),
-				'exp'     => time() + intval( apply_filters( 'wc_session_expiration', DAY_IN_SECONDS * 2 ) ),
-				'iss'     => 'wc/store/v1',
-			),
-			'@' . wp_salt()
-		);
-
-		return $cart_token;
-	}
-
-	/**
-	 * Set the merchant data for the Klarna Checkout API.
+	 * Set the merchant data for the Kustom Checkout API.
 	 *
 	 * @param array $args The request arguments.
 	 *
@@ -166,7 +134,7 @@ class Overrides {
 	private function set_merchant_data( &$args ) {
 		$merchant_data = json_decode( $args['merchant_data'], true ) ?? array();
 
-		// Add the current cart hashes to the Klarna order merchant data object.
+		// Add the current cart hashes to the Kustom order merchant data object.
 		// @see https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/src/StoreApi/Utilities/CartController.php#L763-L769.
 		$cart_controller = new \Automattic\WooCommerce\StoreApi\Utilities\CartController();
 		$cart_hashes     = $cart_controller->get_cart_hashes();
@@ -177,7 +145,7 @@ class Overrides {
 		$merchant_data['wc_coupons_hash']  = $cart_hashes['coupons'] ?? '';
 		$merchant_data['wc_taxes_hash']    = $cart_hashes['taxes'] ?? '';
 
-		$cart_token = WC()->session->get( 'kco_wc_cart_token', $this->create_cart_token() );
+		$cart_token = WC()->session->get( 'kco_wc_cart_token', BlocksUtility::create_cart_token( wc()->session->get_customer_id() ) );
 
 		$merchant_data['wc_cart_token']       = $cart_token;
 		$merchant_data['wc_nonce']            = wp_create_nonce( 'wc_store_api' );
@@ -185,7 +153,7 @@ class Overrides {
 
 		$args['merchant_data'] = wp_json_encode( $merchant_data );
 
-		// Set the cart token in the session for later use to prevent the update request to Klarna from triggering on each call.
+		// Set the cart token in the session for later use to prevent the update request to Kustom from triggering on each call.
 		WC()->session->set( 'kco_wc_cart_token', $cart_token );
 	}
 }

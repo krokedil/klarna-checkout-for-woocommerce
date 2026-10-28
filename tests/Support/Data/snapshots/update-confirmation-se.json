@@ -1,0 +1,33 @@
+{
+    "purchase_country": "SE",
+    "purchase_currency": "SEK",
+    "locale": "sv-SE",
+    "merchant_urls": {
+        "terms": "<site>/terms/",
+        "checkout": "<site>/checkout/",
+        "confirmation": "<site>/checkout/order-received/<order-id>/?key=<order-key>&kco_confirm=yes&kco_order_id={checkout.order.id}&order_id=<order-id>",
+        "push": "<site>/wc-api/KCO_WC_Push/?kco_order_id={checkout.order.id}"
+    },
+    "billing_countries": [
+        "SE"
+    ],
+    "shipping_countries": [
+        "SE"
+    ],
+    "merchant_data": "",
+    "options": [],
+    "order_amount": 12500,
+    "order_tax_amount": 2500,
+    "order_lines": [
+        {
+            "type": "physical",
+            "reference": "kustom-test-product",
+            "name": "Kustom test product",
+            "quantity": 1,
+            "unit_price": 12500,
+            "tax_rate": 2500,
+            "total_amount": 12500,
+            "total_tax_amount": 2500
+        }
+    ]
+}

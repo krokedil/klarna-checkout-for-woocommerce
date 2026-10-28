@@ -24,5 +24,20 @@ tmp*
 readme.dev.md
 .prettierignore
 scoper.custom.php
+phpstan.neon
+phpstan-baseline.neon
+phpstan-bootstrap.php
+phpstan-stubs.php
 pnpm-lock.yaml
 /.changelogs
+
+# WP Playground dev environment (@krokedil/wp-playground-tools).
+playground.config.mjs
+/tools
+/.claude
+CLAUDE.md
+.nvmrc
+.playground
+/pr-screenshots
+.env
+.env.example

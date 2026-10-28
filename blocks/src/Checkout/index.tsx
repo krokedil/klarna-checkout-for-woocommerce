@@ -17,7 +17,7 @@ import { getSetting } from '@woocommerce/settings';
 import { useKcoIframe } from './hooks/useKcoIframe';
 
 // Declare wc and _klarnaCheckout on the window object to avoid TypeScript errors when using them later.
-// _klarnaCheckout is added by the Klarna Checkout script, and wc is added by WooCommerce blocks.
+// _klarnaCheckout is added by the Kustom Checkout script, and wc is added by WooCommerce blocks.
 declare global {
 	interface Window {
 		_klarnaCheckout: any;

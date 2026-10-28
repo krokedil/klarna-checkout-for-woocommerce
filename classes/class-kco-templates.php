@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
+use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
 /**
  * KCO_Templates class.
@@ -33,7 +34,7 @@ class KCO_Templates {
 	/**
 	 * Returns the *Singleton* instance of this class.
 	 *
-	 * @return self::$instance The *Singleton* instance.
+	 * @return KCO_Templates The *Singleton* instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -84,7 +85,8 @@ class KCO_Templates {
 		if ( is_checkout() ) {
 			$confirm = filter_input( INPUT_GET, 'confirm', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			// Don't display KCO template if we have a cart that doesn't needs payment.
-			if ( apply_filters( 'kco_check_if_needs_payment', true ) && ! is_wc_endpoint_url( 'order-pay' ) ) {
+			$check_if_needs_payment = SettingsUtility::check_if_needs_payment();
+			if ( $check_if_needs_payment && ! is_wc_endpoint_url( 'order-pay' ) ) {
 				if ( ! kco_cart_needs_payment() ) {
 					return $template;
 				}
@@ -102,6 +104,12 @@ class KCO_Templates {
 				if ( locate_template( 'woocommerce/klarna-checkout.php' ) ) {
 					$klarna_checkout_template = locate_template( 'woocommerce/klarna-checkout.php' );
 				} else {
+					/**
+					 * Filters the path to the Kustom Checkout template.
+					 *
+					 * @param string $template      The template path.
+					 * @param string $template_name The name of the WooCommerce template being overridden.
+					 */
 					$klarna_checkout_template = apply_filters( 'kco_locate_checkout_template', KCO_WC_PLUGIN_PATH . '/templates/klarna-checkout.php', $template_name );
 				}
 

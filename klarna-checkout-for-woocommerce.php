@@ -5,12 +5,12 @@
  * Description: Kustom Checkout payment gateway for WooCommerce.
  * Author: Kustom
  * Author URI: https://klarna.com/
- * Version: 2.20.7
+ * Version: 2.24.0
  * Text Domain: klarna-checkout-for-woocommerce
  * Domain Path: /languages
  *
  * WC requires at least: 9.7.0
- * WC tested up to: 11.0
+ * WC tested up to: 11.2.1
  *
  * Copyright (c) 2017-2026 Krokedil
  *
@@ -31,7 +31,11 @@
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
+use Krokedil\KustomCheckout\Migrations\CredentialsMigration;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
+use Krokedil\KustomCheckout\ShippingAssistant\ShippingAssistant;
+use Krokedil\KustomCheckout\Elements\Elements;
+use Krokedil\KustomCheckout\Express\Express;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -40,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Required minimums and constants
  */
-define( 'KCO_WC_VERSION', '2.20.7' );
+define( 'KCO_WC_VERSION', '2.24.0' );
 define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
@@ -131,6 +135,34 @@ if ( ! class_exists( 'KCO' ) ) {
 		public $pickup_points;
 
 		/**
+		 * Reference to shipping assistant class.
+		 *
+		 * @var ShippingAssistant $shipping_assistant
+		 */
+		public $shipping_assistant;
+
+		/**
+		 * Reference to Elements class.
+		 *
+		 * @var Elements $elements
+		 */
+		public $elements;
+
+		/**
+		 * Kustom express buttons.
+		 *
+		 * @var Express $express
+		 */
+		public $express;
+
+		/**
+		 * Reference to the credentials migration class.
+		 *
+		 * @var CredentialsMigration $credentials_migration
+		 */
+		public $credentials_migration;
+
+		/**
 		 * Returns the *Singleton* instance of this class.
 		 *
 		 * @return KCO The *Singleton* instance.
@@ -205,9 +237,11 @@ if ( ! class_exists( 'KCO' ) ) {
 		 */
 		public function plugin_action_links( $links ) {
 			$setting_link = $this->get_setting_link();
+			$support_link = add_query_arg( 'subsection', 'support', $setting_link );
+
 			$plugin_links = array(
 				'<a href="' . $setting_link . '">' . __( 'Settings', 'klarna-checkout-for-woocommerce' ) . '</a>',
-				'<a href="http://krokedil.se/">' . __( 'Support', 'klarna-checkout-for-woocommerce' ) . '</a>',
+				'<a href="' . $support_link . '">' . __( 'Support', 'klarna-checkout-for-woocommerce' ) . '</a>',
 			);
 
 			return array_merge( $plugin_links, $links );
@@ -267,7 +301,6 @@ if ( ! class_exists( 'KCO' ) ) {
 			// Admin includes.
 			if ( is_admin() ) {
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-kco-admin-notices.php';
-				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-klarna-for-woocommerce-addons.php';
 				include_once KCO_WC_PLUGIN_PATH . '/classes/admin/class-wc-klarna-banners.php';
 			}
 
@@ -298,18 +331,26 @@ if ( ! class_exists( 'KCO' ) ) {
 			include_once KCO_WC_PLUGIN_PATH . '/includes/kco-functions.php';
 
 			// Set class variables.
-			$this->credentials      = new KCO_Credentials();
-			$this->merchant_urls    = new KCO_Merchant_URLs();
-			$this->logger           = new KCO_Logger();
-			$this->api              = new KCO_API();
-			$this->krokedil         = new KrokedilWooCommerce(
+			// A store still on the old per-region settings is consolidated here, before
+			// KCO_Credentials reads them.
+			$this->credentials_migration = new CredentialsMigration();
+			$this->credentials_migration->maybe_migrate();
+
+			$this->credentials        = new KCO_Credentials();
+			$this->merchant_urls      = new KCO_Merchant_URLs();
+			$this->logger             = new KCO_Logger();
+			$this->api                = new KCO_API();
+			$this->krokedil           = new KrokedilWooCommerce(
 				array(
 					'slug'         => 'kco',
 					'price_format' => 'minor',
 				)
 			);
-			$this->order_management = new OrderManagement();
-			$this->pickup_points    = new PickupPoints();
+			$this->order_management   = new OrderManagement();
+			$this->pickup_points      = new PickupPoints();
+			$this->shipping_assistant = new ShippingAssistant();
+			$this->elements           = new Elements();
+			$this->express            = new Express();
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );

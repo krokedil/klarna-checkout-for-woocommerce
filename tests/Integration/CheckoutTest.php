@@ -1,0 +1,392 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Integration;
+
+use Krokedil\KustomCheckout\CheckoutFlow\CheckoutFlow;
+use Krokedil\KustomCheckout\CheckoutFlow\EmbeddedBlockFlow;
+use Krokedil\KustomCheckout\CheckoutFlow\EmbeddedFlow;
+use Krokedil\KustomCheckout\CheckoutFlow\RedirectFlow;
+use Tests\Support\IntegrationTestCase;
+
+/**
+ * The checkout entry point. Which flow handles a purchase, what each one stamps on
+ * the order, what it hands back to WooCommerce, and how it reads the shipping
+ * selection it is handed.
+ *
+ * @covers \Krokedil\KustomCheckout\CheckoutFlow\CheckoutFlow
+ * @covers \KCO_Gateway::process_payment
+ * @covers \KCO_Checkout::maybe_register_shipping_error
+ * @covers \KCO_Checkout::maybe_change_needs_payment
+ * @covers \Krokedil\KustomCheckout\Utility\SettingsUtility::check_if_needs_payment
+ */
+class CheckoutTest extends IntegrationTestCase {
+
+	protected ?string $storeProfile = 'se';
+
+	/** The `woocommerce_checkout_process` count from before the shipping fixture raised it. */
+	private ?int $checkoutProcessCount = null;
+
+	/** The request URI from before the free order fixture pointed it at the Store API. */
+	private ?string $requestUri = null;
+
+	protected function setUp(): void {
+		parent::setUp();
+
+		$this->haveCustomerAddress( $this->swedishAddress(), $this->swedishAddress() );
+	}
+
+	protected function tearDown(): void {
+		// did_action() counts never fall, and the assessment's first guard reads this one,
+		// so leaving it raised would arm the guard for every later test in the process.
+		if ( null !== $this->checkoutProcessCount ) {
+			$GLOBALS['wp_actions']['woocommerce_checkout_process'] = $this->checkoutProcessCount;
+			$this->checkoutProcessCount                            = null;
+		}
+
+		if ( null !== $this->requestUri ) {
+			$_SERVER['REQUEST_URI'] = $this->requestUri;
+			$this->requestUri       = null;
+		}
+
+		parent::tearDown();
+	}
+
+	/**
+	 * Which flow a request lands on. The setting only decides between embedded and
+	 * redirect; the block checkout and the pay-for-order page override it.
+	 *
+	 * @dataProvider provide_handlers
+	 */
+	public function test_the_flow_setting_picks_the_handler( string $flow, string $expected ): void {
+		$this->haveRedirectFlowEnabled();
+		$this->haveGatewayCredentials( [ 'checkout_flow' => $flow ] );
+		$this->flushGatewaySettingsCache();
+
+		$this->assertInstanceOf( $expected, CheckoutFlow::get_handler() );
+	}
+
+	/** @return array<string, array{0: string, 1: class-string}> */
+	public function provide_handlers(): array {
+		return [
+			'embedded'                    => [ 'embedded', EmbeddedFlow::class ],
+			'redirect'                    => [ 'redirect', RedirectFlow::class ],
+			'an unknown flow is embedded' => [ 'something-new', EmbeddedFlow::class ],
+		];
+	}
+
+	public function test_the_block_checkout_overrides_the_flow_setting(): void {
+		$this->haveRedirectFlowEnabled();
+		$this->haveGatewayCredentials( [ 'checkout_flow' => 'redirect' ] );
+		$this->flushGatewaySettingsCache();
+
+		// The handler is picked off the checkout page's own content, not a setting.
+		$this->haveCheckoutBlockOnTheCheckoutPage();
+
+		$this->assertInstanceOf( EmbeddedBlockFlow::class, CheckoutFlow::get_handler() );
+	}
+
+	/**
+	 * Swaps the checkout page's shortcode for the WooCommerce checkout block. KSES is
+	 * dropped for the save because a block delimiter is an HTML comment, and KSES
+	 * strips those from anyone who may not post unfiltered HTML, which is nobody in CLI.
+	 */
+	private function haveCheckoutBlockOnTheCheckoutPage(): void {
+		$page_id = wc_get_page_id( 'checkout' );
+
+		kses_remove_filters();
+
+		wp_update_post(
+			[
+				'ID'           => $page_id,
+				'post_content' => '<!-- wp:woocommerce/checkout --><div class="wp-block-woocommerce-checkout"></div><!-- /wp:woocommerce/checkout -->',
+			]
+		);
+
+		kses_init_filters();
+
+		clean_post_cache( $page_id );
+	}
+
+	/**
+	 * Turns on the redirect flow's feature flag.
+	 *
+	 * The setting only exists behind `kco_enable_redirected_flow`. With the flag off,
+	 * `KCO_Fields::fields()` writes `checkout_flow => embedded` straight back over the
+	 * stored option, so a store cannot be on the redirect flow without it.
+	 */
+	private function haveRedirectFlowEnabled(): void {
+		add_filter( 'kco_enable_redirected_flow', '__return_true' );
+	}
+
+	/**
+	 * Every flow stamps the same reference, environment and country on the order.
+	 *
+	 * @dataProvider provide_stamped_meta
+	 */
+	public function test_a_processed_order_carries_the_kustom_reference( string $flow, array $expected_meta ): void {
+		$this->arrangeFlow( $flow );
+
+		$order  = $this->haveCheckoutOrder();
+		$result = $this->gateway()->process_payment( $order->get_id() );
+
+		$reloaded = $this->reload( $order );
+
+		$this->assertSame( 'success', $result['result'] );
+
+		foreach ( $expected_meta as $key => $value ) {
+			$this->assertSame( $value, $reloaded->get_meta( $key, true ), $key );
+		}
+	}
+
+	/** @return array<string, array{0: string, 1: array<string, string>}> */
+	public function provide_stamped_meta(): array {
+		$meta = static fn( string $flow ): array => [
+			'_wc_klarna_order_id'      => 'checkout-order-123',
+			'_wc_klarna_environment'   => 'test',
+			'_wc_klarna_country'       => 'SE',
+			'_wc_klarna_checkout_flow' => $flow,
+		];
+
+		return [
+			'the embedded flow' => [ 'embedded', $meta( 'embedded' ) ],
+			'the redirect flow' => [ 'redirect', $meta( 'redirect' ) ],
+		];
+	}
+
+	/**
+	 * The redirect flow's whole job: hand WooCommerce the hosted payment page URL.
+	 */
+	public function test_the_redirect_flow_returns_the_hosted_payment_page(): void {
+		$this->arrangeFlow( 'redirect' );
+
+		$order  = $this->haveCheckoutOrder();
+		$result = $this->gateway()->process_payment( $order->get_id() );
+
+		$this->assertSame( 'https://pay.playground.kustom.co/eu/hpp/payment/hpp-1', $result['redirect'] );
+
+		$reloaded = $this->reload( $order );
+		$this->assertSame( $result['redirect'], $reloaded->get_meta( '_wc_klarna_hpp_url', true ) );
+		$this->assertSame( 'hpp-session-1', $reloaded->get_meta( '_wc_klarna_hpp_session_id', true ) );
+		$this->assertOrderHasNote( $order, 'redirected to Kustom Hosted Payment Page' );
+	}
+
+	/**
+	 * The embedded flow finishes in the browser, so it must not hand WooCommerce a
+	 * redirect of its own.
+	 */
+	public function test_the_embedded_flow_leaves_the_redirect_to_the_iframe(): void {
+		$this->arrangeFlow( 'embedded' );
+
+		$order  = $this->haveCheckoutOrder();
+		$result = $this->gateway()->process_payment( $order->get_id() );
+
+		$this->assertArrayNotHasKey( 'redirect', $result );
+	}
+
+	public function test_a_live_store_records_the_live_environment(): void {
+		$this->arrangeFlow( 'embedded', false );
+
+		$order = $this->haveCheckoutOrder();
+		$this->gateway()->process_payment( $order->get_id() );
+
+		$this->assertSame(
+			'live',
+			$this->reload( $order )->get_meta( '_wc_klarna_environment', true ),
+			'Order management reads this to decide which host to talk to.'
+		);
+	}
+
+	/**
+	 * The recurring flags a subscription purchase leaves, which is what a renewal
+	 * later charges against.
+	 */
+	public function test_a_recurring_order_records_its_token(): void {
+		$this->arrangeFlow( 'embedded', true, [ 'recurring' => true, 'recurring_token' => 'customer-token-1' ] );
+
+		$order = $this->haveCheckoutOrder();
+		$this->gateway()->process_payment( $order->get_id() );
+
+		$reloaded = $this->reload( $order );
+
+		$this->assertSame( 'yes', $reloaded->get_meta( '_kco_recurring_order', true ) );
+		$this->assertSame( 'customer-token-1', $reloaded->get_meta( '_kco_recurring_token', true ) );
+	}
+
+	/**
+	 * @dataProvider provide_failure_guards
+	 */
+	public function test_a_purchase_that_cannot_proceed_is_stopped( string $scenario, string $message ): void {
+		$order = $this->arrangeFailure( $scenario );
+
+		$thrown = null;
+
+		try {
+			$this->gateway()->process_payment( $order->get_id() );
+		} catch ( \Exception $exception ) {
+			$thrown = $exception;
+		}
+
+		$this->assertNotNull( $thrown, sprintf( 'Expected "%s" to stop the purchase.', $scenario ) );
+		// The plugin escapes the message before it throws, so the apostrophe arrives as an entity.
+		$this->assertStringContainsString( $message, html_entity_decode( $thrown->getMessage(), ENT_QUOTES ) );
+		$this->assertSame( 'pending', $this->statusOf( $order ) );
+	}
+
+	/** @return array<string, array{0: string, 1: string}> */
+	public function provide_failure_guards(): array {
+		return [
+			'the order was never created' => [ 'redirect-no-order', "couldn't create your payment session" ],
+			'the hosted page was refused' => [ 'redirect-no-hpp', "couldn't start your payment session" ],
+		];
+	}
+
+	/** An order id nothing resolves must not be processed as if it were an order. */
+	public function test_an_order_id_that_does_not_resolve_is_refused(): void {
+		$this->haveGatewayCredentials();
+		$this->flushGatewaySettingsCache();
+
+		$this->expectExceptionMessage( 'Invalid order ID.' );
+
+		$this->gateway()->process_payment( 999999999 );
+	}
+
+	/**
+	 * WooCommerce quietly swaps the chosen shipping method when it stops recognising it,
+	 * and the plugin turns that into an error the customer can act on. Kustom Shipping
+	 * Assistant owns the selection itself, so its rate must never be read as a swap.
+	 *
+	 * @dataProvider provide_shipping_selections
+	 */
+	public function test_a_shipping_selection_the_plugin_does_not_own_is_left_alone( string $chosen, string $default ): void {
+		$this->arrangeShippingAssessment();
+
+		$before = did_action( 'kco_checkout_shipping_error' );
+
+		$this->assertSame( $default, apply_filters( 'woocommerce_shipping_chosen_method', $default, [], $chosen ) );
+		$this->assertSame(
+			$before,
+			did_action( 'kco_checkout_shipping_error' ),
+			sprintf( 'A chosen method of "%s" must not register a shipping error.', $chosen )
+		);
+	}
+
+	/** @return array<string, array{0: string, 1: string}> */
+	public function provide_shipping_selections(): array {
+		return [
+			'the shipping assistant rate, carrying its zone instance' => [ 'klarna_kss:1', 'flat_rate:1' ],
+			'the shipping assistant method, carrying none'            => [ 'klarna_kss', 'flat_rate:1' ],
+			'a method WooCommerce did not swap'                       => [ 'flat_rate:1', 'flat_rate:1' ],
+		];
+	}
+
+	/**
+	 * With free orders shown in Kustom, the block checkout must still hand a free order to the
+	 * gateway, or the order never gets the Kustom reference the confirmation looks it up by.
+	 *
+	 * @dataProvider provide_free_order_requests
+	 */
+	public function test_a_free_order_goes_through_kustom_only_when_shown_in_kustom( bool $store_api, string $shown_by, bool $expected ): void {
+		if ( $store_api ) {
+			$this->requestUri       = $_SERVER['REQUEST_URI'] ?? '';
+			$_SERVER['REQUEST_URI'] = '/wp-json/wc/store/v1/checkout';
+		}
+
+		if ( 'filter' === $shown_by ) {
+			add_filter( 'kco_check_if_needs_payment', '__return_false' );
+		}
+
+		if ( str_starts_with( $shown_by, 'setting' ) ) {
+			$this->haveGatewayCredentials( [ 'display_on_free_orders' => 'yes' ] );
+		}
+
+		if ( 'setting, filtered back' === $shown_by ) {
+			add_filter( 'kco_check_if_needs_payment', '__return_true' );
+		}
+
+		$order = $this->haveGatewayOrder( [ 'items' => [ [ $this->haveSimpleProduct( [ 'price' => '0.00' ] ), 1 ] ] ] );
+
+		$this->assertSame( 0.0, (float) $order->get_total() );
+		$this->assertSame( $expected, $order->needs_payment() );
+	}
+
+	/** @return array<string, array{0: bool, 1: string, 2: bool}> */
+	public function provide_free_order_requests(): array {
+		return [
+			'the block checkout, shown in Kustom by the filter'            => [ true, 'filter', true ],
+			'the block checkout, shown in Kustom by the setting'           => [ true, 'setting', true ],
+			'the block checkout, setting overridden by the filter'         => [ true, 'setting, filtered back', false ],
+			'the block checkout, free orders left to WooCommerce'          => [ true, '', false ],
+			'outside the checkout, shown in Kustom by the setting'         => [ false, 'setting', false ],
+		];
+	}
+
+	/**
+	 * The assessment only runs part way through a Kustom checkout that has the shipping
+	 * options inside the iframe.
+	 */
+	private function arrangeShippingAssessment(): void {
+		$this->haveGatewayCredentials( [ 'shipping_methods_in_iframe' => 'yes' ] );
+		$this->flushGatewaySettingsCache();
+
+		WC()->session->set( 'chosen_payment_method', 'kco' );
+
+		// The guard only reads the count, so raise it rather than firing the action and
+		// running whatever a plugin has hooked to it.
+		$this->checkoutProcessCount                            = $GLOBALS['wp_actions']['woocommerce_checkout_process'] ?? 0;
+		$GLOBALS['wp_actions']['woocommerce_checkout_process'] = $this->checkoutProcessCount + 1;
+	}
+
+	private function arrangeFailure( string $scenario ): \WC_Order {
+		$this->haveRedirectFlowEnabled();
+		$this->haveGatewayCredentials( [ 'checkout_flow' => 'redirect' ] );
+		$this->flushGatewaySettingsCache();
+
+		if ( 'redirect-no-hpp' === $scenario ) {
+			// The create succeeds, the hosted page does not.
+			$this->willCreateOrder();
+		}
+
+		return $this->haveCheckoutOrder();
+	}
+
+	/**
+	 * Puts the store on the given flow and queues the API answers it needs. The
+	 * embedded flow reads back an order the iframe already created, so the reference
+	 * is in the session before process_payment() runs.
+	 */
+	private function arrangeFlow( string $flow, bool $testmode = true, array $klarna_order = [] ): void {
+		$this->haveRedirectFlowEnabled();
+		$this->haveGatewayCredentials( [ 'checkout_flow' => $flow ], $testmode );
+		$this->flushGatewaySettingsCache();
+		$this->simulateCheckoutPage();
+
+		if ( 'redirect' === $flow ) {
+			$this->willCreateOrder( $klarna_order );
+			$this->willCreateHpp();
+			return;
+		}
+
+		WC()->session->set( 'kco_wc_order_id', 'checkout-order-123' );
+		$this->willRetrieveOrder( $klarna_order );
+	}
+
+	private function gateway(): \KCO_Gateway {
+		$this->reloadPaymentGateways();
+
+		return WC()->payment_gateways()->payment_gateways()['kco'];
+	}
+
+	private function haveCheckoutOrder( array $args = [] ): \WC_Order {
+		return $this->haveOrder(
+			array_merge(
+				[
+					'items'   => [ $this->haveSimpleProduct( [ 'price' => '100.00' ] ) ],
+					'billing' => $this->swedishAddress(),
+				],
+				$args
+			)
+		);
+	}
+}

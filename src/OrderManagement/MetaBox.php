@@ -91,7 +91,7 @@ class MetaBox extends OrderMetabox {
 	/**
 	 * Render the metabox content.
 	 *
-	 * @param WP_Post $post The WordPress post.
+	 * @param \WP_Post $post The WordPress post.
 	 *
 	 * @return void
 	 */
@@ -106,7 +106,7 @@ class MetaBox extends OrderMetabox {
 
 		// Check if the order has been paid.
 		if ( empty( $order->get_date_paid() ) && ! in_array( $order->get_status(), array( 'on-hold' ), true ) ) {
-			$this->print_error_content( __( 'The payment has not been finalized with Klarna.', 'klarna-checkout-for-woocommerce' ) );
+			$this->print_error_content( __( 'The payment has not been finalized with Kustom.', 'klarna-checkout-for-woocommerce' ) );
 			return;
 		}
 		// False if automatic settings are enabled, true if not. If true then show the option.
@@ -115,7 +115,7 @@ class MetaBox extends OrderMetabox {
 			$klarna_order = $this->order_management->retrieve_klarna_order( $order_id );
 
 			if ( is_wp_error( $klarna_order ) ) {
-				$this->print_error_content( __( 'Failed to retrieve the order from Klarna.', 'klarna-checkout-for-woocommerce' ) );
+				$this->print_error_content( __( 'Failed to retrieve the order from Kustom.', 'klarna-checkout-for-woocommerce' ) );
 				return;
 			}
 
@@ -126,7 +126,7 @@ class MetaBox extends OrderMetabox {
 	/**
 	 * Prints the standard content for the OM Metabox
 	 *
-	 * @param object $klarna_order The Klarna order object.
+	 * @param object $klarna_order The Kustom order object.
 	 * @return void
 	 */
 	public function print_standard_content( $klarna_order ) {
@@ -141,20 +141,29 @@ class MetaBox extends OrderMetabox {
 		$session_id  = $order->get_meta( '_kp_session_id' );
 		$environment = ! empty( $order->get_meta( '_wc_klarna_environment' ) ) ? $order->get_meta( '_wc_klarna_environment' ) : '';
 
-		self::output_info(
-			__( 'Klarna Environment', 'klarna-checkout-for-woocommerce' ),
-			apply_filters( 'kom_meta_environment', $environment )
-		);
+		/**
+		 * Filters the Kustom environment shown in the order management metabox.
+		 *
+		 * @param string $environment The Kustom environment the order was placed in ('test' or 'live'), or an empty string.
+		 */
+		$environment = apply_filters( 'kom_meta_environment', $environment );
+		self::output_info( __( 'Kustom Environment', 'klarna-checkout-for-woocommerce' ), $environment );
 
-		self::output_info(
-			__( 'Klarna order status', 'klarna-checkout-for-woocommerce' ),
-			apply_filters( 'kom_meta_order_status', $klarna_order->status )
-		);
+		/**
+		 * Filters the Kustom order status shown in the order management metabox.
+		 *
+		 * @param string $status The Kustom order status.
+		 */
+		$order_status = apply_filters( 'kom_meta_order_status', $klarna_order->status );
+		self::output_info( __( 'Kustom order status', 'klarna-checkout-for-woocommerce' ), $order_status );
 
-		self::output_info(
-			__( 'Initial Payment method', 'klarna-checkout-for-woocommerce' ),
-			apply_filters( 'kom_meta_payment_method', $klarna_order->initial_payment_method->description )
-		);
+		/**
+		 * Filters the initial payment method shown in the order management metabox.
+		 *
+		 * @param string $payment_method The description of the initial payment method of the Kustom order.
+		 */
+		$payment_method = apply_filters( 'kom_meta_payment_method', $klarna_order->initial_payment_method->description );
+		self::output_info( __( 'Initial Payment method', 'klarna-checkout-for-woocommerce' ), $payment_method );
 
 		if ( ! empty( $session_id ) ) {
 			$scheduled_actions = ScheduledActions::get_scheduled_actions( $session_id );
@@ -175,15 +184,17 @@ class MetaBox extends OrderMetabox {
 	 * Output the actions dropdown for the metabox.
 	 *
 	 * @param int    $order_id The ID of the order being considered.
-	 * @param object $klarna_order The Klarna order object associated with this order.
+	 * @param object $klarna_order The Kustom order object associated with this order.
 	 */
 	protected function output_actions_dropdown( $order_id, $klarna_order ) {
 		$settings = $this->order_management->settings->get_settings( $order_id );
 
+		$om_enabled = Settings::is_enabled();
+
 		$actions            = array();
-		$actions['capture'] = ( ! isset( $settings['kom_auto_capture'] ) || 'yes' === $settings['kom_auto_capture'] ) ? false : true;
-		$actions['cancel']  = ( ! isset( $settings['kom_auto_cancel'] ) || 'yes' === $settings['kom_auto_cancel'] ) ? false : true;
-		$actions['sync']    = ( ! isset( $settings['kom_auto_order_sync'] ) || 'yes' === $settings['kom_auto_order_sync'] ) ? false : true;
+		$actions['capture'] = ! $om_enabled || 'yes' !== ( $settings['kom_auto_capture'] ?? 'yes' );
+		$actions['cancel']  = ! $om_enabled || 'yes' !== ( $settings['kom_auto_cancel'] ?? 'yes' );
+		$actions['sync']    = ! $om_enabled || 'yes' !== ( $settings['kom_auto_order_sync'] ?? 'yes' );
 		$actions['any']     = ( $actions['capture'] || $actions['cancel'] || $actions['sync'] );
 
 		ob_start();
@@ -193,19 +204,45 @@ class MetaBox extends OrderMetabox {
 				<li class="wide" id="kom-capture">
 					<select class="kco_order_actions" name="kom_order_actions" id="kom_order_actions">
 						<option value=""><?php esc_attr_e( 'Choose an action...', 'woocommerce' ); ?></option>
-						<?php do_action( 'kom_meta_action_options', $order_id, $klarna_order, $actions ); ?>
+						<?php
+						/**
+						 * Triggers when the action options are output in the order management metabox actions dropdown.
+						 *
+						 * @param int    $order_id     The WooCommerce order ID.
+						 * @param object $klarna_order The Kustom order object.
+						 * @param array  $actions      The available order management actions, keyed by action (capture, cancel, sync, any) with boolean values.
+						 */
+						do_action( 'kom_meta_action_options', $order_id, $klarna_order, $actions );
+						?>
 					</select>
 					<button class="button wc-reload"><span><?php esc_html_e( 'Apply', 'woocommerce' ); ?></span></button>
 					<span class="woocommerce-help-tip" data-tip="
 					<?php
 					ob_start();
+
+					/**
+					 * Triggers when the help tip for the order management metabox actions is output.
+					 *
+					 * @param int    $order_id     The WooCommerce order ID.
+					 * @param object $klarna_order The Kustom order object.
+					 * @param array  $actions      The available order management actions, keyed by action (capture, cancel, sync, any) with boolean values.
+					 */
 					do_action( 'kom_meta_action_tips', $order_id, $klarna_order, $actions );
 					echo esc_attr( ob_get_clean() );
 					?>
 					"></span>
 				</li>
 			<?php else : ?>
-				<?php do_action( 'kom_meta_no_actions', $order_id, $klarna_order, $actions ); ?>
+				<?php
+				/**
+				 * Triggers in the order management metabox when no manual order management actions are available.
+				 *
+				 * @param int    $order_id     The WooCommerce order ID.
+				 * @param object $klarna_order The Kustom order object.
+				 * @param array  $actions      The available order management actions, keyed by action (capture, cancel, sync, any) with boolean values.
+				 */
+				do_action( 'kom_meta_no_actions', $order_id, $klarna_order, $actions );
+				?>
 			<?php endif; ?>
 		</ul>
 		<?php
@@ -270,7 +307,7 @@ class MetaBox extends OrderMetabox {
 
 		$om_status = $order->get_meta( $kom_disconnected_key ) ? 'disabled' : 'enabled';
 		$title     = __( 'Order management', 'klarna-checkout-for-woocommerce' );
-		$tip       = __( 'Disable this to turn off the automatic synchronization with the Klarna Merchant Portal. When disabled, any changes in either system have to be done manually.', 'klarna-checkout-for-woocommerce' );
+		$tip       = __( 'Disable this to turn off the automatic synchronization with the Kustom Merchant Portal. When disabled, any changes in either system have to be done manually.', 'klarna-checkout-for-woocommerce' );
 		$enabled   = 'enabled' === $om_status ? true : false;
 
 		ob_start();
@@ -324,7 +361,7 @@ class MetaBox extends OrderMetabox {
 	 * Determine if output associated with the Capture option is wanted.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 *
 	 * @return bool Should Capture-related stuff be in the output?
@@ -338,7 +375,7 @@ class MetaBox extends OrderMetabox {
 			return false; // Already captured, can't capture again.
 		}
 		if ( in_array( $klarna_order->status, array( 'CAPTURED', 'PART_CAPTURED', 'CANCELLED' ), true ) ) {
-			return false; // Klarna says it's captured (in whole, or in part) at some point. Can't capture again.
+			return false; // Kustom says it's captured (in whole, or in part) at some point. Can't capture again.
 		}
 		if ( 'ACCEPTED' === $klarna_order->fraud_status ) {
 			return true;
@@ -351,7 +388,7 @@ class MetaBox extends OrderMetabox {
 	 * Determine if output associated with the Cancel option is wanted.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 *
 	 * @return bool Should we add the cancel option to the output?
@@ -375,7 +412,7 @@ class MetaBox extends OrderMetabox {
 	 * Capture option for kco_order_actions action list.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */
@@ -389,13 +426,13 @@ class MetaBox extends OrderMetabox {
 	 * Output the tip fragment for the Capture option, if relevant.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */
 	public function output_tip_capture( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_capture( $order_id, $klarna_order, $actions ) ) {
-			$this->print_tip_fragment( __( 'Capture order', 'klarna-checkout-for-woocommerce' ), __( 'Activates the order with Klarna.', 'klarna-checkout-for-woocommerce' ) );
+			$this->print_tip_fragment( __( 'Capture order', 'klarna-checkout-for-woocommerce' ), __( 'Activates the order with Kustom.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -403,7 +440,7 @@ class MetaBox extends OrderMetabox {
 	 * Cancel option for kco_order_actions action list.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */
@@ -417,13 +454,13 @@ class MetaBox extends OrderMetabox {
 	 * Output the tip fragment for the Cancel option, if relevant.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */
 	public function output_tip_cancel( $order_id, $klarna_order, $actions ) {
 		if ( $this->want_output_cancel( $order_id, $klarna_order, $actions ) ) {
-			$this->print_tip_fragment( __( 'Cancel order', 'klarna-checkout-for-woocommerce' ), __( 'Cancels the order with Klarna.', 'klarna-checkout-for-woocommerce' ) );
+			$this->print_tip_fragment( __( 'Cancel order', 'klarna-checkout-for-woocommerce' ), __( 'Cancels the order with Kustom.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -431,7 +468,7 @@ class MetaBox extends OrderMetabox {
 	 * Sync option for kco_order_actions action list.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */
@@ -445,13 +482,13 @@ class MetaBox extends OrderMetabox {
 	 * Output the tip fragment for the Sync option, if relevant.
 	 *
 	 * @param  int    $order_id The ID of the order being considered.
-	 * @param  object $klarna_order The Klarna order object associated with this order.
+	 * @param  object $klarna_order The Kustom order object associated with this order.
 	 * @param  array  $actions The enabled actions.
 	 * @return void
 	 */
 	public function output_tip_sync( $order_id, $klarna_order, $actions ) {
 		if ( $actions['sync'] ) {
-			$this->print_tip_fragment( __( 'Get customer', 'klarna-checkout-for-woocommerce' ), __( 'Gets the customer data from Klarna and saves it to the WooCommerce order.', 'klarna-checkout-for-woocommerce' ) );
+			$this->print_tip_fragment( __( 'Get customer', 'klarna-checkout-for-woocommerce' ), __( 'Gets the customer data from Kustom and saves it to the WooCommerce order.', 'klarna-checkout-for-woocommerce' ) );
 		}
 	}
 
@@ -474,8 +511,8 @@ class MetaBox extends OrderMetabox {
 	/**
 	 * Handles KOM Actions
 	 *
-	 * @param int     $post_id Post ID.
-	 * @param WP_Post $post Post Object.
+	 * @param int      $post_id Post ID.
+	 * @param \WP_Post $post Post Object.
 	 */
 	public function process_kom_actions( $post_id, $post ) {
 		$klarna_order_id = filter_input( INPUT_POST, 'klarna_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );

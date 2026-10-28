@@ -117,7 +117,7 @@ class KCO_Request_Cart {
 	/**
 	 * Gets order amount for Kustom API.
 	 *
-	 * @return int
+	 * @return float
 	 */
 	public function get_order_amount() {
 		$settings     = get_option( 'woocommerce_kco_settings' );
@@ -137,7 +137,7 @@ class KCO_Request_Cart {
 	/**
 	 * Gets order amount for Kustom API.
 	 *
-	 * @return int
+	 * @return float
 	 */
 	public function get_order_lines_total_amount() {
 		$total_amount = 0;
@@ -163,10 +163,17 @@ class KCO_Request_Cart {
 			return $this->order_lines;
 		}
 
+		/**
+		 * Filters the name of the surcharge order line added when the order lines do not match the cart total.
+		 *
+		 * @param string $name The order line name. Default 'Surcharge'.
+		 */
+		$surcharge_name = apply_filters( 'kco_wc_surcharge_name', __( 'Surcharge', 'klarna-checkout-for-woocommerce' ) );
+
 		$adjust_item = array(
 			'type'                  => 'surcharge',
 			'reference'             => 'added-surcharge',
-			'name'                  => apply_filters( 'kco_wc_surcharge_name', __( 'Surcharge', 'klarna-checkout-for-woocommerce' ) ),
+			'name'                  => $surcharge_name,
 			'quantity'              => 1,
 			'unit_price'            => $amount_to_adjust,
 			'tax_rate'              => 0,
@@ -252,6 +259,12 @@ class KCO_Request_Cart {
 				}
 
 				/* This should better support get_catalog_visibility = hidden on product components.  */
+				/**
+				 * Filters a cart item order line before it is added to the Kustom order lines.
+				 *
+				 * @param array $klarna_item The order line formatted for Kustom. Return a falsy value to exclude it.
+				 * @param array $cart_item   The WooCommerce cart item.
+				 */
 				$cart_line_item = apply_filters( 'kco_wc_cart_line_item', $klarna_item, $cart_item );
 				if ( $cart_line_item ) {
 					$this->order_lines[] = $cart_line_item;
@@ -405,7 +418,7 @@ class KCO_Request_Cart {
 	 *
 	 * @param  array      $cart_item Cart item.
 	 * @param  WC_Product $product WooCommerce product.
-	 * @return integer $item_tax_amount Item tax amount.
+	 * @return float $item_tax_amount Item tax amount.
 	 */
 	public function get_item_tax_amount( $cart_item, $product ) {
 		if ( $this->separate_sales_tax ) {
@@ -427,7 +440,7 @@ class KCO_Request_Cart {
 	 *
 	 * @param  array  $cart_item Cart item.
 	 * @param  object $product   Product object.
-	 * @return integer $item_tax_rate Item tax percentage formatted for Kustom
+	 * @return float $item_tax_rate Item tax percentage formatted for Kustom
 	 */
 	public function get_item_tax_rate( $cart_item, $product ) {
 		if ( $product->is_taxable() && $cart_item['line_subtotal_tax'] > 0 ) {
@@ -509,7 +522,7 @@ class KCO_Request_Cart {
 	 * @since  1.0
 	 * @access public
 	 *
-	 * @return integer $item_discount_amount Cart item discount.
+	 * @return float $item_discount_amount Cart item discount.
 	 */
 	public function get_item_discount_amount() {
 
@@ -565,7 +578,7 @@ class KCO_Request_Cart {
 	 * @access public
 	 *
 	 * @param  array $cart_item Cart item.
-	 * @return integer $item_discount_rate Cart item discount rate.
+	 * @return float $item_discount_rate Cart item discount rate.
 	 */
 	public function get_item_discount_rate( $cart_item ) {
 		$item_discount_rate = ( 1 - ( $cart_item['line_total'] / $cart_item['line_subtotal'] ) ) * 100 * 100;
