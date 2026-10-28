@@ -298,15 +298,19 @@ class KCO_Confirmation {
 	private static function claim_inserted_lock( $lock, $id, $now ) {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- We need the stored rows, not a cached option.
-		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT option_id, option_value FROM {$wpdb->options} WHERE option_name = %s ORDER BY option_id ASC", $lock ) );
-		$owner = $id;
+		$for_update = defined( 'DB_ENGINE' ) && 'sqlite' === DB_ENGINE ? '' : ' FOR UPDATE';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- We need the stored rows, not a cached option. $for_update is a fixed string.
+		$rows  = (array) $wpdb->get_results( $wpdb->prepare( "SELECT option_id, option_value FROM {$wpdb->options} WHERE option_name = %s ORDER BY option_id ASC{$for_update}", $lock ) );
+		$owner = null;
 		foreach ( $rows as $row ) {
-			if ( (int) $row->option_value > $now - MINUTE_IN_SECONDS ) {
+			if ( (int) $row->option_value <= $now - MINUTE_IN_SECONDS ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- The lock row is written directly, so it is removed directly.
+				$wpdb->delete( $wpdb->options, array( 'option_id' => $row->option_id ) );
+			} elseif ( null === $owner ) {
 				$owner = (int) $row->option_id;
-				break;
 			}
 		}
+		$owner = $owner ?? $id;
 
 		if ( count( $rows ) > 1 ) {
 			KCO_Logger::log( "The {$wpdb->options} table has more than one $lock row, so its unique key on option_name is missing. Add it back, other plugins rely on it too." );

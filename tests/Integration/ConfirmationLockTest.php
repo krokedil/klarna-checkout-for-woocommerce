@@ -94,7 +94,7 @@ class ConfirmationLockTest extends IntegrationTestCase {
 	 *
 	 * @dataProvider provide_rows_from_other_requests
 	 */
-	public function test_the_oldest_live_row_holds_the_lock_without_a_unique_key( int $age, bool $locks, string $message ): void {
+	public function test_the_oldest_live_row_holds_the_lock_without_a_unique_key( int $age, bool $locks, string $left, string $message ): void {
 		global $wpdb;
 
 		$this->dropUniqueKeyOnOptionName();
@@ -102,14 +102,14 @@ class ConfirmationLockTest extends IntegrationTestCase {
 
 		$this->assertSame( $locks, \KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', self::ORDER_ID ), $message );
 		\KCO_Confirmation::unlock_kco_confirmation( 'kustom-order-123', self::ORDER_ID );
-		$this->assertSame( '1', $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = %s", 'kco_confirmation_lock_' . self::ORDER_ID ) ), 'Only the other request\'s row is left.' );
+		$this->assertSame( $left, $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = %s", 'kco_confirmation_lock_' . self::ORDER_ID ) ), 'Only a live row of another request may be left.' );
 	}
 
-	/** @return array<string, array{0: int, 1: bool, 2: string}> */
+	/** @return array<string, array{0: int, 1: bool, 2: string, 3: string}> */
 	public function provide_rows_from_other_requests(): array {
 		return [
-			'a request still confirming' => [ 0, false, 'The second request must be refused although its insert went through.' ],
-			'a request that died'        => [ MINUTE_IN_SECONDS + 1, true, 'A row older than a minute must not block the order forever.' ],
+			'a request still confirming' => [ 0, false, '1', 'The second request must be refused although its insert went through.' ],
+			'a request that died'        => [ MINUTE_IN_SECONDS + 1, true, '0', 'A row older than a minute must not block the order forever.' ],
 		];
 	}
 
