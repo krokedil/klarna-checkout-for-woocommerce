@@ -27,9 +27,9 @@ class KCO_Confirmation {
 	protected static $instance;
 
 	/**
-	 * The value this request wrote to each lock it holds, so it only releases its own.
+	 * The row and value this request wrote for each lock it holds, so it only releases its own.
 	 *
-	 * @var array<string, string>
+	 * @var array<string, array{id: int, value: string}>
 	 */
 	private static $held_locks = array();
 
@@ -253,17 +253,16 @@ class KCO_Confirmation {
 		// e.g. LiteSpeed's add() only checks the current process before writing to Redis.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- We need an atomic insert, add_option() upserts.
 		if ( $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} ( option_name, option_value, autoload ) VALUES ( %s, %s, 'no' )", $lock, $now ) ) ) {
-			self::$held_locks[ $lock ] = (string) $now;
-			return true;
+			return self::claim_inserted_lock( $lock, (int) $wpdb->insert_id, $now );
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- We need the stored value, not a cached one.
-		$held_since = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $lock ) );
-		if ( null === $held_since && ! empty( $wpdb->last_error ) ) {
+		$held = $wpdb->get_row( $wpdb->prepare( "SELECT option_id, option_value FROM {$wpdb->options} WHERE option_name = %s", $lock ) );
+		if ( null === $held && ! empty( $wpdb->last_error ) ) {
 			KCO_Logger::log( "Could not lock the confirmation of WooCommerce order ID $order_id: {$wpdb->last_error}" );
 		}
 
-		if ( null === $held_since || (int) $held_since > $now - MINUTE_IN_SECONDS ) {
+		if ( null === $held || (int) $held->option_value > $now - MINUTE_IN_SECONDS ) {
 			return false;
 		}
 
@@ -273,15 +272,58 @@ class KCO_Confirmation {
 			$wpdb->options,
 			array( 'option_value' => $now ),
 			array(
-				'option_name'  => $lock,
-				'option_value' => $held_since,
+				'option_id'    => $held->option_id,
+				'option_value' => $held->option_value,
 			)
 		);
 		if ( $took_over ) {
-			self::$held_locks[ $lock ] = (string) $now;
+			self::$held_locks[ $lock ] = array(
+				'id'    => (int) $held->option_id,
+				'value' => (string) $now,
+			);
 		}
 
 		return $took_over;
+	}
+
+	/**
+	 * Decide whether the row this request inserted holds the lock.
+	 *
+	 * @param string $lock The lock name.
+	 * @param int    $id The option_id of the inserted row.
+	 * @param int    $now The time written to the row.
+	 *
+	 * @return bool True if this request holds the lock.
+	 */
+	private static function claim_inserted_lock( $lock, $id, $now ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- We need the stored rows, not a cached option.
+		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT option_id, option_value FROM {$wpdb->options} WHERE option_name = %s ORDER BY option_id ASC", $lock ) );
+		$owner = $id;
+		foreach ( $rows as $row ) {
+			if ( (int) $row->option_value > $now - MINUTE_IN_SECONDS ) {
+				$owner = (int) $row->option_id;
+				break;
+			}
+		}
+
+		if ( count( $rows ) > 1 ) {
+			KCO_Logger::log( "The {$wpdb->options} table has more than one $lock row, so its unique key on option_name is missing. Add it back, other plugins rely on it too." );
+		}
+
+		if ( $owner !== $id ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- The lock row is written directly, so it is removed directly.
+			$wpdb->delete( $wpdb->options, array( 'option_id' => $id ) );
+			return false;
+		}
+
+		self::$held_locks[ $lock ] = array(
+			'id'    => $id,
+			'value' => (string) $now,
+		);
+
+		return true;
 	}
 
 	/**
@@ -300,13 +342,13 @@ class KCO_Confirmation {
 			return;
 		}
 
-		// Only delete our own value. A request that ran past a minute may have lost the lock to a takeover.
+		// Only delete our own row and value. A request that ran past a minute may have lost the lock to a takeover.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- The lock row is written directly, so it is removed directly.
 		$wpdb->delete(
 			$wpdb->options,
 			array(
-				'option_name'  => $lock,
-				'option_value' => self::$held_locks[ $lock ],
+				'option_id'    => self::$held_locks[ $lock ]['id'],
+				'option_value' => self::$held_locks[ $lock ]['value'],
 			)
 		);
 		unset( self::$held_locks[ $lock ] );

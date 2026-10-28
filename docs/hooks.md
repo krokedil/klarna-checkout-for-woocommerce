@@ -18,7 +18,7 @@ Argument | Type | Description
 Examples: 
 - [Customer type changed](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#customer-type-changed)
 
-Source: [./classes/class-kco-ajax.php](../classes/class-kco-ajax.php), [line 296](../classes/class-kco-ajax.php#L296-L302)
+Source: [./classes/class-kco-ajax.php](../classes/class-kco-ajax.php), [line 294](../classes/class-kco-ajax.php#L294-L300)
 
 
 ---
@@ -35,7 +35,7 @@ Argument | Type | Description
 Examples: 
 - [Add a fee using a custom checkbox](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#add-a-fee-using-a-custom-checkbox)
 
-Source: [./classes/class-kco-ajax.php](../classes/class-kco-ajax.php), [line 318](../classes/class-kco-ajax.php#L318-L330)
+Source: [./classes/class-kco-ajax.php](../classes/class-kco-ajax.php), [line 316](../classes/class-kco-ajax.php#L316-L328)
 
 
 ---
@@ -49,7 +49,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$klarna_order_id` | `string` | The Kustom order ID.
 
-Source: [./classes/class-kco-api-callbacks.php](../classes/class-kco-api-callbacks.php), [line 67](../classes/class-kco-api-callbacks.php#L67-L72)
+Source: [./classes/class-kco-api-callbacks.php](../classes/class-kco-api-callbacks.php), [line 76](../classes/class-kco-api-callbacks.php#L76-L81)
 
 
 ---
@@ -67,7 +67,7 @@ Argument | Type | Description
 Examples: 
 - [Add additional checkboxes](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#add-additional-checkboxes)
 
-Source: [./classes/class-kco-api-callbacks.php](../classes/class-kco-api-callbacks.php), [line 111](../classes/class-kco-api-callbacks.php#L111-L118)
+Source: [./classes/class-kco-api-callbacks.php](../classes/class-kco-api-callbacks.php), [line 134](../classes/class-kco-api-callbacks.php#L134-L141)
 
 
 ---
@@ -76,7 +76,7 @@ Source: [./classes/class-kco-api-callbacks.php](../classes/class-kco-api-callbac
 *Fires when the shipping method was changed by WooCommerce during checkout, to throw a shipping error later in the process.*
 
 
-Source: [./classes/class-kco-checkout.php](../classes/class-kco-checkout.php), [line 207](../classes/class-kco-checkout.php#L207-L210)
+Source: [./classes/class-kco-checkout.php](../classes/class-kco-checkout.php), [line 203](../classes/class-kco-checkout.php#L203-L206)
 
 
 ---
@@ -90,7 +90,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$klarna_order` | `array` | The Kustom order data.
 
-Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 111](../includes/kco-functions.php#L111-L116)
+Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 116](../includes/kco-functions.php#L116-L121)
 
 
 ---
@@ -99,7 +99,7 @@ Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 111
 *Fires before the extra checkout fields container.*
 
 
-Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 198](../includes/kco-functions.php#L198-L201)
+Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 203](../includes/kco-functions.php#L203-L206)
 
 
 ---
@@ -108,7 +108,7 @@ Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 198
 *Fires after the extra checkout fields container.*
 
 
-Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 206](../includes/kco-functions.php#L206-L209)
+Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 211](../includes/kco-functions.php#L211-L214)
 
 
 ---
@@ -123,7 +123,7 @@ Argument | Type | Description
 `$order_id` | `int` | The WooCommerce order ID.
 `$klarna_order` | `array` | The Kustom order data.
 
-Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 650](../includes/kco-functions.php#L650-L656)
+Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 661](../includes/kco-functions.php#L661-L667)
 
 
 ---
@@ -141,7 +141,7 @@ Argument | Type | Description
 Examples: 
 - [Add additional checkboxes](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#add-additional-checkboxes)
 
-Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 672](../includes/kco-functions.php#L672-L679)
+Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 685](../includes/kco-functions.php#L685-L692)
 
 
 ---
@@ -155,7 +155,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$data` | `array` | The selected shipping option data from Kustom, including the currency.
 
-Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 974](../includes/kco-functions.php#L974-L979)
+Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 1024](../includes/kco-functions.php#L1024-L1029)
 
 
 ---
@@ -318,7 +318,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$refresh_checkout` | `bool` | Whether to refresh the checkout. Default false.
 
-Source: [./classes/class-kco-ajax.php](../classes/class-kco-ajax.php), [line 332](../classes/class-kco-ajax.php#L332-L337)
+Source: [./classes/class-kco-ajax.php](../classes/class-kco-ajax.php), [line 330](../classes/class-kco-ajax.php#L330-L335)
 
 
 ---
@@ -588,7 +588,7 @@ Examples:
 - [Set a forced purchase country](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#set-a-forced-purchase-country)
 - [Only accept purchases from customer over 18 years of age](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#only-accept-purchases-from-customer-over-18-years-of-age)
 
-Source: [./classes/requests/checkout/post/class-kco-request-update.php](../classes/requests/checkout/post/class-kco-request-update.php), [line 140](../classes/requests/checkout/post/class-kco-request-update.php#L140-L150)
+Source: [./classes/requests/checkout/post/class-kco-request-update.php](../classes/requests/checkout/post/class-kco-request-update.php), [line 129](../classes/requests/checkout/post/class-kco-request-update.php#L129-L139)
 
 
 ---
@@ -602,7 +602,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$timeout` | `int` | The request timeout in seconds. Default 10.
 
-Source: [./classes/requests/checkout/post/class-kco-request-update.php](../classes/requests/checkout/post/class-kco-request-update.php), [line 152](../classes/requests/checkout/post/class-kco-request-update.php#L152-L157)
+Source: [./classes/requests/checkout/post/class-kco-request-update.php](../classes/requests/checkout/post/class-kco-request-update.php), [line 141](../classes/requests/checkout/post/class-kco-request-update.php#L141-L146)
 
 
 ---
@@ -941,6 +941,20 @@ Source: [./classes/requests/helpers/class-kco-request-cart.php](../classes/reque
 
 
 ---
+### `kco_wc_lock_confirmation`
+
+*Handle a push notification for a Kustom order. Also used by the express push route.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$klarna_order_id` | `string` | The Kustom order ID.
+
+Source: [./classes/class-kco-api-callbacks.php](../classes/class-kco-api-callbacks.php), [line 66](../classes/class-kco-api-callbacks.php#L66-L94)
+
+
+---
 ### `kco_wc_api_callbacks_push_klarna_order`
 
 *Filters the Kustom order data retrieved during the push notification callback.*
@@ -951,7 +965,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$klarna_order` | `array\|false` | The Kustom order data from the order management API, or false on failure.
 
-Source: [./classes/class-kco-api-callbacks.php](../classes/class-kco-api-callbacks.php), [line 85](../classes/class-kco-api-callbacks.php#L85-L93)
+Source: [./classes/class-kco-api-callbacks.php](../classes/class-kco-api-callbacks.php), [line 108](../classes/class-kco-api-callbacks.php#L108-L116)
 
 
 ---
@@ -965,7 +979,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$enable_redirected_flow` | `bool` | Whether to enable the redirected checkout flow. Default false.
 
-Source: [./classes/class-kco-fields.php](../classes/class-kco-fields.php), [line 317](../classes/class-kco-fields.php#L317-L322)
+Source: [./classes/class-kco-fields.php](../classes/class-kco-fields.php), [line 325](../classes/class-kco-fields.php#L325-L330)
 
 
 ---
@@ -979,7 +993,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$settings` | `array` | The settings fields.
 
-Source: [./classes/class-kco-fields.php](../classes/class-kco-fields.php), [line 374](../classes/class-kco-fields.php#L374-L379)
+Source: [./classes/class-kco-fields.php](../classes/class-kco-fields.php), [line 382](../classes/class-kco-fields.php#L382-L387)
 
 
 ---
@@ -993,7 +1007,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$supports` | `string[]` | The supported features.
 
-Source: [./classes/class-kco-gateway.php](../classes/class-kco-gateway.php), [line 54](../classes/class-kco-gateway.php#L54-L74)
+Source: [./classes/class-kco-gateway.php](../classes/class-kco-gateway.php), [line 52](../classes/class-kco-gateway.php#L52-L72)
 
 
 ---
@@ -1010,7 +1024,7 @@ Argument | Type | Description
 Examples: 
 - [Modify payment method icon](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#modify-payment-method-icon)
 
-Source: [./classes/class-kco-gateway.php](../classes/class-kco-gateway.php), [line 245](../classes/class-kco-gateway.php#L245-L251)
+Source: [./classes/class-kco-gateway.php](../classes/class-kco-gateway.php), [line 243](../classes/class-kco-gateway.php#L243-L249)
 
 
 ---
@@ -1027,7 +1041,7 @@ Argument | Type | Description
 `$amount` | `float\|null` | The refund amount.
 `$reason` | `string` | The reason for the refund.
 
-Source: [./classes/class-kco-gateway.php](../classes/class-kco-gateway.php), [line 275](../classes/class-kco-gateway.php#L275-L283)
+Source: [./classes/class-kco-gateway.php](../classes/class-kco-gateway.php), [line 273](../classes/class-kco-gateway.php#L273-L281)
 
 
 ---
@@ -1041,7 +1055,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$timeout_time` | `int` | The timeout duration in seconds. Default 20.
 
-Source: [./classes/class-kco-gateway.php](../classes/class-kco-gateway.php), [line 421](../classes/class-kco-gateway.php#L421-L426)
+Source: [./classes/class-kco-gateway.php](../classes/class-kco-gateway.php), [line 419](../classes/class-kco-gateway.php#L419-L424)
 
 
 ---
@@ -1055,24 +1069,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$fields` | `string[]` | The ignored checkout field names.
 
-Source: [./classes/class-kco-gateway.php](../classes/class-kco-gateway.php), [line 428](../classes/class-kco-gateway.php#L428-L433)
-
-
----
-### `kco_check_if_needs_payment`
-
-*Filters whether Kustom Checkout should only be used when the cart or order needs payment.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$check_if_needs_payment` | `bool` | Whether to check if payment is needed. Default true.
-
-Examples: 
-- [Display Kustom Checkout even on free orders](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#display-kustom-checkout-even-on-free-orders)
-
-Source: [./classes/class-kco-templates.php](../classes/class-kco-templates.php), [line 87](../classes/class-kco-templates.php#L87-L93)
+Source: [./classes/class-kco-gateway.php](../classes/class-kco-gateway.php), [line 426](../classes/class-kco-gateway.php#L426-L431)
 
 
 ---
@@ -1087,24 +1084,7 @@ Argument | Type | Description
 `$template` | `string` | The template path.
 `$template_name` | `string` | The name of the WooCommerce template being overridden.
 
-Source: [./classes/class-kco-templates.php](../classes/class-kco-templates.php), [line 112](../classes/class-kco-templates.php#L112-L118)
-
-
----
-### `kco_check_if_needs_payment`
-
-*Filters whether Kustom Checkout should only be used when the cart or order needs payment.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$check_if_needs_payment` | `bool` | Whether to check if payment is needed. Default true.
-
-Examples: 
-- [Display Kustom Checkout even on free orders](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#display-kustom-checkout-even-on-free-orders)
-
-Source: [./classes/class-kco-checkout.php](../classes/class-kco-checkout.php), [line 129](../classes/class-kco-checkout.php#L129-L135)
+Source: [./classes/class-kco-templates.php](../classes/class-kco-templates.php), [line 107](../classes/class-kco-templates.php#L107-L113)
 
 
 ---
@@ -1121,41 +1101,7 @@ Argument | Type | Description
 `$rates` | `array` | The shipping rates calculated when getting the default method.
 `$chosen_method` | `string` | The shipping method ID chosen by the customer.
 
-Source: [./classes/class-kco-checkout.php](../classes/class-kco-checkout.php), [line 193](../classes/class-kco-checkout.php#L193-L201)
-
-
----
-### `kco_check_if_needs_payment`
-
-*Filters whether Kustom Checkout should only be used when the cart or order needs payment.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$check_if_needs_payment` | `bool` | Whether to check if payment is needed. Default true.
-
-Examples: 
-- [Display Kustom Checkout even on free orders](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#display-kustom-checkout-even-on-free-orders)
-
-Source: [./classes/class-kco-checkout.php](../classes/class-kco-checkout.php), [line 255](../classes/class-kco-checkout.php#L255-L261)
-
-
----
-### `kco_check_if_needs_payment`
-
-*Filters whether Kustom Checkout should only be used when the cart or order needs payment.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$check_if_needs_payment` | `bool` | Whether to check if payment is needed. Default true.
-
-Examples: 
-- [Display Kustom Checkout even on free orders](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#display-kustom-checkout-even-on-free-orders)
-
-Source: [./classes/class-kco-checkout.php](../classes/class-kco-checkout.php), [line 277](../classes/class-kco-checkout.php#L277-L283)
+Source: [./classes/class-kco-checkout.php](../classes/class-kco-checkout.php), [line 189](../classes/class-kco-checkout.php#L189-L197)
 
 
 ---
@@ -1174,7 +1120,7 @@ Argument | Type | Description
 Examples: 
 - [Prevent duplicate order confirmations](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#prevent-duplicate-order-confirmations)
 
-Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 614](../includes/kco-functions.php#L614-L622)
+Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 624](../includes/kco-functions.php#L624-L632)
 
 
 ---
@@ -1188,7 +1134,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$chosen_shipping_methods` | `string[]` | The chosen shipping method IDs.
 
-Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 987](../includes/kco-functions.php#L987-L992)
+Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 1037](../includes/kco-functions.php#L1037-L1042)
 
 
 ---
@@ -1204,7 +1150,50 @@ Argument | Type | Description
 `$klarna_order_id` | `string` | The Kustom order id being looked up.
 `$date_after` | `string\|null` | Optional date lower bound, if provided.
 
-Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 1063](../includes/kco-functions.php#L1063-L1070)
+Source: [./includes/kco-functions.php](../includes/kco-functions.php), [line 1113](../includes/kco-functions.php#L1113-L1120)
+
+
+---
+### `kco_express_rate_limit`
+
+*Filters how many express orders a shopper may create per time window.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$options` | `array` | The limit (number of creates) and seconds (window length). Default 60 seconds, with 5 creates<br>for a logged-in shopper and 30 for a guest IP address.
+
+Source: [./src/Express/RateLimiter.php](../src/Express/RateLimiter.php), [line 62](../src/Express/RateLimiter.php#L62-L74)
+
+
+---
+### `kco_express_is_available`
+
+*Filters whether the Kustom express buttons are available.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$available` | `bool` | Whether the gateway, Kustom Shipping Assistant and an Elements public API key are all set up.
+
+Source: [./src/Express/Express.php](../src/Express/Express.php), [line 95](../src/Express/Express.php#L95-L100)
+
+
+---
+### `kco_express_merchant_urls`
+
+*Filters the merchant URLs of an express order, sent to Kustom and shown in the settings. Each must keep the
+{checkout.order.id} placeholder, which Kustom replaces with the order id.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$urls` | `array{push: string, validation: string, confirmation: string}` | The push, validation and confirmation URLs.
+
+Source: [./src/Express/Express.php](../src/Express/Express.php), [line 354](../src/Express/Express.php#L354-L360)
 
 
 ---
@@ -1222,6 +1211,13 @@ Source: [./src/Elements/Utility.php](../src/Elements/Utility.php), [line 35](../
 
 
 ---
+### `kco_elements_api_base`
+
+
+Source: [./src/Elements/KeyValidator.php](../src/Elements/KeyValidator.php), [line 181](../src/Elements/KeyValidator.php#L181-L181)
+
+
+---
 ### `kco_elements_show_everywhere`
 
 *Filters whether the Kustom Elements should be considered active on every request.*
@@ -1232,7 +1228,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$show_everywhere` | `bool` | Whether to load Kustom Elements on every request. Default false.
 
-Source: [./src/Elements/Elements.php](../src/Elements/Elements.php), [line 132](../src/Elements/Elements.php#L132-L137)
+Source: [./src/Elements/Elements.php](../src/Elements/Elements.php), [line 133](../src/Elements/Elements.php#L133-L138)
 
 
 ---
@@ -1247,7 +1243,7 @@ Argument | Type | Description
 `$default_src` | `string` | The default script URL for the current environment.
 `$testmode` | `bool` | Whether test mode is enabled.
 
-Source: [./src/Elements/Elements.php](../src/Elements/Elements.php), [line 183](../src/Elements/Elements.php#L183-L189)
+Source: [./src/Elements/Elements.php](../src/Elements/Elements.php), [line 198](../src/Elements/Elements.php#L198-L204)
 
 
 ---
@@ -1360,7 +1356,7 @@ Argument | Type | Description
 `$type` | `string` | The Kustom order line type. Default 'physical'.
 `$item` | `\WC_Order_Item_Product` | The refunded order item.
 
-Source: [./src/OrderManagement/Request/Post/RequestPostRefund.php](../src/OrderManagement/Request/Post/RequestPostRefund.php), [line 154](../src/OrderManagement/Request/Post/RequestPostRefund.php#L154-L160)
+Source: [./src/OrderManagement/Request/Post/RequestPostRefund.php](../src/OrderManagement/Request/Post/RequestPostRefund.php), [line 155](../src/OrderManagement/Request/Post/RequestPostRefund.php#L155-L161)
 
 
 ---
@@ -1375,7 +1371,7 @@ Argument | Type | Description
 `$data` | `array` | The refund request body.
 `$order_id` | `int` | The WooCommerce order ID.
 
-Source: [./src/OrderManagement/Request/Post/RequestPostRefund.php](../src/OrderManagement/Request/Post/RequestPostRefund.php), [line 282](../src/OrderManagement/Request/Post/RequestPostRefund.php#L282-L288)
+Source: [./src/OrderManagement/Request/Post/RequestPostRefund.php](../src/OrderManagement/Request/Post/RequestPostRefund.php), [line 283](../src/OrderManagement/Request/Post/RequestPostRefund.php#L283-L289)
 
 
 ---
@@ -1404,7 +1400,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$timeout` | `int` | The request timeout in seconds. Default 10.
 
-Source: [./src/OrderManagement/Request/Request.php](../src/OrderManagement/Request/Request.php), [line 278](../src/OrderManagement/Request/Request.php#L278-L283)
+Source: [./src/OrderManagement/Request/Request.php](../src/OrderManagement/Request/Request.php), [line 279](../src/OrderManagement/Request/Request.php#L279-L284)
 
 
 ---
@@ -1419,7 +1415,7 @@ Argument | Type | Description
 `$data` | `array` | The order lines request body.
 `$order_id` | `int` | The WooCommerce order ID.
 
-Source: [./src/OrderManagement/Request/Patch/RequestPatchUpdate.php](../src/OrderManagement/Request/Patch/RequestPatchUpdate.php), [line 44](../src/OrderManagement/Request/Patch/RequestPatchUpdate.php#L44-L50)
+Source: [./src/OrderManagement/Request/Patch/RequestPatchUpdate.php](../src/OrderManagement/Request/Patch/RequestPatchUpdate.php), [line 45](../src/OrderManagement/Request/Patch/RequestPatchUpdate.php#L45-L51)
 
 
 ---
@@ -1450,6 +1446,23 @@ Argument | Type | Description
 `$code` | `string` | The gift card number.
 
 Source: [./src/OrderManagement/OrderLines.php](../src/OrderManagement/OrderLines.php), [line 180](../src/OrderManagement/OrderLines.php#L180-L186)
+
+
+---
+### `kco_check_if_needs_payment`
+
+*Filters whether Kustom Checkout should only be used when the cart or order needs payment.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$check_if_needs_payment` | `bool` | Whether to check if payment is needed. Defaults to the inverse of the "Display on free orders" setting.
+
+Examples: 
+- [Display Kustom Checkout even on free orders](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#display-kustom-checkout-even-on-free-orders)
+
+Source: [./src/Utility/SettingsUtility.php](../src/Utility/SettingsUtility.php), [line 67](../src/Utility/SettingsUtility.php#L67-L73)
 
 
 ---

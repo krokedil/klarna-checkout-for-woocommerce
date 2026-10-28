@@ -19,6 +19,9 @@ class ConfirmationLockTest extends IntegrationTestCase {
 	/** Whether the competing request's insert actually ran. */
 	private bool $competingWriteRan = false;
 
+	/** Whether a test dropped the unique key on option_name. */
+	private bool $restoreUniqueKey = false;
+
 	/**
 	 * Why the lock writes to the options table directly: the options API loses this race.
 	 * The competing write lands between the check and the insert, where a second process would.
@@ -84,6 +87,48 @@ class ConfirmationLockTest extends IntegrationTestCase {
 		\KCO_Confirmation::unlock_kco_confirmation( 'kustom-order-123', self::ORDER_ID );
 
 		$this->assertFalse( \KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', self::ORDER_ID ), 'The release must not delete a lock another request took over.' );
+	}
+
+	/**
+	 * A migrated options table can lose its unique key, and then every INSERT IGNORE succeeds.
+	 *
+	 * @dataProvider provide_rows_from_other_requests
+	 */
+	public function test_the_oldest_live_row_holds_the_lock_without_a_unique_key( int $age, bool $locks, string $message ): void {
+		global $wpdb;
+
+		$this->dropUniqueKeyOnOptionName();
+		$wpdb->insert( $wpdb->options, [ 'option_name' => 'kco_confirmation_lock_' . self::ORDER_ID, 'option_value' => (string) ( time() - $age ), 'autoload' => 'no' ] );
+
+		$this->assertSame( $locks, \KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', self::ORDER_ID ), $message );
+		\KCO_Confirmation::unlock_kco_confirmation( 'kustom-order-123', self::ORDER_ID );
+		$this->assertSame( '1', $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name = %s", 'kco_confirmation_lock_' . self::ORDER_ID ) ), 'Only the other request\'s row is left.' );
+	}
+
+	/** @return array<string, array{0: int, 1: bool, 2: string}> */
+	public function provide_rows_from_other_requests(): array {
+		return [
+			'a request still confirming' => [ 0, false, 'The second request must be refused although its insert went through.' ],
+			'a request that died'        => [ MINUTE_IN_SECONDS + 1, true, 'A row older than a minute must not block the order forever.' ],
+		];
+	}
+
+	private function dropUniqueKeyOnOptionName(): void {
+		global $wpdb;
+
+		$this->assertNotFalse( $wpdb->query( "ALTER TABLE {$wpdb->options} DROP INDEX option_name" ), "Could not drop the unique key: {$wpdb->last_error}" );
+		$this->restoreUniqueKey = true;
+	}
+
+	protected function tearDown(): void {
+		global $wpdb;
+
+		if ( $this->restoreUniqueKey ) {
+			$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name = 'kco_confirmation_lock_" . self::ORDER_ID . "'" );
+			$wpdb->query( "ALTER TABLE {$wpdb->options} ADD UNIQUE KEY option_name (option_name)" );
+		}
+
+		parent::tearDown();
 	}
 
 	/** Inserts the option row just before the next INSERT for it runs, as a faster request would. */
