@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Krokedil\KustomCheckout\Upsell\UpsellException;
 use Krokedil\KustomCheckout\Upsell\UpsellFallback;
 use Krokedil\KustomCheckout\Upsell\UpsellProcessor;
+use Krokedil\KustomCheckout\Upsell\UpsellRecommendations;
 use Krokedil\KustomCheckout\Upsell\UpsellValidator;
 
 /**
@@ -48,6 +49,32 @@ class KCO_API_Callbacks {
 		add_action( 'woocommerce_api_kco_wc_push', array( $this, 'push_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_address_update', array( $this, 'address_update_cb' ) );
 		add_action( 'woocommerce_api_kco_wc_upsell_validation', array( $this, 'upsell_validation_cb' ) );
+		add_action( 'woocommerce_api_kco_wc_upsell', array( $this, 'upsell_cb' ) );
+	}
+
+	/**
+	 * Return the upsell recommendations Kustom shows on the confirmation page.
+	 *
+	 * @return void
+	 */
+	public function upsell_cb() {
+		$data         = json_decode( file_get_contents( 'php://input' ), true );
+		$kco_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$order        = empty( $kco_order_id ) ? false : kco_get_order_by_klarna_id( $kco_order_id );
+
+		if ( empty( $order ) || ! is_array( $data ) ) {
+			KCO_WC()->logger->log( "ERROR Upsell recommendations callback without a matching order or valid body for Kustom order ID: $kco_order_id" );
+			wp_send_json(
+				array(
+					'upsell_lines' => array(),
+					'empty'        => true,
+				)
+			);
+		}
+
+		$response = ( new UpsellRecommendations( $order, $data ) )->get_response();
+		KCO_WC()->logger->log( "Upsell recommendations for Kustom order ID $kco_order_id: " . wp_json_encode( $response ) );
+		wp_send_json( $response );
 	}
 
 	/**
