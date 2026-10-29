@@ -20,6 +20,7 @@ class UpsellHooks {
 			add_filter( 'woocommerce_hidden_order_itemmeta', array( $this, 'add_hidden_order_itemmeta' ) );
 			add_action( 'woocommerce_product_options_related', array( $this, 'output_kustom_upsells_field' ) );
 			add_action( 'woocommerce_admin_process_product_object', array( $this, 'save_kustom_upsells' ) );
+			new UpsellPendingDisplay();
 		}
 	}
 
