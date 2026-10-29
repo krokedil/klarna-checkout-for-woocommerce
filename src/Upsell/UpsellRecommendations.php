@@ -41,6 +41,30 @@ class UpsellRecommendations {
 	}
 
 	/**
+	 * Whether the order could get any upsell recommendations, to decide at confirmation if it should wait for the push.
+	 * Always true for the none setting, where Kustom picks the products in its portal.
+	 *
+	 * @param WC_Order $order The WooCommerce order.
+	 *
+	 * @return bool
+	 */
+	public static function has_recommendations( $order ) {
+		$settings = get_option( 'woocommerce_kco_settings', array() );
+		if ( 'none' === ( $settings['upsell_recommendations'] ?? 'none' ) ) {
+			return true;
+		}
+
+		// Kustom only sends max_upsell_amount on the upsell callback, so no product is left out for its price here.
+		$request_data = array(
+			'upsell_possible'   => true,
+			'max_upsell_amount' => PHP_INT_MAX,
+		);
+		$response     = ( new self( $order, $request_data ) )->get_response();
+
+		return empty( $response['empty'] );
+	}
+
+	/**
 	 * Get the response body for the upsell callback.
 	 *
 	 * @return array
@@ -61,7 +85,8 @@ class UpsellRecommendations {
 		 *
 		 * @param array    $upsell_lines The upsell lines, formatted as Kustom upsell_lines.
 		 * @param WC_Order $order        The WooCommerce order the recommendations are for.
-		 * @param array    $request_data The request body from Kustom, including upsell_possible and max_upsell_amount.
+		 * @param array    $request_data The request body from Kustom, including upsell_possible and max_upsell_amount. When the order is confirmed,
+		 *                               the filter also runs to check if the order should wait for an upsell, with max_upsell_amount set to PHP_INT_MAX.
 		 */
 		$upsell_lines = apply_filters( 'kco_wc_upsell_recommendations', $upsell_lines, $this->order, $this->request_data );
 

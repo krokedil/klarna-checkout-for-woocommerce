@@ -6,6 +6,7 @@
  */
 
 use Krokedil\KustomCheckout\Upsell\UpsellFallback;
+use Krokedil\KustomCheckout\Upsell\UpsellRecommendations;
 use Krokedil\KustomCheckout\Upsell\UpsellStatus;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -679,8 +680,14 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				 */
 				do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
 
-				// Acknowledge order in Kustom. Only do that here if upsell is not enabled, since upsell flow requires the order to be acknowledged after the upsell is processed on the push callback.
-				if ( ! $upsell_enabled ) {
+				// Only wait for the push when the customer can be offered an upsell. Otherwise confirm the order as normal.
+				$wait_for_upsell = $upsell_enabled && UpsellRecommendations::has_recommendations( $order );
+				if ( $upsell_enabled && ! $wait_for_upsell ) {
+					KCO_Logger::log( $klarna_order_id . ': No upsell recommendations for order #' . $order->get_order_number() . ', confirming it without waiting for the push.' );
+				}
+
+				// Acknowledge order in Kustom. Only do that here if not waiting for an upsell, since upsell flow requires the order to be acknowledged after the upsell is processed on the push callback.
+				if ( ! $wait_for_upsell ) {
 					KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
 				}
 
@@ -691,8 +698,8 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 					WC()->cart->empty_cart();
 				}
 
-				// If upsell is enabled, set the order to the configured waiting status and wait for the push notification to confirm the order after the upsell is processed. Otherwise, confirm the order immediately.
-				if ( $upsell_enabled ) {
+				// If waiting for an upsell, set the order to the configured waiting status and wait for the push notification to confirm the order after the upsell is processed. Otherwise, confirm the order immediately.
+				if ( $wait_for_upsell ) {
 					$waiting_status = UpsellStatus::get_configured_status();
 					$order->set_status( $waiting_status, __( 'Waiting for verification from Kustom\'s push notification', 'klarna-checkout-for-woocommerce' ) );
 					$order->add_meta_data( '_kco_upsell_flow', 'yes' );
