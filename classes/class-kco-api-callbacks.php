@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Krokedil\KustomCheckout\Logging\LogMasking;
 use Krokedil\KustomCheckout\Upsell\UpsellException;
 use Krokedil\KustomCheckout\Upsell\UpsellFallback;
 use Krokedil\KustomCheckout\Upsell\UpsellProcessor;
@@ -61,6 +62,7 @@ class KCO_API_Callbacks {
 		$data         = json_decode( file_get_contents( 'php://input' ), true );
 		$kco_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$order        = empty( $kco_order_id ) ? false : kco_get_order_by_klarna_id( $kco_order_id );
+		KCO_WC()->logger->log( "Upsell recommendations request for Kustom order ID $kco_order_id: " . wp_json_encode( LogMasking::mask_response( $data ) ) );
 
 		if ( empty( $order ) || ! is_array( $data ) ) {
 			KCO_WC()->logger->log( "ERROR Upsell recommendations callback without a matching order or valid body for Kustom order ID: $kco_order_id" );
