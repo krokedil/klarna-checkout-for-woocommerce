@@ -23,6 +23,58 @@ class UpsellStatus {
 		add_filter( 'wc_order_statuses', array( $this, 'add_order_status' ) );
 		add_filter( 'woocommerce_valid_order_statuses_for_payment', array( $this, 'allow_payment_from_custom_status' ), 10 );
 		add_filter( 'woocommerce_valid_order_statuses_for_payment_complete', array( $this, 'allow_payment_from_custom_status' ), 10 );
+		add_filter( 'woocommerce_email_actions', array( $this, 'add_email_actions' ) );
+
+		foreach ( array_keys( self::get_email_transitions() ) as $action ) {
+			add_action( $action . '_notification', array( $this, 'trigger_emails' ), 10, 2 );
+		}
+	}
+
+	/**
+	 * Get the status transitions out of the waiting status that need the order emails, and the emails to send for each.
+	 * WooCommerce only sends the new order and processing/on-hold emails when the order leaves pending, failed, cancelled or on-hold.
+	 *
+	 * @return array<string, string[]> Map of transition action => WC_Emails class keys.
+	 */
+	public static function get_email_transitions() {
+		$waiting = self::get_configured_status();
+		if ( in_array( $waiting, array( 'pending', 'on-hold' ), true ) ) {
+			return array();
+		}
+
+		return array(
+			"woocommerce_order_status_{$waiting}_to_processing" => array( 'WC_Email_New_Order', 'WC_Email_Customer_Processing_Order' ),
+			"woocommerce_order_status_{$waiting}_to_completed"  => array( 'WC_Email_New_Order' ),
+			"woocommerce_order_status_{$waiting}_to_on-hold"    => array( 'WC_Email_New_Order', 'WC_Email_Customer_On_Hold_Order' ),
+		);
+	}
+
+	/**
+	 * Register the transitions out of the waiting status as transactional email actions.
+	 *
+	 * @param string[] $actions The transactional email actions.
+	 * @return string[]
+	 */
+	public function add_email_actions( $actions ) {
+		return array_merge( $actions, array_keys( self::get_email_transitions() ) );
+	}
+
+	/**
+	 * Send the order emails for a transition out of the waiting status.
+	 *
+	 * @param int            $order_id The WooCommerce order ID.
+	 * @param \WC_Order|null $order    The WooCommerce order.
+	 * @return void
+	 */
+	public function trigger_emails( $order_id, $order = null ) {
+		$action = substr( current_action(), 0, -strlen( '_notification' ) );
+		$emails = WC()->mailer()->get_emails();
+
+		foreach ( self::get_email_transitions()[ $action ] ?? array() as $email ) {
+			if ( isset( $emails[ $email ] ) && method_exists( $emails[ $email ], 'trigger' ) ) {
+				$emails[ $email ]->trigger( $order_id, $order );
+			}
+		}
 	}
 
 	/**
