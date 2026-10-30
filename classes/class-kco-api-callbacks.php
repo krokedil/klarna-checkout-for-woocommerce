@@ -171,8 +171,13 @@ class KCO_API_Callbacks {
 		$did_lock = false;
 		try {
 			// Reload the order, since another run may have changed it before the lock was taken.
-			$order    = wc_get_order( $order_id );
-			$settings = get_option( 'woocommerce_kco_settings', array() );
+			$order = wc_get_order( $order_id );
+
+			// The merchant cancelled the order before it was paid, e.g. while it waited for upsells, so do not complete it again.
+			if ( empty( $order->get_date_paid() ) && $order->has_status( 'cancelled' ) ) {
+				KCO_WC()->logger->log( 'Push processing for Kustom order ID ' . $klarna_order_id . ' skipped; WC order #' . $order->get_order_number() . ' was cancelled before it was paid.' );
+				return;
+			}
 
 			if ( apply_filters( 'kco_wc_lock_confirmation', false, $klarna_order_id, $order_id ) ) {
 				$did_lock = KCO_Confirmation::lock_kco_confirmation( $klarna_order_id, $order_id );

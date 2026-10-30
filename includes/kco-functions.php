@@ -681,7 +681,8 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
 
 				// Only wait for the push when the customer can be offered an upsell. Otherwise confirm the order as normal.
-				$wait_for_upsell = $upsell_enabled && UpsellRecommendations::has_recommendations( $order );
+				// A rejected order is not completed, so there is nothing to upsell.
+				$wait_for_upsell = $upsell_enabled && 'REJECTED' !== ( $klarna_order['fraud_status'] ?? '' ) && UpsellRecommendations::has_recommendations( $order );
 				if ( $upsell_enabled && ! $wait_for_upsell ) {
 					KCO_Logger::log( $klarna_order_id . ': No upsell recommendations for order #' . $order->get_order_number() . ', confirming it without waiting for the push.' );
 				}

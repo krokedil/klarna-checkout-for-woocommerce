@@ -216,6 +216,41 @@ class CallbacksTest extends IntegrationTestCase {
 		$this->assertSame( \Krokedil\KustomCheckout\Upsell\UpsellStatus::STATUS_SLUG, $this->statusOf( $order ) );
 	}
 
+	public function test_a_rejected_order_does_not_wait_for_an_upsell(): void {
+		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes', 'upsell_recommendations' => 'cross_sells' ] ) );
+		$order = $this->haveOrderAwaitingConfirmation();
+		$this->linkCrossSell( $order );
+
+		$this->willRetrieveManagedOrder(
+			[ 'fraud_status' => 'REJECTED', 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ]
+		);
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertSame( 'cancelled', $this->statusOf( $order ) );
+	}
+
+	/**
+	 * The merchant cancelled the order while it waited for upsells, so the push must not complete it again.
+	 */
+	public function test_the_push_does_not_complete_an_order_cancelled_before_it_was_paid(): void {
+		$order = $this->haveOrderAwaitingConfirmation();
+		$order->set_status( 'cancelled' );
+		$order->save();
+
+		$this->willRetrieveManagedOrder( [ 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ] );
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		\KCO_API_Callbacks::get_instance()->process_push_for_order( 'kustom-order-123' );
+
+		$this->assertSame( 'cancelled', $this->statusOf( $order ) );
+		$this->assertNull( $this->reload( $order )->get_date_paid() );
+		$this->assertGatewayRequestCount( 0, 'acknowledge', 'Kustom keeps the order unacknowledged, so it is released.' );
+	}
+
 	private function linkCrossSell( \WC_Order $order ): void {
 		$items   = $order->get_items();
 		$product = reset( $items )->get_product();
