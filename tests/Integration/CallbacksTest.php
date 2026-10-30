@@ -251,6 +251,25 @@ class CallbacksTest extends IntegrationTestCase {
 		$this->assertGatewayRequestCount( 0, 'acknowledge', 'Kustom keeps the order unacknowledged, so it is released.' );
 	}
 
+	/**
+	 * A missed push still completes an order the customer did not upsell.
+	 */
+	public function test_the_fallback_completes_a_waiting_order_without_upsells(): void {
+		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes' ] ) );
+		$order = $this->haveOrderAwaitingConfirmation();
+		$order->set_status( \Krokedil\KustomCheckout\Upsell\UpsellStatus::STATUS_SLUG );
+		$order->save();
+
+		$this->willRetrieveManagedOrder( [ 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ] );
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		( new \Krokedil\KustomCheckout\Upsell\UpsellFallback() )->handle_fallback( 'kustom-order-123' );
+
+		$this->assertSame( 'processing', $this->statusOf( $order ) );
+		$this->assertGatewayRequestCount( 1, 'acknowledge' );
+	}
+
 	private function linkCrossSell( \WC_Order $order ): void {
 		$items   = $order->get_items();
 		$product = reset( $items )->get_product();
