@@ -92,7 +92,7 @@ class KCO_API_Callbacks {
 		$kco_order_id = filter_input( INPUT_GET, 'kco_wc_order_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		KCO_WC()->logger->log( "Upsell validation callback hit for order: $kco_order_id" );
-		KCO_WC()->logger->log( 'Upsell validation request data: ' . wp_json_encode( $data ) );
+		KCO_WC()->logger->log( 'Upsell validation request data: ' . wp_json_encode( LogMasking::mask_response( $data ) ) );
 
 		try {
 			$validator = new UpsellValidator( $data ?? array(), $kco_order_id ?? '' );

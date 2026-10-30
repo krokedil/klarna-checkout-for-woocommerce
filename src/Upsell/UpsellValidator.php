@@ -51,15 +51,16 @@ class UpsellValidator {
 		$this->validate_input();
 		\KCO_Logger::log( $this->kco_order_id . ': Upsell request input validated.' );
 
-		$this->get_validated_klarna_order();
-		\KCO_Logger::log( $this->kco_order_id . ': Kustom order validated for upsell (status checkout_complete, payment type allows increase).' );
-
+		// The callback is unsigned, so check everything local before the Kustom order is fetched with the merchant credentials.
 		$order = $this->get_validated_wc_order();
 		\KCO_Logger::log( $this->kco_order_id . ': WC order #' . $order->get_order_number() . ' validated for upsell.' );
 
 		$upsell_lines = $this->request_data['upsell_order_lines'];
 		$this->validate_upsell_lines( $upsell_lines );
 		\KCO_Logger::log( $this->kco_order_id . ': Upsell order lines validated (' . count( $upsell_lines ) . ' lines).' );
+
+		$this->get_validated_klarna_order();
+		\KCO_Logger::log( $this->kco_order_id . ': Kustom order validated for upsell (status checkout_complete).' );
 
 		$this->store_upsell_data( $order, $upsell_lines );
 		\KCO_Logger::log( $this->kco_order_id . ': Upsell data stored on WC order #' . $order->get_order_number() . '.' );
@@ -76,6 +77,11 @@ class UpsellValidator {
 			throw new UpsellException( 'Invalid JSON or missing KCO order ID' );
 		}
 
+		// The ID goes into the Kustom API URL, so only allow the characters a Kustom order ID has.
+		if ( ! preg_match( '/^[A-Za-z0-9-]+$/', $this->kco_order_id ) ) {
+			throw new UpsellException( 'Invalid KCO order ID' );
+		}
+
 		if ( ! isset( $this->request_data['upsell_order_lines'] ) || ! is_array( $this->request_data['upsell_order_lines'] ) ) {
 			throw new UpsellException( 'Missing or malformed upsell_order_lines in request data' );
 		}
@@ -88,7 +94,7 @@ class UpsellValidator {
 	/**
 	 * Fetch and validate the Klarna order.
 	 *
-	 * Ensures the order exists and has status checkout_complete with a payment type that allows increase.
+	 * Ensures the order exists and has status checkout_complete.
 	 *
 	 * @return array The Klarna order data.
 	 * @throws UpsellException If the Klarna order is invalid or in wrong state.
