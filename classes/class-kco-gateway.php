@@ -526,7 +526,8 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 					}
 
 					// Check if we need to finalize purchase here. Should already been done in process_payment.
-					if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
+					// Only for pending orders, so a cancelled or failed order is not brought back by a page reload.
+					if ( $order->has_status( 'pending' ) ) {
 						KCO_Logger::log( $klarna_order_id . ': Confirm the Kustom order from the thankyou page.' );
 						kco_confirm_klarna_order( $order_id, $klarna_order_id );
 						WC()->cart->empty_cart();

@@ -1,6 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\Express;
 
+use Krokedil\KustomCheckout\Upsell\UpsellStatus;
 use Krokedil\KustomCheckout\Utility\ConfirmationUtility;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -60,7 +61,8 @@ class Confirmation {
 
 		// Without the key the page always says the order was received, so a failed confirmation must not land there.
 		$order = wc_get_order( $order->get_id() );
-		if ( empty( $order->get_date_paid() ) && ! $order->has_status( 'on-hold' ) ) {
+		// An order waiting for upsells is confirmed and gets paid on the push, so it is not a failure either.
+		if ( empty( $order->get_date_paid() ) && ! $order->has_status( array( 'on-hold', UpsellStatus::get_configured_status() ) ) ) {
 			return self::get_cart_url( "Kustom order {$kustom_order_id} could not be confirmed, order status {$order->get_status()}" );
 		}
 
