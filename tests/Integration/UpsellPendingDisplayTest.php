@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use Krokedil\KustomCheckout\Upsell\UpsellPendingDisplay;
+use Krokedil\KustomCheckout\Upsell\UpsellProcessor;
 use Tests\Support\IntegrationTestCase;
 
 /**
@@ -67,16 +68,88 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 		];
 	}
 
+	/**
+	 * The thank-you page asks for the upsell to be added once the customer adds it, and Kustom's order decides.
+	 */
+	public function test_an_upsell_in_the_kustom_order_is_added_while_the_order_keeps_waiting(): void {
+		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
+		$order = $this->haveOrderAwaitingUpsell( [ [ [ 'reference' => 'cap', 'name' => 'Cap', 'quantity' => 2, 'total_amount' => 3200 ] ] ] );
+		$this->willRetrieveManagedOrder( [ 'order_lines' => [ [ 'reference' => 'cap', 'quantity' => 2, 'total_amount' => 3200 ] ] ] );
+
+		UpsellPendingDisplay::add_confirmed_upsells( $order );
+
+		$order = $this->reload( $order );
+		$this->assertContains( 'Cap', $this->itemNamesOf( $order ) );
+		$this->assertSame( '', $this->pendingRowsOf( $order ), 'The upsell is a real row now.' );
+		$this->assertSame( 'on-hold', $order->get_status(), 'The push still confirms the order, and more upsells can be added until then.' );
+	}
+
+	/**
+	 * @dataProvider provide_kustom_orders_without_the_upsell
+	 */
+	public function test_an_upsell_not_in_the_kustom_order_stays_pending( array $kustom_lines ): void {
+		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
+		$this->haveSimpleProduct( [ 'name' => 'Belt', 'sku' => 'belt', 'price' => '20.00' ] );
+		$order = $this->haveOrderAwaitingUpsell(
+			[
+				[
+					[ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ],
+					[ 'reference' => 'belt', 'quantity' => 1, 'total_amount' => 2000 ],
+				],
+			]
+		);
+		$this->willRetrieveManagedOrder( [ 'order_lines' => $kustom_lines ] );
+
+		UpsellPendingDisplay::add_confirmed_upsells( $order );
+
+		$order = $this->reload( $order );
+		$this->assertNotContains( 'Cap', $this->itemNamesOf( $order ), 'No line is added until all of them are in the Kustom order.' );
+		$this->assertCount( 2, UpsellPendingDisplay::get_pending_lines( $order ) );
+	}
+
+	/** @return array<string, array{0: array}> */
+	public function provide_kustom_orders_without_the_upsell(): array {
+		return [
+			'not added by Kustom yet' => [ [ [ 'reference' => 'kco-test-1', 'quantity' => 1, 'total_amount' => 10000 ] ] ],
+			'only one of two lines'   => [ [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ],
+		];
+	}
+
+	public function test_the_push_does_not_add_an_upsell_the_thank_you_page_already_added(): void {
+		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
+		$order        = $this->haveOrderAwaitingUpsell( [ [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ] );
+		$kustom_order = [ 'order_lines' => [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ];
+		$this->willRetrieveManagedOrder( $kustom_order );
+		UpsellPendingDisplay::add_confirmed_upsells( $order );
+
+		( new UpsellProcessor( $this->reload( $order ), $kustom_order ) )->process();
+
+		$this->assertSame( [ 'Cap' ], array_values( array_intersect( $this->itemNamesOf( $this->reload( $order ) ), [ 'Cap' ] ) ) );
+	}
+
 	private function haveOrderAwaitingUpsell( $upsell_data ): \WC_Order {
 		// The plugin's own waiting status is only registered when upsell is enabled at boot, so wait in on-hold instead.
-		$this->setGatewaySettings( [ 'enable_upsell' => 'yes', 'upsell_waiting_status' => 'on-hold' ] );
+		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes', 'upsell_waiting_status' => 'on-hold' ] ) );
 		$this->display ??= new UpsellPendingDisplay();
 		$order = $this->haveGatewayOrder( [ 'status' => 'on-hold' ] );
 		$order->set_payment_method_title( 'Kustom' );
 		$order->update_meta_data( '_kco_upsell_data', $upsell_data );
+		$order->update_meta_data( '_wc_klarna_order_id', 'kustom-order-123' );
 		$order->save();
 
 		return $order;
+	}
+
+	/** @return string[] */
+	private function itemNamesOf( \WC_Order $order ): array {
+		return array_values(
+			array_map(
+				static function ( \WC_Order_Item $item ): string {
+					return $item->get_name();
+				},
+				$order->get_items()
+			)
+		);
 	}
 
 	private function pendingRowsOf( \WC_Order $order ): string {

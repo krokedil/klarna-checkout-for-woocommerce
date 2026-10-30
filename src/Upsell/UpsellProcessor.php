@@ -67,6 +67,15 @@ class UpsellProcessor {
 
 		\KCO_Logger::log( 'Upsell processing: Starting for WC order #' . $order_number . ' with ' . count( $upsell_data ) . ' upsell batch(es). Data: ' . wp_json_encode( $upsell_data ) );
 
+		// Verify every line before adding any, so a line Kustom has not added yet leaves the order untouched instead of half upsold.
+		foreach ( $upsell_data as $upsell_lines ) {
+			foreach ( is_array( $upsell_lines ) ? $upsell_lines : array() as $line ) {
+				if ( ! empty( $line['reference'] ) ) {
+					$this->verify_line_against_klarna_order( $line );
+				}
+			}
+		}
+
 		foreach ( $upsell_data as $upsell_lines ) {
 			$this->process_upsell_lines( $upsell_lines );
 		}

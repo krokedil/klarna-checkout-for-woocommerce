@@ -167,9 +167,48 @@ class UpsellPendingDisplay {
 			wp_send_json_error( null, 403 );
 		}
 
+		self::add_confirmed_upsells( $order );
+
 		ob_start();
 		woocommerce_order_details_table( $order_id );
 		wp_send_json_success( array( 'html' => ob_get_clean() ) );
+	}
+
+	/**
+	 * Add the pending upsells to the order once they are in the Kustom order, without waiting for the push.
+	 * The request only triggers the check, the Kustom order is what decides. The order keeps waiting for the push,
+	 * which still confirms and acknowledges it, so the customer can add more upsells.
+	 *
+	 * @param WC_Order $order The WooCommerce order.
+	 *
+	 * @return void
+	 */
+	public static function add_confirmed_upsells( $order ) {
+		$klarna_order_id = $order->get_meta( '_wc_klarna_order_id' );
+		if ( empty( $klarna_order_id ) || empty( self::get_pending_lines( $order ) ) ) {
+			return;
+		}
+
+		// Same lock as the push, so the two can not add the same upsell twice.
+		$lock_key = 'kco_push_lock_' . md5( $klarna_order_id );
+		if ( get_transient( $lock_key ) ) {
+			return;
+		}
+		set_transient( $lock_key, 1, 2 * MINUTE_IN_SECONDS );
+
+		try {
+			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
+			if ( empty( $klarna_order ) || is_wp_error( $klarna_order ) ) {
+				return;
+			}
+
+			( new UpsellProcessor( $order, $klarna_order ) )->process();
+		} catch ( UpsellException $e ) {
+			// Kustom may not have added the upsell to its order yet. The script asks again, and the push adds it otherwise.
+			\KCO_Logger::log( $klarna_order_id . ': Upsell not added from the thank-you page yet: ' . $e->getMessage() );
+		} finally {
+			delete_transient( $lock_key );
+		}
 	}
 
 	/**
