@@ -1,0 +1,227 @@
+<?php
+namespace Krokedil\KustomCheckout\Upsell;
+
+use WC_Order;
+
+/**
+ * Validates upsell requests from Kustom and stores them for later processing.
+ *
+ * Validates that the Klarna and WooCommerce orders are in a valid state for upsell,
+ * and that the referenced products exist and are in stock.
+ * Stores validated upsell data as order metadata for processing on the push callback.
+ * Throws UpsellException on any validation failure.
+ */
+class UpsellValidator {
+	/**
+	 * The decoded request body from Kustom.
+	 *
+	 * @var array
+	 */
+	private $request_data;
+
+	/**
+	 * The Kustom Checkout order ID.
+	 *
+	 * @var string
+	 */
+	private $kco_order_id;
+
+	/**
+	 * UpsellValidator constructor.
+	 *
+	 * @param array  $request_data The decoded request body.
+	 * @param string $kco_order_id The Kustom Checkout order ID.
+	 */
+	public function __construct( $request_data, $kco_order_id ) {
+		$this->request_data = $request_data;
+		$this->kco_order_id = $kco_order_id;
+	}
+
+	/**
+	 * Validate the upsell request and store it for later processing.
+	 *
+	 * Validates all preconditions and stores the upsell data as order metadata.
+	 * The actual processing (adding items to the order) happens on the push callback
+	 * via UpsellProcessor.
+	 *
+	 * @return void
+	 * @throws UpsellException If any validation step fails.
+	 */
+	public function process() {
+		$this->validate_input();
+		\KCO_Logger::log( $this->kco_order_id . ': Upsell request input validated.' );
+
+		// The callback is unsigned, so check everything local before the Kustom order is fetched with the merchant credentials.
+		$order = $this->get_validated_wc_order();
+		\KCO_Logger::log( $this->kco_order_id . ': WC order #' . $order->get_order_number() . ' validated for upsell.' );
+
+		$upsell_lines = $this->request_data['upsell_order_lines'];
+		$this->validate_upsell_lines( $upsell_lines );
+		\KCO_Logger::log( $this->kco_order_id . ': Upsell order lines validated (' . count( $upsell_lines ) . ' lines).' );
+
+		$this->get_validated_klarna_order();
+		\KCO_Logger::log( $this->kco_order_id . ': Kustom order validated for upsell (status checkout_complete).' );
+
+		$this->store_upsell_data( $order, $upsell_lines );
+		\KCO_Logger::log( $this->kco_order_id . ': Upsell data stored on WC order #' . $order->get_order_number() . '.' );
+	}
+
+	/**
+	 * Validate that the request data and KCO order ID are present.
+	 *
+	 * @return void
+	 * @throws UpsellException If input is invalid.
+	 */
+	private function validate_input() {
+		if ( empty( $this->request_data ) || empty( $this->kco_order_id ) ) {
+			throw new UpsellException( 'Invalid JSON or missing KCO order ID' );
+		}
+
+		// The ID goes into the Kustom API URL, so only allow the characters a Kustom order ID has.
+		if ( ! preg_match( '/^[A-Za-z0-9-]+$/', $this->kco_order_id ) ) {
+			throw new UpsellException( 'Invalid KCO order ID' );
+		}
+
+		if ( ! isset( $this->request_data['upsell_order_lines'] ) || ! is_array( $this->request_data['upsell_order_lines'] ) ) {
+			throw new UpsellException( 'Missing or malformed upsell_order_lines in request data' );
+		}
+
+		if ( empty( $this->request_data['upsell_order_lines'] ) ) {
+			throw new UpsellException( 'upsell_order_lines is empty' );
+		}
+	}
+
+	/**
+	 * Fetch and validate the Klarna order.
+	 *
+	 * Ensures the order exists and has status checkout_complete.
+	 *
+	 * @return array The Klarna order data.
+	 * @throws UpsellException If the Klarna order is invalid or in wrong state.
+	 */
+	private function get_validated_klarna_order() {
+		$klarna_order = KCO_WC()->api->get_klarna_order( $this->kco_order_id );
+
+		if ( is_wp_error( $klarna_order ) ) {
+			throw new UpsellException( "Could not retrieve KCO order for order ID {$this->kco_order_id}" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- ID is escaped on assignment.
+		}
+
+		if ( 'checkout_complete' !== $klarna_order['status'] ) {
+			throw new UpsellException( 'KCO order status is not checkout_complete, cannot add upsell items.' );
+		}
+
+		return $klarna_order;
+	}
+
+	/**
+	 * Find and validate the WooCommerce order.
+	 *
+	 * Ensures the order exists, has not been captured or cancelled,
+	 * and is in the configured upsell waiting status.
+	 *
+	 * @return WC_Order The validated WooCommerce order.
+	 * @throws UpsellException If the WC order is not found or in invalid state.
+	 */
+	private function get_validated_wc_order() {
+		$order = kco_get_order_by_klarna_id( $this->kco_order_id );
+
+		if ( empty( $order ) ) {
+			throw new UpsellException( "Order not found for KCO order ID {$this->kco_order_id}", 404 ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- ID is escaped on assignment.
+		}
+
+		if ( ! empty( $order->get_meta( '_wc_klarna_capture_id' ) ) || ! empty( $order->get_meta( '_wc_klarna_cancelled' ) ) ) {
+			throw new UpsellException( 'Cannot add upsell items to an order that has already been captured or cancelled.' );
+		}
+
+		if ( UpsellStatus::get_configured_status() !== $order->get_status() ) {
+			throw new UpsellException( 'Cannot add upsell items to an order that is not awaiting upsell.' );
+		}
+
+		return $order;
+	}
+
+	/**
+	 * Validate each upsell order line.
+	 *
+	 * Ensures each line has a valid product reference and that the product exists and is in stock.
+	 *
+	 * @param array $upsell_lines The upsell order lines from Kustom.
+	 *
+	 * @return void
+	 * @throws UpsellException If a line is malformed, product is not found, or does not have enough stock.
+	 */
+	private function validate_upsell_lines( $upsell_lines ) {
+		foreach ( $upsell_lines as $line ) {
+			if ( ! is_array( $line ) ) {
+				throw new UpsellException( 'Malformed upsell order line' );
+			}
+
+			if ( empty( $line['reference'] ) ) {
+				throw new UpsellException( 'Missing product reference in order line' );
+			}
+
+			$quantity = (int) ( $line['quantity'] ?? 0 );
+			if ( $quantity < 1 ) {
+				throw new UpsellException( "Invalid quantity for product {$line['reference']}" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			}
+
+			$product_reference = $line['reference'];
+			$product           = UpsellProcessor::find_product_by_reference( $product_reference );
+
+			if ( ! $product ) {
+				throw new UpsellException( "Product with SKU or ID {$product_reference} not found" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			}
+
+			// Kustom's portal and the recommendations filter do not limit the quantity to the stock, so check the quantity and not only that some stock is left.
+			if ( ! $product->is_in_stock() || ! $product->has_enough_stock( $quantity ) ) {
+				throw new UpsellException( "Product with SKU or ID {$product_reference} does not have enough stock" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			}
+		}
+	}
+
+	/**
+	 * Store the upsell data as order metadata for later processing.
+	 *
+	 * Appends to existing upsell data to support multiple upsells per order. Takes the same lock as the push and
+	 * the thank-you page, so the data is not stored while they process it and lost when they clear it.
+	 *
+	 * @param WC_Order $order        The WooCommerce order.
+	 * @param array    $upsell_lines The upsell order lines from Kustom.
+	 *
+	 * @return void
+	 * @throws UpsellException If the order is still locked after waiting, or no longer awaits the upsell.
+	 */
+	private function store_upsell_data( $order, $upsell_lines ) {
+		$order_id = $order->get_id();
+
+		// Kustom waits for the response, so only wait a few seconds for a running push or thank-you page check.
+		$locked = false;
+		for ( $attempt = 0; $attempt < 20 && ! $locked; $attempt++ ) {
+			$locked = \KCO_Confirmation::lock_kco_confirmation( $this->kco_order_id, $order_id, 'upsell' );
+			if ( ! $locked ) {
+				usleep( 250000 );
+			}
+		}
+
+		if ( ! $locked ) {
+			throw new UpsellException( 'The order is being updated by another request, cannot add upsell items right now.', 409 );
+		}
+
+		try {
+			// Reload and check the order again, since the run that held the lock may have changed it.
+			$order         = $this->get_validated_wc_order();
+			$existing_data = $order->get_meta( '_kco_upsell_data' );
+
+			if ( empty( $existing_data ) || ! is_array( $existing_data ) ) {
+				$existing_data = array();
+			}
+
+			$existing_data[] = $upsell_lines;
+
+			$order->update_meta_data( '_kco_upsell_data', $existing_data );
+			$order->save();
+		} finally {
+			\KCO_Confirmation::unlock_kco_confirmation( $this->kco_order_id, $order_id, 'upsell' );
+		}
+	}
+}

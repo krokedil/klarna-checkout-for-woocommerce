@@ -15,6 +15,7 @@ var cssFiles = [
 var jsFiles = [
 	'assets/js/klarna-checkout-for-woocommerce.js',
 	'assets/js/klarna-checkout-for-woocommerce-admin.js',
+	'assets/js/kco-upsell-confirmation.js',
 	'src/OrderManagement/assets/js/klarna-order-management.js'
 ];
 var translateFiles = [

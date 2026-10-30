@@ -163,6 +163,121 @@ class CallbacksTest extends IntegrationTestCase {
 	}
 
 	/**
+	 * With upsell on, the order only waits for the push when the customer can be offered something.
+	 *
+	 * @dataProvider provide_upsell_recommendations
+	 */
+	public function test_an_order_only_waits_for_an_upsell_that_can_be_recommended( string $source, bool $has_cross_sell, bool $waits ): void {
+		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes', 'upsell_recommendations' => $source ] ) );
+		$order = $this->haveOrderAwaitingConfirmation();
+		if ( $has_cross_sell ) {
+			$this->linkCrossSell( $order );
+		}
+
+		$this->willRetrieveManagedOrder(
+			[ 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ]
+		);
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertSame( $waits ? \Krokedil\KustomCheckout\Upsell\UpsellStatus::STATUS_SLUG : 'processing', $this->statusOf( $order ) );
+		$this->assertGatewayRequestCount( $waits ? 0 : 1, 'acknowledge', 'Kustom is told about the order on the push when it waits.' );
+	}
+
+	/** @return array<string, array{0: string, 1: bool, 2: bool}> */
+	public function provide_upsell_recommendations(): array {
+		return [
+			'cross-sells, with one'                 => [ 'cross_sells', true, true ],
+			'cross-sells, without any'              => [ 'cross_sells', false, false ],
+			'custom, nothing from the filter'       => [ 'custom', true, false ],
+			'picked by Kustom in its portal'        => [ 'none', false, true ],
+		];
+	}
+
+	public function test_the_recommendations_filter_can_make_an_order_wait(): void {
+		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes', 'upsell_recommendations' => 'custom' ] ) );
+		$order = $this->haveOrderAwaitingConfirmation();
+		add_filter(
+			'kco_wc_upsell_recommendations',
+			static function () {
+				return [ [ 'name' => 'Cap' ] ];
+			}
+		);
+
+		$this->willRetrieveManagedOrder(
+			[ 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ]
+		);
+		$this->willSetMerchantReference();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertSame( \Krokedil\KustomCheckout\Upsell\UpsellStatus::STATUS_SLUG, $this->statusOf( $order ) );
+	}
+
+	public function test_a_rejected_order_does_not_wait_for_an_upsell(): void {
+		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes', 'upsell_recommendations' => 'cross_sells' ] ) );
+		$order = $this->haveOrderAwaitingConfirmation();
+		$this->linkCrossSell( $order );
+
+		$this->willRetrieveManagedOrder(
+			[ 'fraud_status' => 'REJECTED', 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ]
+		);
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertSame( 'cancelled', $this->statusOf( $order ) );
+	}
+
+	/**
+	 * The merchant cancelled the order while it waited for upsells, so the push must not complete it again.
+	 */
+	public function test_the_push_does_not_complete_an_order_cancelled_before_it_was_paid(): void {
+		$order = $this->haveOrderAwaitingConfirmation();
+		$order->set_status( 'cancelled' );
+		$order->save();
+
+		$this->willRetrieveManagedOrder( [ 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ] );
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		\KCO_API_Callbacks::get_instance()->process_push_for_order( 'kustom-order-123' );
+
+		$this->assertSame( 'cancelled', $this->statusOf( $order ) );
+		$this->assertNull( $this->reload( $order )->get_date_paid() );
+		$this->assertGatewayRequestCount( 0, 'acknowledge', 'Kustom keeps the order unacknowledged, so it is released.' );
+	}
+
+	/**
+	 * A missed push still completes an order the customer did not upsell.
+	 */
+	public function test_the_fallback_completes_a_waiting_order_without_upsells(): void {
+		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes' ] ) );
+		$order = $this->haveOrderAwaitingConfirmation();
+		$order->set_status( \Krokedil\KustomCheckout\Upsell\UpsellStatus::STATUS_SLUG );
+		$order->save();
+
+		$this->willRetrieveManagedOrder( [ 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ] );
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		( new \Krokedil\KustomCheckout\Upsell\UpsellFallback() )->handle_fallback( 'kustom-order-123' );
+
+		$this->assertSame( 'processing', $this->statusOf( $order ) );
+		$this->assertGatewayRequestCount( 1, 'acknowledge' );
+	}
+
+	private function linkCrossSell( \WC_Order $order ): void {
+		$items   = $order->get_items();
+		$product = reset( $items )->get_product();
+		$product->set_cross_sell_ids( [ $this->haveSimpleProduct( [ 'name' => 'Cap', 'price' => '16.00' ] )->get_id() ] );
+		$product->save();
+	}
+
+	/**
 	 * Only the order management order carries the id, the checkout order does not.
 	 */
 	public function test_a_confirmed_shipping_assistant_order_records_the_ingrid_transport_order(): void {

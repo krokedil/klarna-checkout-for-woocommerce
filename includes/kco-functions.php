@@ -5,6 +5,10 @@
  * @package  Klarna_Checkout/Includes
  */
 
+use Krokedil\KustomCheckout\Upsell\UpsellFallback;
+use Krokedil\KustomCheckout\Upsell\UpsellRecommendations;
+use Krokedil\KustomCheckout\Upsell\UpsellStatus;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -644,6 +648,16 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				return;
 			}
 
+			// Get the settings.
+			$settings       = get_option( 'woocommerce_kco_settings', array() );
+			$upsell_enabled = wc_string_to_bool( $settings['enable_upsell'] ?? 'no' );
+
+			// Skip re-confirming an order that is already sitting in the upsell waiting status.
+			if ( $upsell_enabled && $order->get_status() === UpsellStatus::get_configured_status() ) {
+				KCO_Logger::log( $klarna_order_id . ': kco_confirm_klarna_order skipped; order #' . $order->get_order_number() . ' is already in the upsell waiting status.' );
+				return;
+			}
+
 			// Get the Kustom OM order.
 			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 
@@ -666,14 +680,35 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 				 */
 				do_action( 'kco_wc_confirm_klarna_order', $order_id, $klarna_order );
 
-				// Acknowledge order in Kustom.
-				KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+				// Only wait for the push when the customer can be offered an upsell. Otherwise confirm the order as normal.
+				// A rejected order is not completed, so there is nothing to upsell.
+				$wait_for_upsell = $upsell_enabled && 'REJECTED' !== ( $klarna_order['fraud_status'] ?? '' ) && UpsellRecommendations::has_recommendations( $order );
+				if ( $upsell_enabled && ! $wait_for_upsell ) {
+					KCO_Logger::log( $klarna_order_id . ': No upsell recommendations for order #' . $order->get_order_number() . ', confirming it without waiting for the push.' );
+				}
+
+				// Acknowledge order in Kustom. Only do that here if not waiting for an upsell, since upsell flow requires the order to be acknowledged after the upsell is processed on the push callback.
+				if ( ! $wait_for_upsell ) {
+					KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+				}
+
 				// Set the merchant references for the order.
 				KCO_WC()->api->set_merchant_reference( $klarna_order_id, $order_id );
 				// Empty cart to be safe, unless a product express purchase left the shopper's own cart out of it.
 				if ( ! Krokedil\KustomCheckout\Express\Express::is_product_express_order( $order ) ) {
 					WC()->cart->empty_cart();
 				}
+
+				// If waiting for an upsell, set the order to the configured waiting status and wait for the push notification to confirm the order after the upsell is processed. Otherwise, confirm the order immediately.
+				if ( $wait_for_upsell ) {
+					$waiting_status = UpsellStatus::get_configured_status();
+					$order->set_status( $waiting_status, __( 'Waiting for verification from Kustom\'s push notification', 'klarna-checkout-for-woocommerce' ) );
+					$order->save();
+					UpsellFallback::schedule( $klarna_order_id );
+					KCO_Logger::log( $klarna_order_id . ': Upsell enabled, waiting for push verification. Order #' . $order->get_order_number() . ' set to ' . $waiting_status . '.' );
+					return;
+				}
+
 				// Check fraud status.
 				if ( 'ACCEPTED' === $klarna_order['fraud_status'] ) {
 					// Payment complete and set transaction id.
@@ -809,6 +844,11 @@ function kco_validate_order_content( $klarna_order, $order ) {
 	foreach ( $items as $order_item ) {
 		$order_line = $order_data->get_order_line_items( $order_item );
 		$reference  = $order_line['reference'];
+
+		// If the order row is an upsell row, then set the reference to the stored reference for the upsell.
+		if ( wc_string_to_bool( $order_item->get_meta( '_kco_is_upsell' ) ) ) {
+			$reference = $order_item->get_meta( '_kco_upsell_reference' );
+		}
 
 		if ( isset( $woo_stack[ $reference ] ) ) {
 			$woo_stack[ $reference ] += $order_line['quantity'];

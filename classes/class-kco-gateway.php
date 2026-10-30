@@ -514,21 +514,22 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				return;
 			}
 
-			if ( $order_id ) {
-				$order           = wc_get_order( $order_id );
+			$order = wc_get_order( $order_id );
+			if ( is_object( $order ) ) {
+				$klarna_order_id = $order->get_meta( '_wc_klarna_order_id', true );
 				$upsell_uuids    = $order->get_meta( '_ppu_upsell_ids', true );
 				$has_been_upsold = ! empty( $upsell_uuids );
 
-				if ( is_object( $order ) && $order->get_transaction_id() ) {
-					$klarna_order_id = $order->get_transaction_id();
-
+				if ( ! empty( $klarna_order_id ) ) {
 					$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+
 					if ( $klarna_order && ! $has_been_upsold ) { // Don't show the snippet for upsold orders, since the iFrame wont be updated with the new orders lines.
 						echo kco_extract_script( $klarna_order['html_snippet'] ); // phpcs:ignore WordPress.Security.EscapeOutput -- Cant escape since this is the iframe snippet.
 					}
 
 					// Check if we need to finalize purchase here. Should already been done in process_payment.
-					if ( ! $order->has_status( array( 'on-hold', 'processing', 'completed' ) ) ) {
+					// Only for pending orders, so a cancelled or failed order is not brought back by a page reload.
+					if ( $order->has_status( 'pending' ) ) {
 						KCO_Logger::log( $klarna_order_id . ': Confirm the Kustom order from the thankyou page.' );
 						kco_confirm_klarna_order( $order_id, $klarna_order_id );
 						WC()->cart->empty_cart();

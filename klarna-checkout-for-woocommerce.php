@@ -29,6 +29,9 @@
  */
 
 use Krokedil\KustomCheckout\Blocks\BlockExtension;
+use Krokedil\KustomCheckout\Upsell\UpsellFallback;
+use Krokedil\KustomCheckout\Upsell\UpsellHooks;
+use Krokedil\KustomCheckout\Upsell\UpsellStatus;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\Migrations\CredentialsMigration;
@@ -45,7 +48,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Required minimums and constants
  */
 define( 'KCO_WC_VERSION', '2.24.0' );
-define( 'KCO_WC_MIN_PHP_VER', '5.6.0' );
+define( 'KCO_WC_MIN_PHP_VER', '7.4.0' );
 define( 'KCO_WC_MIN_WC_VER', '3.9.0' );
 define( 'KCO_WC_MAIN_FILE', __FILE__ );
 define( 'KCO_WC_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
@@ -126,6 +129,27 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var OrderManagement $order_management
 		 */
 		public $order_management;
+
+		/**
+		 * Reference to upsell hooks class.
+		 *
+		 * @var UpsellHooks $upsell_hooks
+		 */
+		public $upsell_hooks;
+
+		/**
+		 * Reference to upsell status class.
+		 *
+		 * @var UpsellStatus $upsell_status
+		 */
+		public $upsell_status;
+
+		/**
+		 * Reference to upsell fallback class.
+		 *
+		 * @var UpsellFallback $upsell_fallback
+		 */
+		public $upsell_fallback;
 
 		/**
 		 * Reference to pickup points class.
@@ -347,6 +371,9 @@ if ( ! class_exists( 'KCO' ) ) {
 				)
 			);
 			$this->order_management   = new OrderManagement();
+			$this->upsell_hooks       = new UpsellHooks();
+			$this->upsell_status      = new UpsellStatus();
+			$this->upsell_fallback    = new UpsellFallback();
 			$this->pickup_points      = new PickupPoints();
 			$this->shipping_assistant = new ShippingAssistant();
 			$this->elements           = new Elements();

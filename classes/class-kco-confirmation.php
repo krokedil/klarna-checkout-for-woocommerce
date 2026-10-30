@@ -240,13 +240,14 @@ class KCO_Confirmation {
 	 *
 	 * @param string $kco_id The KCO order id. Unused, the lock is per WooCommerce order.
 	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $name The name of the lock, so other processes can lock the same order separately.
 	 *
 	 * @return bool True if the lock was successful, false if the order is already locked.
 	 */
-	public static function lock_kco_confirmation( $kco_id, $order_id ) {
+	public static function lock_kco_confirmation( $kco_id, $order_id, $name = 'confirmation' ) {
 		global $wpdb;
 
-		$lock = self::get_lock_name( $order_id );
+		$lock = self::get_lock_name( $order_id, $name );
 		$now  = time();
 
 		// Atomic through the unique index on option_name. Object cache add() and transients are not,
@@ -289,13 +290,14 @@ class KCO_Confirmation {
 	 *
 	 * @param string $kco_id The KCO order id. Unused, the lock is per WooCommerce order.
 	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $name The name of the lock.
 	 *
 	 * @return void
 	 */
-	public static function unlock_kco_confirmation( $kco_id, $order_id ) {
+	public static function unlock_kco_confirmation( $kco_id, $order_id, $name = 'confirmation' ) {
 		global $wpdb;
 
-		$lock = self::get_lock_name( $order_id );
+		$lock = self::get_lock_name( $order_id, $name );
 		if ( ! isset( self::$held_locks[ $lock ] ) ) {
 			return;
 		}
@@ -313,14 +315,15 @@ class KCO_Confirmation {
 	}
 
 	/**
-	 * Get the option name of the confirmation lock for an order.
+	 * Get the option name of a lock for an order.
 	 *
-	 * @param int $order_id The WooCommerce order id.
+	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $name The name of the lock.
 	 *
 	 * @return string
 	 */
-	private static function get_lock_name( $order_id ) {
-		return 'kco_confirmation_lock_' . absint( $order_id );
+	private static function get_lock_name( $order_id, $name = 'confirmation' ) {
+		return 'kco_' . sanitize_key( $name ) . '_lock_' . absint( $order_id );
 	}
 }
 KCO_Confirmation::get_instance();

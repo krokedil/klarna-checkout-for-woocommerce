@@ -319,6 +319,45 @@ class KCO_Fields {
 			'color_settings_end'         => array(
 				'type' => 'krokedil_section_end',
 			),
+			// Upsell settings.
+			'upsell_settings_title'      => array(
+				'title' => __( 'Upsell Settings', 'klarna-checkout-for-woocommerce' ),
+				'type'  => 'krokedil_section_start',
+				'id'    => 'upsell_settings_title',
+			),
+			'enable_upsell'              => array(
+				'title'       => __( 'Enable upsell', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Enable upsell in Kustom Checkout', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'If this option is checked, customers will be offered an upsell in Kustom Checkout if there are active upsell campaigns in Kustom.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
+			'upsell_waiting_status'      => array(
+				'title'       => __( 'Upsell waiting status', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'select',
+				'options'     => \Krokedil\KustomCheckout\Upsell\UpsellStatus::get_waiting_status_options(),
+				'description' => __( 'The order status set while waiting for Kustom to confirm the upsell via push callback.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => \Krokedil\KustomCheckout\Upsell\UpsellStatus::STATUS_SLUG,
+				'desc_tip'    => true,
+			),
+			'upsell_recommendations'     => array(
+				'title'       => __( 'Upsell recommendations', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'select',
+				'options'     => array(
+					'none'           => __( 'No recommendations', 'klarna-checkout-for-woocommerce' ),
+					'custom'         => __( 'Custom (set with the kco_wc_upsell_recommendations filter)', 'klarna-checkout-for-woocommerce' ),
+					'cross_sells'    => __( 'Cross-sells of the ordered products', 'klarna-checkout-for-woocommerce' ),
+					'upsells'        => __( 'Upsells of the ordered products', 'klarna-checkout-for-woocommerce' ),
+					'kustom_upsells' => __( 'Kustom upsells of the ordered products', 'klarna-checkout-for-woocommerce' ),
+				),
+				'description' => __( 'The products recommended to the customer on the confirmation page. No recommendations leaves them to the products selected in the Kustom portal. Kustom upsells are set in the Linked Products tab of each product. All options can be changed with the kco_wc_upsell_recommendations filter.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'none',
+				'desc_tip'    => true,
+			),
+			'upsell_section_end'         => array(
+				'type' => 'krokedil_section_end',
+			),
 		);
 
 		// Insert the "Checkout flow" setting after the "Checkout layout" setting.

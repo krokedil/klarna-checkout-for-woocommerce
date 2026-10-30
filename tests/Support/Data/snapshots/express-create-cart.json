@@ -529,6 +529,7 @@
             "require_client_validation_callback_response": false,
             "phone_mandatory": true,
             "show_subtotal_detail": false,
+            "confirmation_page_upsell": false,
             "require_validate_callback_success": true
         },
         "customer": {
