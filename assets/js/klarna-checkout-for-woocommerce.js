@@ -29,7 +29,7 @@ jQuery( function ( $ ) {
 		// True when the KCO iframe is currently suspended, to prevent double-suspend calls.
 		suspended: false,
 		// True once a shipping address is known (via shipping_address_change or change event).
-		// Prevents api.suspend from being called before Kustom has an address to fetch shipping for.
+		// With Kustom Shipping Assistant, prevents api.suspend from being called before Kustom has an address to fetch shipping for.
 		shippingAddressKnown: false,
 
 		redirectAttemptCount: 0,
@@ -115,12 +115,14 @@ jQuery( function ( $ ) {
 
 		/**
 		 * Suspends the Kustom Iframe.
-		 * Will not suspend again if already suspended, and will not suspend before a shipping
-		 * address is known (to avoid triggering premature KSA external TMS shipping fetches).
+		 * Will not suspend again if already suspended. With Kustom Shipping Assistant, will not suspend before
+		 * a shipping address is known (to avoid triggering premature KSA external TMS shipping fetches).
+		 * Without it, the iframe must always be suspended, since it only fetches the updated order on resume.
 		 * @param {boolean} autoResumeBool
 		 */
 		kcoSuspend: function ( autoResumeBool ) {
-			if ( window._klarnaCheckout && ! kco_wc.validation && ! kco_wc.suspended && kco_wc.shippingAddressKnown ) {
+			const waitForAddress = "yes" === kco_params.ksa_enabled && ! kco_wc.shippingAddressKnown
+			if ( window._klarnaCheckout && ! kco_wc.validation && ! kco_wc.suspended && ! waitForAddress ) {
 				kco_wc.log( "kcoSuspend", autoResumeBool )
 				window._klarnaCheckout( function ( api ) {
 					kco_wc.suspended = true

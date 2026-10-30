@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed the Kustom Checkout iframe showing an outdated order total when shipping was changed outside the iframe before the customer had entered an address. Only applies when Kustom Shipping Assistant is not enabled.
