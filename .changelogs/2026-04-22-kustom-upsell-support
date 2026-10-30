@@ -1,4 +1,4 @@
 Type: Feature
 Needs Documentation: yes
 
-Adds support for Kustom's upsell feature, and allows showing upsell products in the thankyou page iframe that can be added to the order after the initial purchase. The recommended products can be the cross-sells, upsells or new Kustom upsells of the ordered products, or set with the `kco_wc_upsell_recommendations` filter. Simple products and single variations can be recommended. Orders only wait for the push when there is something to recommend, unless Kustom picks the products in its portal. Upsells waiting for Kustom to confirm them are shown as pending rows in the order details, and the thank-you page adds them to the order as soon as Kustom has added them to its order, without waiting for the push. An upsell Kustom fails to add is dropped with an order note, so it does not stop the order from being confirmed. The new order and processing or on-hold emails are sent when the order leaves the upsell waiting status.
+Added support for Kustom's upsell feature, which lets customers add recommended products to their order from the confirmation page after the purchase.
