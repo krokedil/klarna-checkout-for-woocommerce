@@ -96,11 +96,12 @@ class UpsellProcessor {
 		// Each batch is one upsell from one validation callback, so it is added or dropped as a whole.
 		$handled       = array();
 		$dropped_names = array();
+		$lines_to_add  = array();
 		foreach ( $upsell_data as $upsell_lines ) {
 			$klarna_lines = $this->match_batch( $upsell_lines );
 			if ( null !== $klarna_lines ) {
-				$this->process_upsell_lines( $klarna_lines );
-				$handled[] = $upsell_lines;
+				$lines_to_add = array_merge( $lines_to_add, $klarna_lines );
+				$handled[]    = $upsell_lines;
 			} elseif ( $this->drop_unmatched ) {
 				\KCO_Logger::log( 'Upsell processing: Dropping an upsell batch that is not in the Kustom order for WC order #' . $order_number . '. Data: ' . wp_json_encode( $upsell_lines ) );
 				$dropped_names = array_merge( $dropped_names, self::get_line_names( $upsell_lines ) );
@@ -113,6 +114,19 @@ class UpsellProcessor {
 		if ( empty( $handled ) ) {
 			return;
 		}
+
+		// Find every product before adding any, since WooCommerce saves each added item right away and a missing product would leave the order half upsold.
+		$products = array();
+		foreach ( $lines_to_add as $line ) {
+			$product = self::find_product_by_reference( $line['reference'] );
+			if ( ! $product ) {
+				\KCO_Logger::log( 'ERROR Upsell processing: Product with reference ' . $line['reference'] . ' not found for WC order #' . $order_number );
+				throw new UpsellException( "Product with SKU or ID {$line['reference']} not found" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			}
+			$products[] = $product;
+		}
+
+		$this->process_upsell_lines( $lines_to_add, $products );
 
 		if ( ! empty( $this->added_product_names ) ) {
 			$this->order->add_order_note(
@@ -243,24 +257,19 @@ class UpsellProcessor {
 	/**
 	 * Process each upsell order line and add the products to the WC order.
 	 *
-	 * @param array[] $upsell_lines The matched upsell order lines from the Kustom order, with a reference and a quantity of at least one.
+	 * @param array[]      $upsell_lines The matched upsell order lines from the Kustom order, with a reference and a quantity of at least one.
+	 * @param WC_Product[] $products     The product of each line, in the same order.
 	 *
 	 * @return void
-	 * @throws UpsellException If the product is not found or can not be added.
+	 * @throws UpsellException If a product can not be added.
 	 */
-	private function process_upsell_lines( $upsell_lines ) {
-		foreach ( $upsell_lines as $line ) {
-			$quantity        = (int) $line['quantity'];
-			$total_amount    = $this->convert_price_to_major_units( $line['total_amount'] ?? 0 );
-			$discount_amount = $this->convert_price_to_major_units( $line['total_discount_amount'] ?? 0 );
-
+	private function process_upsell_lines( $upsell_lines, $products ) {
+		foreach ( $upsell_lines as $index => $line ) {
+			$quantity          = (int) $line['quantity'];
+			$total_amount      = $this->convert_price_to_major_units( $line['total_amount'] ?? 0 );
+			$discount_amount   = $this->convert_price_to_major_units( $line['total_discount_amount'] ?? 0 );
 			$product_reference = $line['reference'];
-			$product           = self::find_product_by_reference( $product_reference );
-
-			if ( ! $product ) {
-				\KCO_Logger::log( 'ERROR Upsell processing: Product with reference ' . $product_reference . ' not found for WC order #' . $this->order->get_order_number() );
-				throw new UpsellException( "Product with SKU or ID {$product_reference} not found" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
-			}
+			$product           = $products[ $index ];
 
 			// Calculate ex VAT prices: subtotal is before discount, total is after discount, so add the discount to get the original subtotal amount.
 			$subtotal_ex_vat = $this->get_price_excluding_vat( $total_amount + $discount_amount, $product );

@@ -288,6 +288,27 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 		];
 	}
 
+	/**
+	 * WooCommerce saves each added item right away, so a missing product must stop the run before anything is added.
+	 */
+	public function test_a_missing_product_leaves_the_order_untouched(): void {
+		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
+		$cap   = [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ];
+		$gone  = [ 'reference' => 'deleted-product', 'quantity' => 1, 'total_amount' => 2000 ];
+		$order = $this->haveOrderAwaitingUpsell( [ [ $cap ], [ $gone ] ] );
+
+		try {
+			( new UpsellProcessor( $order, [ 'order_lines' => [ $cap, $gone ] ] ) )->process();
+			$this->fail( 'The missing product was not reported.' );
+		} catch ( \Krokedil\KustomCheckout\Upsell\UpsellException $e ) {
+			$this->assertStringContainsString( 'deleted-product', $e->getMessage() );
+		}
+
+		$order = $this->reload( $order );
+		$this->assertNotContains( 'Cap', $this->itemNamesOf( $order ) );
+		$this->assertCount( 2, UpsellPendingDisplay::get_pending_lines( $order ), 'Both upsells are kept for the next run.' );
+	}
+
 	public function test_the_push_does_not_add_an_upsell_the_thank_you_page_already_added(): void {
 		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
 		$order        = $this->haveOrderAwaitingUpsell( [ [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ] );
