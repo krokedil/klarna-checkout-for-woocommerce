@@ -148,7 +148,7 @@ class UpsellValidator {
 	 * @param array $upsell_lines The upsell order lines from Kustom.
 	 *
 	 * @return void
-	 * @throws UpsellException If a line is malformed, product is not found, or out of stock.
+	 * @throws UpsellException If a line is malformed, product is not found, or does not have enough stock.
 	 */
 	private function validate_upsell_lines( $upsell_lines ) {
 		foreach ( $upsell_lines as $line ) {
@@ -172,8 +172,9 @@ class UpsellValidator {
 				throw new UpsellException( "Product with SKU or ID {$product_reference} not found" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			}
 
-			if ( ! $product->is_in_stock() ) {
-				throw new UpsellException( "Product with SKU or ID {$product_reference} is out of stock" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			// Kustom's portal and the recommendations filter do not limit the quantity to the stock, so check the quantity and not only that some stock is left.
+			if ( ! $product->is_in_stock() || ! $product->has_enough_stock( $quantity ) ) {
+				throw new UpsellException( "Product with SKU or ID {$product_reference} does not have enough stock" ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			}
 		}
 	}
