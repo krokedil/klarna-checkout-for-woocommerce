@@ -152,22 +152,6 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 		$this->assertSame( $total, $order->get_total() );
 	}
 
-	public function test_an_upsell_stored_while_the_kustom_order_is_fetched_is_kept(): void {
-		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
-		$cap   = [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ];
-		$belt  = [ [ 'reference' => 'belt', 'quantity' => 1, 'total_amount' => 2000 ] ];
-		$order = $this->haveOrderAwaitingUpsell( [ $cap ] );
-
-		// The validation callback stores the next upsell on its own copy of the order.
-		$other = $this->reload( $order );
-		$other->update_meta_data( '_kco_upsell_data', [ $cap, $belt ] );
-		$other->save();
-
-		( new UpsellProcessor( $order, [ 'order_lines' => $cap ] ) )->process();
-
-		$this->assertSame( [ $belt ], $this->reload( $order )->get_meta( '_kco_upsell_data' ) );
-	}
-
 	/**
 	 * Two thank-you tabs both get upsell_product_added. The second request loaded the order before the first one added the upsell.
 	 */

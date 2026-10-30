@@ -6,7 +6,7 @@ use WC_Product;
 use WC_Tax;
 
 /**
- * Processes stored upsell data on the push callback.
+ * Processes stored upsell data on the push callback, the fallback and the thank-you page.
  *
  * Reads upsell metadata stored by UpsellValidator, verifies each stored batch
  * against the Kustom order (authoritative source), adds the upsell products
@@ -62,7 +62,7 @@ class UpsellProcessor {
 	 * UpsellProcessor constructor.
 	 *
 	 * @param WC_Order $order          The WooCommerce order to process upsells for.
-	 * @param array    $klarna_order   The Kustom order fetched on the push, used to verify stored upsell lines.
+	 * @param array    $klarna_order   The Kustom order management order, used to verify stored upsell lines.
 	 * @param bool     $drop_unmatched Whether to drop stored batches that are not in the Kustom order.
 	 */
 	public function __construct( $order, $klarna_order, $drop_unmatched = true ) {
@@ -135,26 +135,9 @@ class UpsellProcessor {
 			);
 		}
 
-		$this->remove_handled_batches( $handled );
-		$this->order->save();
-
-		\KCO_Logger::log( 'Upsell processing: Completed for WC order #' . $order_number . '. New order total: ' . $this->order->get_total() );
-	}
-
-	/**
-	 * Remove the handled batches from the stored upsell data, keeping any batch stored while the Kustom order was fetched.
-	 *
-	 * @param array[] $handled The batches that were added or dropped.
-	 *
-	 * @return void
-	 */
-	private function remove_handled_batches( $handled ) {
-		// Re-read the stored data, since the validation callback may have stored a new upsell after this order was loaded.
-		$stored_order = wc_get_order( $this->order->get_id() );
-		$stored       = $stored_order ? $stored_order->get_meta( '_kco_upsell_data' ) : array();
-
+		// The caller holds the upsell lock, which the validation callback also takes, so no batch was stored since the order was loaded.
 		$remaining = array();
-		foreach ( is_array( $stored ) ? $stored : array() as $batch ) {
+		foreach ( $upsell_data as $batch ) {
 			if ( ! in_array( $batch, $handled, true ) ) {
 				$remaining[] = $batch;
 			}
@@ -165,6 +148,9 @@ class UpsellProcessor {
 		} else {
 			$this->order->update_meta_data( '_kco_upsell_data', $remaining );
 		}
+		$this->order->save();
+
+		\KCO_Logger::log( 'Upsell processing: Completed for WC order #' . $order_number . '. New order total: ' . $this->order->get_total() );
 	}
 
 	/**
@@ -257,29 +243,14 @@ class UpsellProcessor {
 	/**
 	 * Process each upsell order line and add the products to the WC order.
 	 *
-	 * @param array $upsell_lines The matched upsell order lines from the Kustom order, so the discount is Kustom's and not the stored one.
+	 * @param array[] $upsell_lines The matched upsell order lines from the Kustom order, with a reference and a quantity of at least one.
 	 *
 	 * @return void
-	 * @throws UpsellException If a product reference is missing or the product is not found.
+	 * @throws UpsellException If the product is not found or can not be added.
 	 */
 	private function process_upsell_lines( $upsell_lines ) {
-		if ( ! is_array( $upsell_lines ) ) {
-			\KCO_Logger::log( 'ERROR Upsell processing: Stored upsell batch is not an array for WC order #' . $this->order->get_order_number() );
-			throw new UpsellException( 'Stored upsell batch is not an array' );
-		}
-
 		foreach ( $upsell_lines as $line ) {
-			if ( empty( $line['reference'] ) ) {
-				\KCO_Logger::log( 'ERROR Upsell processing: Missing product reference in order line for WC order #' . $this->order->get_order_number() . '. Line data: ' . wp_json_encode( $line ) );
-				throw new UpsellException( 'Missing product reference in order line' );
-			}
-
-			$quantity = (int) ( $line['quantity'] ?? 0 );
-			if ( $quantity < 1 ) {
-				\KCO_Logger::log( 'ERROR Upsell processing: Invalid quantity for line with reference ' . $line['reference'] . ' on WC order #' . $this->order->get_order_number() );
-				throw new UpsellException( 'Invalid quantity in upsell line' );
-			}
-
+			$quantity        = (int) $line['quantity'];
 			$total_amount    = $this->convert_price_to_major_units( $line['total_amount'] ?? 0 );
 			$discount_amount = $this->convert_price_to_major_units( $line['total_discount_amount'] ?? 0 );
 

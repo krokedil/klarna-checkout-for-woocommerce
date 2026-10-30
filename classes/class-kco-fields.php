@@ -319,7 +319,7 @@ class KCO_Fields {
 			'color_settings_end'         => array(
 				'type' => 'krokedil_section_end',
 			),
-			// Checkout iframe settings.
+			// Upsell settings.
 			'upsell_settings_title'      => array(
 				'title' => __( 'Upsell Settings', 'klarna-checkout-for-woocommerce' ),
 				'type'  => 'krokedil_section_start',
