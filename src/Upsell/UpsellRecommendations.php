@@ -204,15 +204,7 @@ class UpsellRecommendations {
 	 */
 	private function get_upsell_line( $product ) {
 		$price     = (float) $product->get_price();
-		$tax_rates = $product->is_taxable() ? WC_Tax::get_rates_from_location(
-			$product->get_tax_class(),
-			array(
-				$this->order->get_billing_country(),
-				$this->order->get_billing_state(),
-				$this->order->get_billing_postcode(),
-				$this->order->get_billing_city(),
-			)
-		) : array();
+		$tax_rates = UpsellProcessor::get_tax_rates( $this->order, $product );
 
 		if ( wc_prices_include_tax() ) {
 			$tax            = array_sum( WC_Tax::calc_inclusive_tax( $price, $tax_rates ) );

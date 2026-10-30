@@ -280,6 +280,30 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 		];
 	}
 
+	/**
+	 * WooCommerce taxes the added item again when it recalculates the order, so the price without tax must use the same rates.
+	 *
+	 * @dataProvider provide_untaxed_upsells
+	 */
+	public function test_an_upsell_adds_the_amount_kustom_charged( array $product_args, array $order_args, string $tax_based_on ): void {
+		update_option( 'woocommerce_tax_based_on', $tax_based_on );
+		$this->haveSimpleProduct( array_merge( [ 'name' => 'Belt', 'sku' => 'belt', 'price' => '20.00' ], $product_args ) );
+		$order = $this->haveOrderAwaitingUpsell( [ [ [ 'reference' => 'belt', 'quantity' => 1, 'total_amount' => 2000 ] ] ], $order_args );
+		$total = (float) $order->get_total();
+
+		( new UpsellProcessor( $order, [ 'order_lines' => [ [ 'reference' => 'belt', 'quantity' => 1, 'total_amount' => 2000 ] ] ] ) )->process();
+
+		$this->assertEqualsWithDelta( $total + 20, (float) $this->reload( $order )->get_total(), 0.001 );
+	}
+
+	/** @return array<string, array{0: array, 1: array, 2: string}> */
+	public function provide_untaxed_upsells(): array {
+		return [
+			'a product without tax'               => [ [ 'tax_status' => 'none' ], [], 'billing' ],
+			'taxed by a shipping address abroad' => [ [], [ 'shipping_address' => [ 'country' => 'US', 'state' => 'CA', 'postcode' => '90210', 'city' => 'Beverly Hills' ] ], 'shipping' ],
+		];
+	}
+
 	public function test_the_push_does_not_add_an_upsell_the_thank_you_page_already_added(): void {
 		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
 		$order        = $this->haveOrderAwaitingUpsell( [ [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ] );

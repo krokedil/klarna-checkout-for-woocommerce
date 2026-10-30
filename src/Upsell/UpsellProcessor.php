@@ -374,7 +374,7 @@ class UpsellProcessor {
 	 * @return float The price excluding VAT in major units.
 	 */
 	private function get_price_excluding_vat( $price_incl_vat, $product ) {
-		$tax_rates = $this->get_tax_rates_for_product( $product );
+		$tax_rates = self::get_tax_rates( $this->order, $product );
 
 		if ( empty( $tax_rates ) ) {
 			return round( $price_incl_vat, wc_get_price_decimals() );
@@ -387,22 +387,20 @@ class UpsellProcessor {
 	}
 
 	/**
-	 * Get the tax rates applicable to a product based on the order's billing location and the product's tax class.
+	 * Get the tax rates WooCommerce applies to a product on the order, the same way it does when it recalculates the order.
 	 *
+	 * @param WC_Order   $order   The WooCommerce order.
 	 * @param WC_Product $product The WooCommerce product to get tax rates for.
 	 *
 	 * @return array
 	 */
-	private function get_tax_rates_for_product( $product ) {
-		return WC_Tax::get_rates_from_location(
-			$product->get_tax_class(),
-			array(
-				$this->order->get_billing_country(),
-				$this->order->get_billing_state(),
-				$this->order->get_billing_postcode(),
-				$this->order->get_billing_city(),
-			)
-		);
+	public static function get_tax_rates( $order, $product ) {
+		$is_vat_exempt = apply_filters( 'woocommerce_order_is_vat_exempt', 'yes' === $order->get_meta( 'is_vat_exempt' ), $order ); // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment -- WooCommerce's own filter.
+		if ( ! wc_tax_enabled() || ! $product->is_taxable() || $is_vat_exempt ) {
+			return array();
+		}
+
+		return WC_Tax::find_rates( array_merge( $order->get_taxable_location(), array( 'tax_class' => $product->get_tax_class() ) ) );
 	}
 
 	/**
