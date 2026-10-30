@@ -1,10 +1,10 @@
-/* global kcoUpsellParams, DOMParser */
+/* global jQuery, kcoUpsellParams */
 /**
- * Refreshes the order details table on the thank-you page when the customer adds an upsell in the Kustom confirmation iframe.
- * The refresh also asks the server to add the upsell to the order, which it only does once the upsell is in Kustom's order.
- * upsell_product_added is not in Kustom's public event docs, so a reload is the fallback if it stops firing.
+ * Refreshes the order details table on the thank-you page when the customer adds an upsell in the Kustom confirmation iframe, or Kustom fails to add one.
+ * The refresh also asks the server to add the upsell to the order, or to drop it when it failed, which the server checks against Kustom's order.
+ * The upsell events are not in Kustom's public event docs, so a reload is the fallback if they stop firing.
  */
-(function () {
+jQuery(function ($) {
 	if (
 		'function' !== typeof window._klarnaCheckout ||
 		'undefined' === typeof kcoUpsellParams
@@ -12,54 +12,71 @@
 		return;
 	}
 
-	const selector = '.woocommerce-order-details';
-	const maxAttempts = 5;
-	const countRows = (root) =>
-		root.querySelectorAll(`${selector} tbody tr`).length;
+	const kcoUpsell = {
+		tableSelector: '.woocommerce-order-details',
+		pendingSelector: '.kco-upsell-pending',
+		maxAttempts: 5,
+		retryDelay: 1500,
 
-	const refresh = (rowsBefore, attempt) => {
-		const body = new URLSearchParams({
-			order_id: kcoUpsellParams.order_id,
-			key: kcoUpsellParams.order_key,
-		});
+		/**
+		 * Listens to the upsell events from the Kustom iframe.
+		 */
+		init() {
+			window._klarnaCheckout(function (api) {
+				api.on({
+					upsell_product_added() {
+						kcoUpsell.refresh(false, 1);
+					},
+					upsell_add_failed() {
+						kcoUpsell.refresh(true, 1);
+					},
+				});
+			});
+		},
 
-		fetch(kcoUpsellParams.url, {
-			method: 'POST',
-			body,
-			credentials: 'same-origin',
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if (!response.success) {
-					return;
-				}
+		/**
+		 * Asks the server to update the pending upsells, and replaces the order details table with the result.
+		 *
+		 * @param {boolean} failed  Whether Kustom failed to add the upsell.
+		 * @param {number}  attempt The attempt number, starting at 1.
+		 */
+		refresh(failed, attempt) {
+			$.ajax({
+				url: kcoUpsellParams.url,
+				type: 'POST',
+				data: {
+					order_id: kcoUpsellParams.order_id,
+					key: kcoUpsellParams.order_key,
+					failed: failed ? 1 : 0,
+				},
+				success(response) {
+					if (!response.success) {
+						return;
+					}
 
-				const fresh = new DOMParser().parseFromString(
-					response.data.html,
-					'text/html'
-				);
-				const stored = countRows(fresh) > rowsBefore;
-				const current = document.querySelector(selector);
-				const replacement = fresh.querySelector(selector);
-				if (stored && current && replacement) {
-					current.replaceWith(replacement);
-				}
+					const fresh = $('<div>')
+						.append($.parseHTML(response.data.html))
+						.find(kcoUpsell.tableSelector);
+					if (!fresh.length) {
+						return;
+					}
 
-				// Kustom may send the event before the upsell is stored, or before it is in Kustom's order so it can be added, so try again shortly.
-				const waiting =
-					!stored || fresh.querySelector('.kco-upsell-pending');
-				if (waiting && attempt < maxAttempts) {
-					setTimeout(() => refresh(rowsBefore, attempt + 1), 1500);
-				}
-			})
-			.catch(() => {});
+					$(kcoUpsell.tableSelector).replaceWith(fresh);
+
+					// Another request may hold the lock, so try again shortly while upsells are still pending.
+					if (
+						fresh.find(kcoUpsell.pendingSelector).length &&
+						attempt < kcoUpsell.maxAttempts
+					) {
+						setTimeout(
+							() => kcoUpsell.refresh(failed, attempt + 1),
+							kcoUpsell.retryDelay
+						);
+					}
+				},
+			});
+		},
 	};
 
-	window._klarnaCheckout(function (api) {
-		api.on({
-			upsell_product_added() {
-				refresh(countRows(document), 1);
-			},
-		});
-	});
-})();
+	kcoUpsell.init();
+});

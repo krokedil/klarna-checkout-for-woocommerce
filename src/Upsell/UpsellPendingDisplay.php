@@ -5,7 +5,7 @@ use WC_Order;
 
 /**
  * Shows upsells that Kustom has accepted, but that wait for the push callback before they are added to the order,
- * as pending rows in the order details table. Refreshes the table when the customer adds an upsell in the confirmation iframe.
+ * as pending rows in the order details table. Refreshes the table when the customer adds an upsell in the confirmation iframe, or Kustom fails to add one.
  */
 class UpsellPendingDisplay {
 	/**
@@ -136,7 +136,7 @@ class UpsellPendingDisplay {
 		wp_enqueue_script(
 			'kco-upsell-confirmation',
 			plugins_url( 'assets/js/kco-upsell-confirmation' . $suffix . '.js', KCO_WC_MAIN_FILE ),
-			array(),
+			array( 'jquery' ),
 			KCO_WC_VERSION,
 			true
 		);
@@ -160,6 +160,7 @@ class UpsellPendingDisplay {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- The order key is the authorization; a nonce would break on cached thank-you pages.
 		$order_id = isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0;
 		$key      = isset( $_POST['key'] ) ? sanitize_text_field( wp_unslash( $_POST['key'] ) ) : '';
+		$failed   = ! empty( $_POST['failed'] );
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		$order = wc_get_order( $order_id );
@@ -167,7 +168,7 @@ class UpsellPendingDisplay {
 			wp_send_json_error( null, 403 );
 		}
 
-		self::add_confirmed_upsells( $order );
+		self::add_confirmed_upsells( $order, $failed );
 
 		ob_start();
 		woocommerce_order_details_table( $order_id );
@@ -179,11 +180,12 @@ class UpsellPendingDisplay {
 	 * The request only triggers the check, the Kustom order is what decides. The order keeps waiting for the push,
 	 * which still confirms and acknowledges it, so the customer can add more upsells.
 	 *
-	 * @param WC_Order $order The WooCommerce order.
+	 * @param WC_Order $order          The WooCommerce order.
+	 * @param bool     $drop_unmatched Whether Kustom reported a failed upsell, so pending upsells not in the Kustom order are dropped.
 	 *
 	 * @return void
 	 */
-	public static function add_confirmed_upsells( $order ) {
+	public static function add_confirmed_upsells( $order, $drop_unmatched = false ) {
 		$klarna_order_id = $order->get_meta( '_wc_klarna_order_id' );
 		if ( empty( $klarna_order_id ) || empty( self::get_pending_lines( $order ) ) ) {
 			return;
@@ -202,10 +204,9 @@ class UpsellPendingDisplay {
 				return;
 			}
 
-			( new UpsellProcessor( $order, $klarna_order ) )->process();
+			( new UpsellProcessor( $order, $klarna_order, $drop_unmatched ) )->process();
 		} catch ( UpsellException $e ) {
-			// Kustom may not have added the upsell to its order yet. The script asks again, and the push adds it otherwise.
-			\KCO_Logger::log( $klarna_order_id . ': Upsell not added from the thank-you page yet: ' . $e->getMessage() );
+			\KCO_Logger::log( $klarna_order_id . ': Upsell could not be added from the thank-you page: ' . $e->getMessage() );
 		} finally {
 			delete_transient( $lock_key );
 		}

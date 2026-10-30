@@ -103,7 +103,7 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 		UpsellPendingDisplay::add_confirmed_upsells( $order );
 
 		$order = $this->reload( $order );
-		$this->assertNotContains( 'Cap', $this->itemNamesOf( $order ), 'No line is added until all of them are in the Kustom order.' );
+		$this->assertNotContains( 'Cap', $this->itemNamesOf( $order ), 'An upsell is only added once all its lines are in the Kustom order.' );
 		$this->assertCount( 2, UpsellPendingDisplay::get_pending_lines( $order ) );
 	}
 
@@ -113,6 +113,58 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 			'not added by Kustom yet' => [ [ [ 'reference' => 'kco-test-1', 'quantity' => 1, 'total_amount' => 10000 ] ] ],
 			'only one of two lines'   => [ [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ],
 		];
+	}
+
+	/**
+	 * Kustom adds an upsell in the same request as the validation callback, so a failed upsell is never added later.
+	 */
+	public function test_a_failed_upsell_is_dropped_and_the_others_are_added(): void {
+		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
+		$this->haveSimpleProduct( [ 'name' => 'Belt', 'sku' => 'belt', 'price' => '20.00' ] );
+		$order = $this->haveOrderAwaitingUpsell(
+			[
+				[ [ 'reference' => 'cap', 'name' => 'Cap', 'quantity' => 1, 'total_amount' => 1600 ] ],
+				[ [ 'reference' => 'belt', 'name' => 'Belt', 'quantity' => 1, 'total_amount' => 2000 ] ],
+			]
+		);
+		$this->willRetrieveManagedOrder( [ 'order_lines' => [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ] );
+
+		UpsellPendingDisplay::add_confirmed_upsells( $order, true );
+
+		$order = $this->reload( $order );
+		$this->assertContains( 'Cap', $this->itemNamesOf( $order ) );
+		$this->assertNotContains( 'Belt', $this->itemNamesOf( $order ) );
+		$this->assertSame( [], UpsellPendingDisplay::get_pending_lines( $order ), 'The failed upsell is no longer shown as pending.' );
+		$this->assertStringContainsString( 'Belt was not added', implode( ' ', wp_list_pluck( wc_get_order_notes( [ 'order_id' => $order->get_id() ] ), 'content' ) ) );
+	}
+
+	public function test_the_push_drops_an_upsell_that_is_not_in_the_kustom_order(): void {
+		$this->haveSimpleProduct( [ 'name' => 'Belt', 'sku' => 'belt', 'price' => '20.00' ] );
+		$order = $this->haveOrderAwaitingUpsell( [ [ [ 'reference' => 'belt', 'name' => 'Belt', 'quantity' => 1, 'total_amount' => 2000 ] ] ] );
+		$total = $order->get_total();
+
+		( new UpsellProcessor( $order, [ 'order_lines' => [ [ 'reference' => 'kco-test-1', 'quantity' => 1, 'total_amount' => 10000 ] ] ] ) )->process();
+
+		$order = $this->reload( $order );
+		$this->assertNotContains( 'Belt', $this->itemNamesOf( $order ) );
+		$this->assertSame( '', $order->get_meta( '_kco_upsell_data' ) );
+		$this->assertSame( $total, $order->get_total() );
+	}
+
+	public function test_an_upsell_stored_while_the_kustom_order_is_fetched_is_kept(): void {
+		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
+		$cap   = [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ];
+		$belt  = [ [ 'reference' => 'belt', 'quantity' => 1, 'total_amount' => 2000 ] ];
+		$order = $this->haveOrderAwaitingUpsell( [ $cap ] );
+
+		// The validation callback stores the next upsell on its own copy of the order.
+		$other = $this->reload( $order );
+		$other->update_meta_data( '_kco_upsell_data', [ $cap, $belt ] );
+		$other->save();
+
+		( new UpsellProcessor( $order, [ 'order_lines' => $cap ] ) )->process();
+
+		$this->assertSame( [ $belt ], $this->reload( $order )->get_meta( '_kco_upsell_data' ) );
 	}
 
 	public function test_the_push_does_not_add_an_upsell_the_thank_you_page_already_added(): void {
