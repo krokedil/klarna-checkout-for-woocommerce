@@ -168,6 +168,11 @@ class UpsellPendingDisplay {
 			wp_send_json_error( null, 403 );
 		}
 
+		// Only answer while the order waits for upsells, so the order key does not expose the order details at any other time.
+		if ( 'kco' !== $order->get_payment_method() || UpsellStatus::get_configured_status() !== $order->get_status() ) {
+			wp_send_json_error( null, 403 );
+		}
+
 		self::add_confirmed_upsells( $order, $failed );
 
 		ob_start();
@@ -192,13 +197,18 @@ class UpsellPendingDisplay {
 		}
 
 		// Same lock as the push, so the two can not add the same upsell twice.
-		$lock_key = 'kco_push_lock_' . md5( $klarna_order_id );
-		if ( get_transient( $lock_key ) ) {
+		$order_id = $order->get_id();
+		if ( ! \KCO_Confirmation::lock_kco_confirmation( $klarna_order_id, $order_id, 'upsell' ) ) {
 			return;
 		}
-		set_transient( $lock_key, 1, 2 * MINUTE_IN_SECONDS );
 
 		try {
+			// Reload the order, since another request may have added the upsell before the lock was taken.
+			$order = wc_get_order( $order_id );
+			if ( ! $order || empty( self::get_pending_lines( $order ) ) ) {
+				return;
+			}
+
 			$klarna_order = KCO_WC()->api->get_klarna_om_order( $klarna_order_id );
 			if ( empty( $klarna_order ) || is_wp_error( $klarna_order ) ) {
 				return;
@@ -208,7 +218,7 @@ class UpsellPendingDisplay {
 		} catch ( UpsellException $e ) {
 			\KCO_Logger::log( $klarna_order_id . ': Upsell could not be added from the thank-you page: ' . $e->getMessage() );
 		} finally {
-			delete_transient( $lock_key );
+			\KCO_Confirmation::unlock_kco_confirmation( $klarna_order_id, $order_id, 'upsell' );
 		}
 	}
 

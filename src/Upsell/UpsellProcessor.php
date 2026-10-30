@@ -38,6 +38,20 @@ class UpsellProcessor {
 	private $drop_unmatched;
 
 	/**
+	 * The product lines of the Kustom order that no stored line has matched yet, keyed by their index in the Kustom order.
+	 *
+	 * @var array[]
+	 */
+	private $unmatched_klarna_lines = array();
+
+	/**
+	 * Per reference, the quantity in the Kustom order that is not on the WC order or matched by a stored line yet.
+	 *
+	 * @var array<string, int>
+	 */
+	private $free_quantities = array();
+
+	/**
 	 * New product names that were added to the order.
 	 *
 	 * @var string[]
@@ -77,12 +91,15 @@ class UpsellProcessor {
 
 		\KCO_Logger::log( 'Upsell processing: Starting for WC order #' . $order_number . ' with ' . count( $upsell_data ) . ' upsell batch(es). Data: ' . wp_json_encode( $upsell_data ) );
 
+		$this->index_klarna_order();
+
 		// Each batch is one upsell from one validation callback, so it is added or dropped as a whole.
 		$handled       = array();
 		$dropped_names = array();
 		foreach ( $upsell_data as $upsell_lines ) {
-			if ( $this->batch_is_in_klarna_order( $upsell_lines ) ) {
-				$this->process_upsell_lines( $upsell_lines );
+			$klarna_lines = $this->match_batch( $upsell_lines );
+			if ( null !== $klarna_lines ) {
+				$this->process_upsell_lines( $klarna_lines );
 				$handled[] = $upsell_lines;
 			} elseif ( $this->drop_unmatched ) {
 				\KCO_Logger::log( 'Upsell processing: Dropping an upsell batch that is not in the Kustom order for WC order #' . $order_number . '. Data: ' . wp_json_encode( $upsell_lines ) );
@@ -167,30 +184,80 @@ class UpsellProcessor {
 	}
 
 	/**
-	 * Whether every line of a stored batch is in the Kustom order.
+	 * Collect the product lines of the Kustom order, and per reference the quantity that is not on the WC order yet.
+	 *
+	 * @return void
+	 */
+	private function index_klarna_order() {
+		$excluded_types = array( 'discount', 'shipping_fee', 'sales_tax', 'gift_card', 'store_credit', 'surcharge' );
+		$klarna_lines   = $this->klarna_order['order_lines'] ?? array();
+
+		$this->unmatched_klarna_lines = array();
+		$this->free_quantities        = array();
+		foreach ( is_array( $klarna_lines ) ? $klarna_lines : array() as $index => $klarna_line ) {
+			if ( in_array( $klarna_line['type'] ?? '', $excluded_types, true ) ) {
+				continue;
+			}
+
+			$reference                              = (string) ( $klarna_line['reference'] ?? '' );
+			$this->unmatched_klarna_lines[ $index ] = $klarna_line;
+			$this->free_quantities[ $reference ]    = ( $this->free_quantities[ $reference ] ?? 0 ) + (int) ( $klarna_line['quantity'] ?? 0 );
+		}
+
+		// Kustom appends upsells to its order, so match from the end and leave the original lines for last.
+		$this->unmatched_klarna_lines = array_reverse( $this->unmatched_klarna_lines, true );
+
+		// The quantity already on the WC order is not free for an upsell, so a stored copy of an ordered line can not match it.
+		$order_data = new \KCO_Request_Order();
+		foreach ( $this->order->get_items() as $item ) {
+			if ( ! $item instanceof \WC_Order_Item_Product ) {
+				continue;
+			}
+
+			$reference                           = wc_string_to_bool( $item->get_meta( '_kco_is_upsell' ) ) ? $item->get_meta( '_kco_upsell_reference' ) : $order_data->get_item_reference( $item );
+			$reference                           = (string) $reference;
+			$this->free_quantities[ $reference ] = ( $this->free_quantities[ $reference ] ?? 0 ) - (int) $item->get_quantity();
+		}
+	}
+
+	/**
+	 * Match every line of a stored batch to its own line in the Kustom order.
 	 *
 	 * @param mixed $upsell_lines The stored upsell lines.
 	 *
-	 * @return bool
+	 * @return array[]|null The matched Kustom lines, or null if any line of the batch is not in the Kustom order.
 	 */
-	private function batch_is_in_klarna_order( $upsell_lines ) {
+	private function match_batch( $upsell_lines ) {
 		if ( empty( $upsell_lines ) || ! is_array( $upsell_lines ) ) {
-			return false;
+			return null;
 		}
 
+		$unmatched = $this->unmatched_klarna_lines;
+		$free      = $this->free_quantities;
+		$matched   = array();
 		foreach ( $upsell_lines as $line ) {
-			if ( empty( $line['reference'] ) || ! $this->line_is_in_klarna_order( $line ) ) {
-				return false;
+			$reference = (string) ( $line['reference'] ?? '' );
+			$quantity  = (int) ( $line['quantity'] ?? 0 );
+			$index     = '' === $reference || $quantity < 1 || ( $free[ $reference ] ?? 0 ) < $quantity ? false : $this->find_klarna_line( $unmatched, $line );
+			if ( false === $index ) {
+				return null;
 			}
+
+			$matched[]           = $unmatched[ $index ];
+			$free[ $reference ] -= $quantity;
+			unset( $unmatched[ $index ] );
 		}
 
-		return true;
+		$this->unmatched_klarna_lines = $unmatched;
+		$this->free_quantities        = $free;
+
+		return $matched;
 	}
 
 	/**
 	 * Process each upsell order line and add the products to the WC order.
 	 *
-	 * @param array $upsell_lines The upsell order lines from Kustom.
+	 * @param array $upsell_lines The matched upsell order lines from the Kustom order, so the discount is Kustom's and not the stored one.
 	 *
 	 * @return void
 	 * @throws UpsellException If a product reference is missing or the product is not found.
@@ -259,25 +326,21 @@ class UpsellProcessor {
 	}
 
 	/**
-	 * Whether a stored upsell line is in the Kustom order with matching reference, quantity, and total amount.
+	 * Find the Kustom line for a stored upsell line, with matching reference, quantity, and total amount.
 	 *
 	 * Since the upsell validation callback is unsigned, the stored data is checked against the Kustom order before it is added.
 	 *
-	 * @param array $line The stored upsell order line.
+	 * @param array[] $klarna_lines The Kustom lines to look in.
+	 * @param array   $line         The stored upsell order line.
 	 *
-	 * @return bool
+	 * @return int|string|false The index of the Kustom line, or false if none matches.
 	 */
-	private function line_is_in_klarna_order( $line ) {
-		$klarna_lines = $this->klarna_order['order_lines'] ?? array();
-		$reference    = $line['reference'];
-		$quantity     = (int) ( $line['quantity'] ?? 0 );
-		$total_amount = (int) ( $line['total_amount'] ?? 0 );
-
-		foreach ( is_array( $klarna_lines ) ? $klarna_lines : array() as $klarna_line ) {
-			if ( ( $klarna_line['reference'] ?? null ) === $reference
-				&& (int) ( $klarna_line['quantity'] ?? 0 ) === $quantity
-				&& (int) ( $klarna_line['total_amount'] ?? 0 ) === $total_amount ) {
-				return true;
+	private function find_klarna_line( $klarna_lines, $line ) {
+		foreach ( $klarna_lines as $index => $klarna_line ) {
+			if ( (string) ( $klarna_line['reference'] ?? '' ) === (string) $line['reference']
+				&& (int) ( $klarna_line['quantity'] ?? 0 ) === (int) $line['quantity']
+				&& (int) ( $klarna_line['total_amount'] ?? 0 ) === (int) ( $line['total_amount'] ?? 0 ) ) {
+				return $index;
 			}
 		}
 

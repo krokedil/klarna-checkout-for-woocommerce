@@ -167,6 +167,118 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 		$this->assertSame( [ $belt ], $this->reload( $order )->get_meta( '_kco_upsell_data' ) );
 	}
 
+	/**
+	 * Two thank-you tabs both get upsell_product_added. The second request loaded the order before the first one added the upsell.
+	 */
+	public function test_a_request_with_an_older_copy_of_the_order_does_not_add_the_upsell_again(): void {
+		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
+		$order = $this->haveOrderAwaitingUpsell( [ [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ] );
+		$stale = $this->reload( $order );
+		$this->willRetrieveManagedOrder( [ 'order_lines' => [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ] );
+		$this->willRetrieveManagedOrder( [ 'order_lines' => [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ] );
+		UpsellPendingDisplay::add_confirmed_upsells( $order );
+
+		UpsellPendingDisplay::add_confirmed_upsells( $stale );
+
+		$this->assertCount( 1, array_keys( $this->itemNamesOf( $this->reload( $order ) ), 'Cap', true ) );
+	}
+
+	public function test_nothing_is_added_while_another_request_holds_the_lock(): void {
+		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
+		$order = $this->haveOrderAwaitingUpsell( [ [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ] );
+		\KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', $order->get_id(), 'upsell' );
+
+		try {
+			UpsellPendingDisplay::add_confirmed_upsells( $order );
+		} finally {
+			\KCO_Confirmation::unlock_kco_confirmation( 'kustom-order-123', $order->get_id(), 'upsell' );
+		}
+
+		$this->assertNotContains( 'Cap', $this->itemNamesOf( $this->reload( $order ) ) );
+		$this->assertCount( 1, UpsellPendingDisplay::get_pending_lines( $this->reload( $order ) ) );
+	}
+
+	/**
+	 * Each Kustom line can only confirm one stored line, and not one that is already on the WooCommerce order.
+	 *
+	 * @dataProvider provide_stored_lines_and_kustom_orders
+	 */
+	public function test_each_kustom_line_confirms_one_upsell( array $upsell_data, array $kustom_lines, int $caps_after ): void {
+		$cap   = $this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
+		$order = $this->haveOrderAwaitingUpsell( $upsell_data, [ 'items' => [ [ $cap, 1 ] ] ] );
+
+		( new UpsellProcessor( $order, [ 'order_lines' => $kustom_lines ] ) )->process();
+
+		$this->assertCount( $caps_after, array_keys( $this->itemNamesOf( $this->reload( $order ) ), 'Cap', true ) );
+	}
+
+	/** @return array<string, array{0: array, 1: array, 2: int}> */
+	public function provide_stored_lines_and_kustom_orders(): array {
+		$cap_line = [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ];
+
+		return [
+			'a copy of the ordered line'           => [ [ [ $cap_line ] ], [ $cap_line ], 1 ],
+			'the same upsell stored twice'         => [ [ [ $cap_line ], [ $cap_line ] ], [ $cap_line, $cap_line ], 2 ],
+			'an upsell of a product in the order'  => [ [ [ $cap_line ] ], [ $cap_line, $cap_line ], 2 ],
+		];
+	}
+
+	public function test_the_discount_comes_from_the_kustom_order(): void {
+		$this->haveSimpleProduct( [ 'name' => 'Belt', 'sku' => 'belt', 'price' => '20.00' ] );
+		$order = $this->haveOrderAwaitingUpsell( [ [ [ 'reference' => 'belt', 'quantity' => 1, 'total_amount' => 2000, 'total_discount_amount' => 5000 ] ] ] );
+
+		( new UpsellProcessor( $order, [ 'order_lines' => [ [ 'reference' => 'belt', 'quantity' => 1, 'total_amount' => 2000, 'total_discount_amount' => 0 ] ] ] ) )->process();
+
+		$belts = array_filter(
+			$this->reload( $order )->get_items(),
+			static function ( \WC_Order_Item $item ): bool {
+				return 'Belt' === $item->get_name();
+			}
+		);
+		$belt  = reset( $belts );
+		$this->assertSame( (float) $belt->get_subtotal(), (float) $belt->get_total() );
+	}
+
+	/**
+	 * @dataProvider provide_orders_for_the_order_details_request
+	 */
+	public function test_the_order_details_are_only_returned_while_the_order_waits( string $status, string $payment_method, bool $success ): void {
+		$order = $this->haveOrderAwaitingUpsell( '' );
+		$order->set_status( $status );
+		$order->set_payment_method( $payment_method );
+		$order->save();
+		$_POST = [ 'order_id' => (string) $order->get_id(), 'key' => $order->get_order_key() ];
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		add_filter(
+			'wp_die_ajax_handler',
+			static function () {
+				return static function () {
+					throw new \RuntimeException( 'wp_die' );
+				};
+			}
+		);
+
+		ob_start();
+		try {
+			$this->display->ajax_order_details();
+		} catch ( \RuntimeException $e ) {
+			// wp_send_json() ends the request.
+		}
+		$response = json_decode( (string) ob_get_clean(), true );
+		$_POST    = [];
+
+		$this->assertSame( $success, $response['success'] );
+	}
+
+	/** @return array<string, array{0: string, 1: string, 2: bool}> */
+	public function provide_orders_for_the_order_details_request(): array {
+		return [
+			'waiting Kustom order'  => [ 'on-hold', 'kco', true ],
+			'processed order'       => [ 'processing', 'kco', false ],
+			'another payment method' => [ 'on-hold', 'bacs', false ],
+		];
+	}
+
 	public function test_the_push_does_not_add_an_upsell_the_thank_you_page_already_added(): void {
 		$this->haveSimpleProduct( [ 'name' => 'Cap', 'sku' => 'cap', 'price' => '16.00' ] );
 		$order        = $this->haveOrderAwaitingUpsell( [ [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ] );
@@ -179,11 +291,11 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 		$this->assertSame( [ 'Cap' ], array_values( array_intersect( $this->itemNamesOf( $this->reload( $order ) ), [ 'Cap' ] ) ) );
 	}
 
-	private function haveOrderAwaitingUpsell( $upsell_data ): \WC_Order {
+	private function haveOrderAwaitingUpsell( $upsell_data, array $args = [] ): \WC_Order {
 		// The plugin's own waiting status is only registered when upsell is enabled at boot, so wait in on-hold instead.
 		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes', 'upsell_waiting_status' => 'on-hold' ] ) );
 		$this->display ??= new UpsellPendingDisplay();
-		$order = $this->haveGatewayOrder( [ 'status' => 'on-hold' ] );
+		$order = $this->haveGatewayOrder( array_merge( [ 'status' => 'on-hold' ], $args ) );
 		$order->set_payment_method_title( 'Kustom' );
 		$order->update_meta_data( '_kco_upsell_data', $upsell_data );
 		$order->update_meta_data( '_wc_klarna_order_id', 'kustom-order-123' );

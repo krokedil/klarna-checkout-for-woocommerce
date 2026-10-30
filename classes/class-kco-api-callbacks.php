@@ -154,26 +154,24 @@ class KCO_API_Callbacks {
 	 * @return void
 	 */
 	public function process_push_for_order( $klarna_order_id ) {
-		// Serialize push + fallback runs for the same Kustom order so they can't
-		// double-process the stored upsell data.
-		$lock_key = 'kco_push_lock_' . md5( $klarna_order_id );
-		if ( get_transient( $lock_key ) ) {
+		$order = kco_get_order_by_klarna_id( $klarna_order_id );
+		if ( empty( $order ) ) {
+			// Backup order creation.
+			KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
+			return;
+		}
+
+		// Serialize the push, the fallback, the thank-you page and the upsell validation for the order, so the stored upsell data is not processed twice.
+		$order_id = $order->get_id();
+		if ( ! KCO_Confirmation::lock_kco_confirmation( $klarna_order_id, $order_id, 'upsell' ) ) {
 			KCO_WC()->logger->log( 'Push processing for Kustom order ID ' . $klarna_order_id . ' skipped; another run is already in progress.' );
 			return;
 		}
-		set_transient( $lock_key, 1, 2 * MINUTE_IN_SECONDS );
 
 		$did_lock = false;
-		$order_id = null;
 		try {
-			$order = kco_get_order_by_klarna_id( $klarna_order_id );
-			if ( empty( $order ) ) {
-				// Backup order creation.
-				KCO_WC()->logger->log( 'ERROR Push callback but no existing WC order found for Kustom order ID ' . stripslashes_deep( wp_json_encode( $klarna_order_id ) ) );
-				return;
-			}
-
-			$order_id = $order->get_id();
+			// Reload the order, since another run may have changed it before the lock was taken.
+			$order    = wc_get_order( $order_id );
 			$settings = get_option( 'woocommerce_kco_settings', array() );
 
 			if ( apply_filters( 'kco_wc_lock_confirmation', false, $klarna_order_id, $order_id ) ) {
@@ -253,7 +251,7 @@ class KCO_API_Callbacks {
 			if ( $did_lock ) {
 				KCO_Confirmation::unlock_kco_confirmation( $klarna_order_id, $order_id );
 			}
-			delete_transient( $lock_key );
+			KCO_Confirmation::unlock_kco_confirmation( $klarna_order_id, $order_id, 'upsell' );
 		}
 	}
 

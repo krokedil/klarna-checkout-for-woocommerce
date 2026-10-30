@@ -175,23 +175,46 @@ class UpsellValidator {
 	/**
 	 * Store the upsell data as order metadata for later processing.
 	 *
-	 * Appends to existing upsell data to support multiple upsells per order.
+	 * Appends to existing upsell data to support multiple upsells per order. Takes the same lock as the push and
+	 * the thank-you page, so the data is not stored while they process it and lost when they clear it.
 	 *
 	 * @param WC_Order $order        The WooCommerce order.
 	 * @param array    $upsell_lines The upsell order lines from Kustom.
 	 *
 	 * @return void
+	 * @throws UpsellException If the order is still locked after waiting, or no longer awaits the upsell.
 	 */
 	private function store_upsell_data( $order, $upsell_lines ) {
-		$existing_data = $order->get_meta( '_kco_upsell_data' );
+		$order_id = $order->get_id();
 
-		if ( empty( $existing_data ) || ! is_array( $existing_data ) ) {
-			$existing_data = array();
+		// Kustom waits for the response, so only wait a few seconds for a running push or thank-you page check.
+		$locked = false;
+		for ( $attempt = 0; $attempt < 20 && ! $locked; $attempt++ ) {
+			$locked = \KCO_Confirmation::lock_kco_confirmation( $this->kco_order_id, $order_id, 'upsell' );
+			if ( ! $locked ) {
+				usleep( 250000 );
+			}
 		}
 
-		$existing_data[] = $upsell_lines;
+		if ( ! $locked ) {
+			throw new UpsellException( 'The order is being updated by another request, cannot add upsell items right now.', 409 );
+		}
 
-		$order->update_meta_data( '_kco_upsell_data', $existing_data );
-		$order->save();
+		try {
+			// Reload and check the order again, since the run that held the lock may have changed it.
+			$order         = $this->get_validated_wc_order();
+			$existing_data = $order->get_meta( '_kco_upsell_data' );
+
+			if ( empty( $existing_data ) || ! is_array( $existing_data ) ) {
+				$existing_data = array();
+			}
+
+			$existing_data[] = $upsell_lines;
+
+			$order->update_meta_data( '_kco_upsell_data', $existing_data );
+			$order->save();
+		} finally {
+			\KCO_Confirmation::unlock_kco_confirmation( $this->kco_order_id, $order_id, 'upsell' );
+		}
 	}
 }
