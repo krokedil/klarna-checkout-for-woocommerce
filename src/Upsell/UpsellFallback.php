@@ -11,14 +11,10 @@ class UpsellFallback {
 
 	/**
 	 * UpsellFallback constructor.
+	 *
+	 * Registered even when upsell is disabled, so the fallbacks scheduled before it was turned off still run.
 	 */
 	public function __construct() {
-		$settings = get_option( 'woocommerce_kco_settings', array() );
-
-		if ( ! wc_string_to_bool( $settings['enable_upsell'] ?? 'no' ) ) {
-			return;
-		}
-
 		add_action( self::HOOK, array( $this, 'handle_fallback' ), 10, 1 );
 	}
 

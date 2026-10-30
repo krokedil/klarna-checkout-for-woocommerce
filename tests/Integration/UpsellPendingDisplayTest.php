@@ -6,6 +6,7 @@ namespace Tests\Integration;
 
 use Krokedil\KustomCheckout\Upsell\UpsellPendingDisplay;
 use Krokedil\KustomCheckout\Upsell\UpsellProcessor;
+use Krokedil\KustomCheckout\Upsell\UpsellStatus;
 use Tests\Support\IntegrationTestCase;
 
 /**
@@ -62,9 +63,9 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 		$line = [ [ [ 'reference' => 'cap', 'quantity' => 1, 'total_amount' => 1600 ] ] ];
 
 		return [
-			'no upsell stored'           => [ 'on-hold', '' ],
+			'no upsell stored'           => [ UpsellStatus::STATUS_SLUG, '' ],
 			'push already processed'     => [ 'processing', $line ],
-			'stored line has no product' => [ 'on-hold', [ [ [ 'quantity' => 1 ] ] ] ],
+			'stored line has no product' => [ UpsellStatus::STATUS_SLUG, [ [ [ 'quantity' => 1 ] ] ] ],
 		];
 	}
 
@@ -81,7 +82,7 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 		$order = $this->reload( $order );
 		$this->assertContains( 'Cap', $this->itemNamesOf( $order ) );
 		$this->assertSame( '', $this->pendingRowsOf( $order ), 'The upsell is a real row now.' );
-		$this->assertSame( 'on-hold', $order->get_status(), 'The push still confirms the order, and more upsells can be added until then.' );
+		$this->assertSame( UpsellStatus::STATUS_SLUG, $order->get_status(), 'The push still confirms the order, and more upsells can be added until then.' );
 	}
 
 	/**
@@ -273,9 +274,9 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 	/** @return array<string, array{0: string, 1: string, 2: bool}> */
 	public function provide_orders_for_the_order_details_request(): array {
 		return [
-			'waiting Kustom order'  => [ 'on-hold', 'kco', true ],
+			'waiting Kustom order'  => [ UpsellStatus::STATUS_SLUG, 'kco', true ],
 			'processed order'       => [ 'processing', 'kco', false ],
-			'another payment method' => [ 'on-hold', 'bacs', false ],
+			'another payment method' => [ UpsellStatus::STATUS_SLUG, 'bacs', false ],
 		];
 	}
 
@@ -292,10 +293,9 @@ class UpsellPendingDisplayTest extends IntegrationTestCase {
 	}
 
 	private function haveOrderAwaitingUpsell( $upsell_data, array $args = [] ): \WC_Order {
-		// The plugin's own waiting status is only registered when upsell is enabled at boot, so wait in on-hold instead.
-		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes', 'upsell_waiting_status' => 'on-hold' ] ) );
+		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes' ] ) );
 		$this->display ??= new UpsellPendingDisplay();
-		$order = $this->haveGatewayOrder( array_merge( [ 'status' => 'on-hold' ], $args ) );
+		$order = $this->haveGatewayOrder( array_merge( [ 'status' => UpsellStatus::STATUS_SLUG ], $args ) );
 		$order->set_payment_method_title( 'Kustom' );
 		$order->update_meta_data( '_kco_upsell_data', $upsell_data );
 		$order->update_meta_data( '_wc_klarna_order_id', 'kustom-order-123' );

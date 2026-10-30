@@ -55,18 +55,48 @@ class UpsellStatusEmailsTest extends IntegrationTestCase {
 		];
 	}
 
-	public function test_on_hold_as_waiting_status_keeps_the_woocommerce_emails(): void {
-		$order = $this->haveOrderWaitingIn( 'on-hold' );
+	/**
+	 * Pending is every order's status before it is confirmed, and on-hold reduces stock before the upsells are added.
+	 *
+	 * @dataProvider provide_disallowed_statuses
+	 */
+	public function test_a_disallowed_waiting_status_falls_back_to_the_kustom_status( string $status ): void {
+		$this->setGatewaySettings( [ 'enable_upsell' => 'yes', 'upsell_waiting_status' => $status ] );
 
-		$order->update_status( 'processing' );
+		$this->assertSame( UpsellStatus::STATUS_SLUG, UpsellStatus::get_configured_status() );
+		$this->assertArrayNotHasKey( $status, UpsellStatus::get_waiting_status_options() );
+	}
 
-		$this->assertSame( [ 'customer_processing_order' ], $this->sent, 'WooCommerce already sent the new order email when the order went on-hold.' );
+	/** @return array<string, array{0: string}> */
+	public function provide_disallowed_statuses(): array {
+		return [
+			'pending' => [ 'pending' ],
+			'on-hold' => [ 'on-hold' ],
+		];
+	}
+
+	/**
+	 * payment_complete() only acts on the statuses it is allowed to, so a status from another plugin must be allowed too.
+	 */
+	public function test_payment_completes_an_order_waiting_in_another_plugins_status(): void {
+		register_post_status( 'wc-awaiting-ship', [ 'label' => 'Awaiting shipment' ] );
+		add_filter(
+			'wc_order_statuses',
+			static function ( array $statuses ): array {
+				return $statuses + [ 'wc-awaiting-ship' => 'Awaiting shipment' ];
+			}
+		);
+		$order = $this->haveOrderWaitingIn( 'awaiting-ship' );
+
+		$order->payment_complete( 'kustom-order-123' );
+
+		$this->assertNotNull( $this->reload( $order )->get_date_paid() );
+		$this->assertNotSame( 'awaiting-ship', $this->reload( $order )->get_status() );
 	}
 
 	private function haveOrderWaitingIn( string $status ): \WC_Order {
 		$this->setGatewaySettings( [ 'enable_upsell' => 'yes', 'upsell_waiting_status' => $status ] );
-		// The plugin only hooks the status in when upsell is enabled at boot, and WooCommerce reads the email actions on init.
-		( new UpsellStatus() )->register_post_status();
+		// WooCommerce reads the email actions on init.
 		\WC_Emails::init_transactional_emails();
 		// The emails hook themselves in once per process, and the hooks are reset between tests.
 		WC()->mailer()->init();

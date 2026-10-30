@@ -168,8 +168,7 @@ class CallbacksTest extends IntegrationTestCase {
 	 * @dataProvider provide_upsell_recommendations
 	 */
 	public function test_an_order_only_waits_for_an_upsell_that_can_be_recommended( string $source, bool $has_cross_sell, bool $waits ): void {
-		// The plugin's own waiting status is only registered when upsell is enabled at boot, so wait in on-hold instead.
-		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes', 'upsell_waiting_status' => 'on-hold', 'upsell_recommendations' => $source ] ) );
+		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes', 'upsell_recommendations' => $source ] ) );
 		$order = $this->haveOrderAwaitingConfirmation();
 		if ( $has_cross_sell ) {
 			$this->linkCrossSell( $order );
@@ -183,7 +182,7 @@ class CallbacksTest extends IntegrationTestCase {
 
 		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
 
-		$this->assertSame( $waits ? 'on-hold' : 'processing', $this->statusOf( $order ) );
+		$this->assertSame( $waits ? \Krokedil\KustomCheckout\Upsell\UpsellStatus::STATUS_SLUG : 'processing', $this->statusOf( $order ) );
 		$this->assertGatewayRequestCount( $waits ? 0 : 1, 'acknowledge', 'Kustom is told about the order on the push when it waits.' );
 	}
 
@@ -198,7 +197,7 @@ class CallbacksTest extends IntegrationTestCase {
 	}
 
 	public function test_the_recommendations_filter_can_make_an_order_wait(): void {
-		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes', 'upsell_waiting_status' => 'on-hold', 'upsell_recommendations' => 'custom' ] ) );
+		$this->setGatewaySettings( array_merge( get_option( 'woocommerce_kco_settings', [] ), [ 'enable_upsell' => 'yes', 'upsell_recommendations' => 'custom' ] ) );
 		$order = $this->haveOrderAwaitingConfirmation();
 		add_filter(
 			'kco_wc_upsell_recommendations',
@@ -214,7 +213,7 @@ class CallbacksTest extends IntegrationTestCase {
 
 		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
 
-		$this->assertSame( 'on-hold', $this->statusOf( $order ) );
+		$this->assertSame( \Krokedil\KustomCheckout\Upsell\UpsellStatus::STATUS_SLUG, $this->statusOf( $order ) );
 	}
 
 	private function linkCrossSell( \WC_Order $order ): void {

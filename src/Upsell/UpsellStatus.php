@@ -11,17 +11,12 @@ class UpsellStatus {
 
 	/**
 	 * UpsellStatus constructor.
+	 *
+	 * Registered even when upsell is disabled, so orders still waiting when it is turned off can be completed.
 	 */
 	public function __construct() {
-		$settings = get_option( 'woocommerce_kco_settings', array() );
-
-		if ( ! wc_string_to_bool( $settings['enable_upsell'] ?? 'no' ) ) {
-			return;
-		}
-
 		add_action( 'init', array( $this, 'register_post_status' ) );
 		add_filter( 'wc_order_statuses', array( $this, 'add_order_status' ) );
-		add_filter( 'woocommerce_valid_order_statuses_for_payment', array( $this, 'allow_payment_from_custom_status' ), 10 );
 		add_filter( 'woocommerce_valid_order_statuses_for_payment_complete', array( $this, 'allow_payment_from_custom_status' ), 10 );
 		add_filter( 'woocommerce_email_actions', array( $this, 'add_email_actions' ) );
 
@@ -38,9 +33,6 @@ class UpsellStatus {
 	 */
 	public static function get_email_transitions() {
 		$waiting = self::get_configured_status();
-		if ( in_array( $waiting, array( 'pending', 'on-hold' ), true ) ) {
-			return array();
-		}
 
 		return array(
 			"woocommerce_order_status_{$waiting}_to_processing" => array( 'WC_Email_New_Order', 'WC_Email_Customer_Processing_Order' ),
@@ -115,10 +107,7 @@ class UpsellStatus {
 	 * @return array
 	 */
 	public function allow_payment_from_custom_status( $statuses ) {
-		if ( ! in_array( self::STATUS_SLUG, $statuses, true ) ) {
-			$statuses[] = self::STATUS_SLUG;
-		}
-		return $statuses;
+		return array_values( array_unique( array_merge( $statuses, array( self::STATUS_SLUG, self::get_configured_status() ) ) ) );
 	}
 
 	/**
@@ -133,7 +122,8 @@ class UpsellStatus {
 		$settings   = get_option( 'woocommerce_kco_settings', array() );
 		$configured = $settings[ self::SETTING_KEY ] ?? self::STATUS_SLUG;
 
-		return ! empty( $configured ) ? $configured : self::STATUS_SLUG;
+		// A disallowed status, e.g. from a settings form that was tampered with, falls back to the Kustom status.
+		return ! empty( $configured ) && ! in_array( $configured, self::get_disallowed_statuses(), true ) ? $configured : self::STATUS_SLUG;
 	}
 
 	/**
@@ -146,13 +136,7 @@ class UpsellStatus {
 	 * @return array<string, string> Map of unprefixed status slug => label.
 	 */
 	public static function get_waiting_status_options() {
-		// Statuses that cannot be used as a "waiting for upsell push" state — either
-		// terminal, or collide with the post-push status and would cause the
-		// fallback to misfire.
-		$disallowed = apply_filters(
-			'kco_upsell_waiting_status_disallowed',
-			array( 'processing', 'completed', 'cancelled', 'refunded', 'failed', 'checkout-draft' )
-		);
+		$disallowed = self::get_disallowed_statuses();
 
 		$options = array();
 		if ( function_exists( 'wc_get_order_statuses' ) ) {
@@ -171,5 +155,20 @@ class UpsellStatus {
 		$options = array( self::STATUS_SLUG => $default_label ) + $options;
 
 		return $options;
+	}
+
+	/**
+	 * Get the statuses that cannot be used as the waiting status.
+	 *
+	 * Terminal statuses, statuses that collide with the post-push status, pending which every order has before it is confirmed,
+	 * and on-hold which reduces stock before the upsells are added and is also used for orders that need a manual check.
+	 *
+	 * @return string[]
+	 */
+	private static function get_disallowed_statuses() {
+		return (array) apply_filters(
+			'kco_upsell_waiting_status_disallowed',
+			array( 'pending', 'on-hold', 'processing', 'completed', 'cancelled', 'refunded', 'failed', 'checkout-draft' )
+		);
 	}
 }
