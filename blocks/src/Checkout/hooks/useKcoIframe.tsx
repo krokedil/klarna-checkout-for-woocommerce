@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	addIframe,
 	getElementsToHide,
+	hideContactStepWhenEmpty,
 	hideElements,
 	removeIframe,
 	showElements,
@@ -25,6 +26,13 @@ type AddressType = 'billing' | 'shipping';
  * want a single cart update out of that burst.
  */
 const ADDRESS_UPDATE_DEBOUNCE_MS = 100;
+
+/**
+ * How long to wait for the checkout data store to settle before sending extension data.
+ * Typing in a third party field emits a store change per keystroke, and we only want one
+ * cart update once the shopper stops.
+ */
+const EXTENSION_DATA_DEBOUNCE_MS = 500;
 
 /**
  * Custom hook to manage the Kustom Checkout iframe in WooCommerce.
@@ -65,6 +73,18 @@ export const useKcoIframe = (
 	);
 	// Signature of the last address update we sent, so an unchanged address is not sent twice.
 	const lastSentAddressRef = useRef<string>('');
+	// Signature of the last extension data we sent, for the same reason. Starts unsent so the first
+	// snapshot always goes out, even an empty one that clears what an earlier page stored.
+	const lastSentExtensionDataRef = useRef<string>('');
+	// The extension data object last seen in the store, and the push waiting to go out.
+	const lastSeenExtensionDataRef = useRef<unknown>(null);
+	const extensionUpdateTimerRef = useRef<ReturnType<
+		typeof setTimeout
+	> | null>(null);
+	// Whether we suspended the iframe for an extension data push, so only we resume it.
+	const extensionSuspendedRef = useRef<boolean>(false);
+	// Stops watching the contact step for fields from other plugins.
+	const stopContactStepRef = useRef<(() => void) | null>(null);
 
 	/**
 	 * Extracts HTML content and script content from the Kustom Checkout snippet.
@@ -192,6 +212,56 @@ export const useKcoIframe = (
 
 		return response;
 	}, [resumeKCO]);
+
+	/**
+	 * Read the extension data third party blocks keep in the checkout data store.
+	 *
+	 * @return {Record<string, unknown>} - The extension data, keyed by namespace.
+	 */
+	const getExtensionData = useCallback((): Record<string, unknown> => {
+		const globals = window as any;
+		const checkoutStore = globals?.wc?.wcBlocksData?.CHECKOUT_STORE_KEY;
+
+		return checkoutStore
+			? (globals?.wp?.data?.select(checkoutStore)?.getExtensionData?.() ??
+					{})
+			: {};
+	}, []);
+
+	/**
+	 * Send the checkout block's extension data to the WooCommerce session.
+	 * The Kustom order is submitted server side from the validation callback, which cannot read the
+	 * browser's checkout store, so the data has to be stored before the shopper pays.
+	 *
+	 * @return {Promise<void>}
+	 */
+	const sendExtensionData = useCallback(async (): Promise<void> => {
+		extensionUpdateTimerRef.current = null;
+		const extensions = getExtensionData();
+		const signature = JSON.stringify(extensions);
+
+		// Nothing changed since the last push, so skip the round trip.
+		if (signature !== lastSentExtensionDataRef.current) {
+			lastSentExtensionDataRef.current = signature;
+
+			try {
+				await extensionCartUpdate({
+					namespace: 'kco-block',
+					data: { action: 'extension_data_changed', extensions },
+				});
+			} catch (_error) {
+				// Send again on the next store change, since the session does not have this data.
+				lastSentExtensionDataRef.current = '';
+				lastSeenExtensionDataRef.current = null;
+			}
+		}
+
+		// Let the shopper pay again, unless a newer change is already waiting to be sent.
+		if (extensionSuspendedRef.current && !extensionUpdateTimerRef.current) {
+			extensionSuspendedRef.current = false;
+			resumeKCO();
+		}
+	}, [getExtensionData, resumeKCO]);
 
 	/**
 	 * Record an address received from Kustom and schedule it to be sent to WooCommerce.
@@ -387,9 +457,73 @@ export const useKcoIframe = (
 	}, []);
 
 	useEffect(() => {
+		const globals = window as any;
+
+		if (!isActive || 'function' !== typeof globals?.wp?.data?.subscribe) {
+			return;
+		}
+
+		/**
+		 * Schedule a push when the extension data changed since it was last sent.
+		 *
+		 * @param {boolean} holdPayment - Whether to suspend the iframe until the push is stored.
+		 * @return {void}
+		 */
+		const onStoreChange = (holdPayment: boolean): void => {
+			const extensions = getExtensionData();
+
+			// The store returns the same object until something changes, so most calls stop here.
+			if (extensions === lastSeenExtensionDataRef.current) {
+				return;
+			}
+			lastSeenExtensionDataRef.current = extensions;
+
+			if (
+				JSON.stringify(extensions) === lastSentExtensionDataRef.current
+			) {
+				return;
+			}
+
+			// The validation callback reads the session, so the shopper must not pay before this is stored.
+			if (holdPayment && !extensionSuspendedRef.current) {
+				extensionSuspendedRef.current = true;
+				suspendKCO();
+			}
+
+			if (extensionUpdateTimerRef.current) {
+				clearTimeout(extensionUpdateTimerRef.current);
+			}
+			extensionUpdateTimerRef.current = setTimeout(
+				sendExtensionData,
+				EXTENSION_DATA_DEBOUNCE_MS
+			);
+		};
+
+		// Third party fields write straight to the checkout data store, and there is no event to
+		// listen for, so watch the store itself and push once the changes settle.
+		const unsubscribe = globals.wp.data.subscribe(() =>
+			onStoreChange(true)
+		);
+
+		// Send whatever was already filled in before the iframe was shown.
+		onStoreChange(false);
+
+		return () => {
+			if (extensionUpdateTimerRef.current) {
+				clearTimeout(extensionUpdateTimerRef.current);
+				extensionUpdateTimerRef.current = null;
+			}
+			lastSeenExtensionDataRef.current = null;
+			extensionSuspendedRef.current = false;
+			unsubscribe();
+		};
+	}, [isActive, getExtensionData, sendExtensionData, suspendKCO]);
+
+	useEffect(() => {
 		// Only show the iframe if the Kustom Checkout is active, we have the content and it was not active before.
 		if (isActive && htmlContent && !prevIsActive.current) {
 			hideElements(elementsToHide);
+			stopContactStepRef.current = hideContactStepWhenEmpty();
 			// Add the iframe and script to the WooCommerce checkout page.
 			kcoWrapperRef.current = addIframe(htmlContent);
 			scriptRef.current = document.createElement('script');
@@ -408,6 +542,8 @@ export const useKcoIframe = (
 			if (kcoWrapperRef.current) removeIframe(kcoWrapperRef.current);
 
 			showElements(elementsToHide);
+			stopContactStepRef.current?.();
+			stopContactStepRef.current = null;
 			document.body.removeChild(scriptRef.current);
 			kcoWrapperRef.current = null;
 			scriptRef.current = null;
