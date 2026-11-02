@@ -122,6 +122,11 @@ export const useKcoIframe = (
 	 * @return {void}
 	 */
 	const resumeKCO = useCallback((): void => {
+		// An extension data push is pending, sendExtensionData resumes once it is stored.
+		if (extensionSuspendedRef.current) {
+			return;
+		}
+
 		// If the Kustom Checkout script hasn't loaded yet, do nothing.
 		if ('function' !== typeof window._klarnaCheckout) {
 			return;
