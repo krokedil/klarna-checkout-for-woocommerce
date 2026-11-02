@@ -31,6 +31,7 @@ jQuery( function ( $ ) {
 		// True once a shipping address is known (via shipping_address_change or change event).
 		// With Kustom Shipping Assistant, prevents api.suspend from being called before Kustom has an address to fetch shipping for.
 		shippingAddressKnown: false,
+		lastOrderTotal: null,
 
 		redirectAttemptCount: 0,
 
@@ -119,9 +120,10 @@ jQuery( function ( $ ) {
 		 * a shipping address is known (to avoid triggering premature KSA external TMS shipping fetches).
 		 * Without it, the iframe must always be suspended, since it only fetches the updated order on resume.
 		 * @param {boolean} autoResumeBool
+		 * @param {boolean} ignoreAddress Suspend even if no shipping address is known yet.
 		 */
-		kcoSuspend: function ( autoResumeBool ) {
-			const waitForAddress = "yes" === kco_params.ksa_enabled && ! kco_wc.shippingAddressKnown
+		kcoSuspend: function ( autoResumeBool, ignoreAddress ) {
+			const waitForAddress = "yes" === kco_params.ksa_enabled && ! kco_wc.shippingAddressKnown && ! ignoreAddress
 			if ( window._klarnaCheckout && ! kco_wc.validation && ! kco_wc.suspended && ! waitForAddress ) {
 				kco_wc.log( "kcoSuspend", autoResumeBool )
 				window._klarnaCheckout( function ( api ) {
@@ -132,6 +134,24 @@ jQuery( function ( $ ) {
 						},
 					} )
 				} )
+			}
+		},
+
+		/**
+		 * Suspends the iframe after a cart total change so the next resume fetches the updated order.
+		 * @param {Event} event
+		 * @param {Object} data The update_order_review response.
+		 */
+		maybeSuspendOnTotalChange: function ( event, data ) {
+			const orderTotal = data && data.fragments ? data.fragments.kco_order_total : undefined
+			if ( undefined === orderTotal ) {
+				return
+			}
+
+			const previousTotal = kco_wc.lastOrderTotal
+			kco_wc.lastOrderTotal = orderTotal
+			if ( null !== previousTotal && orderTotal !== previousTotal ) {
+				kco_wc.kcoSuspend( true, true )
 			}
 		},
 
@@ -604,6 +624,7 @@ jQuery( function ( $ ) {
 			kco_wc.bodyEl.on( "update_checkout", function () {
 				kco_wc.kcoSuspend( true )
 			} )
+			kco_wc.bodyEl.on( "updated_checkout", kco_wc.maybeSuspendOnTotalChange )
 			kco_wc.bodyEl.on( "updated_checkout", kco_wc.kcoResume )
 			kco_wc.bodyEl.on( "updated_checkout", kco_wc.maybeDisplayShippingPrice )
 			kco_wc.bodyEl.on( "change", "input.qty", kco_wc.updateCart )
