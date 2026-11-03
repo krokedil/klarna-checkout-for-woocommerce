@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed fields added by other plugins to the block checkout, such as the WooCommerce Smart Coupons gift card form, being hidden and not saved to the order when Kustom is selected.

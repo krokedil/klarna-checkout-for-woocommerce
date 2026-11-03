@@ -126,12 +126,40 @@ class BlockExtension {
 
 				kco_update_wc_shipping( $data );
 				break;
+			case 'extension_data_changed':
+				$this->store_extension_data( $data );
+				break;
 			case 'load':
 				// No action needed here for now. We just want to trigger an update of the WooCommerce cart.
 				break;
 			default:
 				break;
 		}
+	}
+
+	/**
+	 * Store the checkout block's extension data in the session.
+	 * Third party blocks keep it in the browser and expect it in the checkout POST, which we build
+	 * server side from the validation callback, so OrderValidation reads it back from here.
+	 *
+	 * @param array $data The data from the API.
+	 *
+	 * @return void
+	 */
+	private function store_extension_data( $data ) {
+		$extensions = $data['extensions'] ?? array();
+
+		if ( ! is_array( $extensions ) ) {
+			return;
+		}
+
+		// An empty object means the shopper cleared everything, so drop what an earlier push stored.
+		if ( empty( $extensions ) ) {
+			WC()->session->__unset( 'kco_wc_extension_data' );
+			return;
+		}
+
+		WC()->session->set( 'kco_wc_extension_data', $extensions );
 	}
 
 	/**
