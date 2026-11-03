@@ -19,6 +19,7 @@ use Tests\Support\IntegrationTestCase;
  * @covers \KCO_Gateway::process_payment
  * @covers \KCO_Checkout::maybe_register_shipping_error
  * @covers \KCO_Checkout::maybe_change_needs_payment
+ * @covers \KCO_Checkout::keep_update_shipping_method_hook
  * @covers \Krokedil\KustomCheckout\Utility\SettingsUtility::check_if_needs_payment
  */
 class CheckoutTest extends IntegrationTestCase {
@@ -279,6 +280,46 @@ class CheckoutTest extends IntegrationTestCase {
 			'the shipping assistant method, carrying none'            => [ 'klarna_kss', 'flat_rate:1' ],
 			'a method WooCommerce did not swap'                       => [ 'flat_rate:1', 'flat_rate:1' ],
 		];
+	}
+
+	/**
+	 * Woo Discount Rules' "Suppress third party discount plugins" setting strips every
+	 * callback from woocommerce_before_calculate_totals that is not on its keep-list.
+	 * Without the shipping update, the option selected in Kustom never reaches WooCommerce.
+	 */
+	public function test_the_shipping_update_survives_discount_rules_suppression(): void {
+		$wdr_callback = 'Wdr\App\Controllers\ManageDiscount|applyCartProductDiscount';
+		$kept         = apply_filters(
+			'advanced_woo_discount_rules_exclude_hooks_from_removing',
+			[ 'woocommerce_before_calculate_totals' => [ $wdr_callback ] ]
+		)['woocommerce_before_calculate_totals'];
+
+		$callback = $this->registeredCallback( 'woocommerce_before_calculate_totals', 'update_shipping_method' );
+		$this->assertNotNull( $callback, 'The shipping update is no longer hooked to woocommerce_before_calculate_totals.' );
+
+		// The rule Woo Discount Rules matches by: an object callback, kept as "Class|method".
+		$this->assertTrue(
+			is_object( $callback[0] ) && in_array( get_class( $callback[0] ) . '|' . $callback[1], $kept, true ),
+			'Woo Discount Rules would remove the shipping update, as it is not on the keep-list by its class and method.'
+		);
+		$this->assertContains( $wdr_callback, $kept, 'The keep-list must be added to, not replaced.' );
+	}
+
+	/**
+	 * The callback registered on a hook under the given method name, if any.
+	 *
+	 * @return array{0: object|string, 1: string}|null
+	 */
+	private function registeredCallback( string $hook, string $method ): ?array {
+		foreach ( $GLOBALS['wp_filter'][ $hook ]->callbacks ?? [] as $callbacks ) {
+			foreach ( $callbacks as $details ) {
+				if ( is_array( $details['function'] ) && $method === $details['function'][1] ) {
+					return $details['function'];
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**
