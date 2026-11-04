@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-Fixed the shipping option selected in Kustom not being applied to WooCommerce when the "Suppress third party discount plugins" setting in Woo Discount Rules was enabled. WooCommerce kept another shipping method, which caused order total mismatches with Kustom Shipping Assistant.
