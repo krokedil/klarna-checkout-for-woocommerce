@@ -29,8 +29,9 @@ jQuery( function ( $ ) {
 		// True when the KCO iframe is currently suspended, to prevent double-suspend calls.
 		suspended: false,
 		// True once a shipping address is known (via shipping_address_change or change event).
-		// Prevents api.suspend from being called before Kustom has an address to fetch shipping for.
+		// With Kustom Shipping Assistant, prevents api.suspend from being called before Kustom has an address to fetch shipping for.
 		shippingAddressKnown: false,
+		lastOrderTotal: null,
 
 		redirectAttemptCount: 0,
 
@@ -115,12 +116,15 @@ jQuery( function ( $ ) {
 
 		/**
 		 * Suspends the Kustom Iframe.
-		 * Will not suspend again if already suspended, and will not suspend before a shipping
-		 * address is known (to avoid triggering premature KSA external TMS shipping fetches).
+		 * Will not suspend again if already suspended. With Kustom Shipping Assistant, will not suspend before
+		 * a shipping address is known (to avoid triggering premature KSA external TMS shipping fetches).
+		 * Without it, the iframe must always be suspended, since it only fetches the updated order on resume.
 		 * @param {boolean} autoResumeBool
+		 * @param {boolean} ignoreAddress Suspend even if no shipping address is known yet.
 		 */
-		kcoSuspend: function ( autoResumeBool ) {
-			if ( window._klarnaCheckout && ! kco_wc.validation && ! kco_wc.suspended && kco_wc.shippingAddressKnown ) {
+		kcoSuspend: function ( autoResumeBool, ignoreAddress ) {
+			const waitForAddress = "yes" === kco_params.ksa_enabled && ! kco_wc.shippingAddressKnown && ! ignoreAddress
+			if ( window._klarnaCheckout && ! kco_wc.validation && ! kco_wc.suspended && ! waitForAddress ) {
 				kco_wc.log( "kcoSuspend", autoResumeBool )
 				window._klarnaCheckout( function ( api ) {
 					kco_wc.suspended = true
@@ -130,6 +134,24 @@ jQuery( function ( $ ) {
 						},
 					} )
 				} )
+			}
+		},
+
+		/**
+		 * Suspends the iframe after a cart total change so the next resume fetches the updated order.
+		 * @param {Event} event
+		 * @param {Object} data The update_order_review response.
+		 */
+		maybeSuspendOnTotalChange: function ( event, data ) {
+			const orderTotal = data && data.fragments ? data.fragments.kco_order_total : undefined
+			if ( undefined === orderTotal ) {
+				return
+			}
+
+			const previousTotal = kco_wc.lastOrderTotal
+			kco_wc.lastOrderTotal = orderTotal
+			if ( null !== previousTotal && orderTotal !== previousTotal ) {
+				kco_wc.kcoSuspend( true, true )
 			}
 		},
 
@@ -223,7 +245,7 @@ jQuery( function ( $ ) {
 			$( ".woocommerce-additional-fields" ).appendTo( "#kco-extra-checkout-fields" )
 			var form = $( 'form[name="checkout"] input, form[name="checkout"] select, textarea' )
 			var checkout_add_ons_moved = false
-			for ( i = 0; i < form.length; i++ ) {
+			for ( let i = 0; i < form.length; i++ ) {
 				var name = form[ i ].name.replace( "[]", "\\[\\]" ) // Escape any empty "array" keys to prevent errors.
 				// Check if field is inside the order review.
 				if ( $( "table.woocommerce-checkout-review-order-table" ).find( form[ i ] ).length ) {
@@ -602,6 +624,7 @@ jQuery( function ( $ ) {
 			kco_wc.bodyEl.on( "update_checkout", function () {
 				kco_wc.kcoSuspend( true )
 			} )
+			kco_wc.bodyEl.on( "updated_checkout", kco_wc.maybeSuspendOnTotalChange )
 			kco_wc.bodyEl.on( "updated_checkout", kco_wc.kcoResume )
 			kco_wc.bodyEl.on( "updated_checkout", kco_wc.maybeDisplayShippingPrice )
 			kco_wc.bodyEl.on( "change", "input.qty", kco_wc.updateCart )
@@ -631,8 +654,12 @@ jQuery( function ( $ ) {
 							if ( "billing_only" === kco_params.woocommerce_ship_to_destination ) {
 								"given_name" in data && $( "#billing_first_name" ).val( data.given_name )
 								"family_name" in data && $( "#billing_last_name" ).val( data.family_name )
+								"street_address" in data && $( "#billing_address_1" ).val( data.street_address )
+								"street_address2" in data && $( "#billing_address_2" ).val( data.street_address2 )
+								"city" in data && $( "#billing_city" ).val( data.city )
 								"postal_code" in data && $( "#billing_postcode" ).val( data.postal_code )
 								"country" in data && $( "#billing_country" ).val( country )
+								"phone" in data && $( "#billing_phone" ).val( data.phone )
 								"email" in data && $( "#billing_email" ).val( data.email )
 								$( "#billing_country" ).trigger( "change" )
 								$( "#billing_email" ).trigger( "change" )
@@ -645,8 +672,12 @@ jQuery( function ( $ ) {
 								$( "#ship-to-different-address-checkbox" ).trigger( "blur" )
 								"given_name" in data && $( "#shipping_first_name" ).val( data.given_name )
 								"family_name" in data && $( "#shipping_last_name" ).val( data.family_name )
+								"street_address" in data && $( "#shipping_address_1" ).val( data.street_address )
+								"street_address2" in data && $( "#shipping_address_2" ).val( data.street_address2 )
+								"city" in data && $( "#shipping_city" ).val( data.city )
 								"postal_code" in data && $( "#shipping_postcode" ).val( data.postal_code )
 								"country" in data && $( "#shipping_country" ).val( country )
+								"phone" in data && $( "#shipping_phone" ).val( data.phone )
 								$( "#shipping_country" ).trigger( "change" )
 
 								$( "form.checkout" ).trigger( "update_checkout" )
@@ -659,8 +690,12 @@ jQuery( function ( $ ) {
 							var country = kco_wc.convertCountry( data.country.toUpperCase() )
 							"given_name" in data && $( "#billing_first_name" ).val( data.given_name )
 							"family_name" in data && $( "#billing_last_name" ).val( data.family_name )
+							"street_address" in data && $( "#billing_address_1" ).val( data.street_address )
+							"street_address2" in data && $( "#billing_address_2" ).val( data.street_address2 )
+							"city" in data && $( "#billing_city" ).val( data.city )
 							"postal_code" in data && $( "#billing_postcode" ).val( data.postal_code )
 							"country" in data && $( "#billing_country" ).val( country )
+							"phone" in data && $( "#billing_phone" ).val( data.phone )
 							"email" in data && $( "#billing_email" ).val( data.email )
 							$( "#billing_country" ).trigger( "change" )
 							$( "#billing_email" ).trigger( "change" )

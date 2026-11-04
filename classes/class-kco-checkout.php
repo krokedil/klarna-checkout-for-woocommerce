@@ -21,7 +21,9 @@ class KCO_Checkout {
 	public function __construct() {
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'add_shipping_data_input' ) );
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_shipping_method' ), 9999 );
+		add_filter( 'advanced_woo_discount_rules_exclude_hooks_from_removing', array( $this, 'keep_update_shipping_method_hook' ) );
 		add_action( 'woocommerce_after_calculate_totals', array( $this, 'update_klarna_order' ), 99999 );
+		add_filter( 'woocommerce_update_order_review_fragments', array( $this, 'add_order_total_fragment' ) );
 
 		// Handle potential shipping selection errors.
 		add_filter( 'woocommerce_shipping_chosen_method', array( __CLASS__, 'maybe_register_shipping_error' ), 9999, 3 );
@@ -96,6 +98,23 @@ class KCO_Checkout {
 	}
 
 	/**
+	 * Keep the shipping method update when Woo Discount Rules suppresses third party discount plugins.
+	 *
+	 * That setting removes all other callbacks from woocommerce_before_calculate_totals, so the shipping option selected
+	 * in Kustom never reached WooCommerce and Kustom Shipping Assistant was replaced by another shipping method.
+	 *
+	 * @param array $allowed_hooks Callbacks to keep as 'Class|method', keyed by hook name.
+	 *
+	 * @return array
+	 */
+	public function keep_update_shipping_method_hook( $allowed_hooks ) {
+		$allowed_hooks['woocommerce_before_calculate_totals']   = (array) ( $allowed_hooks['woocommerce_before_calculate_totals'] ?? array() );
+		$allowed_hooks['woocommerce_before_calculate_totals'][] = get_class( $this ) . '|update_shipping_method';
+
+		return $allowed_hooks;
+	}
+
+	/**
 	 * Update the Kustom order after calculations from WooCommerce has run.
 	 *
 	 * @return void
@@ -134,6 +153,23 @@ class KCO_Checkout {
 				WC()->session->set( 'reload_checkout', true );
 			}
 		}
+	}
+
+	/**
+	 * Add the cart total to the checkout fragments.
+	 *
+	 * @param array $fragments The checkout fragments.
+	 *
+	 * @return array
+	 */
+	public function add_order_total_fragment( $fragments ) {
+		if ( 'kco' !== WC()->session->get( 'chosen_payment_method' ) ) {
+			return $fragments;
+		}
+
+		$fragments['kco_order_total'] = (string) WC()->cart->get_total( 'edit' );
+
+		return $fragments;
 	}
 
 	/**

@@ -13,7 +13,7 @@ export const getElementsToHide = (shippingInIframe: boolean): string[] => {
 	return [
 		'#shipping-fields', // Hide shipping fields since they are handled in the iframe.
 		'#billing-fields', // Hide billing fields since they are handled in the iframe.
-		'#contact-fields', // Hide contact fields since they are handled in the iframe.
+		'#contact', // Hide the email field since it is handled in the iframe. The step itself is handled by hideContactStepWhenEmpty.
 		'.wc-block-components-checkout-place-order-button', // Hide the place order button since it is handled in the iframe.
 		'.wp-block-woocommerce-checkout-terms-block', // Hide the terms and conditions block since it is handled in the iframe.
 		shippingInIframe ? '#shipping-option' : '', // Hide shipping option if shipping is in the iframe.
@@ -57,6 +57,61 @@ export const hideElements = (toHide: string[]): void => {
 			element.setAttribute('style', 'display: none;');
 		}
 	});
+};
+
+/**
+ * Test if the contact step holds fields from other plugins, such as the Smart Coupons gift form.
+ * Checks for form controls rather than height, since nothing has a height while the step is hidden.
+ *
+ * @param {Element} step - The contact step element.
+ * @return {boolean} - True if another block in the step has a form field, false otherwise.
+ */
+const contactStepHasOtherFields = (step: Element): boolean => {
+	const content = step.querySelector(
+		'.wc-block-components-checkout-step__content'
+	);
+
+	return Array.from(content?.children ?? []).some(
+		(child) =>
+			child.id !== 'contact' &&
+			child.querySelector('input, select, textarea') !== null
+	);
+};
+
+/**
+ * Hide the contact step when the email field is all it holds, and show it again if another plugin's block mounts into it.
+ * Other plugins can only place their blocks inside the step, so hiding it whole would hide their fields too.
+ *
+ * @return {() => void} - Stops watching the step and shows it again.
+ */
+export const hideContactStepWhenEmpty = (): (() => void) => {
+	const step = document.querySelector('#contact-fields');
+	if (!step) {
+		return () => {};
+	}
+
+	/**
+	 * Show or hide the step depending on what it currently holds.
+	 *
+	 * @return {void}
+	 */
+	const sync = (): void => {
+		const style = contactStepHasOtherFields(step)
+			? 'display: block;'
+			: 'display: none;';
+		if (step.getAttribute('style') !== style) {
+			step.setAttribute('style', style);
+		}
+	};
+
+	sync();
+	const observer = new MutationObserver(sync);
+	observer.observe(step, { childList: true, subtree: true });
+
+	return () => {
+		observer.disconnect();
+		step.setAttribute('style', 'display: block;');
+	};
 };
 
 /**

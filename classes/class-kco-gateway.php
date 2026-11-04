@@ -6,6 +6,7 @@
  */
 
 use Krokedil\KustomCheckout\CheckoutFlow\CheckoutFlow;
+use Krokedil\KustomCheckout\ShippingAssistant\Settings as ShippingAssistantSettings;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
 use KrokedilKlarnaCheckoutDeps\Krokedil\SettingsPage\SettingsPage;
@@ -448,6 +449,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				'is_confirmation_page'            => ( is_kco_confirmation() ) ? 'yes' : 'no',
 				'is_order_received_page'          => is_order_received_page() ? 'yes' : 'no',
 				'shipping_methods_in_iframe'      => $this->shipping_methods_in_iframe,
+				'ksa_enabled'                     => ShippingAssistantSettings::is_enabled() ? 'yes' : 'no',
 				'required_fields_text'            => __( 'Please fill in all required checkout fields.', 'klarna-checkout-for-woocommerce' ),
 				'email_exists'                    => $email_exists,
 				'must_login_message'              => apply_filters( 'woocommerce_registration_error_email_exists', __( 'An account is already registered with your email address. Please log in.', 'woocommerce' ) ),
