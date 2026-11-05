@@ -127,7 +127,7 @@ class Rest {
 		$order = $this->get_order( $request );
 		$this->load_cart();
 
-		return $this->answer( $order, SessionHandler::refresh( $order ) );
+		return $this->answer( $order, SessionHandler::refresh( $order ), $request );
 	}
 
 	/**
@@ -140,7 +140,7 @@ class Rest {
 		$order = $this->get_order( $request );
 		$this->load_cart();
 
-		return $this->answer( $order, SessionHandler::cancel( $order ) );
+		return $this->answer( $order, SessionHandler::cancel( $order ), $request );
 	}
 
 	/**
@@ -160,11 +160,12 @@ class Rest {
 	/**
 	 * Turn an outcome into what the waiting screen does next.
 	 *
-	 * @param \WC_Order       $order The WooCommerce order.
-	 * @param array|\WP_Error $outcome The outcome from the session handler.
+	 * @param \WC_Order        $order The WooCommerce order.
+	 * @param array|\WP_Error  $outcome The outcome from the session handler.
+	 * @param \WP_REST_Request $request The request.
 	 * @return \WP_REST_Response
 	 */
-	private function answer( $order, $outcome ) {
+	private function answer( $order, $outcome, $request ) {
 		if ( is_wp_error( $outcome ) ) {
 			// Kustom being briefly unreachable is not a failed sale: keep waiting.
 			return new \WP_REST_Response(
@@ -188,7 +189,11 @@ class Rest {
 
 		if ( SessionHandler::FAILED === $outcome['state'] ) {
 			$this->restore_cart( $order );
-			wc_add_notice( $outcome['message'], 'error' );
+
+			// The point of sale shows the message itself. A notice left in the session would make the Store API refuse its next sale.
+			if ( 'pos' !== $request->get_param( 'context' ) ) {
+				wc_add_notice( $outcome['message'], 'error' );
+			}
 
 			$response['redirect'] = wc_get_checkout_url();
 		}

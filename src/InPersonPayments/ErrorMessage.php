@@ -46,7 +46,8 @@ class ErrorMessage {
 	 * The sentence for an HTTP status Kustom answered with.
 	 *
 	 * Only what the create session endpoint documents gets wording of its own: 400
-	 * invalid input, 401 authentication failure, 404 device or resource missing.
+	 * invalid input, 401 authentication failure, 404 device or resource missing, 409
+	 * no open cash register on the device.
 	 *
 	 * @param int $status The HTTP status code.
 	 * @return string
@@ -62,6 +63,11 @@ class ErrorMessage {
 
 		if ( 404 === $status ) {
 			return __( 'Kustom does not recognize the chosen POS device. Pick another device, or pair this one again.', 'klarna-checkout-for-woocommerce' );
+		}
+
+		// Kustom answers with the generic conflict code here, not the no_open_cash_register code it documents.
+		if ( 409 === $status ) {
+			return __( 'The chosen device has no open cash register. Open one in the Kustom POS app and try the payment again.', 'klarna-checkout-for-woocommerce' );
 		}
 
 		return __( 'The payment could not be started on the device. Please try the payment again.', 'klarna-checkout-for-woocommerce' );

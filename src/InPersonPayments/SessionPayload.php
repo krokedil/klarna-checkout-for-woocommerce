@@ -29,14 +29,23 @@ class SessionPayload {
 	private $device_id;
 
 	/**
+	 * The payment channel to preselect on the device, or empty to let the device ask.
+	 *
+	 * @var string
+	 */
+	private $payment_channel;
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
 	 * @param string    $device_id The device to dispatch to.
+	 * @param string    $payment_channel One of Gateway::PAYMENT_CHANNELS, or empty to let the device ask.
 	 */
-	public function __construct( $order, $device_id ) {
-		$this->order     = $order;
-		$this->device_id = $device_id;
+	public function __construct( $order, $device_id, $payment_channel = '' ) {
+		$this->order           = $order;
+		$this->device_id       = $device_id;
+		$this->payment_channel = $payment_channel;
 	}
 
 	/**
@@ -65,6 +74,10 @@ class SessionPayload {
 				JSON_UNESCAPED_SLASHES
 			),
 		);
+
+		if ( '' !== $this->payment_channel ) {
+			$payload['payment_channel'] = $this->payment_channel;
+		}
 
 		/**
 		 * The create-session payload before it is sent to the device.

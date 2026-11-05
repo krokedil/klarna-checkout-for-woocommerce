@@ -42,6 +42,20 @@ class InPersonPayments {
 	public $waiting_screen;
 
 	/**
+	 * The handling of sales rung up on a point of sale.
+	 *
+	 * @var PosSale|null
+	 */
+	public $pos_sale;
+
+	/**
+	 * The in-person details box on the order screen.
+	 *
+	 * @var OrderDetails|null
+	 */
+	public $order_details;
+
+	/**
 	 * Class constructor.
 	 */
 	public function __construct() {
@@ -56,6 +70,11 @@ class InPersonPayments {
 		$this->checkout       = new Checkout();
 		$this->rest           = new Rest();
 		$this->waiting_screen = new WaitingScreen();
+		$this->pos_sale       = new PosSale();
+
+		if ( is_admin() ) {
+			$this->order_details = new OrderDetails();
+		}
 
 		add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateway' ) );
 	}

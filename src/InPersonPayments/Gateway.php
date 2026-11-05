@@ -30,6 +30,20 @@ class Gateway extends \WC_Payment_Gateway {
 	public const DEVICE_FIELD = 'kco_ipp_device_id';
 
 	/**
+	 * The optional field the payment channel to preselect on the device is posted in.
+	 *
+	 * @var string
+	 */
+	public const CHANNEL_FIELD = 'kco_ipp_payment_channel';
+
+	/**
+	 * The payment channels a session can be preselected for.
+	 *
+	 * @var string[]
+	 */
+	public const PAYMENT_CHANNELS = array( 'CARD_PAYMENT', 'SCAN_TO_PAY' );
+
+	/**
 	 * Order meta keys.
 	 *
 	 * @var string
@@ -37,6 +51,17 @@ class Gateway extends \WC_Payment_Gateway {
 	public const SESSION_META = '_kco_ipp_session_id';
 	public const DEVICE_META  = '_kco_ipp_device_id';
 	public const STATUS_META  = '_kco_ipp_status';
+
+	/**
+	 * Where and by whom the sale was taken, as it was when the session was sent.
+	 *
+	 * @var string
+	 */
+	public const DEVICE_NAME_META = '_kco_ipp_device_name';
+	public const LOCATION_META    = '_kco_ipp_location_id';
+	public const REGISTER_META    = '_kco_ipp_cash_register_id';
+	public const CHANNEL_META     = '_kco_ipp_payment_channel';
+	public const STAFF_META       = '_kco_ipp_staff_id';
 
 	/**
 	 * Class constructor.
@@ -245,6 +270,18 @@ class Gateway extends \WC_Payment_Gateway {
 	}
 
 	/**
+	 * The posted payment channel, or an empty string to let the device ask.
+	 *
+	 * @return string
+	 */
+	private function get_posted_channel() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verifies the checkout nonce before this runs.
+		$channel = isset( $_POST[ self::CHANNEL_FIELD ] ) ? sanitize_text_field( wp_unslash( $_POST[ self::CHANNEL_FIELD ] ) ) : '';
+
+		return in_array( $channel, self::PAYMENT_CHANNELS, true ) ? $channel : '';
+	}
+
+	/**
 	 * Dispatch a payment session to the chosen device.
 	 *
 	 * The order stays pending: it is the device that decides whether the sale happens.
@@ -267,7 +304,8 @@ class Gateway extends \WC_Payment_Gateway {
 			$order->set_billing_email( Checkout::fallback_email() );
 		}
 
-		$payload  = ( new SessionPayload( $order, $device_id ) )->get_payload();
+		$channel  = $this->get_posted_channel();
+		$payload  = ( new SessionPayload( $order, $device_id, $channel ) )->get_payload();
 		$response = ( new RequestPostSession( array( 'payload' => $payload ) ) )->request();
 
 		if ( is_wp_error( $response ) ) {
@@ -277,6 +315,11 @@ class Gateway extends \WC_Payment_Gateway {
 		$order->update_meta_data( self::SESSION_META, $response['session_id'] ?? '' );
 		$order->update_meta_data( self::DEVICE_META, $device_id );
 		$order->update_meta_data( self::STATUS_META, $response['status'] ?? '' );
+		$order->update_meta_data( self::DEVICE_NAME_META, $device['name'] ?? '' );
+		$order->update_meta_data( self::LOCATION_META, $device['location_id'] ?? '' );
+		$order->update_meta_data( self::REGISTER_META, (string) ( $device['open_cash_register_id'] ?? '' ) );
+		$order->update_meta_data( self::CHANNEL_META, $channel );
+		$order->update_meta_data( self::STAFF_META, (string) get_current_user_id() );
 		$order->add_order_note(
 			sprintf(
 				/* translators: %s: the name of the POS device. */
