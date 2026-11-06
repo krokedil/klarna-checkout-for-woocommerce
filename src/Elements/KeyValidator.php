@@ -117,13 +117,13 @@ class KeyValidator {
 			case self::STATUS_INVALID_KEY:
 				return sprintf(
 					// translators: %s: The environment (production or test).
-					__( 'The %s public API key was not recognized by Kustom. Copy the data-public-api-key from Elements → Installation script in the Kustom Portal.', 'klarna-checkout-for-woocommerce' ),
+					__( 'The %s public API key was not recognized by Kustom. Copy the data-public-api-key from Apps → On-site elements → Installation script in the Kustom Portal.', 'klarna-checkout-for-woocommerce' ),
 					$environment
 				);
 			case self::STATUS_ORIGIN_NOT_ALLOWED:
 				return sprintf(
 					// translators: 1: The environment (production or test), 2: The site domain, e.g. https://example.com.
-					__( 'The %1$s public API key is valid, but %2$s is not an allowed domain. Add the domain under Elements in the Kustom Portal.', 'klarna-checkout-for-woocommerce' ),
+					__( 'The %1$s public API key is valid, but %2$s is not an allowed domain. Add the domain under Apps → On-site elements → My domains in the Kustom Portal.', 'klarna-checkout-for-woocommerce' ),
 					$environment,
 					self::get_origin()
 				);
