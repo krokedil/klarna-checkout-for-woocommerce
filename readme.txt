@@ -7,7 +7,7 @@ Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 9.7.0
 WC tested up to: 11.2.1
-Stable tag: 2.24.0
+Stable tag: 2.24.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,13 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-11-04    - version 2.24.1 =
+* Fix           - Fixed an issue where an incomplete address could be sent to Kustom during checkout, preventing the customer from completing their purchase.
+* Fix           - Fixed fields added by other plugins to the block checkout, such as the WooCommerce Smart Coupons gift card form, being hidden and not savedto the order when Kustom is selected.
+* Fix           - Fixed the checkout script stopping part-way through initialisation when another script on the page declares a global variable named "i".
+* Fix           - Fixed the Kustom Checkout iframe showing an outdated order total when the cart total changed outside the iframe before the customer had entered an address, for example when shipping was changed or a coupon was applied.
+* Fix           - Fixed the shipping option selected in Kustom not being applied to WooCommerce when the "Suppress third party discount plugins" setting in Woo Discount Rules was enabled. WooCommerce kept another shipping method, which caused order total mismatches with Kustom Shipping Assistant.
+
 = 2026-10-27    - version 2.24.0 =
 * Feature       - Added support for adding Kustom express buttons to the cart, the block cart and checkout, product pages, and a new shortcode and block.
 * Enhancement   - Kustom Elements API keys are now validated with Kustom. The settings page reports invalid keys or unauthorized domains, and blocks show the same errors in the editor.

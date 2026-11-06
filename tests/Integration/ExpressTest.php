@@ -382,6 +382,26 @@ class ExpressTest extends IntegrationTestCase {
 		$this->assertNull( ExpressSession::open( $token )->get( 'kco_wc_order_id' ), 'The shopper\'s session must not keep the express order for the iframe to reuse.' );
 	}
 
+	public function test_an_express_order_is_placed_without_the_checkout_pages_extension_data(): void {
+		[ , $token ] = $this->haveExpressOrderToValidate( [ 'order_amount' => 7600 ] );
+		$session     = ExpressSession::open( $token );
+		$session->set( 'kco_wc_extension_data', [ 'woocommerce-smart-coupons' => [ 'is_gift' => 'yes' ] ] );
+		ExpressSession::save( $session );
+
+		OrderValidation::validate_kco_order( 'checkout-order-123' );
+
+		$checkout = array_values(
+			array_filter(
+				$this->httpRequests(),
+				static function ( $request ) {
+					return false !== strpos( $request['url'], 'wc/store/v1/checkout' );
+				}
+			)
+		);
+		$this->assertCount( 1, $checkout );
+		$this->assertArrayNotHasKey( 'extensions', $checkout[0]['json'], 'The shopper never saw the checkout page fields in the express flow.' );
+	}
+
 	/** @return array<string, array{0: array}> */
 	public function provide_approved_totals(): array {
 		// The order is one 100.00 product with 25% VAT, so 12500, and has no shipping line.
