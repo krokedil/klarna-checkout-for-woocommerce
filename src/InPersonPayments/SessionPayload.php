@@ -103,14 +103,26 @@ class SessionPayload {
 		$order_items = array();
 
 		foreach ( $this->order->get_items() as $item ) {
+			if ( ! $item instanceof \WC_Order_Item_Product ) {
+				continue;
+			}
+
 			$order_items[] = $this->product_line( $item );
 		}
 
 		foreach ( $this->order->get_items( 'shipping' ) as $item ) {
+			if ( ! $item instanceof \WC_Order_Item_Shipping ) {
+				continue;
+			}
+
 			$order_items[] = $this->shipping_line( $item );
 		}
 
 		foreach ( $this->order->get_items( 'fee' ) as $item ) {
+			if ( ! $item instanceof \WC_Order_Item_Fee ) {
+				continue;
+			}
+
 			$order_items[] = $this->fee_line( $item );
 		}
 
@@ -252,7 +264,7 @@ class SessionPayload {
 	/**
 	 * The item's tax rate in basis points, e.g. 2500 for 25%.
 	 *
-	 * @param \WC_Order_Item $item The order item.
+	 * @param \WC_Order_Item_Product|\WC_Order_Item_Shipping|\WC_Order_Item_Fee $item The order item.
 	 * @return int
 	 */
 	private function tax_rate( $item ) {

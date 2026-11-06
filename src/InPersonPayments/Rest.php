@@ -216,6 +216,10 @@ class Rest {
 		WC()->cart->empty_cart();
 
 		foreach ( $order->get_items() as $item ) {
+			if ( ! $item instanceof \WC_Order_Item_Product ) {
+				continue;
+			}
+
 			WC()->cart->add_to_cart( $item->get_product_id(), $item->get_quantity(), $item->get_variation_id() );
 		}
 	}

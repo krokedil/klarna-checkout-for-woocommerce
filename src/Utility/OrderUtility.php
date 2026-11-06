@@ -32,11 +32,11 @@ class OrderUtility {
 	/**
 	 * Whether an order was paid with one of them.
 	 *
-	 * @param \WC_Abstract_Order|false|null $order The WooCommerce order.
+	 * @param \WC_Order|\WC_Order_Refund|false|null $order The WooCommerce order.
 	 * @return bool
 	 */
 	public static function is_kustom_order( $order ) {
-		if ( ! $order instanceof \WC_Abstract_Order ) {
+		if ( ! $order instanceof \WC_Order ) {
 			return false;
 		}
 
@@ -47,10 +47,10 @@ class OrderUtility {
 	 * Whether the payment was collected on a Kustom POS device, and so captured by
 	 * Kustom at the tap rather than by this plugin.
 	 *
-	 * @param \WC_Abstract_Order|false|null $order The WooCommerce order.
+	 * @param \WC_Order|\WC_Order_Refund|false|null $order The WooCommerce order.
 	 * @return bool
 	 */
 	public static function is_in_person_order( $order ) {
-		return $order instanceof \WC_Abstract_Order && InPersonPaymentsGateway::ID === $order->get_payment_method();
+		return $order instanceof \WC_Order && InPersonPaymentsGateway::ID === $order->get_payment_method();
 	}
 }
