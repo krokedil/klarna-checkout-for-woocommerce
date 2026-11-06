@@ -482,6 +482,65 @@ class OrderManagementTest extends IntegrationTestCase {
 	}
 
 	/**
+	 * A tap at the counter leaves an ordinary Kustom order behind, so the same screen
+	 * refunds and cancels it.
+	 *
+	 * @dataProvider provide_in_person_operations
+	 */
+	public function test_an_in_person_order_is_managed_like_a_checkout_order( string $op ): void {
+		$order = $this->haveInPersonOrderFor( $op );
+		$this->willSucceed( $op );
+
+		$this->assertTrue( $this->perform( $op, $order ) );
+		$this->assertGatewayRequestCount( 1, self::ENDPOINTS[ $op ][0] );
+	}
+
+	/** @return array<string, array{0: string}> */
+	public function provide_in_person_operations(): array {
+		return [ 'cancel' => [ 'cancel' ], 'refund' => [ 'refund' ] ];
+	}
+
+	/** Kustom captures an in-person payment at the tap, so there is no capture of ours. */
+	public function test_an_in_person_refund_does_not_need_a_capture_of_ours(): void {
+		$order = $this->haveInPersonOrderFor( 'refund' );
+		$this->applyGuard( $order, 'no-capture-id' );
+		$this->willSucceed( 'refund' );
+
+		$this->assertTrue( $this->perform( 'refund', $order ) );
+		$this->assertGatewayRequestCount( 1, '/refunds' );
+	}
+
+	/** For the same reason, completing one must not send a capture. */
+	public function test_an_in_person_order_is_never_captured_by_the_plugin(): void {
+		$order = $this->haveInPersonOrderFor( 'capture' );
+
+		$this->perform( 'capture', $order );
+
+		$this->assertNoGatewayRequests();
+	}
+
+	/** WooCommerce refunds through the gateway the order was paid with. */
+	public function test_refunding_an_in_person_order_through_its_gateway(): void {
+		$order = $this->haveInPersonOrderFor( 'refund' );
+		$this->willSucceed( 'refund' );
+
+		$gateway = new \Krokedil\KustomCheckout\InPersonPayments\Gateway();
+
+		$this->assertTrue( $gateway->supports( 'refunds' ) );
+		$this->assertTrue( $gateway->process_refund( $order->get_id(), '125.00', 'Returned at the counter' ) );
+		$this->assertGatewayRequestCount( 1, '/refunds' );
+	}
+
+	/** The same order state as a checkout order, but paid on a device. */
+	private function haveInPersonOrderFor( string $op ): \WC_Order {
+		$order = $this->haveOrderFor( $op );
+		$order->set_payment_method( \Krokedil\KustomCheckout\InPersonPayments\Gateway::ID );
+		$order->save();
+
+		return $order;
+	}
+
+	/**
 	 * @return bool|null|\WP_Error
 	 */
 	private function perform( string $op, \WC_Order $order, bool $action = false ) {

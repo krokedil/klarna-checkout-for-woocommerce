@@ -248,6 +248,8 @@ trait CanConfigureStore {
 	 * changed after they were first constructed.
 	 */
 	protected function reloadPaymentGateways(): void {
+		// init() only appends, so a gateway registered by an earlier test would survive.
+		WC()->payment_gateways()->payment_gateways = [];
 		WC()->payment_gateways()->init();
 	}
 
