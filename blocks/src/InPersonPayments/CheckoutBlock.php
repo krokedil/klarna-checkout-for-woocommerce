@@ -48,7 +48,8 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 		wp_register_script(
 			self::SCRIPT_HANDLE,
 			plugins_url( 'blocks/build/inpersonpayments.js', KCO_WC_MAIN_FILE ),
-			$assets['dependencies'],
+			// blockUI covers the address forms while the method is chosen.
+			array_merge( $assets['dependencies'], array( 'jquery', 'jquery-blockui' ) ),
 			$assets['version'],
 			true
 		);
@@ -92,6 +93,7 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 			'deviceLabel'     => __( 'Device', 'klarna-checkout-for-woocommerce' ),
 			'placeOrderLabel' => __( 'Take payment on device', 'klarna-checkout-for-woocommerce' ),
 			'noDeviceMessage' => __( 'Please choose a Kustom POS device to take the payment on.', 'klarna-checkout-for-woocommerce' ),
+			'noAddressNotice' => Gateway::no_address_notice(),
 			'devices'         => $this->get_devices(),
 			'features'        => $this->get_supported_features(),
 		);

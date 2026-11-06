@@ -19,7 +19,8 @@ var jsFiles = [
 	'assets/js/klarna-checkout-for-woocommerce-admin.js',
 	'src/OrderManagement/assets/js/klarna-order-management.js',
 	'src/InPersonPayments/assets/js/kustom-ipp-admin.js',
-	'src/InPersonPayments/assets/js/kustom-ipp-checkout.js'
+	'src/InPersonPayments/assets/js/kustom-ipp-checkout.js',
+	'src/InPersonPayments/assets/js/kustom-ipp-checkout-form.js'
 ];
 var translateFiles = [
 	'**/*.php',

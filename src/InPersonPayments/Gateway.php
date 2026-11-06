@@ -221,6 +221,7 @@ class Gateway extends \WC_Payment_Gateway {
 		}
 
 		?>
+		<div class="woocommerce-info"><?php echo esc_html( self::no_address_notice() ); ?></div>
 		<p class="form-row form-row-wide">
 			<label for="<?php echo esc_attr( self::DEVICE_FIELD ); ?>">
 				<?php esc_html_e( 'Device', 'klarna-checkout-for-woocommerce' ); ?>
@@ -235,6 +236,15 @@ class Gateway extends \WC_Payment_Gateway {
 			</select>
 		</p>
 		<?php
+	}
+
+	/**
+	 * The notice shown while in-person payment is chosen.
+	 *
+	 * @return string
+	 */
+	public static function no_address_notice() {
+		return __( 'Shipping and address details will not be added to the order.', 'klarna-checkout-for-woocommerce' );
 	}
 
 	/**

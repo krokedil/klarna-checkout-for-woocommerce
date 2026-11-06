@@ -6,8 +6,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Strips the shortcode checkout down to what a walk-in sale has: nothing required, and
- * no shipping.
+ * Strips the shortcode checkout down to what a walk-in sale has: nothing required, no
+ * shipping, and no address on the order.
  */
 class Checkout {
 
@@ -19,6 +19,63 @@ class Checkout {
 		add_filter( 'woocommerce_cart_needs_shipping', array( $this, 'skip_shipping' ), 100 );
 		add_filter( 'woocommerce_cart_needs_shipping_address', array( $this, 'skip_shipping' ), 100 );
 		add_filter( 'woocommerce_checkout_get_value', array( $this, 'fall_back_to_the_store_email' ), 10, 2 );
+		add_action( 'woocommerce_checkout_create_order', array( $this, 'remove_address' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+	}
+
+	/**
+	 * Leave the address off an in-person order: the form is blocked, so what it holds is
+	 * the salesperson's own prefilled address, not the customer's.
+	 *
+	 * @param \WC_Order $order The order being created.
+	 * @return void
+	 */
+	public function remove_address( $order ) {
+		if ( Gateway::ID === $order->get_payment_method() && current_user_can( Gateway::required_capability() ) ) {
+			self::strip_address( $order );
+		}
+	}
+
+	/**
+	 * Empty an order's billing and shipping address. WooCommerce refuses an order without
+	 * a billing email and country, so those become the store's own.
+	 *
+	 * @param \WC_Order $order The order.
+	 * @return void
+	 */
+	public static function strip_address( $order ) {
+		foreach ( array( 'billing', 'shipping' ) as $type ) {
+			foreach ( array_merge( array_keys( WC()->countries->get_default_address_fields() ), array( 'phone' ) ) as $field ) {
+				$setter = "set_{$type}_{$field}";
+				if ( is_callable( array( $order, $setter ) ) ) {
+					$order->$setter( '' );
+				}
+			}
+		}
+
+		$order->set_billing_email( self::fallback_email() );
+		$order->set_billing_country( WC()->countries->get_base_country() );
+	}
+
+	/**
+	 * Block the address forms of the shortcode checkout while in-person payment is chosen.
+	 *
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+		if ( ! is_checkout() || is_order_received_page() || is_checkout_pay_page() || ! current_user_can( Gateway::required_capability() ) ) {
+			return;
+		}
+
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
+		wp_enqueue_script(
+			'kco_ipp_checkout_form',
+			plugins_url( 'src/InPersonPayments/assets/js/kustom-ipp-checkout-form' . $suffix . '.js', KCO_WC_MAIN_FILE ),
+			array( 'jquery', 'jquery-blockui' ),
+			KCO_WC_VERSION,
+			true
+		);
 	}
 
 	/**

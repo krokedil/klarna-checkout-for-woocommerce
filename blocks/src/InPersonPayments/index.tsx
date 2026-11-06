@@ -32,6 +32,52 @@ type Device = {
  */
 const DEVICE_FIELD = 'kco_ipp_device_id';
 
+/**
+ * The checkout sections whose details are not added to an in-person order.
+ */
+const ADDRESS_FORMS =
+	'.wc-block-checkout__contact-fields, .wc-block-checkout__billing-fields, .wc-block-checkout__shipping-fields';
+
+/**
+ * Block or unblock the address forms with WooCommerce's blockUI, without its spinner.
+ *
+ * @param {boolean} block Whether to block them.
+ */
+const blockAddressForms = (block: boolean): void => {
+	const $ = (window as any).jQuery;
+	if (!$?.fn?.block) {
+		return;
+	}
+
+	if (!document.getElementById('kco-ipp-no-address-style')) {
+		// No spinner: the forms are blocked, not loading. The values are hidden so the
+		// salesperson does not think they end up on the order.
+		$(
+			'<style id="kco-ipp-no-address-style">.kco-ipp-no-address .blockUI.blockOverlay::before { display: none !important; } .kco-ipp-no-address input, .kco-ipp-no-address select, .kco-ipp-no-address textarea, .kco-ipp-no-address .select2-selection__rendered, .kco-ipp-no-address .wc-block-components-address-card address, .kco-ipp-no-address .wc-block-components-address-card address * { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; }</style>'
+		).appendTo('head');
+	}
+
+	const $forms = $(ADDRESS_FORMS);
+	if (block) {
+		$forms
+			.not('.kco-ipp-no-address')
+			.addClass('kco-ipp-no-address')
+			.block({
+				message: null,
+				overlayCSS: {
+					background: '#fff',
+					opacity: 0.6,
+					cursor: 'not-allowed',
+				},
+			});
+	} else {
+		$forms
+			.filter('.kco-ipp-no-address')
+			.removeClass('kco-ipp-no-address')
+			.unblock();
+	}
+};
+
 const settings: any = getSetting('kco_ipp_data', {});
 const title: string = decodeEntities(settings.title || 'In-Person Payment');
 const devices: Device[] = settings.devices || [];
@@ -93,12 +139,23 @@ const InPersonPayment = (props: InPersonPaymentProps): JSX.Element => {
 	// The component is only mounted while the method is selected, so mounting is what
 	// tells WooCommerce that this sale is handed over the counter and needs no shipping.
 	useEffect(() => {
+		blockAddressForms(true);
+
+		// The checkout re-renders its address sections, e.g. when shipping drops out, so keep blocking the new ones.
+		const observer = new MutationObserver(() => blockAddressForms(true));
+		observer.observe(
+			document.querySelector('.wc-block-checkout') || document.body,
+			{ childList: true, subtree: true }
+		);
+
 		extensionCartUpdate({
 			namespace: 'kco-block',
 			data: { action: 'ipp_selected' },
 		}).catch(() => {});
 
 		return () => {
+			observer.disconnect();
+			blockAddressForms(false);
 			extensionCartUpdate({
 				namespace: 'kco-block',
 				data: { action: 'ipp_deselected' },
@@ -108,7 +165,12 @@ const InPersonPayment = (props: InPersonPaymentProps): JSX.Element => {
 
 	return (
 		<div className="wc-block-components-kustom-in-person-payment">
-			<label htmlFor={DEVICE_FIELD}>
+			<div className="wc-block-components-notice-banner is-info">
+				<div className="wc-block-components-notice-banner__content">
+					{decodeEntities(settings.noAddressNotice || '')}
+				</div>
+			</div>
+			<label htmlFor={DEVICE_FIELD} style={{ marginRight: '0.5em' }}>
 				{decodeEntities(settings.deviceLabel || 'Device')}
 			</label>
 			<select

@@ -8,8 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * A sale rung up on a point of sale through the Store API checkout, marked by a
- * `kco_ipp_pos` entry in its payment data: no customer, no address and no customer emails.
+ * In-person orders placed through the Store API, from the checkout block or a point of
+ * sale: no address. A point of sale sale, marked by a `kco_ipp_pos` entry in its payment
+ * data, also has no customer and gets no customer emails.
  */
 class PosSale {
 
@@ -48,35 +49,25 @@ class PosSale {
 	}
 
 	/**
-	 * A point of sale order has no customer: the Store API fills the order in from the
-	 * salesperson's own account, so that is undone before the order is validated and paid.
+	 * Leave the address off an in-person order, and the customer off a point of sale one:
+	 * the Store API fills both in from the salesperson's own account. Done before the
+	 * order is validated and paid.
 	 *
 	 * @param \WC_Order        $order The order.
 	 * @param \WP_REST_Request $request The checkout request.
 	 * @return void
 	 */
 	public function remove_customer( $order, $request ) {
-		if ( Gateway::ID !== $order->get_payment_method() || ! self::is_pos_request( $request ) || ! current_user_can( Gateway::required_capability() ) ) {
+		if ( Gateway::ID !== $order->get_payment_method() || ! current_user_can( Gateway::required_capability() ) ) {
 			return;
 		}
 
-		$order->set_customer_id( 0 );
+		Checkout::strip_address( $order );
 
-		foreach ( array( 'billing', 'shipping' ) as $type ) {
-			foreach ( array_keys( WC()->countries->get_default_address_fields() ) as $field ) {
-				$setter = "set_{$type}_{$field}";
-				if ( is_callable( array( $order, $setter ) ) ) {
-					$order->$setter( '' );
-				}
-			}
+		if ( self::is_pos_request( $request ) ) {
+			$order->set_customer_id( 0 );
+			$order->set_created_via( self::CREATED_VIA );
 		}
-		$order->set_billing_phone( '' );
-		$order->set_shipping_phone( '' );
-
-		// WooCommerce refuses an order without a billing email and country, so they are the store's own.
-		$order->set_billing_email( Checkout::fallback_email() );
-		$order->set_billing_country( WC()->countries->get_base_country() );
-		$order->set_created_via( self::CREATED_VIA );
 
 		// The Store API validates the address against the country locale next. The relaxed in-person locale is only
 		// registered for stores on the checkout block, and the locale is cached per request, so relax it here and rebuild it.
