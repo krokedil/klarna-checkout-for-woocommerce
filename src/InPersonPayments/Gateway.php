@@ -67,9 +67,12 @@ class Gateway extends \WC_Payment_Gateway {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		$this->id                 = self::ID;
-		$this->method_title       = __( 'Kustom In-Person Payments', 'klarna-checkout-for-woocommerce' );
-		$this->method_description = __( 'Take payment at the counter on a paired Kustom POS device. Configured under In-person payments in the Kustom Checkout settings.', 'klarna-checkout-for-woocommerce' );
+		$this->id = self::ID;
+
+		// No admin title or description makes this a "shell" gateway, which WooCommerce leaves off its
+		// payments settings list. It has no settings of its own: they live in the Kustom Checkout settings.
+		$this->method_title       = '';
+		$this->method_description = '';
 		$this->has_fields         = true;
 		$this->supports           = array( 'products' );
 

@@ -52,6 +52,13 @@ class InPersonPaymentsCheckoutTest extends IntegrationTestCase {
 		remove_filter( 'woocommerce_payment_gateways', [ $ipp, 'add_gateway' ] );
 	}
 
+	/** The method has no settings of its own, so WooCommerce leaves it off the payments settings list. */
+	public function test_the_method_is_hidden_from_the_payments_settings_list(): void {
+		$providers = wc_get_container()->get( \Automattic\WooCommerce\Internal\Admin\Settings\PaymentsProviders::class );
+
+		$this->assertTrue( $providers->is_shell_payment_gateway( new Gateway() ) );
+	}
+
 	/**
 	 * Only staff take payments at the counter, so the method is capability gated
 	 * rather than shown to every shopper.
