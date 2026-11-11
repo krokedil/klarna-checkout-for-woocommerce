@@ -69,48 +69,48 @@ class PosSale {
 			$order->set_created_via( self::CREATED_VIA );
 		}
 
-		// The Store API validates the address against the country locale next. The relaxed in-person locale is only
-		// registered for stores on the checkout block, and the locale is cached per request, so relax it here and rebuild it.
+		// The Store API validates the address against the country locale next, and the locale is cached per request,
+		// so relax it from here on and rebuild it.
 		self::$relax_address    = true;
 		WC()->countries->locale = array();
 	}
 
 	/**
-	 * Make the address fields optional while a point of sale order is checked out.
+	 * Make the address fields optional while an in-person order is checked out.
 	 *
 	 * @param array $fields The address fields.
 	 * @return array
 	 */
 	public function relax_address_fields( $fields ) {
-		if ( ! self::$relax_address ) {
-			return $fields;
-		}
-
-		foreach ( BlockCheckout::OPTIONAL_FIELDS as $key ) {
-			if ( isset( $fields[ $key ] ) ) {
-				$fields[ $key ]['required'] = false;
-			}
-		}
-
-		return $fields;
+		return self::should_relax() ? BlockCheckout::make_optional( $fields ) : $fields;
 	}
 
 	/**
-	 * Make each country's address fields optional while a point of sale order is checked out.
+	 * Make each country's address fields optional while an in-person order is checked out.
 	 *
 	 * @param array $locales The address fields by country.
 	 * @return array
 	 */
 	public function relax_locales( $locales ) {
-		if ( ! self::$relax_address ) {
+		if ( ! self::should_relax() ) {
 			return $locales;
 		}
 
 		foreach ( $locales as $country => $fields ) {
-			$locales[ $country ] = $this->relax_address_fields( (array) $fields );
+			$locales[ $country ] = BlockCheckout::make_optional( (array) $fields );
 		}
 
 		return $locales;
+	}
+
+	/**
+	 * Whether the address is optional right now: in-person payment is the chosen method,
+	 * or an in-person order is being placed through the Store API.
+	 *
+	 * @return bool
+	 */
+	private static function should_relax() {
+		return self::$relax_address || Checkout::is_chosen();
 	}
 
 	/**

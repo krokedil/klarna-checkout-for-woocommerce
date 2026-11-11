@@ -1,7 +1,6 @@
 <?php
 namespace Krokedil\KustomCheckout\Blocks\InPersonPayments;
 
-use Krokedil\KustomCheckout\InPersonPayments\Checkout;
 use Krokedil\KustomCheckout\InPersonPayments\Gateway;
 use Krokedil\KustomCheckout\InPersonPayments\InPersonPayments;
 
@@ -23,40 +22,8 @@ class BlockCheckout {
 	 * Class constructor.
 	 */
 	public function __construct() {
+		// The server-side validation is relaxed by PosSale, which runs for the shortcode checkout too.
 		add_filter( 'woocommerce_shared_settings', array( $this, 'relax_address_fields' ) );
-
-		// The Store API validates the address server-side from the country locale, not
-		// from the page settings, so a walk-in sale has to be relaxed there as well.
-		add_filter( 'woocommerce_get_country_locale_default', array( $this, 'relax_address_validation' ), 100 );
-		add_filter( 'woocommerce_get_country_locale', array( $this, 'relax_locale_validation' ), 100 );
-	}
-
-	/**
-	 * Make the default address fields optional while an in-person sale is being placed.
-	 *
-	 * @param array $fields The default address field definitions.
-	 * @return array
-	 */
-	public function relax_address_validation( $fields ) {
-		return Checkout::is_chosen() ? self::make_optional( $fields ) : $fields;
-	}
-
-	/**
-	 * Make each country's address overrides optional while an in-person sale is being placed.
-	 *
-	 * @param array $locales The per-country field overrides.
-	 * @return array
-	 */
-	public function relax_locale_validation( $locales ) {
-		if ( ! Checkout::is_chosen() ) {
-			return $locales;
-		}
-
-		foreach ( $locales as $country => $fields ) {
-			$locales[ $country ] = self::make_optional( (array) $fields );
-		}
-
-		return $locales;
 	}
 
 	/**
@@ -137,7 +104,7 @@ class BlockCheckout {
 	 * @param array $fields The field definitions, keyed by field name.
 	 * @return array
 	 */
-	private static function make_optional( $fields ) {
+	public static function make_optional( $fields ) {
 		foreach ( self::OPTIONAL_FIELDS as $key ) {
 			if ( isset( $fields[ $key ] ) ) {
 				$fields[ $key ]['required'] = false;
