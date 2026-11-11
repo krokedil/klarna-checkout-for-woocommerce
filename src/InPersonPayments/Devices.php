@@ -82,10 +82,20 @@ class Devices {
 	 * @return string
 	 */
 	private static function transient() {
+		return self::TRANSIENT . '_' . self::account_key();
+	}
+
+	/**
+	 * A key for the account the store is talking to right now, for caches that
+	 * must not be shared between test and live, or between merchant ids.
+	 *
+	 * @return string
+	 */
+	public static function account_key() {
 		$prefix      = SettingsUtility::is_testmode() ? 'test_' : '';
 		$merchant_id = (string) SettingsUtility::get_setting( "{$prefix}merchant_id", '' );
 
-		return self::TRANSIENT . '_' . md5( $prefix . $merchant_id );
+		return md5( $prefix . $merchant_id );
 	}
 
 	/**

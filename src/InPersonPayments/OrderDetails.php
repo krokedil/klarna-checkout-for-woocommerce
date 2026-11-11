@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class OrderDetails {
 
 	/**
-	 * The transient the location names are cached in.
+	 * The prefix of the transient the location names are cached in, per account.
 	 *
 	 * @var string
 	 */
@@ -90,12 +90,12 @@ class OrderDetails {
 	}
 
 	/**
-	 * The merchant's location names by id, cached for a day.
+	 * The merchant's location names by id, cached for a day per account.
 	 *
 	 * @return array
 	 */
 	private static function location_names() {
-		$names = get_transient( self::LOCATIONS_TRANSIENT );
+		$names = get_transient( self::LOCATIONS_TRANSIENT . '_' . Devices::account_key() );
 		if ( is_array( $names ) ) {
 			return $names;
 		}
@@ -112,7 +112,7 @@ class OrderDetails {
 			}
 		}
 
-		set_transient( self::LOCATIONS_TRANSIENT, $names, DAY_IN_SECONDS );
+		set_transient( self::LOCATIONS_TRANSIENT . '_' . Devices::account_key(), $names, DAY_IN_SECONDS );
 
 		return $names;
 	}
