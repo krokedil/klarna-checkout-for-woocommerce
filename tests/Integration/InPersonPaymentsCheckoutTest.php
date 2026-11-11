@@ -400,6 +400,19 @@ class InPersonPaymentsCheckoutTest extends IntegrationTestCase {
 		$this->assertSame( 0, $order->get_customer_id() );
 	}
 
+	/** A guest in-person order has no name for the order list, so it is named after the sale. */
+	public function test_the_order_list_names_an_in_person_guest_order(): void {
+		$order = $this->haveInPersonOrder();
+		$order->update_meta_data( Gateway::STAFF_META, (string) get_current_user_id() );
+		$details = new OrderDetails();
+
+		$this->assertSame( 'In-person sale (' . wp_get_current_user()->display_name . ')', $details->buyer_name( '', $order ) );
+		$this->assertSame( 'Anna Andersson', $details->buyer_name( 'Anna Andersson', $order ), 'A real name is kept.' );
+
+		$order->set_payment_method( 'kco' );
+		$this->assertSame( '', $details->buyer_name( '', $order ), 'Other orders are left alone.' );
+	}
+
 	/** Another plugin can add its own rows to the in-person box on the order screen. */
 	public function test_the_order_details_rows_can_be_filtered(): void {
 		$order = $this->haveInPersonOrder();

@@ -15,6 +15,28 @@ class OrderDetails {
 	 */
 	public function __construct() {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ), 10, 2 );
+		add_filter( 'woocommerce_admin_order_buyer_name', array( $this, 'buyer_name' ), 10, 2 );
+	}
+
+	/**
+	 * Name an in-person guest order in the order list, which otherwise shows only its number.
+	 * A name the order does have, such as the customer's, is left as it is.
+	 *
+	 * @param string    $buyer The buyer name WooCommerce found.
+	 * @param \WC_Order $order The order.
+	 * @return string
+	 */
+	public function buyer_name( $buyer, $order ) {
+		if ( '' !== $buyer || ! $order instanceof \WC_Order || Gateway::ID !== $order->get_payment_method() ) {
+			return $buyer;
+		}
+
+		$staff = get_userdata( (int) $order->get_meta( Gateway::STAFF_META ) );
+
+		return $staff
+			/* translators: %s: the name of the staff member who took the sale. */
+			? sprintf( __( 'In-person sale (%s)', 'klarna-checkout-for-woocommerce' ), $staff->display_name )
+			: __( 'In-person sale', 'klarna-checkout-for-woocommerce' );
 	}
 
 	/**
