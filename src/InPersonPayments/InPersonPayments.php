@@ -2,7 +2,6 @@
 namespace Krokedil\KustomCheckout\InPersonPayments;
 
 use Krokedil\KustomCheckout\InPersonPayments\Settings\Admin;
-use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -87,7 +86,10 @@ class InPersonPayments {
 	 * @return bool
 	 */
 	public static function is_enabled() {
-		return wc_string_to_bool( SettingsUtility::get_setting( 'ipp_enabled', 'no' ) );
+		// Read the option itself: this runs on plugins_loaded, and the settings defaults translate their labels, which is too early.
+		$settings = get_option( 'woocommerce_kco_settings', array() );
+
+		return wc_string_to_bool( is_array( $settings ) ? ( $settings['ipp_enabled'] ?? 'no' ) : 'no' );
 	}
 
 	/**
