@@ -54,6 +54,13 @@ class SessionHandler {
 	public const LOCK_LIFETIME = 60;
 
 	/**
+	 * The session status stored on an order whose paid amount did not match.
+	 *
+	 * @var string
+	 */
+	public const HELD_STATUS = 'HELD';
+
+	/**
 	 * The statuses that mean the session is still open.
 	 *
 	 * @var string[]
@@ -207,6 +214,16 @@ class SessionHandler {
 	 * @return array
 	 */
 	private static function hold( $order, $expected, $paid ) {
+		$outcome = self::outcome( self::HELD, 'FINALIZED', __( 'The amount paid on the device does not match this order. Do not take the payment again: check the order notes and the Kustom portal.', 'klarna-checkout-for-woocommerce' ) );
+
+		// The poll, a second tab and the webhook all land here; note the mismatch once.
+		if ( self::HELD_STATUS === $order->get_meta( Gateway::STATUS_META ) ) {
+			return $outcome;
+		}
+
+		$order->update_meta_data( Gateway::STATUS_META, self::HELD_STATUS );
+		$order->save();
+
 		$order->add_order_note(
 			sprintf(
 				/* translators: 1: the amount the device collected, 2: the order total, both in minor units. */
@@ -218,7 +235,7 @@ class SessionHandler {
 
 		\KCO_Logger::log( sprintf( 'ERROR Kustom IPP session %s for order %s reports amount %s, order total is %s.', $order->get_meta( Gateway::SESSION_META ), $order->get_order_number(), null === $paid ? '-' : $paid, $expected ) );
 
-		return self::outcome( self::HELD, 'FINALIZED', __( 'The amount paid on the device does not match this order. Do not take the payment again: check the order notes and the Kustom portal.', 'klarna-checkout-for-woocommerce' ) );
+		return $outcome;
 	}
 
 	/**

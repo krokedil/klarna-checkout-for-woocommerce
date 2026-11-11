@@ -170,6 +170,10 @@ class InPersonPaymentsCompletionTest extends IntegrationTestCase {
 		$this->assertOrderHasNote( $order, '25000' );
 	}
 
+	/** The poll, a second tab and the webhook all see the same mismatch; the order is told once. */
+	public function test_an_amount_mismatch_is_noted_only_once(): void {
+		$order = $this->haveWaitingOrder();
+
 		SessionHandler::sync( $order, $this->session( 'FINALIZED', [ 'order_amount' => 19900 ] ) );
 		$again = SessionHandler::sync( $order, $this->session( 'FINALIZED', [ 'order_amount' => 19900 ] ) );
 
