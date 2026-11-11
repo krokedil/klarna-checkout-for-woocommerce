@@ -389,6 +389,16 @@ class InPersonPaymentsCheckoutTest extends IntegrationTestCase {
 		];
 	}
 
+	/** The salesperson is logged in, but the sale is not theirs: an in-person order is a guest order. */
+	public function test_an_in_person_order_is_a_guest_order(): void {
+		$order = $this->haveInPersonOrder();
+		$order->set_customer_id( get_current_user_id() );
+
+		( new Checkout() )->remove_address( $order );
+
+		$this->assertSame( 0, $order->get_customer_id() );
+	}
+
 	/** The fallback is provisional, so a store can point it somewhere else. */
 	public function test_the_fallback_email_can_be_filtered(): void {
 		add_filter( 'kco_ipp_fallback_billing_email', static fn () => 'counter@example.com' );

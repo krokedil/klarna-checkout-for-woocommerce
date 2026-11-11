@@ -23,8 +23,8 @@ class Checkout {
 	}
 
 	/**
-	 * Leave the address off an in-person order: the form is blocked, so what it holds is
-	 * the salesperson's own prefilled address, not the customer's.
+	 * Leave the customer and the address off an in-person order: the salesperson is logged
+	 * in, and the blocked form holds their own prefilled address, not the customer's.
 	 *
 	 * @param \WC_Order $order The order being created.
 	 * @return void
@@ -36,13 +36,16 @@ class Checkout {
 	}
 
 	/**
-	 * Empty an order's billing and shipping address. WooCommerce refuses an order without
-	 * a billing email and country, so those become the store's own.
+	 * Make an order a guest order and empty its billing and shipping address. WooCommerce
+	 * refuses an order without a billing email and country, so those become the store's own.
+	 * Who took the sale is kept in Gateway::STAFF_META.
 	 *
 	 * @param \WC_Order $order The order.
 	 * @return void
 	 */
 	public static function strip_address( $order ) {
+		$order->set_customer_id( 0 );
+
 		foreach ( array( 'billing', 'shipping' ) as $type ) {
 			foreach ( array_merge( array_keys( WC()->countries->get_default_address_fields() ), array( 'phone' ) ) as $field ) {
 				$setter = "set_{$type}_{$field}";

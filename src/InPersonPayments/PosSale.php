@@ -9,8 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * In-person orders placed through the Store API, from the checkout block or a point of
- * sale: no address. A point of sale sale, marked by a `kco_ipp_pos` entry in its payment
- * data, also has no customer. No in-person order gets customer emails while its email is
+ * sale: a guest order with no address. A point of sale sale is marked by a `kco_ipp_pos`
+ * entry in its payment data. No in-person order gets customer emails while its email is
  * the store's own.
  */
 class PosSale {
@@ -50,9 +50,8 @@ class PosSale {
 	}
 
 	/**
-	 * Leave the address off an in-person order, and the customer off a point of sale one:
-	 * the Store API fills both in from the salesperson's own account. Done before the
-	 * order is validated and paid.
+	 * Leave the customer and the address off an in-person order: the Store API fills both
+	 * in from the salesperson's own account. Done before the order is validated and paid.
 	 *
 	 * @param \WC_Order        $order The order.
 	 * @param \WP_REST_Request $request The checkout request.
@@ -66,7 +65,6 @@ class PosSale {
 		Checkout::strip_address( $order );
 
 		if ( self::is_pos_request( $request ) ) {
-			$order->set_customer_id( 0 );
 			$order->set_created_via( self::CREATED_VIA );
 		}
 

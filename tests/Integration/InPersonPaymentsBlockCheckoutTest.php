@@ -236,6 +236,7 @@ class InPersonPaymentsBlockCheckoutTest extends IntegrationTestCase {
 		$order = wc_get_order( $response->get_data()['order_id'] );
 		$this->assertSame( 'pending', $order->get_status() );
 		$this->assertSame( 'session-1', $order->get_meta( Gateway::SESSION_META ) );
+		$this->assertSame( 0, $order->get_customer_id(), 'The salesperson is not the customer.' );
 		$this->assertSame( $order->get_checkout_order_received_url(), $response->get_data()['payment_result']['redirect_url'] );
 	}
 
