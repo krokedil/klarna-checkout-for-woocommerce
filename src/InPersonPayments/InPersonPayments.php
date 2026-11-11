@@ -63,14 +63,16 @@ class InPersonPayments {
 			$this->admin = new Admin();
 		}
 
+		// Sessions already sent to a device still need their poll, webhook and waiting screen after the feature is switched off.
+		$this->rest           = new Rest();
+		$this->waiting_screen = new WaitingScreen();
+
 		if ( ! self::is_enabled() ) {
 			return;
 		}
 
-		$this->checkout       = new Checkout();
-		$this->rest           = new Rest();
-		$this->waiting_screen = new WaitingScreen();
-		$this->pos_sale       = new PosSale();
+		$this->checkout = new Checkout();
+		$this->pos_sale = new PosSale();
 
 		if ( is_admin() ) {
 			$this->order_details = new OrderDetails();
