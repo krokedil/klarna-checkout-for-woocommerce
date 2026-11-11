@@ -202,6 +202,13 @@ class InPersonPaymentsBlockCheckoutTest extends IntegrationTestCase {
 		$this->ipp = new InPersonPayments();
 		new BlockCheckout();
 		$this->reloadPaymentGateways();
+
+		// The Store API checkout route lists the allowed payment methods when it is
+		// registered, so an earlier test's REST server would not know this one.
+		global $wp_rest_server;
+		$wp_rest_server = new \WP_REST_Server();
+		do_action( 'rest_api_init', $wp_rest_server );
+
 		$this->haveCartWith( [ [ $this->haveSimpleProduct( [ 'name' => 'Counter product', 'price' => '100.00', 'sku' => 'COUNTER-1' ] ), 2 ] ] );
 		BlockCheckout::choose( true );
 		$this->willListDevices();
