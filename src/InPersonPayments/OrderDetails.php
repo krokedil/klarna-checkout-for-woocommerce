@@ -1,8 +1,6 @@
 <?php
 namespace Krokedil\KustomCheckout\InPersonPayments;
 
-use Krokedil\KustomCheckout\InPersonPayments\Request\Get\RequestGetLocations;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -11,13 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The order screen box that shows where and by whom an in-person sale was taken.
  */
 class OrderDetails {
-
-	/**
-	 * The prefix of the transient the location names are cached in, per account.
-	 *
-	 * @var string
-	 */
-	public const LOCATIONS_TRANSIENT = 'kco_ipp_location_names';
 
 	/**
 	 * Class constructor.
@@ -70,7 +61,7 @@ class OrderDetails {
 			__( 'Sold via', 'klarna-checkout-for-woocommerce' )       => PosSale::CREATED_VIA === $order->get_created_via() ? __( 'Point of sale', 'klarna-checkout-for-woocommerce' ) : __( 'Checkout', 'klarna-checkout-for-woocommerce' ),
 			__( 'Staff', 'klarna-checkout-for-woocommerce' )          => $staff ? $staff->display_name : '',
 			__( 'Device', 'klarna-checkout-for-woocommerce' )         => $order->get_meta( Gateway::DEVICE_NAME_META ) ? $order->get_meta( Gateway::DEVICE_NAME_META ) : $order->get_meta( Gateway::DEVICE_META ),
-			__( 'Location', 'klarna-checkout-for-woocommerce' )       => $location ? ( self::location_names()[ $location ] ?? $location ) : '',
+			__( 'Location', 'klarna-checkout-for-woocommerce' )       => $location ? Locations::name( $location ) : '',
 			__( 'Cash register', 'klarna-checkout-for-woocommerce' )  => $order->get_meta( Gateway::REGISTER_META ),
 			__( 'Payment method', 'klarna-checkout-for-woocommerce' ) => $channels[ $order->get_meta( Gateway::CHANNEL_META ) ] ?? $order->get_meta( Gateway::CHANNEL_META ),
 			__( 'Session status', 'klarna-checkout-for-woocommerce' ) => $order->get_meta( Gateway::STATUS_META ),
@@ -87,33 +78,5 @@ class OrderDetails {
 			printf( '<dt><strong>%1$s</strong></dt><dd style="margin:0 0 8px;word-break:break-all">%2$s</dd>', esc_html( $label ), esc_html( $value ) );
 		}
 		echo '</dl>';
-	}
-
-	/**
-	 * The merchant's location names by id, cached for a day per account.
-	 *
-	 * @return array
-	 */
-	private static function location_names() {
-		$names = get_transient( self::LOCATIONS_TRANSIENT . '_' . Devices::account_key() );
-		if ( is_array( $names ) ) {
-			return $names;
-		}
-
-		$response = ( new RequestGetLocations() )->request();
-		if ( is_wp_error( $response ) ) {
-			return array();
-		}
-
-		$names = array();
-		foreach ( $response['content'] ?? array() as $location ) {
-			if ( ! empty( $location['id'] ) ) {
-				$names[ $location['id'] ] = $location['name'] ?? $location['id'];
-			}
-		}
-
-		set_transient( self::LOCATIONS_TRANSIENT . '_' . Devices::account_key(), $names, DAY_IN_SECONDS );
-
-		return $names;
 	}
 }

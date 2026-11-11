@@ -3,7 +3,7 @@ namespace Krokedil\KustomCheckout\InPersonPayments\Settings;
 
 use Krokedil\KustomCheckout\InPersonPayments\Devices;
 use Krokedil\KustomCheckout\InPersonPayments\InPersonPayments;
-use Krokedil\KustomCheckout\InPersonPayments\Request\Get\RequestGetLocations;
+use Krokedil\KustomCheckout\InPersonPayments\Locations;
 use Krokedil\KustomCheckout\InPersonPayments\Request\Post\RequestPostEnrollment;
 use Krokedil\KustomCheckout\InPersonPayments\Request\Put\RequestPutDevice;
 
@@ -103,7 +103,7 @@ class Admin {
 			return $html . $this->disabled_field_html( $data );
 		}
 
-		$locations = $this->get_locations();
+		$locations = Locations::refresh();
 		$error     = is_wp_error( $locations ) ? $locations->get_error_message() : '';
 		$selected  = (string) $gateway->get_option( $key );
 		$field_key = $gateway->get_field_key( $key );
@@ -482,20 +482,6 @@ class Admin {
 	 */
 	private function get_devices() {
 		return Devices::refresh();
-	}
-
-	/**
-	 * Fetch the merchant's locations.
-	 *
-	 * @return array|\WP_Error
-	 */
-	private function get_locations() {
-		$response = ( new RequestGetLocations() )->request();
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		return $response['content'] ?? array();
 	}
 
 	/**
