@@ -300,6 +300,11 @@ class Gateway extends \WC_Payment_Gateway {
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
+		if ( ! $this->is_available() ) {
+			wc_add_notice( __( 'In-person payments can only be taken by store staff.', 'klarna-checkout-for-woocommerce' ), 'error' );
+			return array( 'result' => 'failure' );
+		}
+
 		$order  = wc_get_order( $order_id );
 		$device = $this->get_posted_device();
 
