@@ -18,7 +18,6 @@ class Checkout {
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'relax_checkout_fields' ), 100 );
 		add_filter( 'woocommerce_cart_needs_shipping', array( $this, 'skip_shipping' ), 100 );
 		add_filter( 'woocommerce_cart_needs_shipping_address', array( $this, 'skip_shipping' ), 100 );
-		add_filter( 'woocommerce_checkout_get_value', array( $this, 'fall_back_to_the_store_email' ), 10, 2 );
 		add_action( 'woocommerce_checkout_create_order', array( $this, 'remove_address' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 	}
@@ -106,22 +105,6 @@ class Checkout {
 	 */
 	public function skip_shipping( $needs_shipping ) {
 		return self::is_chosen() ? false : $needs_shipping;
-	}
-
-	/**
-	 * Prefill the billing email, because Woo emails, receipts and the order list all
-	 * assume there is one.
-	 *
-	 * @param string|null $value The value WooCommerce resolved.
-	 * @param string      $key The checkout field key.
-	 * @return string|null
-	 */
-	public function fall_back_to_the_store_email( $value, $key ) {
-		if ( 'billing_email' !== $key || ! empty( $value ) || ! self::is_chosen() ) {
-			return $value;
-		}
-
-		return self::fallback_email();
 	}
 
 	/**
