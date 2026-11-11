@@ -169,7 +169,7 @@ class InPersonPaymentsBlockCheckoutTest extends IntegrationTestCase {
 	/**
 	 * The salesperson watches the same waiting screen on a block order received page:
 	 * the block order confirmation renders `woocommerce_thankyou_kco_ipp`, so the
-	 * ticket-03 state machine drives both surfaces.
+	 * same waiting screen drives both surfaces.
 	 */
 	public function test_the_waiting_screen_renders_on_a_block_order_received_page(): void {
 		$this->haveIppSettings();

@@ -183,7 +183,7 @@ class Admin {
 			return $html . $this->disabled_field_html( $data );
 		}
 
-		$devices = $this->get_devices();
+		$devices = Devices::refresh();
 		$error   = is_wp_error( $devices ) ? $devices->get_error_message() : '';
 		$table   = is_wp_error( $devices ) ? $this->devices_table( array() ) : $this->devices_table( $devices );
 
@@ -388,7 +388,7 @@ class Admin {
 	public function ajax_refresh_devices() {
 		$this->verify_request();
 
-		$devices = $this->get_devices();
+		$devices = Devices::refresh();
 		if ( is_wp_error( $devices ) ) {
 			wp_send_json_error( array( 'message' => $devices->get_error_message() ) );
 		}
@@ -446,7 +446,7 @@ class Admin {
 			wp_send_json_error( array( 'message' => __( 'A device and a name are both required.', 'klarna-checkout-for-woocommerce' ) ) );
 		}
 
-		$devices = $this->get_devices();
+		$devices = Devices::refresh();
 		if ( is_wp_error( $devices ) ) {
 			wp_send_json_error( array( 'message' => $devices->get_error_message() ) );
 		}
@@ -469,19 +469,9 @@ class Admin {
 			wp_send_json_error( array( 'message' => $response->get_error_message() ) );
 		}
 
-		$devices = $this->get_devices();
+		$devices = Devices::refresh();
 
 		wp_send_json_success( array( 'html' => $this->devices_table( is_wp_error( $devices ) ? array() : $devices ) ) );
-	}
-
-	/**
-	 * Fetch the merchant's devices, bypassing the checkout's cache so that the settings
-	 * page always shows what Kustom currently has.
-	 *
-	 * @return array|\WP_Error
-	 */
-	private function get_devices() {
-		return Devices::refresh();
 	}
 
 	/**
