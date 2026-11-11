@@ -85,7 +85,7 @@ class SessionPayload {
 		 * The lines must still add up to `order_amount`, and each line to itself, or
 		 * Kustom refuses the session at the counter.
 		 *
-		 * @since 2.22.0
+		 * @since x.x.x
 		 *
 		 * @param array     $payload The payload, in the IPP API's shape.
 		 * @param \WC_Order $order The WooCommerce order the session is for.

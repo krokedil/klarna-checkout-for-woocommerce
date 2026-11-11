@@ -22,7 +22,7 @@ class OrderUtility {
 		 * The payment method ids whose orders Kustom order management captures,
 		 * cancels, updates and refunds.
 		 *
-		 * @since 2.22.0
+		 * @since x.x.x
 		 *
 		 * @param string[] $payment_methods The payment method ids.
 		 */

@@ -34,7 +34,7 @@ class ErrorMessage {
 		/**
 		 * The sentence the salesperson sees when a session could not be started.
 		 *
-		 * @since 2.22.0
+		 * @since x.x.x
 		 *
 		 * @param string    $message The merchant-facing sentence.
 		 * @param \WP_Error $error The error the request returned; its code is the HTTP status.

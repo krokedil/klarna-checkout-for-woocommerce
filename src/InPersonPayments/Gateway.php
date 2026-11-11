@@ -198,7 +198,7 @@ class Gateway extends \WC_Payment_Gateway {
 		 * Widening it, e.g. to `read`, hands the method and the device list to every
 		 * user with that capability. Meant for custom staff roles, not shoppers.
 		 *
-		 * @since 2.22.0
+		 * @since x.x.x
 		 *
 		 * @param string $capability The capability. Default the `ipp_capability` setting.
 		 */

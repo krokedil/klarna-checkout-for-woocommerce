@@ -122,7 +122,7 @@ class Checkout {
 		 * WooCommerce emails the receipt to it, so a store may prefer a counter inbox
 		 * over the administrator's.
 		 *
-		 * @since 2.22.0
+		 * @since x.x.x
 		 *
 		 * @param string $email The fallback email. Default the site's admin email.
 		 */

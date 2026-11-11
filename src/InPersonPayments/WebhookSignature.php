@@ -123,7 +123,7 @@ class WebhookSignature {
 		 * `MAX_TOLERANCE`; a filter can tighten it, or loosen it for a store whose clock
 		 * drifts, but cannot switch it off.
 		 *
-		 * @since 2.22.0
+		 * @since x.x.x
 		 *
 		 * @param int $tolerance The tolerance in seconds. Default 300.
 		 */

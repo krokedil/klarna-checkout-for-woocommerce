@@ -91,7 +91,7 @@ class BlockCheckout {
 		 * They are relaxed for every user who may take an in-person payment, because
 		 * the block checkout reads the required fields once per page load.
 		 *
-		 * @since 2.22.0
+		 * @since x.x.x
 		 *
 		 * @param bool $relax Whether to relax the fields.
 		 */

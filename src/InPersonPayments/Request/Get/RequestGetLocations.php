@@ -40,7 +40,7 @@ class RequestGetLocations extends RequestGet {
 		 * How many locations are read in one page. Only the first page is read, so a
 		 * merchant with more locations than this raises it.
 		 *
-		 * @since 2.22.0
+		 * @since x.x.x
 		 *
 		 * @param int $page_size The page size. Default 100.
 		 */

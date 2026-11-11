@@ -113,7 +113,7 @@ abstract class Request {
 			 * The create-session call runs inside checkout, so a long timeout holds the
 			 * salesperson's screen for that long.
 			 *
-			 * @since 2.22.0
+			 * @since x.x.x
 			 *
 			 * @param int $timeout The timeout in seconds. Default 10.
 			 */

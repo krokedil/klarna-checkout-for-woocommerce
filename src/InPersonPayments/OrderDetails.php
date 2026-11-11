@@ -66,7 +66,7 @@ class OrderDetails {
 		/**
 		 * Filters the rows of the in-person payment box on the order screen.
 		 *
-		 * @since 2.22.0
+		 * @since x.x.x
 		 *
 		 * @param array<string, string> $rows  The values by label. Empty values are left out.
 		 * @param \WC_Order             $order The order.

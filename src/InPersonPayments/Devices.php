@@ -54,7 +54,7 @@ class Devices {
 		 * A longer lifetime saves round trips on every checkout render; a device paired
 		 * or renamed in the meantime shows up that much later.
 		 *
-		 * @since 2.22.0
+		 * @since x.x.x
 		 *
 		 * @param int $lifetime The cache lifetime in seconds. Default one minute.
 		 */

@@ -194,7 +194,7 @@ class SessionHandler {
 		/**
 		 * Fires once, after an in-person payment has completed its order.
 		 *
-		 * @since 2.22.0
+		 * @since x.x.x
 		 *
 		 * @param int   $order_id The WooCommerce order id.
 		 * @param array $session The finalized session as Kustom reports it.
