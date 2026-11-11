@@ -54,7 +54,6 @@ class OrderDetails {
 		$channels = Gateway::payment_channels();
 
 		$rows = array(
-			__( 'Sold via', 'klarna-checkout-for-woocommerce' )       => PosSale::CREATED_VIA === $order->get_created_via() ? __( 'Point of sale', 'klarna-checkout-for-woocommerce' ) : __( 'Checkout', 'klarna-checkout-for-woocommerce' ),
 			__( 'Staff', 'klarna-checkout-for-woocommerce' )          => $staff ? $staff->display_name : '',
 			__( 'Device', 'klarna-checkout-for-woocommerce' )         => $order->get_meta( Gateway::DEVICE_NAME_META ) ? $order->get_meta( Gateway::DEVICE_NAME_META ) : $order->get_meta( Gateway::DEVICE_META ),
 			__( 'Location', 'klarna-checkout-for-woocommerce' )       => $location ? Locations::name( $location ) : '',
@@ -63,6 +62,16 @@ class OrderDetails {
 			__( 'Session status', 'klarna-checkout-for-woocommerce' ) => $order->get_meta( Gateway::STATUS_META ),
 			__( 'Session ID', 'klarna-checkout-for-woocommerce' )     => $order->get_meta( Gateway::SESSION_META ),
 		);
+
+		/**
+		 * Filters the rows of the in-person payment box on the order screen.
+		 *
+		 * @since 2.22.0
+		 *
+		 * @param array<string, string> $rows  The values by label. Empty values are left out.
+		 * @param \WC_Order             $order The order.
+		 */
+		$rows = apply_filters( 'kco_ipp_order_details_rows', $rows, $order );
 
 		echo '<dl class="kco-ipp-order-details">';
 		foreach ( array_filter(

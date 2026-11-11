@@ -9,6 +9,7 @@ use Krokedil\KustomCheckout\InPersonPayments\Devices;
 use Krokedil\KustomCheckout\InPersonPayments\Gateway;
 use Krokedil\KustomCheckout\InPersonPayments\PosSale;
 use Krokedil\KustomCheckout\InPersonPayments\InPersonPayments;
+use Krokedil\KustomCheckout\InPersonPayments\OrderDetails;
 use Krokedil\KustomCheckout\InPersonPayments\Settings\Admin;
 use Tests\Support\IntegrationTestCase;
 
@@ -397,6 +398,19 @@ class InPersonPaymentsCheckoutTest extends IntegrationTestCase {
 		( new Checkout() )->remove_address( $order );
 
 		$this->assertSame( 0, $order->get_customer_id() );
+	}
+
+	/** Another plugin can add its own rows to the in-person box on the order screen. */
+	public function test_the_order_details_rows_can_be_filtered(): void {
+		$order = $this->haveInPersonOrder();
+		add_filter( 'kco_ipp_order_details_rows', static fn ( array $rows ) => $rows + [ 'Till' => 'Front desk' ] );
+
+		ob_start();
+		( new OrderDetails() )->render( $order );
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'Till', $html );
+		$this->assertStringContainsString( 'Front desk', $html );
 	}
 
 	/** The fallback is provisional, so a store can point it somewhere else. */
