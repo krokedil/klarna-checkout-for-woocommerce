@@ -33,6 +33,11 @@ type Device = {
 const DEVICE_FIELD = 'kco_ipp_device_id';
 
 /**
+ * The field the chosen payment channel is posted in. Matches Gateway::CHANNEL_FIELD.
+ */
+const CHANNEL_FIELD = 'kco_ipp_payment_channel';
+
+/**
  * The checkout sections whose details are not added to an in-person order.
  */
 const ADDRESS_FORMS =
@@ -81,6 +86,7 @@ const blockAddressForms = (block: boolean): void => {
 const settings: any = getSetting('kco_ipp_data', {});
 const title: string = decodeEntities(settings.title || 'In-Person Payment');
 const devices: Device[] = settings.devices || [];
+const channels: Record<string, string> = settings.channels || {};
 const features: string[] = settings.features || ['products'];
 
 /**
@@ -113,6 +119,7 @@ type InPersonPaymentProps = {
 const InPersonPayment = (props: InPersonPaymentProps): JSX.Element => {
 	const { eventRegistration, emitResponse } = props;
 	const [deviceId, setDeviceId] = useState<string>(devices[0]?.id || '');
+	const [channel, setChannel] = useState<string>('');
 
 	useEffect(() => {
 		const unsubscribe = eventRegistration.onPaymentSetup(() => {
@@ -128,13 +135,14 @@ const InPersonPayment = (props: InPersonPaymentProps): JSX.Element => {
 				meta: {
 					paymentMethodData: {
 						[DEVICE_FIELD]: deviceId,
+						[CHANNEL_FIELD]: channel,
 					},
 				},
 			};
 		});
 
 		return () => unsubscribe();
-	}, [eventRegistration, emitResponse, deviceId]);
+	}, [eventRegistration, emitResponse, deviceId, channel]);
 
 	// The component is only mounted while the method is selected, so mounting is what
 	// tells WooCommerce that this sale is handed over the counter and needs no shipping.
@@ -187,6 +195,25 @@ const InPersonPayment = (props: InPersonPaymentProps): JSX.Element => {
 					</option>
 				))}
 			</select>
+			<div>
+				<label htmlFor={CHANNEL_FIELD} style={{ marginRight: '0.5em' }}>
+					{decodeEntities(settings.channelLabel || 'Payment type')}
+				</label>
+				<select
+					id={CHANNEL_FIELD}
+					name={CHANNEL_FIELD}
+					value={channel}
+					onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
+						setChannel(event.target.value)
+					}
+				>
+					{Object.entries(channels).map(([value, label]) => (
+						<option key={value} value={value}>
+							{decodeEntities(label)}
+						</option>
+					))}
+				</select>
+			</div>
 		</div>
 	);
 };

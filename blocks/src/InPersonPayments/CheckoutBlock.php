@@ -91,6 +91,8 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 		return array(
 			'title'           => SettingsUtility::get_setting( 'ipp_title', __( 'In-Person Payment', 'klarna-checkout-for-woocommerce' ) ),
 			'deviceLabel'     => __( 'Device', 'klarna-checkout-for-woocommerce' ),
+			'channelLabel'    => __( 'Payment type', 'klarna-checkout-for-woocommerce' ),
+			'channels'        => Gateway::payment_channels(),
 			'placeOrderLabel' => __( 'Take payment on device', 'klarna-checkout-for-woocommerce' ),
 			'noDeviceMessage' => __( 'Please choose a Kustom POS device to take the payment on.', 'klarna-checkout-for-woocommerce' ),
 			'noAddressNotice' => Gateway::no_address_notice(),

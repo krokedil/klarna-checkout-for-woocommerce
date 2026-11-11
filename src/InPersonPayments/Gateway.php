@@ -238,6 +238,14 @@ class Gateway extends \WC_Payment_Gateway {
 				<?php endforeach; ?>
 			</select>
 		</p>
+		<p class="form-row form-row-wide">
+			<label for="<?php echo esc_attr( self::CHANNEL_FIELD ); ?>"><?php esc_html_e( 'Payment type', 'klarna-checkout-for-woocommerce' ); ?></label>
+			<select name="<?php echo esc_attr( self::CHANNEL_FIELD ); ?>" id="<?php echo esc_attr( self::CHANNEL_FIELD ); ?>" class="select">
+				<?php foreach ( self::payment_channels() as $value => $label ) : ?>
+					<option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</p>
 		<?php
 	}
 
@@ -280,6 +288,20 @@ class Gateway extends \WC_Payment_Gateway {
 		$devices = Devices::all();
 
 		return is_wp_error( $devices ) ? null : Devices::find( $devices, $device_id );
+	}
+
+	/**
+	 * The payment channels the salesperson can pick from, by value. An empty value lets
+	 * the customer choose on the device.
+	 *
+	 * @return array<string, string>
+	 */
+	public static function payment_channels() {
+		return array(
+			''             => __( 'Chosen on the device', 'klarna-checkout-for-woocommerce' ),
+			'CARD_PAYMENT' => __( 'Card', 'klarna-checkout-for-woocommerce' ),
+			'SCAN_TO_PAY'  => __( 'Scan to pay', 'klarna-checkout-for-woocommerce' ),
+		);
 	}
 
 	/**

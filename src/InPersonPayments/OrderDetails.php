@@ -51,11 +51,7 @@ class OrderDetails {
 
 		$staff    = get_userdata( (int) $order->get_meta( Gateway::STAFF_META ) );
 		$location = $order->get_meta( Gateway::LOCATION_META );
-		$channels = array(
-			''             => __( 'Chosen on the device', 'klarna-checkout-for-woocommerce' ),
-			'CARD_PAYMENT' => __( 'Card', 'klarna-checkout-for-woocommerce' ),
-			'SCAN_TO_PAY'  => __( 'Scan to pay', 'klarna-checkout-for-woocommerce' ),
-		);
+		$channels = Gateway::payment_channels();
 
 		$rows = array(
 			__( 'Sold via', 'klarna-checkout-for-woocommerce' )       => PosSale::CREATED_VIA === $order->get_created_via() ? __( 'Point of sale', 'klarna-checkout-for-woocommerce' ) : __( 'Checkout', 'klarna-checkout-for-woocommerce' ),

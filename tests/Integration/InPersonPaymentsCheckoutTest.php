@@ -29,7 +29,7 @@ class InPersonPaymentsCheckoutTest extends IntegrationTestCase {
 	private const DEVICE_ID = '550e8400-e29b-41d4-a716-446655440000';
 
 	protected function tearDown(): void {
-		unset( $_POST['payment_method'], $_POST[ Gateway::DEVICE_FIELD ] );
+		unset( $_POST['payment_method'], $_POST[ Gateway::DEVICE_FIELD ], $_POST[ Gateway::CHANNEL_FIELD ] );
 		wp_set_current_user( 0 );
 
 		parent::tearDown();
@@ -295,6 +295,32 @@ class InPersonPaymentsCheckoutTest extends IntegrationTestCase {
 		$this->processPayment( $order );
 
 		$this->assertHasOrderLine( $this->gatewayRequestTo( 'ipp/v1/sessions' )['json']['order_items'], 'digital' );
+	}
+
+	/**
+	 * The salesperson can pick card or scan to pay up front; anything else leaves the
+	 * choice to the customer on the device.
+	 *
+	 * @dataProvider provide_channels
+	 */
+	public function test_the_chosen_payment_channel_reaches_the_session( string $posted, ?string $sent ): void {
+		$order                           = $this->haveInPersonOrder();
+		$_POST[ Gateway::CHANNEL_FIELD ] = $posted;
+
+		$this->processPayment( $order );
+
+		$this->assertSame( $sent, $this->gatewayRequestTo( 'ipp/v1/sessions' )['json']['payment_channel'] ?? null );
+		$this->assertSame( (string) $sent, $this->reload( $order )->get_meta( Gateway::CHANNEL_META ) );
+	}
+
+	/** @return array<string, array{0: string, 1: ?string}> */
+	public function provide_channels(): array {
+		return [
+			'card'                => [ 'CARD_PAYMENT', 'CARD_PAYMENT' ],
+			'scan to pay'         => [ 'SCAN_TO_PAY', 'SCAN_TO_PAY' ],
+			'chosen on the device' => [ '', null ],
+			'not a channel'       => [ 'CASH', null ],
+		];
 	}
 
 	/** The device decides whether the sale happens, so the order waits unpaid. */
