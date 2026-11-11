@@ -170,6 +170,30 @@ class InPersonPaymentsCompletionTest extends IntegrationTestCase {
 		$this->assertOrderHasNote( $order, '25000' );
 	}
 
+		SessionHandler::sync( $order, $this->session( 'FINALIZED', [ 'order_amount' => 19900 ] ) );
+		$again = SessionHandler::sync( $order, $this->session( 'FINALIZED', [ 'order_amount' => 19900 ] ) );
+
+		$this->assertSame( SessionHandler::HELD, $again['state'] );
+		$this->assertCount( 1, $this->notesContaining( $order, '19900' ) );
+	}
+
+	/** A lock left by a request that died is taken over, but a fresh one is never removed. */
+	public function test_only_a_stale_lock_is_taken_over(): void {
+		global $wpdb;
+
+		$order = $this->haveWaitingOrder();
+		$name  = 'kco_ipp_completing_' . $order->get_id();
+
+		$this->assertTrue( SessionHandler::lock( $order->get_id() ) );
+		$this->assertFalse( SessionHandler::lock( $order->get_id() ), 'A fresh lock is respected.' );
+
+		$wpdb->update( $wpdb->options, [ 'option_value' => (string) ( time() - SessionHandler::LOCK_LIFETIME - 1 ) ], [ 'option_name' => $name ] );
+		$this->assertTrue( SessionHandler::lock( $order->get_id() ), 'A stale lock is taken over.' );
+		$this->assertFalse( SessionHandler::lock( $order->get_id() ), 'The new lock is not taken over in turn.' );
+
+		SessionHandler::unlock( $order->get_id() );
+	}
+
 	/** A cancellation arriving after the tap must not unsell the goods. */
 	public function test_a_paid_order_is_not_reopened_by_a_later_status(): void {
 		$order = $this->haveWaitingOrder();

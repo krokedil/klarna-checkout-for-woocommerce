@@ -246,8 +246,11 @@ class SessionHandler {
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
 		if ( $held_since > 0 && time() - $held_since > self::LOCK_LIFETIME ) {
-			self::unlock( $order_id );
-			return self::lock( $order_id );
+			// Delete only the stale lock that was read, so a racing caller cannot remove a fresh one; whoever deletes it retries.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Compare-and-delete, which the option functions cannot do.
+			$released = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s", $name, (string) $held_since ) );
+
+			return $released ? self::lock( $order_id ) : false;
 		}
 
 		return false;
