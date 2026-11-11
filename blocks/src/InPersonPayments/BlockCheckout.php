@@ -22,7 +22,7 @@ class BlockCheckout {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		// The server-side validation is relaxed by PosSale, which runs for the shortcode checkout too.
+		// The server-side validation is relaxed by StoreApiCheckout, which runs for the shortcode checkout too.
 		add_filter( 'woocommerce_shared_settings', array( $this, 'relax_address_fields' ) );
 	}
 

@@ -42,11 +42,11 @@ class InPersonPayments {
 	public $waiting_screen;
 
 	/**
-	 * The handling of sales rung up on a point of sale.
+	 * The handling of in-person orders placed through the Store API.
 	 *
-	 * @var PosSale|null
+	 * @var StoreApiCheckout|null
 	 */
-	public $pos_sale;
+	public $store_api_checkout;
 
 	/**
 	 * The in-person details box on the order screen.
@@ -71,8 +71,8 @@ class InPersonPayments {
 			return;
 		}
 
-		$this->checkout = new Checkout();
-		$this->pos_sale = new PosSale();
+		$this->checkout           = new Checkout();
+		$this->store_api_checkout = new StoreApiCheckout();
 
 		if ( is_admin() ) {
 			$this->order_details = new OrderDetails();

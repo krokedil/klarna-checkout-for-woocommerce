@@ -7,7 +7,7 @@ namespace Tests\Integration;
 use Krokedil\KustomCheckout\InPersonPayments\Checkout;
 use Krokedil\KustomCheckout\InPersonPayments\Devices;
 use Krokedil\KustomCheckout\InPersonPayments\Gateway;
-use Krokedil\KustomCheckout\InPersonPayments\PosSale;
+use Krokedil\KustomCheckout\InPersonPayments\StoreApiCheckout;
 use Krokedil\KustomCheckout\InPersonPayments\InPersonPayments;
 use Krokedil\KustomCheckout\InPersonPayments\OrderDetails;
 use Krokedil\KustomCheckout\InPersonPayments\Settings\Admin;
@@ -376,7 +376,7 @@ class InPersonPaymentsCheckoutTest extends IntegrationTestCase {
 		$order->set_payment_method( $method );
 		$order->save();
 
-		$recipient = ( new PosSale() )->skip_customer_email( $order->get_billing_email(), $order );
+		$recipient = ( new StoreApiCheckout() )->skip_customer_email( $order->get_billing_email(), $order );
 
 		$this->assertSame( $sent, '' !== $recipient );
 	}

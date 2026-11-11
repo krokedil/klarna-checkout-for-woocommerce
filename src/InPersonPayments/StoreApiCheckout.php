@@ -9,21 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * In-person orders placed through the Store API, from the checkout block or a point of
- * sale: a guest order with no address. A point of sale sale is marked by a `kco_ipp_pos`
- * entry in its payment data. No in-person order gets customer emails while its email is
- * the store's own.
+ * sale: a guest order with no address. No in-person order gets customer emails while its
+ * email is the store's own.
  */
-class PosSale {
+class StoreApiCheckout {
 
 	/**
-	 * The created_via of orders rung up on the point of sale.
-	 *
-	 * @var string
-	 */
-	public const CREATED_VIA = 'kustom-pos';
-
-	/**
-	 * Whether the order being checked out is a point of sale order, whose address is left empty.
+	 * Whether an in-person order is being checked out through the Store API, so its address is optional.
 	 *
 	 * @var bool
 	 */
@@ -40,7 +32,7 @@ class PosSale {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		add_action( 'woocommerce_store_api_checkout_update_order_from_request', array( $this, 'remove_customer' ), 10, 2 );
+		add_action( 'woocommerce_store_api_checkout_update_order_from_request', array( $this, 'remove_customer' ) );
 		add_filter( 'woocommerce_get_country_locale_default', array( $this, 'relax_address_fields' ), 100 );
 		add_filter( 'woocommerce_get_country_locale', array( $this, 'relax_locales' ), 100 );
 
@@ -53,20 +45,15 @@ class PosSale {
 	 * Leave the customer and the address off an in-person order: the Store API fills both
 	 * in from the salesperson's own account. Done before the order is validated and paid.
 	 *
-	 * @param \WC_Order        $order The order.
-	 * @param \WP_REST_Request $request The checkout request.
+	 * @param \WC_Order $order The order.
 	 * @return void
 	 */
-	public function remove_customer( $order, $request ) {
+	public function remove_customer( $order ) {
 		if ( Gateway::ID !== $order->get_payment_method() || ! current_user_can( Gateway::required_capability() ) ) {
 			return;
 		}
 
 		Checkout::strip_address( $order );
-
-		if ( self::is_pos_request( $request ) ) {
-			$order->set_created_via( self::CREATED_VIA );
-		}
 
 		// The Store API validates the address against the country locale next, and the locale is cached per request,
 		// so relax it from here on and rebuild it.
@@ -110,22 +97,6 @@ class PosSale {
 	 */
 	private static function should_relax() {
 		return self::$relax_address || Checkout::is_chosen();
-	}
-
-	/**
-	 * Whether a Store API checkout came from the point of sale.
-	 *
-	 * @param \WP_REST_Request $request The checkout request.
-	 * @return bool
-	 */
-	private static function is_pos_request( $request ) {
-		foreach ( (array) $request['payment_data'] as $item ) {
-			if ( 'kco_ipp_pos' === ( $item['key'] ?? '' ) ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
