@@ -202,8 +202,10 @@ class Rest {
 	}
 
 	/**
-	 * Put the order's products back in the cart, so the salesperson can try again
-	 * without ringing the sale up a second time.
+	 * Put the order's products, chosen variations and coupons back in the cart, so the
+	 * salesperson can try again without ringing the sale up a second time.
+	 *
+	 * Prices come from the catalogue again, as with WooCommerce's own "order again".
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
 	 * @return void
@@ -220,8 +222,25 @@ class Rest {
 				continue;
 			}
 
-			WC()->cart->add_to_cart( $item->get_product_id(), $item->get_quantity(), $item->get_variation_id() );
+			// A variation's attributes are stored as item meta, the way WooCommerce's "order again" reads them back.
+			$variation = array();
+			foreach ( $item->get_meta_data() as $meta ) {
+				if ( taxonomy_is_product_attribute( $meta->key ) ) {
+					$variation[ 'attribute_' . sanitize_title( $meta->key ) ] = sanitize_title( $meta->value );
+				} elseif ( meta_is_product_attribute( $meta->key, $meta->value, $item->get_product_id() ) ) {
+					$variation[ 'attribute_' . sanitize_title( $meta->key ) ] = html_entity_decode( wc_clean( $meta->value ), ENT_QUOTES, get_bloginfo( 'charset' ) );
+				}
+			}
+
+			WC()->cart->add_to_cart( $item->get_product_id(), $item->get_quantity(), $item->get_variation_id(), $variation );
 		}
+
+		foreach ( $order->get_coupon_codes() as $code ) {
+			WC()->cart->apply_coupon( $code );
+		}
+
+		// The restore's own notices ("coupon applied", or a product gone out of stock) would make the Store API refuse the next sale.
+		wc_clear_notices();
 	}
 
 	/**
