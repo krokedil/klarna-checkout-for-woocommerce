@@ -7,6 +7,7 @@ namespace Tests\Integration;
 use Krokedil\KustomCheckout\InPersonPayments\Checkout;
 use Krokedil\KustomCheckout\InPersonPayments\Devices;
 use Krokedil\KustomCheckout\InPersonPayments\Gateway;
+use Krokedil\KustomCheckout\InPersonPayments\PosSale;
 use Krokedil\KustomCheckout\InPersonPayments\InPersonPayments;
 use Krokedil\KustomCheckout\InPersonPayments\Settings\Admin;
 use Tests\Support\IntegrationTestCase;
@@ -334,6 +335,32 @@ class InPersonPaymentsCheckoutTest extends IntegrationTestCase {
 		$this->processPayment( $order );
 
 		$this->assertSame( 'shop@example.com', $this->reload( $order )->get_billing_email() );
+	}
+
+	/**
+	 * The fallback email is the store's own, so no customer email goes to it, whether the
+	 * sale was taken on the checkout or the point of sale.
+	 *
+	 * @dataProvider provide_email_recipients
+	 */
+	public function test_customer_emails_skip_the_fallback_address( string $method, bool $fallback, bool $sent ): void {
+		update_option( 'admin_email', 'shop@example.com' );
+		$order = $this->haveOrder( [ 'billing' => [ 'email' => $fallback ? 'shop@example.com' : 'walk-in@example.com' ] ] );
+		$order->set_payment_method( $method );
+		$order->save();
+
+		$recipient = ( new PosSale() )->skip_customer_email( $order->get_billing_email(), $order );
+
+		$this->assertSame( $sent, '' !== $recipient );
+	}
+
+	/** @return array<string, array{0: string, 1: bool, 2: bool}> */
+	public function provide_email_recipients(): array {
+		return [
+			'in-person, fallback address'      => [ Gateway::ID, true, false ],
+			'in-person, the customer\'s email' => [ Gateway::ID, false, true ],
+			'another method, same address'     => [ 'kco', true, true ],
+		];
 	}
 
 	/** The fallback is provisional, so a store can point it somewhere else. */

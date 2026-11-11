@@ -10,7 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * In-person orders placed through the Store API, from the checkout block or a point of
  * sale: no address. A point of sale sale, marked by a `kco_ipp_pos` entry in its payment
- * data, also has no customer and gets no customer emails.
+ * data, also has no customer. No in-person order gets customer emails while its email is
+ * the store's own.
  */
 class PosSale {
 
@@ -29,11 +30,11 @@ class PosSale {
 	private static $relax_address = false;
 
 	/**
-	 * The customer emails a point of sale order has no customer to send to.
+	 * The customer emails an in-person order has no customer to send to.
 	 *
 	 * @var string[]
 	 */
-	public const CUSTOMER_EMAILS = array( 'customer_on_hold_order', 'customer_processing_order', 'customer_completed_order', 'customer_refunded_order', 'customer_invoice', 'customer_note' );
+	public const CUSTOMER_EMAILS = array( 'customer_on_hold_order', 'customer_processing_order', 'customer_completed_order', 'customer_refunded_order', 'customer_partially_refunded_order', 'customer_failed_order', 'customer_invoice', 'customer_note' );
 
 	/**
 	 * Class constructor.
@@ -130,14 +131,15 @@ class PosSale {
 	}
 
 	/**
-	 * Send no customer emails for a point of sale order: its email is the store's own.
+	 * Send no customer emails for an in-person order whose email is the store's fallback,
+	 * whether it was sold on the checkout or the point of sale.
 	 *
 	 * @param string         $recipient The recipient.
 	 * @param \WC_Order|null $order The order the email is about.
 	 * @return string
 	 */
 	public function skip_customer_email( $recipient, $order ) {
-		if ( $order instanceof \WC_Order && self::CREATED_VIA === $order->get_created_via() && Checkout::fallback_email() === $order->get_billing_email() ) {
+		if ( $order instanceof \WC_Order && Gateway::ID === $order->get_payment_method() && Checkout::fallback_email() === $order->get_billing_email() ) {
 			return '';
 		}
 
