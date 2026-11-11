@@ -16,7 +16,7 @@ use Tests\Support\IntegrationTestCase;
  *
  * @covers \Krokedil\KustomCheckout\InPersonPayments\SessionHandler
  * @covers \Krokedil\KustomCheckout\InPersonPayments\API\Controllers\SessionController
- * @covers \Krokedil\KustomCheckout\InPersonPayments\Webhook
+ * @covers \Krokedil\KustomCheckout\InPersonPayments\API\Controllers\WebhookController
  * @covers \Krokedil\KustomCheckout\InPersonPayments\WebhookSignature
  */
 class InPersonPaymentsCompletionTest extends IntegrationTestCase {
