@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\InPersonPayments;
 
+use Krokedil\KustomCheckout\InPersonPayments\API\Controllers\SessionController;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -86,12 +88,14 @@ class WaitingScreen {
 			true
 		);
 
+		$api_registry = KCO_WC()->in_person_payments->api_registry();
+
 		wp_localize_script(
 			'kco_ipp_checkout',
 			'kco_ipp_checkout_params',
 			array(
-				'status_url'    => rest_url( Rest::REST_NAMESPACE . '/ipp/sessions/' . $order->get_id() ),
-				'cancel_url'    => rest_url( Rest::REST_NAMESPACE . '/ipp/sessions/' . $order->get_id() . '/cancel' ),
+				'status_url'    => $api_registry->get_request_path( SessionController::class, (string) $order->get_id() ),
+				'cancel_url'    => $api_registry->get_request_path( SessionController::class, $order->get_id() . '/cancel' ),
 				'nonce'         => wp_create_nonce( 'wp_rest' ),
 				'order_key'     => $order->get_order_key(),
 				'interval'      => self::INTERVAL,

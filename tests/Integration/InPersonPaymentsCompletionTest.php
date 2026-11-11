@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use Krokedil\KustomCheckout\InPersonPayments\Gateway;
-use Krokedil\KustomCheckout\InPersonPayments\Rest;
+use Krokedil\KustomCheckout\InPersonPayments\API\ApiRegistry;
 use Krokedil\KustomCheckout\InPersonPayments\SessionHandler;
 use Krokedil\KustomCheckout\InPersonPayments\WebhookSignature;
 use Tests\Support\IntegrationTestCase;
@@ -15,7 +15,7 @@ use Tests\Support\IntegrationTestCase;
  * poll or through the webhook.
  *
  * @covers \Krokedil\KustomCheckout\InPersonPayments\SessionHandler
- * @covers \Krokedil\KustomCheckout\InPersonPayments\Rest
+ * @covers \Krokedil\KustomCheckout\InPersonPayments\API\Controllers\SessionController
  * @covers \Krokedil\KustomCheckout\InPersonPayments\Webhook
  * @covers \Krokedil\KustomCheckout\InPersonPayments\WebhookSignature
  */
@@ -425,7 +425,7 @@ class InPersonPaymentsCompletionTest extends IntegrationTestCase {
 	private function haveRestRoutes(): void {
 		global $wp_rest_server;
 
-		new Rest();
+		new ApiRegistry();
 
 		$wp_rest_server = new \WP_REST_Server();
 		do_action( 'rest_api_init', $wp_rest_server );

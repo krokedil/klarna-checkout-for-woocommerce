@@ -1,38 +1,32 @@
 <?php
-namespace Krokedil\KustomCheckout\InPersonPayments;
+namespace Krokedil\KustomCheckout\InPersonPayments\API\Controllers;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+use Krokedil\KustomCheckout\InPersonPayments\{Gateway, SessionHandler};
+
+\defined( 'ABSPATH' ) || exit;
 
 /**
- * The REST routes the waiting screen polls and Kustom delivers webhooks to.
+ * Class SessionController.
+ *
+ * The routes the waiting screen polls and cancels an in-person payment session through.
  */
-class Rest {
-
+class SessionController extends BaseController {
 	/**
-	 * The REST namespace the routes live under.
+	 * The path of the controller.
 	 *
 	 * @var string
 	 */
-	public const REST_NAMESPACE = 'kco/v1';
+	protected $path = 'ipp/sessions';
 
 	/**
-	 * Class constructor.
-	 */
-	public function __construct() {
-		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
-	}
-
-	/**
-	 * Register the routes.
+	 * Register the routes for the controller.
 	 *
 	 * @return void
 	 */
 	public function register_routes() {
 		register_rest_route(
-			self::REST_NAMESPACE,
-			'/ipp/sessions/(?P<order_id>[\d]+)',
+			$this->namespace,
+			$this->get_request_path( '(?P<order_id>[\d]+)' ),
 			array(
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_session_status' ),
@@ -42,8 +36,8 @@ class Rest {
 		);
 
 		register_rest_route(
-			self::REST_NAMESPACE,
-			'/ipp/sessions/(?P<order_id>[\d]+)/cancel',
+			$this->namespace,
+			$this->get_request_path( '(?P<order_id>[\d]+)/cancel' ),
 			array(
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'cancel_session' ),
@@ -51,34 +45,6 @@ class Rest {
 				'args'                => self::order_args(),
 			)
 		);
-
-		register_rest_route(
-			self::REST_NAMESPACE,
-			'/ipp/webhook',
-			array(
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => array( Webhook::class, 'handle' ),
-				'permission_callback' => array( Webhook::class, 'verify' ),
-			)
-		);
-	}
-
-	/**
-	 * The URL Kustom delivers webhooks to, or an empty string before WordPress can
-	 * build one.
-	 *
-	 * The settings defaults are read on `plugins_loaded`, which is before WordPress
-	 * creates the rewrite component `rest_url()` needs, and reading them must not be
-	 * fatal.
-	 *
-	 * @return string
-	 */
-	public static function webhook_url() {
-		if ( ! isset( $GLOBALS['wp_rewrite'] ) ) {
-			return '';
-		}
-
-		return rest_url( self::REST_NAMESPACE . '/ipp/webhook' );
 	}
 
 	/**

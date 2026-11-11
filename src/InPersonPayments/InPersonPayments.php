@@ -1,6 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\InPersonPayments;
 
+use Krokedil\KustomCheckout\InPersonPayments\API\ApiRegistry;
 use Krokedil\KustomCheckout\InPersonPayments\Settings\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,9 +30,9 @@ class InPersonPayments {
 	/**
 	 * The REST routes the waiting screen and Kustom call.
 	 *
-	 * @var Rest|null
+	 * @var ApiRegistry
 	 */
-	public $rest;
+	protected $api_registry;
 
 	/**
 	 * The waiting screen shown while the customer pays.
@@ -63,7 +64,7 @@ class InPersonPayments {
 		}
 
 		// Sessions already sent to a device still need their poll, webhook and waiting screen after the feature is switched off.
-		$this->rest           = new Rest();
+		$this->api_registry   = new ApiRegistry();
 		$this->waiting_screen = new WaitingScreen();
 
 		if ( ! self::is_enabled() ) {
@@ -78,6 +79,15 @@ class InPersonPayments {
 		}
 
 		add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateway' ) );
+	}
+
+	/**
+	 * Get the instance of the API registry class.
+	 *
+	 * @return ApiRegistry
+	 */
+	public function api_registry() {
+		return $this->api_registry;
 	}
 
 	/**

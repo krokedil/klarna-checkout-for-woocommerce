@@ -1,7 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\InPersonPayments\Settings;
 
-use Krokedil\KustomCheckout\InPersonPayments\Rest;
+use Krokedil\KustomCheckout\InPersonPayments\API\Controllers\WebhookController;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -88,7 +88,9 @@ class Fields {
 	 * @return string
 	 */
 	private static function webhook_secret_description() {
-		$url = Rest::webhook_url();
+		// The settings defaults are read on plugins_loaded, before WordPress can build a REST URL and before the module exists.
+		$ipp = KCO_WC()->in_person_payments;
+		$url = isset( $GLOBALS['wp_rewrite'] ) && $ipp ? untrailingslashit( $ipp->api_registry()->get_request_path( WebhookController::class ) ) : '';
 
 		if ( '' === $url ) {
 			return __( 'The <code>whsec_</code> secret from the Kustom Merchant Portal. Leave empty to rely on browser polling only.', 'klarna-checkout-for-woocommerce' );
