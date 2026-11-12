@@ -196,7 +196,9 @@ class WebhookController extends BaseController {
 
 		$order = wc_get_order( absint( $merchant_data['order_id'] ?? 0 ) );
 		if ( ! $order ) {
-			$order = wc_get_order( absint( $session['merchant_reference1'] ?? 0 ) );
+			// merchant_reference1 is the order number. WooCommerce's order tracking maps a number to an id through
+			// this filter, which plugins that customise order numbers hook; the session id check below still applies.
+			$order = wc_get_order( apply_filters( 'woocommerce_shortcode_order_tracking_order_id', (string) ( $session['merchant_reference1'] ?? '' ) ) ); // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment -- WooCommerce's own filter.
 		}
 
 		if ( ! $order || Gateway::ID !== $order->get_payment_method() ) {

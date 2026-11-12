@@ -364,6 +364,25 @@ class InPersonPaymentsCompletionTest extends IntegrationTestCase {
 		$this->assertSame( 'completed', $this->statusOf( $order ) );
 	}
 
+	/**
+	 * Without merchant_data the order is found by its number, which a plugin can have
+	 * customised; such plugins map the number back through WooCommerce's order tracking filter.
+	 */
+	public function test_a_webhook_finds_an_order_by_a_custom_order_number(): void {
+		$order = $this->haveWaitingOrder();
+		$this->willRespondWith( $this->session( 'FINALIZED', [ 'merchant_reference1' => 'SHOP-' . $order->get_id(), 'merchant_data' => '' ] ), 200, 'ipp/v1/sessions/' . self::SESSION_ID );
+		add_filter(
+			'woocommerce_shortcode_order_tracking_order_id',
+			static fn ( $number ) => 'SHOP-' . $order->get_id() === $number ? $order->get_id() : $number,
+			5
+		);
+
+		$response = rest_do_request( $this->webhookRequest() );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'completed', $this->statusOf( $order ) );
+	}
+
 	/** A delivery the store could not act on must be retried, so it is not remembered. */
 	public function test_a_webhook_the_store_could_not_act_on_is_retried(): void {
 		$order = $this->haveWaitingOrder();
