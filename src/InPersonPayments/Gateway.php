@@ -348,11 +348,16 @@ class Gateway extends \WC_Payment_Gateway {
 		$payload  = ( new SessionPayload( $order, $device_id, $channel ) )->get_payload();
 		$response = ( new RequestPostSession( array( 'payload' => $payload ) ) )->request();
 
+		// Without a session id there is nothing to poll or cancel, so it is a failed start, not a sale under way.
+		if ( ! is_wp_error( $response ) && empty( $response['session_id'] ) ) {
+			$response = new \WP_Error( 502, __( 'Kustom answered without a session id.', 'klarna-checkout-for-woocommerce' ) );
+		}
+
 		if ( is_wp_error( $response ) ) {
 			return $this->session_failed( $order, $response );
 		}
 
-		$order->update_meta_data( self::SESSION_META, $response['session_id'] ?? '' );
+		$order->update_meta_data( self::SESSION_META, $response['session_id'] );
 		$order->update_meta_data( self::DEVICE_META, $device_id );
 		$order->update_meta_data( self::STATUS_META, $response['status'] ?? '' );
 		$order->update_meta_data( self::DEVICE_NAME_META, $device['name'] ?? '' );

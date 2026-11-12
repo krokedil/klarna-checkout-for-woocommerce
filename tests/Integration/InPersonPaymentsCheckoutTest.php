@@ -340,6 +340,18 @@ class InPersonPaymentsCheckoutTest extends IntegrationTestCase {
 		$this->assertOrderHasNote( $order, 'Counter' );
 	}
 
+	/** A success without a session id has nothing to poll or cancel, so it is handled as a failed start. */
+	public function test_a_session_without_an_id_is_a_failed_start(): void {
+		$order = $this->haveInPersonOrder();
+		$this->willRespondWith( [ 'status' => 'CREATED' ], 200, 'ipp/v1/sessions' );
+
+		$result = $this->processPayment( $order, false );
+
+		$this->assertSame( 'failure', $result['result'] );
+		$this->assertSame( '', $this->reload( $order )->get_meta( Gateway::DEVICE_META ), 'Nothing is stored for a session that cannot be followed.' );
+		$this->assertOrderHasNote( $order, 'without a session id' );
+	}
+
 	/** A session Kustom refused leaves nothing behind to be confused for a live one. */
 	public function test_a_refused_session_leaves_the_order_untouched(): void {
 		$order = $this->haveInPersonOrder();
