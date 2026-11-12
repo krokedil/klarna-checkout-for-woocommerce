@@ -2,9 +2,11 @@
 namespace Krokedil\KustomCheckout\Blocks\InPersonPayments;
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
+use Krokedil\KustomCheckout\InPersonPayments\API\Controllers\SessionController;
 use Krokedil\KustomCheckout\InPersonPayments\Devices;
 use Krokedil\KustomCheckout\InPersonPayments\Gateway;
 use Krokedil\KustomCheckout\InPersonPayments\InPersonPayments;
+use Krokedil\KustomCheckout\InPersonPayments\SessionHandler;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
 defined( 'ABSPATH' ) || exit;
@@ -96,6 +98,13 @@ class CheckoutBlock extends AbstractPaymentMethodType {
 			'placeOrderLabel' => __( 'Take payment on device', 'klarna-checkout-for-woocommerce' ),
 			'noDeviceMessage' => __( 'Please choose a Kustom POS device to take the payment on.', 'klarna-checkout-for-woocommerce' ),
 			'noAddressNotice' => Gateway::no_address_notice(),
+			'failedArg'       => SessionController::FAILED_ARG,
+			'failureMessages' => array(
+				'CANCELLED' => SessionHandler::reason( 'CANCELLED' ),
+				'EXPIRED'   => SessionHandler::reason( 'EXPIRED' ),
+				'FAILED'    => SessionHandler::reason( 'FAILED' ),
+				'default'   => SessionHandler::reason( '' ),
+			),
 			'devices'         => $this->get_devices(),
 			'features'        => $this->get_supported_features(),
 		);

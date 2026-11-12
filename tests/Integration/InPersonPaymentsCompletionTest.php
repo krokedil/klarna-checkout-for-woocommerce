@@ -6,6 +6,7 @@ namespace Tests\Integration;
 
 use Krokedil\KustomCheckout\InPersonPayments\Gateway;
 use Krokedil\KustomCheckout\InPersonPayments\API\ApiRegistry;
+use Krokedil\KustomCheckout\InPersonPayments\API\Controllers\SessionController;
 use Krokedil\KustomCheckout\InPersonPayments\SessionHandler;
 use Krokedil\KustomCheckout\InPersonPayments\WebhookSignature;
 use Tests\Support\IntegrationTestCase;
@@ -277,6 +278,23 @@ class InPersonPaymentsCompletionTest extends IntegrationTestCase {
 		$this->assertInstanceOf( \WC_Cart::class, WC()->cart );
 		$this->assertSame( 2, WC()->cart->get_cart_contents_count() );
 		$this->assertContains( $response->get_data()['message'], array_column( wc_get_notices( 'error' ), 'notice' ) );
+	}
+
+	/**
+	 * The block checkout never clears a session notice, and a leftover one makes the Store
+	 * API refuse the next sale, so its failure travels back in the URL instead.
+	 */
+	public function test_a_failed_block_checkout_session_reports_through_the_url(): void {
+		$order = $this->haveWaitingOrder();
+		$order->set_created_via( 'store-api' );
+		$order->save();
+		$this->beA( 'shop_manager' );
+		$this->willReturnSession( 'CANCELLED' );
+
+		$response = rest_do_request( $this->pollRequest( $order ) );
+
+		$this->assertSame( add_query_arg( SessionController::FAILED_ARG, 'CANCELLED', wc_get_checkout_url() ), $response->get_data()['redirect'] );
+		$this->assertSame( [], wc_get_notices( 'error' ), 'Nothing is left in the session for the next sale to trip on.' );
 	}
 
 	/** Kustom being briefly unreachable is not a sale that failed. */

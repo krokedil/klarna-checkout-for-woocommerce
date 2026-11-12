@@ -376,7 +376,7 @@ class SessionHandler {
 	 * @param string $status The terminal session status.
 	 * @return string
 	 */
-	private static function reason( $status ) {
+	public static function reason( $status ) {
 		switch ( $status ) {
 			case 'CANCELLED':
 				return __( 'The payment was cancelled on the device. Please try again.', 'klarna-checkout-for-woocommerce' );

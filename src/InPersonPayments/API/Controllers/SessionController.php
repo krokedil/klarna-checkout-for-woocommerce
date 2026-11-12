@@ -19,6 +19,13 @@ class SessionController extends BaseController {
 	protected $path = 'ipp/sessions';
 
 	/**
+	 * The query argument that carries a failed session's status back to the block checkout.
+	 *
+	 * @var string
+	 */
+	public const FAILED_ARG = 'kco_ipp_failed';
+
+	/**
 	 * Register the routes for the controller.
 	 *
 	 * @return void
@@ -158,12 +165,19 @@ class SessionController extends BaseController {
 		if ( SessionHandler::FAILED === $outcome['state'] ) {
 			$this->restore_cart( $order );
 
-			// The point of sale shows the message itself. A notice left in the session would make the Store API refuse its next sale.
-			if ( 'pos' !== $request->get_param( 'context' ) ) {
-				wc_add_notice( $outcome['message'], 'error' );
+			$response['redirect'] = wc_get_checkout_url();
+
+			// A session notice is printed, and so cleared, only by the shortcode checkout. Left in the session it makes the
+			// Store API refuse the next sale, so the point of sale shows the message itself and the block checkout from the URL.
+			if ( 'pos' === $request->get_param( 'context' ) ) {
+				return new \WP_REST_Response( $response, 200 );
 			}
 
-			$response['redirect'] = wc_get_checkout_url();
+			if ( 'store-api' === $order->get_created_via() ) {
+				$response['redirect'] = add_query_arg( self::FAILED_ARG, rawurlencode( (string) $outcome['status'] ), $response['redirect'] );
+			} else {
+				wc_add_notice( $outcome['message'], 'error' );
+			}
 		}
 
 		return new \WP_REST_Response( $response, 200 );

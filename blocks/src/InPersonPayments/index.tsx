@@ -8,6 +8,7 @@ import * as React from 'react';
  */
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useState } from '@wordpress/element';
+import { dispatch } from '@wordpress/data';
 // @ts-ignore - Cant avoid this issue, but its loaded in by Webpack
 // eslint-disable-next-line import/no-unresolved
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
@@ -88,6 +89,32 @@ const title: string = decodeEntities(settings.title || 'In-Person Payment');
 const devices: Device[] = settings.devices || [];
 const channels: Record<string, string> = settings.channels || {};
 const features: string[] = settings.features || ['products'];
+
+/**
+ * Show why the last in-person session failed, as a checkout error, then drop the
+ * status from the URL so a reload does not show it again.
+ *
+ * The status comes back in the URL rather than as a session notice: the block checkout
+ * never clears those, and a leftover one makes the Store API refuse the next sale. Only
+ * the status is in the URL, so a crafted link cannot show text of its own.
+ */
+const showFailedSession = (): void => {
+	const failedArg: string = settings.failedArg || 'kco_ipp_failed';
+	const url = new URL(window.location.href);
+	const status = url.searchParams.get(failedArg);
+	if (null === status) {
+		return;
+	}
+
+	const messages: Record<string, string> = settings.failureMessages || {};
+	(dispatch('core/notices') as any).createErrorNotice(
+		decodeEntities(messages[status] || messages.default || ''),
+		{ context: 'wc/checkout' }
+	);
+
+	url.searchParams.delete(failedArg);
+	window.history.replaceState(window.history.state, '', url.toString());
+};
 
 /**
  * Checks whether the method can be offered.
@@ -256,3 +283,4 @@ const options = {
 };
 
 registerPaymentMethod(options);
+showFailedSession();
