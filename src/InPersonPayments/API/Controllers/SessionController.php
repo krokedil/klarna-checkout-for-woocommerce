@@ -66,7 +66,9 @@ class SessionController extends BaseController {
 	}
 
 	/**
-	 * Only the salesperson who placed the order may drive its session.
+	 * Staff with the in-person capability may drive a session, given the order's key. The
+	 * key is not tied to the salesperson who placed the order on purpose, so a colleague
+	 * can take over a waiting screen; staff with the capability can see the key anyway.
 	 *
 	 * @param \WP_REST_Request $request The request.
 	 * @return bool|\WP_Error
