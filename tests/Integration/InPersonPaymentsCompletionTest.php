@@ -140,21 +140,23 @@ class InPersonPaymentsCompletionTest extends IntegrationTestCase {
 		$fired = 0;
 		add_action( 'kco_ipp_payment_complete', static function () use ( &$fired ) { ++$fired; } );
 
-		$this->assertTrue( SessionHandler::lock( $order->get_id() ), 'The first caller takes the lock.' );
+		$token = SessionHandler::lock( $order->get_id() );
+		$this->assertNotFalse( $token, 'The first caller takes the lock.' );
 		$loser = SessionHandler::sync( $order, $this->session( 'FINALIZED' ) );
 
 		$this->assertSame( SessionHandler::WAITING, $loser['state'], 'A caller shut out of a live lock reports the order as still moving.' );
 		$this->assertSame( 'pending', $this->statusOf( $order ) );
 		$this->assertSame( 0, $fired );
 
-		SessionHandler::unlock( $order->get_id() );
+		SessionHandler::unlock( $order->get_id(), $token );
 		$winner = SessionHandler::sync( $order, $this->session( 'FINALIZED' ) );
 
 		$this->assertSame( SessionHandler::PAID, $winner['state'] );
 		$this->assertSame( 1, $fired );
 		$this->assertCount( 1, $this->notesContaining( $order, 'Payment collected' ) );
-		$this->assertTrue( SessionHandler::lock( $order->get_id() ), 'The lock is released after completion.' );
-		SessionHandler::unlock( $order->get_id() );
+		$token = SessionHandler::lock( $order->get_id() );
+		$this->assertNotFalse( $token, 'The lock is released after completion.' );
+		SessionHandler::unlock( $order->get_id(), $token );
 	}
 
 	/** A FINALIZED session for another amount than the order's is not a payment for it. */
@@ -181,21 +183,56 @@ class InPersonPaymentsCompletionTest extends IntegrationTestCase {
 		$this->assertCount( 1, $this->notesContaining( $order, '19900' ) );
 	}
 
-	/** A lock left by a request that died is taken over, but a fresh one is never removed. */
+	/**
+	 * A lock left by a request that died is taken over, but a fresh one is never removed,
+	 * and the old owner cannot release the lock that replaced its own.
+	 */
 	public function test_only_a_stale_lock_is_taken_over(): void {
 		global $wpdb;
 
 		$order = $this->haveWaitingOrder();
 		$name  = 'kco_ipp_completing_' . $order->get_id();
 
-		$this->assertTrue( SessionHandler::lock( $order->get_id() ) );
+		$old = SessionHandler::lock( $order->get_id() );
+		$this->assertNotFalse( $old );
 		$this->assertFalse( SessionHandler::lock( $order->get_id() ), 'A fresh lock is respected.' );
 
-		$wpdb->update( $wpdb->options, [ 'option_value' => (string) ( time() - SessionHandler::LOCK_LIFETIME - 1 ) ], [ 'option_name' => $name ] );
-		$this->assertTrue( SessionHandler::lock( $order->get_id() ), 'A stale lock is taken over.' );
+		$stale = ( time() - SessionHandler::LOCK_LIFETIME - 1 ) . substr( $old, strpos( $old, ':' ) );
+		$wpdb->update( $wpdb->options, [ 'option_value' => $stale ], [ 'option_name' => $name ] );
+		$new = SessionHandler::lock( $order->get_id() );
+		$this->assertNotFalse( $new, 'A stale lock is taken over.' );
 		$this->assertFalse( SessionHandler::lock( $order->get_id() ), 'The new lock is not taken over in turn.' );
 
-		SessionHandler::unlock( $order->get_id() );
+		SessionHandler::unlock( $order->get_id(), $stale );
+		$this->assertFalse( SessionHandler::lock( $order->get_id() ), 'The old owner cannot release the new lock.' );
+
+		SessionHandler::unlock( $order->get_id(), $new );
+		$this->assertNotFalse( SessionHandler::lock( $order->get_id() ), 'The new owner can.' );
+	}
+
+	/**
+	 * The paid check runs before the lock, so a caller can pass it just before the other
+	 * signal completes the order. It must see the order paid once it holds the lock.
+	 */
+	public function test_an_order_completed_before_the_lock_was_taken_is_not_completed_again(): void {
+		$order = $this->haveWaitingOrder();
+		$fired = 0;
+		add_action( 'kco_ipp_payment_complete', static function () use ( &$fired ) { ++$fired; } );
+
+		SessionHandler::sync( $order, $this->session( 'FINALIZED' ) );
+
+		// Stand in for a caller whose paid check ran just before the order was completed.
+		$checks     = 0;
+		$first_read = static function ( $paid ) use ( &$checks ) {
+			return 1 === ++$checks ? false : $paid;
+		};
+		add_filter( 'woocommerce_order_is_paid', $first_read );
+		$outcome = SessionHandler::sync( $order, $this->session( 'FINALIZED' ) );
+		remove_filter( 'woocommerce_order_is_paid', $first_read );
+
+		$this->assertSame( SessionHandler::PAID, $outcome['state'] );
+		$this->assertSame( 1, $fired );
+		$this->assertCount( 1, $this->notesContaining( $order, 'Payment collected' ) );
 	}
 
 	/** A cancellation arriving after the tap must not unsell the goods. */

@@ -127,15 +127,22 @@ class SessionHandler {
 		}
 
 		if ( 'FINALIZED' === $status ) {
-			if ( ! self::lock( $order->get_id() ) ) {
+			$token = self::lock( $order->get_id() );
+			if ( false === $token ) {
 				// The other signal is completing the order right now; the next poll sees it paid.
 				return self::outcome( self::WAITING, 'FINALIZED' );
 			}
 
 			try {
+				// The other signal may have completed the order between the paid check above and taking the lock.
+				$order = wc_get_order( $order->get_id() );
+				if ( $order->is_paid() ) {
+					return self::outcome( self::PAID, $order->get_meta( Gateway::STATUS_META ) );
+				}
+
 				return self::complete( $order, $session );
 			} finally {
-				self::unlock( $order->get_id() );
+				self::unlock( $order->get_id(), $token );
 			}
 		}
 
@@ -242,48 +249,63 @@ class SessionHandler {
 	 * Take the completion lock for an order. A plain insert against the unique option
 	 * name is atomic where `add_option()` is not: that one updates on a duplicate key.
 	 *
+	 * The lock holds when it was taken and a token for its owner, so that only the owner
+	 * can release it, even after a stale lock was taken over.
+	 *
 	 * @param int $order_id The WooCommerce order id.
-	 * @return bool Whether this caller holds the lock.
+	 * @return string|false The owner token to release the lock with, or false when another caller holds it.
 	 */
 	public static function lock( $order_id ) {
 		global $wpdb;
 
-		$name = self::lock_name( $order_id );
+		$name  = self::lock_name( $order_id );
+		$token = time() . ':' . wp_generate_password( 12, false );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- The insert has to race, which the option functions cannot.
 		$suppressed = $wpdb->suppress_errors( true );
-		$taken      = $wpdb->query( $wpdb->prepare( "INSERT INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %d, 'no')", $name, time() ) );
+		$taken      = $wpdb->query( $wpdb->prepare( "INSERT INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')", $name, $token ) );
 		$wpdb->suppress_errors( $suppressed );
 
 		if ( $taken ) {
-			return true;
+			return $token;
 		}
 
-		$held_since = (int) $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $name ) );
+		$held = (string) $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $name ) );
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
+		$held_since = (int) strtok( $held, ':' );
 		if ( $held_since > 0 && time() - $held_since > self::LOCK_LIFETIME ) {
 			// Delete only the stale lock that was read, so a racing caller cannot remove a fresh one; whoever deletes it retries.
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Compare-and-delete, which the option functions cannot do.
-			$released = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s", $name, (string) $held_since ) );
-
-			return $released ? self::lock( $order_id ) : false;
+			return self::release( $order_id, $held ) ? self::lock( $order_id ) : false;
 		}
 
 		return false;
 	}
 
 	/**
-	 * Release the completion lock for an order.
+	 * Release the completion lock for an order, if the caller still owns it. A lock taken
+	 * over as stale belongs to its new owner, so the old owner's release leaves it alone.
 	 *
-	 * @param int $order_id The WooCommerce order id.
+	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $token The owner token lock() returned.
 	 * @return void
 	 */
-	public static function unlock( $order_id ) {
+	public static function unlock( $order_id, $token ) {
+		self::release( $order_id, $token );
+	}
+
+	/**
+	 * Delete the lock for an order only while it still holds the given value.
+	 *
+	 * @param int    $order_id The WooCommerce order id.
+	 * @param string $value The lock value expected.
+	 * @return bool Whether the lock was deleted.
+	 */
+	private static function release( $order_id, $value ) {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Pairs with the insert in lock().
-		$wpdb->delete( $wpdb->options, array( 'option_name' => self::lock_name( $order_id ) ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Compare-and-delete, which the option functions cannot do.
+		return (bool) $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s", self::lock_name( $order_id ), $value ) );
 	}
 
 	/**
