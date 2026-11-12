@@ -1,6 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement;
 
+use Krokedil\KustomCheckout\Utility\OrderUtility;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\OrderMetabox;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -72,7 +73,7 @@ class MetaBox extends OrderMetabox {
 			$order    = wc_get_order( $order_id );
 
 			// If the order was not paid using the plugin that instanced this class, bail.
-			if ( 'kco' !== $order->get_payment_method() ) {
+			if ( ! OrderUtility::is_kustom_order( $order ) ) {
 				return;
 			}
 
@@ -100,7 +101,7 @@ class MetaBox extends OrderMetabox {
 		$order    = wc_get_order( $order_id );
 
 		// If the order was not paid using the plugin that instanced this class, bail.
-		if ( 'kco' !== $order->get_payment_method() ) {
+		if ( ! OrderUtility::is_kustom_order( $order ) ) {
 			return;
 		}
 
@@ -134,7 +135,7 @@ class MetaBox extends OrderMetabox {
 		$order    = wc_get_order( $order_id );
 
 		// If the order was not paid using the plugin that instanced this class, bail.
-		if ( 'kco' !== $order->get_payment_method() ) {
+		if ( ! OrderUtility::is_kustom_order( $order ) ) {
 			return;
 		}
 

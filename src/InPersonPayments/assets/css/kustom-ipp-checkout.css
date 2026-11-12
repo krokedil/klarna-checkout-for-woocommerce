@@ -1,0 +1,24 @@
+/* The in-person payment waiting screen. */
+
+.kco-ipp-waiting {
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	margin-bottom: 1.5em;
+	padding: 1.2em 1.5em;
+}
+
+.kco-ipp-waiting .kco-ipp-waiting-status {
+	font-size: 1.1em;
+	font-weight: 600;
+	margin: 0 0 0.6em;
+}
+
+.kco-ipp-waiting .kco-ipp-waiting-error {
+	color: #b32d2e;
+	margin: 0 0 0.6em;
+}
+
+.kco-ipp-waiting p:last-child {
+	margin-bottom: 0;
+}

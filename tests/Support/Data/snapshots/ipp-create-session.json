@@ -1,0 +1,26 @@
+{
+    "method": "POST",
+    "path": "https://api.playground.kustom.co/ipp/v1/sessions",
+    "body": {
+        "device_id": "550e8400-e29b-41d4-a716-446655440000",
+        "order_amount": 25000,
+        "order_tax_amount": 5000,
+        "purchase_currency": "SEK",
+        "purchase_started_at": "<started-at>",
+        "order_items": [
+            {
+                "type": "physical",
+                "reference": "COUNTER-1",
+                "name": "Counter product",
+                "quantity": 2,
+                "unit_price": 12500,
+                "total_amount": 25000,
+                "total_discount_amount": 0,
+                "tax_rate": 2500,
+                "total_tax_amount": 5000
+            }
+        ],
+        "merchant_reference1": "<order-number>",
+        "merchant_data": "{\"order_id\":<order-id>,\"site_url\":\"<site>\"}"
+    }
+}

@@ -4,6 +4,9 @@ namespace Krokedil\KustomCheckout\Blocks;
 use Krokedil\KustomCheckout\Blocks\Api\Registry;
 use Krokedil\KustomCheckout\Blocks\Checkout\CheckoutBlock;
 use Krokedil\KustomCheckout\Blocks\Express\ExpressPaymentMethod;
+use Krokedil\KustomCheckout\Blocks\InPersonPayments\BlockCheckout as InPersonBlockCheckout;
+use Krokedil\KustomCheckout\Blocks\InPersonPayments\CheckoutBlock as InPersonCheckoutBlock;
+use Krokedil\KustomCheckout\InPersonPayments\InPersonPayments;
 use Krokedil\KustomCheckout\Blocks\Schema\AddressSchema;
 use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Automattic\WooCommerce\StoreApi\Schemas\V1\CartSchema;
@@ -64,6 +67,7 @@ class BlockExtension {
 				}
 				$this->overrides    = new Overrides();
 				$this->api_registry = new Registry();
+				new InPersonBlockCheckout();
 
 				add_filter( 'kco_wc_api_request_args', array( $this->overrides, 'override_request_body' ), 10, 2 );
 
@@ -126,6 +130,10 @@ class BlockExtension {
 
 				kco_update_wc_shipping( $data );
 				break;
+			case 'ipp_selected':
+			case 'ipp_deselected':
+				InPersonBlockCheckout::choose( 'ipp_selected' === $data['action'] );
+				break;
 			case 'extension_data_changed':
 				$this->store_extension_data( $data );
 				break;
@@ -179,6 +187,10 @@ class BlockExtension {
 				function ( $payment_method_registry ) {
 					$payment_method_registry->register( new CheckoutBlock() );
 					$payment_method_registry->register( new ExpressPaymentMethod() );
+
+					if ( InPersonPayments::is_enabled() ) {
+						$payment_method_registry->register( new InPersonCheckoutBlock() );
+					}
 				}
 			);
 		}

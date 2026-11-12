@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Added support for Kustom In-Person Payments. Stores can set up and manage their payment devices, and staff can create a payment session from WooCommerce and send it to a linked device for the customer to pay on.
