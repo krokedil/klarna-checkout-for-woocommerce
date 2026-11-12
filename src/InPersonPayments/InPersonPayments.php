@@ -68,6 +68,9 @@ class InPersonPayments {
 		$this->waiting_screen = new WaitingScreen();
 		add_action( 'woocommerce_order_status_cancelled', array( SessionHandler::class, 'cancel_with_order' ), 10, 2 );
 
+		// Existing in-person orders are refunded through their gateway, so it stays registered; it follows ipp_enabled for new sales.
+		add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateway' ) );
+
 		if ( ! self::is_enabled() ) {
 			return;
 		}
@@ -78,8 +81,6 @@ class InPersonPayments {
 		if ( is_admin() ) {
 			$this->order_details = new OrderDetails();
 		}
-
-		add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateway' ) );
 	}
 
 	/**

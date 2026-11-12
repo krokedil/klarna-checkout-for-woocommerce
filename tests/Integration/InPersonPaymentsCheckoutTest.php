@@ -36,19 +36,19 @@ class InPersonPaymentsCheckoutTest extends IntegrationTestCase {
 		parent::tearDown();
 	}
 
-	/** The feature switch decides whether WooCommerce ever sees the method at all. */
-	public function test_the_method_is_registered_only_when_the_feature_is_on(): void {
+	/**
+	 * The method stays registered with the feature off, so existing in-person orders can
+	 * still be refunded through it, but it takes no new sales.
+	 */
+	public function test_the_method_stays_registered_but_takes_no_sales_with_the_feature_off(): void {
 		$this->haveIppSettings( [ 'ipp_enabled' => 'no' ] );
-		new InPersonPayments();
-		$this->reloadPaymentGateways();
-
-		$this->assertArrayNotHasKey( Gateway::ID, WC()->payment_gateways()->payment_gateways() );
-
-		$this->haveIppSettings();
+		$this->beA( 'administrator' );
 		$ipp = new InPersonPayments();
 		$this->reloadPaymentGateways();
 
-		$this->assertArrayHasKey( Gateway::ID, WC()->payment_gateways()->payment_gateways() );
+		$gateways = WC()->payment_gateways()->payment_gateways();
+		$this->assertArrayHasKey( Gateway::ID, $gateways );
+		$this->assertFalse( $gateways[ Gateway::ID ]->is_available() );
 
 		// Take the gateway filter down again, so later tests decide for themselves.
 		remove_filter( 'woocommerce_payment_gateways', [ $ipp, 'add_gateway' ] );
