@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed the confirmation lock (`kco_wc_lock_confirmation`) letting two simultaneous confirmations through when the options table is missing its unique key on `option_name`. The push notification now also sees a payment made while it waited for the lock.
