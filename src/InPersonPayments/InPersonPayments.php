@@ -63,9 +63,10 @@ class InPersonPayments {
 			$this->admin = new Admin();
 		}
 
-		// Sessions already sent to a device still need their poll, webhook and waiting screen after the feature is switched off.
+		// Sessions already sent to a device still need their poll, webhook, waiting screen and cancellation after the feature is switched off.
 		$this->api_registry   = new ApiRegistry();
 		$this->waiting_screen = new WaitingScreen();
+		add_action( 'woocommerce_order_status_cancelled', array( SessionHandler::class, 'cancel_with_order' ), 10, 2 );
 
 		if ( ! self::is_enabled() ) {
 			return;

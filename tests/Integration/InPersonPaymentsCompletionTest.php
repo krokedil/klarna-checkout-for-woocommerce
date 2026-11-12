@@ -305,6 +305,28 @@ class InPersonPaymentsCompletionTest extends IntegrationTestCase {
 		$this->assertSame( 'PUT', $this->gatewayRequestTo( '/cancel' )['method'] );
 	}
 
+	/** Cancelling a waiting order in WooCommerce stops the device asking for the payment. */
+	public function test_cancelling_a_waiting_order_cancels_its_session(): void {
+		$order = $this->haveWaitingOrder();
+		$this->willRespondWith( $this->session( 'CANCELLED' ), 200, 'ipp/v1/sessions/' . self::SESSION_ID . '/cancel' );
+
+		$order->update_status( 'cancelled' );
+
+		$this->assertSame( 'PUT', $this->gatewayRequestTo( '/cancel' )['method'] );
+		$this->assertSame( 'cancelled', $this->statusOf( $order ), 'The cancellation stands.' );
+	}
+
+	/** An order with no open session has nothing on a device to cancel. */
+	public function test_cancelling_an_order_without_an_open_session_calls_nothing(): void {
+		$order = $this->haveWaitingOrder();
+		$order->update_meta_data( Gateway::STATUS_META, 'CANCELLED' );
+		$order->save();
+
+		$order->update_status( 'cancelled' );
+
+		$this->assertCount( 0, $this->gatewayRequestsTo( '/cancel' ) );
+	}
+
 	/**
 	 * The session routes drive a payment, so they are staff-only and tied to the one
 	 * order whose key the caller already has.

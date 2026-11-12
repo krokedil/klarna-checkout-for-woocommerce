@@ -97,6 +97,35 @@ class SessionHandler {
 	}
 
 	/**
+	 * Cancel the device session of an in-person order cancelled in WooCommerce while it
+	 * waits for the customer, so the device stops asking for a payment the store no
+	 * longer wants. Should the customer have paid already, the answer completes the order.
+	 *
+	 * @param int            $order_id The WooCommerce order id.
+	 * @param \WC_Order|null $order The order.
+	 * @return void
+	 */
+	public static function cancel_with_order( $order_id, $order = null ) {
+		$order = $order instanceof \WC_Order ? $order : wc_get_order( $order_id );
+
+		if ( ! $order || Gateway::ID !== $order->get_payment_method() || $order->is_paid() || ! in_array( $order->get_meta( Gateway::STATUS_META ), self::OPEN_STATUSES, true ) ) {
+			return;
+		}
+
+		$outcome = self::cancel( $order );
+
+		if ( is_wp_error( $outcome ) ) {
+			$order->add_order_note(
+				sprintf(
+					/* translators: %s: the error message from the Kustom API. */
+					__( 'The in-person payment session could not be cancelled on the device: %s', 'klarna-checkout-for-woocommerce' ),
+					wp_strip_all_tags( $outcome->get_error_message() )
+				)
+			);
+		}
+	}
+
+	/**
 	 * Read a session from Kustom.
 	 *
 	 * @param string $session_id The session id.
