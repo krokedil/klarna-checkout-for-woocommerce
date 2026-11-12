@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-11-11 16:12+0000\n"
+"POT-Creation-Date: 2026-11-12 13:18+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -884,7 +884,7 @@ msgstr ""
 msgid "The details are in the order notes and the Kustom Checkout log."
 msgstr ""
 
-#: ../src/InPersonPayments/Gateway.php:87, ../blocks/src/InPersonPayments/CheckoutBlock.php:92, ../src/InPersonPayments/Settings/Fields.php:40
+#: ../src/InPersonPayments/Gateway.php:87, ../blocks/src/InPersonPayments/CheckoutBlock.php:94, ../src/InPersonPayments/Settings/Fields.php:40
 msgid "In-Person Payment"
 msgstr ""
 
@@ -897,7 +897,7 @@ msgstr ""
 msgid "No Kustom POS device is paired with this store yet."
 msgstr ""
 
-#: ../src/InPersonPayments/Gateway.php:230, ../src/InPersonPayments/OrderDetails.php:59, ../blocks/src/InPersonPayments/CheckoutBlock.php:93
+#: ../src/InPersonPayments/Gateway.php:230, ../src/InPersonPayments/OrderDetails.php:80, ../blocks/src/InPersonPayments/CheckoutBlock.php:95
 msgid "Device"
 msgstr ""
 
@@ -905,7 +905,7 @@ msgstr ""
 msgid "required"
 msgstr ""
 
-#: ../src/InPersonPayments/Gateway.php:242, ../blocks/src/InPersonPayments/CheckoutBlock.php:94
+#: ../src/InPersonPayments/Gateway.php:242, ../blocks/src/InPersonPayments/CheckoutBlock.php:96
 msgid "Payment type"
 msgstr ""
 
@@ -913,7 +913,7 @@ msgstr ""
 msgid "Shipping and address details will not be added to the order."
 msgstr ""
 
-#: ../src/InPersonPayments/Gateway.php:268, ../src/InPersonPayments/Gateway.php:337, ../blocks/src/InPersonPayments/CheckoutBlock.php:97
+#: ../src/InPersonPayments/Gateway.php:268, ../src/InPersonPayments/Gateway.php:337, ../blocks/src/InPersonPayments/CheckoutBlock.php:99
 msgid "Please choose a Kustom POS device to take the payment on."
 msgstr ""
 
@@ -933,87 +933,93 @@ msgstr ""
 msgid "In-person payments can only be taken by store staff."
 msgstr ""
 
+#: ../src/InPersonPayments/Gateway.php:353
+msgid "Kustom answered without a session id."
+msgstr ""
+
 #. translators: %s: the name of the POS device.
-#: ../src/InPersonPayments/Gateway.php:366
+#: ../src/InPersonPayments/Gateway.php:371
 msgid "Kustom in-person payment session sent to %s. Waiting for the customer to pay on the device."
 msgstr ""
 
 #. translators: %s: the error message from the Kustom API.
-#: ../src/InPersonPayments/Gateway.php:392
+#: ../src/InPersonPayments/Gateway.php:397
 msgid "Kustom could not start the in-person payment session: %s"
 msgstr ""
 
-#: ../src/InPersonPayments/OrderDetails.php:37
+#. translators: %s: the name of the staff member who took the sale.
+#: ../src/InPersonPayments/OrderDetails.php:38
+msgid "In-person sale (%s)"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:39
+msgid "In-person sale"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:59
 msgid "In-person payment"
 msgstr ""
 
-#: ../src/InPersonPayments/OrderDetails.php:57
-msgid "Sold via"
-msgstr ""
-
-#: ../src/InPersonPayments/OrderDetails.php:57
-msgid "Point of sale"
-msgstr ""
-
-#: ../src/InPersonPayments/OrderDetails.php:57
-msgid "Checkout"
-msgstr ""
-
-#: ../src/InPersonPayments/OrderDetails.php:58
+#: ../src/InPersonPayments/OrderDetails.php:79
 msgid "Staff"
 msgstr ""
 
-#: ../src/InPersonPayments/OrderDetails.php:60, ../src/InPersonPayments/Settings/Fields.php:66
+#: ../src/InPersonPayments/OrderDetails.php:81, ../src/InPersonPayments/Settings/Fields.php:66
 msgid "Location"
 msgstr ""
 
-#: ../src/InPersonPayments/OrderDetails.php:61
+#: ../src/InPersonPayments/OrderDetails.php:82
 msgid "Cash register"
 msgstr ""
 
-#: ../src/InPersonPayments/OrderDetails.php:62
+#: ../src/InPersonPayments/OrderDetails.php:83
 msgid "Payment method"
 msgstr ""
 
-#: ../src/InPersonPayments/OrderDetails.php:63
+#: ../src/InPersonPayments/OrderDetails.php:84
 msgid "Session status"
 msgstr ""
 
-#: ../src/InPersonPayments/OrderDetails.php:64
+#: ../src/InPersonPayments/OrderDetails.php:85
 msgid "Session ID"
 msgstr ""
 
-#: ../src/InPersonPayments/SessionHandler.php:91, ../src/InPersonPayments/SessionHandler.php:107
+#: ../src/InPersonPayments/SessionHandler.php:91, ../src/InPersonPayments/SessionHandler.php:136
 msgid "This order has no in-person payment session."
 msgstr ""
 
+#. translators: %s: the error message from the Kustom API.
+#: ../src/InPersonPayments/SessionHandler.php:121
+msgid "The in-person payment session could not be cancelled on the device: %s"
+msgstr ""
+
 #. translators: %s: the Kustom order id.
-#: ../src/InPersonPayments/SessionHandler.php:185
+#: ../src/InPersonPayments/SessionHandler.php:221
 msgid "Payment collected on the Kustom POS device. Kustom order id: %s"
 msgstr ""
 
-#: ../src/InPersonPayments/SessionHandler.php:217
+#: ../src/InPersonPayments/SessionHandler.php:253
 msgid "The amount paid on the device does not match this order. Do not take the payment again: check the order notes and the Kustom portal."
 msgstr ""
 
 #. translators: 1: the amount the device collected, 2: the order total, both in minor units.
-#: ../src/InPersonPayments/SessionHandler.php:230
+#: ../src/InPersonPayments/SessionHandler.php:266
 msgid "The Kustom POS device reports a payment of %1$s, but the order total is %2$s. The order was not completed. Check the payment in the Kustom portal."
 msgstr ""
 
-#: ../src/InPersonPayments/SessionHandler.php:331
+#: ../src/InPersonPayments/SessionHandler.php:382
 msgid "The payment was cancelled on the device. Please try again."
 msgstr ""
 
-#: ../src/InPersonPayments/SessionHandler.php:333
+#: ../src/InPersonPayments/SessionHandler.php:384
 msgid "The payment session expired before it was paid. Please try again."
 msgstr ""
 
-#: ../src/InPersonPayments/SessionHandler.php:335
+#: ../src/InPersonPayments/SessionHandler.php:386
 msgid "The payment failed on the device. Please try again."
 msgstr ""
 
-#: ../src/InPersonPayments/SessionHandler.php:337
+#: ../src/InPersonPayments/SessionHandler.php:388
 msgid "The payment could not be collected on the device. Please try again."
 msgstr ""
 
@@ -1313,7 +1319,7 @@ msgstr ""
 msgid "Something went wrong."
 msgstr ""
 
-#: ../blocks/src/InPersonPayments/CheckoutBlock.php:96
+#: ../blocks/src/InPersonPayments/CheckoutBlock.php:98
 msgid "Take payment on device"
 msgstr ""
 
@@ -1564,7 +1570,7 @@ msgstr ""
 msgid "No paired devices."
 msgstr ""
 
-#: ../src/InPersonPayments/Settings/Admin.php:548, ../src/InPersonPayments/API/Controllers/SessionController.php:76
+#: ../src/InPersonPayments/Settings/Admin.php:548, ../src/InPersonPayments/API/Controllers/SessionController.php:85
 msgid "You are not allowed to do this."
 msgstr ""
 
@@ -1637,7 +1643,7 @@ msgstr ""
 msgid "Failed to validate your order, please try again."
 msgstr ""
 
-#: ../src/InPersonPayments/API/Controllers/SessionController.php:82
+#: ../src/InPersonPayments/API/Controllers/SessionController.php:91
 msgid "No in-person payment is waiting on this order."
 msgstr ""
 
