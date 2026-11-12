@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-11-04 07:23+0000\n"
+"POT-Creation-Date: 2026-11-11 16:12+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -17,19 +17,19 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../klarna-checkout-for-woocommerce.php:185, ../klarna-checkout-for-woocommerce.php:195
+#: ../klarna-checkout-for-woocommerce.php:193, ../klarna-checkout-for-woocommerce.php:203
 msgid "Nope"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:243
+#: ../klarna-checkout-for-woocommerce.php:251
 msgid "Settings"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:244
+#: ../klarna-checkout-for-woocommerce.php:252
 msgid "Support"
 msgstr ""
 
-#: ../klarna-checkout-for-woocommerce.php:468, ../klarna-checkout-for-woocommerce.php:478
+#: ../klarna-checkout-for-woocommerce.php:478, ../klarna-checkout-for-woocommerce.php:488
 msgid "Your installation of Kustom Checkout for WooCommerce is not complete. If you installed this plugin directly from Github please refer to the README.DEV.md file in the plugin."
 msgstr ""
 
@@ -66,384 +66,384 @@ msgstr ""
 msgid "Something went wrong with the external payment. Please try again"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:26
+#: ../classes/class-kco-fields.php:28
 msgid "General configuration"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:29
+#: ../classes/class-kco-fields.php:31
 msgid "Get started with Kustom Checkout by configuring the settings below."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:32
+#: ../classes/class-kco-fields.php:34, ../src/InPersonPayments/Settings/Fields.php:29
 msgid "Enable/Disable"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:33
+#: ../classes/class-kco-fields.php:35
 msgid "Enable Kustom Checkout"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:39
+#: ../classes/class-kco-fields.php:41, ../src/InPersonPayments/Settings/Fields.php:37
 msgid "Title"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:41
+#: ../classes/class-kco-fields.php:43
 msgid "Payment method title."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:46
+#: ../classes/class-kco-fields.php:48
 msgid "Description"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:48
+#: ../classes/class-kco-fields.php:50
 msgid "Payment method description."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:53
+#: ../classes/class-kco-fields.php:55
 msgid "Other payment method button text"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:55
+#: ../classes/class-kco-fields.php:57
 msgid "Customize the <em>Select another payment method</em> button text that is displayed in checkout if using other payment methods than Kustom Checkout. Leave blank to use the default (and translatable) text."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:63
+#: ../classes/class-kco-fields.php:65
 msgid "Test mode"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:64
+#: ../classes/class-kco-fields.php:66
 msgid "Enable Test Mode"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:66
+#: ../classes/class-kco-fields.php:68
 msgid "Place the payment gateway in test mode using test API keys."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:71
+#: ../classes/class-kco-fields.php:73
 msgid "Logging"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:72
+#: ../classes/class-kco-fields.php:74
 msgid "Log debug messages"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:74
+#: ../classes/class-kco-fields.php:76
 msgid "Save debug messages to the WooCommerce System Status log."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:79
+#: ../classes/class-kco-fields.php:81
 msgid "Checkout layout"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:82
+#: ../classes/class-kco-fields.php:84
 msgid "One column checkout"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:83
+#: ../classes/class-kco-fields.php:85
 msgid "Two column checkout (Kustom Checkout in right column)"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:84
+#: ../classes/class-kco-fields.php:86
 msgid "Two column checkout (Kustom Checkout in left column)"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:85
+#: ../classes/class-kco-fields.php:87
 msgid "Two column checkout (Kustom Checkout in left column) - Storefront light"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:97
+#: ../classes/class-kco-fields.php:99
 msgid "Production Kustom API Username"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:99, ../classes/class-kco-fields.php:109, ../classes/class-kco-fields.php:119, ../classes/class-kco-fields.php:129
+#: ../classes/class-kco-fields.php:101, ../classes/class-kco-fields.php:111, ../classes/class-kco-fields.php:121, ../classes/class-kco-fields.php:131
 msgid "Use API username and API password you downloaded in the Kustom Merchant Portal. Don’t use your email address."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:107
+#: ../classes/class-kco-fields.php:109
 msgid "Production Kustom API Password"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:117
+#: ../classes/class-kco-fields.php:119
 msgid "Test Kustom API Username"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:127
+#: ../classes/class-kco-fields.php:129
 msgid "Test Kustom API Password"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:141
+#: ../classes/class-kco-fields.php:143
 msgid "Shipping settings"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:146
+#: ../classes/class-kco-fields.php:148
 msgid "Separate shipping address"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:147
+#: ../classes/class-kco-fields.php:149
 msgid "Allow separate shipping address"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:149
+#: ../classes/class-kco-fields.php:151
 msgid "If this option is checked, customers will be able to enter shipping address different than their billing address in checkout."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:154
+#: ../classes/class-kco-fields.php:156
 msgid "Shipping methods in iframe"
 msgstr ""
 
 #. translators: 1: Configuration link, 2: Tax settings link.
-#: ../classes/class-kco-fields.php:156
+#: ../classes/class-kco-fields.php:158
 msgid "Display Shipping methods in Kustom iframe. Required when <b>Kustom Shipping Assistant</b> is enabled further down on this page. For setup, see the sections titled %1$s and %2$s in the documentation."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:158
+#: ../classes/class-kco-fields.php:160
 msgid "If this option is checked, selection of shipping methods is done in Kustom iframe. Shipping price and name of the selected shipping method will still be displayed in WooCommerce order review."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:163
+#: ../classes/class-kco-fields.php:165
 msgid "Shipping details"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:164
+#: ../classes/class-kco-fields.php:166
 msgid "Shipping details note shown to customer"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:166
+#: ../classes/class-kco-fields.php:168
 msgid "Will be shown to customer in thank you page."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:178
+#: ../classes/class-kco-fields.php:180
 msgid "Checkout settings"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:183
+#: ../classes/class-kco-fields.php:185
 msgid "Product URLs"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:185
+#: ../classes/class-kco-fields.php:187
 msgid "Send product and product image URLs to Kustom"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:190
+#: ../classes/class-kco-fields.php:192
 msgid "Date of birth mandatory"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:191
+#: ../classes/class-kco-fields.php:193
 msgid "Make customer date of birth mandatory"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:193
+#: ../classes/class-kco-fields.php:195
 msgid "If checked, the customer cannot skip date of birth."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:198
+#: ../classes/class-kco-fields.php:200
 msgid "National identification number mandatory"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:199
+#: ../classes/class-kco-fields.php:201
 msgid "Makes the validation of national identification numbers mandatory for customers."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:201
+#: ../classes/class-kco-fields.php:203
 msgid "If checked, the customer will have to complete a validation process for the national identification number ( SE, NO, FI and DK only ). This will also make national identification numbers mandatory."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:206
+#: ../classes/class-kco-fields.php:208
 msgid "Allowed Customer Types"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:209
+#: ../classes/class-kco-fields.php:211
 msgid "B2C only"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:210
+#: ../classes/class-kco-fields.php:212
 msgid "B2B only"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:211
+#: ../classes/class-kco-fields.php:213
 msgid "B2C & B2B (defaults to B2C)"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:212
+#: ../classes/class-kco-fields.php:214
 msgid "B2B & B2C (defaults to B2B)"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:214
+#: ../classes/class-kco-fields.php:216
 msgid "Select if you want to sell both to consumers and companies or only to one of them (available for SE, NO, FI and DE). You need to contact Kustom directly to activate this with your account."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:219
+#: ../classes/class-kco-fields.php:221
 msgid "Title mandatory (GB)"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:220
+#: ../classes/class-kco-fields.php:222
 msgid "Make customer title mandatory"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:222
+#: ../classes/class-kco-fields.php:224
 msgid "If unchecked, title becomes optional. Only available for orders for country GB."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:227
+#: ../classes/class-kco-fields.php:229
 msgid "Show prefill consent notice"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:228
+#: ../classes/class-kco-fields.php:230
 msgid "Only applicable for stores based in Germany and Austria."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:229
+#: ../classes/class-kco-fields.php:231
 msgid "Show a notice in the checkout asking for consent to prefill the checkout form"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:234
+#: ../classes/class-kco-fields.php:236
 msgid "Display quantity fields"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:235
+#: ../classes/class-kco-fields.php:237
 msgid "Display the quantity selection fields on the checkout page"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:237
+#: ../classes/class-kco-fields.php:239
 msgid "If this option is checked, the customer will be able to change the quantity of a product purchased on the checkout page as they would on the cart page."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:242
+#: ../classes/class-kco-fields.php:244
 msgid "Display on free orders"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:243
+#: ../classes/class-kco-fields.php:245
 msgid "Display Kustom Checkout even when the order total is 0"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:245
+#: ../classes/class-kco-fields.php:247
 msgid "If unchecked, the standard WooCommerce checkout is shown when the order total is 0, for example after a 100% discount coupon."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:250
+#: ../classes/class-kco-fields.php:252
 msgid "Display subtotal details"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:253
+#: ../classes/class-kco-fields.php:255
 msgid "In the WooCommerce order review"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:254
+#: ../classes/class-kco-fields.php:256
 msgid "In the Kustom Checkout iFrame"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:255
+#: ../classes/class-kco-fields.php:257
 msgid "In both"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:257
+#: ../classes/class-kco-fields.php:259
 msgid "Select how you want to show the subtotal details on the checkout page."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:266
+#: ../classes/class-kco-fields.php:268
 msgid "Color Settings"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:271
+#: ../classes/class-kco-fields.php:273
 msgid "Checkout button color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:273
+#: ../classes/class-kco-fields.php:275
 msgid "Checkout page button color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:278
+#: ../classes/class-kco-fields.php:280
 msgid "Checkout button text color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:280
+#: ../classes/class-kco-fields.php:282
 msgid "Checkout page button text color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:285
+#: ../classes/class-kco-fields.php:287
 msgid "Checkout checkbox color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:287
+#: ../classes/class-kco-fields.php:289
 msgid "Checkout page checkbox color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:292
+#: ../classes/class-kco-fields.php:294
 msgid "Checkout checkbox checkmark color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:294
+#: ../classes/class-kco-fields.php:296
 msgid "Checkout page checkbox checkmark color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:299
+#: ../classes/class-kco-fields.php:301
 msgid "Checkout header color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:301
+#: ../classes/class-kco-fields.php:303
 msgid "Checkout page header color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:306
+#: ../classes/class-kco-fields.php:308
 msgid "Checkout link color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:308
+#: ../classes/class-kco-fields.php:310
 msgid "Checkout page link color"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:313
+#: ../classes/class-kco-fields.php:315
 msgid "Checkout radius border (px)"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:315
+#: ../classes/class-kco-fields.php:317
 msgid "Checkout page radius border in pixels"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:332
+#: ../classes/class-kco-fields.php:334
 msgid "Checkout flow"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:335
+#: ../classes/class-kco-fields.php:337
 msgid "Embedded"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:336
+#: ../classes/class-kco-fields.php:338
 msgid "Redirect"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:338
+#: ../classes/class-kco-fields.php:340
 msgid "<strong>Embedded:</strong> the checkout is embedded in the WooCommerce checkout page and partially replaces the checkout form. <strong>Redirect:</strong> the customer is redirected to a payment page hosted by Kustom"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:360
+#: ../classes/class-kco-fields.php:362
 msgid "Checkout privacy policy text"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:361
+#: ../classes/class-kco-fields.php:363
 msgid "Select if you want to show the <em>Checkout privacy policy</em> text on the checkout page, and where you want to display it."
 msgstr ""
 
-#: ../classes/class-kco-fields.php:365
+#: ../classes/class-kco-fields.php:367
 msgid "Do not display"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:366
+#: ../classes/class-kco-fields.php:368
 msgid "Display above checkout"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:367
+#: ../classes/class-kco-fields.php:369
 msgid "Display below checkout"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:371
+#: ../classes/class-kco-fields.php:373
 msgid "Terms and conditions checkbox"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:372
+#: ../classes/class-kco-fields.php:374
 msgid "Add a terms and conditions checkbox inside Kustom Checkout iframe"
 msgstr ""
 
-#: ../classes/class-kco-fields.php:374
+#: ../classes/class-kco-fields.php:376
 msgid "To change the text navigate to → Appearance → Customize → WooCommerce → Checkout."
 msgstr ""
 
@@ -852,67 +852,264 @@ msgstr ""
 msgid "Could not start express checkout, please try again or use checkout."
 msgstr ""
 
+#: ../src/InPersonPayments/ErrorMessage.php:29
+msgid "The store could not reach Kustom. Check the connection and take the payment again."
+msgstr ""
+
+#: ../src/InPersonPayments/ErrorMessage.php:26
+msgid "This store is not connected to Kustom yet. Add the API credentials in the Kustom Checkout settings."
+msgstr ""
+
+#: ../src/InPersonPayments/ErrorMessage.php:57
+msgid "Kustom turned this sale down. Check the order details and try the payment again."
+msgstr ""
+
+#: ../src/InPersonPayments/ErrorMessage.php:61
+msgid "Kustom did not accept this store's credentials. Check the API credentials in the Kustom Checkout settings."
+msgstr ""
+
+#: ../src/InPersonPayments/ErrorMessage.php:65
+msgid "Kustom does not recognize the chosen POS device. Pick another device, or pair this one again."
+msgstr ""
+
+#: ../src/InPersonPayments/ErrorMessage.php:70
+msgid "The chosen device has no open cash register. Open one in the Kustom POS app and try the payment again."
+msgstr ""
+
+#: ../src/InPersonPayments/ErrorMessage.php:73
+msgid "The payment could not be started on the device. Please try the payment again."
+msgstr ""
+
+#: ../src/InPersonPayments/ErrorMessage.php:82
+msgid "The details are in the order notes and the Kustom Checkout log."
+msgstr ""
+
+#: ../src/InPersonPayments/Gateway.php:87, ../blocks/src/InPersonPayments/CheckoutBlock.php:92, ../src/InPersonPayments/Settings/Fields.php:40
+msgid "In-Person Payment"
+msgstr ""
+
+#. translators: %1$s: opening link tag, %2$s: closing link tag.
+#: ../src/InPersonPayments/Gateway.php:161
+msgid "In-person payments are configured in the %1$sKustom Checkout settings%2$s."
+msgstr ""
+
+#: ../src/InPersonPayments/Gateway.php:222
+msgid "No Kustom POS device is paired with this store yet."
+msgstr ""
+
+#: ../src/InPersonPayments/Gateway.php:230, ../src/InPersonPayments/OrderDetails.php:59, ../blocks/src/InPersonPayments/CheckoutBlock.php:93
+msgid "Device"
+msgstr ""
+
+#: ../src/InPersonPayments/Gateway.php:231
+msgid "required"
+msgstr ""
+
+#: ../src/InPersonPayments/Gateway.php:242, ../blocks/src/InPersonPayments/CheckoutBlock.php:94
+msgid "Payment type"
+msgstr ""
+
+#: ../src/InPersonPayments/Gateway.php:258
+msgid "Shipping and address details will not be added to the order."
+msgstr ""
+
+#: ../src/InPersonPayments/Gateway.php:268, ../src/InPersonPayments/Gateway.php:337, ../blocks/src/InPersonPayments/CheckoutBlock.php:97
+msgid "Please choose a Kustom POS device to take the payment on."
+msgstr ""
+
+#: ../src/InPersonPayments/Gateway.php:301
+msgid "Chosen on the device"
+msgstr ""
+
+#: ../src/InPersonPayments/Gateway.php:302
+msgid "Card"
+msgstr ""
+
+#: ../src/InPersonPayments/Gateway.php:303
+msgid "Scan to pay"
+msgstr ""
+
+#: ../src/InPersonPayments/Gateway.php:329
+msgid "In-person payments can only be taken by store staff."
+msgstr ""
+
+#. translators: %s: the name of the POS device.
+#: ../src/InPersonPayments/Gateway.php:366
+msgid "Kustom in-person payment session sent to %s. Waiting for the customer to pay on the device."
+msgstr ""
+
+#. translators: %s: the error message from the Kustom API.
+#: ../src/InPersonPayments/Gateway.php:392
+msgid "Kustom could not start the in-person payment session: %s"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:37
+msgid "In-person payment"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:57
+msgid "Sold via"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:57
+msgid "Point of sale"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:57
+msgid "Checkout"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:58
+msgid "Staff"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:60, ../src/InPersonPayments/Settings/Fields.php:66
+msgid "Location"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:61
+msgid "Cash register"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:62
+msgid "Payment method"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:63
+msgid "Session status"
+msgstr ""
+
+#: ../src/InPersonPayments/OrderDetails.php:64
+msgid "Session ID"
+msgstr ""
+
+#: ../src/InPersonPayments/SessionHandler.php:91, ../src/InPersonPayments/SessionHandler.php:107
+msgid "This order has no in-person payment session."
+msgstr ""
+
+#. translators: %s: the Kustom order id.
+#: ../src/InPersonPayments/SessionHandler.php:185
+msgid "Payment collected on the Kustom POS device. Kustom order id: %s"
+msgstr ""
+
+#: ../src/InPersonPayments/SessionHandler.php:217
+msgid "The amount paid on the device does not match this order. Do not take the payment again: check the order notes and the Kustom portal."
+msgstr ""
+
+#. translators: 1: the amount the device collected, 2: the order total, both in minor units.
+#: ../src/InPersonPayments/SessionHandler.php:230
+msgid "The Kustom POS device reports a payment of %1$s, but the order total is %2$s. The order was not completed. Check the payment in the Kustom portal."
+msgstr ""
+
+#: ../src/InPersonPayments/SessionHandler.php:331
+msgid "The payment was cancelled on the device. Please try again."
+msgstr ""
+
+#: ../src/InPersonPayments/SessionHandler.php:333
+msgid "The payment session expired before it was paid. Please try again."
+msgstr ""
+
+#: ../src/InPersonPayments/SessionHandler.php:335
+msgid "The payment failed on the device. Please try again."
+msgstr ""
+
+#: ../src/InPersonPayments/SessionHandler.php:337
+msgid "The payment could not be collected on the device. Please try again."
+msgstr ""
+
+#: ../src/InPersonPayments/SessionPayload.php:223
+msgid "Rounding"
+msgstr ""
+
+#: ../src/InPersonPayments/WaitingScreen.php:55
+msgid "Waiting for the customer to pay on the device…"
+msgstr ""
+
+#: ../src/InPersonPayments/WaitingScreen.php:60
+msgid "Cancel on device"
+msgstr ""
+
+#: ../src/InPersonPayments/WaitingScreen.php:103
+msgid "Could not reach Kustom. Still waiting for the device."
+msgstr ""
+
+#: ../src/InPersonPayments/WebhookSignature.php:53
+msgid "No webhook signing secret is configured."
+msgstr ""
+
+#: ../src/InPersonPayments/WebhookSignature.php:57
+msgid "The delivery is not signed."
+msgstr ""
+
+#: ../src/InPersonPayments/WebhookSignature.php:61
+msgid "The delivery is too old to accept."
+msgstr ""
+
+#: ../src/InPersonPayments/WebhookSignature.php:74
+msgid "The delivery signature does not match."
+msgstr ""
+
 #: ../src/Migrations/CredentialsMigration.php:175
 msgid "Kustom Checkout for WooCommerce has been updated to use a single set of credentials for all regions. It looks like you had credentials configured for both Europe and the United States. We've defaulted to the credentials previously entered for Europe. Your other credentials are still stored in the database, and will be available again if you roll back to a previous version."
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:109
+#: ../src/OrderManagement/MetaBox.php:110
 msgid "The payment has not been finalized with Kustom."
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:118
+#: ../src/OrderManagement/MetaBox.php:119
 msgid "Failed to retrieve the order from Kustom."
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:150
+#: ../src/OrderManagement/MetaBox.php:151
 msgid "Kustom Environment"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:158
+#: ../src/OrderManagement/MetaBox.php:159
 msgid "Kustom order status"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:166
+#: ../src/OrderManagement/MetaBox.php:167
 msgid "Initial Payment method"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:174
+#: ../src/OrderManagement/MetaBox.php:175
 msgid "Scheduled actions"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:180
+#: ../src/OrderManagement/MetaBox.php:181
 msgid "Advanced"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:309
+#: ../src/OrderManagement/MetaBox.php:310
 msgid "Order management"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:310
+#: ../src/OrderManagement/MetaBox.php:311
 msgid "Disable this to turn off the automatic synchronization with the Kustom Merchant Portal. When disabled, any changes in either system have to be done manually."
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:421, ../src/OrderManagement/MetaBox.php:435
+#: ../src/OrderManagement/MetaBox.php:422, ../src/OrderManagement/MetaBox.php:436
 msgid "Capture order"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:435
+#: ../src/OrderManagement/MetaBox.php:436
 msgid "Activates the order with Kustom."
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:449, ../src/OrderManagement/MetaBox.php:463
+#: ../src/OrderManagement/MetaBox.php:450, ../src/OrderManagement/MetaBox.php:464
 msgid "Cancel order"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:463
+#: ../src/OrderManagement/MetaBox.php:464
 msgid "Cancels the order with Kustom."
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:477, ../src/OrderManagement/MetaBox.php:491
+#: ../src/OrderManagement/MetaBox.php:478, ../src/OrderManagement/MetaBox.php:492
 msgid "Get customer"
 msgstr ""
 
-#: ../src/OrderManagement/MetaBox.php:491
+#: ../src/OrderManagement/MetaBox.php:492
 msgid "Gets the customer data from Kustom and saves it to the WooCommerce order."
 msgstr ""
 
@@ -928,64 +1125,64 @@ msgstr ""
 msgid "Sales Tax"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:85
+#: ../src/OrderManagement/OrderManagement.php:86
 msgid "Order Management is now included in Kustom Checkout for WooCommerce."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:86
+#: ../src/OrderManagement/OrderManagement.php:87
 msgid "You no longer need the separate Klarna Order Management plugin."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:150
+#: ../src/OrderManagement/OrderManagement.php:151
 msgid "minus a return fee of"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:151
+#: ../src/OrderManagement/OrderManagement.php:152
 msgid "Refund amount is less than the return fee."
 msgstr ""
 
 #. translators: 1: User name, 2: Existing token, 3: New token.
-#: ../src/OrderManagement/OrderManagement.php:315
+#: ../src/OrderManagement/OrderManagement.php:316
 msgid "%1$s updated the subscription recurring token from \"%2$s\" to \"%3$s\"."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:385
+#: ../src/OrderManagement/OrderManagement.php:386
 msgid "Could not update Kustom order lines. An unknown error occurred."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:383
+#: ../src/OrderManagement/OrderManagement.php:384
 msgid "Could not update Kustom order lines: %s."
 msgstr ""
 
 #. translators: %s: Error message from Kustom.
-#: ../src/OrderManagement/OrderManagement.php:506
+#: ../src/OrderManagement/OrderManagement.php:507
 msgid "Could not capture Kustom order. %s"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:496
+#: ../src/OrderManagement/OrderManagement.php:497
 msgid "Kustom could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:543, ../src/OrderManagement/OrderManagement.php:562
+#: ../src/OrderManagement/OrderManagement.php:545, ../src/OrderManagement/OrderManagement.php:564
 msgid "Kustom order has not been captured and cannot be refunded."
 msgstr ""
 
 #. translators: %s Kustom error message.
-#: ../src/OrderManagement/OrderManagement.php:554, ../src/OrderManagement/OrderManagement.php:594
+#: ../src/OrderManagement/OrderManagement.php:556, ../src/OrderManagement/OrderManagement.php:596
 msgid "Could not refund Kustom order. %s."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:574
+#: ../src/OrderManagement/OrderManagement.php:576
 msgid "Could not retrieve the refund order."
 msgstr ""
 
 #. translators: refund amount, refund id.
-#: ../src/OrderManagement/OrderManagement.php:608
+#: ../src/OrderManagement/OrderManagement.php:610
 msgid "Processing a refund of %1$s with Kustom"
 msgstr ""
 
 #. translators: 1: original amount, 2: return fee amount.
-#: ../src/OrderManagement/OrderManagement.php:618
+#: ../src/OrderManagement/OrderManagement.php:620
 msgid " (original amount of %1$s - return fee of %2$s)"
 msgstr ""
 
@@ -1019,35 +1216,35 @@ msgstr ""
 msgid "Order address updated by Kustom Order management."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:47
+#: ../src/OrderManagement/Settings.php:48
 msgid "Enable order management"
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:51
+#: ../src/OrderManagement/Settings.php:52
 msgid "Let WooCommerce activate, cancel, update and credit Kustom orders."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:52
+#: ../src/OrderManagement/Settings.php:53
 msgid "Disable this if you manage orders in the Kustom portal. Refunds must then be registered in WooCommerce with \"Refund manually\". The manual actions on individual orders remain available."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:61
+#: ../src/OrderManagement/Settings.php:62
 msgid "Activate Kustom order automatically when WooCommerce order is marked complete."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:69
+#: ../src/OrderManagement/Settings.php:70
 msgid "Cancel Kustom order automatically when WooCommerce order is marked canceled."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:77
+#: ../src/OrderManagement/Settings.php:78
 msgid "Update Kustom order automatically when WooCommerce order is updated."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:85
+#: ../src/OrderManagement/Settings.php:86
 msgid "Gets the customer information from Kustom when creating a manual admin order and adding a Kustom order id as a transaction id."
 msgstr ""
 
-#: ../src/OrderManagement/Settings.php:93
+#: ../src/OrderManagement/Settings.php:94
 msgid "Force capture full order. Useful if the Kustom order has been updated by an ERP system."
 msgstr ""
 
@@ -1114,6 +1311,10 @@ msgstr ""
 
 #: ../blocks/src/Checkout/CheckoutBlock.php:138
 msgid "Something went wrong."
+msgstr ""
+
+#: ../blocks/src/InPersonPayments/CheckoutBlock.php:96
+msgid "Take payment on device"
 msgstr ""
 
 #: ../blocks/src/Schema/AddressSchema.php:16
@@ -1236,8 +1437,212 @@ msgstr ""
 msgid "Correlation ID"
 msgstr ""
 
+#: ../src/InPersonPayments/Request/Request.php:180
+msgid "Kustom Checkout credentials are missing."
+msgstr ""
+
+#. translators: %s: HTTP status code.
+#: ../src/InPersonPayments/Request/Request.php:244, ../src/InPersonPayments/Request/Request.php:258
+msgid "Kustom API error %s."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:83
+msgid "Could not reach Kustom. Please try again."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:125
+msgid "No location (single-location accounts only)"
+msgstr ""
+
+#. translators: %s: the location id saved in the settings.
+#: ../src/InPersonPayments/Settings/Admin.php:167
+msgid "Unknown location (%s)"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:204
+msgid "Refresh device list"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:237
+msgid "Generate a code, then type it into the Kustom POS app on the device you want to pair."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:241, ../src/InPersonPayments/Settings/Admin.php:334
+msgid "Generate enrollment code"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:269
+msgid "Enable in-person payments and save the settings to pair a device."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:289
+msgid "Edit device"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:291, ../src/InPersonPayments/Settings/Admin.php:336
+msgid "Close"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:298
+msgid "Device name"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:302
+msgid "The name shown here and in the Kustom Merchant Portal."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:310
+msgid "Save device"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:342
+msgid "Code valid for"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:349
+msgid "Anything longer than two hours returns a long code that has to be copied rather than typed."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:357
+msgid "Generate code"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:376
+msgid "2 hours (short, typeable code)"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:377
+msgid "24 hours"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:378
+msgid "48 hours"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:379
+msgid "72 hours"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:417
+msgid "Kustom did not return an enrollment code."
+msgstr ""
+
+#. translators: %s: date and time the enrollment code expires.
+#: ../src/InPersonPayments/Settings/Admin.php:426
+msgid "Expires %s."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:446
+msgid "A device and a name are both required."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:456
+msgid "That device is no longer paired with this account."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:489
+msgid "Name"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:490
+msgid "Platform"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:491
+msgid "Paired"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:492
+msgid "Actions"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:510
+msgid "Edit"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:498
+msgid "No paired devices."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Admin.php:548, ../src/InPersonPayments/API/Controllers/SessionController.php:76
+msgid "You are not allowed to do this."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:23
+msgid "In-person payments"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:26
+msgid "Take payments at the counter on a paired Kustom POS device."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:30
+msgid "Enable in-person payments"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:32
+msgid "Adds a separate in-person payment method to the checkout for staff with the capability selected below."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:39
+msgid "The payment method title shown at checkout."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:44
+msgid "Required capability"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:47
+msgid "Manage WooCommerce (shop managers and administrators)"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:48
+msgid "Edit orders"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:49
+msgid "Manage options (administrators only)"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:51
+msgid "Only logged in users with this capability can see the in-person payment method."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:56
+msgid "Webhook signing secret"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:68
+msgid "The Kustom location to enroll devices at. Required unless the merchant account has exactly one location."
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:72
+msgid "Pair a device"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:76
+msgid "Paired devices"
+msgstr ""
+
+#: ../src/InPersonPayments/Settings/Fields.php:96
+msgid "The <code>whsec_</code> secret from the Kustom Merchant Portal. Leave empty to rely on browser polling only."
+msgstr ""
+
+#. translators: %s: the callback URL to enter in the Kustom Merchant Portal.
+#: ../src/InPersonPayments/Settings/Fields.php:101
+msgid "The <code>whsec_</code> secret from the Kustom Merchant Portal, where the callback URL is set to <code>%s</code>. Leave empty to rely on browser polling only."
+msgstr ""
+
 #: ../blocks/src/Api/Controllers/OrderController.php:92
 msgid "Failed to validate your order, please try again."
+msgstr ""
+
+#: ../src/InPersonPayments/API/Controllers/SessionController.php:82
+msgid "No in-person payment is waiting on this order."
+msgstr ""
+
+#: ../src/InPersonPayments/API/Controllers/WebhookController.php:74
+msgid "Unauthorized."
 msgstr ""
 
 #: ../src/OrderManagement/Request/Post/RequestPostRefund.php:271
