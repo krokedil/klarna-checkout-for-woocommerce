@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: yes
+
+The confirmation lock that prevents duplicate order confirmations is now on by default. Return false from the "kco_wc_lock_confirmation" filter to turn it off.

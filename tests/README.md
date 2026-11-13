@@ -681,7 +681,7 @@ it. The gate is a backstop for mistakes, not the control.
 | `tests/_mu-plugins/05-kustom-test-admin-password.php` | Resets the admin password from `WORDPRESS_ADMIN_PASSWORD`. |
 | `tests/_mu-plugins/06-admin-screens-offline.php` | Drops the wp-admin requests that never answer here. |
 | `tests/_mu-plugins/08-login-no-autofocus.php` | Stops wp-login.php from clearing the password the driver typed. |
-| `tests/_mu-plugins/09-kustom-push-lock.php` | Turns the confirmation lock on and records the push's Kustom lookups instead of sending them, when `PushCallbackCest` asks. |
+| `tests/_mu-plugins/09-kustom-push-lock.php` | Records the push's Kustom lookups instead of sending them, when `PushCallbackCest` asks. The lock itself is left at its default. |
 | `tests/_mu-plugins/10-wordpress-options-unique-name.php` | Creates the `option_name` unique index SQLite drops, which the confirmation lock relies on. |
 | `tests/_support_scripts/install-test-env.php` | Idempotent WP scaffold, runs on `composer install`. |
 | `tests/_support_scripts/regenerate-dump.sh` | Rebuilds `dump.sql` from a clean install. |

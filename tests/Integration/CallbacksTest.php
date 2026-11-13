@@ -275,7 +275,6 @@ class CallbacksTest extends IntegrationTestCase {
 	 */
 	public function test_a_locked_confirmation_stops_a_second_request_for_the_same_order( bool $object_cache ): void {
 		$order = $this->haveOrderAwaitingConfirmation();
-		add_filter( 'kco_wc_lock_confirmation', '__return_true' );
 		$this->usingObjectCache = wp_using_ext_object_cache( $object_cache );
 
 		$this->assertTrue( \KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', $order->get_id() ), 'The first request takes the lock.' );
@@ -284,6 +283,23 @@ class CallbacksTest extends IntegrationTestCase {
 		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
 
 		$this->assertNoGatewayRequests( 'The second request must stop before it confirms the order again.' );
+	}
+
+	public function test_a_store_that_turns_the_lock_off_confirms_despite_a_held_lock(): void {
+		$order = $this->haveOrderAwaitingConfirmation();
+		add_filter( 'kco_wc_lock_confirmation', '__return_false' );
+
+		$this->assertTrue( \KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', $order->get_id() ), 'Another request holds the lock.' );
+
+		$this->willRetrieveManagedOrder(
+			[ 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ]
+		);
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		kco_confirm_klarna_order( $order->get_id(), 'kustom-order-123' );
+
+		$this->assertNotNull( $this->reload( $order )->get_date_paid(), 'With the lock filtered off, the held lock must not stop the confirmation.' );
 	}
 
 	/** @return array<string, array{0: bool}> */
@@ -296,7 +312,6 @@ class CallbacksTest extends IntegrationTestCase {
 
 	public function test_a_finished_confirmation_releases_the_lock(): void {
 		$order = $this->haveOrderAwaitingConfirmation();
-		add_filter( 'kco_wc_lock_confirmation', '__return_true' );
 
 		$this->willRetrieveManagedOrder(
 			[ 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ]
