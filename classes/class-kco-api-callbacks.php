@@ -91,7 +91,7 @@ class KCO_API_Callbacks {
 		$order_id = $order->get_id();
 
 		$did_lock = false;
-		if ( apply_filters( 'kco_wc_lock_confirmation', false, $klarna_order_id, $order_id ) ) {
+		if ( apply_filters( 'kco_wc_lock_confirmation', true, $klarna_order_id, $order_id ) ) {
 			$did_lock = KCO_Confirmation::lock_kco_confirmation( $klarna_order_id, $order_id );
 			if ( ! $did_lock ) {
 				KCO_WC()->logger->log( "[PUSH CALLBACK]: Simultaneous push callback for Kustom order ID $klarna_order_id and WooCommerce order ID $order_id. Stopping process." );

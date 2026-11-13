@@ -626,11 +626,11 @@ function kco_confirm_klarna_order( $order_id = null, $klarna_order_id = null ) {
 		 * Filters whether to lock the order confirmation to prevent simultaneous confirmations of the same order.
 		 *
 		 * @link https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#prevent-duplicate-order-confirmations Prevent duplicate order confirmations
-		 * @param bool   $lock            Whether to lock the confirmation. Default false.
+		 * @param bool   $lock            Whether to lock the confirmation. Default true.
 		 * @param string $klarna_order_id The Kustom order ID.
 		 * @param int    $order_id        The WooCommerce order ID.
 		 */
-		if ( apply_filters( 'kco_wc_lock_confirmation', false, $klarna_order_id, $order_id ) ) {
+		if ( apply_filters( 'kco_wc_lock_confirmation', true, $klarna_order_id, $order_id ) ) {
 			$did_lock = KCO_Confirmation::lock_kco_confirmation( $klarna_order_id, $order_id );
 			if ( ! $did_lock ) {
 				KCO_Logger::log( "Simultaneous confirmation attempt for Kustom order ID $klarna_order_id and WooCommerce order ID $order_id. Stopping process." );

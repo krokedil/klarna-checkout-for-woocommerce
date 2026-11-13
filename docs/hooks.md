@@ -1167,7 +1167,7 @@ Source: [./classes/class-kco-checkout.php](../classes/class-kco-checkout.php), [
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$lock` | `bool` | Whether to lock the confirmation. Default false.
+`$lock` | `bool` | Whether to lock the confirmation. Default true.
 `$klarna_order_id` | `string` | The Kustom order ID.
 `$order_id` | `int` | The WooCommerce order ID.
 
