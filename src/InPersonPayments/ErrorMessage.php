@@ -67,7 +67,7 @@ class ErrorMessage {
 
 		// Kustom answers with the generic conflict code here, not the no_open_cash_register code it documents.
 		if ( 409 === $status ) {
-			return __( 'The chosen device has no open cash register. Open one in the Kustom POS app and try the payment again.', 'klarna-checkout-for-woocommerce' );
+			return __( 'The chosen device has no open cash register. Open one in the Kustom app and try the payment again.', 'klarna-checkout-for-woocommerce' );
 		}
 
 		return __( 'The payment could not be started on the device. Please try the payment again.', 'klarna-checkout-for-woocommerce' );

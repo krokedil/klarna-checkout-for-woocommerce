@@ -88,7 +88,7 @@ class Admin {
 	/**
 	 * Render the location picker.
 	 *
-	 * The ids are not shown anywhere in the Merchant Portal, so they have to be read
+	 * The ids are not shown anywhere in the Kustom Portal, so they have to be read
 	 * off the API. A lookup that fails falls back to a plain text input rather than
 	 * leaving the merchant with no way to set the location at all.
 	 *
@@ -234,7 +234,7 @@ class Admin {
 			<td class="forminp">
 				<div id="kco-ipp-enrollment" data-key="<?php echo esc_attr( $key ); ?>">
 					<p class="description">
-						<?php esc_html_e( 'Generate a code, then type it into the Kustom POS app on the device you want to pair.', 'klarna-checkout-for-woocommerce' ); ?>
+						<?php esc_html_e( 'Generate a code, then type it into the Kustom app on the device you want to pair.', 'klarna-checkout-for-woocommerce' ); ?>
 					</p>
 					<p>
 						<button type="button" class="button kco-ipp-create-enrollment">
@@ -299,7 +299,7 @@ class Admin {
 									<input type="text" id="kco-ipp-device-name" name="name" class="input-text regular-input"
 										value="{{ data.name }}" autocomplete="off" />
 									<span class="description">
-										<?php esc_html_e( 'The name shown here and in the Kustom Merchant Portal.', 'klarna-checkout-for-woocommerce' ); ?>
+										<?php esc_html_e( 'The name shown here and in the Kustom Portal.', 'klarna-checkout-for-woocommerce' ); ?>
 									</span>
 								</p>
 							</form>

@@ -129,7 +129,7 @@ jQuery( function ( $ ) {
 		},
 
 		/**
-		 * Ask Kustom for a code the salesperson types into the POS app.
+		 * Ask Kustom for a code the salesperson types into the Kustom app.
 		 *
 		 * @param {object} data The serialized form fields.
 		 * @return {void}

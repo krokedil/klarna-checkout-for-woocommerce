@@ -93,12 +93,12 @@ class Fields {
 		$url = isset( $GLOBALS['wp_rewrite'] ) && $ipp ? untrailingslashit( $ipp->api_registry()->get_request_path( WebhookController::class ) ) : '';
 
 		if ( '' === $url ) {
-			return __( 'The <code>whsec_</code> secret from the Kustom Merchant Portal. Leave empty to rely on browser polling only.', 'klarna-checkout-for-woocommerce' );
+			return __( 'The <code>whsec_</code> secret from the Kustom Portal. Leave empty to rely on browser polling only.', 'klarna-checkout-for-woocommerce' );
 		}
 
 		return sprintf(
-			/* translators: %s: the callback URL to enter in the Kustom Merchant Portal. */
-			__( 'The <code>whsec_</code> secret from the Kustom Merchant Portal, where the callback URL is set to <code>%s</code>. Leave empty to rely on browser polling only.', 'klarna-checkout-for-woocommerce' ),
+			/* translators: %s: the callback URL to enter in the Kustom Portal. */
+			__( 'The <code>whsec_</code> secret from the Kustom Portal, where the callback URL is set to <code>%s</code>. Leave empty to rely on browser polling only.', 'klarna-checkout-for-woocommerce' ),
 			esc_url( $url )
 		);
 	}

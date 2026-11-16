@@ -873,7 +873,7 @@ msgid "Kustom does not recognize the chosen POS device. Pick another device, or 
 msgstr ""
 
 #: ../src/InPersonPayments/ErrorMessage.php:70
-msgid "The chosen device has no open cash register. Open one in the Kustom POS app and try the payment again."
+msgid "The chosen device has no open cash register. Open one in the Kustom app and try the payment again."
 msgstr ""
 
 #: ../src/InPersonPayments/ErrorMessage.php:73
@@ -1470,7 +1470,7 @@ msgid "Refresh device list"
 msgstr ""
 
 #: ../src/InPersonPayments/Settings/Admin.php:237
-msgid "Generate a code, then type it into the Kustom POS app on the device you want to pair."
+msgid "Generate a code, then type it into the Kustom app on the device you want to pair."
 msgstr ""
 
 #: ../src/InPersonPayments/Settings/Admin.php:241, ../src/InPersonPayments/Settings/Admin.php:334
@@ -1494,7 +1494,7 @@ msgid "Device name"
 msgstr ""
 
 #: ../src/InPersonPayments/Settings/Admin.php:302
-msgid "The name shown here and in the Kustom Merchant Portal."
+msgid "The name shown here and in the Kustom Portal."
 msgstr ""
 
 #: ../src/InPersonPayments/Settings/Admin.php:310
@@ -1631,12 +1631,12 @@ msgid "Paired devices"
 msgstr ""
 
 #: ../src/InPersonPayments/Settings/Fields.php:96
-msgid "The <code>whsec_</code> secret from the Kustom Merchant Portal. Leave empty to rely on browser polling only."
+msgid "The <code>whsec_</code> secret from the Kustom Portal. Leave empty to rely on browser polling only."
 msgstr ""
 
-#. translators: %s: the callback URL to enter in the Kustom Merchant Portal.
+#. translators: %s: the callback URL to enter in the Kustom Portal.
 #: ../src/InPersonPayments/Settings/Fields.php:101
-msgid "The <code>whsec_</code> secret from the Kustom Merchant Portal, where the callback URL is set to <code>%s</code>. Leave empty to rely on browser polling only."
+msgid "The <code>whsec_</code> secret from the Kustom Portal, where the callback URL is set to <code>%s</code>. Leave empty to rely on browser polling only."
 msgstr ""
 
 #: ../blocks/src/Api/Controllers/OrderController.php:92
