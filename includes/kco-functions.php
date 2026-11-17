@@ -605,6 +605,10 @@ function kco_print_error_message( $wp_error ) {
  * @return void
  */
 function kco_unset_sessions() {
+	if ( ! WC()->session ) {
+		return;
+	}
+
 	WC()->session->__unset( 'kco_valid_checkout' );
 	WC()->session->__unset( 'kco_wc_prefill_consent' );
 	WC()->session->__unset( 'kco_wc_order_id' );
