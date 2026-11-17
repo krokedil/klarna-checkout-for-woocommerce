@@ -499,8 +499,10 @@ class OrderManagement {
 				}
 
 				/* The suggested approach by Kustom is to try again after some time. If that still fails, the merchant should inform the customer, and ask them to either "create a new subscription or add funds to their payment method if they wish to continue." */
-				if ( isset( $response->get_error_data()['code'] ) && 403 === $response->get_error_data()['code'] && 'PAYMENT_METHOD_FAILED' === $response->get_error_code() ) {
-					$order->update_status( 'on-hold', __( 'Kustom could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue.', 'klarna-checkout-for-woocommerce' ) );
+				$error_body = (array) $response->get_error_data( 'klarna_error_body' );
+				if ( 403 === (int) $response->get_error_code() && 'PAYMENT_METHOD_FAILED' === ( $error_body['error_code'] ?? '' ) ) {
+					$note = __( 'Kustom could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue.', 'klarna-checkout-for-woocommerce' );
+					$this->put_on_hold( $order, $this->format_error_note( $note, $response ) );
 					return new \WP_Error( 'capture_failed', 'Capture failed. Please try again later.' );
 				} else {
 					$error_message = $response->get_error_message();

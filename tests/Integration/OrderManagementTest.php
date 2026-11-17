@@ -321,6 +321,18 @@ class OrderManagementTest extends IntegrationTestCase {
 		];
 	}
 
+	public function test_a_declined_charge_tells_the_merchant_to_retry_the_capture(): void {
+		$order = $this->haveOrderFor( 'capture' );
+
+		$this->willRetrieveManagedOrder();
+		$this->willRejectWith( '/captures', 'Payment method failed.', 403, [ 'error_code' => 'PAYMENT_METHOD_FAILED', 'correlation_id' => 'corr-123' ] );
+
+		$this->assertWpErrorCode( 'capture_failed', $this->perform( 'capture', $order ) );
+		$this->assertOrderHasNote( $order, 'Kustom could not charge the customer. Please try again later.' );
+		$this->assertOrderHasNote( $order, 'Error code: PAYMENT_METHOD_FAILED. Correlation ID: corr-123.' );
+		$this->assertSame( 'on-hold', $this->statusOf( $order ) );
+	}
+
 	public function test_saving_a_subscription_without_a_kustom_order_id_does_not_contact_kustom(): void {
 		$order = $this->haveOrderFor( 'update' );
 		$this->applyGuard( $order, 'no-kustom-id' );
