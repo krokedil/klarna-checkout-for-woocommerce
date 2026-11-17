@@ -323,6 +323,9 @@ class OrderManagement {
 				// If the recurring token was changed, we can assume the merchant didn't update the subscription as that would require a recurring token which as has now been modified, but not yet saved.
 				return true;
 			}
+
+			// A subscription is not a Kustom order. Any Kustom order ID it carries was copied from the parent order.
+			return null;
 		}
 
 		if ( ! isset( $options['kom_auto_update'] ) || 'yes' === $options['kom_auto_update'] || $action ) {

@@ -313,6 +313,27 @@ class OrderManagementTest extends IntegrationTestCase {
 		];
 	}
 
+	public function test_saving_a_subscription_without_a_kustom_order_id_does_not_contact_kustom(): void {
+		$order = $this->haveOrderFor( 'update' );
+		$this->applyGuard( $order, 'no-kustom-id' );
+		$subscription = $this->markAsSubscription( $order );
+
+		$this->perform( 'update', $subscription );
+
+		$this->assertNoGatewayRequests();
+		$this->assertOrderHasNoNote( $subscription, 'could not be updated' );
+	}
+
+	/** A subscription is never a Kustom order, even when it carries its parent's Kustom order ID. */
+	public function test_saving_a_subscription_does_not_update_the_parents_kustom_order(): void {
+		$subscription = $this->markAsSubscription( $this->haveOrderFor( 'update' ) );
+
+		$this->perform( 'update', $subscription );
+
+		$this->assertNoGatewayRequests();
+		$this->assertOrderHasNoNote( $subscription, 'could not be updated' );
+	}
+
 	/**
 	 * @dataProvider provide_rejections
 	 */
