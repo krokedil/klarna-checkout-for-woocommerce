@@ -13,35 +13,6 @@ defined( 'ABSPATH' ) || exit;
  */
 class Overrides {
 	/**
-	 * Maybe calculate the recurring carts before WooCommerce Subscriptions creates the subscriptions.
-	 *
-	 * The Store API route that pays an existing draft order never recalculates the cart, so the recurring
-	 * carts that WCS builds the subscriptions from are missing and the order is placed without any.
-	 *
-	 * @param \WC_Order $order The WooCommerce order.
-	 *
-	 * @return void
-	 */
-	public function maybe_calculate_recurring_carts( $order ) {
-		if ( 'kco' !== $order->get_payment_method() || ! class_exists( 'WC_Subscriptions_Cart' ) ) {
-			return;
-		}
-
-		$cart = WC()->cart;
-		if ( ! $cart || ! \WC_Subscriptions_Cart::cart_contains_subscription() ) {
-			return;
-		}
-
-		// The create route has already calculated the totals in this request.
-		if ( ! empty( $cart->recurring_carts ) ) {
-			return;
-		}
-
-		// WCS hooks into the totals calculation to set the recurring carts on the cart object.
-		$cart->calculate_totals();
-	}
-
-	/**
 	 * Override the request body for the Kustom Checkout API.
 	 *
 	 * @param array    $args The request arguments.

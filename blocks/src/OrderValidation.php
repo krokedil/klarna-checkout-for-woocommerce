@@ -57,8 +57,9 @@ class OrderValidation {
 			return;
 		}
 
-		// Submit the order via the store api. When no order exists yet it is created from the cart token.
-		$updated_order = self::submit_wc_order( $klarna_order, $order );
+		// Submit via the store API; subscriptions use the create route to reuse the draft order and create the customer account and recurring carts WooCommerce Subscriptions needs.
+		$pay_order     = $order && ! self::contains_subscription( $order ) ? $order : null;
+		$updated_order = self::submit_wc_order( $klarna_order, $pay_order );
 
 		// Compare the order hashes to the once stored in the merchant data to ensure the order is valid.
 		self::validate_hash( $klarna_merchant_data['wc_cart_hash'], $updated_order->get_cart_hash() );
@@ -248,6 +249,27 @@ class OrderValidation {
 		if ( ! empty( $order->get_date_paid() ) ) {
 			throw new Exception( 'Order is already paid.', 400 );
 		}
+	}
+
+	/**
+	 * Check if the order contains a subscription product.
+	 *
+	 * @param \WC_Order $order The WooCommerce order.
+	 *
+	 * @return bool
+	 */
+	private static function contains_subscription( $order ) {
+		if ( ! class_exists( 'WC_Subscriptions_Product' ) ) {
+			return false;
+		}
+
+		foreach ( $order->get_items() as $item ) {
+			if ( $item instanceof \WC_Order_Item_Product && \WC_Subscriptions_Product::is_subscription( $item->get_product() ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

@@ -66,9 +66,6 @@ class BlockExtension {
 				$this->api_registry = new Registry();
 
 				add_filter( 'kco_wc_api_request_args', array( $this->overrides, 'override_request_body' ), 10, 2 );
-
-				// Important: Needs to be on a priority before 100, since WCS creates the subscriptions at 100.
-				add_action( 'woocommerce_store_api_checkout_order_processed', array( $this->overrides, 'maybe_calculate_recurring_carts' ), 90 );
 			},
 			5
 		);
