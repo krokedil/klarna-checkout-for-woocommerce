@@ -286,10 +286,13 @@ $renewal      = $this->haveRenewalOrderFor( $subscription );
 
 Those are real orders. Only the class `wc_get_order()` returns is swapped, for
 `Fakes\SubscriptionOrder`, which is a `WC_Order` plus the `shop_subscription`
-type, `get_parent()` and `payment_failed()`. It does **not** stand in for
-`WC_Subscriptions_Cart` or `WC_Subscriptions_Product`, so a cart holding a new
-subscription product is still out of reach. `haveCartContaining( 'renewal' )` and
-its siblings cover the states the plugin branches on beyond that.
+type, `get_parent()` and `payment_failed()`. `WC_Subscriptions_Product` is faked too:
+only a product passed through `markAsSubscriptionProduct()` is a subscription,
+and every one of them is a plain monthly subscription without a trial. It does
+**not** stand in for `WC_Subscriptions_Cart`, so a cart holding a new subscription
+product, and the recurring carts WooCommerce Subscriptions builds from it, are
+still out of reach. `haveCartContaining( 'renewal' )` and its siblings cover the
+states the plugin branches on beyond that.
 [Harness/Fixtures/FakeSubscriptionsTest.php](Harness/Fixtures/FakeSubscriptionsTest.php)
 pins what the fake answers.
 
