@@ -360,7 +360,9 @@ class OrderManagement {
 			// Retrieve Kustom order first.
 			$klarna_order = $this->retrieve_klarna_order( $order_id );
 			if ( is_wp_error( $klarna_order ) ) {
-				$order->add_order_note( 'Kustom order could not be updated due to an error.' );
+				// translators: %s: Error message from Kustom.
+				$note = sprintf( __( 'Kustom order could not be updated due to an error: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() );
+				$order->add_order_note( $this->format_error_note( $note, $klarna_order ) );
 				$order->save();
 
 				return new \WP_Error( 'object_error', 'Kustom order object is of type WP_Error.', $klarna_order );
@@ -388,7 +390,7 @@ class OrderManagement {
 						$order_note = __( 'Could not update Kustom order lines. An unknown error occurred.', 'klarna-checkout-for-woocommerce' );
 					}
 
-					$order->add_order_note( $order_note );
+					$order->add_order_note( $this->format_error_note( $order_note, $response ) );
 					$order->save();
 					return new \WP_Error( 'unknown_error', 'Response object is of type WP_Error.', $response );
 				}
@@ -448,7 +450,9 @@ class OrderManagement {
 			$klarna_order = $this->retrieve_klarna_order( $order_id );
 
 			if ( is_wp_error( $klarna_order ) ) {
-				$order->update_status( 'on-hold', 'Kustom order could not be captured due to an error.' );
+				// translators: %s: Error message from Kustom.
+				$note = sprintf( __( 'Kustom order could not be captured due to an error: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() );
+				$this->put_on_hold( $order, $this->format_error_note( $note, $klarna_order ) );
 				return new \WP_Error( 'object_error', 'Kustom order object is of type WP_Error.', $klarna_order );
 			}
 			// Check if order is pending review.
@@ -506,7 +510,8 @@ class OrderManagement {
 					}
 
 					// translators: %s: Error message from Kustom.
-					$order->update_status( 'on-hold', sprintf( __( 'Could not capture Kustom order. %s', 'klarna-checkout-for-woocommerce' ), $error_message ) );
+					$note = sprintf( __( 'Could not capture Kustom order. %s', 'klarna-checkout-for-woocommerce' ), $error_message );
+					$this->put_on_hold( $order, $this->format_error_note( $note, $response ) );
 					return new \WP_Error( 'capture_failed', 'Capture failed.', $error_message );
 				}
 			}
@@ -645,6 +650,58 @@ class OrderManagement {
 		$klarna_order = $request->request();
 
 		return $klarna_order;
+	}
+
+	/**
+	 * Puts the order on hold with a note, keeping the note when the order is already on hold.
+	 *
+	 * @param \WC_Order $order The order.
+	 * @param string    $note  The order note.
+	 * @return void
+	 */
+	private function put_on_hold( $order, $note ) {
+		// WooCommerce drops the update_status() note when the status does not change, e.g. on a retried capture.
+		if ( $order->has_status( 'on-hold' ) ) {
+			$order->add_order_note( $note );
+			$order->save();
+			return;
+		}
+
+		$order->update_status( 'on-hold', $note );
+	}
+
+	/**
+	 * Appends Kustom's error code and correlation ID from a failed request to an order note.
+	 *
+	 * @param string    $note  The order note.
+	 * @param \WP_Error $error The error returned by a request.
+	 * @return string
+	 */
+	private function format_error_note( $note, $error ) {
+		return trim( $note . ' ' . $this->get_error_details( $error ) );
+	}
+
+	/**
+	 * Formats Kustom's error code and correlation ID from a failed request for an order note.
+	 *
+	 * @param \WP_Error $error The error returned by a request.
+	 * @return string Empty when Kustom returned neither, for example on a timeout.
+	 */
+	private function get_error_details( $error ) {
+		$body    = (array) $error->get_error_data( 'klarna_error_body' );
+		$details = array();
+
+		if ( ! empty( $body['error_code'] ) ) {
+			// translators: %s: Kustom error code.
+			$details[] = sprintf( __( 'Error code: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_text_field( $body['error_code'] ) );
+		}
+
+		if ( ! empty( $body['correlation_id'] ) ) {
+			// translators: %s: Kustom correlation ID.
+			$details[] = sprintf( __( 'Correlation ID: %s.', 'klarna-checkout-for-woocommerce' ), sanitize_text_field( $body['correlation_id'] ) );
+		}
+
+		return implode( ' ', $details );
 	}
 
 	/**

@@ -30,6 +30,12 @@ class OrderManagementTest extends IntegrationTestCase {
 		'update'  => 'kom_auto_update',
 	];
 
+	/** The error body Kustom sends alongside its error messages. */
+	private const ERROR_DETAILS = [
+		'error_code'     => 'BAD_VALUE',
+		'correlation_id' => 'corr-123',
+	];
+
 	/** @dataProvider provide_operations */
 	public function test_the_operation_reaches_the_api( string $op ): void {
 		$order = $this->haveOrderFor( $op );
@@ -302,6 +308,8 @@ class OrderManagementTest extends IntegrationTestCase {
 		$this->assertWpErrorCode( 'object_error', $this->perform( $op, $order ) );
 		$this->assertGatewayRequestCount( 1, '', 'Acting on an order whose state is unknown is not safe.' );
 		$this->assertOrderHasNote( $order, $note );
+		$this->assertOrderHasNoNote( $order, 'Error code:' );
+		$this->assertOrderHasNoNote( $order, 'Correlation ID:' );
 	}
 
 	/** @return array<string, array{0: string, 1: string}> */
@@ -335,13 +343,39 @@ class OrderManagementTest extends IntegrationTestCase {
 	}
 
 	/**
+	 * The merchant needs Kustom's error code and correlation ID to raise a failure with Kustom support.
+	 *
+	 * @dataProvider provide_detailed_lookup_failures
+	 */
+	public function test_a_rejected_lookup_note_carries_kustoms_error_code_and_correlation_id( string $op, string $status ): void {
+		$order = $this->haveOrderFor( $op );
+		$order->set_status( $status );
+		$order->save();
+
+		$this->willRejectWith( 'ordermanagement/v1/orders', 'Something went wrong.', 400, self::ERROR_DETAILS );
+
+		$this->perform( $op, $order, true );
+
+		$this->assertOrderHasNote( $order, 'Something went wrong. Error code: BAD_VALUE. Correlation ID: corr-123.' );
+	}
+
+	/** @return array<string, array{0: string, 1: string}> */
+	public function provide_detailed_lookup_failures(): array {
+		return [
+			'capture'                     => [ 'capture', 'processing' ],
+			'capture, retried on on-hold' => [ 'capture', 'on-hold' ],
+			'update'                      => [ 'update', 'on-hold' ],
+		];
+	}
+
+	/**
 	 * @dataProvider provide_rejections
 	 */
 	public function test_the_api_rejecting_the_operation_is_noted( string $op, string $reason, string $error_code, string $note, ?string $unset_meta ): void {
 		$order = $this->haveOrderFor( $op );
 
 		$this->willRetrieveManagedOrder( $this->lookupFor( $op ) );
-		$this->willRejectWith( self::ENDPOINTS[ $op ][0], $reason );
+		$this->willRejectWith( self::ENDPOINTS[ $op ][0], $reason, 400, self::ERROR_DETAILS );
 
 		$this->assertWpErrorCode( $error_code, $this->perform( $op, $order ) );
 		$this->assertOrderHasNote( $order, $note );
@@ -354,9 +388,9 @@ class OrderManagementTest extends IntegrationTestCase {
 	/** @return array<string, array{0: string, 1: string, 2: string, 3: string, 4: string|null}> */
 	public function provide_rejections(): array {
 		return [
-			'capture' => [ 'capture', 'Order is not in a capturable state.', 'capture_failed', 'Order is not in a capturable state.', '_wc_klarna_capture_id' ],
+			'capture' => [ 'capture', 'Order is not in a capturable state.', 'capture_failed', 'Order is not in a capturable state. Error code: BAD_VALUE. Correlation ID: corr-123.', '_wc_klarna_capture_id' ],
 			'cancel'  => [ 'cancel', 'Order has already been captured', 'unknown_error', 'Order has already been captured.', '_wc_klarna_cancelled' ],
-			'update'  => [ 'update', 'Amount exceeds the authorized amount', 'unknown_error', 'Amount exceeds the authorized amount.', null ],
+			'update'  => [ 'update', 'Amount exceeds the authorized amount', 'unknown_error', 'Amount exceeds the authorized amount. Error code: BAD_VALUE. Correlation ID: corr-123.', null ],
 			'refund'  => [ 'refund', 'Refund amount is higher than remaining captured amount', 'unknown_error', 'Refund amount is higher than remaining captured amount.', null ],
 		];
 	}

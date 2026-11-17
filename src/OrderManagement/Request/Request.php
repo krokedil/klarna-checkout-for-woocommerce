@@ -252,6 +252,11 @@ abstract class Request {
 				$error_message = join( ' ', $body->error_messages );
 			}
 			$processed_response = new \WP_Error( $response_code, $error_message, $data );
+
+			// Keep Kustom's error body, it holds the error code and correlation ID that order notes report.
+			if ( null !== $body ) {
+				$processed_response->add_data( (array) $body, 'klarna_error_body' );
+			}
 		} else { // Response is *not* an error!
 			$processed_response = $body;
 
