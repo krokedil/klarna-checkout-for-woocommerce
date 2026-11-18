@@ -400,7 +400,7 @@ class KCO_Subscription {
 	 */
 	public function set_recurring_token_for_subscription( $subscription_id = null, $klarna_order = null ) {
 		if ( isset( $klarna_order['recurring_token'] ) ) {
-			$recurring_token    = $klarna_order['recurring_token'];
+			$recurring_token    = sanitize_key( $klarna_order['recurring_token'] );
 			$subscription_order = wc_get_order( $subscription_id );
 			$subscription_order->update_meta_data( '_kco_recurring_token', $recurring_token );
 			$subscription_order->save();
@@ -658,34 +658,72 @@ class KCO_Subscription {
 		$subscription_id = filter_input( INPUT_GET, 'key', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$kco_action      = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( ! empty( $subscription_id ) && ( ! empty( $kco_action ) && 'subs-payment-changed' === $kco_action ) ) {
-
-			$subscription = wcs_get_subscription( $subscription_id );
-
-			// Add recurring token to order via Checkout API.
-			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
-			if ( ! is_wp_error( $klarna_order ) ) {
-				if ( isset( $klarna_order['recurring_token'] ) && ! empty( $klarna_order['recurring_token'] ) ) {
-					$subscription_order = wc_get_order( $subscription->get_id() );
-					$subscription_order->update_meta_data( '_kco_recurring_token', sanitize_key( $klarna_order['recurring_token'] ) );
-					$subscription_order->save();
-
-					// translators: %s Kustom recurring token.
-					$note = sprintf( __( 'Payment method changed via Kustom Checkout. New recurring token for subscription: %s', 'klarna-checkout-for-woocommerce' ), sanitize_key( $klarna_order['recurring_token'] ) );
-					$subscription->add_order_note( $note );
-				}
-			} else {
-				// Retrieve error.
-				$error_message = $klarna_order->get_error_message();
-				$note          = sprintf( __( 'Could not retrieve new Kustom recurring token for subscription when customer changed payment method. Read the log for detailed information.', 'klarna-checkout-for-woocommerce' ), $error_message );
-				$subscription->add_order_note( $note );
-			}
-
-			// Acknowledge order in Kustom.
-			KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
-			KCO_WC()->api->set_merchant_reference( $klarna_order_id, $subscription_id );
-
+			$this->process_payment_method_change_push( $klarna_order_id, $subscription_id );
 			exit;
 		}
+	}
+
+	/**
+	 * Saves the new recurring token from a payment method change push, and acknowledges the Kustom order.
+	 *
+	 * @param string     $klarna_order_id The Kustom order ID.
+	 * @param int|string $subscription_id The WooCommerce Subscription ID.
+	 * @return bool Whether the subscription was updated.
+	 */
+	public function process_payment_method_change_push( $klarna_order_id, $subscription_id ) {
+		$subscription = wcs_get_subscription( $subscription_id );
+		if ( empty( $subscription ) ) {
+			return false;
+		}
+
+		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+		if ( is_wp_error( $klarna_order ) ) {
+			KCO_WC()->logger->log( "Could not retrieve Kustom order {$klarna_order_id} for a payment method change on subscription {$subscription->get_id()}." );
+			return false;
+		}
+
+		if ( ! $this->is_payment_change_order_for( $klarna_order, $subscription->get_id() ) ) {
+			KCO_WC()->logger->log( "Rejected payment method change push: Kustom order {$klarna_order_id} was not opened for subscription {$subscription->get_id()}." );
+			return false;
+		}
+
+		if ( ! empty( $klarna_order['recurring_token'] ) ) {
+			$recurring_token = sanitize_key( $klarna_order['recurring_token'] );
+			$subscription->update_meta_data( '_kco_recurring_token', $recurring_token );
+			$subscription->save();
+
+			// translators: %s Kustom recurring token.
+			$note = sprintf( __( 'Payment method changed via Kustom Checkout. New recurring token for subscription: %s', 'klarna-checkout-for-woocommerce' ), $recurring_token );
+			$subscription->add_order_note( $note );
+		}
+
+		KCO_WC()->api->acknowledge_klarna_order( $klarna_order_id );
+		KCO_WC()->api->set_merchant_reference( $klarna_order_id, $subscription->get_id() );
+
+		return true;
+	}
+
+	/**
+	 * Whether a Kustom order was opened to change the payment method of this subscription.
+	 *
+	 * The push URL is set by set_recurring() only for a caller holding the subscription's order key, and Kustom echoes it back.
+	 *
+	 * @param array      $klarna_order The Kustom order.
+	 * @param int|string $subscription_id The WooCommerce Subscription ID.
+	 * @return bool
+	 */
+	private function is_payment_change_order_for( $klarna_order, $subscription_id ) {
+		$push_url = $klarna_order['merchant_urls']['push'] ?? '';
+		if ( ! is_string( $push_url ) || empty( $push_url ) ) {
+			return false;
+		}
+
+		$query = array();
+		wp_parse_str( (string) wp_parse_url( $push_url, PHP_URL_QUERY ), $query );
+
+		return 'subs-payment-changed' === ( $query['kco-action'] ?? '' )
+			&& absint( $subscription_id ) > 0
+			&& (string) absint( $subscription_id ) === (string) ( $query['key'] ?? '' );
 	}
 
 	/**
@@ -695,6 +733,11 @@ class KCO_Subscription {
 	 * @return void
 	 */
 	public function display_thankyou_message_for_payment_method_change() {
+		// A push to a wp-json URL arrives with no session to put a notice in.
+		if ( ! WC()->session ) {
+			return;
+		}
+
 		$kco_action = filter_input( INPUT_GET, 'kco-action', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( ! empty( $kco_action ) && 'subs-payment-changed' === $kco_action ) {
 			wc_add_notice( __( 'Thank you, your subscription payment method is now updated.', 'klarna-checkout-for-woocommerce' ), 'success' );
@@ -711,10 +754,34 @@ class KCO_Subscription {
 	public function maybe_confirm_change_payment_method( $subscription_id ) {
 		$klarna_order_id = filter_input( INPUT_GET, 'kco-order-id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( ! empty( $klarna_order_id ) ) {
-			$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
-			$this->set_recurring_token_for_subscription( $subscription_id, $klarna_order );
-			$this->update_subscription_address( $subscription_id, $klarna_order );
+			$this->confirm_change_payment_method( $subscription_id, $klarna_order_id );
 		}
+	}
+
+	/**
+	 * Saves the new recurring token and address when the customer returns from a payment method change.
+	 *
+	 * WooCommerce fires the view-subscription endpoint for any logged-in user and ID, so ownership is checked here.
+	 *
+	 * @param int|string $subscription_id The WooCommerce Subscription ID.
+	 * @param string     $klarna_order_id The Kustom order ID.
+	 * @return bool Whether the subscription was updated.
+	 */
+	public function confirm_change_payment_method( $subscription_id, $klarna_order_id ) {
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- WooCommerce grants view_order to the order's owner.
+		if ( ! current_user_can( 'view_order', absint( $subscription_id ) ) || empty( wcs_get_subscription( $subscription_id ) ) ) {
+			return false;
+		}
+
+		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
+		if ( is_wp_error( $klarna_order ) || ! $this->is_payment_change_order_for( $klarna_order, $subscription_id ) ) {
+			return false;
+		}
+
+		$this->set_recurring_token_for_subscription( $subscription_id, $klarna_order );
+		$this->update_subscription_address( $subscription_id, $klarna_order );
+
+		return true;
 	}
 
 	/**
