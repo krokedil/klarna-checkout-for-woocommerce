@@ -233,6 +233,131 @@ class SubscriptionsTest extends IntegrationTestCase {
 		];
 	}
 
+	/**
+	 * A push may only change the token of the subscription its Kustom order was opened for.
+	 *
+	 * @dataProvider provide_payment_change_pushes
+	 */
+	public function test_a_payment_change_push_only_reaches_its_own_subscription( string $scenario, bool $expected ): void {
+		$subscription = $this->haveKustomSubscription();
+		$target_id    = 'not a subscription' === $scenario ? $this->haveGatewayOrder()->get_id() : $subscription->get_id();
+
+		switch ( $scenario ) {
+			case 'opened for another subscription':
+				$this->willRetrieveOrder( $this->paymentChangeOrder( $subscription->get_id() + 1000 ) );
+				break;
+			case 'an ordinary purchase':
+				$this->willRetrieveOrder( [ 'recurring_token' => 'attacker-token' ] );
+				break;
+			case 'unknown to Kustom':
+				$this->willRejectWith( '/checkout/v3/orders', 'Not found', 404 );
+				break;
+			default:
+				$this->willRetrieveOrder( $this->paymentChangeOrder( $target_id ) );
+		}
+
+		( new \KCO_Subscription() )->process_payment_method_change_push( 'checkout-order-123', $target_id );
+
+		$this->assertSame(
+			$expected ? 'attacker-token' : 'customer-token-1',
+			(string) $this->reload( $subscription )->get_meta( '_kco_recurring_token', true )
+		);
+		$this->assertGatewayRequestCount(
+			$expected ? 1 : 0,
+			'/acknowledge',
+			'Only an order that changed a subscription may be acknowledged.'
+		);
+	}
+
+	/** @return array<string, array{0: string, 1: bool}> */
+	public function provide_payment_change_pushes(): array {
+		return [
+			'the order opened for this subscription' => [ 'opened for this subscription', true ],
+			'an order opened for another one'        => [ 'opened for another subscription', false ],
+			'an ordinary purchase'                   => [ 'an ordinary purchase', false ],
+			'an order Kustom does not know'          => [ 'unknown to Kustom', false ],
+			'an id that is not a subscription'       => [ 'not a subscription', false ],
+		];
+	}
+
+	/**
+	 * The customer's return from a payment change may only touch a subscription they
+	 * own, with the order opened for it.
+	 *
+	 * @dataProvider provide_payment_change_returns
+	 */
+	public function test_a_payment_change_return_only_reaches_the_customers_own_subscription( string $scenario, bool $expected ): void {
+		$owner        = self::factory()->user->create( [ 'role' => 'customer' ] );
+		$subscription = $this->haveKustomSubscription( $owner );
+
+		wp_set_current_user( 'another customer' === $scenario ? self::factory()->user->create( [ 'role' => 'customer' ] ) : $owner );
+		if ( 'logged out' === $scenario ) {
+			wp_set_current_user( 0 );
+		}
+
+		if ( 'unknown to Kustom' === $scenario ) {
+			$this->willRejectWith( '/checkout/v3/orders', 'Not found', 404 );
+		} else {
+			$opened_for = 'opened for another subscription' === $scenario ? $subscription->get_id() + 1000 : $subscription->get_id();
+			$this->willRetrieveOrder( $this->paymentChangeOrder( $opened_for ) );
+		}
+
+		( new \KCO_Subscription() )->confirm_change_payment_method( $subscription->get_id(), 'checkout-order-123' );
+
+		$changed = $this->reload( $subscription );
+		$this->assertSame( $expected ? 'attacker-token' : 'customer-token-1', (string) $changed->get_meta( '_kco_recurring_token', true ) );
+		$this->assertSame( $expected ? 'Mallory' : 'Karl', $changed->get_billing_first_name() );
+		$this->assertSame( $expected ? 'Mallory' : 'Karl', $changed->get_shipping_first_name() );
+	}
+
+	/** @return array<string, array{0: string, 1: bool}> */
+	public function provide_payment_change_returns(): array {
+		return [
+			'the owner, with the order opened for it'   => [ 'owner', true ],
+			'another customer'                          => [ 'another customer', false ],
+			'logged out'                                => [ 'logged out', false ],
+			'the owner, with an order for another one'  => [ 'opened for another subscription', false ],
+			'the owner, with an order Kustom lost'      => [ 'unknown to Kustom', false ],
+		];
+	}
+
+	/** A Kustom subscription with a token and an address, owned by $customer_id. */
+	private function haveKustomSubscription( int $customer_id = 0 ): \WC_Order {
+		$subscription = $this->haveSubscriptionFor(
+			$this->haveGatewayOrder(),
+			[ 'billing' => $this->swedishAddress(), 'shipping_address' => $this->swedishAddress() ]
+		);
+		$subscription->set_customer_id( $customer_id );
+		$subscription->update_meta_data( '_kco_recurring_token', 'customer-token-1' );
+		$subscription->save();
+
+		return $this->reload( $subscription );
+	}
+
+	/** The Kustom order a payment change for $subscription_id produces, as set_recurring() opens it. */
+	private function paymentChangeOrder( int $subscription_id ): array {
+		$address = [
+			'given_name'     => 'Mallory',
+			'family_name'    => 'Svensson',
+			'street_address' => 'Annan gata 2',
+			'postal_code'    => '111 22',
+			'city'           => 'Stockholm',
+			'country'        => 'se',
+			'email'          => 'mallory@example.com',
+			'phone'          => '+46700000000',
+		];
+
+		return [
+			'recurring'        => true,
+			'recurring_token'  => 'attacker-token',
+			'billing_address'  => $address,
+			'shipping_address' => $address,
+			'merchant_urls'    => [
+				'push' => home_url( "/wc-api/KCO_WC_Push/?kco-action=subs-payment-changed&kco_wc_order_id={checkout.order.id}&key={$subscription_id}" ),
+			],
+		];
+	}
+
 	public function test_the_scheduled_payment_hook_is_wired_to_the_gateway(): void {
 		$this->assertNotFalse(
 			has_action(
