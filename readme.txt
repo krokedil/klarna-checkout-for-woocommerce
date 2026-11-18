@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 9.7.0
-WC tested up to: 11.2.1
-Stable tag: 2.24.1
+WC tested up to: 11.3.0
+Stable tag: 2.24.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,11 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-11-18    - version 2.24.2 =
+* Tweak         - Updated the Kustom Portal paths in the Kustom Elements and express button settings and error messages to match the current portal menu (Apps → On-site elements → Installation script, Express buttons and My domains).
+* Fix           - A payment method change is now only applied to the subscription it was started for. Thanks to Ika Aprilliani (https://github.com/ikaaplrilliani-lgtm) for reporting the issue.
+* Fix           - Fixed the "KCO get order management order" log entry showing the request type as POST. It now shows GET, which is the request the plugin actually sends.
+
 = 2026-11-04    - version 2.24.1 =
 * Fix           - Fixed an issue where an incomplete address could be sent to Kustom during checkout, preventing the customer from completing their purchase.
 * Fix           - Fixed fields added by other plugins to the block checkout, such as the WooCommerce Smart Coupons gift card form, being hidden and not savedto the order when Kustom is selected.

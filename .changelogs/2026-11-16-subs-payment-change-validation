@@ -1,4 +1,0 @@
-Type: Fix
-Needs Documentation: no
-
-A payment method change is now only applied to the subscription it was started for. Thanks to Ika Aprilliani (https://github.com/ikaaplrilliani-lgtm) for reporting the issue.
