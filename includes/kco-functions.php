@@ -180,8 +180,9 @@ function kco_wc_show_order_notes() {
 function kco_wc_show_another_gateway_button() {
 	$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
 
-	if ( count( $available_gateways ) > 1 ) {
-		$settings                   = get_option( 'woocommerce_kco_settings' );
+	$settings = get_option( 'woocommerce_kco_settings' );
+
+	if ( count( $available_gateways ) > 1 && ! wc_string_to_bool( $settings['force_payment_method'] ?? 'no' ) ) {
 		$select_another_method_text = isset( $settings['select_another_method_text'] ) && '' !== $settings['select_another_method_text'] ? $settings['select_another_method_text'] : __( 'Select another payment method', 'klarna-checkout-for-woocommerce' );
 
 		?>
