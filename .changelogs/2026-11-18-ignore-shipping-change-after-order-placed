@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+The checkout no longer refreshes and sends the cart to Kustom again when Kustom repeats the shipping option change event while it completes a purchase. Kustom has locked the order at that point and refused the update, which showed up in the log as a 403 "Resource is read-only" error.
