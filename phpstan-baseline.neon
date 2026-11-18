@@ -43,12 +43,6 @@ parameters:
 			path: classes/class-kco-ajax.php
 
 		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: classes/class-kco-api-callbacks.php
-
-		-
 			message: '#^Parameter \#2 \$order_id of method KCO_Request_Set_Merchant_Reference\:\:request\(\) expects string, int given\.$#'
 			identifier: argument.type
 			count: 1

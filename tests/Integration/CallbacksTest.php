@@ -310,6 +310,43 @@ class CallbacksTest extends IntegrationTestCase {
 		$this->assertTrue( \KCO_Confirmation::lock_kco_confirmation( 'kustom-order-123', $order->get_id() ), 'The lock is released afterwards.' );
 	}
 
+	public function test_a_push_does_not_pay_an_order_the_confirmation_paid_while_it_waited_for_the_lock(): void {
+		$order = $this->haveOrderAwaitingConfirmation();
+		add_filter( 'kco_wc_lock_confirmation', '__return_true' );
+		$fired = 0;
+		add_action(
+			'kco_wc_payment_complete',
+			static function () use ( &$fired ) {
+				++$fired;
+			}
+		);
+
+		// The confirmation finishes just before the push takes the lock.
+		add_filter(
+			'query',
+			static function ( $query ) use ( $order ) {
+				static $done = false;
+				if ( ! $done && false !== strpos( $query, 'kco_confirmation_lock_' . $order->get_id() ) && 0 === stripos( ltrim( $query ), 'INSERT' ) ) {
+					$done = true;
+					$paid = wc_get_order( $order->get_id() );
+					$paid->payment_complete( 'kustom-order-123' );
+				}
+				return $query;
+			}
+		);
+
+		$this->willRetrieveManagedOrder(
+			[ 'order_amount' => 12500, 'order_lines' => $this->orderLinesFor( $order ) ]
+		);
+		$this->willAcknowledge();
+		$this->willSetMerchantReference();
+
+		\KCO_API_Callbacks::get_instance()->process_push( 'kustom-order-123' );
+
+		$this->assertSame( 0, $fired, 'The push must see the payment the confirmation saved, not the order it loaded before the lock.' );
+		$this->assertGatewayRequestCount( 1, '/acknowledge', 'The push must still run to the end, or the first assertion proves nothing.' );
+	}
+
 	public function test_the_callback_endpoints_are_registered(): void {
 		$callbacks = \KCO_API_Callbacks::get_instance();
 
