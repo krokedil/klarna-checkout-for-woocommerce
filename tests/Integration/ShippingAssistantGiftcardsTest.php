@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use Krokedil\KustomCheckout\ShippingAssistant\Giftcards;
+use Krokedil\KustomCheckout\ShippingAssistant\RequestModifier;
 use Tests\Support\IntegrationTestCase;
 
 /**
@@ -117,6 +118,42 @@ class ShippingAssistantGiftcardsTest extends IntegrationTestCase {
 			[ Giftcards::SHIPPING_STAND_IN_KEY => $shipping - 3000 ],
 			json_decode( $marked['order_lines'][0]['merchant_data'], true )
 		);
+	}
+
+	/**
+	 * Without the callback Kustom adds the selected shipping option itself, so a shipping line from the
+	 * plugin would charge it twice. This is the state a removed gift card leaves behind.
+	 *
+	 * @dataProvider provide_callback_settings
+	 */
+	public function test_the_shipping_line_is_only_sent_with_the_callback( string $setting, bool $sent ): void {
+		if ( $sent && ! KCO_WC()->shipping_assistant->api_registry() ) {
+			$this->markTestSkipped( 'The shipping assistant module is not loaded in this run.' );
+		}
+
+		$this->haveGatewayCredentials( [ 'ksa_enabled' => 'yes', 'ksa_enable_shipping_option_update_callback' => $setting ] );
+		$this->flushGatewaySettingsCache();
+		$this->haveCustomerAddress( $this->swedishAddress(), $this->swedishAddress() );
+		$this->haveCartWith( [ $this->haveSimpleProduct( [ 'price' => '100.00' ] ) ] );
+		$this->haveChosenFlatRateShipping( 'SE', '40.00' );
+		WC()->session->set( 'kco_wc_order_id', 'checkout-order-123' );
+		set_transient( 'kss_override_data_checkout-order-123', [ 'name' => 'DHL Express', 'price' => 5000 ], HOUR_IN_SECONDS );
+
+		$args   = [ 'order_lines' => [ $this->line( 'physical', 10000 ) ], 'order_amount' => 10000, 'order_tax_amount' => 2000 ];
+		$result = ( new \ReflectionClass( RequestModifier::class ) )->newInstanceWithoutConstructor()->maybe_add_shipping_override_data( $args );
+
+		$this->assertSame( $sent, in_array( 'shipping_fee', array_column( $result['order_lines'], 'type' ), true ) );
+		$this->assertSame( $sent, false !== get_transient( 'kss_override_data_checkout-order-123' ), 'The stored override must go when it is not used.' );
+
+		delete_transient( 'kss_override_data_checkout-order-123' );
+	}
+
+	/** @return array<string, array{0: string, 1: bool}> */
+	public static function provide_callback_settings(): array {
+		return [
+			'callback off' => [ 'no', false ],
+			'callback on'  => [ 'yes', true ],
+		];
 	}
 
 	/** @return array<string, mixed> */

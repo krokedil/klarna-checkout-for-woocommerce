@@ -31,32 +31,11 @@ class MerchantUrls {
 	 * @return array The modified merchant URLs array.
 	 */
 	public function maybe_add_shipping_option_change_callback_url( $merchant_urls ) {
-		// Only if we have an actual cart that is not empty.
-		if ( ! WC()->cart || WC()->cart->is_empty() ) {
-			return $merchant_urls;
-		}
-
-		// If the cart does not need shipping, we don't need to add the shipping option update callback URL.
-		if ( ! WC()->cart->needs_shipping() ) {
-			return $merchant_urls;
-		}
-
-		// If the cart only has free trial subscriptions, we will always need to add the callback handler.
-		$is_free_trial_subscription = $this->cart_contains_only_free_trial_subscription();
-		$setting_enabled            = Settings::is_shipping_option_update_callback_enabled();
-
-		// A gift card can only pay for the shipping if the callback gets to recalculate it.
-		$has_giftcard = ! $is_free_trial_subscription && ! $setting_enabled && Giftcards::cart_has_giftcard();
-
-		// Only if the cart has a subscription and it's a free trial subscription. Otherwise only if the setting is enabled.
-		if ( ! $is_free_trial_subscription && ! $setting_enabled && ! $has_giftcard ) {
+		if ( ! self::is_callback_used() ) {
 			return $merchant_urls;
 		}
 
 		$api_registry = KCO_WC()->shipping_assistant->api_registry();
-		if ( ! $api_registry ) {
-			return $merchant_urls;
-		}
 
 		$merchant_urls['shipping_option_update'] = add_query_arg(
 			array( 'kco_id' => '{checkout.order.id}' ),
@@ -64,6 +43,35 @@ class MerchantUrls {
 		);
 
 		return $merchant_urls;
+	}
+
+	/**
+	 * Whether the current cart is sent to Kustom with the shipping option update callback.
+	 *
+	 * @return bool
+	 */
+	public static function is_callback_used() {
+		// Only if we have an actual cart that is not empty.
+		if ( ! WC()->cart || WC()->cart->is_empty() ) {
+			return false;
+		}
+
+		// If the cart does not need shipping, we don't need the shipping option update callback.
+		if ( ! WC()->cart->needs_shipping() ) {
+			return false;
+		}
+
+		if ( ! KCO_WC()->shipping_assistant->api_registry() ) {
+			return false;
+		}
+
+		// If the cart only has free trial subscriptions, we will always need the callback handler.
+		if ( self::cart_contains_only_free_trial_subscription() || Settings::is_shipping_option_update_callback_enabled() ) {
+			return true;
+		}
+
+		// A gift card can only pay for the shipping if the callback gets to recalculate it.
+		return Giftcards::cart_has_giftcard();
 	}
 
 	/**
@@ -78,7 +86,7 @@ class MerchantUrls {
 	public function maybe_add_subscription_free_trial_tag( $request_args ) {
 		$tags = isset( $request_args['tags'] ) ? $request_args['tags'] : array();
 
-		if ( $this->cart_contains_only_free_trial_subscription() ) {
+		if ( self::cart_contains_only_free_trial_subscription() ) {
 			$tags[] = 'ksa_subscription_free_trial_shipping';
 		}
 
@@ -91,7 +99,7 @@ class MerchantUrls {
 	 *
 	 * @return bool True if the cart contains only a free trial subscription, false otherwise.
 	 */
-	private function cart_contains_only_free_trial_subscription() {
+	private static function cart_contains_only_free_trial_subscription() {
 		// If there is no cart or the cart is empty, return false.
 		if ( ! WC()->cart || WC()->cart->is_empty() ) {
 			return false;
