@@ -59,6 +59,35 @@ class ShippingAssistantGiftcardsTest extends IntegrationTestCase {
 		$this->assertSame( $lines, Giftcards::apply_to_order_lines( $lines ) );
 	}
 
+	/**
+	 * A gift card added before the first callback is sent with an adjustment line in place of the shipping it covers.
+	 */
+	public function test_the_adjustment_surcharge_is_not_paid_by_the_gift_card(): void {
+		$lines = [
+			$this->line( 'physical', 3600 ),
+			$this->line( 'gift_card', -9725, 1000000 ),
+			$this->line( 'surcharge', 6125 ) + [ 'reference' => 'added-surcharge' ],
+			$this->line( 'shipping_fee', 0 ),
+		];
+
+		$result = Giftcards::apply_to_order_lines( $lines );
+
+		$this->assertSame( [ 'physical', 'gift_card', 'shipping_fee' ], array_column( $result, 'type' ) );
+		$this->assertSame( [ 0, 1, 2 ], array_keys( $result ), 'The lines must stay a list, or Kustom receives an object.' );
+		$this->assertSame( -3600, $result[1]['total_amount'] );
+		$this->assertSame( 0, array_sum( array_column( $result, 'total_amount' ) ) );
+	}
+
+	public function test_a_surcharge_is_kept_without_a_gift_card(): void {
+		$lines = [
+			$this->line( 'physical', 3600 ),
+			$this->line( 'surcharge', 100 ) + [ 'reference' => 'added-surcharge' ],
+			$this->line( 'shipping_fee', 999 ),
+		];
+
+		$this->assertSame( $lines, Giftcards::apply_to_order_lines( $lines ) );
+	}
+
 	/** @return array<string, mixed> */
 	private function line( string $type, int $amount, ?int $balance = null ): array {
 		$line = [

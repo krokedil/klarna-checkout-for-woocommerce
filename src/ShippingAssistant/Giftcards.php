@@ -124,6 +124,18 @@ class Giftcards {
 			$balances[ $key ] = $balance;
 		}
 
+		if ( empty( $balances ) ) {
+			return $order_lines;
+		}
+
+		// The plugin's own adjustment line stood in for shipping the gift card could not cover yet, so it is not a real charge.
+		foreach ( $order_lines as $key => $order_line ) {
+			if ( 'added-surcharge' === ( $order_line['reference'] ?? '' ) ) {
+				$due -= intval( $order_line['total_amount'] ?? 0 );
+				unset( $order_lines[ $key ] );
+			}
+		}
+
 		foreach ( $balances as $key => $balance ) {
 			$applied = max( 0, min( $balance, $due ) );
 			$due    -= $applied;
@@ -132,7 +144,7 @@ class Giftcards {
 			$order_lines[ $key ]['total_amount'] = -$applied;
 		}
 
-		return $order_lines;
+		return array_values( $order_lines );
 	}
 
 	/**
