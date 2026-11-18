@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed the "KCO get order management order" log entry showing the request type as POST. It now shows GET, which is the request the plugin actually sends.
