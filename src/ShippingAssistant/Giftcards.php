@@ -18,11 +18,17 @@ class Giftcards {
 	const BALANCE_KEY = 'ksa_giftcard_balance';
 
 	/**
+	 * The key in the adjustment line's merchant data that holds how much of it stands in for shipping, in minor units.
+	 */
+	const SHIPPING_STAND_IN_KEY = 'ksa_shipping_stand_in';
+
+	/**
 	 * Class constructor.
 	 */
 	public function __construct() {
 		add_filter( 'kco_wc_gift_card_line_item', array( $this, 'add_balance_to_order_line' ), 10, 2 );
 		add_filter( 'kco_wc_allow_negative_cart_order_amount', array( $this, 'maybe_allow_negative_order_amount' ) );
+		add_filter( 'kco_wc_api_request_args', array( $this, 'mark_shipping_stand_in' ) );
 		add_filter( 'yith_ywgc_detract_residue_to_shipping_total', array( $this, 'maybe_keep_yith_shipping_total' ) );
 	}
 
@@ -43,6 +49,40 @@ class Giftcards {
 		$order_line['merchant_data'] = wp_json_encode( array( self::BALANCE_KEY => $balance ) );
 
 		return $order_line;
+	}
+
+	/**
+	 * Mark how much of the adjustment line is shipping the gift card already paid for in WooCommerce.
+	 *
+	 * The rest of that line is a real rounding difference, which the callback has to keep.
+	 *
+	 * @param array $request_args The request args for Kustom Checkout.
+	 *
+	 * @return array
+	 */
+	public function mark_shipping_stand_in( $request_args ) {
+		if ( empty( $request_args['order_lines'] ) || ! WC()->cart || WC()->cart->is_empty() ) {
+			return $request_args;
+		}
+
+		// With a negative amount allowed, nothing was clamped and no stand-in was added.
+		if ( apply_filters( 'kco_wc_allow_negative_cart_order_amount', false ) ) { // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment -- Documented in KCO_Request_Cart::get_order_amount().
+			return $request_args;
+		}
+
+		$cart_helper = new \KCO_Request_Cart();
+		$stand_in    = $cart_helper->get_shipping_amount() - intval( round( WC()->cart->total * 100 ) );
+		if ( $stand_in <= 0 ) {
+			return $request_args;
+		}
+
+		foreach ( $request_args['order_lines'] as $key => $order_line ) {
+			if ( 'added-surcharge' === ( $order_line['reference'] ?? '' ) ) {
+				$request_args['order_lines'][ $key ]['merchant_data'] = wp_json_encode( array( self::SHIPPING_STAND_IN_KEY => $stand_in ) );
+			}
+		}
+
+		return $request_args;
 	}
 
 	/**
@@ -128,12 +168,23 @@ class Giftcards {
 			return $order_lines;
 		}
 
-		// The plugin's own adjustment line stood in for shipping the gift card could not cover yet, so it is not a real charge.
+		// Part of the adjustment line stood in for shipping, which the shipping line now carries. Any rounding difference stays.
 		foreach ( $order_lines as $key => $order_line ) {
-			if ( 'added-surcharge' === ( $order_line['reference'] ?? '' ) ) {
-				$due -= intval( $order_line['total_amount'] ?? 0 );
-				unset( $order_lines[ $key ] );
+			$stand_in = self::get_merchant_data_amount( $order_line, self::SHIPPING_STAND_IN_KEY );
+			if ( null === $stand_in ) {
+				continue;
 			}
+
+			$due      -= $stand_in;
+			$remaining = intval( $order_line['total_amount'] ?? 0 ) - $stand_in;
+			if ( 0 === $remaining ) {
+				unset( $order_lines[ $key ] );
+				continue;
+			}
+
+			$order_lines[ $key ]['unit_price']   = $remaining;
+			$order_lines[ $key ]['total_amount'] = $remaining;
+			unset( $order_lines[ $key ]['merchant_data'] );
 		}
 
 		foreach ( $balances as $key => $balance ) {
@@ -155,17 +206,29 @@ class Giftcards {
 	 * @return int|null The balance in minor units, or null if the line is not a gift card with a known balance.
 	 */
 	private static function get_order_line_balance( $order_line ) {
+		return self::get_merchant_data_amount( $order_line, self::BALANCE_KEY );
+	}
+
+	/**
+	 * Get an amount stored in a Kustom order line's merchant data.
+	 *
+	 * @param array  $order_line The Kustom order line.
+	 * @param string $key        The merchant data key.
+	 *
+	 * @return int|null The amount in minor units, never negative, or null if the line does not have it.
+	 */
+	private static function get_merchant_data_amount( $order_line, $key ) {
 		$merchant_data = $order_line['merchant_data'] ?? '';
 		if ( ! is_string( $merchant_data ) || '' === $merchant_data ) {
 			return null;
 		}
 
 		$merchant_data = json_decode( $merchant_data, true );
-		if ( ! is_array( $merchant_data ) || ! is_numeric( $merchant_data[ self::BALANCE_KEY ] ?? null ) ) {
+		if ( ! is_array( $merchant_data ) || ! is_numeric( $merchant_data[ $key ] ?? null ) ) {
 			return null;
 		}
 
-		return max( 0, intval( $merchant_data[ self::BALANCE_KEY ] ) );
+		return max( 0, intval( $merchant_data[ $key ] ) );
 	}
 
 	/**

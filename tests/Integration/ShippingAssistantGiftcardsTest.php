@@ -61,31 +61,62 @@ class ShippingAssistantGiftcardsTest extends IntegrationTestCase {
 
 	/**
 	 * A gift card added before the first callback is sent with an adjustment line in place of the shipping it covers.
+	 *
+	 * @dataProvider provide_adjustments
 	 */
-	public function test_the_adjustment_surcharge_is_not_paid_by_the_gift_card(): void {
-		$lines = [
-			$this->line( 'physical', 3600 ),
-			$this->line( 'gift_card', -9725, 1000000 ),
-			$this->line( 'surcharge', 6125 ) + [ 'reference' => 'added-surcharge' ],
-			$this->line( 'shipping_fee', 0 ),
-		];
+	public function test_only_the_shipping_stand_in_is_taken_out_of_the_adjustment( int $surcharge, ?int $stand_in, array $types, int $giftcard ): void {
+		$adjustment = $this->line( 'surcharge', $surcharge ) + [ 'reference' => 'added-surcharge' ];
+		if ( null !== $stand_in ) {
+			$adjustment['merchant_data'] = wp_json_encode( [ Giftcards::SHIPPING_STAND_IN_KEY => $stand_in ] );
+		}
 
-		$result = Giftcards::apply_to_order_lines( $lines );
+		$result = Giftcards::apply_to_order_lines(
+			[
+				$this->line( 'physical', 7503 ),
+				$this->line( 'gift_card', -7503 - $surcharge, 1000000 ),
+				$adjustment,
+				$this->line( 'shipping_fee', 999 ),
+			]
+		);
 
-		$this->assertSame( [ 'physical', 'gift_card', 'shipping_fee' ], array_column( $result, 'type' ) );
-		$this->assertSame( [ 0, 1, 2 ], array_keys( $result ), 'The lines must stay a list, or Kustom receives an object.' );
-		$this->assertSame( -3600, $result[1]['total_amount'] );
+		$this->assertSame( $types, array_column( $result, 'type' ) );
+		$this->assertSame( array_keys( $types ), array_keys( $result ), 'The lines must stay a list, or Kustom receives an object.' );
+		$this->assertSame( $giftcard, $result[1]['total_amount'] );
 		$this->assertSame( 0, array_sum( array_column( $result, 'total_amount' ) ) );
 	}
 
-	public function test_a_surcharge_is_kept_without_a_gift_card(): void {
-		$lines = [
-			$this->line( 'physical', 3600 ),
-			$this->line( 'surcharge', 100 ) + [ 'reference' => 'added-surcharge' ],
-			$this->line( 'shipping_fee', 999 ),
+	/** @return array<string, array{0: int, 1: ?int, 2: list<string>, 3: int}> */
+	public static function provide_adjustments(): array {
+		return [
+			'only a stand-in is removed'             => [ 6125, 6125, [ 'physical', 'gift_card', 'shipping_fee' ], -8502 ],
+			'only rounding is kept'                  => [ 1, null, [ 'physical', 'gift_card', 'surcharge', 'shipping_fee' ], -8503 ],
+			'a stand-in with rounding keeps the öre' => [ 6126, 6125, [ 'physical', 'gift_card', 'surcharge', 'shipping_fee' ], -8503 ],
 		];
+	}
 
-		$this->assertSame( $lines, Giftcards::apply_to_order_lines( $lines ) );
+	/**
+	 * The request marks how much of the adjustment line is shipping, so the callback can tell it from rounding.
+	 */
+	public function test_the_request_marks_the_shipping_the_gift_card_already_paid(): void {
+		$this->haveCustomerAddress( $this->swedishAddress(), $this->swedishAddress() );
+		$this->haveCartWith( [ $this->haveSimpleProduct( [ 'price' => '100.00' ] ) ] );
+		$this->haveChosenFlatRateShipping( 'SE', '40.00' );
+
+		$shipping  = ( new \KCO_Request_Cart() )->get_shipping_amount();
+		$giftcards = ( new \ReflectionClass( Giftcards::class ) )->newInstanceWithoutConstructor();
+		$args      = [ 'order_lines' => [ $this->line( 'surcharge', $shipping - 2999 ) + [ 'reference' => 'added-surcharge' ] ] ];
+
+		$this->assertSame( $args, $giftcards->mark_shipping_stand_in( $args ), 'A cart total that covers the shipping has no stand-in.' );
+
+		// What a gift card plugin leaves when it pays the goods and all but 30.00 of the shipping.
+		WC()->cart->set_total( '30.00' );
+
+		$marked = $giftcards->mark_shipping_stand_in( $args );
+
+		$this->assertSame(
+			[ Giftcards::SHIPPING_STAND_IN_KEY => $shipping - 3000 ],
+			json_decode( $marked['order_lines'][0]['merchant_data'], true )
+		);
 	}
 
 	/** @return array<string, mixed> */
