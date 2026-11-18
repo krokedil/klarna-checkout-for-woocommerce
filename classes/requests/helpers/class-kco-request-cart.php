@@ -127,7 +127,12 @@ class KCO_Request_Cart {
 			$order_amount -= $this->get_shipping_amount();
 		}
 
-		if ( $order_amount < 0 ) {
+		/**
+		 * Filters whether the cart order amount sent to Kustom may be negative, before shipping is added back to the request.
+		 *
+		 * @param bool $allow Whether a negative amount is allowed. Default false.
+		 */
+		if ( $order_amount < 0 && ! apply_filters( 'kco_wc_allow_negative_cart_order_amount', false ) ) {
 			return 0;
 		}
 
@@ -330,7 +335,7 @@ class KCO_Request_Cart {
 			$retrieved_giftcards = $giftcards->get_cart_giftcards();
 			foreach ( $retrieved_giftcards as $retrieved_giftcard ) {
 
-				$this->order_lines[] = array(
+				$gift_card_item = array(
 					'type'                  => 'gift_card',
 					'reference'             => $retrieved_giftcard->get_sku(),
 					'name'                  => $retrieved_giftcard->get_name(),
@@ -341,6 +346,14 @@ class KCO_Request_Cart {
 					'unit_price'            => $retrieved_giftcard->get_total_amount(),
 					'total_amount'          => $retrieved_giftcard->get_total_amount(),
 				);
+
+				/**
+				 * Filters a gift card or store credit order line before it is added to the Kustom order lines.
+				 *
+				 * @param array  $gift_card_item     The order line formatted for Kustom.
+				 * @param object $retrieved_giftcard The gift card line from the gift card compatibility.
+				 */
+				$this->order_lines[] = apply_filters( 'kco_wc_gift_card_line_item', $gift_card_item, $retrieved_giftcard );
 			}
 		}
 	}

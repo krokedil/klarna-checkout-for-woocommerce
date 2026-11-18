@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Injects the shipping option update callback URL into Kustom's merchant URLs, and tags requests that
  * need the callback even when the setting is off (free-trial subscriptions, where shipping must start
- * at zero).
+ * at zero). Carts with a gift card also get the callback, so the gift card can pay for the shipping.
  */
 class MerchantUrls {
 	/**
@@ -45,8 +45,11 @@ class MerchantUrls {
 		$is_free_trial_subscription = $this->cart_contains_only_free_trial_subscription();
 		$setting_enabled            = Settings::is_shipping_option_update_callback_enabled();
 
+		// A gift card can only pay for the shipping if the callback gets to recalculate it.
+		$has_giftcard = ! $is_free_trial_subscription && ! $setting_enabled && Giftcards::cart_has_giftcard();
+
 		// Only if the cart has a subscription and it's a free trial subscription. Otherwise only if the setting is enabled.
-		if ( ! $is_free_trial_subscription && ! $setting_enabled ) {
+		if ( ! $is_free_trial_subscription && ! $setting_enabled && ! $has_giftcard ) {
 			return $merchant_urls;
 		}
 

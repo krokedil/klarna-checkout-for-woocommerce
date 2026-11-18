@@ -2,6 +2,7 @@
 namespace Krokedil\KustomCheckout\ShippingAssistant\API\Controllers;
 
 use Krokedil\KustomCheckout\Logging\LogMasking;
+use Krokedil\KustomCheckout\ShippingAssistant\Giftcards;
 
 \defined( 'ABSPATH' ) || exit;
 
@@ -122,6 +123,7 @@ class ShippingOptionUpdateController extends BaseController {
 		}
 
 		$order_lines = $this->build_order_lines( $body, $shipping_order_line );
+		$order_lines = Giftcards::apply_to_order_lines( $order_lines );
 		$response    = $this->build_response( $body, $order_lines );
 
 		// Set the override transient to be used in the shipping method class.
@@ -268,7 +270,7 @@ class ShippingOptionUpdateController extends BaseController {
 	 */
 	private function build_response( $body, $order_lines ) {
 		return array(
-			'order_amount'             => $this->calculate_order_total( $order_lines, 'total_amount' ),
+			'order_amount'             => max( 0, $this->calculate_order_total( $order_lines, 'total_amount' ) ),
 			'order_tax_amount'         => $this->calculate_order_total( $order_lines, 'total_tax_amount' ),
 			'merchant_data'            => $body['merchant_data'] ?? null,
 			'order_lines'              => $order_lines,

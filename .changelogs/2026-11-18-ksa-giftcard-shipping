@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: yes
+
+Kustom Shipping Assistant: a gift card or store credit can now pay for the shipping as well as the goods. Before, the customer was still charged the shipping price in Kustom even when the gift card covered the whole order, so the Kustom total did not match the WooCommerce order. When the cart has a gift card, the shipping option update callback is now used even if the setting for it is turned off. Works with WooCommerce Gift Cards, PW Gift Cards, YITH Gift Cards and Smart Coupons store credit.
