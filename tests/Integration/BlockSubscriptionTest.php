@@ -32,6 +32,40 @@ class BlockSubscriptionTest extends IntegrationTestCase {
 		$this->assertArrayNotHasKey( 'key', $request['json'], 'The order key is only sent to pay an existing order.' );
 	}
 
+	public function test_orders_from_earlier_attempts_are_detached_when_the_create_route_places_a_new_one(): void {
+		$product    = $this->markAsSubscriptionProduct( $this->haveSimpleProduct( [ 'sku' => 'block-subscription' ] ) );
+		$older      = $this->haveOrder( [ 'items' => [ [ $product, 3 ] ], 'status' => 'failed' ] );
+		$referenced = $this->haveDraftOrderToValidate( $product );
+		$referenced->update_status( 'pending' );
+		foreach ( [ $older, $referenced ] as $earlier_attempt ) {
+			$earlier_attempt->update_meta_data( '_wc_klarna_order_id', 'checkout-order-123' );
+			$earlier_attempt->save();
+		}
+
+		// The cart changed since the earlier attempt, so the create route places a new order.
+		$placed = $this->haveOrder( [ 'items' => [ [ $product, 2 ] ] ] );
+		foreach ( [ '_shipping_hash', '_fees_hash', '_coupons_hash', '_taxes_hash' ] as $key ) {
+			$placed->update_meta_data( $key, 'hash' );
+		}
+		$placed->update_meta_data( '_wc_klarna_order_id', 'checkout-order-123' );
+		$placed->save();
+		$this->resetHttpInterception();
+		$this->willRetrieveOrder( $this->kustomOrderFor( $referenced, $placed->get_cart_hash() ) );
+		$this->willRespondWith( [ 'order_id' => $placed->get_id() ], 200, 'wc/store/v1/checkout' );
+
+		OrderValidation::validate_kco_order( 'checkout-order-123' );
+
+		foreach ( [ $older, $referenced ] as $earlier_attempt ) {
+			$this->assertSame(
+				'',
+				wc_get_order( $earlier_attempt->get_id() )->get_meta( '_wc_klarna_order_id' ),
+				"Lookups by the Kustom order id must only find the placed order, not unpaid order {$earlier_attempt->get_id()}."
+			);
+		}
+		$this->assertSame( $placed->get_id(), kco_get_order_by_klarna_id( 'checkout-order-123' )->get_id() );
+		$this->assertSame( 'checkout-order-123', wc_get_order( $placed->get_id() )->get_meta( '_wc_klarna_order_id' ) );
+	}
+
 	public function test_a_draft_without_a_subscription_is_paid_through_its_order_route(): void {
 		$draft = $this->haveDraftOrderToValidate( $this->haveSimpleProduct( [ 'sku' => 'block-plain' ] ) );
 
@@ -46,7 +80,6 @@ class BlockSubscriptionTest extends IntegrationTestCase {
 	 * A draft order for the product that the Kustom order references, and a Store API that answers with it.
 	 */
 	private function haveDraftOrderToValidate( \WC_Product $product ): \WC_Order {
-		$token = BlocksUtility::create_cart_token( (string) WC()->session->get_customer_id() );
 		$order = $this->haveOrder(
 			[
 				'items'  => [ [ $product, 1 ] ],
@@ -59,25 +92,30 @@ class BlockSubscriptionTest extends IntegrationTestCase {
 		$order->save();
 
 		$this->resetHttpInterception();
-		$this->willRetrieveOrder(
-			[
-				'status'              => 'checkout_incomplete',
-				'merchant_reference2' => (string) $order->get_id(),
-				'merchant_data'       => wp_json_encode(
-					[
-						'wc_cart_token'    => $token,
-						'wc_cart_hash'     => $order->get_cart_hash(),
-						'wc_shipping_hash' => 'hash',
-						'wc_fees_hash'     => 'hash',
-						'wc_coupons_hash'  => 'hash',
-						'wc_taxes_hash'    => 'hash',
-					]
-				),
-			]
-		);
+		$this->willRetrieveOrder( $this->kustomOrderFor( $order, $order->get_cart_hash() ) );
 		$this->willRespondWith( [ 'order_id' => $order->get_id() ], 200, 'wc/store/v1/checkout' );
 
 		return $order;
+	}
+
+	/**
+	 * A Kustom order that references the order, with merchant data for a cart with the given hash.
+	 */
+	private function kustomOrderFor( \WC_Order $order, string $cart_hash ): array {
+		return [
+			'status'              => 'checkout_incomplete',
+			'merchant_reference2' => (string) $order->get_id(),
+			'merchant_data'       => wp_json_encode(
+				[
+					'wc_cart_token'    => BlocksUtility::create_cart_token( (string) WC()->session->get_customer_id() ),
+					'wc_cart_hash'     => $cart_hash,
+					'wc_shipping_hash' => 'hash',
+					'wc_fees_hash'     => 'hash',
+					'wc_coupons_hash'  => 'hash',
+					'wc_taxes_hash'    => 'hash',
+				]
+			),
+		];
 	}
 
 	private function storeApiCheckoutRequest(): array {

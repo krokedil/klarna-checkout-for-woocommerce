@@ -39,26 +39,28 @@ class OrderValidation {
 		$merchant_reference = $klarna_order['merchant_reference2'] ?? '';
 		$order              = ! empty( $merchant_reference ) ? self::get_wc_order( $merchant_reference ) : null;
 
+		$express_context = self::get_express_context( $klarna_merchant_data );
+		$pay_order       = $order && ( $express_context || ! self::contains_subscription( $order ) ) ? $order : null;
+
 		if ( $order ) {
 			self::validate_wc_order( $order );
-
-			// Set the Kustom order id in the order meta data.
-			$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
-
-			// Set the customers billing email from the Kustom order.
-			$order->set_billing_email( $klarna_order['billing_address']['email'] ?? '' );
-
-			$order->save();
 		}
 
-		$express_context = self::get_express_context( $klarna_merchant_data );
+		if ( $pay_order ) {
+			// Set the Kustom order id in the order meta data.
+			$pay_order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
+
+			// Set the customers billing email from the Kustom order.
+			$pay_order->set_billing_email( $klarna_order['billing_address']['email'] ?? '' );
+
+			$pay_order->save();
+		}
+
 		if ( $express_context ) {
 			self::validate_express_order( $klarna_order, $order, $express_context );
 			return;
 		}
 
-		// Submit via the store API; subscriptions use the create route to reuse the draft order and create the customer account and recurring carts WooCommerce Subscriptions needs.
-		$pay_order     = $order && ! self::contains_subscription( $order ) ? $order : null;
 		$updated_order = self::submit_wc_order( $klarna_order, $pay_order );
 
 		// Compare the order hashes to the once stored in the merchant data to ensure the order is valid.
@@ -67,6 +69,49 @@ class OrderValidation {
 		self::validate_hash( $klarna_merchant_data['wc_fees_hash'], $updated_order->get_meta( '_fees_hash' ) );
 		self::validate_hash( $klarna_merchant_data['wc_coupons_hash'], $updated_order->get_meta( '_coupons_hash' ) );
 		self::validate_hash( $klarna_merchant_data['wc_taxes_hash'], $updated_order->get_meta( '_taxes_hash' ) );
+
+		// Only the create route can place another order than an earlier attempt in this Kustom session did.
+		if ( ! $pay_order ) {
+			self::release_superseded_orders( $updated_order, $klarna_order_id );
+		}
+	}
+
+	/**
+	 * Detach the Kustom order from unpaid orders that earlier attempts in the same Kustom session left behind.
+	 *
+	 * @param \WC_Order $placed_order    The order the Store API placed.
+	 * @param string    $klarna_order_id The Kustom order ID.
+	 *
+	 * @return void
+	 */
+	private static function release_superseded_orders( $placed_order, $klarna_order_id ) {
+		$orders = wc_get_orders(
+			array(
+				'meta_key'   => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- We need to query by meta key.
+				'meta_value' => sanitize_key( $klarna_order_id ), // phpcs:ignore WordPress.DB.SlowDBQuery -- We need to query by meta value.
+				'type'       => 'shop_order',
+				'status'     => array( 'pending', 'failed', 'checkout-draft' ),
+				'limit'      => -1,
+			)
+		);
+
+		foreach ( $orders as $order ) {
+			if ( $order->get_id() === $placed_order->get_id() || ! empty( $order->get_date_paid() ) ) {
+				continue;
+			}
+
+			\KCO_Logger::log( "[Blocks] - Kustom order $klarna_order_id was placed as order {$placed_order->get_id()}, detaching it from unpaid order {$order->get_id()}." );
+
+			$order->delete_meta_data( '_wc_klarna_order_id' );
+			$order->add_order_note(
+				sprintf(
+					// translators: %s: The number of the order that was placed instead.
+					__( 'The Kustom order was placed as order %s instead, because the cart changed.', 'klarna-checkout-for-woocommerce' ),
+					$placed_order->get_order_number()
+				)
+			);
+			$order->save();
+		}
 	}
 
 	/**
