@@ -30,6 +30,12 @@ class OrderManagementTest extends IntegrationTestCase {
 		'update'  => 'kom_auto_update',
 	];
 
+	/** The error body Kustom sends alongside its error messages. */
+	private const ERROR_DETAILS = [
+		'error_code'     => 'BAD_VALUE',
+		'correlation_id' => 'corr-123',
+	];
+
 	/** @dataProvider provide_operations */
 	public function test_the_operation_reaches_the_api( string $op ): void {
 		$order = $this->haveOrderFor( $op );
@@ -302,6 +308,8 @@ class OrderManagementTest extends IntegrationTestCase {
 		$this->assertWpErrorCode( 'object_error', $this->perform( $op, $order ) );
 		$this->assertGatewayRequestCount( 1, '', 'Acting on an order whose state is unknown is not safe.' );
 		$this->assertOrderHasNote( $order, $note );
+		$this->assertOrderHasNoNote( $order, 'Error code:' );
+		$this->assertOrderHasNoNote( $order, 'Correlation ID:' );
 	}
 
 	/** @return array<string, array{0: string, 1: string}> */
@@ -313,6 +321,65 @@ class OrderManagementTest extends IntegrationTestCase {
 		];
 	}
 
+	public function test_a_declined_charge_tells_the_merchant_to_retry_the_capture(): void {
+		$order = $this->haveOrderFor( 'capture' );
+
+		$this->willRetrieveManagedOrder();
+		$this->willRejectWith( '/captures', 'Payment method failed.', 403, [ 'error_code' => 'PAYMENT_METHOD_FAILED', 'correlation_id' => 'corr-123' ] );
+
+		$this->assertWpErrorCode( 'capture_failed', $this->perform( 'capture', $order ) );
+		$this->assertOrderHasNote( $order, 'Kustom could not charge the customer. Please try again later.' );
+		$this->assertOrderHasNote( $order, 'Error code: PAYMENT_METHOD_FAILED. Correlation ID: corr-123.' );
+		$this->assertSame( 'on-hold', $this->statusOf( $order ) );
+	}
+
+	public function test_saving_a_subscription_without_a_kustom_order_id_does_not_contact_kustom(): void {
+		$order = $this->haveOrderFor( 'update' );
+		$this->applyGuard( $order, 'no-kustom-id' );
+		$subscription = $this->markAsSubscription( $order );
+
+		$this->perform( 'update', $subscription );
+
+		$this->assertNoGatewayRequests();
+		$this->assertOrderHasNoNote( $subscription, 'could not be updated' );
+	}
+
+	/** A subscription is never a Kustom order, even when it carries its parent's Kustom order ID. */
+	public function test_saving_a_subscription_does_not_update_the_parents_kustom_order(): void {
+		$subscription = $this->markAsSubscription( $this->haveOrderFor( 'update' ) );
+
+		$this->perform( 'update', $subscription );
+
+		$this->assertNoGatewayRequests();
+		$this->assertOrderHasNoNote( $subscription, 'could not be updated' );
+	}
+
+	/**
+	 * The merchant needs Kustom's error code and correlation ID to raise a failure with Kustom support.
+	 *
+	 * @dataProvider provide_detailed_lookup_failures
+	 */
+	public function test_a_rejected_lookup_note_carries_kustoms_error_code_and_correlation_id( string $op, string $status ): void {
+		$order = $this->haveOrderFor( $op );
+		$order->set_status( $status );
+		$order->save();
+
+		$this->willRejectWith( 'ordermanagement/v1/orders', 'Something went wrong.', 400, self::ERROR_DETAILS );
+
+		$this->perform( $op, $order, true );
+
+		$this->assertOrderHasNote( $order, 'Something went wrong. Error code: BAD_VALUE. Correlation ID: corr-123.' );
+	}
+
+	/** @return array<string, array{0: string, 1: string}> */
+	public function provide_detailed_lookup_failures(): array {
+		return [
+			'capture'                     => [ 'capture', 'processing' ],
+			'capture, retried on on-hold' => [ 'capture', 'on-hold' ],
+			'update'                      => [ 'update', 'on-hold' ],
+		];
+	}
+
 	/**
 	 * @dataProvider provide_rejections
 	 */
@@ -320,7 +387,7 @@ class OrderManagementTest extends IntegrationTestCase {
 		$order = $this->haveOrderFor( $op );
 
 		$this->willRetrieveManagedOrder( $this->lookupFor( $op ) );
-		$this->willRejectWith( self::ENDPOINTS[ $op ][0], $reason );
+		$this->willRejectWith( self::ENDPOINTS[ $op ][0], $reason, 400, self::ERROR_DETAILS );
 
 		$this->assertWpErrorCode( $error_code, $this->perform( $op, $order ) );
 		$this->assertOrderHasNote( $order, $note );
@@ -333,9 +400,9 @@ class OrderManagementTest extends IntegrationTestCase {
 	/** @return array<string, array{0: string, 1: string, 2: string, 3: string, 4: string|null}> */
 	public function provide_rejections(): array {
 		return [
-			'capture' => [ 'capture', 'Order is not in a capturable state.', 'capture_failed', 'Order is not in a capturable state.', '_wc_klarna_capture_id' ],
+			'capture' => [ 'capture', 'Order is not in a capturable state.', 'capture_failed', 'Order is not in a capturable state. Error code: BAD_VALUE. Correlation ID: corr-123.', '_wc_klarna_capture_id' ],
 			'cancel'  => [ 'cancel', 'Order has already been captured', 'unknown_error', 'Order has already been captured.', '_wc_klarna_cancelled' ],
-			'update'  => [ 'update', 'Amount exceeds the authorized amount', 'unknown_error', 'Amount exceeds the authorized amount.', null ],
+			'update'  => [ 'update', 'Amount exceeds the authorized amount', 'unknown_error', 'Amount exceeds the authorized amount. Error code: BAD_VALUE. Correlation ID: corr-123.', null ],
 			'refund'  => [ 'refund', 'Refund amount is higher than remaining captured amount', 'unknown_error', 'Refund amount is higher than remaining captured amount.', null ],
 		];
 	}

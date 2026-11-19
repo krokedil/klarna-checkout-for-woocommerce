@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where saving a subscription sent a failing order update to Kustom and added the order note "Kustom order could not be updated due to an error." to the subscription.
