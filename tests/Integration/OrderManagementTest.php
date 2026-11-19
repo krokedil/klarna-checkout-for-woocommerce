@@ -323,8 +323,7 @@ class OrderManagementTest extends IntegrationTestCase {
 		$this->willRejectWith( self::ENDPOINTS[ $op ][0], $reason, 403, $body );
 
 		$this->assertWpErrorCode( $error_code, $this->perform( $op, $order ) );
-		// Formatted here, not in the provider, so the price uses the store settings the test runs with.
-		$this->assertOrderHasNote( $order, str_replace( '<remaining-amount>', wc_price( 250, [ 'currency' => 'SEK' ] ), $note ) );
+		$this->assertOrderHasNote( $order, $note );
 
 		if ( null !== $unset_meta ) {
 			$this->assertSame( '', $this->reload( $order )->get_meta( $unset_meta ), 'A failed operation must not look like it succeeded.' );
@@ -339,7 +338,7 @@ class OrderManagementTest extends IntegrationTestCase {
 				'capture',
 				'Capture amount exceeds remaining authorized amount',
 				'capture_failed',
-				'Capture amount exceeds remaining authorized amount. Remaining authorized amount: <remaining-amount>.',
+				'Capture amount exceeds remaining authorized amount. Remaining authorized amount: ' . wc_price( 250, [ 'currency' => 'SEK' ] ) . '.',
 				'_wc_klarna_capture_id',
 				[ 'error_code' => 'CAPTURE_NOT_ALLOWED' ],
 			],
