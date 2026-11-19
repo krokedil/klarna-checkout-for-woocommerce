@@ -316,11 +316,11 @@ class OrderManagementTest extends IntegrationTestCase {
 	/**
 	 * @dataProvider provide_rejections
 	 */
-	public function test_the_api_rejecting_the_operation_is_noted( string $op, string $reason, string $error_code, string $note, ?string $unset_meta ): void {
+	public function test_the_api_rejecting_the_operation_is_noted( string $op, string $reason, string $error_code, string $note, ?string $unset_meta, array $body = [] ): void {
 		$order = $this->haveOrderFor( $op );
 
 		$this->willRetrieveManagedOrder( $this->lookupFor( $op ) );
-		$this->willRejectWith( self::ENDPOINTS[ $op ][0], $reason );
+		$this->willRejectWith( self::ENDPOINTS[ $op ][0], $reason, 403, $body );
 
 		$this->assertWpErrorCode( $error_code, $this->perform( $op, $order ) );
 		$this->assertOrderHasNote( $order, $note );
@@ -330,10 +330,26 @@ class OrderManagementTest extends IntegrationTestCase {
 		}
 	}
 
-	/** @return array<string, array{0: string, 1: string, 2: string, 3: string, 4: string|null}> */
+	/** @return array<string, array{0: string, 1: string, 2: string, 3: string, 4: string|null, 5?: array}> */
 	public function provide_rejections(): array {
 		return [
 			'capture' => [ 'capture', 'Order is not in a capturable state.', 'capture_failed', 'Order is not in a capturable state.', '_wc_klarna_capture_id' ],
+			'capture, over the remaining amount' => [
+				'capture',
+				'Capture amount exceeds remaining authorized amount',
+				'capture_failed',
+				'Capture amount exceeds remaining authorized amount. Remaining authorized amount: ' . wc_price( 250, [ 'currency' => 'SEK' ] ) . '.',
+				'_wc_klarna_capture_id',
+				[ 'error_code' => 'CAPTURE_NOT_ALLOWED' ],
+			],
+			'capture, kustom cannot charge' => [
+				'capture',
+				'Payment method failed',
+				'capture_failed',
+				'Kustom could not charge the customer. Please try again later.',
+				'_wc_klarna_capture_id',
+				[ 'error_code' => 'PAYMENT_METHOD_FAILED' ],
+			],
 			'cancel'  => [ 'cancel', 'Order has already been captured', 'unknown_error', 'Order has already been captured.', '_wc_klarna_cancelled' ],
 			'update'  => [ 'update', 'Amount exceeds the authorized amount', 'unknown_error', 'Amount exceeds the authorized amount.', null ],
 			'refund'  => [ 'refund', 'Refund amount is higher than remaining captured amount', 'unknown_error', 'Refund amount is higher than remaining captured amount.', null ],
