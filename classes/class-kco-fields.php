@@ -59,6 +59,14 @@ class KCO_Fields {
 					'autocomplete' => 'off',
 				),
 			),
+			'force_payment_method'       => array(
+				'title'       => __( 'Always use Kustom Checkout', 'klarna-checkout-for-woocommerce' ),
+				'label'       => __( 'Always show Kustom Checkout on the checkout page', 'klarna-checkout-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'Keeps Kustom Checkout selected and hides the <em>Select another payment method</em> button. Other payment gateways stay enabled, so they can still be offered inside Kustom Checkout as external payment methods, for example Vipps. Applies to the classic checkout with the embedded checkout flow only. If Kustom Checkout fails to load, the customer is not switched to another payment method.', 'klarna-checkout-for-woocommerce' ),
+				'default'     => 'no',
+				'desc_tip'    => true,
+			),
 			'testmode'                   => array(
 				'title'       => __( 'Test mode', 'klarna-checkout-for-woocommerce' ),
 				'label'       => __( 'Enable Test Mode', 'klarna-checkout-for-woocommerce' ),
