@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Harness\Fixtures;
 
 use Tests\Support\IntegrationTestCase;
+use WC_Subscriptions_Product;
 
 /**
  * Pins the WooCommerce Subscriptions fakes: the `wcs_*` stubs are declared for
@@ -54,6 +55,17 @@ class FakeSubscriptionsTest extends IntegrationTestCase {
 			[ $subscription->get_id() ],
 			array_keys( wcs_get_subscriptions_for_renewal_order( $renewal->get_id() ) )
 		);
+	}
+
+	public function test_only_a_registered_product_is_a_subscription_product(): void {
+		$plain        = $this->haveSimpleProduct( [ 'sku' => 'fake-plain' ] );
+		$subscription = $this->markAsSubscriptionProduct( $this->haveSimpleProduct( [ 'sku' => 'fake-subscription' ] ) );
+
+		$this->assertFalse( WC_Subscriptions_Product::is_subscription( $plain ) );
+		$this->assertFalse( WC_Subscriptions_Product::is_subscription( $plain->get_id() ) );
+		$this->assertTrue( WC_Subscriptions_Product::is_subscription( $subscription ) );
+		$this->assertTrue( WC_Subscriptions_Product::is_subscription( $subscription->get_id() ), 'The plugin also passes a product id.' );
+		$this->assertSame( 0, WC_Subscriptions_Product::get_trial_length( $subscription ), 'A trial would drop the item from the shipping packages.' );
 	}
 
 	public function test_only_the_named_cart_states_answer_true(): void {

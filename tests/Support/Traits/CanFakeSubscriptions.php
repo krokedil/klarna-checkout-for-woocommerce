@@ -44,6 +44,13 @@ trait CanFakeSubscriptions {
 		return wc_get_order( $order->get_id() );
 	}
 
+	/** Makes `WC_Subscriptions_Product::is_subscription()` answer true for the product. */
+	protected function markAsSubscriptionProduct( \WC_Product $product ): \WC_Product {
+		SubscriptionsRegistry::registerProduct( $product->get_id() );
+
+		return $product;
+	}
+
 	/** Makes the named `wcs_cart_contains_*()` checks answer true. */
 	protected function haveCartContaining( string ...$kinds ): void {
 		foreach ( $kinds as $kind ) {
