@@ -554,10 +554,12 @@ class OrderManagement {
 
 		if ( is_wp_error( $klarna_order ) ) {
 			// translators: %s Kustom error message.
-			$order->add_order_note( \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() ) );
+			$message = \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() );
+			$order->add_order_note( $message );
 			$order->save();
 
-			return new \WP_Error( 'object_error', 'Kustom order object is of type WP_Error.', $klarna_order );
+			// WooCommerce shows this message to the merchant, so it has to say what went wrong.
+			return new \WP_Error( 'object_error', $message, $klarna_order );
 		}
 
 		// We've checked for the metadata `_wc_klarna_capture_id`, now we check for the Kustom status.
@@ -609,10 +611,11 @@ class OrderManagement {
 		$response = $request->request();
 		if ( is_wp_error( $response ) ) {
 			// translators: %s Kustom error message.
-			$order->add_order_note( \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $response->get_error_message() ) );
+			$message = \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $response->get_error_message() );
+			$order->add_order_note( $message );
 			$order->save();
 
-			return new \WP_Error( 'unknown_error', 'Response object is of type WP_Error.', $response );
+			return new \WP_Error( 'unknown_error', $message, $response );
 		}
 
 		/**

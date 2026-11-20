@@ -333,6 +333,18 @@ class OrderManagementTest extends IntegrationTestCase {
 		}
 	}
 
+	/** WooCommerce shows the merchant the error's message, so it has to carry Kustom's reason. */
+	public function test_a_rejected_refund_tells_the_merchant_why(): void {
+		$order = $this->haveOrderFor( 'refund' );
+
+		$this->willRetrieveManagedOrder( $this->lookupFor( 'refund' ) );
+		$this->willRejectWith( '/refunds', 'Refund amount is higher than remaining captured amount' );
+
+		$error = $this->perform( 'refund', $order );
+
+		$this->assertSame( 'Could not refund Kustom order. Refund amount is higher than remaining captured amount.', $error->get_error_message() );
+	}
+
 	/** @return array<string, array{0: string, 1: string, 2: string, 3: string, 4: string|null}> */
 	public function provide_rejections(): array {
 		return [
