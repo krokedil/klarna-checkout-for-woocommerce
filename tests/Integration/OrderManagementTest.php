@@ -564,7 +564,7 @@ class OrderManagementTest extends IntegrationTestCase {
 			[ '<refund-id>' => $this->refundIdOf( $order ), '<order-number>' => $order->get_order_number() ]
 		);
 		$this->assertSame( 'true', $request['headers']['kco-expand-api'] ?? null );
-		$this->assertStringContainsString( 'cashRegisterStatus=OPEN', $this->gatewayRequestTo( 'ipp/v1/devices' )['url'] );
+		$this->assertStringContainsString( 'cash_register_status=OPEN', $this->gatewayRequestTo( 'ipp/v1/devices' )['url'] );
 		$this->assertOrderHasNote( $order, 'registered on the Kustom POS device Sale device' );
 	}
 

@@ -50,7 +50,7 @@ class RequestGetDevices extends RequestGet {
 
 		// Narrows the list to devices whose cash register is in the given state, e.g. OPEN.
 		if ( ! empty( $this->arguments['cash_register_status'] ) ) {
-			$url = add_query_arg( 'cashRegisterStatus', rawurlencode( $this->arguments['cash_register_status'] ), $url );
+			$url = add_query_arg( 'cash_register_status', rawurlencode( $this->arguments['cash_register_status'] ), $url );
 		}
 
 		return $url;

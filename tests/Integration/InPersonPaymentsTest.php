@@ -290,7 +290,7 @@ class InPersonPaymentsTest extends IntegrationTestCase {
 
 		$request = new RequestGetDevices( [ 'cash_register_status' => 'OPEN' ] );
 
-		$this->assertStringContainsString( 'cashRegisterStatus=OPEN', $this->readRequestUrl( $request ) );
+		$this->assertStringContainsString( 'cash_register_status=OPEN', $this->readRequestUrl( $request ) );
 	}
 
 	/** Renaming a device addresses it by id in the path. */
