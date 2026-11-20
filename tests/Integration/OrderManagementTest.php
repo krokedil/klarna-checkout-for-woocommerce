@@ -626,6 +626,15 @@ class OrderManagementTest extends IntegrationTestCase {
 		$this->assertGatewayRequestCount( 0, 'ipp/v1/devices' );
 	}
 
+	public function test_a_refund_carries_an_idempotency_key(): void {
+		$order = $this->haveOrderFor( 'refund' );
+		$this->willSucceed( 'refund' );
+
+		$this->perform( 'refund', $order );
+
+		$this->assertTrue( wp_is_uuid( $this->gatewayRequestTo( '/refunds' )['headers']['Klarna-Idempotency-Key'] ?? '', 4 ) );
+	}
+
 	/** The same order state as a checkout order, but paid on a device. */
 	private function haveInPersonOrderFor( string $op ): \WC_Order {
 		$order = $this->haveOrderFor( $op );

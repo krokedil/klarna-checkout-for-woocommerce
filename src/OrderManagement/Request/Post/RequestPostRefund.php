@@ -78,6 +78,8 @@ class RequestPostRefund extends RequestPost {
 			return $headers;
 		}
 
+		$headers['Klarna-Idempotency-Key'] = wp_generate_uuid4();
+
 		// Only the extended API accepts the device a refund is fiscally registered on.
 		if ( '' !== $this->device_id ) {
 			$headers['kco-expand-api'] = 'true';
