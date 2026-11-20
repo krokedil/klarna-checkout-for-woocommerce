@@ -19,6 +19,7 @@ use Krokedil\KustomCheckout\OrderManagement\MetaBox;
 use Krokedil\KustomCheckout\OrderManagement\Ajax;
 use Krokedil\KustomCheckout\OrderManagement\PendingOrders;
 use Krokedil\KustomCheckout\InPersonPayments\RefundDevice;
+use Krokedil\KustomCheckout\InPersonPayments\RefundLines;
 use Krokedil\KustomCheckout\Utility\OrderUtility;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Support\SystemReport;
 
@@ -584,7 +585,8 @@ class OrderManagement {
 		// An in-person refund is fiscally registered on a device with an open cash register.
 		$refund_device = null;
 		if ( OrderUtility::is_in_person_order( $order ) ) {
-			$refund_device = RefundDevice::for_order( $order );
+			$refundable    = RefundLines::validate( $order, $refund_order, $amount );
+			$refund_device = is_wp_error( $refundable ) ? $refundable : RefundDevice::for_order( $order );
 
 			if ( is_wp_error( $refund_device ) ) {
 				// translators: %s Kustom error message.

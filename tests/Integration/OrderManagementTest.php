@@ -600,8 +600,12 @@ class OrderManagementTest extends IntegrationTestCase {
 		];
 	}
 
-	/** Kustom matches a refund line to the sale by unit price, so half an item is a discount on it. */
-	public function test_an_in_person_refund_of_part_of_an_item_keeps_the_sale_unit_price(): void {
+	/**
+	 * Kustom refunds whole units of what was sold, so anything else stops before it is sent.
+	 *
+	 * @dataProvider provide_refunds_of_less_than_whole_items
+	 */
+	public function test_an_in_person_refund_has_to_be_of_whole_items( array $line_items ): void {
 		$order = $this->haveInPersonOrderFor( 'refund' );
 		$item  = array_key_first( $order->get_items() );
 		$rate  = array_key_first( $order->get_item( $item )->get_taxes()['total'] );
@@ -611,17 +615,31 @@ class OrderManagementTest extends IntegrationTestCase {
 			[
 				'order_id'   => $order->get_id(),
 				'amount'     => 62.50,
-				'line_items' => [ $item => [ 'qty' => 1, 'refund_total' => 50.00, 'refund_tax' => [ $rate => 12.50 ] ] ],
+				'line_items' => array_map(
+					static function ( $line ) use ( $rate ) {
+						return [ 'qty' => $line['qty'], 'refund_total' => 50.00, 'refund_tax' => [ $rate => 12.50 ] ];
+					},
+					array_fill_keys( array_slice( [ $item ], 0, count( $line_items ) ), $line_items[0] ?? [] )
+				),
 			]
 		);
 
-		$this->willSucceed( 'refund' );
-		$this->willListOpenRegisters();
+		$this->willRetrieveManagedOrder( $this->lookupFor( 'refund' ) );
 
-		KCO_WC()->order_management->refund_klarna_order( false, $order->get_id(), '62.50', '' );
+		$error = KCO_WC()->order_management->refund_klarna_order( false, $order->get_id(), '62.50', '' );
 
-		$line = $this->gatewayRequestTo( '/refunds' )['json']['order_lines'][0];
-		$this->assertEquals( [ 12500, 1, 6250, 6250 ], [ $line['unit_price'], $line['quantity'], $line['total_amount'], $line['total_discount_amount'] ] );
+		$this->assertWpErrorCode( 'partial_item_refund', $error );
+		$this->assertGatewayRequestCount( 1, '', 'Only the order lookup is made.' );
+		$this->assertOrderHasNote( $order, 'can only be refunded by whole items' );
+	}
+
+	/** @return array<string, array{0: array<int, array{qty: int}>}> */
+	public function provide_refunds_of_less_than_whole_items(): array {
+		return [
+			'half the price of one item'  => [ [ [ 'qty' => 1 ] ] ],
+			'an amount with no quantity'  => [ [ [ 'qty' => 0 ] ] ],
+			'an amount with no item at all' => [ [] ],
+		];
 	}
 
 	public function test_a_refund_kustom_cannot_match_to_the_sale_says_what_to_do(): void {
