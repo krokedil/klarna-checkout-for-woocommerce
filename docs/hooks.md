@@ -372,6 +372,22 @@ Source: [./src/ShippingAssistant/ShippingMethod.php](../src/ShippingAssistant/Sh
 
 
 ---
+### `kco_wc_allow_negative_cart_order_amount`
+
+*Mark how much of the adjustment line is shipping the gift card already paid for in WooCommerce.*
+
+The rest of that line is a real rounding difference, which the callback has to keep.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$request_args` | `array` | The request args for Kustom Checkout.
+
+Source: [./src/ShippingAssistant/Giftcards.php](../src/ShippingAssistant/Giftcards.php), [line 54](../src/ShippingAssistant/Giftcards.php#L54-L69)
+
+
+---
 ### `kom_skip_scheduled_actions`
 
 *Filters whether to skip displaying the scheduled actions for the order in the order management metabox.*
@@ -628,7 +644,7 @@ Source: [./src/Utility/SettingsUtility.php](../src/Utility/SettingsUtility.php),
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$lock` | `bool` | Whether to lock the confirmation. Default false.
+`$lock` | `bool` | Whether to lock the confirmation. Default true.
 `$klarna_order_id` | `string` | The Kustom order ID.
 `$order_id` | `int` | The WooCommerce order ID.
 
