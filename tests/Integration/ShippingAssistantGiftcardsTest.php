@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
+use Krokedil\KustomCheckout\ShippingAssistant\API\ApiRegistry;
 use Krokedil\KustomCheckout\ShippingAssistant\Giftcards;
 use Krokedil\KustomCheckout\ShippingAssistant\RequestModifier;
 use Tests\Support\IntegrationTestCase;
@@ -126,9 +127,10 @@ class ShippingAssistantGiftcardsTest extends IntegrationTestCase {
 	 *
 	 * @dataProvider provide_callback_settings
 	 */
-	public function test_the_shipping_line_is_only_sent_with_the_callback( string $setting, bool $sent ): void {
-		if ( $sent && ! KCO_WC()->shipping_assistant->api_registry() ) {
-			$this->markTestSkipped( 'The shipping assistant module is not loaded in this run.' );
+	public function test_the_shipping_line_is_only_sent_with_the_callback( string $setting, bool $giftcard, bool $sent ): void {
+		$restore = [ $this->haveShippingAssistantApi() ];
+		if ( $giftcard ) {
+			$restore[] = $this->haveGiftcardInCart( 5000 );
 		}
 
 		$this->haveGatewayCredentials( [ 'ksa_enabled' => 'yes', 'ksa_enable_shipping_option_update_callback' => $setting ] );
@@ -142,18 +144,83 @@ class ShippingAssistantGiftcardsTest extends IntegrationTestCase {
 		$args   = [ 'order_lines' => [ $this->line( 'physical', 10000 ) ], 'order_amount' => 10000, 'order_tax_amount' => 2000 ];
 		$result = ( new \ReflectionClass( RequestModifier::class ) )->newInstanceWithoutConstructor()->maybe_add_shipping_override_data( $args );
 
+		array_map( static fn( callable $undo ) => $undo(), $restore );
+
 		$this->assertSame( $sent, in_array( 'shipping_fee', array_column( $result['order_lines'], 'type' ), true ) );
 		$this->assertSame( $sent, false !== get_transient( 'kss_override_data_checkout-order-123' ), 'The stored override must go when it is not used.' );
 
 		delete_transient( 'kss_override_data_checkout-order-123' );
 	}
 
-	/** @return array<string, array{0: string, 1: bool}> */
+	/** @return array<string, array{0: string, 1: bool, 2: bool}> */
 	public static function provide_callback_settings(): array {
 		return [
-			'callback off' => [ 'no', false ],
-			'callback on'  => [ 'yes', true ],
+			'callback off'                  => [ 'no', false, false ],
+			'callback on'                   => [ 'yes', false, true ],
+			'callback off with a gift card' => [ 'no', true, true ],
 		];
+	}
+
+	/**
+	 * The module only registers its API when the gateway boots with the shipping assistant enabled.
+	 *
+	 * @return callable(): void Puts back what was there.
+	 */
+	private function haveShippingAssistantApi(): callable {
+		$module   = KCO_WC()->shipping_assistant;
+		$property = new \ReflectionProperty( $module, 'api_registry' );
+		$property->setAccessible( true );
+		$original = $property->getValue( $module );
+
+		if ( ! $original ) {
+			$property->setValue( $module, ( new \ReflectionClass( ApiRegistry::class ) )->newInstanceWithoutConstructor() );
+		}
+
+		return static function () use ( $property, $module, $original ): void {
+			$property->setValue( $module, $original );
+		};
+	}
+
+	/**
+	 * Put a gift card with a known balance in the cart, as a gift card plugin's compatibility would report it.
+	 *
+	 * @return callable(): void Removes the gift card again.
+	 */
+	private function haveGiftcardInCart( int $balance ): callable {
+		$giftcard = new class( $balance ) {
+			private int $balance;
+
+			public function __construct( int $balance ) {
+				$this->balance = $balance;
+			}
+
+			public function get_gift_card_balance(): int {
+				return $this->balance;
+			}
+		};
+
+		$compatibility = new class( $giftcard ) {
+			private object $giftcard;
+
+			public function __construct( object $giftcard ) {
+				$this->giftcard = $giftcard;
+			}
+
+			/** @return list<object> */
+			public function get_cart_giftcards(): array {
+				return [ $this->giftcard ];
+			}
+		};
+
+		$property = new \ReflectionProperty( KCO_WC()->krokedil->compatibility(), 'giftcards' );
+		$property->setAccessible( true );
+		$registry = KCO_WC()->krokedil->compatibility();
+		$original = $property->getValue( $registry );
+		$property->setValue( $registry, [ 'test' => $compatibility ] );
+
+		return static function () use ( $property, $registry, $original ): void {
+			$property->setValue( $registry, $original );
+		};
 	}
 
 	/** @return array<string, mixed> */
