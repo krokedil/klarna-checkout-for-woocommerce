@@ -24,6 +24,9 @@ class OrderManagementTest extends IntegrationTestCase {
 		'refund'  => [ '/refunds', 'POST' ],
 	];
 
+	private const SALE_DEVICE   = 'device-1';
+	private const SALE_LOCATION = 'location-1';
+
 	private const AUTO_SETTINGS = [
 		'capture' => 'kom_auto_capture',
 		'cancel'  => 'kom_auto_cancel',
@@ -490,6 +493,7 @@ class OrderManagementTest extends IntegrationTestCase {
 	public function test_an_in_person_order_is_managed_like_a_checkout_order( string $op ): void {
 		$order = $this->haveInPersonOrderFor( $op );
 		$this->willSucceed( $op );
+		$this->willListOpenRegisters();
 
 		$this->assertTrue( $this->perform( $op, $order ) );
 		$this->assertGatewayRequestCount( 1, self::ENDPOINTS[ $op ][0] );
@@ -505,6 +509,7 @@ class OrderManagementTest extends IntegrationTestCase {
 		$order = $this->haveInPersonOrderFor( 'refund' );
 		$this->applyGuard( $order, 'no-capture-id' );
 		$this->willSucceed( 'refund' );
+		$this->willListOpenRegisters();
 
 		$this->assertTrue( $this->perform( 'refund', $order ) );
 		$this->assertGatewayRequestCount( 1, '/refunds' );
@@ -523,6 +528,7 @@ class OrderManagementTest extends IntegrationTestCase {
 	public function test_refunding_an_in_person_order_through_its_gateway(): void {
 		$order = $this->haveInPersonOrderFor( 'refund' );
 		$this->willSucceed( 'refund' );
+		$this->willListOpenRegisters();
 
 		$gateway = new \Krokedil\KustomCheckout\InPersonPayments\Gateway();
 
@@ -531,13 +537,111 @@ class OrderManagementTest extends IntegrationTestCase {
 		$this->assertGatewayRequestCount( 1, '/refunds' );
 	}
 
+	/** Swedish law wants the refund registered on a cash register, which the extended API does. */
+	public function test_an_in_person_refund_is_registered_on_a_device(): void {
+		$order = $this->haveInPersonOrderFor( 'refund' );
+		$this->willSucceed( 'refund' );
+		$this->willListOpenRegisters();
+
+		$this->assertTrue( $this->perform( 'refund', $order ) );
+
+		$request = $this->gatewayRequestTo( '/refunds' );
+		$this->assertRequestMatchesSnapshot(
+			$request,
+			'om-refund-in-person',
+			[ '<refund-id>' => $this->refundIdOf( $order ), '<order-number>' => $order->get_order_number() ]
+		);
+		$this->assertSame( 'true', $request['headers']['kco-expand-api'] ?? null );
+		$this->assertStringContainsString( 'cashRegisterStatus=OPEN', $this->gatewayRequestTo( 'ipp/v1/devices' )['url'] );
+		$this->assertOrderHasNote( $order, 'registered on the Kustom POS device Sale device' );
+	}
+
+	/**
+	 * Any open register will do, so the nearest one to the sale is picked for the merchant.
+	 *
+	 * @dataProvider provide_open_registers
+	 */
+	public function test_which_device_an_in_person_refund_is_registered_on( array $open, string $expected ): void {
+		$order = $this->haveInPersonOrderFor( 'refund' );
+		$this->willSucceed( 'refund' );
+		$this->willListOpenRegisters( $open );
+
+		$this->perform( 'refund', $order );
+
+		$this->assertSame( $expected, $this->gatewayRequestTo( '/refunds' )['json']['device_id'] );
+	}
+
+	/** @return array<string, array{0: array<int, array>, 1: string}> */
+	public function provide_open_registers(): array {
+		$elsewhere = [ 'id' => 'device-9', 'kco_id' => 'idev_elsewhere', 'location_id' => 'location-9' ];
+		$same_shop = [ 'id' => 'device-2', 'kco_id' => 'idev_same_shop', 'location_id' => self::SALE_LOCATION ];
+		$sale      = [ 'id' => self::SALE_DEVICE, 'kco_id' => 'idev_sale', 'location_id' => self::SALE_LOCATION ];
+		$unusable  = [ 'id' => self::SALE_DEVICE, 'location_id' => self::SALE_LOCATION ];
+
+		return [
+			'the sale device, when its register is open' => [ [ $elsewhere, $same_shop, $sale ], 'idev_sale' ],
+			'else a device in the same shop'             => [ [ $elsewhere, $same_shop ], 'idev_same_shop' ],
+			'else any open register'                     => [ [ $elsewhere ], 'idev_elsewhere' ],
+			'never a device without a Kustom id'         => [ [ $unusable, $elsewhere ], 'idev_elsewhere' ],
+		];
+	}
+
+	public function test_an_in_person_refund_needs_an_open_cash_register(): void {
+		$order = $this->haveInPersonOrderFor( 'refund' );
+		$this->willSucceed( 'refund' );
+		$this->willListOpenRegisters( [] );
+
+		$this->assertWpErrorCode( 'no_open_cash_register', $this->perform( 'refund', $order ) );
+		$this->assertGatewayRequestCount( 0, '/refunds' );
+		$this->assertOrderHasNote( $order, 'No Kustom POS device has an open cash register' );
+	}
+
+	public function test_the_refund_device_can_be_chosen_by_a_filter(): void {
+		$order = $this->haveInPersonOrderFor( 'refund' );
+		$this->willSucceed( 'refund' );
+		$this->willListOpenRegisters();
+
+		add_filter(
+			'kco_ipp_refund_device',
+			static function () {
+				return [ 'kco_id' => 'idev_filtered', 'name' => 'Back office' ];
+			}
+		);
+
+		$this->perform( 'refund', $order );
+
+		$this->assertSame( 'idev_filtered', $this->gatewayRequestTo( '/refunds' )['json']['device_id'] );
+	}
+
+	/** A checkout order has no cash register, so it stays on the ordinary refund API. */
+	public function test_a_checkout_refund_names_no_device(): void {
+		$order = $this->haveOrderFor( 'refund' );
+		$this->willSucceed( 'refund' );
+
+		$this->perform( 'refund', $order );
+
+		$request = $this->gatewayRequestTo( '/refunds' );
+		$this->assertArrayNotHasKey( 'kco-expand-api', $request['headers'] );
+		$this->assertArrayNotHasKey( 'device_id', $request['json'] );
+		$this->assertGatewayRequestCount( 0, 'ipp/v1/devices' );
+	}
+
 	/** The same order state as a checkout order, but paid on a device. */
 	private function haveInPersonOrderFor( string $op ): \WC_Order {
 		$order = $this->haveOrderFor( $op );
 		$order->set_payment_method( \Krokedil\KustomCheckout\InPersonPayments\Gateway::ID );
+		$order->update_meta_data( \Krokedil\KustomCheckout\InPersonPayments\Gateway::DEVICE_META, self::SALE_DEVICE );
+		$order->update_meta_data( \Krokedil\KustomCheckout\InPersonPayments\Gateway::LOCATION_META, self::SALE_LOCATION );
 		$order->save();
 
 		return $order;
+	}
+
+	/** Queues the devices with an open cash register; by default the one the sale was made on. */
+	private function willListOpenRegisters( ?array $devices = null ): void {
+		$sale = [ 'id' => self::SALE_DEVICE, 'kco_id' => 'idev_sale', 'location_id' => self::SALE_LOCATION, 'name' => 'Sale device' ];
+
+		$this->willRespondWith( [ 'content' => $devices ?? [ $sale ] ], 200, 'ipp/v1/devices' );
 	}
 
 	/**

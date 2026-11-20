@@ -46,6 +46,13 @@ class RequestGetDevices extends RequestGet {
 		 */
 		$page_size = apply_filters( 'kco_ipp_device_page_size', 100 );
 
-		return add_query_arg( 'page_size', $page_size, $this->get_api_url_base() . 'ipp/v1/devices' );
+		$url = add_query_arg( 'page_size', $page_size, $this->get_api_url_base() . 'ipp/v1/devices' );
+
+		// Narrows the list to devices whose cash register is in the given state, e.g. OPEN.
+		if ( ! empty( $this->arguments['cash_register_status'] ) ) {
+			$url = add_query_arg( 'cashRegisterStatus', rawurlencode( $this->arguments['cash_register_status'] ), $url );
+		}
+
+		return $url;
 	}
 }

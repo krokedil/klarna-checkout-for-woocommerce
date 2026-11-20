@@ -45,6 +45,13 @@ class RequestPostRefund extends RequestPost {
 	protected $refund_id;
 
 	/**
+	 * The Kustom id of the POS device an in-person refund is registered on.
+	 *
+	 * @var string
+	 */
+	protected $device_id;
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param OrderManagement $order_management The order management instance.
@@ -57,6 +64,26 @@ class RequestPostRefund extends RequestPost {
 		$this->refund_amount = $arguments['refund_amount'];
 		$this->return_fee    = $arguments['return_fee'] ?? array();
 		$this->refund_id     = $arguments['refund_id'] ?? '';
+		$this->device_id     = $arguments['device_id'] ?? '';
+	}
+
+	/**
+	 * Get the request headers.
+	 *
+	 * @return array|\WP_Error
+	 */
+	protected function get_request_headers() {
+		$headers = parent::get_request_headers();
+		if ( is_wp_error( $headers ) ) {
+			return $headers;
+		}
+
+		// Only the extended API accepts the device a refund is fiscally registered on.
+		if ( '' !== $this->device_id ) {
+			$headers['kco-expand-api'] = 'true';
+		}
+
+		return $headers;
 	}
 
 	/**
@@ -86,6 +113,10 @@ class RequestPostRefund extends RequestPost {
 		// Add the order number and refund id if available.
 		if ( ! empty( $this->refund_id ) ) {
 			$data['reference'] = "{$order_number}|{$this->refund_id}";
+		}
+
+		if ( '' !== $this->device_id ) {
+			$data['device_id'] = $this->device_id;
 		}
 
 		$refund_order_lines = $this->get_refund_order_lines();

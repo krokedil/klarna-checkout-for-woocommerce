@@ -66,6 +66,21 @@ class Devices {
 	}
 
 	/**
+	 * The devices with an open cash register, read fresh every time: a register is
+	 * opened and closed during the day, so a cached answer would be wrong.
+	 *
+	 * @return array|\WP_Error
+	 */
+	public static function with_open_register() {
+		$response = ( new RequestGetDevices( array( 'cash_register_status' => 'OPEN' ) ) )->request();
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		return $response['content'] ?? array();
+	}
+
+	/**
 	 * Throw the cached list away.
 	 *
 	 * @return void

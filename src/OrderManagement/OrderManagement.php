@@ -18,6 +18,7 @@ use Krokedil\KustomCheckout\OrderManagement\Request\Post\RequestPostCancel;
 use Krokedil\KustomCheckout\OrderManagement\MetaBox;
 use Krokedil\KustomCheckout\OrderManagement\Ajax;
 use Krokedil\KustomCheckout\OrderManagement\PendingOrders;
+use Krokedil\KustomCheckout\InPersonPayments\RefundDevice;
 use Krokedil\KustomCheckout\Utility\OrderUtility;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Support\SystemReport;
 
@@ -578,6 +579,20 @@ class OrderManagement {
 			return new \WP_Error( 'invalid_refund_order', 'Refund order is not valid.' );
 		}
 
+		// An in-person refund is fiscally registered on a device with an open cash register.
+		$refund_device = null;
+		if ( OrderUtility::is_in_person_order( $order ) ) {
+			$refund_device = RefundDevice::for_order( $order );
+
+			if ( is_wp_error( $refund_device ) ) {
+				// translators: %s Kustom error message.
+				$order->add_order_note( \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), rtrim( $refund_device->get_error_message(), '.' ) ) );
+				$order->save();
+
+				return $refund_device;
+			}
+		}
+
 		$return_fee = $this->get_return_fee_from_post();
 		$request    = new RequestPostRefund(
 			$this,
@@ -587,6 +602,7 @@ class OrderManagement {
 				'refund_reason' => $reason,
 				'return_fee'    => $return_fee,
 				'refund_id'     => $refund_order_id,
+				'device_id'     => $refund_device['kco_id'] ?? '',
 			)
 		);
 
@@ -623,6 +639,12 @@ class OrderManagement {
 
 		$formatted_text = \sprintf( $text, wc_price( $amount, array( 'currency' => $order->get_currency() ) ) );
 		$order->add_order_note( "$formatted_text." );
+
+		if ( $refund_device ) {
+			$device_name = empty( $refund_device['name'] ) ? $refund_device['kco_id'] : $refund_device['name'];
+			// translators: %s: the name of the POS device.
+			$order->add_order_note( \sprintf( __( 'The refund was registered on the Kustom POS device %s.', 'klarna-checkout-for-woocommerce' ), $device_name ) );
+		}
 
 		return true;
 	}

@@ -284,6 +284,15 @@ class InPersonPaymentsTest extends IntegrationTestCase {
 		$this->assertSame( 'Downtown Store', $response['content'][0]['name'] );
 	}
 
+	/** A refund may only be registered on a device whose cash register is open. */
+	public function test_the_device_list_can_be_narrowed_to_open_registers(): void {
+		$this->haveGatewayCredentials();
+
+		$request = new RequestGetDevices( [ 'cash_register_status' => 'OPEN' ] );
+
+		$this->assertStringContainsString( 'cashRegisterStatus=OPEN', $this->readRequestUrl( $request ) );
+	}
+
 	/** Renaming a device addresses it by id in the path. */
 	public function test_the_device_update_addresses_the_device_by_id(): void {
 		$this->haveGatewayCredentials();
