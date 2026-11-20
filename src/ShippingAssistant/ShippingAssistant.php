@@ -96,6 +96,7 @@ class ShippingAssistant {
 		new CompareTotals();
 		new Checkout();
 		new MerchantUrls();
+		new Giftcards();
 
 		$this->shipping_cost_requires_address = new ShippingCostRequiresAddress();
 		add_filter( 'option_woocommerce_shipping_cost_requires_address', array( $this->shipping_cost_requires_address, 'maybe_disable' ) );

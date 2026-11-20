@@ -16,6 +16,8 @@ jQuery( function ( $ ) {
 		// Form fields.
 		shippingUpdated: false,
 		validation: false,
+		// True once the order is placed, until the customer tries to complete the purchase again.
+		orderPlaced: false,
 
 		preventPaymentMethodChange: false,
 
@@ -529,6 +531,34 @@ jQuery( function ( $ ) {
 			}
 		},
 
+		/**
+		 * Whether the shipping option is the one the checkout already has, apart from its id.
+		 * @param {Object} data The shipping option from Kustom.
+		 * @return {boolean} True if only the id differs, or nothing does.
+		 */
+		isCurrentShippingOption: function ( data ) {
+			let current
+			try {
+				current = JSON.parse( $( "#kco_shipping_data" ).val() )
+			} catch ( err ) {
+				return false
+			}
+
+			if ( ! current || "object" !== typeof current || ! data || "object" !== typeof data ) {
+				return false
+			}
+
+			const withoutId = ( option ) => {
+				const sorted = {}
+				Object.keys( option ).filter( ( key ) => "id" !== key ).sort().forEach( ( key ) => {
+					sorted[ key ] = option[ key ]
+				} )
+				return JSON.stringify( sorted )
+			}
+
+			return withoutId( current ) === withoutId( data )
+		},
+
 		updateShipping: function (data) {
 			const serializedData = JSON.stringify(data)
 
@@ -567,6 +597,7 @@ jQuery( function ( $ ) {
 							try {
 								if ( "success" === data.result ) {
 									kco_wc.logToFile( 'Successfully placed order. Sending "should_proceed: true" to Kustom' )
+									kco_wc.orderPlaced = true
 									callback( { should_proceed: true } )
 								} else {
 									throw "Result failed"
@@ -716,13 +747,22 @@ jQuery( function ( $ ) {
 						shipping_option_change: function ( data ) {
 							kco_wc.log( "shipping_option_change", data )
 							kco_wc.log( data )
+
+							// Kustom repeats the selected option with a new id after each shipping callback. Once the order is placed it may already be locked for updates.
+							if ( kco_wc.orderPlaced && kco_wc.isCurrentShippingOption( data ) ) {
+								kco_wc.logToFile( "shipping_option_change ignored, the order is placed and the option is unchanged" )
+								return
+							}
+
 							kco_wc.updateShipping( data )
 						},
 						can_not_complete_order: function ( data ) {
 							kco_wc.log( "can_not_complete_order", data )
+							kco_wc.orderPlaced = false
 						},
 						validation_callback: function ( data, callback ) {
 							kco_wc.validation = true
+							kco_wc.orderPlaced = false
 							kco_wc.logToFile( "validation_callback from Kustom triggered" )
 							if ( kco_params.pay_for_order ) {
 								callback( { should_proceed: true } )
