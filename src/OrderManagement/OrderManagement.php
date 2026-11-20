@@ -595,7 +595,8 @@ class OrderManagement {
 			}
 		}
 
-		$return_fee = $this->get_return_fee_from_post();
+		// A return fee matches no line of the sale, which the extended API refuses.
+		$return_fee = $refund_device ? array() : $this->get_return_fee_from_post();
 		$request    = new RequestPostRefund(
 			$this,
 			array(

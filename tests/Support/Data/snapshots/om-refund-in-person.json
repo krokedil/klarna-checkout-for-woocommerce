@@ -17,15 +17,6 @@
                 "total_amount": 12500,
                 "total_discount_amount": 0,
                 "total_tax_amount": 2500
-            },
-            {
-                "type": "return_fee",
-                "name": "Return fee",
-                "quantity": 1,
-                "unit_price": 0,
-                "tax_rate": 0,
-                "total_amount": 0,
-                "total_tax_amount": 0
             }
         ]
     }
