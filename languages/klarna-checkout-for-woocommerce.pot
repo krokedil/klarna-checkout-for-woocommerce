@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-11-12 13:18+0000\n"
+"POT-Creation-Date: 2026-11-20 13:50+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -984,6 +984,14 @@ msgstr ""
 msgid "Session ID"
 msgstr ""
 
+#: ../src/InPersonPayments/RefundDevice.php:41
+msgid "No Kustom POS device has an open cash register. Open one in the Kustom app and try the refund again."
+msgstr ""
+
+#: ../src/InPersonPayments/RefundLines.php:23
+msgid "An in-person purchase can only be refunded by whole items. Enter the quantity to refund for each item and leave the amounts as WooCommerce fills them in, or refund the order in full."
+msgstr ""
+
 #: ../src/InPersonPayments/SessionHandler.php:91, ../src/InPersonPayments/SessionHandler.php:136
 msgid "This order has no in-person payment session."
 msgstr ""
@@ -1127,69 +1135,74 @@ msgstr ""
 msgid "Gift card"
 msgstr ""
 
-#: ../src/OrderManagement/OrderLines.php:350, ../src/OrderManagement/OrderLines.php:351, ../classes/requests/helpers/class-kco-request-cart.php:307, ../classes/requests/helpers/class-kco-request-cart.php:308, ../src/OrderManagement/Request/Post/RequestPostRefund.php:242, ../src/OrderManagement/Request/Post/RequestPostRefund.php:243
+#: ../src/OrderManagement/OrderLines.php:350, ../src/OrderManagement/OrderLines.php:351, ../classes/requests/helpers/class-kco-request-cart.php:307, ../classes/requests/helpers/class-kco-request-cart.php:308, ../src/OrderManagement/Request/Post/RequestPostRefund.php:285, ../src/OrderManagement/Request/Post/RequestPostRefund.php:286
 msgid "Sales Tax"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:86
+#: ../src/OrderManagement/OrderManagement.php:88
 msgid "Order Management is now included in Kustom Checkout for WooCommerce."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:87
+#: ../src/OrderManagement/OrderManagement.php:89
 msgid "You no longer need the separate Klarna Order Management plugin."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:151
+#: ../src/OrderManagement/OrderManagement.php:153
 msgid "minus a return fee of"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:152
+#: ../src/OrderManagement/OrderManagement.php:154
 msgid "Refund amount is less than the return fee."
 msgstr ""
 
 #. translators: 1: User name, 2: Existing token, 3: New token.
-#: ../src/OrderManagement/OrderManagement.php:316
+#: ../src/OrderManagement/OrderManagement.php:318
 msgid "%1$s updated the subscription recurring token from \"%2$s\" to \"%3$s\"."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:386
+#: ../src/OrderManagement/OrderManagement.php:388
 msgid "Could not update Kustom order lines. An unknown error occurred."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:384
+#: ../src/OrderManagement/OrderManagement.php:386
 msgid "Could not update Kustom order lines: %s."
 msgstr ""
 
 #. translators: %s: Error message from Kustom.
-#: ../src/OrderManagement/OrderManagement.php:507
+#: ../src/OrderManagement/OrderManagement.php:509
 msgid "Could not capture Kustom order. %s"
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:497
+#: ../src/OrderManagement/OrderManagement.php:499
 msgid "Kustom could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:545, ../src/OrderManagement/OrderManagement.php:564
+#: ../src/OrderManagement/OrderManagement.php:547, ../src/OrderManagement/OrderManagement.php:568
 msgid "Kustom order has not been captured and cannot be refunded."
 msgstr ""
 
 #. translators: %s Kustom error message.
-#: ../src/OrderManagement/OrderManagement.php:556, ../src/OrderManagement/OrderManagement.php:596
+#: ../src/OrderManagement/OrderManagement.php:558, ../src/OrderManagement/OrderManagement.php:593, ../src/OrderManagement/OrderManagement.php:617
 msgid "Could not refund Kustom order. %s."
 msgstr ""
 
-#: ../src/OrderManagement/OrderManagement.php:576
+#: ../src/OrderManagement/OrderManagement.php:580
 msgid "Could not retrieve the refund order."
 msgstr ""
 
 #. translators: refund amount, refund id.
-#: ../src/OrderManagement/OrderManagement.php:610
+#: ../src/OrderManagement/OrderManagement.php:632
 msgid "Processing a refund of %1$s with Kustom"
 msgstr ""
 
 #. translators: 1: original amount, 2: return fee amount.
-#: ../src/OrderManagement/OrderManagement.php:620
+#: ../src/OrderManagement/OrderManagement.php:642
 msgid " (original amount of %1$s - return fee of %2$s)"
+msgstr ""
+
+#. translators: %s: the name of the POS device.
+#: ../src/OrderManagement/OrderManagement.php:652
+msgid "The refund was registered on the Kustom POS device %s."
 msgstr ""
 
 #: ../src/OrderManagement/ReturnFee.php:74
@@ -1651,6 +1664,10 @@ msgstr ""
 msgid "Unauthorized."
 msgstr ""
 
-#: ../src/OrderManagement/Request/Post/RequestPostRefund.php:271
+#: ../src/OrderManagement/Request/Post/RequestPostRefund.php:314
 msgid "Return fee"
+msgstr ""
+
+#: ../src/OrderManagement/Request/Post/RequestPostRefund.php:365
+msgid "Kustom could not match the refund to the items of the original sale. Refund whole items at the price they were sold for, or refund the order in full."
 msgstr ""
