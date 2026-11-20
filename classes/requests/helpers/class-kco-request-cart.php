@@ -127,16 +127,25 @@ class KCO_Request_Cart {
 			$order_amount -= $this->get_shipping_amount();
 		}
 
+		if ( $order_amount < 0 && ! self::is_negative_order_amount_allowed() ) {
+			return 0;
+		}
+
+		return $order_amount;
+	}
+
+	/**
+	 * Whether the cart order amount sent to Kustom may be negative.
+	 *
+	 * @return bool
+	 */
+	public static function is_negative_order_amount_allowed() {
 		/**
 		 * Filters whether the cart order amount sent to Kustom may be negative, before shipping is added back to the request.
 		 *
 		 * @param bool $allow Whether a negative amount is allowed. Default false.
 		 */
-		if ( $order_amount < 0 && ! apply_filters( 'kco_wc_allow_negative_cart_order_amount', false ) ) {
-			return 0;
-		}
-
-		return $order_amount;
+		return (bool) apply_filters( 'kco_wc_allow_negative_cart_order_amount', false );
 	}
 
 	/**

@@ -372,22 +372,6 @@ Source: [./src/ShippingAssistant/ShippingMethod.php](../src/ShippingAssistant/Sh
 
 
 ---
-### `kco_wc_allow_negative_cart_order_amount`
-
-*Mark how much of the adjustment line is shipping the gift card already paid for in WooCommerce.*
-
-The rest of that line is a real rounding difference, which the callback has to keep.
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$request_args` | `array` | The request args for Kustom Checkout.
-
-Source: [./src/ShippingAssistant/Giftcards.php](../src/ShippingAssistant/Giftcards.php), [line 54](../src/ShippingAssistant/Giftcards.php#L54-L69)
-
-
----
 ### `kom_skip_scheduled_actions`
 
 *Filters whether to skip displaying the scheduled actions for the order in the order management metabox.*
@@ -909,8 +893,15 @@ Source: [./classes/requests/helpers/class-kco-request-options.php](../classes/re
 ---
 ### `kco_wc_allow_negative_cart_order_amount`
 
+*Filters whether the cart order amount sent to Kustom may be negative, before shipping is added back to the request.*
 
-Source: [./classes/requests/helpers/class-kco-request-cart.php](../classes/requests/helpers/class-kco-request-cart.php), [line 135](../classes/requests/helpers/class-kco-request-cart.php#L135-L135)
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$allow` | `bool` | Whether a negative amount is allowed. Default false.
+
+Source: [./classes/requests/helpers/class-kco-request-cart.php](../classes/requests/helpers/class-kco-request-cart.php), [line 143](../classes/requests/helpers/class-kco-request-cart.php#L143-L148)
 
 
 ---
@@ -924,7 +915,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$name` | `string` | The order line name. Default 'Surcharge'.
 
-Source: [./classes/requests/helpers/class-kco-request-cart.php](../classes/requests/helpers/class-kco-request-cart.php), [line 171](../classes/requests/helpers/class-kco-request-cart.php#L171-L176)
+Source: [./classes/requests/helpers/class-kco-request-cart.php](../classes/requests/helpers/class-kco-request-cart.php), [line 180](../classes/requests/helpers/class-kco-request-cart.php#L180-L185)
 
 
 ---
@@ -939,7 +930,7 @@ Argument | Type | Description
 `$klarna_item` | `array` | The order line formatted for Kustom. Return a falsy value to exclude it.
 `$cart_item` | `array` | The WooCommerce cart item.
 
-Source: [./classes/requests/helpers/class-kco-request-cart.php](../classes/requests/helpers/class-kco-request-cart.php), [line 267](../classes/requests/helpers/class-kco-request-cart.php#L267-L273)
+Source: [./classes/requests/helpers/class-kco-request-cart.php](../classes/requests/helpers/class-kco-request-cart.php), [line 276](../classes/requests/helpers/class-kco-request-cart.php#L276-L282)
 
 
 ---
@@ -954,7 +945,7 @@ Argument | Type | Description
 `$gift_card_item` | `array` | The order line formatted for Kustom.
 `$retrieved_giftcard` | `object` | The gift card line from the gift card compatibility.
 
-Source: [./classes/requests/helpers/class-kco-request-cart.php](../classes/requests/helpers/class-kco-request-cart.php), [line 350](../classes/requests/helpers/class-kco-request-cart.php#L350-L356)
+Source: [./classes/requests/helpers/class-kco-request-cart.php](../classes/requests/helpers/class-kco-request-cart.php), [line 359](../classes/requests/helpers/class-kco-request-cart.php#L359-L365)
 
 
 ---

@@ -66,7 +66,7 @@ class Giftcards {
 		}
 
 		// With a negative amount allowed, nothing was clamped and no stand-in was added.
-		if ( apply_filters( 'kco_wc_allow_negative_cart_order_amount', false ) ) { // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment -- Documented in KCO_Request_Cart::get_order_amount().
+		if ( \KCO_Request_Cart::is_negative_order_amount_allowed() ) {
 			return $request_args;
 		}
 
