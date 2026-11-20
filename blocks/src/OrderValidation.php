@@ -63,6 +63,12 @@ class OrderValidation {
 
 		$updated_order = self::submit_wc_order( $klarna_order, $pay_order );
 
+		// Kustom confirms to the referenced order, so the create route must not have placed another one.
+		if ( $order && $updated_order->get_id() !== $order->get_id() ) {
+			\KCO_Logger::log( "[Blocks] - Kustom order $klarna_order_id references order {$order->get_id()}, but the Store API placed order {$updated_order->get_id()}." );
+			throw new Exception( 'Could not validate the order, please try again.', 401 );
+		}
+
 		// Compare the order hashes to the once stored in the merchant data to ensure the order is valid.
 		self::validate_hash( $klarna_merchant_data['wc_cart_hash'], $updated_order->get_cart_hash() );
 		self::validate_hash( $klarna_merchant_data['wc_shipping_hash'], $updated_order->get_meta( '_shipping_hash' ) );
@@ -70,7 +76,7 @@ class OrderValidation {
 		self::validate_hash( $klarna_merchant_data['wc_coupons_hash'], $updated_order->get_meta( '_coupons_hash' ) );
 		self::validate_hash( $klarna_merchant_data['wc_taxes_hash'], $updated_order->get_meta( '_taxes_hash' ) );
 
-		// Only the create route can place another order than an earlier attempt in this Kustom session did.
+		// The create route may have placed another order than earlier attempts in this Kustom session left behind.
 		if ( ! $pay_order ) {
 			self::release_superseded_orders( $updated_order, $klarna_order_id );
 		}
