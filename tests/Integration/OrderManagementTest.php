@@ -600,6 +600,43 @@ class OrderManagementTest extends IntegrationTestCase {
 		];
 	}
 
+	/** Kustom matches a refund line to the sale by unit price, so half an item is a discount on it. */
+	public function test_an_in_person_refund_of_part_of_an_item_keeps_the_sale_unit_price(): void {
+		$order = $this->haveInPersonOrderFor( 'refund' );
+		$item  = array_key_first( $order->get_items() );
+		$rate  = array_key_first( $order->get_item( $item )->get_taxes()['total'] );
+
+		$order->get_refunds()[0]->delete( true );
+		wc_create_refund(
+			[
+				'order_id'   => $order->get_id(),
+				'amount'     => 62.50,
+				'line_items' => [ $item => [ 'qty' => 1, 'refund_total' => 50.00, 'refund_tax' => [ $rate => 12.50 ] ] ],
+			]
+		);
+
+		$this->willSucceed( 'refund' );
+		$this->willListOpenRegisters();
+
+		KCO_WC()->order_management->refund_klarna_order( false, $order->get_id(), '62.50', '' );
+
+		$line = $this->gatewayRequestTo( '/refunds' )['json']['order_lines'][0];
+		$this->assertEquals( [ 12500, 1, 6250, 6250 ], [ $line['unit_price'], $line['quantity'], $line['total_amount'], $line['total_discount_amount'] ] );
+	}
+
+	public function test_a_refund_kustom_cannot_match_to_the_sale_says_what_to_do(): void {
+		$order = $this->haveInPersonOrderFor( 'refund' );
+
+		$this->willRetrieveManagedOrder( $this->lookupFor( 'refund' ) );
+		$this->willListOpenRegisters();
+		$this->willRejectWith( '/refunds', 'Refund line X at unit price Money[minorUnits=900] matches no line of the original sale', 403, [ 'error_code' => 'REFUND_LINE_MISMATCH' ] );
+
+		$error = $this->perform( 'refund', $order );
+
+		$this->assertStringContainsString( 'Refund whole items at the price they were sold for', $error->get_error_message() );
+		$this->assertStringNotContainsString( 'minorUnits', $error->get_error_message() );
+	}
+
 	public function test_an_in_person_refund_needs_an_open_cash_register(): void {
 		$order = $this->haveInPersonOrderFor( 'refund' );
 		$this->willSucceed( 'refund' );

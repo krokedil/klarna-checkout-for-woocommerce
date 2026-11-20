@@ -160,6 +160,7 @@ class RequestPostRefund extends RequestPost {
 					$product = wc_get_product( $item->get_product_id() );
 
 					$order_line_tax_rate = 0;
+					$sale_item           = null;
 					$refunded_item_id    = absint( $item->get_meta( '_refunded_item_id' ) );
 					/**
 					 * Get the tax rate WooCommerce applied to the matching order item.
@@ -169,6 +170,7 @@ class RequestPostRefund extends RequestPost {
 					foreach ( $order_items as $order_item ) {
 						if ( $order_item->get_id() === $refunded_item_id ) {
 							$order_line_tax_rate = $this->get_order_item_tax_rate( $order, $order_item );
+							$sale_item           = $order_item;
 							break;
 						}
 					}
@@ -202,7 +204,15 @@ class RequestPostRefund extends RequestPost {
 					$refund_tax_amount   = $separate_sales_tax ? 0 : abs( $order_lines_processor->get_item_tax_amount( $item ) );
 					$unit_price          = round( ( $refund_price_amount + $refund_tax_amount ) / $quantity );
 					$total               = round( $quantity * $unit_price );
-					$item_data           = array(
+
+					// An in-person refund line has to carry the unit price of the sale; only quantity and total may differ.
+					if ( '' !== $this->device_id && $sale_item ) {
+						$total          = $refund_price_amount + $refund_tax_amount;
+						$unit_price     = $this->get_sale_unit_price( $sale_item );
+						$total_discount = max( 0, $unit_price * $quantity - $total );
+					}
+
+					$item_data = array(
 						'type'                  => $type,
 						'reference'             => $reference,
 						'name'                  => $name,
@@ -320,6 +330,43 @@ class RequestPostRefund extends RequestPost {
 		 * @param int   $order_id The WooCommerce order ID.
 		 */
 		return apply_filters( 'kom_refund_order_args', $data, $this->order_id );
+	}
+
+	/**
+	 * The unit price an in-person sale sent Kustom for an order item, in minor units.
+	 *
+	 * @param \WC_Order_Item_Product $sale_item The item of the original order.
+	 * @return int
+	 */
+	private function get_sale_unit_price( $sale_item ) {
+		$quantity = max( 1, (int) $sale_item->get_quantity() );
+		$subtotal = round( ( (float) $sale_item->get_subtotal() + (float) $sale_item->get_subtotal_tax() ) * 100 );
+
+		// Rounded up the same way SessionPayload::product_line() does for the sale.
+		return (int) ceil( $subtotal / $quantity );
+	}
+
+	/**
+	 * Kustom's line mismatch answer names amounts in its own notation, so the merchant
+	 * is told what to do instead.
+	 *
+	 * @param object|\WP_Error $response The response from the request.
+	 * @param array            $request_args The request args.
+	 * @param string           $request_url The request url.
+	 * @return array|\WP_Error
+	 */
+	protected function process_response( $response, $request_args, $request_url ) {
+		$processed = parent::process_response( $response, $request_args, $request_url );
+
+		if ( is_wp_error( $processed ) && ! is_wp_error( $response ) ) {
+			$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+			if ( 'REFUND_LINE_MISMATCH' === ( $body['error_code'] ?? '' ) ) {
+				return new \WP_Error( 'refund_line_mismatch', __( 'Kustom could not match the refund to the items of the original sale. Refund whole items at the price they were sold for, or refund the order in full.', 'klarna-checkout-for-woocommerce' ) );
+			}
+		}
+
+		return $processed;
 	}
 
 	/**

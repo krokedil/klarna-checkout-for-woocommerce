@@ -612,7 +612,7 @@ class OrderManagement {
 		$response = $request->request();
 		if ( is_wp_error( $response ) ) {
 			// translators: %s Kustom error message.
-			$message = \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $response->get_error_message() );
+			$message = \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), rtrim( $response->get_error_message(), '.' ) );
 			$order->add_order_note( $message );
 			$order->save();
 
