@@ -585,16 +585,18 @@ class OrderManagementTest extends IntegrationTestCase {
 
 	/** @return array<string, array{0: array<int, array>, 1: string}> */
 	public function provide_open_registers(): array {
-		$elsewhere = [ 'id' => 'device-9', 'kco_id' => 'idev_elsewhere', 'location_id' => 'location-9' ];
-		$same_shop = [ 'id' => 'device-2', 'kco_id' => 'idev_same_shop', 'location_id' => self::SALE_LOCATION ];
-		$sale      = [ 'id' => self::SALE_DEVICE, 'kco_id' => 'idev_sale', 'location_id' => self::SALE_LOCATION ];
-		$unusable  = [ 'id' => self::SALE_DEVICE, 'location_id' => self::SALE_LOCATION ];
+		$elsewhere = [ 'id' => 'device-9', 'kco_id' => 'idev_elsewhere', 'location_id' => 'location-9', 'open_cash_register_id' => 9 ];
+		$same_shop = [ 'id' => 'device-2', 'kco_id' => 'idev_same_shop', 'location_id' => self::SALE_LOCATION, 'open_cash_register_id' => 2 ];
+		$sale      = [ 'id' => self::SALE_DEVICE, 'kco_id' => 'idev_sale', 'location_id' => self::SALE_LOCATION, 'open_cash_register_id' => 1 ];
+		$unusable  = [ 'id' => self::SALE_DEVICE, 'location_id' => self::SALE_LOCATION, 'open_cash_register_id' => 1 ];
+		$closed    = [ 'id' => self::SALE_DEVICE, 'kco_id' => 'idev_closed', 'location_id' => self::SALE_LOCATION ];
 
 		return [
 			'the sale device, when its register is open' => [ [ $elsewhere, $same_shop, $sale ], 'idev_sale' ],
 			'else a device in the same shop'             => [ [ $elsewhere, $same_shop ], 'idev_same_shop' ],
 			'else any open register'                     => [ [ $elsewhere ], 'idev_elsewhere' ],
 			'never a device without a Kustom id'         => [ [ $unusable, $elsewhere ], 'idev_elsewhere' ],
+			'never a device whose register is closed'    => [ [ $closed, $elsewhere ], 'idev_elsewhere' ],
 		];
 	}
 
@@ -660,7 +662,7 @@ class OrderManagementTest extends IntegrationTestCase {
 
 	/** Queues the devices with an open cash register; by default the one the sale was made on. */
 	private function willListOpenRegisters( ?array $devices = null ): void {
-		$sale = [ 'id' => self::SALE_DEVICE, 'kco_id' => 'idev_sale', 'location_id' => self::SALE_LOCATION, 'name' => 'Sale device' ];
+		$sale = [ 'id' => self::SALE_DEVICE, 'kco_id' => 'idev_sale', 'location_id' => self::SALE_LOCATION, 'name' => 'Sale device', 'open_cash_register_id' => 1 ];
 
 		$this->willRespondWith( [ 'content' => $devices ?? [ $sale ] ], 200, 'ipp/v1/devices' );
 	}

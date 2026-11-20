@@ -23,8 +23,8 @@ class RefundDevice {
 			return $devices;
 		}
 
-		// The refund addresses the device by its Kustom id, so one without it cannot be used.
-		$devices = array_values( array_filter( $devices, fn( $device ) => ! empty( $device['kco_id'] ) ) );
+		// The list can hold a device with no open register, and the refund addresses a device by its Kustom id.
+		$devices = array_values( array_filter( $devices, fn( $device ) => ! empty( $device['kco_id'] ) && ! empty( $device['open_cash_register_id'] ) ) );
 
 		/**
 		 * Filters the device an in-person refund is registered on.
