@@ -18,6 +18,9 @@ use Krokedil\KustomCheckout\OrderManagement\Request\Post\RequestPostCancel;
 use Krokedil\KustomCheckout\OrderManagement\MetaBox;
 use Krokedil\KustomCheckout\OrderManagement\Ajax;
 use Krokedil\KustomCheckout\OrderManagement\PendingOrders;
+use Krokedil\KustomCheckout\InPersonPayments\RefundDevice;
+use Krokedil\KustomCheckout\InPersonPayments\RefundLines;
+use Krokedil\KustomCheckout\Utility\OrderUtility;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Support\SystemReport;
 
 /**
@@ -141,7 +144,7 @@ class OrderManagement {
 			return;
 		}
 
-		if ( 'kco' !== $order->get_payment_method() ) {
+		if ( ! OrderUtility::is_kustom_order( $order ) ) {
 			return;
 		}
 
@@ -216,7 +219,7 @@ class OrderManagement {
 			$order = wc_get_order( $order_id );
 
 			// If the order was not paid using the plugin that instanced this class, bail.
-			if ( 'kco' !== $order->get_payment_method() ) {
+			if ( ! OrderUtility::is_kustom_order( $order ) ) {
 				return null;
 			}
 
@@ -524,7 +527,7 @@ class OrderManagement {
 		$order = wc_get_order( $order_id );
 
 		// If the order was not paid using Kustom Checkout, return the original result.
-		if ( 'kco' !== $order->get_payment_method() ) {
+		if ( ! OrderUtility::is_kustom_order( $order ) ) {
 			return $result;
 		}
 
@@ -538,8 +541,9 @@ class OrderManagement {
 			return new \WP_Error( 'order_sync_off', 'Order management is disabled' );
 		}
 
-		// Do nothing if Kustom order is not captured.
-		if ( ! $order->get_meta( '_wc_klarna_capture_id', true ) ) {
+		// Do nothing if Kustom order is not captured. An in-person payment is captured
+		// by Kustom at the tap, so it has no capture of ours; its status is checked below.
+		if ( ! $order->get_meta( '_wc_klarna_capture_id', true ) && ! OrderUtility::is_in_person_order( $order ) ) {
 			$order->add_order_note( __( 'Kustom order has not been captured and cannot be refunded.', 'klarna-checkout-for-woocommerce' ) );
 			$order->save();
 
@@ -551,10 +555,12 @@ class OrderManagement {
 
 		if ( is_wp_error( $klarna_order ) ) {
 			// translators: %s Kustom error message.
-			$order->add_order_note( \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() ) );
+			$message = \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() );
+			$order->add_order_note( $message );
 			$order->save();
 
-			return new \WP_Error( 'object_error', 'Kustom order object is of type WP_Error.', $klarna_order );
+			// WooCommerce shows this message to the merchant, so it has to say what went wrong.
+			return new \WP_Error( 'object_error', $message, $klarna_order );
 		}
 
 		// We've checked for the metadata `_wc_klarna_capture_id`, now we check for the Kustom status.
@@ -576,7 +582,23 @@ class OrderManagement {
 			return new \WP_Error( 'invalid_refund_order', 'Refund order is not valid.' );
 		}
 
-		$return_fee = $this->get_return_fee_from_post();
+		// An in-person refund is fiscally registered on a device with an open cash register.
+		$refund_device = null;
+		if ( OrderUtility::is_in_person_order( $order ) ) {
+			$refundable    = RefundLines::validate( $order, $refund_order, $amount );
+			$refund_device = is_wp_error( $refundable ) ? $refundable : RefundDevice::for_order( $order );
+
+			if ( is_wp_error( $refund_device ) ) {
+				// translators: %s Kustom error message.
+				$order->add_order_note( \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), rtrim( $refund_device->get_error_message(), '.' ) ) );
+				$order->save();
+
+				return $refund_device;
+			}
+		}
+
+		// A return fee matches no line of the sale, which the extended API refuses.
+		$return_fee = $refund_device ? array() : $this->get_return_fee_from_post();
 		$request    = new RequestPostRefund(
 			$this,
 			array(
@@ -585,16 +607,18 @@ class OrderManagement {
 				'refund_reason' => $reason,
 				'return_fee'    => $return_fee,
 				'refund_id'     => $refund_order_id,
+				'device_id'     => $refund_device['kco_id'] ?? '',
 			)
 		);
 
 		$response = $request->request();
 		if ( is_wp_error( $response ) ) {
 			// translators: %s Kustom error message.
-			$order->add_order_note( \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), $response->get_error_message() ) );
+			$message = \sprintf( __( 'Could not refund Kustom order. %s.', 'klarna-checkout-for-woocommerce' ), rtrim( $response->get_error_message(), '.' ) );
+			$order->add_order_note( $message );
 			$order->save();
 
-			return new \WP_Error( 'unknown_error', 'Response object is of type WP_Error.', $response );
+			return new \WP_Error( 'unknown_error', $message, $response );
 		}
 
 		/**
@@ -621,6 +645,12 @@ class OrderManagement {
 
 		$formatted_text = \sprintf( $text, wc_price( $amount, array( 'currency' => $order->get_currency() ) ) );
 		$order->add_order_note( "$formatted_text." );
+
+		if ( $refund_device ) {
+			$device_name = empty( $refund_device['name'] ) ? $refund_device['kco_id'] : $refund_device['name'];
+			// translators: %s: the name of the POS device.
+			$order->add_order_note( \sprintf( __( 'The refund was registered on the Kustom POS device %s.', 'klarna-checkout-for-woocommerce' ), $device_name ) );
+		}
 
 		return true;
 	}

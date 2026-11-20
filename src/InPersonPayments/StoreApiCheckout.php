@@ -1,0 +1,117 @@
+<?php
+namespace Krokedil\KustomCheckout\InPersonPayments;
+
+use Krokedil\KustomCheckout\Blocks\InPersonPayments\BlockCheckout;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * In-person orders placed through the Store API, from the checkout block or a point of
+ * sale: a guest order with no address. No in-person order gets customer emails while its
+ * email is the store's own.
+ */
+class StoreApiCheckout {
+
+	/**
+	 * Whether an in-person order is being checked out through the Store API, so its address is optional.
+	 *
+	 * @var bool
+	 */
+	private static $relax_address = false;
+
+	/**
+	 * The customer emails an in-person order has no customer to send to.
+	 *
+	 * @var string[]
+	 */
+	public const CUSTOMER_EMAILS = array( 'customer_on_hold_order', 'customer_processing_order', 'customer_completed_order', 'customer_refunded_order', 'customer_partially_refunded_order', 'customer_failed_order', 'customer_invoice', 'customer_note' );
+
+	/**
+	 * Class constructor.
+	 */
+	public function __construct() {
+		add_action( 'woocommerce_store_api_checkout_update_order_from_request', array( $this, 'remove_customer' ) );
+		add_filter( 'woocommerce_get_country_locale_default', array( $this, 'relax_address_fields' ), 100 );
+		add_filter( 'woocommerce_get_country_locale', array( $this, 'relax_locales' ), 100 );
+
+		foreach ( self::CUSTOMER_EMAILS as $email_id ) {
+			add_filter( "woocommerce_email_recipient_{$email_id}", array( $this, 'skip_customer_email' ), 10, 2 );
+		}
+	}
+
+	/**
+	 * Leave the customer and the address off an in-person order: the Store API fills both
+	 * in from the salesperson's own account. Done before the order is validated and paid.
+	 *
+	 * @param \WC_Order $order The order.
+	 * @return void
+	 */
+	public function remove_customer( $order ) {
+		if ( Gateway::ID !== $order->get_payment_method() || ! current_user_can( Gateway::required_capability() ) ) {
+			return;
+		}
+
+		Checkout::strip_address( $order );
+
+		// The Store API validates the address against the country locale next, and the locale is cached per request,
+		// so relax it from here on and rebuild it.
+		self::$relax_address    = true;
+		WC()->countries->locale = array();
+	}
+
+	/**
+	 * Make the address fields optional while an in-person order is checked out.
+	 *
+	 * @param array $fields The address fields.
+	 * @return array
+	 */
+	public function relax_address_fields( $fields ) {
+		return self::should_relax() ? BlockCheckout::make_optional( $fields ) : $fields;
+	}
+
+	/**
+	 * Make each country's address fields optional while an in-person order is checked out.
+	 *
+	 * @param array $locales The address fields by country.
+	 * @return array
+	 */
+	public function relax_locales( $locales ) {
+		if ( ! self::should_relax() ) {
+			return $locales;
+		}
+
+		foreach ( $locales as $country => $fields ) {
+			$locales[ $country ] = BlockCheckout::make_optional( (array) $fields );
+		}
+
+		return $locales;
+	}
+
+	/**
+	 * Whether the address is optional right now: in-person payment is the chosen method,
+	 * or an in-person order is being placed through the Store API.
+	 *
+	 * @return bool
+	 */
+	private static function should_relax() {
+		return self::$relax_address || Checkout::is_chosen();
+	}
+
+	/**
+	 * Send no customer emails for an in-person order whose email is the store's fallback,
+	 * whether it was sold on the checkout or the point of sale.
+	 *
+	 * @param string         $recipient The recipient.
+	 * @param \WC_Order|null $order The order the email is about.
+	 * @return string
+	 */
+	public function skip_customer_email( $recipient, $order ) {
+		if ( $order instanceof \WC_Order && Gateway::ID === $order->get_payment_method() && Checkout::fallback_email() === $order->get_billing_email() ) {
+			return '';
+		}
+
+		return $recipient;
+	}
+}

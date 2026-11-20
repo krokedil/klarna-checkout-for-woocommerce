@@ -1,6 +1,7 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement;
 
+use Krokedil\KustomCheckout\Utility\OrderUtility;
 use Krokedil\KustomCheckout\Utility\SettingsUtility;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -133,10 +134,9 @@ class Settings {
 			);
 		}
 
-		$order          = wc_get_order( $order_id );
-		$payment_method = $order->get_payment_method();
+		$order = wc_get_order( $order_id );
 
-		if ( 'kco' === $payment_method ) {
+		if ( OrderUtility::is_kustom_order( $order ) ) {
 			return get_option( 'woocommerce_kco_settings', array() );
 		} else {
 			return get_option( 'kom_settings', array() );

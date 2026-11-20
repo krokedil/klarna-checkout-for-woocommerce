@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
+use Krokedil\KustomCheckout\InPersonPayments\Devices;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use Qameta\Allure\Allure;
 use Tests\Support\Reporting\Redactor;
@@ -137,6 +138,9 @@ abstract class IntegrationTestCase extends WPTestCase {
 	 * Puts the store back to a blank slate.
 	 */
 	protected function resetStore(): void {
+		// The device cache is keyed by account, so it is flushed while this test's account is still configured.
+		Devices::flush();
+
 		$this->deleteAllTaxRates();
 		$this->haveStorePages();
 		$this->emptyCart();
