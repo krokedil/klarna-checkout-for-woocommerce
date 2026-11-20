@@ -71,7 +71,7 @@ class Giftcards {
 		}
 
 		$cart_helper = new \KCO_Request_Cart();
-		$stand_in    = $cart_helper->get_shipping_amount() - intval( round( WC()->cart->total * 100 ) );
+		$stand_in    = $cart_helper->get_shipping_amount() - intval( round( floatval( WC()->cart->get_total( 'edit' ) ) * 100 ) );
 		if ( $stand_in <= 0 ) {
 			return $request_args;
 		}
