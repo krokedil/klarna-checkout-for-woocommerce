@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Added the "kco_checkout_scope" filter. Return "PAYMENT" to use Kustom's payment only mode, which shows only the payment selector without email and address forms. The filter's context argument is "express" for the express buttons, which Kustom does not support in that mode. Kustom sets the scope only when its order is created, and WooCommerce still requires the billing fields by default, so they must also be made optional for the order to go through.

@@ -64,7 +64,36 @@ class KCO_Request_Options {
 			$options['additional_checkboxes'] = $additional_checkboxes;
 		}
 
+		$scope = $this->get_scope( $checkout_flow );
+		if ( '' !== $scope ) {
+			$options['scope'] = $scope;
+		}
+
 		return $options;
+	}
+
+	/**
+	 * Gets the checkout scope, empty when Kustom's default full checkout should be used.
+	 *
+	 * @param string $checkout_flow The checkout flow: redirect or embedded.
+	 * @return string
+	 */
+	private function get_scope( $checkout_flow ) {
+		$context = \Krokedil\KustomCheckout\Express\OrderCreator::is_creating() ? 'express' : 'checkout';
+
+		/**
+		 * Filters the Kustom checkout scope. Return "PAYMENT" to show only the payment selector, without address forms.
+		 *
+		 * Kustom sets the scope only when its order is created, and does not support shipping, express buttons,
+		 * age verification or recurring payments in that scope.
+		 *
+		 * @param string $scope         The scope, empty for the default full checkout.
+		 * @param string $checkout_flow The checkout flow: redirect or embedded.
+		 * @param string $context       Where the order is created: checkout, or express for the express buttons.
+		 */
+		$scope = apply_filters( 'kco_checkout_scope', '', $checkout_flow, $context );
+
+		return is_string( $scope ) ? strtoupper( trim( $scope ) ) : '';
 	}
 
 	/**

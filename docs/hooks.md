@@ -895,6 +895,25 @@ Source: [./classes/requests/helpers/class-kco-request-shipping-options.php](../c
 
 
 ---
+### `kco_checkout_scope`
+
+*Filters the Kustom checkout scope. Return "PAYMENT" to show only the payment selector, without address forms.*
+
+Kustom sets the scope only when its order is created, and does not support shipping, express buttons,
+age verification or recurring payments in that scope.
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$scope` | `string` | The scope, empty for the default full checkout.
+`$checkout_flow` | `string` | The checkout flow: redirect or embedded.
+`$context` | `string` | Where the order is created: checkout, or express for the express buttons.
+
+Source: [./classes/requests/helpers/class-kco-request-options.php](../classes/requests/helpers/class-kco-request-options.php), [line 84](../classes/requests/helpers/class-kco-request-options.php#L84-L94)
+
+
+---
 ### `kco_additional_checkboxes`
 
 *Filters the additional checkboxes displayed in Kustom Checkout.*
@@ -908,7 +927,7 @@ Argument | Type | Description
 Examples: 
 - [Add additional checkboxes](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#add-additional-checkboxes)
 
-Source: [./classes/requests/helpers/class-kco-request-options.php](../classes/requests/helpers/class-kco-request-options.php), [line 259](../classes/requests/helpers/class-kco-request-options.php#L259-L265)
+Source: [./classes/requests/helpers/class-kco-request-options.php](../classes/requests/helpers/class-kco-request-options.php), [line 288](../classes/requests/helpers/class-kco-request-options.php#L288-L294)
 
 
 ---
