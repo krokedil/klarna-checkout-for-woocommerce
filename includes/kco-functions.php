@@ -977,9 +977,9 @@ function kco_maybe_save_upsell_available( $order, $klarna_order ) {
 	/**
 	 * Filters additional Kustom payment method types that allow post purchase upsell.
 	 *
-	 * Only add payment methods that Kustom has enabled upsell for on the merchant account, e.g. 'CARD' or
-	 * 'PAY_BY_CARD'. Contact Kustom before adding anything beyond the default methods. If upsell is not
-	 * enabled for the payment method, Kustom will reject the order update and the upsell will fail.
+	 * Only add payment methods that Kustom has enabled upsell for on the merchant account, e.g. 'CARD'.
+	 * Contact Kustom before adding anything beyond the default methods. If upsell is not enabled for the
+	 * payment method, Kustom will reject the order update and the upsell will fail.
 	 *
 	 * The returned methods are added to the default ones and can not remove them. Country restrictions are
 	 * applied afterwards, so methods added here are not allowed in countries where upsell is unsupported.
