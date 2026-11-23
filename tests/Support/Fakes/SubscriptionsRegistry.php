@@ -33,13 +33,33 @@ final class SubscriptionsRegistry {
 	 */
 	private static $cart_flags = [];
 
+	/**
+	 * Product ids `WC_Subscriptions_Product::is_subscription()` answers true for.
+	 *
+	 * @var array<int, bool>
+	 */
+	private static $subscription_products = [];
+
 	/** Static only. */
 	private function __construct() {}
 
-	/** Forgets every registered subscription and cart flag. */
+	/** Forgets every registered subscription, cart flag and subscription product. */
 	public static function reset(): void {
-		self::$subscriptions = [];
-		self::$cart_flags    = [];
+		self::$subscriptions         = [];
+		self::$cart_flags            = [];
+		self::$subscription_products = [];
+	}
+
+	/** Registers a product id as a subscription product. */
+	public static function registerProduct( int $product_id ): void {
+		self::$subscription_products[ $product_id ] = true;
+	}
+
+	/** Backs `WC_Subscriptions_Product::is_subscription()`, which takes a product or a product id. */
+	public static function isSubscriptionProduct( $product ): bool {
+		$id = $product instanceof \WC_Product ? $product->get_id() : ( is_numeric( $product ) ? (int) $product : 0 );
+
+		return isset( self::$subscription_products[ $id ] );
 	}
 
 	/** Registers an order id as a subscription. */

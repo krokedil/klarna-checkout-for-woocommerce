@@ -33,6 +33,35 @@ if ( ! class_exists( 'WC_Subscription' ) ) {
 	class WC_Subscription extends SubscriptionOrder {}
 }
 
+/*
+ * Only products a test registers through `markAsSubscriptionProduct()` are
+ * subscriptions. The schedule getters answer a plain monthly subscription without
+ * a trial or an end date, which is what the plugin's request builders read.
+ */
+if ( ! class_exists( 'WC_Subscriptions_Product' ) ) {
+	class WC_Subscriptions_Product {
+		public static function is_subscription( $product ) {
+			return SubscriptionsRegistry::isSubscriptionProduct( $product );
+		}
+
+		public static function get_period( $product ) {
+			return 'month';
+		}
+
+		public static function get_interval( $product ) {
+			return 1;
+		}
+
+		public static function get_trial_length( $product ) {
+			return 0;
+		}
+
+		public static function get_expiration_date( $product ) {
+			return 0;
+		}
+	}
+}
+
 if ( ! function_exists( 'wcs_is_subscription' ) ) {
 	function wcs_is_subscription( $order ) {
 		return SubscriptionsRegistry::isSubscription( $order );
