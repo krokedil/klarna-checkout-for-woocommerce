@@ -249,9 +249,12 @@ abstract class Request {
 			$error_message = "API Error {$response_code}";
 
 			if ( null !== $body && property_exists( $body, 'error_messages' ) ) {
-				$error_message = join( ' ', $body->error_messages );
+				// Callers end their notes with their own full stop.
+				$error_message = rtrim( join( ' ', $body->error_messages ), '.' );
 			}
 			$processed_response = new \WP_Error( $response_code, $error_message, $data );
+			// Keep the body so callers can branch on Kustom's error_code, as the checkout requests do.
+			$processed_response->add_data( (array) $body, 'klarna_error_body' );
 		} else { // Response is *not* an error!
 			$processed_response = $body;
 
