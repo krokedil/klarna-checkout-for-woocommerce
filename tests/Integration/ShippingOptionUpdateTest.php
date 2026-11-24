@@ -55,6 +55,15 @@ class ShippingOptionUpdateTest extends IntegrationTestCase {
 		$this->assertSame( $body['order_amount'], array_sum( array_column( $body['order_lines'], 'total_amount' ) ) );
 	}
 
+	public function test_the_response_never_hands_back_the_orders_merchant_data(): void {
+		$this->willRetrieveCheckoutOrder( [ 'merchant_data' => wp_json_encode( [ 'wp_logged_in_cookie' => 'secret-cookie' ] ) ] );
+
+		[ , $response ] = $this->sendCallback();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayNotHasKey( 'merchant_data', $response->get_data(), 'Anyone with the order id can call this route, and the block checkout keeps the login cookie there.' );
+	}
+
 	public function test_the_free_trial_tag_on_the_kustom_order_makes_shipping_free(): void {
 		$this->willRetrieveCheckoutOrder( [ 'tags' => [ 'ksa_subscription_free_trial_shipping' ] ] );
 

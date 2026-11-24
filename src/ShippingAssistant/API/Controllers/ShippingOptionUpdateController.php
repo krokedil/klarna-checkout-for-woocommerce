@@ -290,10 +290,11 @@ class ShippingOptionUpdateController extends BaseController {
 	 * @return array The response body.
 	 */
 	private function build_response( $kco_order, $order_lines ) {
+		// No merchant_data: the caller is unauthenticated and it can hold the shopper's login cookie.
+		// Kustom keeps the stored value when the response leaves it out.
 		return array(
 			'order_amount'             => $this->calculate_order_total( $order_lines, 'total_amount' ),
 			'order_tax_amount'         => $this->calculate_order_total( $order_lines, 'total_tax_amount' ),
-			'merchant_data'            => $kco_order['merchant_data'] ?? null,
 			'order_lines'              => $order_lines,
 			'attachments'              => $kco_order['attachments'] ?? null,
 			'purchase_currency'        => $kco_order['purchase_currency'] ?? get_woocommerce_currency(),
