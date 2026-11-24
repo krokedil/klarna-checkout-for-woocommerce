@@ -356,6 +356,34 @@ class ExpressTest extends IntegrationTestCase {
 		);
 	}
 
+	/**
+	 * A merchant using payment only mode can keep it off the express buttons, which Kustom does not support in that scope.
+	 *
+	 * @dataProvider provide_express_outcomes
+	 */
+	public function test_the_scope_filter_can_tell_express_apart_from_the_checkout( bool $kustom_accepts ): void {
+		add_filter( 'kco_checkout_scope', static fn( $scope, $flow, $context ) => 'checkout' === $context ? 'PAYMENT' : '', 10, 3 );
+		$this->haveCartWith( [ $this->haveSimpleProduct() ] );
+		$this->resetHttpInterception();
+		if ( $kustom_accepts ) {
+			$this->willCreateOrder();
+		}
+
+		$response = $this->createExpressOrder( [ 'context' => 'cart' ] );
+
+		$this->assertSame( $kustom_accepts ? 200 : 400, $response->get_status() );
+		$this->assertArrayNotHasKey( 'scope', $this->gatewayRequestTo( '/checkout/v3/orders' )['json']['options'] );
+		$this->assertSame( 'PAYMENT', ( new \KCO_Request_Options() )->get_options()['scope'] ?? null, 'The checkout must get its own context back after an express order.' );
+	}
+
+	/** @return array<string, array{0: bool}> */
+	public function provide_express_outcomes(): array {
+		return [
+			'the express order is created' => [ true ],
+			'kustom refuses it'            => [ false ],
+		];
+	}
+
 	public function test_the_express_order_never_asks_for_the_shipping_option_update_callback(): void {
 		// KSA adds the URL from a filter registered at boot, so feed it in directly.
 		$args = ( new OrderCreator() )->add_express_data( [ 'merchant_urls' => [ 'shipping_option_update' => 'https://example.com/callback' ] ] );

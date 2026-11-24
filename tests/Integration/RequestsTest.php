@@ -14,6 +14,7 @@ use Tests\Support\IntegrationTestCase;
  * @covers \KCO_Request::get_api_url_base
  * @covers \KCO_Request::get_request_headers
  * @covers \KCO_Request_Cart
+ * @covers \KCO_Request_Options::get_options
  * @covers \KCO_Request_Update_Confirmation::get_body
  */
 class RequestsTest extends IntegrationTestCase {
@@ -164,6 +165,58 @@ class RequestsTest extends IntegrationTestCase {
 			'no SKU'         => [ 'no-sku' ],
 			'shipping'       => [ 'shipping' ],
 			'coupon'         => [ 'coupon' ],
+		];
+	}
+
+	/**
+	 * Only PAYMENT reaches Kustom, since it refuses the whole order for any other scope.
+	 *
+	 * @dataProvider provide_scopes
+	 *
+	 * @param mixed $filtered What the kco_checkout_scope filter returns.
+	 */
+	public function test_the_scope_filter_only_sends_payment_only_mode( $filtered, ?string $expected ): void {
+		add_filter( 'kco_checkout_scope', static fn() => $filtered );
+
+		$options = ( new \KCO_Request_Options() )->get_options();
+
+		$this->assertSame( $expected, $options['scope'] ?? null );
+	}
+
+	/** @return array<string, array{0: mixed, 1: ?string}> */
+	public function provide_scopes(): array {
+		return [
+			'payment'                     => [ 'PAYMENT', 'PAYMENT' ],
+			'payment, lower case, padded' => [ ' payment ', 'PAYMENT' ],
+			'empty'                       => [ '', null ],
+			'an unknown scope'            => [ 'ADDRESS', null ],
+			'not a string'                => [ true, null ],
+		];
+	}
+
+	/** @dataProvider provide_checkout_flows */
+	public function test_the_scope_filter_is_told_the_checkout_flow( string $flow ): void {
+		$args = [];
+		add_filter(
+			'kco_checkout_scope',
+			static function ( $scope, ...$rest ) use ( &$args ) {
+				$args = $rest;
+				return $scope;
+			},
+			10,
+			3
+		);
+
+		( new \KCO_Request_Options() )->get_options( $flow );
+
+		$this->assertSame( [ $flow, 'checkout' ], $args );
+	}
+
+	/** @return array<string, array{0: string}> */
+	public function provide_checkout_flows(): array {
+		return [
+			'embedded' => [ 'embedded' ],
+			'redirect' => [ 'redirect' ],
 		];
 	}
 
