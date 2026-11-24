@@ -35,7 +35,7 @@ class YITHGiftCards {
 	 * @return void
 	 */
 	public static function add_gift_cards_as_fee( $and_taxes, $order ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed -- Kept to match the hook.
-		if ( ! $order instanceof \WC_Order || 'kco' !== $order->get_payment_method() ) {
+		if ( ! $order instanceof \WC_Order || 'kco' !== $order->get_payment_method() || self::is_subscription_or_renewal( $order ) ) {
 			return;
 		}
 
@@ -71,7 +71,7 @@ class YITHGiftCards {
 	 * @return array
 	 */
 	public static function get_order_gift_cards( $order ) {
-		if ( ! defined( 'YITH_YWGC_VERSION' ) ) {
+		if ( ! defined( 'YITH_YWGC_VERSION' ) || self::is_subscription_or_renewal( $order ) ) {
 			return array();
 		}
 
@@ -82,5 +82,16 @@ class YITHGiftCards {
 
 		$gift_cards = $order->get_meta( '_ywgc_applied_gift_cards' );
 		return is_array( $gift_cards ) ? $gift_cards : array();
+	}
+
+	/**
+	 * Whether the order is a subscription or a renewal, which inherit the gift card meta from the parent order.
+	 *
+	 * @param \WC_Order $order The WooCommerce order.
+	 * @return bool
+	 */
+	private static function is_subscription_or_renewal( $order ) {
+		return ( function_exists( 'wcs_is_subscription' ) && wcs_is_subscription( $order ) )
+			|| ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) );
 	}
 }

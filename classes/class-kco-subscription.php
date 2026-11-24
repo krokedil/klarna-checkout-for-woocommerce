@@ -537,6 +537,11 @@ class KCO_Subscription {
 		$renewal_order->delete_meta_data( '_wc_klarna_order_id' );
 		$renewal_order->delete_meta_data( '_wc_klarna_capture_id' );
 
+		// YITH Gift Cards meta is also inherited, but the gift card only paid the parent order.
+		foreach ( array( '_ywgc_applied_gift_cards', '_ywgc_applied_gift_cards_totals', '_ywgc_applied_gift_cards_order_total', 'ywgc_gift_card_updated_as_fee' ) as $meta_key ) {
+			$renewal_order->delete_meta_data( $meta_key );
+		}
+
 		$parent = $subscription->get_parent();
 
 		// Environment: only set if the Data Copier didn't already copy it from the subscription.

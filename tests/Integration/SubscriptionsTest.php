@@ -168,6 +168,10 @@ class SubscriptionsTest extends IntegrationTestCase {
 		// The Data Copier does not exclude these, so a fresh renewal arrives carrying the parent's.
 		$renewal->update_meta_data( '_wc_klarna_order_id', 'parent-kustom-order' );
 		$renewal->update_meta_data( '_wc_klarna_capture_id', 'parent-kustom-capture' );
+		$renewal->update_meta_data( '_ywgc_applied_gift_cards', [ 'GIFT-100' => 100.0 ] );
+		$renewal->update_meta_data( '_ywgc_applied_gift_cards_totals', 100.0 );
+		$renewal->update_meta_data( '_ywgc_applied_gift_cards_order_total', 50.0 );
+		$renewal->update_meta_data( 'ywgc_gift_card_updated_as_fee', '1' );
 		$renewal->save();
 
 		$copied = ( new \KCO_Subscription() )->copy_meta_fields_to_renewal_order(
@@ -178,6 +182,11 @@ class SubscriptionsTest extends IntegrationTestCase {
 		// Identifiers belong to the parent order, not to this renewal.
 		$this->assertSame( '', $copied->get_meta( '_wc_klarna_order_id', true ) );
 		$this->assertSame( '', $copied->get_meta( '_wc_klarna_capture_id', true ) );
+
+		// The YITH gift card paid the parent order only.
+		foreach ( [ '_ywgc_applied_gift_cards', '_ywgc_applied_gift_cards_totals', '_ywgc_applied_gift_cards_order_total', 'ywgc_gift_card_updated_as_fee' ] as $meta_key ) {
+			$this->assertSame( '', $copied->get_meta( $meta_key, true ), $meta_key );
+		}
 
 		$this->assertSame( 'live', $copied->get_meta( '_wc_klarna_environment', true ) );
 		$this->assertSame( $kss_data, $copied->get_meta( '_kco_kss_data', true ) );

@@ -89,6 +89,29 @@ class YITHGiftCardsTest extends IntegrationTestCase {
 		$this->assertEmpty( $this->reload( $order )->get_items( 'fee' ), 'Only Kustom orders get the gift card fee.' );
 	}
 
+	/** WooCommerce Subscriptions copies the parent's gift card meta to the subscription and every renewal. */
+	public function test_a_renewal_does_not_inherit_the_parent_gift_cards(): void {
+		$parent       = $this->haveGiftCardOrder();
+		$subscription = $this->haveSubscriptionFor( $parent );
+		$renewal      = $this->haveRenewalOrderFor( $subscription );
+
+		foreach ( [ $subscription, $renewal ] as $order ) {
+			$order->set_payment_method( 'kco' );
+			$order->update_meta_data( '_ywgc_applied_gift_cards', self::GIFT_CARDS );
+			$order->update_meta_data( '_ywgc_applied_gift_cards_totals', array_sum( self::GIFT_CARDS ) );
+			$order->save();
+		}
+
+		$this->assertSame( [], YITHGiftCards::get_order_gift_cards( $renewal ), 'A renewal capture must not deduct the parent gift cards.' );
+		$this->assertSame( [], YITHGiftCards::get_order_gift_cards( $subscription ) );
+
+		foreach ( [ $subscription, $renewal ] as $order ) {
+			$order = $this->reload( $order );
+			$order->calculate_totals( false );
+			$this->assertEmpty( $this->reload( $order )->get_items( 'fee' ), 'The gift card paid the parent order only.' );
+		}
+	}
+
 	/** A paid Kustom order with what YITH stores at checkout: the gift cards deducted from the total, as meta only. */
 	private function haveGiftCardOrder(): \WC_Order {
 		$order = $this->haveCapturableGatewayOrder(
