@@ -62,6 +62,12 @@ class RequestModifier {
 			return $request_args;
 		}
 
+		// Without the callback Kustom adds the shipping itself, so a shipping line from us would charge it twice.
+		if ( ! MerchantUrls::is_callback_used() ) {
+			delete_transient( "kss_override_data_$kco_order_id" );
+			return $request_args;
+		}
+
 		// Use the same logic as KCO_Request_Cart for the shipping data. The price has already been set in ShippingMethod.
 		if ( WC()->shipping->get_packages() && ! empty( WC()->session->get( 'chosen_shipping_methods' ) ) ) {
 			$kco_cart_helper = new \KCO_Request_Cart();
