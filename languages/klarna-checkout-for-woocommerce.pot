@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Krokedil <info@krokedil.se>\n"
 "Last-Translator: Krokedil <info@krokedil.se>\n"
-"POT-Creation-Date: 2026-11-04 07:23+0000\n"
+"POT-Creation-Date: 2026-11-24 09:34+0000\n"
 "Report-Msgid-Bugs-To: http://krokedil.se\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
@@ -34,7 +34,7 @@ msgid "Your installation of Kustom Checkout for WooCommerce is not complete. If 
 msgstr ""
 
 #. translators: Kustom order ID.
-#: ../classes/class-kco-api-callbacks.php:143, ../includes/kco-functions.php:697
+#: ../classes/class-kco-api-callbacks.php:143, ../includes/kco-functions.php:701
 msgid "Kustom order is under review, order ID: %s."
 msgstr ""
 
@@ -42,7 +42,7 @@ msgstr ""
 msgid "Kustom Checkout order was rejected."
 msgstr ""
 
-#: ../classes/class-kco-api-callbacks.php:129, ../includes/kco-functions.php:682
+#: ../classes/class-kco-api-callbacks.php:129, ../includes/kco-functions.php:686
 msgid "Payment via Kustom Checkout, order ID: %s"
 msgstr ""
 
@@ -526,15 +526,12 @@ msgstr ""
 msgid "Kustom recurring token"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:679
-msgid "Could not retrieve new Kustom recurring token for subscription when customer changed payment method. Read the log for detailed information."
-msgstr ""
-
-#: ../classes/class-kco-subscription.php:673
+#. translators: %s Kustom recurring token.
+#: ../classes/class-kco-subscription.php:696
 msgid "Payment method changed via Kustom Checkout. New recurring token for subscription: %s"
 msgstr ""
 
-#: ../classes/class-kco-subscription.php:700
+#: ../classes/class-kco-subscription.php:743
 msgid "Thank you, your subscription payment method is now updated."
 msgstr ""
 
@@ -546,30 +543,30 @@ msgstr ""
 msgid "Select another payment method"
 msgstr ""
 
-#: ../includes/kco-functions.php:708
+#: ../includes/kco-functions.php:712
 msgid "Waiting for verification from Kustom's push notification"
 msgstr ""
 
-#: ../includes/kco-functions.php:703
+#: ../includes/kco-functions.php:707
 msgid "Kustom Checkout order was rejected"
 msgstr ""
 
 #. translators: 1: Kustom order total, 2: WooCommerce order total.
-#: ../includes/kco-functions.php:753
+#: ../includes/kco-functions.php:757
 msgid "Kustom order total (%1$s) does not match WooCommerce order total (%2$s). Please verify the order with Kustom before processing."
 msgstr ""
 
-#: ../includes/kco-functions.php:783
+#: ../includes/kco-functions.php:787
 msgid "A mismatch between the WooCommerce and Kustom orders was identified. Please verify the order in the Kustom merchant portal before processing."
 msgstr ""
 
 #. translators: %1$s: Product name, %2$d: Expected quantity, %3$d: Found quantity.
-#: ../includes/kco-functions.php:834
+#: ../includes/kco-functions.php:838
 msgid "The product \"%1$s\" has a quantity mismatch. Expected %2$d found %3$d."
 msgstr ""
 
 #. translators: %s: Product name.
-#: ../includes/kco-functions.php:844
+#: ../includes/kco-functions.php:848
 msgid "The product \"%s\" was not found in the Kustom order."
 msgstr ""
 
@@ -657,12 +654,12 @@ msgstr ""
 
 #. translators: %s: The environment (production or test).
 #: ../src/Elements/KeyValidator.php:120
-msgid "The %s public API key was not recognized by Kustom. Copy the data-public-api-key from Elements → Installation script in the Kustom Portal."
+msgid "The %s public API key was not recognized by Kustom. Copy the data-public-api-key from Apps → On-site elements → Installation script in the Kustom Portal."
 msgstr ""
 
 #. translators: 1: The environment (production or test), 2: The site domain, e.g. https://example.com.
 #: ../src/Elements/KeyValidator.php:126
-msgid "The %1$s public API key is valid, but %2$s is not an allowed domain. Add the domain under Elements in the Kustom Portal."
+msgid "The %1$s public API key is valid, but %2$s is not an allowed domain. Add the domain under Apps → On-site elements → My domains in the Kustom Portal."
 msgstr ""
 
 #: ../src/Elements/KeyValidator.php:131
@@ -735,7 +732,7 @@ msgstr ""
 
 #. translators: %s: Kustom Portal link.
 #: ../src/Elements/Settings.php:134
-msgid "The public API keys used here are separate from the API Username and Password used for the payment integration above — find them in the %s under Elements → Installation script → data-public-api-key."
+msgid "The public API keys used here are separate from the API Username and Password used for the payment integration above — find them in the %s under Apps → On-site elements → Installation script → data-public-api-key."
 msgstr ""
 
 #: ../src/Elements/Settings.php:135
@@ -799,7 +796,7 @@ msgid "Express merchant URLs"
 msgstr ""
 
 #: ../src/Elements/Settings.php:181
-msgid "Paste these into the Kustom Portal under Elements → Express buttons."
+msgid "Paste these into the Kustom Portal under Apps → On-site elements → Express buttons."
 msgstr ""
 
 #: ../src/Elements/Settings.php:184
@@ -825,7 +822,7 @@ msgstr ""
 
 #. translators: %s: The environment (production or test).
 #: ../src/Elements/Settings.php:280
-msgid "The %s public API key for Kustom Elements is invalid and has been cleared. Use the data-public-api-key from the Elements installation script in the Kustom Portal, not the API Username or Password."
+msgid "The %s public API key for Kustom Elements is invalid and has been cleared. Use the data-public-api-key from Apps → On-site elements → Installation script in the Kustom Portal, not the API Username or Password."
 msgstr ""
 
 #: ../src/Elements/Settings.php:384

@@ -6,8 +6,8 @@ Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 9.7.0
-WC tested up to: 11.3.0
-Stable tag: 2.24.2
+WC tested up to: 11.3.1
+Stable tag: 2.24.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -50,6 +50,9 @@ Kustom Checkout works for merchants in Sweden, Finland, Norway, Germany, Austria
 For help setting up and configuring Kustom Checkout for WooCommerce please refer to our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/).
 
 == Changelog ==
+= 2026-11-24    - version 2.24.3 =
+* Fix           - Fixed block checkout purchases being rejected with "invalid payment" on WooCommerce 11.3.1, where the Store API no longer accepted the cart token Kustom Checkout created and saw an empty cart. Tokens already stored on open sessions and Kustom orders are re-issued automatically.
+
 = 2026-11-18    - version 2.24.2 =
 * Tweak         - Updated the Kustom Portal paths in the Kustom Elements and express button settings and error messages to match the current portal menu (Apps → On-site elements → Installation script, Express buttons and My domains).
 * Fix           - A payment method change is now only applied to the subscription it was started for. Thanks to Ika Aprilliani (https://github.com/ikaaplrilliani-lgtm) for reporting the issue.
