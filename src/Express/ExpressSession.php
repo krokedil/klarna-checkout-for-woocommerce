@@ -230,6 +230,7 @@ class ExpressSession {
 	 * @throws Exception If the token is not valid.
 	 */
 	public static function open( $token ) {
+		$token = BlocksUtility::refresh_cart_token( $token );
 		if ( empty( $token ) || ! JsonWebToken::validate( $token, '@' . wp_salt() ) ) {
 			throw new Exception( 'Invalid cart token.' );
 		}

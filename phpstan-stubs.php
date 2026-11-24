@@ -43,6 +43,20 @@ namespace Automattic\WooCommerce\StoreApi\Utilities {
 		 * @return bool
 		 */
 		public static function validate( string $token, string $secret ) {}
+
+		/**
+		 * @param string $token Full token string.
+		 * @return object{header: object, payload: object, signature: string}
+		 */
+		public static function get_parts( string $token ) {}
+	}
+
+	class CartTokenUtils {
+		/**
+		 * @param string $customer_id The customer ID.
+		 * @return string
+		 */
+		public static function get_cart_token( string $customer_id ) {}
 	}
 
 	class CartController {

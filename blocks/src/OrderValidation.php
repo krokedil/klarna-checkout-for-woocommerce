@@ -3,6 +3,7 @@ namespace Krokedil\KustomCheckout\Blocks;
 
 use Krokedil\KustomCheckout\Express\Express;
 use Krokedil\KustomCheckout\Express\ExpressSession;
+use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Exception;
 
 defined( 'ABSPATH' ) || exit;
@@ -96,7 +97,7 @@ class OrderValidation {
 	 */
 	private static function validate_express_order( $klarna_order, $order, $context ) {
 		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-		$wc_cart_token        = $klarna_merchant_data['wc_cart_token'] ?? '';
+		$wc_cart_token        = BlocksUtility::refresh_cart_token( $klarna_merchant_data['wc_cart_token'] ?? '' );
 		$klarna_order_id      = $klarna_order['order_id'];
 
 		$previous = ExpressSession::prime_for_validation( $wc_cart_token, $klarna_order );
@@ -285,7 +286,7 @@ class OrderValidation {
 		$klarna_shipping_address = $klarna_order['shipping_address'] ?? array();
 		$klarna_id               = $klarna_order['order_id'];
 		$klarna_merchant_data    = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-		$wc_cart_token           = $klarna_merchant_data['wc_cart_token'] ?? '';
+		$wc_cart_token           = BlocksUtility::refresh_cart_token( $klarna_merchant_data['wc_cart_token'] ?? '' );
 		$wc_nonce                = $klarna_merchant_data['wc_nonce'] ?? '';
 		$wp_logged_in_cookie     = $klarna_merchant_data['wp_logged_in_cookie'] ?? null;
 
