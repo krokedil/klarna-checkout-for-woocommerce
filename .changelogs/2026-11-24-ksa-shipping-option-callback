@@ -1,4 +1,4 @@
 Type: Fix
 Needs Documentation: no
 
-The Kustom Shipping Assistant shipping option update callback now reads the selected shipping option and its price from the Kustom order instead of the request, so a forged request can no longer change the shipping price saved on the WooCommerce order. Thanks to kta1kri (https://github.com/kta1kri) for reporting the issue.
+The Kustom Shipping Assistant shipping option update callback now reads the selected shipping option and its price from the Kustom order instead of the request, so a forged request can no longer change the shipping price saved on the WooCommerce order. The callback is also refused for orders Kustom was not told to call back for, since nothing would keep its shipping data current. Thanks to kta1kri (https://github.com/kta1kri) for reporting the issue.

@@ -88,6 +88,15 @@ class ShippingOptionUpdateTest extends IntegrationTestCase {
 		$this->assertFalse( $allowed );
 	}
 
+	public function test_an_order_kustom_was_not_told_to_call_back_for_is_refused(): void {
+		$this->willRetrieveCheckoutOrder( [ 'merchant_urls' => [ 'checkout' => home_url( '/checkout/' ) ] ] );
+
+		[ $allowed ] = $this->sendCallback();
+
+		$this->assertFalse( $allowed, 'Nothing would refresh the override on an order Kustom never calls back for.' );
+		$this->assertFalse( get_transient( 'kss_override_data_checkout-order-123' ) );
+	}
+
 	/**
 	 * Runs the permission check and then the handler, as the REST server does.
 	 *
@@ -111,6 +120,9 @@ class ShippingOptionUpdateTest extends IntegrationTestCase {
 			$this->kustomRetrievedOrder(
 				array_merge(
 					[
+						'merchant_urls'            => [
+							'shipping_option_update' => home_url( '/wp-json/kustom/shipping-service/v1/callback/shipping-option-update?kco_id={checkout.order.id}' ),
+						],
 						'billing_address'          => [ 'country' => 'SE' ],
 						'shipping_address'         => [ 'country' => 'SE' ],
 						'tags'                     => [],

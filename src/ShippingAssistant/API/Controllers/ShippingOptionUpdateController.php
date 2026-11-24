@@ -74,6 +74,11 @@ class ShippingOptionUpdateController extends BaseController {
 			return false;
 		}
 
+		// Only Kustom refreshes the override, so answer only for orders it was told to call back for.
+		if ( empty( $kco_order['merchant_urls']['shipping_option_update'] ) ) {
+			return false;
+		}
+
 		$this->kco_order = $kco_order;
 
 		return true;
