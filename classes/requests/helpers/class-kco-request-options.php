@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Krokedil\KustomCheckout\Express\OrderCreator;
+
 /**
  * KCO_Request_Options class.
  *
@@ -79,21 +81,29 @@ class KCO_Request_Options {
 	 * @return string
 	 */
 	private function get_scope( $checkout_flow ) {
-		$context = \Krokedil\KustomCheckout\Express\OrderCreator::is_creating() ? 'express' : 'checkout';
+		$context = OrderCreator::is_creating() ? 'express' : 'checkout';
 
 		/**
 		 * Filters the Kustom checkout scope. Return "PAYMENT" to show only the payment selector, without address forms.
 		 *
-		 * Kustom sets the scope only when its order is created, and does not support shipping, express buttons,
-		 * age verification or recurring payments in that scope.
+		 * Kustom then returns only the billing country, so make the billing fields optional. Not for the block checkout,
+		 * which always requires an email. Shipping is charged unseen and the order gets no shipping address. Express
+		 * buttons, age verification and recurring payments are not supported. Kustom reads it only when creating its order.
 		 *
 		 * @param string $scope         The scope, empty for the default full checkout.
 		 * @param string $checkout_flow The checkout flow: redirect or embedded.
-		 * @param string $context       Where the order is created: checkout, or express for the express buttons.
+		 * @param string $context       The request's source: express for the express buttons, otherwise checkout.
 		 */
-		$scope = apply_filters( 'kco_checkout_scope', '', $checkout_flow, $context );
+		$filtered = apply_filters( 'kco_checkout_scope', '', $checkout_flow, $context );
+		$scope    = is_string( $filtered ) ? strtoupper( trim( $filtered ) ) : '';
 
-		return is_string( $scope ) ? strtoupper( trim( $scope ) ) : '';
+		// Kustom refuses the whole order for an unknown scope, so fall back to the full checkout instead.
+		if ( '' !== $scope && 'PAYMENT' !== $scope ) {
+			KCO_Logger::log( 'Ignored an unsupported kco_checkout_scope value, using the full checkout: ' . sanitize_text_field( $filtered ) );
+			return '';
+		}
+
+		return $scope;
 	}
 
 	/**

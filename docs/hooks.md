@@ -899,8 +899,9 @@ Source: [./classes/requests/helpers/class-kco-request-shipping-options.php](../c
 
 *Filters the Kustom checkout scope. Return "PAYMENT" to show only the payment selector, without address forms.*
 
-Kustom sets the scope only when its order is created, and does not support shipping, express buttons,
-age verification or recurring payments in that scope.
+Kustom then returns only the billing country, so make the billing fields optional. Not for the block checkout,
+which always requires an email. Shipping is charged unseen and the order gets no shipping address. Express
+buttons, age verification and recurring payments are not supported. Kustom reads it only when creating its order.
 
 **Arguments**
 
@@ -908,9 +909,9 @@ Argument | Type | Description
 -------- | ---- | -----------
 `$scope` | `string` | The scope, empty for the default full checkout.
 `$checkout_flow` | `string` | The checkout flow: redirect or embedded.
-`$context` | `string` | Where the order is created: checkout, or express for the express buttons.
+`$context` | `string` | The request's source: express for the express buttons, otherwise checkout.
 
-Source: [./classes/requests/helpers/class-kco-request-options.php](../classes/requests/helpers/class-kco-request-options.php), [line 84](../classes/requests/helpers/class-kco-request-options.php#L84-L94)
+Source: [./classes/requests/helpers/class-kco-request-options.php](../classes/requests/helpers/class-kco-request-options.php), [line 86](../classes/requests/helpers/class-kco-request-options.php#L86-L97)
 
 
 ---
@@ -927,7 +928,7 @@ Argument | Type | Description
 Examples: 
 - [Add additional checkboxes](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#add-additional-checkboxes)
 
-Source: [./classes/requests/helpers/class-kco-request-options.php](../classes/requests/helpers/class-kco-request-options.php), [line 288](../classes/requests/helpers/class-kco-request-options.php#L288-L294)
+Source: [./classes/requests/helpers/class-kco-request-options.php](../classes/requests/helpers/class-kco-request-options.php), [line 298](../classes/requests/helpers/class-kco-request-options.php#L298-L304)
 
 
 ---
