@@ -27,7 +27,7 @@ class CartTokenTest extends IntegrationTestCase {
 	/**
 	 * @dataProvider provide_stored_tokens
 	 */
-	public function test_a_stored_token_only_gets_reissued_when_we_signed_it_for_another_issuer( string $iss, string $secret, bool $reissued ): void {
+	public function test_only_a_legacy_token_we_signed_gets_reissued( string $iss, string $secret, bool $reissued ): void {
 		$token = JsonWebToken::create(
 			[
 				'user_id' => 't_shopper',
@@ -55,6 +55,7 @@ class CartTokenTest extends IntegrationTestCase {
 		return [
 			'issued before the fix'           => [ 'wc/store/v1', '', true ],
 			'already issued by the store api' => [ 'store-api', '', false ],
+			'a cart link token'               => [ 'cart-link', '', false ],
 			'signed with another secret'      => [ 'wc/store/v1', 'not-our-secret', false ],
 		];
 	}

@@ -14,6 +14,11 @@ class BlocksUtility {
 	const CART_TOKEN_ISSUER = 'store-api';
 
 	/**
+	 * The `iss` claim on cart tokens issued before WooCommerce 11.3.1 required `store-api`.
+	 */
+	const LEGACY_CART_TOKEN_ISSUER = 'wc/store/v1';
+
+	/**
 	 * Check if the checkout block is present on the checkout page.
 	 *
 	 * @return bool
@@ -50,9 +55,9 @@ class BlocksUtility {
 	}
 
 	/**
-	 * Re-issue a cart token we signed with an issuer the Store API no longer accepts, for the same session key.
+	 * Re-issue a legacy `wc/store/v1` cart token we signed, which WooCommerce 11.3.1 rejects, for the same session key.
 	 *
-	 * Older tokens use `wc/store/v1`, which WooCommerce 11.3.1 rejects. Other tokens are returned as is.
+	 * Other tokens, such as WooCommerce's cart link tokens, are returned as is.
 	 *
 	 * @param string $token The cart token.
 	 * @return string
@@ -63,7 +68,7 @@ class BlocksUtility {
 		}
 
 		$payload = JsonWebToken::get_parts( $token )->payload;
-		if ( self::CART_TOKEN_ISSUER === ( $payload->iss ?? '' ) || empty( $payload->user_id ) ) {
+		if ( self::LEGACY_CART_TOKEN_ISSUER !== ( $payload->iss ?? '' ) || empty( $payload->user_id ) ) {
 			return $token;
 		}
 
