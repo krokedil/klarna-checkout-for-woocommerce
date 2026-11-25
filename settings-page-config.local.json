@@ -1,0 +1,339 @@
+{
+    "$schema": "../schema/settings-page-config.schema.json",
+    "support": {
+        "content": [
+            {
+                "type": "link",
+                "text": {
+                    "en": "General plugin information",
+                    "sv": "Allmän plugin information"
+                },
+                "target": "_blank",
+                "href": {
+                    "en": "https://krokedil.com/product/kustom-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=support",
+                    "sv": "https://krokedil.se/product/kustom-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=support"
+                }
+            },
+            {
+                "type": "link",
+                "text": {
+                    "en": "Technical documentation",
+                    "sv": "Teknisk dokumentation"
+                },
+                "target": "_blank",
+                "href": "https://docs.krokedil.com/kustom-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=support"
+            },
+            {
+                "type": "link",
+                "text": {
+                    "en": "Krokedil general support information",
+                    "sv": "Krokedil generell support information"
+                },
+                "target": "_blank",
+                "href": "https://docs.krokedil.com/krokedil-general-support-info/?utm_source=kco&utm_medium=wp-admin&utm_campaign=support"
+            },
+            {
+                "type": "spacer"
+            },
+            {
+                "type": "link_text",
+                "text": {
+                    "en": "If you have question regarding a certain purchase, you are welcome to contact %s.",
+                    "sv": "Om du har frågor kring ett visst köp, är du välkommen att kontakta %s."
+                },
+                "link": {
+                    "text": "Kustom",
+                    "target": "_blank",
+                    "href": {
+                        "en": "https://help.kustom.co/en/"
+                    }
+                }
+            },
+            {
+                "type": "text",
+                "en": "If you have <b>technical questions or question regarding the configuration</b> of the plugin, you are welcome to contact Krokedil, who are the developers of the plugin, using the button below.",
+                "sv": "Om du har <b>tekniska frågor eller frågor krint konfiguration</b> av pluginet, är du välkommen att kontakta Krokedil, pluginutvecklaren, genom att använda knappen nedan."
+            },
+            {
+                "type": "spacer"
+            },
+            {
+                "type": "text",
+                "en": "When you open a support ticket with Krokedil through the button below, please note the following:",
+                "sv": "När du öppnar ett supportärende med Krokedil genom knappen nedan, notera följande:"
+            },
+            {
+                "type": "list",
+                "items": [
+                    {
+                        "type": "link_text",
+                        "text": {
+                            "en": "<b>WooCommerce system status report</b> - we automatically add %s from this website as an attachment to the support ticket form. This report contains information about your website that is very useful for troubleshooting issues, but you are absolutely free to remove the system status report when submitting the form if you wish to.",
+                            "sv": "<b>WooCommerce system status report</b> - vi lägger automatiskt till %s från denna webbplats som en bilaga till supportbiljetten. Denna rapport innehåller information om din webbplats som är mycket användbar för att för felsökning, men du är helt fri att ta bort systemstatusrapporten när du skickar in formuläret om du vill."
+                        },
+                        "link": {
+                            "text": {
+                                "en": "the WooCommerce system status report",
+                                "sv": "WooCommerce-systemstatusrapporten"
+                            },
+                            "target": "_blank",
+                            "class": "no-external-icon",
+                            "href": {
+                                "en": "/wp-admin/admin.php?page=wc-status",
+                                "sv": "/wp-admin/admin.php?page=wc-status"
+                            }
+                        }
+                    },
+                    {
+                        "type": "link_text",
+                        "text": {
+                            "en": "<b>QuickForget secret URL</b> - Providing relevant logs and screenshots can be very useful for troubleshooting e.g. a specific order. Get more information on how to find these %s and then use <a target='_blank' class='no-external-icon' href='https://quickforget.com/?views=20&hours=360'>quickforget.com</a> to upload and get a secret URL that you enter in the support ticket form.",
+                            "sv": "<b>QuickForget secret URL</b> - Att tillhandahålla relevanta loggar och skärmbilder kan vara mycket användbart för felsökning t.ex. en specifik order. Få mer information om hur du hittar dessa %s och använd sedan <a target='_blank' class='no-external-icon' href='https://quickforget.com/?views=20&hours=360'>quickforget.com</a> för att ladda upp och få en hemlig URL som du anger i supportbiljetten."
+                        },
+                        "link": {
+                            "text": {
+                                "en": "here",
+                                "sv": "här"
+                            },
+                            "target": "_blank",
+                            "class": "no-external-icon",
+                            "href": "https://docs.krokedil.com/krokedil-general-support-info/prepare-a-support-ticket/#3-logs"
+                        }
+                    },
+                    {
+                        "type": "link_text",
+                        "text": {
+                            "en": "<b>Privacy information</b> - By submitting the support case, you provide us with personal information and any customer data. If you are interested in learning more about how we handle privacy information, read more %s.",
+                            "sv": "<b>Integritetsinformation</b> - Genom att skicka supportärendet tillhandahåller du oss personlig information och eventuella kunddata. Om du är intresserad av att lära dig mer om hur vi hanterar integritetsinformation, läs mer %s."
+                        },
+                        "link": {
+                            "text": {
+                                "en": "here",
+                                "sv": "här"
+                            },
+                            "target": "_blank",
+                            "class": "no-external-icon",
+                            "href": {
+                                "en": "https://krokedil.com/privacy-policy/",
+                                "sv": "https://krokedil.se/personuppgiftspolicy/"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "spacer"
+            }
+        ],
+        "sections": [
+            {
+                "title": {
+                    "en": "Documentation",
+                    "sv": "Dokumentation"
+                },
+                "description": {
+                    "en": "In our Kustom Checkout for WooCommerce documentation, you will find guidance on how to configure and get started with the plugin.<br>You will also find information on customization options and troubleshooting.",
+                    "sv": "I vår dokumentation för Kustom Checkout for WooCommerce hittar du vägledning om hur du konfigurerar och kommer igång med pluginet.<br>Du hittar även information om anpassningsmöjligheter och felsökning."
+                },
+                "content": [
+                    {
+                        "type": "title",
+                        "en": "Kustom Checkout technical documentation",
+                        "sv": "Teknisk dokumentation för Kustom Checkout"
+                    },
+                    {
+                        "type": "text",
+                        "en": "Use the quick links below to access the Kustom Checkout for WooCommerce documentation you need.",
+                        "sv": "Använd snabblänkarna nedan för att hitta den dokumentation för Kustom Checkout for WooCommerce som du behöver."
+                    },
+                    {
+                        "type": "link",
+                        "text": {
+                            "en": "Get started",
+                            "sv": "Kom igång"
+                        },
+                        "target": "_blank",
+                        "href": "https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/?utm_source=kco&utm_medium=wp-admin&utm_campaign=support"
+                    },
+                    {
+                        "type": "link",
+                        "text": {
+                            "en": "Customization",
+                            "sv": "Anpassningar"
+                        },
+                        "target": "_blank",
+                        "href": "https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/?utm_source=kco&utm_medium=wp-admin&utm_campaign=support"
+                    },
+                    {
+                        "type": "link",
+                        "text": {
+                            "en": "Troubleshooting",
+                            "sv": "Felsökning"
+                        },
+                        "target": "_blank",
+                        "href": "https://docs.krokedil.com/kustom-checkout-for-woocommerce/troubleshooting/?utm_source=kco&utm_medium=wp-admin&utm_campaign=support"
+                    },
+                    {
+                        "type": "title",
+                        "en": "Krokedil general documentation",
+                        "sv": "Krokedils generella dokumentation"
+                    },
+                    {
+                        "type": "text",
+                        "en": "Here you will find resources that may be helpful when troubleshooting a <b>Krokedil</b> plugin for WooCommerce.<br>This section also includes more general WooCommerce guidance that may assist you along the way.",
+                        "sv": "Här hittar du resurser som kan vara till hjälp vid felsökning av ett plugin för WooCommerce från <b>Krokedil</b>.<br>Här finns även mer generell vägledning för WooCommerce som kan hjälpa dig på vägen."
+                    },
+                    {
+                        "type": "link",
+                        "text": {
+                            "en": "Krokedil general support information",
+                            "sv": "Krokedil generell supportinformation"
+                        },
+                        "target": "_blank",
+                        "href": "https://docs.krokedil.com/krokedil-general-support-info/?utm_source=kco&utm_medium=wp-admin&utm_campaign=support"
+                    }
+                ]
+            },
+            {
+                "title": {
+                    "en": "Support",
+                    "sv": "Support"
+                },
+                "description": {
+                    "en": "If you still require assistance after consulting the documentation, please contact either Krokedil or Kustom, depending on your issue.",
+                    "sv": "Om du fortfarande behöver hjälp efter att ha läst dokumentationen, kontakta antingen Krokedil eller Kustom beroende på ditt ärende."
+                },
+                "content": [
+                    {
+                        "type": "title",
+                        "en": "Kustom support",
+                        "sv": "Kustom support"
+                    },
+                    {
+                        "type": "link_text",
+                        "text": {
+                            "en": "If you have questions regarding a specific purchase or order, please contact %s.",
+                            "sv": "Om du har frågor om ett specifikt köp eller en specifik order, kontakta %s."
+                        },
+                        "link": {
+                            "text": {
+                                "en": "Kustom directly",
+                                "sv": "Kustom direkt"
+                            },
+                            "target": "_blank",
+                            "href": "https://help.kustom.co/en/"
+                        }
+                    },
+                    {
+                        "type": "title",
+                        "en": "Krokedil plugin support",
+                        "sv": "Krokedil pluginsupport"
+                    },
+                    {
+                        "type": "text",
+                        "en": "If you need assistance with the plugin itself, please open a support ticket with Krokedil.",
+                        "sv": "Om du behöver hjälp med själva pluginet, öppna ett supportärende hos Krokedil."
+                    },
+                    {
+                        "type": "box",
+                        "title": {
+                            "en": "Before opening a support ticket:",
+                            "sv": "Innan du öppnar ett supportärende:"
+                        },
+                        "items": [
+                            {
+                                "type": "list",
+                                "items": [
+                                    {
+                                        "type": "link_text",
+                                        "text": {
+                                            "en": "<b>WooCommerce system status report</b> - %s from your site is automatically attached to the support form.<br>This report contains useful and sometimes necessary technical information for troubleshooting. You may remove it before submitting the form if you prefer, but doing so may limit our ability to investigate the issue effectively.",
+                                            "sv": "<b>WooCommerce systemstatusrapport</b> - %s från din webbplats bifogas automatiskt i supportformuläret.<br>Rapporten innehåller användbar och ibland nödvändig teknisk information för felsökning. Du kan ta bort den innan du skickar formuläret om du vill, men det kan begränsa våra möjligheter att utreda ärendet."
+                                        },
+                                        "link": {
+                                            "text": {
+                                                "en": "The WooCommerce system status report",
+                                                "sv": "WooCommerce-systemstatusrapporten"
+                                            },
+                                            "target": "_blank",
+                                            "class": "no-external-icon",
+                                            "href": "/wp-admin/admin.php?page=wc-status"
+                                        }
+                                    },
+                                    {
+                                        "type": "link_text",
+                                        "text": {
+                                            "en": "<b>Logs and screenshots</b> - Providing relevant logs and screenshots can significantly help when troubleshooting, especially for specific orders.<br>Learn how to locate the logs %s.<br><b>Upload the files</b> using <a target='_blank' class='no-external-icon' href='https://quickforget.com/?views=20&hours=360'>quickforget.com</a> and <b>enter the secret URL</b> in the support ticket form.",
+                                            "sv": "<b>Loggar och skärmbilder</b> - Relevanta loggar och skärmbilder kan underlätta felsökningen avsevärt, särskilt för specifika ordrar.<br>Läs om hur du hittar loggarna %s.<br><b>Ladda upp filerna</b> med <a target='_blank' class='no-external-icon' href='https://quickforget.com/?views=20&hours=360'>quickforget.com</a> och <b>ange den hemliga URL:en</b> i supportformuläret."
+                                        },
+                                        "link": {
+                                            "text": {
+                                                "en": "here",
+                                                "sv": "här"
+                                            },
+                                            "target": "_blank",
+                                            "class": "no-external-icon",
+                                            "href": "https://docs.krokedil.com/krokedil-general-support-info/prepare-a-support-ticket/?utm_source=kco&utm_medium=wp-admin&utm_campaign=support#3-logs"
+                                        }
+                                    },
+                                    {
+                                        "type": "link_text",
+                                        "text": {
+                                            "en": "<b>Privacy information</b> - By submitting a support request, you may share personal data and customer information with us.<br>To learn more about how we process personal data, please read our privacy information %s.",
+                                            "sv": "<b>Integritetsinformation</b> - När du skickar ett supportärende kan du dela personuppgifter och kunduppgifter med oss.<br>Läs mer om hur vi behandlar personuppgifter i vår integritetsinformation %s."
+                                        },
+                                        "link": {
+                                            "text": {
+                                                "en": "here",
+                                                "sv": "här"
+                                            },
+                                            "target": "_blank",
+                                            "class": "no-external-icon",
+                                            "href": "https://krokedil.com/privacy-policy/?utm_source=kco&utm_medium=wp-admin&utm_campaign=support"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "styled_output": true,
+    "settings_navigation": true,
+    "sidebar": {
+        "plugin_resources": {
+            "description": {
+                "en": "Helpful resources and additional Kustom Checkout documentation.",
+                "sv": "Användbara resurser och ytterligare dokumentation för Kustom Checkout."
+            },
+            "links": [
+                {
+                    "text": {
+                        "en": "Plugin product page",
+                        "sv": "Pluginets produktsida"
+                    },
+                    "target": "_blank",
+                    "href": "https://krokedil.com/product/kustom-checkout-for-woocommerce/?utm_source=kco&utm_medium=wp-admin&utm_campaign=settings-sidebar"
+                },
+                {
+                    "text": {
+                        "en": "Kustom documentation",
+                        "sv": "Kustom dokumentation"
+                    },
+                    "target": "_blank",
+                    "href": "https://docs.kustom.co/"
+                },
+                {
+                    "text": {
+                        "en": "Kustom Knowledge base",
+                        "sv": "Kustom kunskapsbank"
+                    },
+                    "target": "_blank",
+                    "href": "https://help.kustom.co/en/"
+                }
+            ]
+        }
+    }
+}

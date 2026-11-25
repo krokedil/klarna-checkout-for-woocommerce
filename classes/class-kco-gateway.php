@@ -745,7 +745,13 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		 * @return array|null
 		 */
 		private function get_settings_page_args() {
-			$args = get_transient( 'kustom_checkout_settings_page_config' );
+			// LOCAL TESTING ONLY, do not commit: use the local copy of the config when it exists.
+			$local_config = KCO_WC_PLUGIN_PATH . '/settings-page-config.local.json';
+			if ( is_readable( $local_config ) ) {
+				$args = file_get_contents( $local_config ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file.
+			} else {
+				$args = get_transient( 'kustom_checkout_settings_page_config' );
+			}
 			if ( ! $args ) {
 				$args = wp_remote_get( 'https://krokedil-settings-page-configs.s3.eu-north-1.amazonaws.com/main/configs/kustom-checkout-for-woocommerce.json' );
 
