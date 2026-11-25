@@ -286,10 +286,13 @@ $renewal      = $this->haveRenewalOrderFor( $subscription );
 
 Those are real orders. Only the class `wc_get_order()` returns is swapped, for
 `Fakes\SubscriptionOrder`, which is a `WC_Order` plus the `shop_subscription`
-type, `get_parent()` and `payment_failed()`. It does **not** stand in for
-`WC_Subscriptions_Cart` or `WC_Subscriptions_Product`, so a cart holding a new
-subscription product is still out of reach. `haveCartContaining( 'renewal' )` and
-its siblings cover the states the plugin branches on beyond that.
+type, `get_parent()` and `payment_failed()`. `WC_Subscriptions_Product` is faked too:
+only a product passed through `markAsSubscriptionProduct()` is a subscription,
+and every one of them is a plain monthly subscription without a trial. It does
+**not** stand in for `WC_Subscriptions_Cart`, so a cart holding a new subscription
+product, and the recurring carts WooCommerce Subscriptions builds from it, are
+still out of reach. `haveCartContaining( 'renewal' )` and its siblings cover the
+states the plugin branches on beyond that.
 [Harness/Fixtures/FakeSubscriptionsTest.php](Harness/Fixtures/FakeSubscriptionsTest.php)
 pins what the fake answers.
 
@@ -681,7 +684,7 @@ it. The gate is a backstop for mistakes, not the control.
 | `tests/_mu-plugins/05-kustom-test-admin-password.php` | Resets the admin password from `WORDPRESS_ADMIN_PASSWORD`. |
 | `tests/_mu-plugins/06-admin-screens-offline.php` | Drops the wp-admin requests that never answer here. |
 | `tests/_mu-plugins/08-login-no-autofocus.php` | Stops wp-login.php from clearing the password the driver typed. |
-| `tests/_mu-plugins/09-kustom-push-lock.php` | Turns the confirmation lock on and records the push's Kustom lookups instead of sending them, when `PushCallbackCest` asks. |
+| `tests/_mu-plugins/09-kustom-push-lock.php` | Records the push's Kustom lookups instead of sending them, when `PushCallbackCest` asks. The lock itself is left at its default. |
 | `tests/_mu-plugins/10-wordpress-options-unique-name.php` | Creates the `option_name` unique index SQLite drops, which the confirmation lock relies on. |
 | `tests/_support_scripts/install-test-env.php` | Idempotent WP scaffold, runs on `composer install`. |
 | `tests/_support_scripts/regenerate-dump.sh` | Rebuilds `dump.sql` from a clean install. |

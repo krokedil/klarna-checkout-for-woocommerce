@@ -3,6 +3,7 @@ namespace Krokedil\KustomCheckout\Blocks;
 
 use Krokedil\KustomCheckout\Express\Express;
 use Krokedil\KustomCheckout\Express\ExpressSession;
+use Krokedil\KustomCheckout\Utility\BlocksUtility;
 use Exception;
 
 defined( 'ABSPATH' ) || exit;
@@ -39,26 +40,35 @@ class OrderValidation {
 		$merchant_reference = $klarna_order['merchant_reference2'] ?? '';
 		$order              = ! empty( $merchant_reference ) ? self::get_wc_order( $merchant_reference ) : null;
 
+		$express_context = self::get_express_context( $klarna_merchant_data );
+		$pay_order       = $order && ( $express_context || ! self::contains_subscription( $order ) ) ? $order : null;
+
 		if ( $order ) {
 			self::validate_wc_order( $order );
-
-			// Set the Kustom order id in the order meta data.
-			$order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
-
-			// Set the customers billing email from the Kustom order.
-			$order->set_billing_email( $klarna_order['billing_address']['email'] ?? '' );
-
-			$order->save();
 		}
 
-		$express_context = self::get_express_context( $klarna_merchant_data );
+		if ( $pay_order ) {
+			// Set the Kustom order id in the order meta data.
+			$pay_order->update_meta_data( '_wc_klarna_order_id', sanitize_key( $klarna_order_id ) );
+
+			// Set the customers billing email from the Kustom order.
+			$pay_order->set_billing_email( $klarna_order['billing_address']['email'] ?? '' );
+
+			$pay_order->save();
+		}
+
 		if ( $express_context ) {
 			self::validate_express_order( $klarna_order, $order, $express_context );
 			return;
 		}
 
-		// Submit the order via the store api. When no order exists yet it is created from the cart token.
-		$updated_order = self::submit_wc_order( $klarna_order, $order );
+		$updated_order = self::submit_wc_order( $klarna_order, $pay_order );
+
+		// Kustom confirms to the referenced order, so the create route must not have placed another one.
+		if ( $order && $updated_order->get_id() !== $order->get_id() ) {
+			\KCO_Logger::log( "[Blocks] - Kustom order $klarna_order_id references order {$order->get_id()}, but the Store API placed order {$updated_order->get_id()}." );
+			throw new Exception( 'Could not validate the order, please try again.', 401 );
+		}
 
 		// Compare the order hashes to the once stored in the merchant data to ensure the order is valid.
 		self::validate_hash( $klarna_merchant_data['wc_cart_hash'], $updated_order->get_cart_hash() );
@@ -66,6 +76,49 @@ class OrderValidation {
 		self::validate_hash( $klarna_merchant_data['wc_fees_hash'], $updated_order->get_meta( '_fees_hash' ) );
 		self::validate_hash( $klarna_merchant_data['wc_coupons_hash'], $updated_order->get_meta( '_coupons_hash' ) );
 		self::validate_hash( $klarna_merchant_data['wc_taxes_hash'], $updated_order->get_meta( '_taxes_hash' ) );
+
+		// The create route may have placed another order than earlier attempts in this Kustom session left behind.
+		if ( ! $pay_order ) {
+			self::release_superseded_orders( $updated_order, $klarna_order_id );
+		}
+	}
+
+	/**
+	 * Detach the Kustom order from unpaid orders that earlier attempts in the same Kustom session left behind.
+	 *
+	 * @param \WC_Order $placed_order    The order the Store API placed.
+	 * @param string    $klarna_order_id The Kustom order ID.
+	 *
+	 * @return void
+	 */
+	private static function release_superseded_orders( $placed_order, $klarna_order_id ) {
+		$orders = wc_get_orders(
+			array(
+				'meta_key'   => '_wc_klarna_order_id', // phpcs:ignore WordPress.DB.SlowDBQuery -- We need to query by meta key.
+				'meta_value' => sanitize_key( $klarna_order_id ), // phpcs:ignore WordPress.DB.SlowDBQuery -- We need to query by meta value.
+				'type'       => 'shop_order',
+				'status'     => array( 'pending', 'failed', 'checkout-draft' ),
+				'limit'      => -1,
+			)
+		);
+
+		foreach ( $orders as $order ) {
+			if ( $order->get_id() === $placed_order->get_id() || ! empty( $order->get_date_paid() ) ) {
+				continue;
+			}
+
+			\KCO_Logger::log( "[Blocks] - Kustom order $klarna_order_id was placed as order {$placed_order->get_id()}, detaching it from unpaid order {$order->get_id()}." );
+
+			$order->delete_meta_data( '_wc_klarna_order_id' );
+			$order->add_order_note(
+				sprintf(
+					// translators: %s: The number of the order that was placed instead.
+					__( 'The Kustom order was placed as order %s instead, because the cart changed.', 'klarna-checkout-for-woocommerce' ),
+					$placed_order->get_order_number()
+				)
+			);
+			$order->save();
+		}
 	}
 
 	/**
@@ -96,7 +149,7 @@ class OrderValidation {
 	 */
 	private static function validate_express_order( $klarna_order, $order, $context ) {
 		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-		$wc_cart_token        = $klarna_merchant_data['wc_cart_token'] ?? '';
+		$wc_cart_token        = BlocksUtility::refresh_cart_token( $klarna_merchant_data['wc_cart_token'] ?? '' );
 		$klarna_order_id      = $klarna_order['order_id'];
 
 		$previous = ExpressSession::prime_for_validation( $wc_cart_token, $klarna_order );
@@ -251,6 +304,27 @@ class OrderValidation {
 	}
 
 	/**
+	 * Check if the order contains a subscription product.
+	 *
+	 * @param \WC_Order $order The WooCommerce order.
+	 *
+	 * @return bool
+	 */
+	private static function contains_subscription( $order ) {
+		if ( ! class_exists( 'WC_Subscriptions_Product' ) ) {
+			return false;
+		}
+
+		foreach ( $order->get_items() as $item ) {
+			if ( $item instanceof \WC_Order_Item_Product && \WC_Subscriptions_Product::is_subscription( $item->get_product() ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Get the extension data the checkout block script stashed in the session.
 	 *
 	 * @param string $wc_cart_token The cart token from the Kustom order merchant data.
@@ -285,7 +359,7 @@ class OrderValidation {
 		$klarna_shipping_address = $klarna_order['shipping_address'] ?? array();
 		$klarna_id               = $klarna_order['order_id'];
 		$klarna_merchant_data    = json_decode( $klarna_order['merchant_data'], true ) ?? array();
-		$wc_cart_token           = $klarna_merchant_data['wc_cart_token'] ?? '';
+		$wc_cart_token           = BlocksUtility::refresh_cart_token( $klarna_merchant_data['wc_cart_token'] ?? '' );
 		$wc_nonce                = $klarna_merchant_data['wc_nonce'] ?? '';
 		$wp_logged_in_cookie     = $klarna_merchant_data['wp_logged_in_cookie'] ?? null;
 

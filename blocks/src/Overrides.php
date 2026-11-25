@@ -13,29 +13,6 @@ defined( 'ABSPATH' ) || exit;
  */
 class Overrides {
 	/**
-	 * Maybe calculate recurring carts.
-	 *
-	 * @param \WC_Order $order The WooCommerce order.
-	 *
-	 * @return \WC_Order
-	 */
-	public function maybe_calculate_recurring_carts( $order ) {
-		// Only do this if the order is placed with Kustom Checkout, and the class exists.
-		if ( $order->get_payment_method() !== 'kco' || ! class_exists( 'WC_Subscriptions_Cart' ) ) {
-			return $order;
-		}
-
-		// Get the cart from WooCommerce and the cart total.
-		$cart  = WC()->cart;
-		$total = $cart->get_total( 'edit' );
-
-		// Trigger the calculation of recurring carts so they are set on the cart object before WCS tries to process the order.
-		\WC_Subscriptions_Cart::calculate_subscription_totals( $total, $cart );
-
-		return $order;
-	}
-
-	/**
 	 * Override the request body for the Kustom Checkout API.
 	 *
 	 * @param array    $args The request arguments.
@@ -145,7 +122,7 @@ class Overrides {
 		$merchant_data['wc_coupons_hash']  = $cart_hashes['coupons'] ?? '';
 		$merchant_data['wc_taxes_hash']    = $cart_hashes['taxes'] ?? '';
 
-		$cart_token = WC()->session->get( 'kco_wc_cart_token', BlocksUtility::create_cart_token( wc()->session->get_customer_id() ) );
+		$cart_token = BlocksUtility::refresh_cart_token( WC()->session->get( 'kco_wc_cart_token', BlocksUtility::create_cart_token( wc()->session->get_customer_id() ) ) );
 
 		$merchant_data['wc_cart_token']       = $cart_token;
 		$merchant_data['wc_nonce']            = wp_create_nonce( 'wc_store_api' );

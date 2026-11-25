@@ -131,7 +131,7 @@ class Settings {
 			'type'              => 'krokedil_elements_key',
 			'description'       => sprintf(
 				// translators: %s: Kustom Portal link.
-				__( 'The public API keys used here are separate from the API Username and Password used for the payment integration above — find them in the %s under Elements → Installation script → data-public-api-key.', 'klarna-checkout-for-woocommerce' ),
+				__( 'The public API keys used here are separate from the API Username and Password used for the payment integration above — find them in the %s under Apps → On-site elements → Installation script → data-public-api-key.', 'klarna-checkout-for-woocommerce' ),
 				'<a href="https://portal.kustom.co" target="_blank">' . __( 'Kustom Portal', 'klarna-checkout-for-woocommerce' ) . '</a>'
 			),
 			'desc_tip'          => __( 'The public API key used for Kustom Elements when test mode is disabled.', 'klarna-checkout-for-woocommerce' ),
@@ -178,7 +178,7 @@ class Settings {
 		$settings['elements_express_urls'] = array(
 			'title'       => __( 'Express merchant URLs', 'klarna-checkout-for-woocommerce' ),
 			'type'        => 'kco_express_urls',
-			'description' => __( 'Paste these into the Kustom Portal under Elements → Express buttons.', 'klarna-checkout-for-woocommerce' ),
+			'description' => __( 'Paste these into the Kustom Portal under Apps → On-site elements → Express buttons.', 'klarna-checkout-for-woocommerce' ),
 		);
 
 		$product_express_field = $this->get_product_placement_field( __( 'Express buttons on product pages', 'klarna-checkout-for-woocommerce' ) );
@@ -277,7 +277,7 @@ class Settings {
 		\WC_Admin_Settings::add_error(
 			sprintf(
 				// translators: %s: The environment (production or test).
-				__( 'The %s public API key for Kustom Elements is invalid and has been cleared. Use the data-public-api-key from the Elements installation script in the Kustom Portal, not the API Username or Password.', 'klarna-checkout-for-woocommerce' ),
+				__( 'The %s public API key for Kustom Elements is invalid and has been cleared. Use the data-public-api-key from Apps → On-site elements → Installation script in the Kustom Portal, not the API Username or Password.', 'klarna-checkout-for-woocommerce' ),
 				$label
 			)
 		);
