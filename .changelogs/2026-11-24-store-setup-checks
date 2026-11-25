@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Added a check of the store settings Kustom Checkout requires, shown in the settings sidebar, the system status report and an admin notice that cannot be dismissed when a required setting is missing.
