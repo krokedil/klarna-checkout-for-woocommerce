@@ -136,10 +136,11 @@ class InPersonPaymentsBlockCheckoutTest extends IntegrationTestCase {
 		$this->haveIppSettings();
 		$this->beA( $role );
 		$this->simulateCheckoutPage();
-		new BlockCheckout();
+		( new BlockCheckout() )->hook_address_fields();
 
 		$settings = apply_filters( 'woocommerce_shared_settings', $this->shared_settings() );
 
+		$this->assertSame( $optional, false !== has_filter( 'woocommerce_shared_settings' ), 'WooCommerce warns in the console of every page the deprecated filter is hooked on.' );
 		$this->assertSame( $optional, false === $settings['defaultFields']['email']['required'] );
 		$this->assertSame( $optional, false === $settings['countryData']['SE']['locale']['postcode']['required'] );
 		$this->assertTrue( $settings['defaultFields']['country']['required'], 'The address format and the state list are derived from the country.' );
@@ -153,13 +154,23 @@ class InPersonPaymentsBlockCheckoutTest extends IntegrationTestCase {
 		];
 	}
 
+	/** A store that does not take in-person payments gets no console warning from them. */
+	public function test_the_address_filter_is_not_hooked_while_the_feature_is_off(): void {
+		$this->haveIppSettings( [ 'ipp_enabled' => 'no' ] );
+		$this->beA( 'shop_manager' );
+		$this->simulateCheckoutPage();
+		( new BlockCheckout() )->hook_address_fields();
+
+		$this->assertFalse( has_filter( 'woocommerce_shared_settings' ) );
+	}
+
 	/** A store that does not want a relaxed checkout for its staff can say so. */
 	public function test_the_relaxed_address_can_be_switched_off(): void {
 		$this->haveIppSettings();
 		$this->beA( 'shop_manager' );
 		$this->simulateCheckoutPage();
-		new BlockCheckout();
 		add_filter( 'kco_ipp_relax_block_checkout_fields', '__return_false' );
+		( new BlockCheckout() )->hook_address_fields();
 
 		$settings = apply_filters( 'woocommerce_shared_settings', $this->shared_settings() );
 

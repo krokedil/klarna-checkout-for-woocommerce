@@ -22,6 +22,21 @@ class BlockCheckout {
 	 * Class constructor.
 	 */
 	public function __construct() {
+		// Decided once the page is known, so the filter is only hooked where it has something to do.
+		add_action( 'wp', array( $this, 'hook_address_fields' ) );
+	}
+
+	/**
+	 * Hook the address relaxation for a salesperson's checkout only. WooCommerce logs a
+	 * deprecation warning in the browser console of every page the filter is hooked on.
+	 *
+	 * @return void
+	 */
+	public function hook_address_fields() {
+		if ( ! self::should_relax_fields() ) {
+			return;
+		}
+
 		// The server-side validation is relaxed by StoreApiCheckout, which runs for the shortcode checkout too.
 		add_filter( 'woocommerce_shared_settings', array( $this, 'relax_address_fields' ) );
 	}
