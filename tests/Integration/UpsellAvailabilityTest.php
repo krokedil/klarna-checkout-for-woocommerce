@@ -40,8 +40,46 @@ class UpsellAvailabilityTest extends IntegrationTestCase {
 	public function provide_payment_methods(): array {
 		return [
 			'invoice'                             => [ 'INVOICE', 'SE', true ],
+			'business invoice'                    => [ 'INVOICE_BUSINESS', 'SE', true ],
+			'direct debit'                        => [ 'DIRECT_DEBIT', 'SE', true ],
 			'card'                                => [ 'CARD', 'SE', false ],
+			'fixed amount, in its countries'      => [ 'FIXED_AMOUNT', 'SE', true ],
 			'fixed amount, outside its countries' => [ 'FIXED_AMOUNT', 'US', false ],
+			'invoice, in Switzerland'             => [ 'INVOICE', 'CH', false ],
+		];
+	}
+
+	/**
+	 * Kustom can enable upsell for more payment methods on a merchant account, which the merchant adds with a filter.
+	 *
+	 * @dataProvider provide_payment_methods_with_filter
+	 */
+	public function test_the_filter_adds_payment_methods_without_overriding_the_defaults_or_country_rules( string $payment_method, string $country, bool $expected ): void {
+		add_filter(
+			'kco_upsell_additional_payment_methods',
+			static function ( $methods ) {
+				$methods[] = 'CARD';
+				return $methods;
+			}
+		);
+
+		$order = $this->markAsGatewayOrder( $this->haveCapturableGatewayOrder() );
+		$this->willRetrieveManagedOrder(
+			[
+				'initial_payment_method' => [ 'type' => $payment_method ],
+				'billing_address'        => [ 'country' => $country ],
+			]
+		);
+
+		$this->assertSame( $expected, $this->gateway()->upsell_available( $order->get_id() ) );
+	}
+
+	/** @return array<string, array{0: string, 1: string, 2: bool}> */
+	public function provide_payment_methods_with_filter(): array {
+		return [
+			'added method'                 => [ 'CARD', 'SE', true ],
+			'default method is kept'       => [ 'INVOICE', 'SE', true ],
+			'added method, in Switzerland' => [ 'CARD', 'CH', false ],
 		];
 	}
 

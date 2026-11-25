@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: yes
+
+Updated the payment methods that allow post purchase upsell and added the "kco_upsell_additional_payment_methods" filter to add more.

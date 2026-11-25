@@ -971,8 +971,27 @@ function kco_maybe_save_upsell_available( $order, $klarna_order ) {
 		return null;
 	}
 
-	// Set allowed payment methods for upsell based on country. https://docs.kustom.co/v3/order-management/manage-orders-with-the-api/view-and-change-orders#update-order-amount-1.
-	$allowed_payment_methods = array( 'INVOICE', 'B2B_INVOICE', 'BASE_ACCOUNT', 'DIRECT_DEBIT' );
+	// Payment methods that allow upsell by default.
+	$allowed_payment_methods = array( 'INVOICE', 'INVOICE_BUSINESS', 'DIRECT_DEBIT' );
+
+	/**
+	 * Filters additional Kustom payment method types that allow post purchase upsell.
+	 *
+	 * Only add payment methods that Kustom has enabled upsell for on the merchant account, e.g. 'CARD'.
+	 * Contact Kustom before adding anything beyond the default methods. If upsell is not enabled for the
+	 * payment method, Kustom will reject the order update and the upsell will fail.
+	 *
+	 * The returned methods are added to the default ones and can not remove them. Country restrictions are
+	 * applied afterwards, so methods added here are not allowed in countries where upsell is unsupported.
+	 *
+	 * @param string[] $additional_payment_methods Additional payment method types (initial_payment_method.type) that allow upsell. Default empty.
+	 * @param array    $klarna_order               The Kustom order management order.
+	 * @param WC_Order $order                      The WooCommerce order.
+	 */
+	$additional_payment_methods = (array) apply_filters( 'kco_upsell_additional_payment_methods', array(), $klarna_order, $order );
+	$allowed_payment_methods    = array_merge( $allowed_payment_methods, $additional_payment_methods );
+
+	// Apply country restrictions.
 	switch ( $klarna_order['billing_address']['country'] ?? '' ) {
 		case 'AT':
 		case 'DE':
