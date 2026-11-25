@@ -1,0 +1,4 @@
+Type: Tweak
+Needs Documentation: no
+
+Changed priority so the built-in order management logic now takes precedence over the external Klarna Order Management plugin.
