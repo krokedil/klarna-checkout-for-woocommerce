@@ -97,6 +97,9 @@ class KCO_API_Callbacks {
 				KCO_WC()->logger->log( "[PUSH CALLBACK]: Simultaneous push callback for Kustom order ID $klarna_order_id and WooCommerce order ID $order_id. Stopping process." );
 				return;
 			}
+
+			// A confirmation may have paid the order between the lookup above and taking the lock.
+			$order = wc_get_order( $order_id );
 		}
 
 		try {
