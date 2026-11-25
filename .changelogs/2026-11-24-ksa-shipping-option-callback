@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+The Kustom Shipping Assistant shipping option callback now takes the shipping price from Kustom, not the request. Thanks to kta1kri (https://github.com/kta1kri) for reporting the issue.
