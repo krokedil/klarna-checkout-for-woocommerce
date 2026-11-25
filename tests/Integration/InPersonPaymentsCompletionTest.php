@@ -167,7 +167,7 @@ class InPersonPaymentsCompletionTest extends IntegrationTestCase {
 		$outcome = SessionHandler::sync( $order, $this->session( 'FINALIZED', [ 'order_amount' => 19900 ] ) );
 
 		$this->assertSame( SessionHandler::HELD, $outcome['state'] );
-		$this->assertSame( 'pending', $this->statusOf( $order ), 'An amount mismatch is investigated, not written off as a failed sale.' );
+		$this->assertSame( 'on-hold', $this->statusOf( $order ), 'Left pending, WooCommerce would cancel the order as unpaid and keep the goods in stock.' );
 		$this->assertFalse( $this->reload( $order )->is_paid() );
 		$this->assertOrderHasNote( $order, '19900' );
 		$this->assertOrderHasNote( $order, '25000' );

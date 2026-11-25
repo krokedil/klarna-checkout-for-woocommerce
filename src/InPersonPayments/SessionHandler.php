@@ -241,8 +241,8 @@ class SessionHandler {
 	}
 
 	/**
-	 * The device collected a different amount than the order is for. The order is left
-	 * as it is, because neither marking it paid nor failing it would be true.
+	 * The device collected a different amount than the order is for. The order is put on
+	 * hold, because neither marking it paid nor failing it would be true.
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
 	 * @param int       $expected The order total in minor units.
@@ -258,9 +258,10 @@ class SessionHandler {
 		}
 
 		$order->update_meta_data( Gateway::STATUS_META, self::HELD_STATUS );
-		$order->save();
 
-		$order->add_order_note(
+		// Left pending, WooCommerce would cancel it as unpaid and never take the goods out of stock.
+		$order->update_status(
+			'on-hold',
 			sprintf(
 				/* translators: 1: the amount the device collected, 2: the order total, both in minor units. */
 				__( 'The Kustom POS device reports a payment of %1$s, but the order total is %2$s. The order was not completed. Check the payment in the Kustom portal.', 'klarna-checkout-for-woocommerce' ),
