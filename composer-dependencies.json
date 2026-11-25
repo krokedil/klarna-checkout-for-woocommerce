@@ -5,7 +5,7 @@
         "krokedil/woocommerce": "^1.0",
         "krokedil/shipping": "2.4.0",
         "krokedil/support": "1.0.4",
-        "krokedil/settings-page": "1.3.8"
+        "krokedil/settings-page": "dev-develop-support-tab-styled"
     },
     "config": {
         "platform": {
