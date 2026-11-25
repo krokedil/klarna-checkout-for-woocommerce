@@ -1,12 +1,23 @@
 <?php
 namespace Krokedil\KustomCheckout\Utility;
 
+use Automattic\WooCommerce\StoreApi\Utilities\CartTokenUtils;
 use Automattic\WooCommerce\StoreApi\Utilities\JsonWebToken;
 
 /**
  * Utility class for helper functions related to blocks.
  */
 class BlocksUtility {
+	/**
+	 * The `iss` claim the Store API requires on a cart token.
+	 */
+	const CART_TOKEN_ISSUER = 'store-api';
+
+	/**
+	 * The `iss` claim on cart tokens issued before WooCommerce 11.3.1 required `store-api`.
+	 */
+	const LEGACY_CART_TOKEN_ISSUER = 'wc/store/v1';
+
 	/**
 	 * Check if the checkout block is present on the checkout page.
 	 *
@@ -29,14 +40,39 @@ class BlocksUtility {
 	 * @return string
 	 */
 	public static function create_cart_token( $customer_id ) {
+		if ( is_callable( array( CartTokenUtils::class, 'get_cart_token' ) ) ) {
+			return CartTokenUtils::get_cart_token( (string) $customer_id );
+		}
+
 		return JsonWebToken::create(
 			array(
 				'user_id' => $customer_id,
 				'exp'     => time() + intval( apply_filters( 'wc_session_expiration', DAY_IN_SECONDS * 2 ) ), // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment -- WooCommerce core hook.
-				'iss'     => 'wc/store/v1',
+				'iss'     => self::CART_TOKEN_ISSUER,
 			),
 			'@' . wp_salt()
 		);
+	}
+
+	/**
+	 * Re-issue a legacy `wc/store/v1` cart token we signed, which WooCommerce 11.3.1 rejects, for the same session key.
+	 *
+	 * Other tokens, such as WooCommerce's cart link tokens, are returned as is.
+	 *
+	 * @param string $token The cart token.
+	 * @return string
+	 */
+	public static function refresh_cart_token( $token ) {
+		if ( ! is_string( $token ) || empty( $token ) || ! JsonWebToken::validate( $token, '@' . wp_salt() ) ) {
+			return $token;
+		}
+
+		$payload = JsonWebToken::get_parts( $token )->payload;
+		if ( self::LEGACY_CART_TOKEN_ISSUER !== ( $payload->iss ?? '' ) || empty( $payload->user_id ) ) {
+			return $token;
+		}
+
+		return self::create_cart_token( (string) $payload->user_id );
 	}
 
 	/**
