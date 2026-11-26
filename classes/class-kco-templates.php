@@ -57,6 +57,7 @@ class KCO_Templates {
 		// Override template if Kustom Checkout page.
 		add_filter( 'wc_get_template', array( $this, 'override_template' ), 999, 2 );
 		add_action( 'wp_footer', array( $this, 'check_that_kco_template_has_loaded' ) );
+		add_action( 'template_redirect', array( $this, 'maybe_force_kco' ) );
 
 		// Template hooks.
 		add_action( 'kco_wc_after_order_review', 'kco_wc_add_extra_checkout_fields', 10 );
@@ -153,6 +154,27 @@ class KCO_Templates {
 	}
 
 	/**
+	 * Select Kustom Checkout on checkout page load if the "Always use Kustom Checkout" setting is on.
+	 *
+	 * Runs before the script enqueue and template checks read the session. External payment methods run on init, so they are not affected.
+	 *
+	 * @return void
+	 */
+	public function maybe_force_kco() {
+		if ( ! wc_string_to_bool( SettingsUtility::get_setting( 'force_payment_method', 'no' ) ) || null === WC()->session ) {
+			return;
+		}
+
+		if ( ! is_checkout() || is_wc_endpoint_url( 'order-pay' ) || is_wc_endpoint_url( 'order-received' ) || BlocksUtility::is_checkout_block_enabled() ) {
+			return;
+		}
+
+		if ( array_key_exists( 'kco', WC()->payment_gateways()->get_available_payment_gateways() ) ) {
+			WC()->session->set( 'chosen_payment_method', 'kco' );
+		}
+	}
+
+	/**
 	 * Redirect customer to cart page if Kustom Checkout is the selected (or first)
 	 * payment method but the KCO template file hasn't been loaded.
 	 */
@@ -179,6 +201,13 @@ class KCO_Templates {
 			|| did_action( 'woocommerce_cart_has_errors' )
 			|| isset( $_GET['change_payment_method'] ) // phpcs:ignore
 			|| ! $enabled ) {
+				return;
+			}
+
+			// Forced, a redirect to another gateway would loop back to Kustom, so the store cannot take payments until it recovers.
+			if ( wc_string_to_bool( $settings['force_payment_method'] ?? 'no' ) ) {
+				KCO_Logger::log( 'Kustom Checkout failed to load on the checkout page. "Always use Kustom Checkout" is enabled, so no other payment method was offered.' );
+				wc_add_notice( __( 'Kustom Checkout is not available at the moment. Please try again later or contact the store for assistance.', 'klarna-checkout-for-woocommerce' ), 'error' );
 				return;
 			}
 
