@@ -19,6 +19,13 @@ class ShippingOptionUpdateController extends BaseController {
 	protected $path = 'callback';
 
 	/**
+	 * The Kustom order fetched by verify_request(), the only trusted source for the handler.
+	 *
+	 * @var array
+	 */
+	private $kco_order = array();
+
+	/**
 	 * Register the routes for the controller.
 	 *
 	 * @return void
@@ -39,13 +46,15 @@ class ShippingOptionUpdateController extends BaseController {
 	/**
 	 * Verify the request before processing it.
 	 *
+	 * Also keeps the fetched Kustom order for handle_shipping_option_update().
+	 *
 	 * @param \WP_REST_Request $request The REST request object.
 	 *
 	 * @return bool True if the request is valid, false otherwise.
 	 */
 	public function verify_request( $request ) {
-		// Get the KCO order ID from the request parameters.
-		$kco_id = $request->get_param( 'kco_id' );
+		$this->kco_order = array();
+		$kco_id          = $this->get_kco_id( $request );
 
 		// If the KCO order ID is not present, return false.
 		if ( ! $kco_id ) {
@@ -65,11 +74,32 @@ class ShippingOptionUpdateController extends BaseController {
 			return false;
 		}
 
+		// Only Kustom refreshes the override, so answer only for orders it was told to call back for.
+		if ( empty( $kco_order['merchant_urls']['shipping_option_update'] ) ) {
+			return false;
+		}
+
+		$this->kco_order = $kco_order;
+
 		return true;
 	}
 
 	/**
+	 * Get the sanitized Kustom order id from the request.
+	 *
+	 * @param \WP_REST_Request $request The REST request object.
+	 *
+	 * @return string The Kustom order id, or an empty string if missing.
+	 */
+	private function get_kco_id( $request ) {
+		return sanitize_key( (string) $request->get_param( 'kco_id' ) );
+	}
+
+	/**
 	 * Handle the shipping option update callback for Kustom Shipping Assistant.
+	 *
+	 * The request body is ignored: the route is public and unsigned, so the response and the
+	 * shipping override are built from the Kustom order fetched by verify_request().
 	 *
 	 * @param \WP_REST_Request $request The REST request object.
 	 *
@@ -77,27 +107,20 @@ class ShippingOptionUpdateController extends BaseController {
 	 * @throws \Exception If an error occurs while processing the request.
 	 */
 	public function handle_shipping_option_update( $request ) {
-		$body   = $request->get_json_params();
-		$kco_id = $request->get_param( 'kco_id' );
+		$kco_id    = $this->get_kco_id( $request );
+		$kco_order = $this->kco_order;
 
 		try {
-			// If the body is empty, return an error response.
-			if ( empty( $body ) ) {
-				throw new \Exception( 'Request body is empty' );
+			// Kustom's order already carries the option the shopper just picked when it calls us.
+			if ( empty( $kco_order['selected_shipping_option'] ) ) {
+				throw new \Exception( 'No shipping option is selected in the Kustom order' );
 			}
 
-			// Get the selected shipping option from the request body.
-			$selected_shipping_option = $body['selected_shipping_option'] ?? null;
+			$response_body = $this->get_response_body( $kco_order, $kco_id );
 
-			// If the selected shipping option is not set, return an error response.
-			if ( ! $selected_shipping_option ) {
-				throw new \Exception( 'Selected shipping option not provided' );
-			}
+			KCO_WC()->logger->log( '[KSA Callback] shipping option response body for kco_id ' . $kco_id . ': ' . json_encode( LogMasking::mask_response( $response_body ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Kept as ported from standalone KSA.
 
-			KCO_WC()->logger->log( '[KSA Callback] shipping option response body for kco_id ' . $kco_id . ': ' . json_encode( LogMasking::mask_response( $this->get_response_body( $body, $kco_id ) ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Kept as ported from standalone KSA.
-
-			// Return the response body.
-			return $this->success_response( $this->get_response_body( $body, $kco_id ) );
+			return $this->success_response( $response_body );
 		} catch ( \Exception $e ) {
 			KCO_WC()->logger->log( '[KSA Callback] shipping option update failed for kco_id ' . $kco_id . ': ' . $e->getMessage() );
 			return new \WP_REST_Response( array( 'error' => 'An error occurred while processing the request' ), 500 );
@@ -107,22 +130,22 @@ class ShippingOptionUpdateController extends BaseController {
 	/**
 	 * Get response body
 	 *
-	 * @param array  $body The request body.
-	 * @param string $kco_id The KCO order id.
+	 * @param array  $kco_order The Kustom order.
+	 * @param string $kco_id    The KCO order id.
 	 *
 	 * @return array The response body.
 	 */
-	private function get_response_body( $body, $kco_id ) {
-		$shipping_option     = $this->build_shipping_option( $body );
+	private function get_response_body( $kco_order, $kco_id ) {
+		$shipping_option     = $this->build_shipping_option( $kco_order );
 		$shipping_order_line = $this->build_shipping_order_line( $shipping_option );
 
 		// If the order is a free trial subscription, shipping must be free, so zero out the price and tax.
-		if ( $this->is_free_trial_shipping( $body ) ) {
+		if ( $this->is_free_trial_shipping( $kco_order ) ) {
 			$this->apply_free_trial_override( $shipping_order_line );
 		}
 
-		$order_lines = $this->build_order_lines( $body, $shipping_order_line );
-		$response    = $this->build_response( $body, $order_lines );
+		$order_lines = $this->build_order_lines( $kco_order, $shipping_order_line );
+		$response    = $this->build_response( $kco_order, $order_lines );
 
 		// Set the override transient to be used in the shipping method class.
 		$this->store_override_data( $kco_id, $shipping_option );
@@ -131,17 +154,17 @@ class ShippingOptionUpdateController extends BaseController {
 	}
 
 	/**
-	 * Build the shipping option from the request body, including the calculated shipping tax.
+	 * Build the shipping option from the Kustom order, including the calculated shipping tax.
 	 *
-	 * @param array $body The request body.
+	 * @param array $kco_order The Kustom order.
 	 *
 	 * @return array The shipping option.
 	 */
-	private function build_shipping_option( $body ) {
-		$shipping_tax_rates  = $this->get_shipping_tax_rates( $body['billing_address'] ?? array(), $body['shipping_address'] ?? array() );
-		$shipping_tax_amount = $this->calculate_shipping_tax_amount( $body['selected_shipping_option']['price'] ?? 0, $shipping_tax_rates );
+	private function build_shipping_option( $kco_order ) {
+		$shipping_tax_rates  = $this->get_shipping_tax_rates( $kco_order['billing_address'] ?? array(), $kco_order['shipping_address'] ?? array() );
+		$shipping_tax_amount = $this->calculate_shipping_tax_amount( $kco_order['selected_shipping_option']['price'] ?? 0, $shipping_tax_rates );
 
-		$selected_shipping_option = $body['selected_shipping_option'] ?? array();
+		$selected_shipping_option = $kco_order['selected_shipping_option'] ?? array();
 
 		return array(
 			'id'               => $selected_shipping_option['id'] ?? 'default_shipping_option',
@@ -195,12 +218,12 @@ class ShippingOptionUpdateController extends BaseController {
 	/**
 	 * Whether the order is a free trial subscription where shipping should be free.
 	 *
-	 * @param array $body The request body.
+	 * @param array $kco_order The Kustom order.
 	 *
 	 * @return bool True if the free trial shipping tag is present.
 	 */
-	private function is_free_trial_shipping( $body ) {
-		return in_array( 'ksa_subscription_free_trial_shipping', $body['tags'] ?? array(), true );
+	private function is_free_trial_shipping( $kco_order ) {
+		return in_array( 'ksa_subscription_free_trial_shipping', $kco_order['tags'] ?? array(), true );
 	}
 
 	/**
@@ -219,13 +242,13 @@ class ShippingOptionUpdateController extends BaseController {
 	/**
 	 * Build the order lines, replacing any existing shipping line with the new one.
 	 *
-	 * @param array $body                The request body.
+	 * @param array $kco_order           The Kustom order.
 	 * @param array $shipping_order_line The shipping order line to append.
 	 *
 	 * @return array The order lines.
 	 */
-	private function build_order_lines( $body, $shipping_order_line ) {
-		$order_lines = $body['order_lines'] ?? array();
+	private function build_order_lines( $kco_order, $shipping_order_line ) {
+		$order_lines = $kco_order['order_lines'] ?? array();
 
 		// Remove any existing shipping order lines from the order lines array.
 		$order_lines = array_filter(
@@ -261,22 +284,23 @@ class ShippingOptionUpdateController extends BaseController {
 	/**
 	 * Build the response body returned to Kustom.
 	 *
-	 * @param array $body        The request body.
+	 * @param array $kco_order   The Kustom order.
 	 * @param array $order_lines The order lines.
 	 *
 	 * @return array The response body.
 	 */
-	private function build_response( $body, $order_lines ) {
+	private function build_response( $kco_order, $order_lines ) {
+		// No merchant_data: the caller is unauthenticated and it can hold the shopper's login cookie.
+		// Kustom keeps the stored value when the response leaves it out.
 		return array(
 			'order_amount'             => $this->calculate_order_total( $order_lines, 'total_amount' ),
 			'order_tax_amount'         => $this->calculate_order_total( $order_lines, 'total_tax_amount' ),
-			'merchant_data'            => $body['merchant_data'] ?? null,
 			'order_lines'              => $order_lines,
-			'attachments'              => $body['attachments'] ?? null,
-			'purchase_currency'        => $body['purchase_currency'] ?? get_woocommerce_currency(),
-			'locale'                   => $body['locale'] ?? get_locale(),
-			'external_payment_methods' => $body['external_payment_methods'] ?? null,
-			'tags'                     => $body['tags'] ?? null,
+			'attachments'              => $kco_order['attachments'] ?? null,
+			'purchase_currency'        => $kco_order['purchase_currency'] ?? get_woocommerce_currency(),
+			'locale'                   => $kco_order['locale'] ?? get_locale(),
+			'external_payment_methods' => $kco_order['external_payment_methods'] ?? null,
+			'tags'                     => $kco_order['tags'] ?? null,
 		);
 	}
 

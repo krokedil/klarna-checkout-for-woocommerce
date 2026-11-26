@@ -1,4 +1,4 @@
 Type: Tweak
 Needs Documentation: no
 
-The order note for a failed capture or order update now includes the error code and correlation ID from Kustom, and is also added when the order is already on hold. A capture declined because the customer's payment method failed now adds a note asking you to try again later.
+The order note for a failed capture or order update now includes the error code and correlation ID from Kustom, and is also added when the order is already on hold.

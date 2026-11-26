@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where the order note for a rejected capture was missing the remaining authorized amount and the retry advice.

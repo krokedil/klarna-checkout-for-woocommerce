@@ -321,18 +321,6 @@ class OrderManagementTest extends IntegrationTestCase {
 		];
 	}
 
-	public function test_a_declined_charge_tells_the_merchant_to_retry_the_capture(): void {
-		$order = $this->haveOrderFor( 'capture' );
-
-		$this->willRetrieveManagedOrder();
-		$this->willRejectWith( '/captures', 'Payment method failed.', 403, [ 'error_code' => 'PAYMENT_METHOD_FAILED', 'correlation_id' => 'corr-123' ] );
-
-		$this->assertWpErrorCode( 'capture_failed', $this->perform( 'capture', $order ) );
-		$this->assertOrderHasNote( $order, 'Kustom could not charge the customer. Please try again later.' );
-		$this->assertOrderHasNote( $order, 'Error code: PAYMENT_METHOD_FAILED. Correlation ID: corr-123.' );
-		$this->assertSame( 'on-hold', $this->statusOf( $order ) );
-	}
-
 	public function test_saving_a_subscription_without_a_kustom_order_id_does_not_contact_kustom(): void {
 		$order = $this->haveOrderFor( 'update' );
 		$this->applyGuard( $order, 'no-kustom-id' );
@@ -383,11 +371,11 @@ class OrderManagementTest extends IntegrationTestCase {
 	/**
 	 * @dataProvider provide_rejections
 	 */
-	public function test_the_api_rejecting_the_operation_is_noted( string $op, string $reason, string $error_code, string $note, ?string $unset_meta ): void {
+	public function test_the_api_rejecting_the_operation_is_noted( string $op, string $reason, string $error_code, string $note, ?string $unset_meta, array $body = [] ): void {
 		$order = $this->haveOrderFor( $op );
 
 		$this->willRetrieveManagedOrder( $this->lookupFor( $op ) );
-		$this->willRejectWith( self::ENDPOINTS[ $op ][0], $reason, 400, self::ERROR_DETAILS );
+		$this->willRejectWith( self::ENDPOINTS[ $op ][0], $reason, 403, array_merge( self::ERROR_DETAILS, $body ) );
 
 		$this->assertWpErrorCode( $error_code, $this->perform( $op, $order ) );
 		$this->assertOrderHasNote( $order, $note );
@@ -397,10 +385,26 @@ class OrderManagementTest extends IntegrationTestCase {
 		}
 	}
 
-	/** @return array<string, array{0: string, 1: string, 2: string, 3: string, 4: string|null}> */
+	/** @return array<string, array{0: string, 1: string, 2: string, 3: string, 4: string|null, 5?: array}> */
 	public function provide_rejections(): array {
 		return [
 			'capture' => [ 'capture', 'Order is not in a capturable state.', 'capture_failed', 'Order is not in a capturable state. Error code: BAD_VALUE. Correlation ID: corr-123.', '_wc_klarna_capture_id' ],
+			'capture, over the remaining amount' => [
+				'capture',
+				'Capture amount exceeds remaining authorized amount',
+				'capture_failed',
+				'Capture amount exceeds remaining authorized amount. Remaining authorized amount: ' . wc_price( 250, [ 'currency' => 'SEK' ] ) . '. Error code: CAPTURE_NOT_ALLOWED. Correlation ID: corr-123.',
+				'_wc_klarna_capture_id',
+				[ 'error_code' => 'CAPTURE_NOT_ALLOWED' ],
+			],
+			'capture, kustom cannot charge' => [
+				'capture',
+				'Payment method failed',
+				'capture_failed',
+				'add funds to their payment method if they wish to continue. Error code: PAYMENT_METHOD_FAILED. Correlation ID: corr-123.',
+				'_wc_klarna_capture_id',
+				[ 'error_code' => 'PAYMENT_METHOD_FAILED' ],
+			],
 			'cancel'  => [ 'cancel', 'Order has already been captured', 'unknown_error', 'Order has already been captured.', '_wc_klarna_cancelled' ],
 			'update'  => [ 'update', 'Amount exceeds the authorized amount', 'unknown_error', 'Amount exceeds the authorized amount. Error code: BAD_VALUE. Correlation ID: corr-123.', null ],
 			'refund'  => [ 'refund', 'Refund amount is higher than remaining captured amount', 'unknown_error', 'Refund amount is higher than remaining captured amount.', null ],

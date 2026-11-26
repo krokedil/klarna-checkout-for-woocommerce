@@ -20,6 +20,7 @@ use Tests\Support\IntegrationTestCase;
  * @covers ::kco_maybe_save_org_nr
  * @covers ::kco_maybe_save_reference
  * @covers ::kco_maybe_save_surcharge
+ * @covers ::kco_unset_sessions
  */
 class FunctionsTest extends IntegrationTestCase {
 
@@ -104,6 +105,20 @@ class FunctionsTest extends IntegrationTestCase {
 
 		$this->assertNotEmpty( $found );
 		$this->assertSame( $order->get_id(), $found->get_id() );
+	}
+
+	/** WooCommerce loads no session for a wp-json request, and a push can arrive on one. */
+	public function test_clearing_the_session_survives_a_request_without_one(): void {
+		$session      = WC()->session;
+		WC()->session = null;
+
+		try {
+			kco_unset_sessions();
+		} finally {
+			WC()->session = $session;
+		}
+
+		$this->addToAssertionCount( 1 );
 	}
 
 	public function test_a_reference_no_order_carries_resolves_to_nothing(): void {

@@ -361,7 +361,7 @@ class OrderManagement {
 			$klarna_order = $this->retrieve_klarna_order( $order_id );
 			if ( is_wp_error( $klarna_order ) ) {
 				// translators: %s: Error message from Kustom.
-				$note = sprintf( __( 'Kustom order could not be updated due to an error: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() );
+				$note = sprintf( __( 'Kustom order could not be updated due to an error: %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() );
 				$order->add_order_note( $this->format_error_note( $note, $klarna_order ) );
 				$order->save();
 
@@ -451,7 +451,7 @@ class OrderManagement {
 
 			if ( is_wp_error( $klarna_order ) ) {
 				// translators: %s: Error message from Kustom.
-				$note = sprintf( __( 'Kustom order could not be captured due to an error: %s', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() );
+				$note = sprintf( __( 'Kustom order could not be captured due to an error: %s.', 'klarna-checkout-for-woocommerce' ), $klarna_order->get_error_message() );
 				$this->put_on_hold( $order, $this->format_error_note( $note, $klarna_order ) );
 				return new \WP_Error( 'object_error', 'Kustom order object is of type WP_Error.', $klarna_order );
 			}
@@ -498,24 +498,27 @@ class OrderManagement {
 					return true;
 				}
 
+				$kustom_error_code = $response->get_error_data( 'klarna_error_body' )['error_code'] ?? '';
+
 				/* The suggested approach by Kustom is to try again after some time. If that still fails, the merchant should inform the customer, and ask them to either "create a new subscription or add funds to their payment method if they wish to continue." */
-				$error_body = (array) $response->get_error_data( 'klarna_error_body' );
-				if ( 403 === (int) $response->get_error_code() && 'PAYMENT_METHOD_FAILED' === ( $error_body['error_code'] ?? '' ) ) {
+				if ( 'PAYMENT_METHOD_FAILED' === $kustom_error_code ) {
 					$note = __( 'Kustom could not charge the customer. Please try again later. If that still fails, the customer may have to create a new subscription or add funds to their payment method if they wish to continue.', 'klarna-checkout-for-woocommerce' );
 					$this->put_on_hold( $order, $this->format_error_note( $note, $response ) );
 					return new \WP_Error( 'capture_failed', 'Capture failed. Please try again later.' );
-				} else {
-					$error_message = $response->get_error_message();
-
-					if ( ! is_array( $error_message ) && false !== strpos( $error_message, 'Captured amount is higher than the remaining authorized amount.' ) ) {
-						$error_message = str_replace( '. Capture not possible.', sprintf( ': %s %s.', $klarna_order->remaining_authorized_amount / 100, $klarna_order->purchase_currency ), $error_message );
-					}
-
-					// translators: %s: Error message from Kustom.
-					$note = sprintf( __( 'Could not capture Kustom order. %s', 'klarna-checkout-for-woocommerce' ), $error_message );
-					$this->put_on_hold( $order, $this->format_error_note( $note, $response ) );
-					return new \WP_Error( 'capture_failed', 'Capture failed.', $error_message );
 				}
+
+				$error_message = $response->get_error_message() . '.';
+
+				if ( 'CAPTURE_NOT_ALLOWED' === $kustom_error_code ) {
+					$remaining_amount = wc_price( $klarna_order->remaining_authorized_amount / 100, array( 'currency' => $klarna_order->purchase_currency ) );
+					// translators: %s: Formatted amount that is still authorized and can be captured.
+					$error_message .= ' ' . sprintf( __( 'Remaining authorized amount: %s.', 'klarna-checkout-for-woocommerce' ), $remaining_amount );
+				}
+
+				// translators: %s: Error message from Kustom.
+				$note = sprintf( __( 'Could not capture Kustom order. %s', 'klarna-checkout-for-woocommerce' ), $error_message );
+				$this->put_on_hold( $order, $this->format_error_note( $note, $response ) );
+				return new \WP_Error( 'capture_failed', 'Capture failed.', $error_message );
 			}
 		}
 	}
