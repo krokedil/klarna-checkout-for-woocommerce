@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed Kustom captures failing with "Captured amount is higher than the remaining authorized amount" for orders paid partly with a YITH gift card, when the order was set to completed from the edit order page.

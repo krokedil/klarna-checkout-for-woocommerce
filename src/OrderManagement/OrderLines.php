@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KustomCheckout\OrderManagement;
 
+use Krokedil\KustomCheckout\Compatibility\YITHGiftCards;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -198,6 +200,24 @@ class OrderLines {
 			);
 
 			$this->order_lines[] = $order_item;
+		}
+
+		/**
+		 * YITH WooCommerce Gift Cards, while they are only stored as order meta.
+		 */
+		foreach ( YITHGiftCards::get_order_gift_cards( $order ) as $code => $amount ) {
+			$gift_card_amount    = intval( round( $amount * -100 ) );
+			$this->order_lines[] = array(
+				'type'                  => 'gift_card',
+				'reference'             => 'gift_card',
+				'name'                  => __( 'Gift card', 'klarna-checkout-for-woocommerce' ) . ' ' . $code,
+				'quantity'              => 1,
+				'tax_rate'              => 0,
+				'total_discount_amount' => 0,
+				'total_tax_amount'      => 0,
+				'unit_price'            => $gift_card_amount,
+				'total_amount'          => $gift_card_amount,
+			);
 		}
 
 		$added_surcharge = json_decode( $this->order->get_meta( '_kco_added_surcharge', true ), true );

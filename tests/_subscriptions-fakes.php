@@ -92,6 +92,12 @@ if ( ! function_exists( 'wcs_order_contains_subscription' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wcs_order_contains_renewal' ) ) {
+	function wcs_order_contains_renewal( $order ) {
+		return [] !== SubscriptionsRegistry::forRenewalOrder( $order );
+	}
+}
+
 if ( ! function_exists( 'wcs_cart_contains_renewal' ) ) {
 	function wcs_cart_contains_renewal() {
 		return SubscriptionsRegistry::cartContains( 'renewal' );
