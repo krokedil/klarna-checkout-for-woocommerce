@@ -90,10 +90,38 @@ class ForcedPaymentMethodTest extends IntegrationTestCase {
 	 * gateway and reloads. Forced, that reload would land straight back on Kustom.
 	 */
 	public function test_a_failed_render_does_not_fall_back_to_another_gateway_when_forced(): void {
-		$this->haveGatewayCredentials( [ 'force_payment_method' => 'yes' ] );
+		$this->haveFailedKustomRender( [ 'force_payment_method' => 'yes' ] );
+
+		\KCO_Templates::get_instance()->check_that_kco_template_has_loaded();
+
+		// The notice proves the check got past its early returns to the forced guard.
+		$notices = wc_get_notices( 'error' );
+		$this->assertCount( 1, $notices );
+		$this->assertStringContainsString( 'try again later', $notices[0]['notice'] );
+		$this->assertSame( 'kco', WC()->session->get( 'chosen_payment_method' ) );
+	}
+
+	/**
+	 * The control case: unforced, the same failed render still switches gateway and reloads.
+	 */
+	public function test_a_failed_render_falls_back_to_another_gateway_when_not_forced(): void {
+		$this->haveFailedKustomRender( [] );
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'Redirected to' );
+
+		\KCO_Templates::get_instance()->check_that_kco_template_has_loaded();
+	}
+
+	/**
+	 * A checkout where Kustom is selected but its snippet never rendered, with redirects turned into exceptions.
+	 */
+	private function haveFailedKustomRender( array $settings ): void {
+		$this->haveGatewayCredentials( $settings );
 		$this->reloadPaymentGateways();
 		$this->simulateCheckoutPage();
 		WC()->session->set( 'chosen_payment_method', 'kco' );
+		wc_clear_notices();
 
 		add_filter(
 			'wp_redirect',
@@ -101,9 +129,5 @@ class ForcedPaymentMethodTest extends IntegrationTestCase {
 				throw new \RuntimeException( "Redirected to {$location}" );
 			}
 		);
-
-		\KCO_Templates::get_instance()->check_that_kco_template_has_loaded();
-
-		$this->assertSame( 'kco', WC()->session->get( 'chosen_payment_method' ) );
 	}
 }

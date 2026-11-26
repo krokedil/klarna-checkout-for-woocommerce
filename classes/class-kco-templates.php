@@ -204,10 +204,17 @@ class KCO_Templates {
 				return;
 			}
 
+			// Forced, a redirect to another gateway would loop back to Kustom, so the store cannot take payments until it recovers.
+			if ( wc_string_to_bool( $settings['force_payment_method'] ?? 'no' ) ) {
+				KCO_Logger::log( 'Kustom Checkout failed to load on the checkout page. "Always use Kustom Checkout" is enabled, so no other payment method was offered.' );
+				wc_add_notice( __( 'Kustom Checkout is not available at the moment. Please try again later or contact the store for assistance.', 'klarna-checkout-for-woocommerce' ), 'error' );
+				return;
+			}
+
 			wc_add_notice( __( 'Kustom Checkout is not available. Please choose a different payment option or contact the store for assistance.', 'klarna-checkout-for-woocommerce' ), 'error' );
 			$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
-			// Do not redirect if KCO is the only (or forced) gateway to prevent infinite loop.
-			if ( 1 === count( $available_gateways ) || wc_string_to_bool( $settings['force_payment_method'] ?? 'no' ) ) {
+			// Do not redirect if KCO is the only available gateway to prevent infinite loop.
+			if ( 1 === count( $available_gateways ) ) {
 				return;
 			}
 
