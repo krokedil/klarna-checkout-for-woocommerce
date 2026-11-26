@@ -160,8 +160,8 @@ if ( ! class_exists( 'WC_Klarna_Banners' ) ) {
 						<h1 id="krokdocs-sidebar-title">Get started</h1>
 							<div class="krokdocs-sidebar-content">
 								<p id="krokdocs-sidebar-main-text">
-									<a href="https://docs.krokedil.com/klarna-checkout-for-woocommerce/" target="_blank">Documentation</a> <br/>
-									<a href="https://krokedil.com/product/klarna-checkout-for-woocommerce/" target="_blank">Plugin site</a>
+									<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/" target="_blank">Documentation</a> <br/>
+									<a href="https://krokedil.com/product/kustom-checkout-for-woocommerce/" target="_blank">Plugin site</a>
 								</p>
 						<h1 id="krokdocs-sidebar-title">Support</h1>
 								<p id="krokdocs-sidebar-main-text">

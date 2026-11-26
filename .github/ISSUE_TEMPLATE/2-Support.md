@@ -9,4 +9,4 @@ assignees: ''
 ### We do not offer support on GitHub for our plugins. 
 This applies to support questions as well as compatibility questions. 
 
-You can check our [documentation](https://docs.krokedil.com/category/139-get-started) to see if we already have an answer to your question. Or you can get in contact with our support at support@krokedil.com. We offer support in English and Swedish.
+You can check our [documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/) to see if we already have an answer to your question. Or you can get in contact with our support at support@krokedil.com. We offer support in English and Swedish.

@@ -48,8 +48,8 @@ class CompareTotals {
 				sprintf(
 					// translators: 1: configuration docs link, 2: tax settings docs link.
 					__( 'A discrepancy between the Kustom order\'s shipping tax and the WooCommerce shipping tax has been detected. Please verify that you have set up your %1$s and %2$s according to the instructions given in the plugin documentation.', 'klarna-checkout-for-woocommerce' ),
-					'<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#configuration" target="_blank">' . esc_html__( 'configuration', 'klarna-checkout-for-woocommerce' ) . '</a>',
-					'<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/get-started/kustom-shipping-assistant/#tax-settings" target="_blank">' . esc_html__( 'tax settings', 'klarna-checkout-for-woocommerce' ) . '</a>'
+					'<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/setup-and-configuration/kustom-shipping-assistant/#configuration" target="_blank">' . esc_html__( 'configuration', 'klarna-checkout-for-woocommerce' ) . '</a>',
+					'<a href="https://docs.krokedil.com/kustom-checkout-for-woocommerce/setup-and-configuration/kustom-shipping-assistant/#tax-settings" target="_blank">' . esc_html__( 'tax settings', 'klarna-checkout-for-woocommerce' ) . '</a>'
 				)
 			);
 		}
