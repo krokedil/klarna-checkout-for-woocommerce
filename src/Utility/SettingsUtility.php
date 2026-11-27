@@ -30,6 +30,15 @@ class SettingsUtility {
 	}
 
 	/**
+	 * Forget the cached settings, so the next read goes back to the option.
+	 *
+	 * @return void
+	 */
+	public static function flush() {
+		self::$settings = null;
+	}
+
+	/**
 	 * Get the value of a specific setting.
 	 *
 	 * @param string $key           The key of the setting to retrieve.

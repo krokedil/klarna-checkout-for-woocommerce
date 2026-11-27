@@ -32,6 +32,7 @@ use Krokedil\KustomCheckout\Blocks\BlockExtension;
 use KrokedilKlarnaCheckoutDeps\Krokedil\Shipping\PickupPoints;
 use KrokedilKlarnaCheckoutDeps\Krokedil\WooCommerce\KrokedilWooCommerce;
 use Krokedil\KustomCheckout\Migrations\CredentialsMigration;
+use Krokedil\KustomCheckout\InPersonPayments\InPersonPayments;
 use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 use Krokedil\KustomCheckout\ShippingAssistant\ShippingAssistant;
 use Krokedil\KustomCheckout\Elements\Elements;
@@ -127,6 +128,13 @@ if ( ! class_exists( 'KCO' ) ) {
 		 * @var OrderManagement $order_management
 		 */
 		public $order_management;
+
+		/**
+		 * Reference to in-person payments class.
+		 *
+		 * @var InPersonPayments $in_person_payments
+		 */
+		public $in_person_payments;
 
 		/**
 		 * Reference to pickup points class.
@@ -352,6 +360,7 @@ if ( ! class_exists( 'KCO' ) ) {
 			$this->shipping_assistant = new ShippingAssistant();
 			$this->elements           = new Elements();
 			$this->express            = new Express();
+			$this->in_person_payments = new InPersonPayments();
 
 			YITHGiftCards::init();
 
