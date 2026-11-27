@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed broken links to the plugin documentation in the settings page, the Kustom Shipping Assistant tax discrepancy order note and the admin sidebar, which led to pages that no longer exist.

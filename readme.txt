@@ -313,7 +313,7 @@ For help setting up and configuring Kustom Checkout for WooCommerce please refer
 * Tweak         - Added Germany (DE) to the list of countries that allow sale to B2B and B2C customers from the same checkout session.
 
 = 2024.09.03    - version 2.13.0 =
-* Feature       - Added the ['kco_customer_type_changed'](https://docs.krokedil.com/klarna-checkout-for-woocommerce/customization/hooks-action-filter/#customer-type-changed) action hook that is triggered whenever the customer switches between organization and person in the checkout.
+* Feature       - Added the ['kco_customer_type_changed'](https://docs.krokedil.com/kustom-checkout-for-woocommerce/customization/hooks-action-filter/#customer-type-changed) action hook that is triggered whenever the customer switches between organization and person in the checkout.
 * Tweak         - The view should no longer scroll up before the customer is redirected to the confirmation page unless an error notice has to be shown.
 * Tweak         – You can now overwrite the recurring payment token from the admin Subscription page.
 * Fix           - Fixed an issue where updating the payment method on a Klarna subscription would cause the renewal to fail.
@@ -349,7 +349,7 @@ For help setting up and configuring Kustom Checkout for WooCommerce please refer
 * Fix           - Bumped the plugin version.
 
 = 2024.01.29    - version 2.12.0 =
-* Feature       - Added a new checkout flow: redirect. The redirect flow replaces the current embedded checkout, and redirects the customer to [Klarna's hosted payment page](https://docs.kustom.co/v3/hosted-payment-page) ("HPP"). Please refer to [our documentation](https://docs.krokedil.com/klarna-checkout-for-woocommerce/get-started/introduction/#checkout-flow-setting) on how to enable this setting.
+* Feature       - Added a new checkout flow: redirect. The redirect flow replaces the current embedded checkout, and redirects the customer to [Klarna's hosted payment page](https://docs.kustom.co/v3/hosted-payment-page) ("HPP"). Please refer to [our documentation](https://docs.krokedil.com/kustom-checkout-for-woocommerce/setup-and-configuration/configuration/#checkout-flow-setting) on how to enable this setting.
 
 = 2024.01.08    - version 2.11.7 =
 * Enhancement   - Improved performance when redirecting to confirmation page.
@@ -781,7 +781,7 @@ For help setting up and configuring Kustom Checkout for WooCommerce please refer
 * Fix			- Reverted change to the validation callback URL from site to home URL. We are now using the home_url again.
 
 = 2019.07.03  	- version 1.10.2 =
-* Enhancement	- Added require_validate_callback_success to the API calls. This means that all orders have to get a valid response from your store on the validation callback to be able to be completed. For more info about this read here: https://docs.krokedil.com/article/287-klarna-checkout-faq
+* Enhancement	- Added require_validate_callback_success to the API calls. This means that all orders have to get a valid response from your store on the validation callback to be able to be completed. For more info about this read here: https://docs.krokedil.com/kustom-checkout-for-woocommerce/troubleshooting/faq/#customers-can-not-make-a-purchase-in-my-store-and-receives-the-error-sorry-this-purchase-cannot-be-processed
 * Enhancement	- Changed purchase_country to be based on customer billing address instead of store base address.
 * Enhancement	- Improved logging for subscription errors.
 * Enhancement	- Added saving of shipping phone and email to the order as _shipping_phone and _shipping_email meta fields for other plugins to use if needed.
