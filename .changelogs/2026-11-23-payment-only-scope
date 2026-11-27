@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Added the "kco_checkout_scope" filter. Return "PAYMENT" to use Kustom's payment only mode, which hides the email and address forms.

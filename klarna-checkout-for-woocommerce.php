@@ -37,6 +37,7 @@ use Krokedil\KustomCheckout\OrderManagement\OrderManagement;
 use Krokedil\KustomCheckout\ShippingAssistant\ShippingAssistant;
 use Krokedil\KustomCheckout\Elements\Elements;
 use Krokedil\KustomCheckout\Express\Express;
+use Krokedil\KustomCheckout\Compatibility\YITHGiftCards;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -359,8 +360,10 @@ if ( ! class_exists( 'KCO' ) ) {
 			$this->shipping_assistant = new ShippingAssistant();
 			$this->elements           = new Elements();
 			$this->express            = new Express();
-
 			$this->in_person_payments = new InPersonPayments();
+
+			YITHGiftCards::init();
+
 
 			load_plugin_textdomain( 'klarna-checkout-for-woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 			add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateways' ) );

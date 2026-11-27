@@ -41,6 +41,13 @@ class OrderCreator {
 	private $context = '';
 
 	/**
+	 * Whether an express order is being created, so the request options can tell it apart from the checkout.
+	 *
+	 * @var bool
+	 */
+	private static $creating = false;
+
+	/**
 	 * Create a Kustom order from the shopper's cart.
 	 *
 	 * @return string The Kustom order id.
@@ -101,9 +108,11 @@ class OrderCreator {
 		add_filter( 'kco_wc_api_request_args', array( $this, 'add_express_data' ), 20 );
 
 		try {
-			$request  = new \KCO_Request_Create();
-			$response = $request->request( null, 'embedded' );
+			self::$creating = true;
+			$request        = new \KCO_Request_Create();
+			$response       = $request->request( null, 'embedded' );
 		} finally {
+			self::$creating = false;
 			remove_filter( 'kco_wc_api_request_args', array( $this, 'add_express_data' ), 20 );
 			if ( $overrides ) {
 				remove_filter( 'kco_wc_api_request_args', array( $overrides, 'override_request_body' ), 10 );
@@ -164,6 +173,15 @@ class OrderCreator {
 		WC()->session->set( self::SESSION_KEY, array_slice( $orders, -self::MAX_REMEMBERED, null, true ) );
 
 		return $klarna_order_id;
+	}
+
+	/**
+	 * Whether an express order is being created right now.
+	 *
+	 * @return bool
+	 */
+	public static function is_creating() {
+		return self::$creating;
 	}
 
 	/**

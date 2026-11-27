@@ -1,0 +1,4 @@
+Type: Feature
+Needs Documentation: yes
+
+Added an "Always use Kustom Checkout" setting that keeps Kustom Checkout selected and hides the "Select another payment method" button.
