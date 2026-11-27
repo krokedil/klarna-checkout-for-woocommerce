@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: no
+
+Fixed an issue where a repeated redirect to the confirmation page was not written to the log.
