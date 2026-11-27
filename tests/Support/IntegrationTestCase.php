@@ -149,6 +149,9 @@ abstract class IntegrationTestCase extends WPTestCase {
 		delete_option( 'kom_settings' );
 		$this->resetGatewaySession();
 		$this->resetFakeSubscriptions();
+
+		// Notices live in the WC session, which a transaction rollback does not reset.
+		wc_clear_notices();
 	}
 
 	/**
