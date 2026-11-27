@@ -60,6 +60,16 @@ class BlockOrderValidationTest extends IntegrationTestCase {
 		];
 	}
 
+	public function test_a_refusal_on_the_express_route_is_labelled_express(): void {
+		$this->haveLoggingEnabled();
+
+		$request = new \WP_REST_Request( 'POST', '/kco-express/v1/validate/' );
+		$request->set_param( 'id', '' );
+		( new OrderController() )->validate( $request );
+
+		$this->assertStringContainsString( '[Express] - Order validation failed for Kustom order : Missing the Kustom order ID.', $this->loggedText() );
+	}
+
 	public function test_a_valid_order_is_accepted_without_a_failure_line(): void {
 		$this->haveIframeOrderToValidate( [], [] );
 		$this->haveLoggingEnabled();

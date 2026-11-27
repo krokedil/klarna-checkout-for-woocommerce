@@ -43,6 +43,8 @@ class OrderController extends Controller {
 	public function validate( $request ) {
 		// Get the Kustom order id from the request.
 		$klarna_order_id = sanitize_text_field( (string) $request->get_param( 'id' ) );
+		// The express validation route reuses this callback.
+		$flow = 0 === strpos( (string) $request->get_route(), '/kco-express/' ) ? 'Express' : 'Blocks';
 
 		try {
 			// Validate the Kustom order.
@@ -52,11 +54,11 @@ class OrderController extends Controller {
 			return new \WP_REST_Response( null, 200 );
 		} catch ( \WP_Exception $e ) {
 			// Handle any exceptions that occur during validation that we are throwing from the plugin.
-			self::log_failure( $klarna_order_id, $e );
+			self::log_failure( $flow, $klarna_order_id, $e );
 			return self::get_error_response( $e );
 		} catch ( \Throwable $e ) {
 			// Handle any other exceptions that occur during validation, that should return a generic error message.
-			self::log_failure( $klarna_order_id, $e );
+			self::log_failure( $flow, $klarna_order_id, $e );
 			return self::get_error_response( $e, true );
 		}
 	}
@@ -64,13 +66,14 @@ class OrderController extends Controller {
 	/**
 	 * Log why the order was refused. Kustom only shows the shopper a generic message.
 	 *
+	 * @param string     $flow The checkout flow named in the log prefix, Blocks or Express.
 	 * @param string     $klarna_order_id The Kustom order ID.
 	 * @param \Throwable $e The reason the validation failed.
 	 *
 	 * @return void
 	 */
-	private static function log_failure( $klarna_order_id, $e ) {
-		\KCO_Logger::log( sprintf( '[Blocks] - Order validation failed for Kustom order %s: %s (code %s)', $klarna_order_id, $e->getMessage(), $e->getCode() ) );
+	private static function log_failure( $flow, $klarna_order_id, $e ) {
+		\KCO_Logger::log( sprintf( '[%s] - Order validation failed for Kustom order %s: %s (code %s)', $flow, $klarna_order_id, $e->getMessage(), $e->getCode() ) );
 	}
 
 	/**
