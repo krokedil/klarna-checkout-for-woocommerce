@@ -1,0 +1,4 @@
+Type: Fix
+Needs Documentation: yes
+
+The Kustom log now says why a Checkout block purchase was refused at validation, for example a cart hash mismatch.
