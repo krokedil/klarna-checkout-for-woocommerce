@@ -25,14 +25,14 @@ class OrderValidation {
 	 */
 	public static function validate_kco_order( $klarna_order_id ) {
 		if ( empty( $klarna_order_id ) ) {
-			throw new Exception( 'Could not validate the order, please try again.', 400 );
+			throw new Exception( 'Missing the Kustom order ID.', 400 );
 		}
 
 		$klarna_order         = self::get_klarna_order( $klarna_order_id );
-		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'], true ) ?? array();
+		$klarna_merchant_data = json_decode( $klarna_order['merchant_data'] ?? '', true ) ?? array();
 		// The merchant data (which carries the cart token used to place the order) is always required.
 		if ( empty( $klarna_merchant_data ) ) {
-			throw new Exception( 'Could not validate the order, please try again.', 400 );
+			throw new Exception( 'The Kustom order has no merchant data.', 400 );
 		}
 
 		// On WooCommerce 10.9.x there is no early draft order, so the reference may be empty and the order is created from
@@ -67,15 +67,15 @@ class OrderValidation {
 		// Kustom confirms to the referenced order, so the create route must not have placed another one.
 		if ( $order && $updated_order->get_id() !== $order->get_id() ) {
 			\KCO_Logger::log( "[Blocks] - Kustom order $klarna_order_id references order {$order->get_id()}, but the Store API placed order {$updated_order->get_id()}." );
-			throw new Exception( 'Could not validate the order, please try again.', 401 );
+			throw new Exception( 'The Store API placed another order than the referenced one.', 401 );
 		}
 
 		// Compare the order hashes to the once stored in the merchant data to ensure the order is valid.
-		self::validate_hash( $klarna_merchant_data['wc_cart_hash'], $updated_order->get_cart_hash() );
-		self::validate_hash( $klarna_merchant_data['wc_shipping_hash'], $updated_order->get_meta( '_shipping_hash' ) );
-		self::validate_hash( $klarna_merchant_data['wc_fees_hash'], $updated_order->get_meta( '_fees_hash' ) );
-		self::validate_hash( $klarna_merchant_data['wc_coupons_hash'], $updated_order->get_meta( '_coupons_hash' ) );
-		self::validate_hash( $klarna_merchant_data['wc_taxes_hash'], $updated_order->get_meta( '_taxes_hash' ) );
+		self::validate_hash( 'Cart', $klarna_merchant_data['wc_cart_hash'] ?? '', $updated_order->get_cart_hash() );
+		self::validate_hash( 'Shipping', $klarna_merchant_data['wc_shipping_hash'] ?? '', $updated_order->get_meta( '_shipping_hash' ) );
+		self::validate_hash( 'Fees', $klarna_merchant_data['wc_fees_hash'] ?? '', $updated_order->get_meta( '_fees_hash' ) );
+		self::validate_hash( 'Coupons', $klarna_merchant_data['wc_coupons_hash'] ?? '', $updated_order->get_meta( '_coupons_hash' ) );
+		self::validate_hash( 'Taxes', $klarna_merchant_data['wc_taxes_hash'] ?? '', $updated_order->get_meta( '_taxes_hash' ) );
 
 		// The create route may have placed another order than earlier attempts in this Kustom session left behind.
 		if ( ! $pay_order ) {
@@ -163,8 +163,8 @@ class OrderValidation {
 		$updated_order->update_meta_data( Express::ORDER_META, $context );
 		$updated_order->save();
 
-		self::validate_hash( $klarna_merchant_data['wc_fees_hash'] ?? '', $updated_order->get_meta( '_fees_hash' ) );
-		self::validate_hash( $klarna_merchant_data['wc_coupons_hash'] ?? '', $updated_order->get_meta( '_coupons_hash' ) );
+		self::validate_hash( 'Fees', $klarna_merchant_data['wc_fees_hash'] ?? '', $updated_order->get_meta( '_fees_hash' ) );
+		self::validate_hash( 'Coupons', $klarna_merchant_data['wc_coupons_hash'] ?? '', $updated_order->get_meta( '_coupons_hash' ) );
 		self::validate_express_items( $klarna_order, $updated_order );
 		self::validate_express_total( $klarna_order, $updated_order );
 	}
@@ -206,7 +206,7 @@ class OrderValidation {
 
 		if ( $klarna_items !== $wc_items ) {
 			\KCO_Logger::log( "[Express] Order items mismatch for Kustom order {$klarna_order['order_id']}." );
-			throw new Exception( 'Could not validate the order, please try again.', 401 );
+			throw new Exception( 'Order items mismatch.', 401 );
 		}
 	}
 
@@ -233,22 +233,23 @@ class OrderValidation {
 
 		if ( abs( $klarna_total - $wc_total ) > 1 ) {
 			\KCO_Logger::log( "[Express] Order total mismatch for Kustom order {$klarna_order['order_id']}: Kustom {$klarna_total}, WooCommerce {$wc_total}." );
-			throw new Exception( 'Could not validate the order, please try again.', 401 );
+			throw new Exception( 'Order total mismatch.', 401 );
 		}
 	}
 
 	/**
 	 * Validate the hashes to ensure the order is valid.
 	 *
+	 * @param string $name        What the hash covers, named in the exception message.
 	 * @param string $klarna_hash The hash from Kustom.
-	 * @param string $wc_hash The hash from WooCommerce.
+	 * @param string $wc_hash     The hash from WooCommerce.
 	 *
 	 * @return void
 	 * @throws Exception If the hashes do not match.
 	 */
-	private static function validate_hash( $klarna_hash, $wc_hash ) {
-		if ( ! hash_equals( $klarna_hash, $wc_hash ) ) {
-			throw new Exception( 'Could not validate the order, please try again.', 401 );
+	private static function validate_hash( $name, $klarna_hash, $wc_hash ) {
+		if ( ! hash_equals( (string) $klarna_hash, (string) $wc_hash ) ) {
+			throw new Exception( esc_html( "$name hash mismatch." ), 401 );
 		}
 	}
 
@@ -264,7 +265,7 @@ class OrderValidation {
 		$order = wc_get_order( $merchant_reference );
 
 		if ( ! $order ) {
-			throw new Exception( 'Could not find the order, please try again.', 404 );
+			throw new Exception( esc_html( "WooCommerce order $merchant_reference does not exist." ), 404 );
 		}
 
 		return $order;
@@ -282,7 +283,7 @@ class OrderValidation {
 		$klarna_order = KCO_WC()->api->get_klarna_order( $klarna_order_id );
 
 		if ( ! $klarna_order || is_wp_error( $klarna_order ) ) {
-			throw new Exception( 'Could not find the order, please try again.', 404 );
+			throw new Exception( 'Could not retrieve the Kustom order.', 404 );
 		}
 
 		return $klarna_order;
@@ -299,7 +300,7 @@ class OrderValidation {
 	private static function validate_wc_order( $order ) {
 		// Check if the order is paid.
 		if ( ! empty( $order->get_date_paid() ) ) {
-			throw new Exception( 'Order is already paid.', 400 );
+			throw new Exception( esc_html( "WooCommerce order {$order->get_id()} is already paid." ), 400 );
 		}
 	}
 
