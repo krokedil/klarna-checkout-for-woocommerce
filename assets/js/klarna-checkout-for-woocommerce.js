@@ -764,7 +764,7 @@ jQuery( function ( $ ) {
 							kco_wc.log( "redirect_initiated", trigger )
 							if ( kco_wc.redirectAttemptCount >= 1 ) {
 								kco_wc.logToFile(
-									`Redirect was initiated by Kustom, but the user was not redirected. This is attempt ${ redirectAttemptCount }.`,
+									`Redirect was initiated by Kustom, but the user was not redirected. This is attempt ${ kco_wc.redirectAttemptCount }.`,
 								)
 							} else {
 								kco_wc.logToFile(
