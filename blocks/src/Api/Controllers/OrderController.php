@@ -41,10 +41,10 @@ class OrderController extends Controller {
 	 * @return \WP_REST_Response
 	 */
 	public function validate( $request ) {
-		try {
-			// Get the Kustom order id from the request.
-			$klarna_order_id = $request->get_param( 'id' );
+		// Get the Kustom order id from the request.
+		$klarna_order_id = sanitize_text_field( (string) $request->get_param( 'id' ) );
 
+		try {
 			// Validate the Kustom order.
 			OrderValidation::validate_kco_order( $klarna_order_id );
 
@@ -52,11 +52,25 @@ class OrderController extends Controller {
 			return new \WP_REST_Response( null, 200 );
 		} catch ( \WP_Exception $e ) {
 			// Handle any exceptions that occur during validation that we are throwing from the plugin.
+			self::log_failure( $klarna_order_id, $e );
 			return self::get_error_response( $e );
-		} catch ( \Exception $e ) {
+		} catch ( \Throwable $e ) {
 			// Handle any other exceptions that occur during validation, that should return a generic error message.
+			self::log_failure( $klarna_order_id, $e );
 			return self::get_error_response( $e, true );
 		}
+	}
+
+	/**
+	 * Log why the order was refused. Kustom only shows the shopper a generic message.
+	 *
+	 * @param string     $klarna_order_id The Kustom order ID.
+	 * @param \Throwable $e The reason the validation failed.
+	 *
+	 * @return void
+	 */
+	private static function log_failure( $klarna_order_id, $e ) {
+		\KCO_Logger::log( sprintf( '[Blocks] - Order validation failed for Kustom order %s: %s (code %s)', $klarna_order_id, $e->getMessage(), $e->getCode() ) );
 	}
 
 	/**
@@ -80,7 +94,7 @@ class OrderController extends Controller {
 	/**
 	 * Return a WP_REST_Response for an error.
 	 *
-	 * @param \Exception $e The exception that was thrown.
+	 * @param \Throwable $e The exception that was thrown.
 	 * @param bool       $generic_message If true, use a generic error message.
 	 *
 	 * @return \WP_REST_Response
