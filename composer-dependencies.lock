@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b8aee8296192d0086586b33de8b773f8",
+    "content-hash": "c4692af11811574840d14aebb3a7aa0d",
     "packages": [
         {
             "name": "krokedil/settings-page",
-            "version": "1.3.8",
+            "version": "dev-develop-support-tab-styled",
             "source": {
                 "type": "git",
                 "url": "https://github.com/krokedil/settings-page.git",
-                "reference": "8ba11d2e62dfc0b63d75ec295374ea183fcdac63"
+                "reference": "fe67a0e9fd03d9b11f60a98ce5e748551b6e8fca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/krokedil/settings-page/zipball/8ba11d2e62dfc0b63d75ec295374ea183fcdac63",
-                "reference": "8ba11d2e62dfc0b63d75ec295374ea183fcdac63",
+                "url": "https://api.github.com/repos/krokedil/settings-page/zipball/fe67a0e9fd03d9b11f60a98ce5e748551b6e8fca",
+                "reference": "fe67a0e9fd03d9b11f60a98ce5e748551b6e8fca",
                 "shasum": ""
             },
             "require-dev": {
@@ -88,10 +88,10 @@
             ],
             "description": "A package to help setup settings pages in WordPress and WooCommerce for Krokedil plugins to add the Addons and Support tabs",
             "support": {
-                "source": "https://github.com/krokedil/settings-page/tree/1.3.8",
+                "source": "https://github.com/krokedil/settings-page/tree/develop-support-tab-styled",
                 "issues": "https://github.com/krokedil/settings-page/issues"
             },
-            "time": "2026-10-29T09:53:20+00:00"
+            "time": "2026-11-27T10:51:38+00:00"
         },
         {
             "name": "krokedil/shipping",
@@ -215,23 +215,25 @@
         },
         {
             "name": "krokedil/woocommerce",
-            "version": "1.9.2",
+            "version": "1.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/krokedil/woocommerce.git",
-                "reference": "6c38cf569df5eeb3598f206d449eca86ae9ac402"
+                "reference": "08dd70f22d9f21ad94158c4254954609b14fcda3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/krokedil/woocommerce/zipball/6c38cf569df5eeb3598f206d449eca86ae9ac402",
-                "reference": "6c38cf569df5eeb3598f206d449eca86ae9ac402",
+                "url": "https://api.github.com/repos/krokedil/woocommerce/zipball/08dd70f22d9f21ad94158c4254954609b14fcda3",
+                "reference": "08dd70f22d9f21ad94158c4254954609b14fcda3",
                 "shasum": ""
             },
             "require-dev": {
                 "10up/wp_mock": "^1.0",
                 "php": "~7.4 || ~8.0",
-                "php-stubs/woocommerce-stubs": "^7.2",
-                "php-stubs/wordpress-stubs": "^6.1"
+                "php-stubs/woocommerce-stubs": "^10.2",
+                "php-stubs/woocommerce-subscriptions-stubs": "^9.1",
+                "php-stubs/wordpress-stubs": "^6.1",
+                "phpstan/phpstan": "^2.1"
             },
             "type": "library",
             "autoload": {
@@ -244,6 +246,14 @@
                     "Krokedil\\WooCommerce\\Tests\\": "tests/"
                 }
             },
+            "scripts": {
+                "phpstan": [
+                    "./vendor/bin/phpstan analyse --memory-limit=2G"
+                ],
+                "phpstan:baseline": [
+                    "./vendor/bin/phpstan analyse --memory-limit=2G --generate-baseline"
+                ]
+            },
             "license": [
                 "GPL-V2"
             ],
@@ -255,10 +265,10 @@
             ],
             "description": "A library package for Krokedils plugins that contains helper methods when working with WooCommerce.",
             "support": {
-                "source": "https://github.com/krokedil/woocommerce/tree/1.9.2",
+                "source": "https://github.com/krokedil/woocommerce/tree/1.9.3",
                 "issues": "https://github.com/krokedil/woocommerce/issues"
             },
-            "time": "2026-08-14T09:23:09+00:00"
+            "time": "2026-11-10T10:37:31+00:00"
         },
         {
             "name": "krokedil/wp-api",
@@ -373,13 +383,16 @@
                 "issues": "https://github.com/php-fig/container/issues",
                 "source": "https://github.com/php-fig/container"
             },
-            "time": "2023-09-22T11:11:30+00:00"
+            "time": "2023-09-22T11:11:30+00:00",
+            "published-time": "2025-08-22T15:26:08+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "krokedil/settings-page": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
@@ -389,5 +402,5 @@
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }

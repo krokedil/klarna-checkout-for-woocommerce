@@ -47,7 +47,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function __construct() {
 			$this->id                 = 'kco';
 			$this->method_title       = __( 'Kustom Checkout', 'klarna-checkout-for-woocommerce' );
-			$this->method_description = __( 'The current Kustom Checkout replaces standard WooCommerce checkout page.', 'klarna-checkout-for-woocommerce' );
+			$this->method_description = __( 'Kustom Checkout is embedded in the WooCommerce checkout page and partially replaces the checkout form.', 'klarna-checkout-for-woocommerce' );
 			$this->has_fields         = false;
 
 			/**
@@ -538,7 +538,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		}
 
 		/**
-		 * Changes footer text in KCO settings page.
+		 * Removes the footer text on the KCO settings page.
 		 *
 		 * @param string $text Footer text.
 		 *
@@ -547,7 +547,7 @@ if ( class_exists( 'WC_Payment_Gateway' ) ) {
 		public function admin_footer_text( $text ) {
 			$section = filter_input( INPUT_GET, 'section', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			if ( ! empty( $section ) && 'kco' === $section ) {
-				$text = 'If you like Kustom Checkout for WooCommerce, please consider <strong>assigning Krokedil as your integration partner.</strong>.';
+				$text = '';
 			}
 
 			return $text;
